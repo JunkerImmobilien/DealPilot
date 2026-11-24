@@ -360,7 +360,7 @@ async function darlehen(userId, objectId, args) {
    Marcel 23.11.2026: „Den Co-Piloten haben wir unten doch schon. Reicht das nicht? Ist das nicht dasselbe?“
    Bis v4130 gab es ein eigenes Fragefeld im Reiter ViVi (Route /vivi/objekt/:id/frage, agentLauf). Jetzt legt der
    Server beim normalen Co-Piloten (routes/ai.js _copilotObjektwissen) das passende ViVi-Wissen in den Kontext:
-   nur bei verknuepftem Objekt, nur mit Vorschau-Freigabe 'vivi', nur wenn die Frage nach Verwaltungsdaten klingt.
+   nur bei verknuepftem Objekt, nur mit Plan-Merkmal vivi (ab Investor, v4350), nur wenn die Frage nach Verwaltungsdaten klingt.
    Dieselben Lesefunktionen wie oben, dieselbe Schwaerzung, derselbe 5-min-Zwischenspeicher. Kein eigener KI-Aufruf. */
 const _VIVI = {
   vivi: /\bvivi\b/i,
@@ -393,7 +393,7 @@ async function copilotWissen(userId, objectId, text, opt) {
   opt = opt || {};
   const f = frageErkennen(text); if (!f || !userId || !objectId) return null;
   let frei = false;
-  try { frei = opt.darf ? await opt.darf(userId) : await require('../vorschau').darf({ id: userId }, 'vivi'); } catch (e) { frei = false; }
+  try { frei = opt.darf ? await opt.darf(userId) : await require('./viviZugang').darf({ id: userId });   /* v4350 */ } catch (e) { frei = false; }
   if (!frei) return null;
   const v = await umgebung().speicher.verknuepfung(userId, objectId);
   if (!v || v.anlage_status !== 'fertig' || !v.vivi_objekt_id) return null;

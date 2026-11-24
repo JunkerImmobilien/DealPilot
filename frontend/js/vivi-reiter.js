@@ -38,8 +38,8 @@
 
   /* Vorschau-Funktion 'vivi' (claude/vorschau-funktionen.md): wie vivi-mieterhoehung.js einmal geladen, synchron gelesen */
   var _frei = null;
-  try { if (global.DpVorschau && typeof global.DpVorschau.frei === 'function') global.DpVorschau.frei('vivi').then(function (v) { _frei = !!v; }).catch(function () { _frei = false; }); } catch (e) {}
-  function vorschauFrei() { try { if (_frei === false) return false; var V = global.DpVorschau; return !(V && typeof V.istFrei === 'function' && V.istFrei('vivi') === false); } catch (e) { return false; } }
+  try { if (global.DpViviZugang) global.DpViviZugang.frei().then(function (v) { _frei = !!v; }).catch(function () { _frei = false; }); } catch (e) {}
+  function vorschauFrei() { try { if (_frei === false) return false; var V = global.DpViviZugang; return !(V && V.istFrei() === false); } catch (e) { return false; } }
   /** Reiter zeigen? Verknüpft (gespeicherter Stand im Objekt), Vorschau frei und nicht Einsteiger. */
   function sichtbar() { var v = felder(); return !!(v && v.verknuepft) && vorschauFrei() && !einsteiger(); }
 

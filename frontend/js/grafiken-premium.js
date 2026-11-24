@@ -388,6 +388,7 @@
     if (A.some(function (a) { return a.p != null; })) out.push('<polygon class="gx-fade" points="' + poly('p') + '" style="fill:' + F.blau + ';fill-opacity:.16;stroke:' + F.blau + ';stroke-width:1.5;stroke-opacity:.75"/>');
     out.push('<polygon class="gx-zieh" points="' + poly('o') + '" style="fill:color-mix(in srgb,' + F.gold + ' 14%,transparent);stroke:' + F.gold + ';stroke-width:2.2;stroke-linejoin:round"/>');
     A.forEach(function (a, i) { var v = norm(a, a.o); if (v == null) return; var p = pt(i, v); out.push('<circle cx="' + f1(p[0]) + '" cy="' + f1(p[1]) + '" r="4.5" style="fill:' + F.gold + ';stroke:' + F.karte + ';stroke-width:2"/><circle cx="' + f1(p[0]) + '" cy="' + f1(p[1]) + '" r="14" style="fill:transparent"' + tipA('<div class="t">' + esc(a.n) + '</div>Dieses Objekt <b>' + esc(a.f(a.o)) + '</b>' + (a.p != null ? '<br>Portfolio-Schnitt <b>' + esc(a.f(a.p)) + '</b>' : '') + '<br>Skala ' + esc(a.f(a.lo)) + ' bis ' + esc(a.f(a.hi))) + '/>'); });
+    if (d.mitte == null && d.mitteText) out.push('<text class="gx-ax" x="' + cx + '" y="' + (cy + 4) + '" text-anchor="middle" style="fill:' + F.tinte2 + '">' + esc(d.mitteText) + '</text>');   /* v4350 · unter der Schwelle nur das Wort */
     if (d.mitte != null) out.push('<text class="gx-zahl" x="' + cx + '" y="' + (cy + 6) + '" text-anchor="middle">' + esc(d.mitte) + '</text>' + (d.mitteText ? '<text class="gx-ax" x="' + cx + '" y="' + (cy + 22) + '" text-anchor="middle" style="fill:' + F.tinte2 + '">' + esc(d.mitteText) + '</text>' : ''));
     out.push('</svg>');
     host.innerHTML = out.join('') + legende([{ n: 'dieses Objekt', f: F.gold }].concat(A.some(function (a) { return a.p != null; }) ? [{ n: 'Portfolio-Schnitt' + (d.n ? ' (' + d.n + ' Objekte)' : ''), f: F.blau }] : []));
@@ -620,7 +621,8 @@
     var O = []; try { var P = window.DealPilotDashboard && window.DealPilotDashboard.portfolioPayload ? window.DealPilotDashboard.portfolioPayload() : null; O = P && Array.isArray(P.objekte) ? P.objekte : []; } catch (e) { O = []; }
     var mw = function (f) { var a = O.map(f).filter(function (v) { return v != null && isFinite(v); }); return a.length ? a.reduce(function (s, v) { return s + v; }, 0) / a.length : null; };
     return { n: O.length, bmy: mw(function (o) { return zahl(o.bruttomietrendite_prozent); }), dscr: mw(function (o) { return zahl(o.dscr); }), ltv: mw(function (o) { return zahl(o.ltv_prozent); }),
-      cfm: mw(function (o) { var v = zahl(o.cashflow_vor_steuer_eur_jahr); return v == null ? null : v / 12; }), score: mw(function (o) { return zahl(o.dealpilot_score); }) };
+      cfm: mw(function (o) { var v = zahl(o.cashflow_vor_steuer_eur_jahr); return v == null ? null : v / 12; }), score: mw(function (o) { return zahl(o.dealpilot_score); }),
+      ids: mw(function (o) { return zahl(o.investor_deal_score); }) };   /* v4350 · Schnitt des Investor Deal Score (nur belastbar gespeicherte) */
   }
   function profil(k) { try { var v = window.DealPilotInvestmentProfile ? window.DealPilotInvestmentProfile.get(k) : null; return zahl(v); } catch (e) { return null; } }
   function einordnungDaten(mitAnkauf) {
@@ -691,21 +693,36 @@
     var i = karte(k, { eyebrow: 'Zielerreichung · Ankauf, heute, Ziel', titel: titel, unter: 'Marke heute, Kreis beim Ankauf, goldener Strich dein Ziel. Rot bis zum Ziel, grün dahinter. Die Prozentzahl sagt, wie viel vom Weg zwischen Ankauf und Ziel geschafft ist.', chips: ['gemessen'] });
     bullets(i, D.B, { breite: w - 2, zielName: 'Ziel' });
   }
+  /* v4350 · der Score, den die Bewertung zeigt (dpsh-score-hero.js realRenderAll): Investor Deal Score, wenn der Plan ihn
+     voll führt UND die Datentiefe die Schwelle erreicht; voller Plan unter der Schwelle: „noch nicht belastbar“ (v4320);
+     sonst der DealPilot Score. Vorher stand in der Mitte immer der DealPilot Score (Demostraße 29), die Seitenleiste 61. */
+  function gewaehlterScore() {
+    var dp = null; try { dp = window.DealScore && window.DealScore.compute ? window.DealScore.compute() : null; } catch (e) { dp = null; }
+    var klassisch = dp && dp.score != null ? { score: zahl(dp.score), name: 'DealScore', art: 'dp' } : null;
+    var voll = false; try { voll = !!(window.DealPilotConfig && DealPilotConfig.pricing && DealPilotConfig.pricing.hasFullFeature && DealPilotConfig.pricing.hasFullFeature('deal_score_v2')); } catch (e) { voll = false; }
+    if (!voll || !window.DealScore2 || typeof window.DealScore2.compute !== 'function' || typeof window._buildDeal2FromState !== 'function') return klassisch;
+    var r2 = null, comp = null;
+    try { var deal = window._buildDeal2FromState(); r2 = window.DealScore2.compute(deal); comp = window.DealScore2.getKpiCompleteness ? window.DealScore2.getKpiCompleteness(deal) : null; } catch (e) { r2 = null; }
+    if (!r2 || r2.score == null) return klassisch;
+    var schw = 0.70; try { if (typeof window._dpDs2Schwelle === 'function') schw = window._dpDs2Schwelle(); } catch (e) {}
+    if (!comp || !(comp.percent >= schw * 100)) return { score: null, name: 'Investor Deal Score', art: 'ids', unterSchwelle: true, ist: comp ? comp.percent : null, soll: Math.round(schw * 100) };
+    return { score: zahl(r2.score), name: 'Investor Deal Score', art: 'ids' };
+  }
   function karteFingerabdruck(k, w) {
-    var sc = null; try { sc = window.DealScore && window.DealScore.compute ? window.DealScore.compute() : null; } catch (e) { sc = null; }
+    var sc = gewaehlterScore();
     var K = (window.State && window.State.kpis) || {}, Pt = portfolioSchnitt();
     var A = [
       { n: 'Bruttorendite', o: zahl(K.bmy), p: Pt.bmy, lo: 3, hi: 8, f: function (v) { return pct(v, 2); } },
       { n: 'DSCR', o: zahl(K.dscr), p: Pt.dscr, lo: 0.6, hi: 1.6, f: function (v) { return nf2.format(v); } },
       { n: 'Beleihung', o: zahl(K.ltv), p: Pt.ltv, lo: 110, hi: 50, f: function (v) { return pct(v); } },
       { n: 'Cashflow', o: zahl(K.cf_m), p: Pt.cfm, lo: -300, hi: 300, f: function (v) { return eurV(v) + ' im Monat'; } },
-      { n: 'DealScore', o: sc ? zahl(sc.score) : null, p: Pt.score, lo: 0, hi: 100, f: function (v) { return nf0.format(v); } }
+      { n: sc && sc.art === 'ids' ? 'Investor Score' : 'DealScore', o: sc && sc.score != null ? sc.score : null, p: sc && sc.art === 'ids' ? Pt.ids : Pt.score, lo: 0, hi: 100, f: function (v) { return nf0.format(v); } }
     ].filter(function (a) { return a.o != null; });
     if (A.length < 3) { k.innerHTML = ''; return; }
-    var wort = ''; try { wort = window.ScoreTier && sc ? window.ScoreTier.stufe(sc.score).wort : (sc && sc.label) || ''; } catch (e) { wort = sc && sc.label || ''; }
+    var wort = ''; try { wort = sc && sc.unterSchwelle ? 'noch nicht belastbar' : (window.ScoreTier && sc && sc.score != null ? window.ScoreTier.stufe(sc.score).wort : ''); } catch (e) { wort = ''; }
     var besser = A.filter(function (a) { if (a.p == null) return false; return a.hi > a.lo ? a.o > a.p : a.o < a.p; }).length, mitP = A.filter(function (a) { return a.p != null; }).length;
     var i = karte(k, { eyebrow: 'Score-Fingerabdruck', titel: mitP ? 'In ' + besser + ' von ' + mitP + ' Achsen besser als dein Portfolio-Schnitt' : 'Das Profil dieses Objekts', unter: 'Weiter außen ist besser. Gold dieses Objekt, Creme der Schnitt deiner Objekte.', chips: ['gemessen'] });
-    fingerabdruck(i, { achsen: A, mitte: sc ? nf0.format(sc.score) : null, mitteText: wort ? String(wort).toUpperCase() : '', n: Pt.n }, { breite: w - 2 });
+    fingerabdruck(i, { achsen: A, mitte: sc && sc.score != null ? nf0.format(sc.score) : null, mitteText: wort ? String(wort).toUpperCase() : '', n: Pt.n }, { breite: w - 2 });
   }
   function karteHeat(k, w, P, C, kompakt) {
     C.heat = C.heat || MODELL.heat(P); var Hm = C.heat; if (!Hm) { k.innerHTML = ''; return; }

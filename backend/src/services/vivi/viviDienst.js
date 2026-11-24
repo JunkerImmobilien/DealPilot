@@ -29,7 +29,7 @@ const STANDARD = {
   get objekte() { return require('../objectService'); },   /* v4050 · nur der Import legt ein Objekt an */
   client: function (token, opt) { return viviClient.erzeugen(token, opt); },
   jetzt: function () { return Date.now(); },
-  /* v3951 · Testbetrieb: solange 'vivi' als Vorschau-Funktion gefuehrt und nicht fuer alle freigegeben ist */
+  /* v3951 · Testbetrieb: solange 'vivi' als Vorschau-Funktion gefuehrt war. Seit v4350 (Plan-Merkmal) steht kein Eintrag mehr dort, also false: echte Namen und Anschrift sind die Vorgabe */
   testbetrieb: async function () {
     const vs = require('../vorschau');
     if (!vs.eintrag('vivi')) return false;

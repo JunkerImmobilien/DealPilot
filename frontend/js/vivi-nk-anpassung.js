@@ -37,8 +37,8 @@
   function ersterNaechster() { var V = global.DpViviMieterhoehung; if (V && V._ersterNaechster) return V._ersterNaechster(null); var d = new Date(), y = d.getFullYear(), m = d.getMonth() + 2; if (m > 12) { m = 1; y++; } return y + '-' + String(m).padStart(2, '0') + '-01'; }
   /* Vorschau-Funktion 'vivi' (claude/vorschau-funktionen.md): wie vivi-mieterhoehung.js einmal geladen, synchron gelesen */
   var _frei = null;
-  try { if (global.DpVorschau && typeof global.DpVorschau.frei === 'function') global.DpVorschau.frei('vivi').then(function (v) { _frei = !!v; }).catch(function () { _frei = false; }); } catch (e) {}
-  function vorschauFrei() { try { if (_frei === false) return false; var V = global.DpVorschau; return !(V && typeof V.istFrei === 'function' && V.istFrei('vivi') === false); } catch (e) { return false; } }
+  try { if (global.DpViviZugang) global.DpViviZugang.frei().then(function (v) { _frei = !!v; }).catch(function () { _frei = false; }); } catch (e) {}
+  function vorschauFrei() { try { if (_frei === false) return false; var V = global.DpViviZugang; return !(V && V.istFrei() === false); } catch (e) { return false; } }
   function verfuegbar() { var V = global.DpViviMieterhoehung; return vorschauFrei() && !!(V && V.verfuegbar && V.verfuegbar()); }
 
   /** Je vermieteter Wohnung (mit Vorauszahlung in ViVi): { i, name, vivi, ziel, quelle, abw }. i = null beim Einzelobjekt. */

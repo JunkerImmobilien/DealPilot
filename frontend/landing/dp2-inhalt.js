@@ -201,6 +201,7 @@
     ['Exposé-Import', '+', '+', '+', '+'],
     ['Marktbericht-Import', '+', '+', '+', '+'],
     ['Excel-Import', '-', '+', '+', '+'],
+    ['ViVi-Anbindung (Objektverwaltung)', '-', '-', '+', '+'],   /* v4350 · Marcel 24.11.2026: ab Investor */
     ['API-Zugang', '-', '-', '-', '+'],
     /* v1948 · "Migration & Setup-Service" ist raus. Marcel am 07.10.2026:
        "in der matrix unter pro den Migration & Setup-Service rausnehmen".

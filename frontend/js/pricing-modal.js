@@ -79,6 +79,7 @@
         'Live-Marktzinsen',
         'Mietspiegel — Auto-Vergleich',
         'BMF-Rechner & Export',
+        'ViVi-Anbindung (Objektverwaltung)',   /* v4350 */
         '5 Marktpreisindikationen + 5 erweiterte / Monat', /* v1176-kontingent */
         '50 Co-Pilot-Fragen am Tag'
       ],
@@ -733,6 +734,7 @@
       ['Expos\u00e9-Import','\u2713','\u2713','\u2713','\u2713'],
       ['Marktbericht-Import','\u2713','\u2713','\u2713','\u2713'],
       ['Excel-Import','\u2013','\u2713','\u2713','\u2713'],
+      ['ViVi-Anbindung (Objektverwaltung)','\u2013','\u2013','\u2713','\u2713'],
       ['API-Zugang','\u2013','\u2013','\u2013','\u2713']
     ];
     var h = '<div class="mx-wrap"><table class="mx"><thead><tr>' +
@@ -1124,7 +1126,8 @@
       { cat: 'Import & Datenübernahme', items: [
         ['Exposé-Import',                   '✓', '✓', '✓', '✓'],
         ['Marktbericht-Import',                  '✓', '✓', '✓', '✓'],
-        ['Excel-Import',                         '–', '✓', '✓', '✓']
+        ['Excel-Import',                         '–', '✓', '✓', '✓'],
+        ['ViVi-Anbindung (Objektverwaltung)',    '–', '–', '✓', '✓']   /* v4350 */
       ]},
       { cat: 'Service & Integration', items: [
         ['API-Zugang',                           '–', '–', '–', '✓']

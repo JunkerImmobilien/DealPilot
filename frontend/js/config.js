@@ -265,6 +265,7 @@ window.DealPilotConfig = (function() {
          GELESEN WIRD ES NIRGENDS MEHR (`aiCreditsService._monatsReset`). */
       kontingent: { mpi: 1, mpi_plus: 0, wev: 0, sparfaktor: 0 },
       features: {
+        vivi:                false,   /* v4350 · ViVi-Anbindung ab Investor (Spiegel von plans.features.vivi, Migration 128) */
         marktreport: false, rnd_full: false, json_backup: false, excel_import: false, // v494-matrix
         full_calc:           true,    // Vollständige Kalkulation & Charts
         deal_score_v2:       'demo', // V63.82: nur Demo-Sichtbarkeit, kein voller Funktionsumfang
@@ -334,6 +335,7 @@ window.DealPilotConfig = (function() {
       /* v1176 · Kontingente — siehe Kommentar beim Free-Plan. */
       kontingent: { mpi: 5, mpi_plus: 0, wev: 0, sparfaktor: 3 },
       features: {
+        vivi:                false,   /* v4350 · ViVi-Anbindung ab Investor (Spiegel von plans.features.vivi, Migration 128) */
         marktreport: true, rnd_full: false, json_backup: false, excel_import: true, // v494-matrix
         full_calc:           true,
         deal_score_v2:       false,       // Nur Basic-Score
@@ -387,6 +389,7 @@ window.DealPilotConfig = (function() {
       /* v1176 · Kontingente — siehe Kommentar beim Free-Plan. */
       kontingent: { mpi: 5, mpi_plus: 5, wev: 0, sparfaktor: 3 },
       features: {
+        vivi:                true,   /* v4350 · ViVi-Anbindung ab Investor (Spiegel von plans.features.vivi, Migration 128) */
         marktreport: true, rnd_full: true, json_backup: false, excel_import: true, // v494-matrix
         full_calc:           true,
         deal_score_v2:       true,        // Voller Deal Score 2.0 (24-30 KPIs)
@@ -434,6 +437,7 @@ window.DealPilotConfig = (function() {
       /* v1176 · Kontingente — siehe Kommentar beim Free-Plan. */
       kontingent: { mpi: 5, mpi_plus: 5, wev: 5, sparfaktor: 3 },
       features: {
+        vivi:                true,   /* v4350 · ViVi-Anbindung ab Investor (Spiegel von plans.features.vivi, Migration 128) */
         theme_palette:       true,    /*v901-theme*/
         marktreport: true, rnd_full: true, json_backup: true, excel_import: true, // v494-matrix
         full_calc:                  true,

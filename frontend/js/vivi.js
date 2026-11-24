@@ -7,7 +7,7 @@
  *   · verknuepfte Felder sind ausgegraut (js/vivi-felder.js)
  *
  * Vorschau-Funktion 'vivi' (backend/src/services/vorschau-funktionen.json): alles hier laeuft erst nach
- * DpVorschau.frei('vivi'). Das Backend sperrt /api/v1/vivi zusaetzlich (routes/vivi.js).
+ * DpViviZugang.frei(). Das Backend sperrt /api/v1/vivi zusaetzlich (routes/vivi.js).
  *
  * Teile:
  *   verbindungKarte(host)   Einstellungen › Konto › Externe Anbieter: Token eintragen, Test-Abruf, Liste
@@ -29,9 +29,9 @@
   }
   function meldung(t) { try { if (window.toast) window.toast(t); else console.log('[vivi] ' + t); } catch (e) {} }
   function frei() {
-    if (_frei) return _frei;
-    _frei = (window.DpVorschau && typeof window.DpVorschau.frei === 'function')
-      ? window.DpVorschau.frei('vivi').catch(function () { return false; })
+    /* v4350 · kein eigener Merker mehr: DpViviZugang merkt sich nur eine echte Plan-Antwort */
+    _frei = (window.DpViviZugang)
+      ? window.DpViviZugang.frei().catch(function () { return false; })
       : Promise.resolve(false);
     return _frei;
   }
@@ -77,7 +77,7 @@
   function verbindungKarte(host) {
     if (!host) return;
     frei().then(function (ok) {
-      if (!ok) { host.innerHTML = ''; return; }
+      if (!ok) { host.innerHTML = window.DpViviZugang ? window.DpViviZugang.upgradeHtml() : ''; return; }   /* v4350 · Starter/Free: Hinweis statt nichts */
       stil();
       host.innerHTML = '<div id="pk-vivi" style="border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 30%, transparent);border-radius:12px;padding:14px 15px;margin-top:14px">' +
         '<div style="display:flex;align-items:center;gap:10px;margin-bottom:4px"><span style="font-weight:700;font-size:15px">ViVi</span>' +

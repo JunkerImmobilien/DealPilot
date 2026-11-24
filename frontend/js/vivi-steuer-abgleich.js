@@ -132,7 +132,7 @@
   function api(pfad, opt) { return global.Auth && global.Auth.apiCall ? global.Auth.apiCall(pfad, opt || { method: 'GET' }) : Promise.reject(new Error('Nicht angemeldet')); }
   function meldung(t) { try { if (global.toast) global.toast(t); } catch (e) {} }
   function einsteiger() { try { return !!(global.DpDetailgrad && global.DpDetailgrad.stufe() === 1); } catch (e) { return false; } }
-  function frei() { return global.DpVorschau && global.DpVorschau.frei ? global.DpVorschau.frei('vivi').catch(function () { return false; }) : Promise.resolve(false); }
+  function frei() { return global.DpViviZugang ? global.DpViviZugang.frei().catch(function () { return false; }) : Promise.resolve(false); }
 
   function einstellung(neu) {
     if (_einstP && !neu) return _einstP;

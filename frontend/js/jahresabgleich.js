@@ -903,7 +903,7 @@
       Einstellung, beide lassen festgeschriebene Jahre unberührt (v4090). */
   function viviAbgleichen(still) {
     if (!viviVerknuepft() || !global.DpVivi || !global.DpVivi.abgleichen) return Promise.resolve(false);
-    var frei = global.DpVorschau && global.DpVorschau.frei ? global.DpVorschau.frei('vivi').catch(function () { return false; }) : Promise.resolve(false);   /* Vorschau-Funktion vivi */
+    var frei = global.DpViviZugang ? global.DpViviZugang.frei().catch(function () { return false; }) : Promise.resolve(false);   /* v4350 · Plan-Merkmal vivi (ab Investor) */
     return frei.then(function (ok) { return ok ? global.DpVivi.abgleichen(!!still) : null; }).then(function () { return warte(1500); }).then(function () { return true; }, function () { return false; });
   }
   /** Jahreswechsel: das Vorjahr ist vorbei und noch nicht festgeschrieben */

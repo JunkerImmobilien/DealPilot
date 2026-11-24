@@ -58,23 +58,6 @@
       "backend_erkennung": "umsetzungswuensche"
     },
     {
-      "schluessel": "vivi",
-      "bezeichnung": "ViVi-Anbindung: Objekt einmal in ViVi anlegen, danach Werte aus ViVi lesen",
-      "seit": "v3950",
-      "beschreibung": "Einstellungen › Konto › Externe Anbieter › ViVi (Token, Probeabruf), am Objekt die Leiste „In ViVi anlegen“ mit Vorschau und „Jetzt abgleichen“, ausgegraute verknüpfte Felder (js/vivi-felder.js). Backend /api/v1/vivi (routes/vivi.js, services/vivi/), Takt viviAbruf. Pakete V1 bis V3 aus Dateien/Architektur/ViVi-Anbindung-2026-11-22.md, noch ohne Abnahme gegen das ViVi-Testkonto.",
-      "frei_fuer": [
-        "admin",
-        "vorschau"
-      ],
-      "frontend_erkennung": "[\"'`]/vivi/|DpVivi.(leiste|anlegen|abgleichen)",
-      "frontend_ausgenommen": {},
-      "routen": [
-        "/api/v1/vivi"
-      ],
-      "backend_stellen": [],
-      "backend_erkennung": "services/vivi/|vivi_verknuepfung"
-    },
-    {
       "schluessel": "grafiken_neu",
       "bezeichnung": "Neue Grafiken in Pilot-Analyse und Portfolio-Cockpit",
       "seit": "v4140",

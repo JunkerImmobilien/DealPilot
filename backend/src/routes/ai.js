@@ -2106,11 +2106,11 @@ async function _copilotObjektwissen(uid, payload) {
       }
       /* v4190 · Marcel 23.11.2026: EIN Co-Pilot. Bei einer Frage nach Verwaltungsdaten (Mieter, Erhoehung, Belege, Darlehen …)
          und verknuepftem Objekt legt der Server das ViVi-Wissen dazu (services/vivi/viviAuskunft.js copilotWissen:
-         Vorschau 'vivi', Mieter abgekuerzt, Freitext geschwaerzt, 5-min-Zwischenspeicher). Keine ViVi-Frage = keine Anfrage. */
+         Plan-Merkmal vivi ab Investor, Mieter abgekuerzt, Freitext geschwaerzt, 5-min-Zwischenspeicher). Keine ViVi-Frage = keine Anfrage. */
       try {
-        const _vorschau = require('../services/vorschau');
+        const _viviZugang = require('../services/vivi/viviZugang');   /* v4350 · Plan-Merkmal */
         const vw = await require('../services/vivi/viviAuskunft').copilotWissen(uid, oid, payload.message,
-          { darf: function () { return _vorschau.darf({ id: uid }, 'vivi'); } });
+          { darf: function () { return _viviZugang.darf({ id: uid }); } });
         if (vw) wissen.vivi = vw;
       } catch (e) { wissen.vivi = { ok: false, fehler: 'ViVi nicht lesbar' }; }
     } else if (istPortfolio) {

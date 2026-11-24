@@ -20,9 +20,9 @@
   /* Vorschau-Funktion 'vivi' (tools/vorschau-pruefen.mjs): ohne Freigabe keine Zeile, auch wenn der Reiter sie ruft */
   var _frei = false, _fragt = false;
   function pruefeFrei() {
-    if (_frei || _fragt || !(global.DpVorschau && typeof global.DpVorschau.frei === 'function')) return;
+    if (_frei || _fragt || !(global.DpViviZugang)) return;
     _fragt = true;
-    global.DpVorschau.frei('vivi').then(function (f) {
+    global.DpViviZugang.frei().then(function (f) {
       _fragt = false; if (!f || _frei) return; _frei = true;
       try { if (global.DpViviReiter && global.DpViviReiter.mountAll) global.DpViviReiter.mountAll(); } catch (e) {}
     }, function () { _fragt = false; });

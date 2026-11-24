@@ -4642,14 +4642,14 @@ async function marktpreis_ohne_objekt_abrufen(ctx) {
 /* ── v4130 · ViVi-Werkzeuge (nur lesen) ─────────────────────────────────
    Marcel 23.11.2026: „kann im Reiter ViVi man auch KI-Anfragen machen zu seinem Objekt? … mit dem Co-Pilot
    kombinieren?“ Gelesen wird ueber services/vivi/viviAuskunft.js, das Mieter abkuerzt („Hr. M.“) und Freitext
-   schwaerzt, BEVOR etwas das Modell erreicht. Nur das eigene, verknuepfte Objekt, nur mit Vorschau-Freigabe 'vivi'.
+   schwaerzt, BEVOR etwas das Modell erreicht. Nur das eigene, verknuepfte Objekt, nur mit Plan-Merkmal vivi (ab Investor, v4350).
    Dieselben Werkzeuge sieht der Telegram-Bot und die Flow-Schnittstelle: dort gilt dieselbe Sperre. */
 async function _viviWerkzeug(art, ctx, args) {
   const a = Object.assign({}, args || {});
   const id = await _findeObjekt(ctx, { nummer: a.nummer, id: a.id, adresse: a.adresse });
   if (!id) return { gefunden: false, hinweis: 'Kein Objekt zu dieser Angabe gefunden.' };
   let frei = false;
-  try { frei = await require('./vorschau').darf({ id: ctx.userId }, 'vivi'); } catch (e) { frei = false; }
+  try { frei = await require('./vivi/viviZugang').darf({ id: ctx.userId });   /* v4350 */ } catch (e) { frei = false; }
   if (!frei) return { ok: false, gesperrt: true, hinweis: 'Die ViVi-Anbindung ist für dieses Konto noch nicht freigegeben. Sag das so, ohne Details.' };
   if (typeof ctx.merkeObjekt === 'function') ctx.merkeObjekt(id);
   const r = await require('./vivi/viviAuskunft')[art](ctx.userId, id, a);

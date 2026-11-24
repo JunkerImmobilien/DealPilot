@@ -671,8 +671,8 @@ kopf('H  Frontend: Felder, Hinweis, Ausgrauen');
   ok(vf.includes("var HINWEIS = 'Verknüpft mit ViVi, der Wert kommt aus ViVi, Änderungen bitte in ViVi.';"), 'Hinweis Zeichen für Zeichen: „Verknüpft mit ViVi, der Wert kommt aus ViVi, Änderungen bitte in ViVi.“');
   const ohneK = vf.replace(/\/\*[\s\S]*?\*\//g, '');
   ok(/data-vivi-ro/.test(ohneK) && !/data-mff-ro/.test(ohneK) && !/mff-gesperrt/.test(ohneK), 'eigenes Merkattribut data-vivi-ro, kein data-mff-ro und keine mff-Klasse (mfh-felder.js bleibt unberührt)');
-  ok(!/["'`]\/vivi\//.test(ohneK), 'vivi-felder.js spricht nicht mit dem Backend (das tut nur vivi.js hinter DpVorschau.frei)');
-  ok(/DpVorschau\.frei\('vivi'\)/.test(lies('frontend/js/vivi.js')), "vivi.js fragt DpVorschau.frei('vivi')");
+  ok(!/["'`]\/vivi\//.test(ohneK), 'vivi-felder.js spricht nicht mit dem Backend (das tut nur vivi.js hinter DpViviZugang.frei)');
+  ok(/DpViviZugang\.frei\(\)/.test(lies('frontend/js/vivi.js')), 'vivi.js fragt DpViviZugang.frei() (v4350, Plan-Merkmal)');
 
   /* Nachgebautes Formular: setzen, sperren, eigen, loesen */
   function feldbau() {
@@ -737,7 +737,7 @@ kopf('I  Token');
   const envs = ['.env.example', 'backend/.env.example'].filter((f) => fs.existsSync(P(f)) && /VIVI/i.test(lies(f)));
   ok(!envs.length, 'keine ViVi-Zeile in den .env-Vorlagen');
   const r = lies('backend/src/routes/vivi.js');
-  ok(/router\.use\(vorschau\.sperre\('vivi'\)\)/.test(r) && !/credentials\/reveal|reveal/.test(r), "Route hinter vorschau.sperre('vivi'), kein Anzeigen des Tokens");
+  ok(/router\.use\(viviZugang\.sperre\(\)\)/.test(r) && !/credentials\/reveal|reveal/.test(r), 'Route hinter viviZugang.sperre() (v4350, ab Investor), kein Anzeigen des Tokens');
 }
 
 /* ═══ J · Kundentext ═════════════════════════════════════════════════════ */
@@ -769,7 +769,7 @@ kopf('J  Kundentext ohne Gedankenstrich und Semikolon');
 kopf('K  Testbetrieb: Musteranschrift und Platzhalter, solange vivi Vorschau-Funktion ist');
 {
   const VS = require(P('backend/src/services/vorschau.js'));
-  ok(!!VS.eintrag('vivi'), "vivi steht in vorschau-funktionen.json (dort hängt der Testbetrieb)");
+  ok(!VS.eintrag('vivi'), 'vivi steht seit v4350 nicht mehr in vorschau-funktionen.json, der Testbetrieb ist damit aus (echte Namen und Anschrift sind die Vorgabe)');
   const echt = FAELLE.find((x) => x.nr === '2026-1041').d;
   const mit = mapping.nachVivi(Object.assign({}, echt, { str: 'Echtweg', hnr: '77', plz: '33613', ort: 'Echtstadt' }), { musterAnschrift: true, musterNr: '1041' });
   ok(mit.projekt.street === 'Musterstraße' && mit.projekt.house_number === '1041' && mit.projekt.postal_code === '12345' && mit.projekt.city === 'Musterstadt', 'Musteranschrift: Musterstraße 1041, 12345 Musterstadt');
@@ -978,7 +978,7 @@ function zeileDetails(nr, jahr, zeile) {
   let fe = null; try { await dienst.steuerEinstellungSpeichern(USER, { modus: 'immer' }); } catch (e) { fe = e; }
   ok(fe && fe.status === 400, 'unbekannte Einstellung wird abgewiesen (400)');
   const RV = lies('backend/src/routes/vivi.js');
-  ok(/router\.get\('\/steuer-einstellung'/.test(RV) && /router\.put\('\/steuer-einstellung'/.test(RV) && RV.indexOf("router.use(vorschau.sperre('vivi'))") < RV.indexOf("'/steuer-einstellung'"), 'Routen GET/PUT /vivi/steuer-einstellung hinter der Vorschau-Sperre vivi');
+  ok(/router\.get\('\/steuer-einstellung'/.test(RV) && /router\.put\('\/steuer-einstellung'/.test(RV) && RV.indexOf('router.use(viviZugang.sperre())') > 0 && RV.indexOf('router.use(viviZugang.sperre())') < RV.indexOf("'/steuer-einstellung'"), 'Routen GET/PUT /vivi/steuer-einstellung hinter der Plan-Sperre vivi (v4350)');
   dienst._setzeDeps(null);
 }
 
@@ -1184,8 +1184,8 @@ kopf('T  Steuerjahre aus ViVi: Kategorien, Sperre, keine Doppelung, automatisch 
   const VJ = lies('frontend/js/vivi.js'), IX = lies('frontend/index.html');
   ok(/dp:vivi-stand/.test(VJ) && /standMelden\(\);/.test(VJ) && /pk-vivi-steuer/.test(VJ) && /DpViviSteuer\.einstellungKarte/.test(VJ), 'vivi.js meldet jeden Stand (dp:vivi-stand) und trägt die Einstellung in die Verbindungskarte');
   ok(IX.indexOf('js/vivi-steuer-abgleich.js?v=') > IX.indexOf('js/vivi.js?v='), 'index.html lädt vivi-steuer-abgleich.js nach vivi.js');
-  ok(/DpVorschau\.frei\('vivi'\)/.test(QS) && /aenderungErlaubt\(jahr, 'steuer'\)/.test(QS) && /a\.auto\.length\) n \+= uebernehmen\(j, a\.auto, true\)/.test(QS),
-    'Browser: nur hinter der Vorschau-Funktion vivi, Übernehmen von Hand fragt bei erklärt/Bescheid nach, automatisch nur aus der auto-Liste des Kerns');
+  ok(/DpViviZugang\.frei\(\)/.test(QS) && /aenderungErlaubt\(jahr, 'steuer'\)/.test(QS) && /a\.auto\.length\) n \+= uebernehmen\(j, a\.auto, true\)/.test(QS),
+    'Browser: nur mit Plan-Merkmal vivi (v4350), Übernehmen von Hand fragt bei erklärt/Bescheid nach, automatisch nur aus der auto-Liste des Kerns');
   ok(/quelle: 'ViVi'/.test(QS) && /vivi-st-marke/.test(QS) && /'yearly-tax-form-box'/.test(QS), 'Herkunft „ViVi“ je übernommenem Wert, Marke am Feld im Reiter Steuer');
 }
 
@@ -1301,8 +1301,8 @@ kopf('V  v4040 Reiter ViVi, Bewirtschaftung Ist heute aus dem Steuerjahr');
   }
   const RV = lies('backend/src/routes/vivi.js'), nkj = lies('frontend/js/vivi-nk-anpassung.js'), md = lies('frontend/js/miete-demo.js'), vr2 = lies('frontend/js/vivi-reiter.js'), ix = lies('frontend/index.html');
   const nkRoute = RV.slice(RV.indexOf("'/objekt/:id/nk-anpassung'"));
-  ok(/router\.post\('\/objekt\/:id\/nk-anpassung', bremse/.test(RV) && /art: 'nk'/.test(nkRoute) && /b\.bestaetigt !== true\) return res\.status\(400\)/.test(nkRoute) && RV.indexOf("router.use(vorschau.sperre('vivi'))") >= 0 && RV.indexOf("router.use(vorschau.sperre('vivi'))") < RV.indexOf('nk-anpassung'),
-    'N11 Route POST /vivi/objekt/:id/nk-anpassung: hinter der Vorschau-Sperre vivi, Bremse, Bestätigung Pflicht, Art nk');
+  ok(/router\.post\('\/objekt\/:id\/nk-anpassung', bremse/.test(RV) && /art: 'nk'/.test(nkRoute) && /b\.bestaetigt !== true\) return res\.status\(400\)/.test(nkRoute) && RV.indexOf('router.use(viviZugang.sperre())') >= 0 && RV.indexOf('router.use(viviZugang.sperre())') < RV.indexOf('nk-anpassung'),
+    'N11 Route POST /vivi/objekt/:id/nk-anpassung: hinter der Plan-Sperre vivi (v4350), Bremse, Bestätigung Pflicht, Art nk');
   ok(/\/nk-anpassung'/.test(nkj) && /fk\('vorschau'/.test(nkj) && /fk\('anlegen', 'In ViVi anlegen', 'haupt', !!\(darf && _z\.vorschauOk\)/.test(nkj) && /DpNkVorauszahlung/.test(nkj), 'N12 Fenster: erst „ViVi rechnen lassen“, „In ViVi anlegen“ erst nach der Vorschau, Soll aus DpNkVorauszahlung');
   ok(/data-md-nk=/.test(md) && /DpViviNkAnpassung\.oeffnen/.test(md) && /data-vr="w-nk"/.test(vr2) && /DpViviNkAnpassung\.oeffnen/.test(vr2) && /js\/vivi-nk-anpassung\.js\?v=v4\d{3}/.test(ix),
     'N13 Absprung im Reiter Miete und im Häuschen der Pilot-Analyse › ViVi, Datei in index.html geladen');
@@ -1577,5 +1577,36 @@ kopf('MV Mietverlauf beim Anlegen: frühere Verträge und Mieterhöhungen, Abdec
   ok(ve2.indexOf('ij.summe[j].abgedeckt === false) { werte[j] = null; return; }') >= 0, 'MV14 vivi-felder.js istJahreUebernehmen: nicht abgedeckte Jahre ohne Ist aus ViVi');
 }
 dienst._setzeDeps(null);
+
+/* ═══ Z · v4350 ViVi ab Investor: Plan-Merkmal statt Vorschau-Funktion (Marcel 24.11.2026) ═══ */
+kopf('Z  v4350 ViVi ab Investor: Plan-Merkmal, Upgrade-Hinweis, Gegenprobe');
+{
+  const VZ = require(P('backend/src/services/vivi/viviZugang.js'));
+  const fall = (role, feat) => VZ.entscheiden(role, feat).frei;
+  ok(fall('user', { vivi: true }) && fall('admin', {}) && fall('admin', null), 'Z1 Plan mit vivi frei, Admin immer');
+  ok(!fall('user', { vivi: false }) && !fall('user', {}) && !fall('user', null) && !fall(null, { vivi: 'ja' }), 'Z2 Starter/Free (false), fehlender Schlüssel, unbekannter Plan, kein echtes true: gesperrt');
+  const mig = lies('backend/migrations/128_vivi_plan.sql');
+  const an = (/\{"vivi": true\}'::jsonb\s+WHERE id IN \(([^)]*)\)/.exec(mig) || [])[1] || '', aus = (/\{"vivi": false\}'::jsonb WHERE id IN \(([^)]*)\)/.exec(mig) || [])[1] || '';
+  ok(/'investor'/.test(an) && /'pro'/.test(an) && /'partner'/.test(an) && /'free'/.test(aus) && /'starter'/.test(aus) && !/'starter'|'free'/.test(an), 'Z3 Migration 128: Investor, Pro, Partner true, Free und Starter false');
+  const cfg = lies('frontend/js/config.js');
+  const vw = (cfg.match(/^ {8}vivi: +(true|false),/mg) || []).map((z) => /true/.test(z));
+  ok(JSON.stringify(vw) === JSON.stringify([false, false, true, true]), 'Z4 config.js spiegelt das Merkmal: free, starter false, investor, pro true');
+  const FE = ['vivi', 'vivi-import', 'vivi-mieterhoehung', 'vivi-nk-anpassung', 'vivi-reiter', 'vivi-copilot', 'vivi-steuer-abgleich', 'jahresabgleich', 'unterlagen-eingang'];
+  const alt = FE.filter((n) => /DpVorschau[.\w]*\(\s*'vivi'/.test(lies('frontend/js/' + n + '.js').replace(/\/\*[\s\S]*?\*\//g, '')));
+  const ohne = FE.filter((n) => !/DpViviZugang/.test(lies('frontend/js/' + n + '.js')));
+  ok(!alt.length && !ohne.length, 'Z5 neun Oberflächen fragen DpViviZugang, keine mehr DpVorschau vivi' + (alt.length ? ', alt: ' + alt.join(', ') : '') + (ohne.length ? ', ohne: ' + ohne.join(', ') : ''));
+  const B = ['backend/src/routes/ai.js', 'backend/src/services/agentWerkzeuge.js', 'backend/src/services/vivi/viviAuskunft.js'];
+  const bAlt = B.filter((d) => /darf\([^)]*\}, 'vivi'\)/.test(lies(d)));
+  const bNeu = B.filter((d) => /viviZugang/.test(lies(d)));
+  ok(!bAlt.length && bNeu.length === 3, 'Z6 Co-Pilot, Agent-Werkzeug und Auskunft fragen viviZugang.darf' + (bAlt.length ? ', alt: ' + bAlt.join(', ') : ''));
+  const zg = lies('frontend/js/vivi-zugang.js'), vj = lies('frontend/js/vivi.js');
+  ok(/Enthalten ab dem Paket Investor/.test(zg) && /openPricingModal/.test(zg) && /DpViviZugang\.upgradeHtml\(\)/.test(vj) && !/[–—;]/.test(((/Verbinde DealPilot[^<]*/.exec(zg) || [''])[0])), 'Z7 Starter sieht in den Einstellungen den Hinweis „ab Investor“ mit Knopf zu den Paketen, ohne – und ;');
+  ok(/sub && !sub\._fallback/.test(zg), 'Z8 nur eine echte Plan-Antwort wird gemerkt (Rückfall-Plan sperrt nicht bis zum Neuladen)');
+  const ix = lies('frontend/index.html');
+  ok(ix.indexOf('js/vivi-zugang.js') > ix.indexOf('js/subscription.js') && ix.indexOf('js/vivi-zugang.js') < ix.indexOf('js/vivi.js?'), 'Z9 vivi-zugang.js lädt nach subscription.js und vor vivi.js');
+  /* Gegenprobe: eine Entscheidung ohne Plan-Prüfung muss Z2 rot machen */
+  const kaputt = new Function('module', lies('backend/src/services/vivi/viviZugang.js').replace("if (planFeatures && planFeatures[MERKMAL] === true)", 'if (true)').replace(/require\([^)]*\)/g, '({})') + '; return module.exports;')({ exports: {} });
+  ok(kaputt.entscheiden('user', {}).frei === true, 'Z10 Gegenprobe: ohne Plan-Prüfung wäre Starter frei (Z2 hätte rot gemeldet)');
+}
 console.log('\n' + (rot ? 'ROT · ' + rot + ' Befund(e), ' + gruen + ' grün' : 'SAUBER · ' + gruen + ' Prüfpunkte grün'));
 process.exit(rot ? 1 : 0);

@@ -1,7 +1,7 @@
 'use strict';
 /**
  * routes/vivi.js — v3950 · ViVi-Anbindung (Pakete V1 bis V3)
- * Mount: /api/v1/vivi  · Vorschau-Funktion 'vivi' (services/vorschau-funktionen.json): nur Admin und Freigabeliste.
+ * Mount: /api/v1/vivi  · v4350 Plan-Merkmal vivi ab Investor (services/vivi/viviZugang.js), Admin immer. Bis v4340 Vorschau-Funktion.
  *
  *   GET    /verbindung                  { exists, hint, updatedAt }   (nie der Token)
  *   PUT    /verbindung      {token}     Token verschluesselt speichern (providerCredentialsService, Anbieter 'vivi')
@@ -26,12 +26,12 @@
 const express = require('express');
 const rateLimit = require('express-rate-limit');
 const { authenticate } = require('../middleware/auth');
-const vorschau = require('../services/vorschau');
+const viviZugang = require('../services/vivi/viviZugang');   /* v4350 · Plan-Merkmal statt Vorschau-Funktion */
 const dienst = require('../services/vivi/viviDienst');
 
 const router = express.Router();
 router.use(authenticate);
-router.use(vorschau.sperre('vivi'));
+router.use(viviZugang.sperre());   /* v4350 · ab Investor (plans.features.vivi, Migration 128), Admin immer */
 
 const bremse = rateLimit({ windowMs: 60 * 1000, max: 30, standardHeaders: true, legacyHeaders: false });
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;

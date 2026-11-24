@@ -433,7 +433,7 @@ app.use('/api/v1/telegram', require('./routes/telegram'));  // v1791/v1792 — d
 app.use('/api/v1/unterlagen', require('./routes/unterlagen'));  // v1833 — Flurkarte, Grundbuch, Altlasten, Baulasten, Bauakte
 app.use('/api/v1/avm', avmRoutes);  // V326: AVM-Integration
 app.use('/api/v1/immometrica', require('./routes/immometrica'));  // v655: ImmoMetrica
-app.use('/api/v1/vivi', require('./routes/vivi'));  // v3950 · ViVi-Anbindung: einmal anlegen, danach nur lesen (Vorschau-Funktion 'vivi')
+app.use('/api/v1/vivi', require('./routes/vivi'));  // v3950 · ViVi-Anbindung: einmal anlegen, danach nur lesen (v4350 Plan-Merkmal vivi ab Investor)
 app.use('/api/v1/marktbericht', marktberichtRoutes);  // v539: Marktbericht-Proxy
 app.use('/api/v1', resellerRoutes);  // V200
 app.use('/api/v1/reseller', require('./routes/resellerPortal'));  // reseller-portal-p3

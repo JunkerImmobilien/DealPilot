@@ -56,7 +56,7 @@
   /* ── Einstellungen ─────────────────────────────────────────────── */
   var _liste = [], _laeuft = false;
   function frei() {
-    return (window.DpVorschau && typeof window.DpVorschau.frei === 'function') ? window.DpVorschau.frei('vivi').catch(function () { return false; }) : Promise.resolve(false);
+    return (window.DpViviZugang) ? window.DpViviZugang.frei().catch(function () { return false; }) : Promise.resolve(false);
   }
   function karte(host) {
     if (!host) return;
