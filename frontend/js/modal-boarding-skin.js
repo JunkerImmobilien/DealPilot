@@ -49,6 +49,7 @@
   // Hero-Text je Modal (anhand des h3-Titels erkannt)
   function heroFor(title) {
     var t = (title || '').toLowerCase();
+    if (t.indexOf('in vivi anlegen') >= 0 || t.indexOf('vivi-objekt') >= 0) return { kick: 'OBJEKTVERWALTUNG · VIVI', title: null };   /* v4400 · Anlegen und Verknüpfen (js/vivi.js) */
     if (t.indexOf('vivi') >= 0 || t.indexOf('vorauszahlung') >= 0) return { kick: 'ABGLEICH MIT VIVI', title: null };   /* v4120 · ViVi-Fenster im Boarding-Rahmen */
     if (t.indexOf('jahresabschluss') >= 0) return { kick: 'BESTAND · JAHRESABSCHLUSS', title: null };   /* v4110 · Assistent Jahresabschluss (jahresabschluss.js) */
     if (t.indexOf('immometrica') >= 0) return { kick: 'OBJEKT-IMPORT', title: 'ImmoMetrica' };

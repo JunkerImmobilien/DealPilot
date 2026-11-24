@@ -1625,5 +1625,38 @@ kopf('Z  v4350 ViVi ab Investor: Plan-Merkmal, Upgrade-Hinweis, Gegenprobe');
   const kaputt = new Function('module', lies('backend/src/services/vivi/viviZugang.js').replace("if (planFeatures && planFeatures[MERKMAL] === true)", 'if (true)').replace(/require\([^)]*\)/g, '({})') + '; return module.exports;')({ exports: {} });
   ok(kaputt.entscheiden('user', {}).frei === true, 'Z10 Gegenprobe: ohne Plan-Prüfung wäre Starter frei (Z2 hätte rot gemeldet)');
 }
+/* ═══ AB · v4400 ViVi-Knöpfe in Deal-Aktion und Einstellungen, Fenster im DealPilot-Design (Marcel 24.11.2026) ═══ */
+kopf('AB v4400 Anlegen/Verknüpfen nicht im Reiter Objekt, Fenster, Objektart deutsch');
+{
+  const vj = lies('frontend/js/vivi.js'), bh = lies('frontend/js/buchhaltung-verbinden.js');
+  const ohneKomm = (s) => s.replace(/\/\*[\s\S]*?\*\//g, '');
+  /* AB1: die Leiste im Reiter Objekt bietet weder Anlegen noch Verknüpfen */
+  const leisteFn = (/function leiste\(\) \{[\s\S]*?\n  \}\n/.exec(vj) || [''])[0];
+  ok(leisteFn && !/data-vivi="anlegen"|data-vivi="zuordnen"/.test(leisteFn), 'AB1 Reiter Objekt: Leiste ohne „In ViVi anlegen“ und „Mit ViVi-Objekt verknüpfen“');
+  /* AB2: Deal-Aktion hat beide Knöpfe, ViVi meldet verknuepfen und loesen an */
+  ok(/data-buha="/.test(bh) && /data-buha-verkn="/.test(bh) && /verknuepfen: zuordnen/.test(vj) && /loesen: loesen/.test(vj), 'AB2 Deal-Aktion: Anlegen und Verknüpfen, Anbieter meldet beides an');
+  /* AB3: Einstellungen listen die Objekte mit Anlegen und Verknüpfen je Objekt */
+  ok(/function objektListe\(\)/.test(vj) && /data-vivi-obj="anlegen"/.test(vj) && /data-vivi-obj="zuordnen"/.test(vj) && /anlegen\(id\)/.test(vj) && /zuordnen\(id\)/.test(vj), 'AB3 Einstellungen › ViVi: Objektliste mit Anlegen und Verknüpfen je Objekt');
+  /* AB4: kein Schließen per Klick daneben in den ViVi-Fenstern */
+  const FE = ['vivi', 'vivi-mieterhoehung', 'vivi-nk-anpassung', 'vivi-reiter', 'vivi-import', 'vivi-steuer-abgleich'];
+  const neben = FE.filter((n) => /ev\.target === ov|e\.target === ov|target === ov\b/.test(ohneKomm(lies('frontend/js/' + n + '.js'))));
+  ok(!neben.length, 'AB4 kein ViVi-Fenster schließt per Klick daneben' + (neben.length ? ': ' + neben.join(', ') : ''));
+  /* AB5: Fenster im Rahmen wie „Belege einlesen“ (.oabi-ov, Kopf, Fuß mit .oabi-btn), × über modal-boarding-skin */
+  ok(/ov\.className = 'oabi-ov'/.test(vj) && /class="oabi-head"><h3>/.test(vj) && /class="oabi-foot"/.test(vj) && /oabi-btn' \+ \(haupt \? ' primary'/.test(vj)
+    && /in vivi anlegen/.test(lies('frontend/js/modal-boarding-skin.js')), 'AB5 Anlegen und Verknüpfen im Boarding-Rahmen (Whitelabel-Token über modal-boarding-skin)');
+  /* AB6: keine Rohdaten (JSON) im Fenster */
+  ok(!/JSON\.stringify\(v\.nutzlast/.test(vj) && !/Was genau an ViVi geht/.test(ohneKomm(vj)), 'AB6 kein Block „Was genau an ViVi geht“ mit Rohdaten');
+  /* AB7: Objektart in der Vorschau deutsch, an ViVi weiter der Typ */
+  const art = (d) => { const r = mapping.nachVivi(d, {}); return { zeile: (r.vorschau.filter((z) => z.feld === 'Objektart')[0] || {}).wert, typ: r.projekt.type }; };
+  const mfh = art(Object.assign({}, FAELLE[0].d, { objart: 'MFH', objektart: 'MFH' }));
+  const etw = art(Object.assign({}, FAELLE[0].d, { objart: 'ETW', objektart: 'ETW' }));
+  const alle = ['MFH', 'ETW', 'EFH', 'GESCH', 'GRST', 'GAR', 'XYZ'].map((a) => art(Object.assign({}, FAELLE[0].d, { objart: a, objektart: a })).zeile);
+  ok(!alle.some((w) => /[a-z]_[a-z]|house|apartment|commercial|land\b|other/i.test(String(w))) && alle.every(Boolean), 'AB7 Objektart in der Vorschau immer deutsch: ' + alle.join(', '));
+  ok(/Mehrfamilienhaus|Eigentumswohnung/.test(String(mfh.zeile) + String(etw.zeile)) && /_house|apartment/.test(mfh.typ + etw.typ), 'AB8 an ViVi geht weiter der ViVi-Typ (' + mfh.typ + ', ' + etw.typ + ')');
+  /* AB9 Gegenprobe: der alte Leisten-Knopf würde AB1 rot machen */
+  const alt = leisteFn.replace("l.style.display = 'none'; l.innerHTML = ''; return;", "knoepfe = '<button data-vivi=\"anlegen\">In ViVi anlegen</button>';");
+  ok(/data-vivi="anlegen"/.test(alt), 'AB9 Gegenprobe: mit dem alten Knopf in der Leiste wäre AB1 rot');
+}
+
 console.log('\n' + (rot ? 'ROT · ' + rot + ' Befund(e), ' + gruen + ' grün' : 'SAUBER · ' + gruen + ' Prüfpunkte grün'));
 process.exit(rot ? 1 : 0);
