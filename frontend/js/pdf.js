@@ -1036,7 +1036,7 @@ function _renderAiJsonInPdf(doc, a, cy, M, CW, W, C, stripMd, newPage) {
     return t.replace(/\*+/g, '').trim();
   }
   function maybePage(needed) {
-    if (cy + needed > 280) cy = newPage('Pilot-Analyse');
+    if (cy + needed > 280) cy = newPage('Gesamtbewertung');
   }
 
   /* v2555 · Ein Abschnitt bricht ueber die Seite um, statt als Ganzes auf die
@@ -1046,7 +1046,7 @@ function _renderAiJsonInPdf(doc, a, cy, M, CW, W, C, stripMd, newPage) {
      er weiter und traegt dort „(Fortsetzung)". */
   function _zeichneBlock(title, lines, accentColor, isDarkBg) {
     var LINE_H = 5.2, KOPF = 12, FUSS = 7, UNTEN = 280;
-    if (cy + KOPF + 3 * LINE_H + FUSS > UNTEN) cy = newPage('Pilot-Analyse');
+    if (cy + KOPF + 3 * LINE_H + FUSS > UNTEN) cy = newPage('Gesamtbewertung');
     var i = 0, erst = true;
     while (i < lines.length) {
       var platz = Math.max(1, Math.floor((UNTEN - cy - KOPF - FUSS) / LINE_H));
@@ -1079,7 +1079,7 @@ function _renderAiJsonInPdf(doc, a, cy, M, CW, W, C, stripMd, newPage) {
       });
       if (typeof doc.setLineHeightFactor === 'function') doc.setLineHeightFactor(1.15);
       i += teil.length; erst = false;
-      if (i < lines.length) cy = newPage('Pilot-Analyse'); else cy += h + 4;
+      if (i < lines.length) cy = newPage('Gesamtbewertung'); else cy += h + 4;
     }
   }
 
@@ -1119,7 +1119,7 @@ function _renderAiJsonInPdf(doc, a, cy, M, CW, W, C, stripMd, newPage) {
     _zeichneBlock(title, lines, accentColor, isDarkBg);   /* v2555 */
   }
 
-  function bulletBlock(title, items, bgColor, accentColor) {
+  function bulletBlock(title, items, bgColor, accentColor, kopf) {   /* v4390b · kopf: angezeigte Überschrift, title bleibt Schlüssel der Abschnittswahl */
     if (typeof _dpPdfSectionOn === 'function' && !_dpPdfSectionOn(title)) return; /* v603-gate2 */
     bgColor = [255, 255, 255]; accentColor = C.GOLD; /* v596-pdf-clean2 */
     if (!Array.isArray(items) || !items.length) return;
@@ -1137,7 +1137,7 @@ function _renderAiJsonInPdf(doc, a, cy, M, CW, W, C, stripMd, newPage) {
         rendered.push({ t: String(w).trim(), ende: idx === wrapped.length - 1, punkt: idx === 0, einzug: 4, breite: TEXT_W });
       });
     });
-    _zeichneBlock(title, rendered, accentColor, false);   /* v2555 */
+    _zeichneBlock(kopf || title, rendered, accentColor, false);   /* v2555 */
   }
 
   // 1. Gesamtbewertung
@@ -1159,7 +1159,7 @@ function _renderAiJsonInPdf(doc, a, cy, M, CW, W, C, stripMd, newPage) {
 
   // 2. Stärken / Risiken
   bulletBlock('Stärken', a.staerken,   [232, 247, 234], [42, 138, 86]);
-  bulletBlock('Risiken', a.risiken,    [248, 232, 230], [184, 98, 92]);
+  bulletBlock('Risiken', a.risiken,    [248, 232, 230], [184, 98, 92], 'Schwächen');
 
   // 3. Risikoanalyse
   if (a.risikoanalyse && typeof a.risikoanalyse === 'object') {
@@ -1218,7 +1218,7 @@ function _renderAiJsonInPdf(doc, a, cy, M, CW, W, C, stripMd, newPage) {
     var _afQa = _qaText(a.anschlussfinanzierung);
     _af.push(_afQa || (typeof a.anschlussfinanzierung === 'string' && a.anschlussfinanzierung ? clean(a.anschlussfinanzierung) + '\n\n' + _neu : _neu));
     if (Array.isArray(a.bankargumente) && a.bankargumente.length)
-      _af.push('Argumente für die Bank:\n' + a.bankargumente.map(function (x) { return '\• ' + clean(x); }).join('\n'));
+      _af.push('Was für die Finanzierung spricht:\n' + a.bankargumente.map(function (x) { return '\• ' + clean(x); }).join('\n'));
     block('Anschlussfinanzierung', _af.filter(Boolean).join('\n\n'));
     var _ex = [];
     try { _ex.push(window.DpBestand.exitText()); } catch (e) {}
@@ -1238,7 +1238,7 @@ function _renderAiJsonInPdf(doc, a, cy, M, CW, W, C, stripMd, newPage) {
     if (offText) block('Kaufpreis-Offerte', offText.trim(), [240, 232, 255], [122, 90, 181]);
   }
   if (!_best && Array.isArray(a.bankargumente) && a.bankargumente.length) {   /* v2985 · im Bestand unter Anschlussfinanzierung */
-    bulletBlock('Bankargumente', a.bankargumente, [232, 244, 234], [42, 154, 90]);
+    bulletBlock('Bankargumente', a.bankargumente, [232, 244, 234], [42, 154, 90], 'Was für die Finanzierung spricht');
   }
 
   /* v2552 · Marcel 21.10.2026: „in der Pilot-Analyse muss auch der Reiter Bausteine
@@ -3883,14 +3883,14 @@ async function _exportPDFInner() {
   /* v3018c · gemessen: ETW 2026-001 S. 11 (13 %) und Parkstr. 2026-1056 S. 14 (24 %) trugen nur
      einen Rest, danach begann die Pilot-Analyse auf neuer Seite. Ist mehr als die halbe Seite
      frei, beginnt sie dort - mit ihrem dunklen Kopfbalken als Kapitelanfang. */
-  if (cy > 40 && cy < 140) cy += 8; else cy = newPage('Pilot-Analyse');
+  if (cy > 40 && cy < 140) cy += 8; else cy = newPage('Gesamtbewertung');
 
   // Header-Banner
   doc.setFillColor.apply(doc, C.CH); doc.roundedRect(M, cy, CW, 13, 2, 2, 'F');
   doc.setFillColor.apply(doc, C.GOLD); doc.rect(M, cy, CW, 1.2, 'F');
   doc.setFont('helvetica', 'bold'); doc.setFontSize(10.5);
   doc.setTextColor.apply(doc, C.GOLD);
-  doc.text('PILOT-ANALYSE', M + 5, cy + 9);
+  doc.text('GESAMTBEWERTUNG', M + 5, cy + 9);   /* v4390b · Marcel 24.11.2026 */
   doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5);
   doc.setTextColor(140, 130, 110);
   (function(){var b=_getBranding();doc.text('KI-Analyse via ' + _pn() + (b.company ? ' \u00b7 ' + b.company : ''), W - M, cy + 9, { align: 'right' });})();
