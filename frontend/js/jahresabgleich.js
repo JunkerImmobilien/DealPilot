@@ -759,7 +759,7 @@
         if (!x) return '<button type="button" class="btn-clean dp-ja-sj kommt" disabled title="' + y + ' kommt noch' + (marke ? ' (Ende der Zinsbindung)' : '') + '"><i class="dp-ja-sp"></i><b>' + y + '</b><small>' + (marke || '&nbsp;') + '</small></button>';
         var sx = stand(x, weg, L), xl = x.jahr >= heuteJahr();
         var kl = xl ? 'laeuft' : (sx.nFest === 4 ? 'fest' : (sx.n === 4 ? 'ok' : (sx.n >= 2 ? 'teil' : 'offen')));
-        var tt = xl ? y + ' läuft' : (sx.nFest === 4 ? y + ' festgeschrieben' : standText(sx, y) + (sx.offen.length ? '. Offen: ' + sx.offen.join(', ') : ''));
+        var tt = xl ? y + ' läuft' : (sx.nFest === 4 ? y + ' festgeschrieben' : standText(sx, y) + (sx.offen.length ? '. Offen: ' + sx.offen.join(', ') : '')); if (marke) tt += marke === 'Kauf' ? ' (Kaufjahr)' : ' (Ende der Zinsbindung)';
         return '<button type="button" class="btn-clean dp-ja-sj ' + kl + '" data-ja-jahr="' + y + '" aria-pressed="' + (y === _gewaehlt) + '" title="' + esc(tt) + '" aria-label="' + esc(tt) + '"><i class="dp-ja-sp">' + (kl === 'fest' ? SCHLOSS : '') + '</i><b>' + y + '</b>'
           + (xl ? '<small>' + (marke || 'läuft') + '</small>' : sx.nFest === 4 ? '<small>' + (marke || 'fest') + '</small>'
             : '<span class="dp-ja-mini">' + SCHRITTE.map(function (q) { return '<i class="dp-ja-' + (sx[q[0]] === 'ok' ? 'ok' : sx[q[0]]) + '"></i>'; }).join('') + '</span>') + '</button>';
