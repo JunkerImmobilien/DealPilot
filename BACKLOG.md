@@ -10,10 +10,6 @@ direkt unter den Punkt — nicht kommentarlos liegenlassen.
 
 ## → PDF-Fassungen neu denken (Marcel 24.11.2026, zurückgestellt)
 
-Der Umbau v4370 (Kurz/Kompakt/Vollständig, Kombi) wurde verworfen: „zu dünn, erst mal die alten“. Es gelten die alten PDFs, nur mit den neuen Diagrammen (v4380). Für später notiert: Kurzfassung im Ankauf ohne Einordnung Ankauf·heute·Zielbild und ohne Score-Fingerabdruck (Ankauf hat noch kein Heute). Investment-PDF für den Ankauf: „Wohin die Miete geht“, grobe steuerliche Betrachtung, Verlauf mit Steuern wählbar. Jede Wertangabe nur aus dem letzten Marktbericht, derselbe Wert wie die App. Muster in Dateien/Investment-PDF/verworfen/.
-
-## → PDF-Fassungen neu denken (Marcel 24.11.2026, zurückgestellt)
-
 Der Umbau v4370 (Kurz/Kompakt/Vollständig, Kombi) ist verworfen: „zu dünn, erst mal die alten“. Es gelten die alten PDFs, nur mit den neuen Diagrammen (v4380). Für später: Kurzfassung im Ankauf ohne Einordnung Ankauf·heute·Zielbild und ohne Score-Fingerabdruck. Investment-PDF für den Ankauf: „Wohin die Miete geht“, grobe steuerliche Betrachtung, Verlauf mit Steuern wählbar. Jede Wertangabe nur aus dem letzten Marktbericht, derselbe Wert wie die App. Muster in `Dateien/Investment-PDF/verworfen/`.
 
 **Vorlagen und Bilder:** `design/` (Mockups, Logos). Siehe `design/README.md`.
