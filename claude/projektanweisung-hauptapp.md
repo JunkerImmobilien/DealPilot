@@ -45316,3 +45316,9 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** staging ad03263d, main 5ea7ce80 + 4e2309c2 (Version), Merge main → staging.
 - **Nachweis:** teamplatz-pruefen 123/123, landing-zaehlen 27, buster-ebenen sauber; Staging-Browser: Monat 99/253/367/772 €, Jahr 1.089/2.783/4.037/8.492 €, Buchen-Links kundenplaetze 0/5/10/25, teamplaetze 0/1/2/7; 390 px (iframe) ohne Querscrollen, Karten 323 px; preise.html Umschalter weiter richtig. Prod: dealpilot.immo/partner.html und app.dealpilot.immo/landing/partner.html 200, 4 Pakete, keine alte Staffel. Sicherung haupt-20261124-0943-tt.
 - **Rest:** keiner.
+
+### Rollout 1.0.168 · 24.11.2026 · v4450a–v4450d
+- **Was:** Einfach-Ansicht aller Pilot-Analyse-Unterreiter in Stichpunkten (punkteAus, kuerzen), „Das Wichtigste“ oben im Reiter Bewertung aus kernpunkte, Abstand Kaufpreis/Objektwert fertig gerechnet im Prompt plus Nachprüfung, Kundentext ohne Gedankenstrich (pilot-blase.js, pilot-analyse-v4.js).
+- **Commit:** staging d1896629, f8d71154, 2b10b0f3, 1f678672; main be9be80d (Dateien byte-gleich mit 1f678672, Buster einzeln).
+- **Nachweis:** wertvergleich-pruefen 13 (Gegenprobe rot), buster-ebenen, vorschau sauber; Staging-Browser Demostraße 5 alle Unterreiter und Reiter Bewertung; Prod: Sicherung haupt-20261124-0957-ss2, Backend healthy, Buster v4450d/v4450a per curl.
+- **Rest:** zwei einzelne lange Sätze bleiben (nicht teilbar ohne Kürzen) · 390 px nicht per Fenster gemessen.
