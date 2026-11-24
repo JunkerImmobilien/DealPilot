@@ -35,7 +35,9 @@ const STANDARD = {
     if (!vs.eintrag('vivi')) return false;
     try { return !(await vs.fuerAlle()).has('vivi'); } catch (e) { return true; }
   },
-  schlafen: function (ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+  schlafen: function (ms) { return new Promise(function (r) { setTimeout(r, ms); }); },
+  /* v4360 · Marcel 24.11.: ohne Plan-Merkmal vivi (Herabstufung auf Starter/Free) haelt der Takt an, die Verknuepfung bleibt */
+  zugang: function (userId) { return require('./viviZugang').darf({ id: userId }); }
 };
 let _deps = null;
 function deps() { return _deps || STANDARD; }
@@ -564,8 +566,12 @@ async function taktLauf() {
   const zeilen = await sp.faelligeAbrufe(TAKT_STUNDEN, TAKT_GRENZE);
   const je = {};
   zeilen.forEach(function (z) { (je[z.user_id] = je[z.user_id] || []).push(z.object_id); });
-  const stand = { nutzer: 0, objekte: 0, fehler: 0, bremse: 0 };
+  const stand = { nutzer: 0, objekte: 0, fehler: 0, bremse: 0, angehalten: 0 };
   for (const userId of Object.keys(je)) {
+    /* v4360 · kein ViVi im Plan mehr: nichts lesen, Verknuepfungen und Tresor bleiben, beim Hochstufen geht es weiter */
+    let _frei = false;
+    try { _frei = await deps().zugang(userId); } catch (e) { _frei = false; }
+    if (!_frei) { stand.angehalten++; continue; }
     const t = await deps().creds.getSecret(userId, ANBIETER);
     if (!t) continue;
     stand.nutzer++;

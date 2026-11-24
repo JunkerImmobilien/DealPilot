@@ -78,7 +78,7 @@
       return { t: 'Eigenkapitalrendite',
         a: 'Wie sich dein eingesetztes Eigenkapital jedes Jahr laufend verzinst, vor Steuern und ohne Wertsteigerung.',
         r: [['Cashflow vor Steuern im Jahr', eur(basis, true)], ['geteilt durch Eigenkapital', eur(k.ek)], ['= Eigenkapitalrendite', pct(k.ekr), 1]],
-        h: 'Gerechnet mit Miete, Kosten und Rate wie eingegeben, also für das erste volle Jahr. Der Cashflow links zeigt dagegen das laufende Jahr. Ab 8 % gilt sie als gut, unter 4 % als schwach. Die Tilgung zählt hier als Ausgabe, im IRR dagegen als Vermögen.' };
+        h: 'Gerechnet für ein volles Jahr nach den heutigen Eingaben, so rechnen auch Score, Bank und PDF. ' + (k.heute && k.heute.jahr ? 'Der Cashflow links zeigt dagegen das laufende Jahr ' + k.heute.jahr + '.' : '') + ' Ab 8 % gilt sie als gut, unter 4 % als schwach. Die Tilgung zählt hier als Ausgabe, im IRR dagegen als Vermögen.' };
     },
     'kpi-bmy': function () {
       var k = K(); if (!k.kp) return null;
@@ -113,7 +113,7 @@
       var k = K(); if (!k.kd_dscr) return null;
       return { t: 'DSCR, trägt die Miete die Rate?', a: 'Wie oft der Reinertrag den Kapitaldienst deckt. Banken schauen darauf zuerst.',
         r: [['Reinertrag (Miete minus eigene Kosten)', eur(k.noi_dscr)], ['geteilt durch Zins und Tilgung im Jahr', eur(k.kd_dscr)], ['= DSCR', zahl(k.dscr, 2), 1]],
-        h: (k.dscr < 1 ? 'Unter 1,0 trägt die Miete die Rate nicht ganz, du zahlst zu. ' : '') + 'Banken erwarten meist 1,1 bis 1,2. Gerechnet mit Miete und Rate wie eingegeben. Die Karte Cashflow, korrekte Berechnung zeigt den DSCR des gewählten Jahres.' };
+        h: (k.dscr < 1 ? 'Unter 1,0 trägt die Miete die Rate nicht ganz, du zahlst zu. ' : '') + 'Banken erwarten meist 1,1 bis 1,2. Gerechnet für ein volles Jahr nach den heutigen Eingaben, so rechnen auch Score, Bank und PDF. ' + (k.heute && k.heute.jahr ? 'Die Karte Cashflow, korrekte Berechnung zeigt den DSCR ' + k.heute.jahr + ', also das laufende Jahr.' : '') };
     },
     'kpi-ltv': function () {
       var k = K(); if (!k.ltv || !k.d_total) return null;

@@ -38,6 +38,8 @@
     return '<div class="vivi-upgrade" style="border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 35%, transparent);border-radius:10px;padding:12px 14px;font:400 13px/1.45 Inter,system-ui,sans-serif">'
       + '<div style="font:600 11px/1 \'JetBrains Mono\',ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">ViVi-Anbindung</div>'
       + '<div>Verbinde DealPilot mit deiner Objektverwaltung ViVi. Objekte und Mieter übertragen, Mieterhöhung und Nebenkosten direkt nach ViVi schreiben, Jahresabgleich mit den Werten aus ViVi. Enthalten ab dem Paket Investor.</div>'
+      /* v4360 · Marcel 24.11.: beim Herabstufen haelt der Abgleich an, Verknuepfungen bleiben */
+      + '<div class="vivi-angehalten" style="margin-top:6px;opacity:.85">Hast du ViVi schon verbunden, ist der Abgleich angehalten. Deine Verknüpfungen bleiben erhalten, ab Investor läuft er wieder.</div>'
       + '<button type="button" class="btn btn-sm btn-gold" style="margin-top:10px" onclick="if(window.openPricingModal)window.openPricingModal();">Pakete ansehen</button>'
       + '</div>';
   }

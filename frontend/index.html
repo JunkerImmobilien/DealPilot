@@ -3670,7 +3670,7 @@ label.dp-required.qc-required::after {
       <div>
         <div class="bw-kat-t">Finanzierung &amp; Risiko</div>
         <div class="bw-grid bw-grid-3">
-          <div class="kpi"><div class="kpi-label">DSCR <button type="button" class="dp-tip" data-tip-id="tab5.dscr" tabindex="-1" aria-label="Hilfe zu DSCR"></button></div><div class="kpi-val" id="kpi-dscr">—</div><div class="kpi-sub">Schuldendeckung</div></div>
+          <div class="kpi"><div class="kpi-label">DSCR <button type="button" class="dp-tip" data-tip-id="tab5.dscr" tabindex="-1" aria-label="Hilfe zu DSCR"></button></div><div class="kpi-val" id="kpi-dscr">—</div><div class="kpi-sub">volles Jahr, heutige Eingaben</div></div>
           <div class="kpi"><div class="kpi-label">LTV <button type="button" class="dp-tip" data-tip-id="tab5.ltv" tabindex="-1" aria-label="Hilfe zu LTV"></button></div><div class="kpi-val" id="kpi-ltv">—</div><div class="kpi-sub">Fremdfinanzierungsquote</div></div>
           <div class="kpi"><div class="kpi-label">Break-Even</div><div class="kpi-val" id="kpi-be">—</div><div class="kpi-sub" id="kpi-be-sub">Cashflow positiv</div></div>
         </div>
@@ -3892,7 +3892,7 @@ label.dp-required.qc-required::after {
         <tr><td>Bruttomietrendite <span class="cf-hint">(statisch · NKM/KP)</span></td><td class="num" id="ph-bmr-now">—</td><td class="num" id="ph-bmr-ezb">—</td><td class="num" id="ph-bmr-an">—</td></tr>
         <tr><td>Cashflow-Rendite <span class="cf-hint">(CF n.St. / Immo-Wert)</span> <button type="button" class="dp-tip" data-tip-id="tab8.cashflow_rendite" tabindex="-1" aria-label="Hilfe zu Cashflow-Rendite"></button></td><td class="num" id="ph-cfy-now">—</td><td class="num" id="ph-cfy-ezb">—</td><td class="num" id="ph-cfy-an">—</td></tr>
         <tr><td>EK-Rendite im Objekt <span class="cf-hint">(CF n.St. / EK im Objekt)</span></td><td class="num" id="ph-ekr-now">—</td><td class="num" id="ph-ekr-ezb">—</td><td class="num" id="ph-ekr-an">—</td></tr>
-        <tr><td>DSCR (Schuldendeckung) <span class="cf-hint" title="Bank-Sicht: Reinertrag (Miete minus nicht umlagefähige Kosten) / (Zins+Tilgung). Steuern sind nicht enthalten.">ⓘ</span></td><td class="num" id="ph-dscr-now">—</td><td class="num" id="ph-dscr-ezb">—</td><td class="num" id="ph-dscr-an">—</td></tr>
+        <tr><td>DSCR (Schuldendeckung) <span class="cf-hint">(Heute: volles Jahr, heutige Eingaben)</span> <span class="cf-hint" title="Bank-Sicht: Reinertrag (Miete minus nicht umlagefähige Kosten) / (Zins+Tilgung). Steuern sind nicht enthalten.">ⓘ</span></td><td class="num" id="ph-dscr-now">—</td><td class="num" id="ph-dscr-ezb">—</td><td class="num" id="ph-dscr-an">—</td></tr>
         <tr><td>LTV (Restschuld / Wert) <button type="button" class="dp-tip" data-tip-id="tab8.ltv_basis" tabindex="-1" aria-label="Hilfe zu tab8.ltv_basis"></button></td><td class="num" id="ph-ltv-now">—</td><td class="num" id="ph-ltv-ezb">—</td><td class="num" id="ph-ltv-an">—</td></tr>
         <tr><td>Restschuld</td><td class="num" id="ph-rs-now">—</td><td class="num" id="ph-rs-ezb">—</td><td class="num" id="ph-rs-an">—</td></tr>
         <tr><td>Immobilienwert</td><td class="num" id="ph-wert-now">—</td><td class="num" id="ph-wert-ezb">—</td><td class="num" id="ph-wert-an">—</td></tr>
@@ -4052,7 +4052,7 @@ label.dp-required.qc-required::after {
   <script src="js/finanzierung-validation.js?v=1"></script>
 <script src="js/data/foerderregister.js?v=v3072"></script>
   <script src="js/finanzierungskosten.js?v=v3994"></script><!-- v3992 · F6 Disagio, Bereitstellungszinsen (Rechenkern) -->
-  <script src="js/calc.js?v=v4300"></script>
+  <script src="js/calc.js?v=v4360"></script>
   <script src="js/zahlenfelder.js?v=v3800e"></script>
 <script src="js/d1-type-handler.js?v=161"></script>
 <script src="js/icons.js?v=166"></script>
@@ -4187,7 +4187,7 @@ label.dp-required.qc-required::after {
 <script src="js/nk-vorauszahlung.js?v=v3950"></script><!-- v3950 · Nebenkosten-Vorauszahlung: Vorschlag aus den umlagefaehigen Kosten je Einheit nach Wohnflaeche -->
 <script src="js/vivi-felder.js?v=v4210"></script><!-- v3950/v3951 · ViVi: verknuepfte Felder ausgegraut, Hinweis, lokal ueberschreiben -->
 <script src="js/buchhaltung-verbinden.js?v=v4040"></script><!-- v3967 · Buchhaltung verbinden: Angebot unter Gewonnen in der Deal-Aktion, Anbieterliste (heute ViVi), nur mit hinterlegtem Schluessel -->
-<script src="js/vivi-zugang.js?v=v4350"></script><!-- v4350 · ViVi ab Investor (Plan-Merkmal statt Vorschau) --><script src="js/vivi.js?v=v4350"></script><script src="js/vivi-import.js?v=v4350"></script><!-- v4050 · Objekte aus ViVi uebernehmen, Ankauf rueckwirkend --><script src="js/vivi-mieterhoehung.js?v=v4350"></script><script src="js/vivi-nk-anpassung.js?v=v4350"></script><!-- v4042 · Nebenkosten-Vorauszahlung nach ViVi --><script src="js/vivi-reiter.js?v=v4350"></script><script src="js/vivi-copilot.js?v=v4350"></script><!-- v4130 · Co-Pilot im Reiter ViVi --><!-- v4040 · Reiter ViVi in der Pilot-Analyse --><!-- v4037 · Mieterhöhung aus DealPilot in ViVi anlegen (ein Fenster für Reiter Miete und Pilot-Analyse) --><!-- v3950/v3951/v3967 · ViVi: Verbindung, einmal anlegen mit Vorschau und Wartehinweis, Jetzt abgleichen (Vorschau-Funktion vivi) -->
+<script src="js/vivi-zugang.js?v=v4360"></script><!-- v4350 · ViVi ab Investor (Plan-Merkmal statt Vorschau) --><script src="js/vivi.js?v=v4350"></script><script src="js/vivi-import.js?v=v4350"></script><!-- v4050 · Objekte aus ViVi uebernehmen, Ankauf rueckwirkend --><script src="js/vivi-mieterhoehung.js?v=v4350"></script><script src="js/vivi-nk-anpassung.js?v=v4350"></script><!-- v4042 · Nebenkosten-Vorauszahlung nach ViVi --><script src="js/vivi-reiter.js?v=v4350"></script><script src="js/vivi-copilot.js?v=v4350"></script><!-- v4130 · Co-Pilot im Reiter ViVi --><!-- v4040 · Reiter ViVi in der Pilot-Analyse --><!-- v4037 · Mieterhöhung aus DealPilot in ViVi anlegen (ein Fenster für Reiter Miete und Pilot-Analyse) --><!-- v3950/v3951/v3967 · ViVi: Verbindung, einmal anlegen mit Vorschau und Wartehinweis, Jetzt abgleichen (Vorschau-Funktion vivi) -->
 <script src="js/vivi-steuer-abgleich.js?v=v4350"></script><!-- v4020 · ViVi Steuerjahre: Einstellung, Abgleich je Jahr im Jahresabgleich, automatisch nur offene Jahre, Marke im Reiter Steuer -->
 <script src="js/wertangabe.js?v=v3003b"></script><!-- v3003a · eine Wertangabe: Marktwert/Verkehrswert + Herkunft statt Bankbewertung -->
 <script src="js/indexreihen.js?v=v3026"></script><!-- v3026 · VPI/Nettokaltmieten aus dem Server-Cache -->
@@ -4279,7 +4279,7 @@ label.dp-required.qc-required::after {
 <script src="js/grafiken-premium.js?v=v4350"></script><!-- v4160 · Pilot-Analyse im Premium-Stil: Einordnung, Fingerabdruck, Heatmap, Mieteuro, Fahrplan, Wertverlauf, Monte-Carlo, Hebel, Ausstieg (Vorschau grafiken_neu), API window.DpGrafiken -->
 <script src="js/grafiken-portfolio.js?v=v4280"></script><!-- v4180 · Portfolio auf einen Blick: Kennzahlen und Gesamtbewertung oben vereint, je Objekt Miete, Cashflow n. St., Steuer; Zinsbindung mit Mehrbelastung (Vorschau grafiken_neu) -->
 <script src="js/grafiken-bewertung.js?v=v4280a"></script><!-- v4170 · Reiter Bewertung: Einordnung, DSCR- und Beleihungsverlauf, Zinsrisiko als Heatmap (Vorschau grafiken_neu) -->
-<script src="js/bewertung-ansicht.js?v=v4320a"></script><!-- v4320 · Reiter Bewertung: Erklärung beim Darüberfahren, Ansicht anpassen (Vorschau grafiken_neu) -->
+<script src="js/bewertung-ansicht.js?v=v4360"></script><!-- v4320 · Reiter Bewertung: Erklärung beim Darüberfahren, Ansicht anpassen (Vorschau grafiken_neu) -->
 <script src="js/portfolio-strategie.js?v=v3380"></script><!-- v1880 · Modul hinter Feature-Schluessel -->
 <script src="js/vermoegen.js?v=v4030"></script><!-- v3217 · W-11 Vermögen & Haushalt, W-5 Profilfoto (user_settings vermoegen) -->
 <script src="js/portfolio-spiegel.js?v=v1802"></script><!-- v1793: liest portfolioPayload() und legt es fuer den Bot ab - rechnet NICHTS -->

@@ -3238,7 +3238,7 @@ function _calcImmediate(){
      `||` gearbeitet: 0 ist ein gültiger Wert und darf nicht durchfallen. */
   st('kpi-irr', (irr == null) ? '—' : fP(irr, 1));
   /* v3192 · EK-Rendite als eigene Kachel (Marcel: „die Eigenkapitalrendite ist halt ganz wichtig, dass wir die direkt sehen“) - dieselbe Rechnung wie DealKpis (cf_banker_j / ek) und die Kennzahlen-Bewertung */
-  try { var _ekr = (ekv > 100) ? (cf_op / ekv * 100) : null; st('kpi-ekr', (ekv <= 100) ? '∞' : fP(_ekr, 1)); st('kpi-ekr-sub', (ekv <= 100) ? 'kaum Eigenkapital · max. Hebel' : 'p.a. vor Steuern auf ' + fE(ekv, 0) + ' EK'); if (_ekr != null) setKpiColor('kpi-ekr', _ekr, 8, 4); } catch (_eEk) {}
+  try { var _ekr = (ekv > 100) ? (cf_op / ekv * 100) : null; st('kpi-ekr', (ekv <= 100) ? '∞' : fP(_ekr, 1)); st('kpi-ekr-sub', (ekv <= 100) ? 'kaum Eigenkapital · max. Hebel' : 'vor Steuern auf ' + fE(ekv, 0) + ' EK, volles Jahr nach heutigen Eingaben'); if (_ekr != null) setKpiColor('kpi-ekr', _ekr, 8, 4); } catch (_eEk) {}
   if (irr != null) setKpiColor('kpi-irr', irr, 8, 4);   /* ≥8 % grün, 4–8 gold, <4 rot */
   if (be.cf == null) {
     st('kpi-be', '—');
@@ -4814,6 +4814,20 @@ function renderCFCalc(mode){
     dscrSubVal.textContent = dscrBrutto > 0 ? dscrBrutto.toFixed(2).replace('.', ',') : '—';   /* v3031: Zusatz brutto */
   }
   var dscr = dscrNetto;
+  /* v4360 · Marcel 24.11.: die Karte zeigt das gewaehlte Jahr, die Kacheln das volle Jahr nach
+     den heutigen Eingaben. Damit nie zwei DSCR ohne Erklaerung nebeneinander stehen, sagt die
+     Karte, welches Jahr sie rechnet. Nur Beschriftung, keine Rechnung. */
+  try {
+    var _crJ = (mode === 'heute' && K.heute && K.heute.jahr) ? String(K.heute.jahr) : null;
+    var _dT = document.querySelector('#cr-dscr-box .dscr-title');
+    if (_dT) _dT.textContent = mode === 'ezb' ? 'DSCR zum Ende der Zinsbindung'
+      : mode === 'anschluss' ? 'DSCR in der Anschlussfinanzierung'
+      : _crJ ? 'DSCR ' + _crJ : 'DSCR, volles Jahr nach heutigen Eingaben';
+    var _cfL = document.getElementById('cr-cfns');
+    if (_cfL && _cfL.parentNode && _cfL.parentNode.firstElementChild) {
+      _cfL.parentNode.firstElementChild.innerHTML = '<b>= Cashflow nach Steuern' + (_crJ ? ' ' + _crJ : '') + ' / Jahr <span class="cf-hint">(nach Tilgung)</span></b>';
+    }
+  } catch (_eCrJ) {}
 }
 
 function switchCFMode(mode){
@@ -5423,6 +5437,20 @@ function renderPhaseTable() {
   _setCfCard('cf-nst-now', nowVals.cfns);
   _setCfCard('cf-nst-ezb', ezbVals.cfns);
   _setCfCard('cf-nst-an', anVals.cfns);
+  /* v4360 · im Bestand ist „heute" das laufende Jahr (K.heute) - die Zeile nennt es, die Kacheln
+     daneben rechnen das volle Jahr nach den heutigen Eingaben. Gleiches fuer die Spalte „Heute"
+     im Kennzahlen-Vergleich je Phase. */
+  try {
+    var _hJ = (K.heute && K.heute.jahr) ? String(K.heute.jahr) : null;
+    ['cf-vst-now', 'cf-nst-now'].forEach(function (_id) {
+      var _b = document.getElementById(_id), _s = _b && _b.previousElementSibling;
+      if (_s && _s.tagName === 'SMALL') _s.textContent = _hJ || 'heute';
+    });
+    var _phT = document.getElementById('ph-wm-now');
+    var _phTab = _phT && _phT.closest('table');
+    var _phH = _phTab && _phTab.querySelector('th.phase-h-now');
+    if (_phH) _phH.textContent = _hJ ? 'Heute (' + _hJ + ')' : 'Heute';
+  } catch (_eHJ) {}
 
   State.phaseTable = { now: nowVals, ezb: ezbVals, an: anVals };
 

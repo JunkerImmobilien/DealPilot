@@ -57,7 +57,7 @@ const viviClient = require(P('backend/src/services/vivi/viviClient.js'));
 const dienst = require(P('backend/src/services/vivi/viviDienst.js'));
 const steuerEntwurf = require(P('backend/src/services/vivi/viviSteuer.js'));   /* v3951 · V4 als Entwurf */
 /* v3951 · Testbetrieb (Musteranschrift) ist in den Teilen A bis J aus, damit sie die echte Abbildung pruefen. Teil K schaltet ihn an. */
-const setzeDeps = (d) => dienst._setzeDeps(Object.assign({ testbetrieb: async () => false }, d));
+const setzeDeps = (d) => dienst._setzeDeps(Object.assign({ testbetrieb: async () => false, zugang: async () => true }, d));   /* v4360 · zugang: Plan-Merkmal vivi im Takt */
 
 /* ── Schema-Werkzeug ─────────────────────────────────────────────────── */
 function deref(s) { let n = 0; while (s && s.$ref && n++ < 10) s = SPEC.components.schemas[s.$ref.split('/').pop()]; return s; }
@@ -644,6 +644,23 @@ kopf('F  Anfragebremse');
   viviClient._fensterLeeren();
   const s = await dienst.taktLauf();
   ok(anfragen === 1 && s.bremse === 1 && s.objekte === 0, 'Takt: 429 beim ersten Objekt beendet die Runde dieses Nutzers (1 Anfrage, zweites Objekt nicht gefragt)');
+
+  /* v4360 · Herabstufung: ohne Plan-Merkmal vivi liest der Takt nichts, Verknuepfung bleibt; beim Hochstufen geht es weiter */
+  const S5 = speicherImArbeitsspeicher({});
+  S5.v['o1'] = { object_id: 'o1', user_id: USER, vivi_objekt_id: 'x', anlage_status: 'fertig', vivi_ids: {} };
+  let anf5 = 0, darfZ = false;
+  setzeDeps({ speicher: Object.assign(S5, { objektHolen: async (u, o) => ({ id: o, data: {} }) }), creds: { getSecret: async () => TOKEN }, zugang: async () => darfZ,
+    client: (tk, o) => viviClient.erzeugen(tk, Object.assign({}, o, { fetch: async () => { anf5++; return { status: 429, json: async () => ({}) }; }, maxWarten: 0 })), jetzt: () => Date.now(), schlafen: async () => {} });
+  viviClient._fensterLeeren();
+  const s5 = await dienst.taktLauf();
+  ok(anf5 === 0 && s5.angehalten === 1 && s5.nutzer === 0, 'Takt: ohne Plan-Merkmal vivi (Starter/Free) keine einzige Anfrage, Nutzer als angehalten gezählt');
+  ok(S5.v['o1'] && S5.v['o1'].anlage_status === 'fertig', 'Takt: angehaltene Verknüpfung bleibt bestehen');
+  darfZ = true; viviClient._fensterLeeren();
+  const s6 = await dienst.taktLauf();
+  ok(anf5 >= 1 && s6.angehalten === 0, 'Takt: nach dem Hochstufen wird wieder gelesen (Gegenprobe)');
+  const qD = lies('backend/src/services/vivi/viviDienst.js');
+  ok(qD.includes("zugang: function (userId) { return require('./viviZugang').darf"), 'Takt fragt viviZugang.darf je Nutzer (dieselbe Entscheidung wie die Route)');
+  ok(/Abgleich angehalten/.test(lies('frontend/js/vivi-zugang.js')), 'Hinweis „Abgleich angehalten“ im Upgrade-Hinweis');
 }
 
 /* ═══ G · Takt ═══════════════════════════════════════════════════════════ */
