@@ -275,13 +275,48 @@
 
      Er erscheint nur, wenn ueberhaupt eine Karte einen Ankauf-Stand
      hat - ein Schalter ohne Wirkung ist ein Versprechen. */
+  /* v4600 · Hilfen des Dreier-Schalters */
+  function dreiAus() {
+    document.documentElement.removeAttribute('data-dk-drei');
+  }
+  function dreiAktivSetzen() {
+    var s = el('dk-schalter');
+    if (!s || !s.classList.contains('dk-drei')) return;
+    var offen = document.documentElement.getAttribute('data-dpl-portfolio') === 'auf';
+    var wahl = !offen ? 'aktionen' : (alle ? 'ankauf' : 'bestand');
+    var bs = s.querySelectorAll('[data-dk-modus]');
+    for (var i = 0; i < bs.length; i++) {
+      var an = bs[i].getAttribute('data-dk-modus') === wahl;
+      bs[i].classList.toggle('aktiv', an);
+      bs[i].setAttribute('aria-selected', an ? 'true' : 'false');
+      bs[i].setAttribute('role', 'tab');
+    }
+    s.setAttribute('data-wahl', wahl);
+  }
+  var _dreiBeob = false;
+  function dreiBeobachten() {
+    if (_dreiBeob) return;
+    _dreiBeob = true;
+    /* gemerkten Reiter einmal wiederherstellen, nur am Schreibtisch (am Handy oeffnet portfolio() die Schublade) */
+    try {
+      var gem = localStorage.getItem('dp_dk_reiter');
+      if ((gem === 'ankauf' || gem === 'bestand') && !window.matchMedia('(max-width: 900px)').matches
+          && document.documentElement.getAttribute('data-dpl-portfolio') !== 'auf'
+          && window.DealPilotLayout && DealPilotLayout.portfolio) DealPilotLayout.portfolio(false);
+    } catch (e) {}
+    try {
+      new MutationObserver(function () { dreiAktivSetzen(); })
+        .observe(document.documentElement, { attributes: true, attributeFilter: ['data-dpl-portfolio'] });
+    } catch (e) {}
+  }
+
   function schalterSetzen() {
     var liste = el('sb-list');
     if (!liste) return;
     var mit = 0, karten = liste.querySelectorAll('.sb-card');
     for (var i = 0; i < karten.length; i++) if (ankaufVon(karten[i].getAttribute('data-key'))) mit++;
     var s = el('dk-schalter');
-    if (!karten.length) { if (s) s.remove(); return; }   /* v2173: filtert, braucht keinen Ankauf-Stand */
+    if (!karten.length) { if (s) s.remove(); dreiAus(); return; }   /* v2173: filtert, braucht keinen Ankauf-Stand */
     if (!s) {
       s = document.createElement('div');
       s.id = 'dk-schalter';
@@ -290,12 +325,21 @@
         var b = ev.target && ev.target.closest ? ev.target.closest('[data-dk-modus]') : null;
         if (!b) return;
         ev.stopPropagation();
+        /* v4600 · nur der KLICK merkt den Reiter (Kartenklick/Escape klappen zu, ohne ihn zu ueberschreiben) */
+        try { localStorage.setItem('dp_dk_reiter', b.getAttribute('data-dk-modus')); } catch (e) {}
+        /* v4600 · dritter Reiter „Aktionen“: klappt die Objektliste zu, die Schiene zeigt das Register */
+        if (b.getAttribute('data-dk-modus') === 'aktionen') {
+          try { if (window.DealPilotLayout && DealPilotLayout.portfolio) DealPilotLayout.portfolio(true); } catch (e) {}
+          dreiAktivSetzen();
+          return;
+        }
         modusSetzen(b.getAttribute('data-dk-modus') === 'ankauf');
         /* v3061 · Marcel 02.11.2026: „wenn wir in der Seitenleiste auf Bestand oder
            Ankauf klicken, soll sich automatisch die Objektliste öffnen". Der Schalter
            filterte nur - die Liste blieb hinter „Portfolio" zugeklappt (#sb-list 0 px).
            Nur auf den KLICK, nicht beim Laden (modusSetzen läuft auch von dort). */
         try { if (window.DealPilotLayout && DealPilotLayout.portfolio) DealPilotLayout.portfolio(false); } catch (e) {}
+        dreiAktivSetzen();
       });
       /* v2040 - NICHT mehr in die Liste. Marcel: „das soll ganz nach
          oben ... unter das DealPilot Logo."
@@ -406,6 +450,45 @@
         else if (liste) liste.insertBefore(s, liste.firstChild);   /* Rueckfall */
       }
     }
+    /* ══ v4600 · EIN UMSCHALTER: ANKAUF · BESTAND · AKTIONEN ══════════════
+       Marcel 24.11.2026: „Wir haben dort Aktionen und Portfolio mit so einem
+       Umschalter … könnten wir auch Bestand und Ankauf einfach unbedingt in
+       Aktionen … so kann ich dann einfach zwischen den drei Reitern umschalten."
+       In den Gestaltungen mit Schiene (Aktenmappe, Kanzlei, Tower) und am Handy
+       ersetzt dieser Schalter den Regler „Aktionen | Portfolio" (der bleibt im DOM,
+       html[data-dk-drei] blendet ihn aus). Ankauf/Bestand filtern UND klappen die
+       Liste auf, Aktionen klappt sie zu. Aktiver Reiter folgt data-dpl-portfolio
+       (auch Escape oder Kartenklick klappen zu). Ohne Gestaltung bleibt Stand. */
+    if (document.documentElement.hasAttribute('data-dp-layout')) {
+      var nB = 0, nA = 0;
+      for (var q = 0; q < karten.length; q++) {
+        if (karten[q].classList.contains('deal-won')) nB++;
+        else if (!karten[q].classList.contains('deal-lost')) nA++;
+      }
+      var tipA = 'Ankauf: Objekte in der Akquise, noch nicht gewonnen. Verlorene stehen ausgegraut am Ende.';
+      var tipB = 'Bestand: gewonnene Objekte mit ihrem laufenden Stand. Den eingefrorenen Ankauf-Stand zeigt das Objekt-Cockpit.';
+      var tipX = 'Aktionen: Ansichten, Anlegen, Ausgeben und System.';
+      var htmlDrei =
+          '<button type="button" data-dk-modus="ankauf" class="dk-seg dk-drei-seg" title="' + tipA + '"><span>Ankauf</span><b>' + nA + '</b></button>'
+        + '<button type="button" data-dk-modus="bestand" class="dk-seg dk-drei-seg" title="' + tipB + '"><span>Bestand</span><b>' + nB + '</b></button>'
+        + '<button type="button" data-dk-modus="aktionen" class="dk-seg dk-drei-seg" title="' + tipX + '"><span>Aktionen</span></button>';
+      if (s.getAttribute('data-drei-html') !== htmlDrei) {
+        s.innerHTML = htmlDrei;
+        s.setAttribute('data-drei-html', htmlDrei);
+      }
+      s.classList.add('dk-drei');
+      s.setAttribute('role', 'tablist');
+      document.documentElement.setAttribute('data-dk-drei', '');
+      dreiBeobachten();
+      dreiAktivSetzen();
+      var alteHilfe0 = el('dk-hilfe');
+      if (alteHilfe0 && alteHilfe0.parentNode) alteHilfe0.parentNode.removeChild(alteHilfe0);
+      return;
+    }
+    s.classList.remove('dk-drei');
+    s.removeAttribute('data-drei-html');
+    s.removeAttribute('role');
+    dreiAus();
     s.innerHTML =
       '<span class="dk-seg-titel">Stand</span>'
       /* v2039 - die Zahl ist raus (Marcel: „da steht eine 2 drinne"),
