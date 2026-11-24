@@ -107,7 +107,7 @@
       + '<label class="' + (weg === 'vivi-anpassen' ? 'an' : '') + '"><input type="radio" name="vnk-weg" data-vnk-f="weg" value="vivi-anpassen"' + (weg === 'vivi-anpassen' ? ' checked' : '') + '><span><b>In ViVi anpassen</b><small>DealPilot legt die neue Vorauszahlung als Anpassung in ViVi an.</small></span></label>'
       + '<label class="' + (weg === 'vivi-gilt' ? 'an' : '') + '"><input type="radio" name="vnk-weg" data-vnk-f="weg" value="vivi-gilt"' + (weg === 'vivi-gilt' ? ' checked' : '') + '><span><b>ViVi-Wert übernehmen</b><small>In DealPilot gilt ' + esc(eur2(w.vivi)) + ' laut ViVi. Der Vergleich entfällt.</small></span></label></div>';
     if (weg === 'vivi-gilt') {
-      h += '<p class="vmh-hin">Die Vorauszahlung steht nur im Mietvertrag. Cashflow und Steuer rechnen weiter mit den umlagefähigen Kosten. Zurücknehmen geht im Reiter Pilot-Analyse unter ViVi.</p>';
+      h += '<p class="vmh-hin">Die Vorauszahlung steht nur im Mietvertrag. Cashflow und Steuer rechnen weiter mit den umlagefähigen Kosten. Zurücknehmen geht im Objekt-Cockpit unter ViVi.</p>';
       if (_z.fehler) h += '<div class="vmh-fehler">' + esc(_z.fehler) + '</div>';
       host.innerHTML = h;
       fuss(fk('zu', 'Abbrechen', 'zu') + fk('gilt', 'ViVi-Wert übernehmen', 'haupt', true));
