@@ -683,10 +683,10 @@
     if (!kurz) objektSeite();
     /* Ertrag und Cashflow (v4370: Kennzahlen „wie eingegeben“ = volles Jahr mit den heutigen Eingaben, nicht das laufende Kalenderjahr) */
     S.push(B.seite(c, 'Ertrag und Cashflow', B.abschnitt(ab(), 'Von der Warmmiete zum Cashflow', 'Volles Jahr mit den heutigen Eingaben') + ertragKette(K, B)
-      + (kurz ? g('mieteuro') : '<div class="zwei"><div>' + bewirtschaftungDetail(K, B) + '</div><div>' + steuerWirkung(K, B) + '</div></div>')));
+      + (kurz ? (g('heatKompakt') || bankCockpit(B, true)) : '<div class="zwei"><div>' + bewirtschaftungDetail(K, B) + '</div><div>' + steuerWirkung(K, B) + '</div></div>')));
     if (kurz) {
-      S.push(B.seite(c, 'Steuer und Anschlusszins', B.abschnitt(ab(), 'Verlauf mit Steuern und Anschlusszins', 'Cashflow nach Steuern je Jahr und der Cashflow nach der Zinsbindung je Anschlusszins')
-        + '<div class="gx-pdf-klein">' + (g('steuer') || steuerWirkung(K, B) + zuwachsKurz(B)) + (g('heatKompakt') || bankCockpit(B, true)) + '</div>'));
+      S.push(B.seite(c, 'Wohin die Miete geht', B.abschnitt(ab(), 'Wohin die Miete geht', 'Der Weg der Miete in diesem Jahr und der Cashflow nach Steuern im Verlauf')
+        + g('mieteuro') + (g('steuer') || steuerWirkung(K, B) + zuwachsKurz(B))));
       wertSeite('');
     } else {
       if (g('mieteuro') || g('steuer')) S.push(B.seite(c, 'Wohin die Miete geht', B.abschnitt(ab(), 'Wohin die Miete geht', 'Der Weg der Miete in diesem Jahr und der Cashflow nach Steuern im Verlauf') + g('mieteuro') + g('steuer')));
