@@ -386,7 +386,7 @@
       '.dp-pa4-kp > li{position:relative;padding-left:18px}',
       '.dp-pa4-kp:not(.n) > li::before{content:"";position:absolute;left:2px;top:.5em;width:8px;height:8px;border-radius:50%;background:#A39E95}',
       '.dp-pa4-kp > li.gut::before{background:#3FA56C}.dp-pa4-kp > li.schlecht::before{background:#B8625C}',
-      '.dp-pa4-kpbox{margin:6px 0 8px}.dp-pa4-kpbox .dp-pa4-kp{margin-top:4px}.dp-pa4-kplbl{display:block;font:600 13px/1.4 Inter,system-ui,sans-serif;color:#2A2727}',
+      '.dp-kp-weg{display:none !important}.dp-pa4-kpbox{margin:6px 0 8px}.dp-pa4-kpbox .dp-pa4-kp{margin-top:4px}.dp-pa4-kplbl{display:block;font:600 13px/1.4 Inter,system-ui,sans-serif;color:#2A2727}',
       '.dp-pa4-kp.n{counter-reset:kp}.dp-pa4-kp.n > li{counter-increment:kp;padding-left:26px}',
       '.dp-pa4-kp.n > li::before{content:counter(kp);position:absolute;left:0;top:0;width:19px;height:19px;border-radius:50%;background:#F8F6F1;border:1px solid #E4DED2;font:600 11px/19px "JetBrains Mono",monospace;text-align:center;color:#2A2727}',
       '.dp-pa4-mehr{margin-top:10px;border:1px solid #E6DCC2;background:#fff;border-radius:9px;padding:7px 12px;font:600 12.5px "Space Grotesk",Inter,sans-serif;cursor:pointer;color:#2A2727}',
@@ -761,19 +761,21 @@
     var kand = root.querySelectorAll('p, .dp-pa-kv');
     Array.prototype.forEach.call(kand, function (el) {
       if (el.hasAttribute('data-dp-kp')) return;
-      if (el.closest('.dp-pa-d, .dp-pa-e, table, .dp-pa4-kp, .dp-pa5-erg, .dp-pa4-szk, [data-dp-kp-nie], .dpsh-tip, .dp-pa4-tippop, svg')) return;
+      var _selbstE = el.classList.contains('dp-pa-e');   /* ein Einfach-Absatz eines anderen Moduls wird ersetzt, nicht verdoppelt */
+      if ((el.parentElement && el.parentElement.closest('.dp-pa-d, .dp-pa-e, table, .dp-pa4-kp, .dp-pa5-erg, .dp-pa4-szk, [data-dp-kp-nie], .dpsh-tip, .dp-pa4-tippop, svg')) || el.classList.contains('dp-pa-d')) return;
       if (el.querySelector('p, ul, ol, table, input, button, select')) return;
       var text = (el.textContent || '').replace(/\s+/g, ' ').trim();
       if (text.length < PUNKTE_AB) return;
       var lbl = '', rest = text, st = el.classList.contains('dp-pa-kv') ? el.querySelector('strong, b') : null;
       if (st && text.indexOf((st.textContent || '').trim()) === 0) { lbl = (st.textContent || '').trim(); rest = text.slice(lbl.length).trim(); }
       var s = satzListe(rest);
+      if (s.length < 2 && rest.split(' · ').length >= 2) s = rest.split(' · ').map(function (x) { return satzListe(x).join(' '); }).filter(Boolean);   /* Potenzial: Angaben mit Mittelpunkt */
       if (s.length < 2) return;
       el.setAttribute('data-dp-kp', '1');
       var box = document.createElement('div'); box.className = 'dp-pa-e dp-pa4-kpbox';
       box.innerHTML = (lbl ? '<b class="dp-pa4-kplbl">' + esc(lbl.replace(/:$/, '')) + '</b>' : '')
         + '<ul class="dp-pa4-kp">' + s.slice(0, 4).map(function (x) { return '<li class="neutral">' + esc(x) + '</li>'; }).join('') + '</ul>';
-      el.classList.add('dp-pa-d');
+      if (_selbstE) el.classList.add('dp-kp-weg'); else el.classList.add('dp-pa-d');
       el.parentNode.insertBefore(box, el);
     });
   }
