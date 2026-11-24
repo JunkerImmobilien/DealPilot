@@ -164,7 +164,10 @@
 
   function los() {
     anwenden(true); weiterAnpassen();
-    window.addEventListener('dp:object-ready', function () { setTimeout(function () { anwenden(true); }, 50); setTimeout(function () { anwenden(true); }, 600); });
+    /* Handy: die Leiste scrollt; gemessen v4460c stand sie nach dem Laden bei 75 px, das Cockpit lag links ausserhalb.
+       Nach dem Laden eines gewonnenen Objekts an den Anfang rollen. */
+    var anfang = function () { try { if (aktiv()) { var n = document.querySelector('nav.tabs'); if (n && n.scrollWidth > n.clientWidth) n.scrollLeft = 0; } } catch (e) {} };
+    window.addEventListener('dp:object-ready', function () { setTimeout(function () { anwenden(true); anfang(); }, 50); setTimeout(function () { anwenden(true); anfang(); }, 600); setTimeout(anfang, 1500); });
     /* Status-Wechsel in der Deal-Aktion und der Umschalter Ankauf/Bestand feuern kein eigenes Ereignis:
        leichter Abgleich (nur Lesen, kein Schreiben), wirkt sofort ohne Neuladen */
     setInterval(function () { try { anwenden(false); } catch (e) {} }, 700);
