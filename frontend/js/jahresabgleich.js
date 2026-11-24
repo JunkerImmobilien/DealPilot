@@ -48,7 +48,7 @@
 (function (global) {
   'use strict';
   if (global.DpJahresabgleich) return;
-  var VERSION = 'v4500';
+  var VERSION = 'v4500a';
   var GOLD = 'var(--wl-c9a84c, #C9A84C)';
   /* v4090 · Marcel 23.11.2026: „ich würde die Reihenfolge ändern in Miete, Wert, Haus und dann Steuern" (die Steuer braucht die Zahlen der drei davor) */
   var SCHRITTE = [['miete', 'Miete'], ['wert', 'Wert'], ['haus', 'Haus'], ['steuer', 'Steuer']];
@@ -497,6 +497,7 @@
       '.dp-ja-tab .dp-ja-av{display:block;margin:3px 0 0 auto;padding:1px 7px;border:1px solid var(--wl-c9a84c, #C9A84C);border-radius:999px;background:transparent;color:' + T + ';font:500 10.5px/1.5 Inter,sans-serif;cursor:pointer;white-space:nowrap}',
       '.dp-ja-tab .dp-ja-av:hover{background:color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 14%,transparent)}',
       '.dp-ja-tab th .dp-tip{margin-left:3px;vertical-align:middle}',
+      '.dp-ja-tab td small.dp-ja-schlecht{color:#B8625C}', '.dp-ja-tab td small.dp-ja-gut{color:#2f7d52}',
       '.dp-ja-tab th:first-child,.dp-ja-tab td:first-child{text-align:left}',
       '.dp-ja-tab th{font:500 10px/1.35 "JetBrains Mono",monospace;letter-spacing:.06em;text-transform:uppercase;color:' + M + ';border-bottom:1px solid ' + RA + ';vertical-align:bottom}',
       '.dp-ja-tab td small{display:block;color:' + LE + ';font-size:11px;font-weight:400}',
@@ -589,7 +590,7 @@
     var genutzt = !lauf && ungenutzt > 0 && gen.length && mp.ungenutzt_jahr <= Math.max(5, ungenutzt * 1.2);
     var wort = genutzt ? 'genutzt' : (ungenutzt > 0 ? vz(ungenutzt) + ' / Monat' : (U.ueber ? 'über der Grenze' : 'ausgeschöpft'));
     if (genutzt) ungenutzt = 0;   /* v4220 · B15: festgeschriebene Miete des Jahres bietet keine Mieterhöhung mehr an (Knöpfe unten) */
-    return '<div class="dp-ja-pot" data-ja-pot="' + z.jahr + '"><div><div class="dp-ja-eti">Mieterhöhung ' + z.jahr + '</div><div class="dp-ja-w' + (ungenutzt > 0 ? '' : ' dp-ja-gut') + '">' + wort + '</div>'
+    return '<div class="dp-ja-pot" data-ja-pot="' + z.jahr + '"><div><div class="dp-ja-eti">Mieterhöhung ' + z.jahr + '</div><div class="dp-ja-w' + (ungenutzt > 0 ? '' : (U.ueber ? ' dp-ja-schlecht' : ' dp-ja-gut')) + '">' + wort + '</div>'
       + (genutzt ? '<div class="dp-ja-vgl">' + vz(Math.round(mp.zul - mp.ist)) + ' / Monat ab ' + mmjj(gen[0].datum) + '</div>' : '') + '</div>'
       + '<div><div class="dp-ja-balken" role="img" aria-label="eingetragen ' + quote + ' % der zulässigen Miete"><i style="width:' + quote + '%"></i></div><p>' + t + '</p></div>'
       + (ungenutzt > 0 && !(festJahr(z.jahr) || {}).miete ? '<span>' + knopf('mieterhoehung', 'Mieterhöhung vorbereiten', true)
@@ -625,8 +626,11 @@
   function tabelleHtml(Z, weg, L, vd) {
     var J = global.DpJahresstaende;
     /* v4500 · Marcel 24.11.2026: „Kaltmiete Plan und Kaltmiete Ist … kann ich nicht nachvollziehen“. Klare Worte und Hilfe zum Überfahren. */
+    /* Überfahren des Kopfes zeigt den Text (title, auch im Modus Feldhilfe, dort sind die i-Knöpfe aus), der i-Knopf das Fenster */
     var tip = function (id, t) { return '<button type="button" class="dp-tip" data-tip-id="' + id + '" tabindex="-1" aria-label="' + t + '"></button>'; };
-    var kopf = '<tr><th>Jahr</th><th>Kaltmiete<br>geplant' + tip('pa.ja_miete_plan', 'Was heißt geplant?') + '</th><th>Kaltmiete<br>tatsächlich' + tip('pa.ja_miete_ist', 'Was heißt tatsächlich?') + '</th>' + (vd ? '<th>Kaltmiete<br>laut ViVi</th>' : '') + '<th>zulässig<br>§ 558' + tip('pa.ja_zulaessig', 'Was heißt zulässig?') + '</th><th>Cashflow v. St.<br>Plan · Ist</th><th>Ergebnis<br>V+V</th><th>Wert</th><th>Rest&shy;schuld</th><th>DSCR</th><th>Score</th><th>Abgleich</th></tr>';
+    var th = function (id, inhalt, t) { var x = null; try { x = global.DpTooltips && global.DpTooltips.get ? global.DpTooltips.get(id) : null; } catch (e) { x = null; }
+      return '<th' + (x ? ' title="' + esc(x.title + ': ' + x.body) + '" style="cursor:help"' : '') + '>' + inhalt + tip(id, t) + '</th>'; };
+    var kopf = '<tr><th>Jahr</th>' + th('pa.ja_miete_plan', 'Kaltmiete<br>geplant', 'Was heißt geplant?') + th('pa.ja_miete_ist', 'Kaltmiete<br>tatsächlich', 'Was heißt tatsächlich?') + (vd ? '<th>Kaltmiete<br>laut ViVi</th>' : '') + th('pa.ja_zulaessig', 'zulässig<br>§ 558', 'Was heißt zulässig?') + '<th>Cashflow v. St.<br>Plan · Ist</th><th>Ergebnis<br>V+V</th><th>Wert</th><th>Rest&shy;schuld</th><th>DSCR</th><th>Score</th><th>Abgleich</th></tr>';
     var body = Z.map(function (z) {
       var sx = stand(z, weg, L), lauf = z.jahr >= heuteJahr(), pl = planZeile(z.jahr), mp = mpJahr(z.jahr);
       var st = J && J.standJahr ? J.standJahr(z.jahr) : null, kz = (st && st.kz) || {};
