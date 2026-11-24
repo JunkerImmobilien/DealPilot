@@ -72,6 +72,7 @@
       '.vivi-obj-liste .vivi-obj-adr{flex:1 1 220px;min-width:0}',
       '.vivi-obj-liste .vivi-obj-st{display:block;color:var(--muted, #7A7370);font-size:11.5px}',
       '.vivi-obj-liste .vivi-obj-k{display:flex;gap:6px;flex-wrap:wrap}',
+      '.vivi-obj-liste .vivi-obj-k .btn-ghost{border:1px solid var(--border, #E7E2DC) !important;background:#fff !important;color:var(--ch, #2A2727) !important}',
       '#vivi-ov table{width:100%;border-collapse:collapse;margin:8px 0;font-size:12.5px}',
       '#vivi-ov td,#vivi-ov th{padding:5px 6px;border-bottom:1px solid rgba(42,39,39,.1);text-align:left;vertical-align:top}',
       '#vivi-ov th{font:600 10px/1.2 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;color:#7A7370}',
