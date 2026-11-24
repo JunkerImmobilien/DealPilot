@@ -33,6 +33,9 @@
  *     Tilgungsplan der Bank (calc.js v3029: 300.000 €, 3,8 %, 2 % -> 227.146 €), Anschluss 5 % mit derselben Tilgung,
  *     Cashflow und DSCR je Phase aus DealKpis, Laufzeit aus dem Monatsplan, keine eigene Zins- oder Tilgungsformel
  *   P v3946 · Grundangaben Pflicht (Server und Browser, dieselbe Liste), schlagen die gelesenen Werte, keine Anschrift
+ *     einzelcheck-3: Pflicht erst beim KAUF, die Unterlagen kommen vorher (Marcel 24.11.2026 „erst auslesen“)
+ *   S einzelcheck-3 · Bewertungsbericht (Marktbericht, Gutachten) mit eigenem Schema, nie als Exposé; Herkunft je Feld;
+ *     Ablauf Unterlagen → Auslesen → Grundangaben vorbelegt; Widerspruch Eingabe gegen Unterlage nur per Wahl
  *     im Zahlenstand, Formular getrennt in Objekt und Finanzierung
  *   Q v3946 · nach dem Kauf kein zweites Hochladen: kein zweites Fenster, Ablage auf dem Gerät vor der Weiterleitung,
  *     Bericht startet nach der Rückkehr von selbst, Ablage gelöscht (fertig, Abbruch, Alter), Datenschutztext
@@ -52,6 +55,7 @@ const WURZEL = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const require = createRequire(import.meta.url);
 const P = {
   dienst: path.join(WURZEL, 'backend/src/services/einzelcheck.js'),
+  schemas: path.join(WURZEL, 'backend/src/services/dokumentSchemas.js'),   /* einzelcheck-3 · Schema wertbericht */
   route: path.join(WURZEL, 'backend/src/routes/publicEinzelcheck.js'),
   webhook: path.join(WURZEL, 'backend/src/routes/stripeWebhook.js'),
   index: path.join(WURZEL, 'backend/src/index.js'),
@@ -829,7 +833,8 @@ TEILE.P = async function (svc, q) {
     if (JSON.stringify(zeile && zeile.zahlen).indexOf(STRASSE) >= 0 || JSON.stringify(zeile && zeile.zahlen).indexOf(NAME) >= 0) f.push('Anschrift oder Name im Zahlenstand');
   } finally { svc._setzeDeps(null); }
   const route = ohneKommentar(q.route);
-  if (!/const fehltG = ec\.grundFehlt\(req\.body && req\.body\.grund\);\s*if \(fehltG\.length\) return res\.status\(400\)/.test(route)) f.push('/auslesen prüft die Grundangaben nicht');
+  /* einzelcheck-3 · /auslesen darf OHNE Grundangaben laufen (erst auslesen, dann die Grundangaben) */
+  if (/ec\.grundFehlt\(/.test(route.split("router.post('/auslesen'")[1].split('router.post(')[0])) f.push('/auslesen verlangt wieder die Grundangaben vor den Unterlagen');
   if (!/kaufAnlegen\(\{ zahlen: b\.zahlen, siegelWert: b\.siegel, grund: b\.grund \}\)/.test(route)) f.push('/kaufen gibt die Grundangaben nicht weiter');
   const bb = route.split("router.post('/bericht'")[1] || '';
   if (!/Object\.assign\(\{\}, ec\.zahlenSauber\(z\.zahlen\), r \? r\.zahlen : \{\}, grund\)/.test(bb)) f.push('/bericht: Grundangaben schlagen die gelesenen Werte nicht');
@@ -839,9 +844,70 @@ TEILE.P = async function (svc, q) {
   const gf = C.DpEinzelCheck._grundFehlt;
   if (gf(GRUND).length || gf(ohne).indexOf('zins_pct') < 0 || gf({}).length < 8) f.push('Browser prüft die Grundangaben anders als der Server');
   const fr = ohneKommentar(q.front);
-  if (!/function zeigeUnterlagen\(hinweis\) \{\s*if \(grundFehlt\(S\.grund\)\.length\) \{ zeigeGrund\(hinweis\); return; \}/.test(fr)) f.push('Unterlagen ohne Grundangaben erreichbar');
+  /* einzelcheck-3 · Kauf bleibt hinter den Grundangaben: kaufen() nur aus zeigeErgebnis, und dorthin nur über das Formular */
+  if (!/S\.grund = n; S\.abweichungen = \[\];[\s\S]{0,200}zeigeErgebnis\(\);/.test(fr)) f.push('Ergebnis nicht hinter den bestätigten Grundangaben');
+  if (!/else if \(\(S\.frei \|\| S\.ohneUnterlagen\) && S\.grund && !grundFehlt\(S\.grund\)\.length\) zeigeErgebnis\(\);/.test(fr)) f.push('auf() öffnet das Ergebnis ohne vollständige Grundangaben');
   if (!/<legend>Objekt<\/legend>/.test(fr) || !/<legend>Finanzierung<\/legend>/.test(fr)) f.push('Formular nicht in Objekt und Finanzierung getrennt');
   if (!/fd\.append\('grund', JSON\.stringify\(S\.grund\)\)/.test(fr)) f.push('Grundangaben gehen nicht mit dem Formular');
+  return f;
+};
+/* S · einzelcheck-3 · Bewertungsbericht und neuer Ablauf (Marcel 24.11.2026: „Marktbericht reingeladen mit 180.000 …
+   die Unterlagen sagen was ganz anderes“ / „erst auslesen, dann die Grundangaben gucken, was noch fehlt“) */
+TEILE.S = async function (svc, q) {
+  const f = [];
+  const MB_TEXT = 'DealPilot Marktbericht. MARKTWERT-INDIKATION SPANNE DER VERFAHREN KAUFPREIS BODENRICHTWERT. Vergleichswertverfahren 143.550 €. '
+    + 'Kaufpreis von 165.000 €, Wohnfläche 78 m², 1.013 Vergleichsangebote, Angebotsabschlag 5,8 % auf 180.000 €. Marktpreisindikation 171.000 €. Ertragswert 83.000 €.';
+  if (!svc.istWertbericht(MB_TEXT, 'Bericht.pdf', { typ: 'marktbericht' })) f.push('Marktbericht nicht als Bewertungsbericht erkannt (Klassifizierung)');
+  if (!svc.istWertbericht(MB_TEXT, 'Unterlage.pdf', {})) f.push('Marktbericht nicht am Text erkannt');
+  if (svc.istWertbericht(TEXTE.expose, 'Expose.pdf', {})) f.push('Exposé als Bewertungsbericht erkannt');
+  if (svc.istWertbericht('Exposé Mehrfamilienhaus. Kaufpreis 520.000 €, Wohnfläche 410 m², Käuferprovision 3,57 %.', 'Angebot.pdf', {})) f.push('Verkaufsangebot als Bewertungsbericht erkannt');
+  /* Kette mit nachgebauter KI: der Bericht läuft über das Schema „wertbericht“, nie über extractExpose */
+  const U = umgebung(); const altText = TEXTE.expose; TEXTE.mbx = MB_TEXT;
+  const kiAlt = U.deps.openai;
+  const arten = [];
+  const openai = { extractExpose: async function (t, o) { arten.push('expose'); return kiAlt.extractExpose(t, o); },
+    extractDokument: async function (t, typ, o) { arten.push(typ);
+      if (typ === 'wertbericht') return { success: true, model: o.model, extracted: { kaufpreis_im_bericht_eur: 165000, fuehrender_wert_eur: 143550, fuehrendes_verfahren: 'vergleichswert',
+        marktpreisindikation_eur: 171000, ertragswert_eur: 83000, wohnflaeche_m2: 78, objektart: 'Eigentumswohnung', plz: '32423', ort: 'Minden' } };
+      return kiAlt.extractDokument(t, typ, o); } };
+  svc._setzeDeps(Object.assign({}, U.deps, { openai: openai }));
+  try {
+    const r = await svc.auslesen([pdf('mbx', 'Marktbericht.pdf')], 'frei');
+    if (arten.join() !== 'wertbericht') f.push('Marktbericht nicht über das eigene Schema gelesen: ' + arten.join());
+    const z = r.zahlen || {};
+    if (z.kp !== 165000 || z.wert_bericht !== 143550 || z.mpi_bericht !== 171000 || z.wert_verfahren !== 'vergleichswert') f.push('Zahlen aus dem Bericht falsch: ' + JSON.stringify(z));
+    if (!r.herkunft || r.herkunft.kp !== 'Marktbericht' || r.herkunft.wfl !== 'Marktbericht') f.push('Herkunft fehlt: ' + JSON.stringify(r.herkunft));
+    if (!svc.siegelPruefen(z, r.siegel || svc.siegel(z))) f.push('Siegel passt nicht zu den Zahlen');
+    if (Object.keys(r).indexOf('herkunft') < 0) f.push('herkunft nicht in der Antwort');
+    /* Exposé und Bericht zusammen: der Kaufpreis des Exposés gewinnt, die Verfahrenswerte nie als Kaufpreis */
+    arten.length = 0;
+    const r2 = await svc.auslesen([pdf('expose', 'Expose.pdf'), pdf('mbx', 'Marktbericht.pdf')], 'frei');
+    if (r2.zahlen.kp !== 180000 || r2.herkunft.kp !== 'Exposé') f.push('Exposé-Kaufpreis gewinnt nicht vor dem Bericht: ' + r2.zahlen.kp + ' ' + r2.herkunft.kp);
+    if (r2.zahlen.wert_bericht !== 143550) f.push('Wert des Berichts fehlt neben dem Exposé');
+  } finally { svc._setzeDeps(null); delete TEXTE.mbx; TEXTE.expose = altText; }
+  /* Schema: eigener Eintrag nur in SCHEMATA, nie in DOKUMENT_TYPEN (der App-Import bleibt unberührt) */
+  const ds = q.schemas;
+  if (!/wertbericht: \{\s*einleitung:/.test(ds)) f.push('Schema wertbericht fehlt');
+  if (/kaufpreis_im_bericht_eur/.test(ds) && !/NIE ein Verfahrenswert/.test(ds)) f.push('Schema trennt Kaufpreis und Verfahrenswerte nicht');
+  const typenTeil = ds.split('const DOKUMENT_TYPEN')[1] ? ds.split('const DOKUMENT_TYPEN')[1].split('};')[0] : '';
+  if (/\bwertbericht\b/.test(typenTeil)) f.push('wertbericht steht in DOKUMENT_TYPEN (der App-Import würde ihn wählen)');
+  /* Browser: Ablauf und Wahl bei Widerspruch */
+  const fr = ohneKommentar(q.front);
+  if (!/<li>Unterlagen<\/li><li>Auslesen<\/li><li>Grundangaben<\/li><li>Ergebnis<\/li><li>Bericht<\/li>/.test(fr)) f.push('Schrittleiste nicht Unterlagen, Auslesen, Grundangaben');
+  if (!/S\.frei = j; S\.herkunft = j\.herkunft \|\| \{\}; S\.ohneUnterlagen = false;\s*zeigeGrund\(\);/.test(fr)) f.push('nach dem Auslesen nicht die Grundangaben');
+  if (!/var nochOffen = Object\.keys\(offen\);\s*if \(nochOffen\.length\) \{/.test(fr)) f.push('Widerspruch ohne Wahl übergehbar');
+  if (!/class="btn-l ec-ohne"/.test(fr)) f.push('kein Weg ohne Unterlagen');
+  /* echter Lauf im Browser-Nachbau: Deal-Check 180.000, Unterlage 165.000 → Wahl, weiter erst nach Klick */
+  let C; try { C = frontLaden(q.front, q.kerne); } catch (e) { return f.concat(['Frontend lädt nicht: ' + e.message]); }
+  if (!C.DpEinzelCheck || !C.DpEinzelCheck._vorbelegung) return f.concat(['_vorbelegung fehlt']);
+  const S0 = C.DpEinzelCheck._S;
+  S0.grund = Object.assign({}, GRUND, { kp: 180000 }); S0.frei = { zahlen: { kp: 165000, wfl: 100, bj: 1928, wert_bericht: 143550 } }; S0.herkunft = { kp: 'Marktbericht', wfl: 'Marktbericht', bj: 'Marktbericht' };
+  const vb = C.DpEinzelCheck._vorbelegung();
+  if (!vb.konflikt.kp || vb.konflikt.kp.a !== 180000 || vb.konflikt.kp.b !== 165000 || vb.konflikt.kp.bq !== 'Marktbericht') f.push('Widerspruch Kaufpreis nicht erkannt: ' + JSON.stringify(vb.konflikt));
+  if (vb.werte.kp !== 180000) f.push('Kaufpreis still überschrieben: ' + vb.werte.kp);
+  if (vb.konflikt.wfl) f.push('gleicher Wert als Widerspruch gemeldet');
+  if (vb.werte.bj !== 1928 || vb.quelle.bj !== 'Marktbericht') f.push('leeres Feld nicht aus der Unterlage vorbelegt: ' + vb.werte.bj + ' ' + vb.quelle.bj);
+  S0.grund = null; S0.frei = null; S0.herkunft = {};
   return f;
 };
 /* Q · Nach dem Kauf kein zweites Hochladen: selber Tab, Ablage auf dem Gerät, Bericht startet von selbst, Ablage wird gelöscht */
@@ -916,7 +982,7 @@ function quellen(ueber) {
 const NAMEN = { A: 'Speicher-only', A2: 'pdftotext echt über stdin/stdout', B: 'Schwärzen vor dem KI-Aufruf', C: 'Bremse und Schalter', D: 'kostenlos höchstens 2 Unterlagen',
   E: 'Bericht nur mit gültigem Kauf-Token', F: 'Frist 14 Tage', G: 'Preis aus dem lookup_key', H: 'Webhook', I: 'Zahlen-Weissliste', J: 'Siegel', K: 'Marktbericht Stufe 3 ohne Ablage, Wertermittlung mit Herkunft, keine Quellennamen',
   L: 'gescannte PDFs: Texterkennung nur im Speicher', M: 'Rabatt-Vorrang Anrechnung vor Flyer-Code', N: 'Vergleichsmiete und Obergrenze für Investoren',
-  O: 'Finanzierung wie im Investment-PDF (Kerne)', P: 'Grundangaben Pflicht', Q: 'kein zweites Hochladen nach dem Kauf', R: 'Bericht: Kapitel, Deckblatt, Kundentext' };
+  O: 'Finanzierung wie im Investment-PDF (Kerne)', P: 'Grundangaben Pflicht', Q: 'kein zweites Hochladen nach dem Kauf', R: 'Bericht: Kapitel, Deckblatt, Kundentext', S: 'Bewertungsbericht und Ablauf erst auslesen' };
 
 console.log('einzelcheck-pruefen · v3946');
 const svc = require(P.dienst);
@@ -949,7 +1015,7 @@ const GEGEN = [
   ['C', 'Tagesdeckel umgangen', { dienst: ersetze(D, 'return { ok: v < tagesdeckelEur(),', 'return { ok: true,') }],
   ['H', 'Preisprüfung im Webhook entfernt', { dienst: ersetze(D, "if (!passt) { console.error('[einzelcheck-webhook] Sitzung ohne Preis ' + LOOKUP_KEY + ':', session.id); return { ok: false, reason: 'fremder_preis' }; }", '') }],
   ['H', 'unbezahlt angenommen', { dienst: ersetze(D, "if (session.payment_status && session.payment_status !== 'paid') return", "if (false) return") }],
-  ['I', 'Weissliste abgeschaltet', { dienst: ersetze(D, '  z.unterlagen = liste.length;\n  return zahlenSauber(z);', '  z.unterlagen = liste.length;\n  return Object.assign({ name: ' + JSON.stringify(NAME) + ' }, z);') }],
+  ['I', 'Weissliste abgeschaltet', { dienst: ersetze(D, '  const zahlen = zahlenSauber(z), herkunft = {};', '  const zahlen = Object.assign({ name: ' + JSON.stringify(NAME) + ' }, z), herkunft = {};') }],
   ['J', 'Siegel nicht geprüft', { dienst: ersetze(D, 'if (Object.keys(gelesen).length && !siegelPruefen(gelesen, siegelWert)) {', 'if (false) {') }],
   ['K', 'mb speichert wieder', { mbOrch: ersetze(q0.mbOrch, '(NUR_WERT || OHNE_ABLAGE) ? { id: null }', 'NUR_WERT ? { id: null }') }],
   /* v3941 / v3946 */
@@ -987,8 +1053,13 @@ const GEGEN = [
   ['O', 'Anschluss mit eigener Tilgung', { front: ersetze(q0.front, 'var plan2 = DW.monatsplan({ betrag: rs, zins: anschlussZins, tilg: e.tilg }, 1200);', 'var plan2 = DW.monatsplan({ betrag: rs, zins: anschlussZins, tilg: 1 }, 1200);').split("d1: rs, d1z: anschlussZins, d1t: e.tilg, ek: r.ek });").join("d1: rs, d1z: anschlussZins, d1t: 1, ek: r.ek });") }],
   ['O', 'Restschuld selbst gerechnet', { front: ersetze(q0.front, '    var rs = plan.length ? plan[plan.length - 1].rs : r.d1;', '    var rs = r.d1 * Math.pow(1 + e.zins / 1200, bind * 12) - (r.d1 * (e.zins + e.tilg) / 1200) * (Math.pow(1 + e.zins / 1200, bind * 12) - 1) / (e.zins / 1200) * 1.01;') }],
   ['P', 'Kauf ohne Prüfung der Grundangaben', { dienst: ersetze(D, '  if (fehlt.length) {\n    const e = new Error(\'Bitte zuerst die Grundangaben', '  if (false) {\n    const e = new Error(\'Bitte zuerst die Grundangaben') }],
-  ['P', '/auslesen ohne Grundangaben', { route: ersetze(R, '    if (fehltG.length) return res.status(400)', '    if (false) return res.status(400)') }],
-  ['P', 'Unterlagen ohne Grundangaben im Browser', { front: ersetze(q0.front, '    if (grundFehlt(S.grund).length) { zeigeGrund(hinweis); return; }   /* v3946 · Pflicht vor dem Hochladen */\n', '') }],
+  ['P', '/auslesen verlangt wieder die Grundangaben', { route: ersetze(R, "    const dateien = req.files || [];\n    if (!dateien.length) return res.status(400).json({ error: 'Bitte mindestens ein PDF hochladen.', code: 'keine_datei' });", "    const dateien = req.files || [];\n    if (!dateien.length) return res.status(400).json({ error: 'Bitte mindestens ein PDF hochladen.', code: 'keine_datei' });\n    if (ec.grundFehlt(req.body && req.body.grund).length) return res.status(400).json({});") }],
+  ['P', 'Ergebnis ohne vollständige Grundangaben', { front: ersetze(q0.front, '    else if ((S.frei || S.ohneUnterlagen) && S.grund && !grundFehlt(S.grund).length) zeigeErgebnis();', '    else if (S.frei || S.ohneUnterlagen) zeigeErgebnis();') }],
+  /* einzelcheck-3 */
+  ['S', 'Marktbericht wieder als Exposé gelesen', { dienst: ersetze(D, "  const typ = istWertbericht(text, name, erk) ? 'wertbericht'\n    : istExpose", "  const typ = false ? 'wertbericht'\n    : istExpose") }],
+  ['S', 'Widerspruch still mit der Unterlage überschrieben', { front: ersetze(q0.front, "      if (!gleich(VORBELEGBAR[k], werte[k], u)) konflikt[k] =", "      if (!gleich(VORBELEGBAR[k], werte[k], u)) werte[k] = u; if (false) konflikt[k] =") }],
+  ['S', 'Weiter trotz offener Wahl', { front: ersetze(q0.front, '      if (nochOffen.length) {', '      if (false) {') }],
+  ['S', 'nach dem Auslesen gleich das Ergebnis', { front: ersetze(q0.front, "      S.frei = j; S.herkunft = j.herkunft || {}; S.ohneUnterlagen = false;\n      zeigeGrund();", "      S.frei = j; S.herkunft = j.herkunft || {}; S.ohneUnterlagen = false;\n      zeigeErgebnis();") }],
   ['P', 'Browser ohne Zinsbindung als Pflicht', { front: ersetze(q0.front, "  var GRUND_PFLICHT = ['kp', 'nkm', 'wfl', 'art', 'ek_eur', 'zins_pct', 'tilg_pct', 'bindung_j'];", "  var GRUND_PFLICHT = ['kp', 'nkm', 'wfl', 'art', 'ek_eur', 'tilg_pct', 'bindung_j'];") }],
   ['P', 'Grundangaben schlagen die gelesenen Werte nicht', { dienst: ersetze(D, '  const z = Object.assign({}, gelesen, grundSauber(grund));', '  const z = Object.assign({}, grundSauber(grund), gelesen);') }],
   ['Q', 'Stripe wieder im zweiten Fenster', { front: ersetze(q0.front, "        var weiter = function () { location.href = r.url; };", "        var weiter = function () { window.open(r.url, '_blank'); };") }],
