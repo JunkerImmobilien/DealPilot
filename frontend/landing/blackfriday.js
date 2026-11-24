@@ -101,14 +101,14 @@
       '@media(prefers-reduced-motion:reduce){#' + ID + ',#' + ID + ' .k{transition:none}}',
       /* Preise */
       '.dpbf-alt{position:relative;display:inline-block;margin-right:11px;font-size:.62em;font-weight:600;',
-      '  opacity:.55;vertical-align:.32em;white-space:nowrap}',
+      '  color:#7A7366;vertical-align:.32em;white-space:nowrap}',
       '.dpbf-alt:after{content:"";position:absolute;left:-3px;right:-3px;top:53%;height:2px;',
       '  background:#D8564C;transform:rotate(-8deg)}',
       '.dpbf-etk{display:block;width:-moz-fit-content;width:fit-content;margin:8px 0 2px;',
       '  background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);color:#1a1509;',
       '  font:700 10.5px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.1em;padding:6px 10px;border-radius:99px}',
-      '.dpbf-code{display:block;margin-top:5px;font:500 11.5px/1.4 Inter,sans-serif;opacity:.75}',
-      '.dpbf-code b{font-family:"JetBrains Mono",ui-monospace,monospace;letter-spacing:.06em}',
+      '.dpbf-code{display:block;margin-top:5px;font:500 11.5px/1.4 Inter,sans-serif;color:#5C5648}',
+      '.dpbf-code b{color:#2A2727;font-family:"JetBrains Mono",ui-monospace,monospace;letter-spacing:.06em}',
     ].join('');
     document.head.appendChild(s);
   }
