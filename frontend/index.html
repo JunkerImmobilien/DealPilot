@@ -3471,14 +3471,14 @@ label.dp-required.qc-required::after {
 
 <!-- ═══════════ TAB 5: KI ═══════════ -->
 <div class="sec" id="s5">
-  <h2 class="sec-title">Pilot-Investment-Analyse</h2>
-  <p class="sec-desc">DealPilot bewertet deine Zahlen — Bewertung, Stärken, Risiken, Verhandlungsempfehlung, Bankargumente, Fazit</p>
+  <h2 class="sec-title">Pilot-Analyse</h2>
+  <p class="sec-desc">DealPilot bewertet deine Zahlen: Gesamtbewertung, Stärken, Schwächen und die nächsten Schritte.</p>
 
   <div class="ai-box">
     <div class="ai-hdr">
       <div class="ai-icon ai-icon-brain" id="ai-icon-main"></div>
       <div>
-        <div class="ai-title">Investment-Analyse</div>
+        <div class="ai-title">Pilot-Analyse</div>
         <div class="ai-sub">Pilot-Analyse</div>
       </div>
     </div>
@@ -3622,7 +3622,7 @@ label.dp-required.qc-required::after {
     <div class="ai-mini-header">
       <div class="ai-mini-title">
         <span class="ai-mini-icon ai-mini-icon-svg" id="ai-mini-icon-svg"></span>
-        <span>Pilot-Investment-Analyse</span>
+        <span>Pilot-Analyse</span>
         <span class="ai-mini-tag">basiert auf DealScore</span>
       </div>
       <div class="ai-mini-actions">
@@ -4063,7 +4063,7 @@ label.dp-required.qc-required::after {
 <script src="js/steuer-verlauf.js?v=v3273a"></script>
 <script src="js/pa-potenzial.js?v=v3710"></script><!-- v3323 · Pilot-Analyse: Reiter Potenzialanalyse -->
 <script src="js/hausverlauf.js?v=v4007"></script><!-- v3323 · Pilot-Analyse: Reiter Hausverlauf (WEG-Unterlagen chronologisch) · v3430 Haus je Jahr -->
-<script src="js/pilot-analyse-v4.js?v=v4450d"></script><!-- v3099 · Pilot-Analyse Fassung 4 (v3259: eine Kopfzeile + Reiterleiste; Kopfzeile, Einfach/Detail, Uebersicht, Risiken & Szenarien, Wertverlauf) -->
+<script src="js/pilot-analyse-v4.js?v=v4450d"></script><script src="js/objekt-cockpit.js?v=v4460"></script><!-- v4460 · Objekt-Cockpit vorne bei gewonnenen Objekten --><!-- v3099 · Pilot-Analyse Fassung 4 (v3259: eine Kopfzeile + Reiterleiste; Kopfzeile, Einfach/Detail, Uebersicht, Risiken & Szenarien, Wertverlauf) -->
 <script src="js/config.js?v=v4350"></script>
 <script src="js/dealcheck-uebernahme.js?v=v3940"></script><!-- v3313 · Deal-Check der Startseite: Fragment vor auth.js/register-easter-egg.js annehmen -->
 <script src="js/gnotkg.js?v=v3088"></script><!-- v3088 · Notar und Grundbuch nach Gebuehrenordnung -->
@@ -4121,7 +4121,7 @@ label.dp-required.qc-required::after {
 <script src="js/ui.js?v=v4390"></script>
 <script src="js/ki-text.js?v=v4230"></script><!-- v4230 · KI-Text ohne Markdown (Co-Pilot, Portfolio-Pilot) -->
 <script src="js/sidebar-collapse.js?v=20260611174630"></script>
-<script src="js/storage.js?v=v4420"></script>
+<script src="js/storage.js?v=v4460"></script>
 <script src="js/nachrechnen.js?v=v3031"></script><!-- v3031: Kennzahlen/Scores gespeicherter Objekte neu rechnen (nur auf Aufruf) -->
 <!-- v845-newsearch-removed: sb-search.js entfernt (Kollision mit sidebar-search.js) -->
 <script src="js/inventar-sync.js?v=v3006c"></script><!-- V291-inv-sync-applied -->
@@ -4187,7 +4187,7 @@ label.dp-required.qc-required::after {
 <script src="js/nk-vorauszahlung.js?v=v3950"></script><!-- v3950 · Nebenkosten-Vorauszahlung: Vorschlag aus den umlagefaehigen Kosten je Einheit nach Wohnflaeche -->
 <script src="js/vivi-felder.js?v=v4210"></script><!-- v3950/v3951 · ViVi: verknuepfte Felder ausgegraut, Hinweis, lokal ueberschreiben -->
 <script src="js/buchhaltung-verbinden.js?v=v4400c"></script><!-- v3967 · Buchhaltung verbinden: Angebot unter Gewonnen in der Deal-Aktion, Anbieterliste (heute ViVi), nur mit hinterlegtem Schluessel -->
-<script src="js/vivi-zugang.js?v=v4360"></script><!-- v4350 · ViVi ab Investor (Plan-Merkmal statt Vorschau) --><script src="js/vivi.js?v=v4400b"></script><script src="js/vivi-import.js?v=v4350"></script><!-- v4050 · Objekte aus ViVi uebernehmen, Ankauf rueckwirkend --><script src="js/vivi-mieterhoehung.js?v=v4400"></script><script src="js/vivi-nk-anpassung.js?v=v4400"></script><!-- v4042 · Nebenkosten-Vorauszahlung nach ViVi --><script src="js/vivi-reiter.js?v=v4430"></script><script src="js/vivi-copilot.js?v=v4350"></script><!-- v4130 · Co-Pilot im Reiter ViVi --><!-- v4040 · Reiter ViVi in der Pilot-Analyse --><!-- v4037 · Mieterhöhung aus DealPilot in ViVi anlegen (ein Fenster für Reiter Miete und Pilot-Analyse) --><!-- v3950/v3951/v3967 · ViVi: Verbindung, einmal anlegen mit Vorschau und Wartehinweis, Jetzt abgleichen (Vorschau-Funktion vivi) -->
+<script src="js/vivi-zugang.js?v=v4360"></script><!-- v4350 · ViVi ab Investor (Plan-Merkmal statt Vorschau) --><script src="js/vivi.js?v=v4400b"></script><script src="js/vivi-import.js?v=v4350"></script><!-- v4050 · Objekte aus ViVi uebernehmen, Ankauf rueckwirkend --><script src="js/vivi-mieterhoehung.js?v=v4400"></script><script src="js/vivi-nk-anpassung.js?v=v4460"></script><!-- v4042 · Nebenkosten-Vorauszahlung nach ViVi --><script src="js/vivi-reiter.js?v=v4430"></script><script src="js/vivi-copilot.js?v=v4350"></script><!-- v4130 · Co-Pilot im Reiter ViVi --><!-- v4040 · Reiter ViVi in der Pilot-Analyse --><!-- v4037 · Mieterhöhung aus DealPilot in ViVi anlegen (ein Fenster für Reiter Miete und Pilot-Analyse) --><!-- v3950/v3951/v3967 · ViVi: Verbindung, einmal anlegen mit Vorschau und Wartehinweis, Jetzt abgleichen (Vorschau-Funktion vivi) -->
 <script src="js/vivi-steuer-abgleich.js?v=v4350"></script><!-- v4020 · ViVi Steuerjahre: Einstellung, Abgleich je Jahr im Jahresabgleich, automatisch nur offene Jahre, Marke im Reiter Steuer -->
 <script src="js/wertangabe.js?v=v3003b"></script><!-- v3003a · eine Wertangabe: Marktwert/Verkehrswert + Herkunft statt Bankbewertung -->
 <script src="js/indexreihen.js?v=v3026"></script><!-- v3026 · VPI/Nettokaltmieten aus dem Server-Cache -->
@@ -4279,7 +4279,7 @@ label.dp-required.qc-required::after {
 <script src="js/grafiken-premium.js?v=v4390"></script><!-- v4160 · Pilot-Analyse im Premium-Stil: Einordnung, Fingerabdruck, Heatmap, Mieteuro, Fahrplan, Wertverlauf, Monte-Carlo, Hebel, Ausstieg (Vorschau grafiken_neu), API window.DpGrafiken -->
 <script src="js/grafiken-portfolio.js?v=v4280"></script><!-- v4180 · Portfolio auf einen Blick: Kennzahlen und Gesamtbewertung oben vereint, je Objekt Miete, Cashflow n. St., Steuer; Zinsbindung mit Mehrbelastung (Vorschau grafiken_neu) -->
 <script src="js/grafiken-bewertung.js?v=v4280a"></script><!-- v4170 · Reiter Bewertung: Einordnung, DSCR- und Beleihungsverlauf, Zinsrisiko als Heatmap (Vorschau grafiken_neu) -->
-<script src="js/bewertung-ansicht.js?v=v4450a"></script><!-- v4320 · Reiter Bewertung: Erklärung beim Darüberfahren, Ansicht anpassen (Vorschau grafiken_neu) -->
+<script src="js/bewertung-ansicht.js?v=v4460"></script><!-- v4320 · Reiter Bewertung: Erklärung beim Darüberfahren, Ansicht anpassen (Vorschau grafiken_neu) -->
 <script src="js/portfolio-strategie.js?v=v3380"></script><!-- v1880 · Modul hinter Feature-Schluessel -->
 <script src="js/vermoegen.js?v=v4030"></script><!-- v3217 · W-11 Vermögen & Haushalt, W-5 Profilfoto (user_settings vermoegen) -->
 <script src="js/portfolio-spiegel.js?v=v1802"></script><!-- v1793: liest portfolioPayload() und legt es fuer den Bot ab - rechnet NICHTS -->

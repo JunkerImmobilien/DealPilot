@@ -336,7 +336,7 @@
     if (k && Array.isArray(k.einordnung)) p = k.einordnung.map(function (x) { return norm(x); });
     if (k && p.length < 3 && Array.isArray(k.risiken)) p = p.concat(k.risiken.map(function (x) { return norm(x, 'schlecht'); }));
     p = p.filter(function (x) { return x.t && !/^\.\.\./.test(x.t); }).slice(0, 5);
-    var link = '<button type="button" class="bwa-knopf" onclick="var t=document.querySelector(\'.tab[data-target-sec]\');Array.prototype.forEach.call(document.querySelectorAll(\'nav.tabs .tab\'),function(b){if(/Pilot-Analyse/.test(b.textContent))t=b;});if(t)t.click();">Zur Pilot-Analyse</button>';
+    var link = '<button type="button" class="bwa-knopf" onclick="var t=document.querySelector(\'nav.tabs .tab[data-target-sec=s5]\');if(t)t.click();">' + (window.DpObjektCockpit && window.DpObjektCockpit.aktiv() ? 'Zum Objekt-Cockpit' : 'Zur Pilot-Analyse') + '</button>';   /* v4460 · Reiter s5 heisst bei gewonnenen Objekten Objekt-Cockpit */
     if (!p.length) return '<div class="bwa-w-k"><b>Das Wichtigste</b>' + link + '</div><p class="bwa-w-hin">' + (a ? 'Mit der nächsten Pilot-Analyse steht hier das Wichtigste in Stichpunkten.' : 'Sobald eine Pilot-Analyse vorliegt, steht hier das Wichtigste in Stichpunkten.') + '</p>';
     return '<div class="bwa-w-k"><b>Das Wichtigste</b>' + link + '</div><ul class="bwa-w">' + p.map(function (x) { return '<li class="' + x.ton + '">' + esc(x.t) + '</li>'; }).join('') + '</ul>';
   }

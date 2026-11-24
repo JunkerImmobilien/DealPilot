@@ -995,7 +995,7 @@ function loadData(d) {
     var aiContentEmpty = document.getElementById('ai-content');
     if (aiContentEmpty) {
       aiContentEmpty.innerHTML = '<div style="color:var(--muted);padding:30px 20px;text-align:center">' +
-        'Noch keine KI-Analyse für dieses Objekt. Klicke auf <strong>"KI-Analyse starten"</strong> um eine Investmentanalyse zu generieren.' +
+        'Noch keine Pilot-Analyse für dieses Objekt. Klicke auf <strong>„Pilot-Analyse starten“</strong>, um sie zu erzeugen.' +
         '</div>' +
         /* v4300 · ohne Marktbericht vor dem ersten Lauf anbieten (pilot-analyse-v4.js mbHinweis, Vorschau grafiken_neu) */
         '<div data-dp-pa-mbfehlt="1" data-vorschau="grafiken_neu" style="display:none;max-width:760px;margin:0 auto 14px;text-align:left"></div>';
@@ -1701,7 +1701,7 @@ function _newObjLeeren() {
   }
   var aiContent = document.getElementById('ai-content');
   if (aiContent) {
-    aiContent.innerHTML = 'Noch keine KI-Analyse für dieses Objekt. Klicke auf <strong>"KI-Analyse starten"</strong>, um eine Investmentanalyse zu erzeugen.';   /* v3987 · F15: kein eigener Schlüssel nötig */
+    aiContent.innerHTML = 'Noch keine Pilot-Analyse für dieses Objekt. Klicke auf <strong>„Pilot-Analyse starten“</strong>, um sie zu erzeugen.';   /* v3987 · F15: kein eigener Schlüssel nötig */
   }
   // V25: Mini-AI-Block in Tab Kennzahlen zurücksetzen
   var miniBody = document.getElementById('ai-mini-body');
