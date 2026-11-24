@@ -69,6 +69,9 @@
     var an = k.classList.contains('dp-tab-cockpit'), akt = k.classList.contains('active');
     var setz = function (el, p, v) { if (v == null) el.style.removeProperty(p); else el.style.setProperty(p, v, 'important'); };
     var kinder = k.querySelectorAll('.tab-lbl,.tab-ico');
+    /* gemessen v4460b: .tab hat transition all .2s, damit wurde auch order animiert und blieb in einem
+       Hintergrund-Tab bei -1 haengen. order nie animieren. */
+    setz(k, 'transition-property', 'background, background-color, box-shadow, color, border-color');
     if (!an) {
       ['background', 'box-shadow', 'color', 'border-radius', 'margin-right'].forEach(function (p) { setz(k, p, null); });
       k.style.setProperty('order', '0');   /* gemessen v4460a: ohne Klasse blieb order -1 stehen, daher ausdruecklich */
