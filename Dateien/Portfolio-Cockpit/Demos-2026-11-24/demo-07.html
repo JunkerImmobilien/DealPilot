@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Portfolio-Cockpit · Demo 07 · Objektmatrix</title>
+<link rel="stylesheet" href="kit.css">
+
+</head>
+<body>
+<div class="seite">
+ <div class="kopf">
+  <div><div class="marke"><i></i>Portfolio-Cockpit · Demo 07 von 10</div><h1>Objektmatrix</h1><div class="unter">Jedes Objekt als kleine Karte, sortierbar. Für alle, die in Häusern denken, nicht in Summen. Echte Werte des Demokontos, Stand 24.11.2026.</div></div>
+  <div class="leiste"><span id="ziel"></span><div class="schalter" id="thema"><button aria-pressed="true" data-t="light">Hell</button><button aria-pressed="false" data-t="dark">Dunkel</button></div></div>
+ </div>
+<div id="sk"></div>
+<div id="kz"></div>
+<div class="leiste" style="margin:0 0 10px"><div class="schalter" id="sort"><button aria-pressed="true" data-s="score">Score</button><button aria-pressed="false" data-s="cf">Cashflow</button><button aria-pressed="false" data-s="zb">Zinsbindung</button><button aria-pressed="false" data-s="hebel">Hebel</button></div></div>
+<div id="kac" style="margin-bottom:12px"></div>
+<div class="karte" id="bsz"></div>
+ <div class="fuss">Wertansatz: Ertragswert im Bestand, wo gerechnet, sonst Kaufpreis. Projektion aus dem Portfolio-Modell (Stützjahre 1, 5 und 10). Restschuld zum Ende der Zinsbindung vereinfacht mit heutiger Tilgung fortgeschrieben.</div>
+</div>
+<script src="daten.js"></script>
+<script src="kit.js"></script>
+<script src="bausteine.js"></script>
+<script>
+
+var k = K.kennzahlen(), S = K.D.summe, Z = K.D.ziele, O = K.D.objekte;
+function kzStd(){ var z=K.ziele(); return [
+ {l:'Wertansatz', v:K.mio(k.wert), s:'18 Objekte · '+k.we+' Einheiten', tip:'<div class="t-k">Wertansatz</div>Ertragswert im Bestand, wo gerechnet, sonst Kaufpreis.'},
+ {l:'Eigenkapital im Bestand', v:K.mio(k.ekHeute), s:'eingesetzt '+K.mio(k.ekEin), hero:1},
+ {l:'Kaltmiete', v:K.eur(S.mieteJ/12), s:'im Monat · '+K.pct(S.brutto)+' brutto'},
+ {l:'Cashflow vor Steuer', v:K.eurV(S.cfVsJ/12), s:'im Monat', c:S.cfVsJ>=0?'ok':'nok', tip:z?K.tz('dein Ziel je Objekt', 'mind. '+K.eur(z.minCfVs))+K.tz('erreicht', O.filter(function(o){return o.cfVs>=z.minCfVs}).length+' von 18'):''},
+ {l:'Cashflow nach Steuer', v:K.eurV(S.cfNsJ/12), s:'im Monat', c:S.cfNsJ>=0?'ok':'nok'},
+ {l:'DSCR', v:K.d2(S.dscr), s:z?'Ziel '+K.d2(z.minDscr)+' · '+k.unterZiel.length+' Objekte darunter':'Kapitaldienstdeckung', c:z?(S.dscr>=z.minDscr?'ok':'nok'):''},
+ {l:'Nächste Zinsbindung', v:(function(){var x=O.slice().sort(function(a,b){return a.zbJahr-b.zbJahr})[0];return x.zb.slice(5,7)+'/'+x.zb.slice(0,4)})(), s:(function(){var x=O.slice().sort(function(a,b){return a.zbJahr-b.zbJahr})[0];return x.name})(), c:k.bald.length?'nok':'warn'}
+];}
+function zeichneKz(sel, fs, n){ K.modul(sel, function(){ return K.kz(fs(), n); }); }
+
+K.modul("#sk", function(){ return K.scoreKopf(); });
+zeichneKz('#kz', function(){ var a=kzStd(); return [a[0],a[1],a[2],a[3],a[5],a[6]]; }, 6);
+var sorts={score:function(a,b){return (b.score||0)-(a.score||0)},cf:function(a,b){return b.cfVs-a.cfVs},zb:function(a,b){return a.zbJahr-b.zbJahr},hebel:function(a,b){return b.mehrMiete-a.mehrMiete}}, akt='score';
+B.objektKacheln('#kac', function(a,b){return sorts[akt](a,b)});
+document.getElementById('sort').addEventListener('click',function(e){var b=e.target.closest('button'); if(!b)return; akt=b.getAttribute('data-s'); this.querySelectorAll('button').forEach(function(x){x.setAttribute('aria-pressed',x===b?'true':'false')}); K.neu();});
+K.modul('#bsz', function(){ return K.karte('Bestand und Zielbild je Objekt','Dieselben Objekte als Tabelle. Fahr über ein Objekt für die Details.', K.bszTabelle()); });
+K.zielSchalter('#ziel');
+document.getElementById('thema').addEventListener('click',function(e){var b=e.target.closest('button'); if(!b)return; document.documentElement.setAttribute('data-theme',b.getAttribute('data-t')); this.querySelectorAll('button').forEach(function(x){x.setAttribute('aria-pressed',x===b?'true':'false')});});
+(function(){ var t=new URLSearchParams(location.search).get('thema')||document.documentElement.getAttribute('data-theme'); if(t){ document.documentElement.setAttribute('data-theme',t); document.querySelectorAll('#thema button').forEach(function(x){x.setAttribute('aria-pressed',x.getAttribute('data-t')===t?'true':'false')}); } })();
+if(/mass=1/.test(location.search)) setTimeout(function(){ var t=document.createElement('meta'); t.id='hoehe'; t.content=String(document.documentElement.scrollHeight); document.head.appendChild(t); }, 600);
+</script>
+</body>
+</html>
