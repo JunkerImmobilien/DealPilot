@@ -45,17 +45,46 @@
     s.id = 'dp-oc-stil';
     /* Gold ist der AKZENT (Flaeche, Rand), die Schrift bleibt die der Leiste; aktiv: volle Goldflaeche mit dunkler
        Schrift. Farben nur ueber Whitelabel-Token, damit ein Partner seine Farbe bekommt. */
+    /* Spezifitaet: layout-varianten.css setzt html[data-dp-layout][data-dp-layout] body:has(#sb-user) nav.tabs .tab
+       (und alle Kinder) mit !important auf transparent - gemessen v4460. Daher dieselbe Kette plus eigene Klasse. */
+    var P = ['nav.tabs', 'html[data-dp-layout][data-dp-layout] body:has(#sb-user) nav.tabs', 'html[data-dp-layout^="v"] body:has(#sb-user) nav.tabs'];
+    var sel = function (suf) { return P.map(function (p) { return p + ' .tab.dp-tab-cockpit[data-dp-oc="1"]' + suf; }).join(','); };
+    var G = 'var(--gold,var(--wl-c9a84c,#C9A84C))';
     s.textContent = ''
-      + 'nav.tabs .tab.dp-tab-cockpit{order:-1;position:relative;'
-      + 'background:color-mix(in srgb,var(--gold,var(--wl-c9a84c,#C9A84C)) 18%,transparent)!important;'
-      + 'box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--gold,var(--wl-c9a84c,#C9A84C)) 70%,transparent)!important;'
-      + 'border-radius:8px;margin-right:6px}'
-      + 'nav.tabs .tab.dp-tab-cockpit .tab-ico{color:var(--gold,var(--wl-c9a84c,#C9A84C))}'
-      + 'nav.tabs .tab.dp-tab-cockpit.active{background:linear-gradient(110deg,var(--gold-hi,var(--wl-e8cc7a,#E8CC7A)),var(--gold,var(--wl-c9a84c,#C9A84C)) 55%,var(--gold-lo,var(--wl-b8932f,#b8932f)))!important;'
-      + 'color:#1a1712!important;box-shadow:none!important}'
-      + 'nav.tabs .tab.dp-tab-cockpit.active .tab-lbl,nav.tabs .tab.dp-tab-cockpit.active .tab-ico{color:#1a1712!important}'
-      + 'nav.tabs .tab.dp-tab-cockpit.active::after{display:none!important}';
+      + sel('') + '{order:-1;position:relative;border-radius:8px;margin-right:6px;'
+      + 'background:color-mix(in srgb,' + G + ' 20%,transparent)!important;'
+      + 'box-shadow:inset 0 0 0 1px color-mix(in srgb,' + G + ' 75%,transparent)!important}'
+      + sel(' .tab-ico') + '{color:' + G + '!important}'
+      + sel('.active') + '{background:linear-gradient(110deg,var(--gold-hi,var(--wl-e8cc7a,#E8CC7A)),' + G + ' 55%,var(--gold-lo,var(--wl-b8932f,#b8932f)))!important;color:#1a1712!important;box-shadow:none!important}'
+      + sel('.active *') + '{color:#1a1712!important;background:transparent!important}'
+      + sel('.active::after') + '{display:none!important}';
     (document.head || document.documentElement).appendChild(s);
+  }
+
+  /* Flaeche und Schrift direkt am Knopf (style, !important): gemessen v4460 kam die Stylesheet-Regel gegen die
+     !important-Ketten von layout-varianten.css / style.css (header.hdr.has-v64-score + nav.tabs .tab) nicht an,
+     backgroundColor blieb transparent. Inline schlaegt jede Stylesheet-Regel. */
+  var G = 'var(--gold,var(--wl-c9a84c,#C9A84C))';
+  function faerben(k) {
+    var an = k.classList.contains('dp-tab-cockpit'), akt = k.classList.contains('active');
+    var setz = function (el, p, v) { if (v == null) el.style.removeProperty(p); else el.style.setProperty(p, v, 'important'); };
+    var kinder = k.querySelectorAll('.tab-lbl,.tab-ico');
+    if (!an) {
+      ['background', 'box-shadow', 'color', 'border-radius', 'margin-right'].forEach(function (p) { setz(k, p, null); });
+      Array.prototype.forEach.call(kinder, function (c) { setz(c, 'color', null); });
+      return;
+    }
+    setz(k, 'border-radius', '8px'); setz(k, 'margin-right', '6px');
+    if (akt) {
+      setz(k, 'background', 'linear-gradient(110deg,var(--gold-hi,var(--wl-e8cc7a,#E8CC7A)),' + G + ' 55%,var(--gold-lo,var(--wl-b8932f,#b8932f)))');
+      setz(k, 'box-shadow', 'none'); setz(k, 'color', '#1a1712');
+      Array.prototype.forEach.call(kinder, function (c) { setz(c, 'color', '#1a1712'); });
+    } else {
+      setz(k, 'background', 'color-mix(in srgb,' + G + ' 20%,transparent)');
+      setz(k, 'box-shadow', 'inset 0 0 0 1px color-mix(in srgb,' + G + ' 75%,transparent)');
+      setz(k, 'color', null);
+      Array.prototype.forEach.call(kinder, function (c) { setz(c, 'color', c.classList.contains('tab-ico') ? G : null); });
+    }
   }
 
   var _zuletzt = null;
@@ -68,6 +97,12 @@
     stil();
     knopf.setAttribute('data-dp-oc', sig);
     knopf.classList.toggle('dp-tab-cockpit', an);
+    faerben(knopf);
+    if (!knopf._dpOcBeob && window.MutationObserver) {
+      /* aktiv/inaktiv wechselt ueber die Klasse .active (switchTab) - dann neu faerben */
+      knopf._dpOcBeob = new MutationObserver(function () { faerben(knopf); });
+      knopf._dpOcBeob.observe(knopf, { attributes: true, attributeFilter: ['class'] });
+    }
     var lbl = knopf.querySelector('.tab-lbl');
     if (lbl) lbl.textContent = an ? 'Objekt-Cockpit' : 'Pilot-Analyse';
     var ico = knopf.querySelector('.tab-ico');
