@@ -2011,6 +2011,25 @@
     return n;
   }
 
+  /* v4590 · Marcel 24.11.2026 (Lindenallee 14 aus dem Quick-Check): beim Speichern als Objekt gehen die gelesenen
+     Einheiten nicht mehr verloren. Dieselbe Kette wie von Hand (vorbelegen → „Übernehmen“), nur ohne Klick.
+     aufgeteilt: eine gelesene Teilungserklärung heißt, das Haus IST schon in Wohnungseigentum aufgeteilt; dann
+     der Haken „In Wohnungseigentum aufgeteilt“ und Kosten der Aufteilung 0 (wie der Hinweis im Fenster sagt). */
+  function automatisch(liste, o) {
+    o = o || {};
+    if (!Array.isArray(liste) || !liste.length) return 0;
+    var n = vorbelegen(liste);
+    if (!n) { schliessen(); return 0; }
+    if (o.aufgeteilt) {
+      _weg = true;
+      if (_auftK == null) _auftK = '0';
+      var wf = el('mfh-weg'); if (wf) wf.checked = true;
+    }
+    uebernehmen();
+    schliessen();
+    return n;
+  }
+
   /* v3670 · Die Stellplatzmiete je Wohnung (Mietvertrag, Feld stellplatz_miete) rechnete nirgends mit -
      „Übernehmen" setzte nur nkm. Sie gehoert in die Zusatzeinnahmen, Teil Stellplatz (js/ze-aufteilung.js).
      Regel gegen Doppelzaehlung: der Stellplatzanteil wird auf die Summe der Wohnungen ANGEHOBEN, nie
@@ -2259,7 +2278,7 @@
   }
   window.DpMfhEinheiten = { /* v2430: Punkte-Helfer fuer potenzial.js - keine zweite Tabelle */
     punkteVon: punkteVon, maxPunkte: maxPunkte, labelVon: labelVon, punkteObjekt: punkteObjekt, WE_IDS: WE_IDS, GEB_IDS: GEB_IDS,
-    vermstandPruefen: vermstandPruefen /* v3001b */, vertragAblegen: vertragAblegen /* v3160 */, vorbelegen: vorbelegen /* v3016 */,
+    vermstandPruefen: vermstandPruefen /* v3001b */, vertragAblegen: vertragAblegen /* v3160 */, vorbelegen: vorbelegen /* v3016 */, automatisch: automatisch /* v4590 */,
     oeffnen: oeffnen, knopf: knopf,
     /* v3027 · eine Einheit gezielt öffnen (Absprung aus der Vertragsübersicht im Reiter Miete) */
     jahreOeffnen: jahreOeffnen,   /* v3860 */
