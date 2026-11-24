@@ -330,7 +330,7 @@
     }
     o.verlauf = o.verlauf.concat([{ id: _id, am: _am,
       quelle: e.quelle || null, dokumente: (e.dokumente || []).slice(0, 30), uebernommen: (e.uebernommen || []).slice(0, 60),
-      nicht_gelesen: (e.nicht_gelesen || []).slice(0, 30), aenderungen: aend.slice(0, 200) }]).slice(-50);
+      nicht_gelesen: (e.nicht_gelesen || []).slice(0, 30), aenderungen: aend.slice(0, 200), umbuchung: e.umbuchung || undefined }]).slice(-50);   /* v4340 umbuchung */
     schreiben(o);
     /* v3120a · gemessen: der Reiter Unterlagen & WEG zeigte den Verlauf erst nach dem nächsten Zeichnen */
     setTimeout(neuZeichnen, 300);
@@ -374,6 +374,14 @@
     try { if (typeof window.calc === 'function') setTimeout(window.calc, 60); } catch (y) {}
     o = lesen();
     o.verlauf.forEach(function (v) { if (v.id === id) v.zurueck = { am: new Date().toISOString(), anzahl: ok, konflikt: konflikt, nicht: nicht }; });
+    /* v4340 · eine Umbuchung zurücknehmen: die Position wandert in ihren alten Posten, wenn die Beträge zurückgingen */
+    var U = x.umbuchung;
+    if (U && ok > 0 && !konflikt.length && Array.isArray(o.buchungen)) o.buchungen.some(function (b) {
+      if (Number(b.jahr) !== Number(U.jahr) || (b.feld || '') !== (U.nach || '') || (b.eid || null) !== U.eid || (b.datei || '') !== U.datei || (b.position || '') !== U.position || Math.abs(Number(b.betrag) - U.betrag) > 0.005) return false;
+      b.feld = U.von; (b.umgebucht = Array.isArray(b.umgebucht) ? b.umgebucht : []).push({ von: U.nach, nach: U.von, am: new Date().toISOString().slice(0, 10), zurueck: true });
+      var hin = b.umgebucht.filter(function (u) { return !u.zurueck; }).length; if (hin * 2 === b.umgebucht.length) delete b.zuordnung;   /* alle Umbuchungen zurück: wieder der Vorschlag der KI */
+      return true;
+    });
     /* v3164 · die Buchungen dieses Imports fallen mit - außer in Posten, die wegen eines Konflikts stehen blieben */
     if (Array.isArray(o.buchungen)) o.buchungen = o.buchungen.filter(function (b) {
       return b.eid !== id || konflikt.indexOf(b.feld + ' ' + b.jahr) >= 0;

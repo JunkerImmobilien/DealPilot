@@ -193,7 +193,8 @@
       schreiben(o);
     }
     var txt = 'Steuer ' + j + ' · ' + (b.position || b.datei || 'Position') + ' ' + eur(betrag) + ': ' + (LABEL[von] || von || 'nicht absetzbar') + ' → ' + (LABEL[ziel] || 'nicht absetzbar');
-    try { if (E && E.protokoll) E.protokoll({ quelle: 'Umbuchung', aenderungen: aend, dokumente: b.datei ? [{ name: b.datei, typ: 'Beleg' }] : [], uebernommen: [txt] }); } catch (e) {}
+    try { if (E && E.protokoll) E.protokoll({ quelle: 'Umbuchung', aenderungen: aend, dokumente: b.datei ? [{ name: b.datei, typ: 'Beleg' }] : [], uebernommen: [txt],
+      umbuchung: { eid: b.eid || null, datei: b.datei || '', position: b.position || '', betrag: betrag, jahr: j, von: von, nach: ziel } }); } catch (e) {}
     ['renderYearlyTaxForm', 'renderTaxTimeline', 'renderTaxModule'].forEach(function (f) { try { if (typeof window[f] === 'function') window[f](); } catch (e) {} });
     try { if (typeof window.calc === 'function') setTimeout(window.calc, 60); } catch (e) {}
     return { ok: true, text: txt, von: von, nach: ziel, jahr: j, betrag: betrag };

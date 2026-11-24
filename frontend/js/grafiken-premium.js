@@ -636,6 +636,18 @@
       { name: 'Beleihung (LTV)', wert: zahl(K.ltv), ziel: profil('max_ltv'), zielText: 'dein maximaler LTV', port: mitAnkauf ? null : Pt.ltv, ankauf: ak._kpis_ltv, lo: 0, hi: 120, fmt: function (v) { return pct(v); }, hoch: false },
       { name: 'Cashflow vor Steuer im Monat', wert: zahl(K.cf_m), ziel: profil('min_cashflow_vor_st'), zielText: 'dein Mindest-Cashflow', port: mitAnkauf ? null : Pt.cfm, ankauf: cfAk, zielbild: zahl(zb.cf_m), lo: -400, hi: 400, fmt: function (v) { return eurV(v); }, hoch: true }
     ].filter(function (b) { return b.wert != null; });
+    /* v4310d · Marcel 24.11.2026 (über Fork AB): Kaufpreis gegen den maßgebenden Objektwert. NICHT neu gerechnet: State.wert_basis
+       und State.wert_basis_text setzt calc.js (v4300, Einstellung dp_wert_anker: maßgebendes Verfahren oder Marktpreisindikation
+       mit bzw. ohne Abschlag). Nur wenn der Wert nicht der Kaufpreis selbst ist. */
+    if (mitAnkauf) { try {
+      var S0 = window.State || {}, kp0 = wert('kp'), ow = zahl(S0.wert_basis);
+      if (kp0 > 0 && ow > 0 && S0.wert_basis_quelle && S0.wert_basis_quelle !== 'kaufpreis') {
+        var an = S0.wert_anker && S0.wert_anker.jahr ? ' ' + S0.wert_anker.jahr : '', d0 = ow - kp0;
+        B.unshift({ name: 'Objektwert', notiz: (S0.wert_basis_text || 'Objektwert') + an, wert: ow, ziel: kp0, zielText: 'Kaufpreis', hoch: true, ohneSchwelle: true,
+          lo: Math.min(ow, kp0) * 0.85, hi: Math.max(ow, kp0) * 1.15, fmt: function (v) { return eur(v); },
+          wort: (d0 >= 0 ? '✓ ' : '✕ ') + eur(Math.abs(d0)) + (d0 >= 0 ? ' über' : ' unter') + ' Kaufpreis' });
+      }
+    } catch (e) {} }
     return { B: B, Pt: Pt };
   }
 
@@ -646,7 +658,7 @@
 
   function karteEinordnung(k, w, mitAnkauf) {
     var D = einordnungDaten(mitAnkauf); if (!D.B.length) { k.innerHTML = ''; return; }
-    var schlecht = D.B.filter(function (b) { return b.ziel != null && !(b.hoch ? b.wert >= b.ziel : b.wert <= b.ziel); }).map(function (b) { return b.name.replace(' im Monat', ''); });
+    var schlecht = D.B.filter(function (b) { return b.ziel != null && !b.ohneSchwelle && !(b.hoch ? b.wert >= b.ziel : b.wert <= b.ziel); }).map(function (b) { return b.name.replace(' im Monat', ''); });
     var titel = schlecht.length ? (schlecht.length === 1 ? schlecht[0] + ' unter deiner Schwelle' : schlecht.length + ' Kennzahlen unter deinen Schwellen: ' + schlecht.join(', ')) : 'Alle Kennzahlen innerhalb deiner Schwellen';
     var mitZb = D.B.some(function (b) { return b.zielbild != null; });
     var i = karte(k, { eyebrow: mitAnkauf ? 'Einordnung · Ankauf, heute' + (mitZb ? ', Zielbild' : '') : 'Einordnung', titel: titel, unter: 'Marke heute, goldener Strich deine Schwelle aus dem Investmentprofil' + (mitAnkauf ? ', Kreis beim Ankauf' + (mitZb ? ', Raute im Zielbild' : '') : (D.Pt.n ? ', Dreieck der Schnitt deiner ' + D.Pt.n + ' Objekte' : '')) + '.', chips: ['gemessen'] });
