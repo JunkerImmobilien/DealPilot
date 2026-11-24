@@ -502,9 +502,10 @@
   /* v4580 · Marcel 24.11.2026: „Ertragswert Bestand. Ist das jetzt überhaupt führend? Da steige ich gar nicht durch.“ Die Rolle des
      Ertragswerts steht jetzt an der Überschrift: führend nur, wenn er der maßgebende Wert ist (calc.js wert_anker). */
   function ewRolle() {
-    var A = St().wert_anker, auf = A && A.art === 'aufteiler';
+    /* v4580b · aufgeteilt: das Haus als Ganzes bleibt maßgebend (Marcel: „der Aufteilerwert steht nur daneben“) */
+    var A = St().wert_anker;
     if (!A) return '';
-    return A.art === 'ertragswert' ? ' (führend)' : (auf ? ' (Haus als Ganzes, stützend)' : ' (stützend)');
+    return A.art === 'ertragswert' ? ' (Haus als Ganzes, führend)' : ' (stützend)';
   }
   function wertZielbild(K, B, WZ, PD, kurz, bank) {
     if (!WZ && !PD) return '';

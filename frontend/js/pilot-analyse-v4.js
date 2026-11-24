@@ -607,28 +607,28 @@
       gutachten = true;
       out.push(zahlKachel((S.svw_label || 'Verkehrswert') + ' · führend', eur(S.wert_basis), 'deine Angabe im Reiter Objekt', C.c1,
         { t: (S.svw_label || 'Verkehrswert') + ', führend', a: 'Deine Wertangabe aus Gutachten oder Bankbewertung geht jedem Marktbericht vor. An ihr misst sich der Preis.' }));
-    } else if (auf) {
-      gezeigt = 'aufteiler';
-      out.push(zahlKachel('Vergleichswert je Wohnung · führend', eur(auf.wert), (auf.n ? auf.n + ' Wohnungen einzeln' : 'Wohnungen einzeln') + (auf.kosten > 0 ? ', nach Aufteilungskosten' : ''), C.c1,
-        { t: 'Vergleichswert je Wohnung, führend', a: 'Das Haus ist in Wohnungseigentum aufgeteilt. Jede Wohnung ist einzeln über das Vergleichswertverfahren bewertet. Die Summe nach Aufteilungskosten führt, der Wert des Hauses als Ganzes stützt.',
-          r: [['Herkunft', auf.bezeichnung || ''], ['Summe der Wohnungen', zahl(auf.summe) ? eur(auf.summe) : ''], ['Aufteilungskosten', auf.kosten > 0 ? eur(auf.kosten) : ''], ['Marktbericht vom', bericht]] }));
     } else if (w && w.fuehrend && w[w.fuehrend] && zahl(w[w.fuehrend].wert) > 0) {
       fu = w.fuehrend; gezeigt = fu; var f = w[fu], nm = N[fu] + (f.vorlaeufig ? ' (vorläufig)' : '');
-      out.push(zahlKachel(N[fu] + ' · führend', eur(f.wert), (st ? 'Stichtag ' + st : '') + (f.vorlaeufig ? (st ? ', ' : '') + 'vorläufig' : ''), C.c1,
+      out.push(zahlKachel(N[fu] + ' · führend', eur(f.wert), (auf ? 'Haus als Ganzes' + (st ? ', ' : '') : '') + (st ? 'Stichtag ' + st : '') + (f.vorlaeufig ? (st ? ', ' : '') + 'vorläufig' : ''), C.c1,
         { t: nm + ', führendes Verfahren', a: ERK[fu] + ' An ihm misst sich der Preis, die übrigen Werte sind die Gegenprobe.',
           r: [['Wertermittlungsstichtag', st], ['Liegenschaftszins', fu === 'ertragswert' && zahl(f.lzs_pct) ? de(f.lzs_pct, 2) + ' %' + (f.lzs_stufe ? ', Stufe ' + f.lzs_stufe : '') : ''],
             ['Spanne', fu === 'ertragswert' && zahl(f.von) && zahl(f.bis) ? eur(f.von) + ' bis ' + eur(f.bis) : ''], ['Marktbericht vom', bericht]] }));
     }
-    var stu = null, folge = (w && w.fuehrend && (gutachten || auf) ? [w.fuehrend] : []).concat(['ertragswert', 'sachwert', 'vergleichswert']);
+    var stu = null, folge = (w && w.fuehrend && gutachten ? [w.fuehrend] : []).concat(['ertragswert', 'sachwert', 'vergleichswert']);
     for (var si0 = 0; si0 < folge.length && !stu; si0++) { var k0 = folge[si0]; if (k0 !== gezeigt && w && w[k0] && zahl(w[k0].wert) > 0) stu = k0; }
     if (stu) {
       var sv = w[stu], lz = stu === 'ertragswert' && zahl(sv.lzs_pct) ? de(sv.lzs_pct, 2) + ' %' + (sv.lzs_stufe ? ', Stufe ' + sv.lzs_stufe : '') : '';
-      out.push(zahlKachel(N[stu] + ' · stützend', eur(sv.wert), auf ? 'Haus als Ganzes' : (sv.vorlaeufig ? 'vorläufig' : (lz ? 'LZS ' + lz.replace(/, Stufe.*/, '') : (st ? 'Stichtag ' + st : ''))), C.c1,
-        { t: N[stu] + (sv.vorlaeufig ? ' (vorläufig)' : '') + ', stützendes Verfahren', a: ERK[stu] + ' Es ist die Gegenprobe zum führenden Wert' + (auf ? ' und bewertet das Haus als Ganzes' : '') + '.',
+      out.push(zahlKachel(N[stu] + ' · stützend', eur(sv.wert), (sv.vorlaeufig ? 'vorläufig' : (lz ? 'LZS ' + lz.replace(/, Stufe.*/, '') : (st ? 'Stichtag ' + st : ''))), C.c1,
+        { t: N[stu] + (sv.vorlaeufig ? ' (vorläufig)' : '') + ', stützendes Verfahren', a: ERK[stu] + ' Es ist die Gegenprobe zum führenden Wert' + '.',
           r: [['Wertermittlungsstichtag', st], ['Liegenschaftszins', lz], ['Spanne', zahl(sv.von) && zahl(sv.bis) ? eur(sv.von) + ' bis ' + eur(sv.bis) : ''], ['Marktbericht vom', bericht]] }));
     }
+    /* v4580b · Marcel 24.11.2026: „Nee, der Aufteilerwert steht nur daneben.“ Maßgebend bleibt das Haus als Ganzes (führendes Verfahren,
+       Anker calc.js), der Vergleichswert je Wohnung steht als zusätzliche Kachel daneben. v4490 hatte ihn führend genannt. */
+    if (auf) out.push(zahlKachel('Wert nach Aufteilung', eur(auf.wert), (auf.n ? auf.n + ' Wohnungen einzeln' : 'Wohnungen einzeln') + ', zusätzlich', C.c1,
+      { t: 'Wert nach Aufteilung, zusätzliche Angabe', a: 'Das Haus ist in Wohnungseigentum aufgeteilt. Daneben steht, was die Wohnungen einzeln über den Vergleichswert wert wären, nach Aufteilungskosten. Gerechnet wird mit dem Wert des Hauses als Ganzes.',
+        r: [['Herkunft', auf.bezeichnung || ''], ['Summe der Wohnungen', zahl(auf.summe) ? eur(auf.summe) : ''], ['Aufteilungskosten', auf.kosten > 0 ? eur(auf.kosten) : ''], ['Marktbericht vom', bericht]] }));
     if (mpi) {
-      var stufeM = !fu && !gutachten && !auf && w.fuehrend === 'vergleichswert';
+      var stufeM = !fu && !gutachten && w.fuehrend === 'vergleichswert';
       var oh = w.ohne_abschlag && zahl(w.ohne_abschlag.mitte) ? eur(w.ohne_abschlag.mitte) : '';
       out.push(zahlKachel('Marktpreis Ø' + (stufeM ? ' · führend' : ''), eur(mpi.mitte), oh ? 'ohne Abschlag ' + oh : (st ? 'Stichtag ' + st : ''), 'var(--wl-c9a84c,#C9A84C)',
         { t: 'Marktpreisindikation' + (stufeM ? ', führend' : ''),
