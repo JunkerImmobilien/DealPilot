@@ -1985,6 +1985,8 @@ try { window._dpEmpfStufe = _dpEmpfStufe; } catch (e) {}
    Soll-Ansicht des eingefrorenen Stands, die zeigt die damalige Analyse). */
 function _dpPaIstBestand() {
   try {
+    /* v4460e · Im Objekt-Cockpit (gewonnen, nicht Ankauf-Ansicht) immer die Bestand-Reiter, auch ohne Ankauf-Stand */
+    if (window.DpObjektCockpit && window.DpObjektCockpit.aktiv()) return true;
     if (window.DpBestand) return window.DpBestand.istBestand();
     var AK = window.DealPilotAnkauf, AA = window.DealPilotAnkaufAnsicht;
     return !!(AK && AK.vorhanden() && !(AA && AA.aktiv()));
@@ -2379,7 +2381,7 @@ function _renderAIServerAnalysis(a) {
     var bewegtHtml = bewegt.length
       ? '<div class="abw-bewegt"><b>Was sich bewegt hat</b><ul>' + satz + '</ul>'
         + (sc && sc.richtung !== 'gleich' ? '<div>Unterm Strich: DealScore ' + f(sc.ankauf, 'zahl').replace(',00', '') + ' → ' + f(sc.bestand, 'zahl').replace(',00', '')
-            + ' — das Objekt steht ' + (sc.richtung === 'besser' ? '<b>über</b>' : '<b>unter</b>') + ' Plan.</div>' : '')
+            + '. Das Objekt steht ' + (sc.richtung === 'besser' ? '<b>über</b>' : '<b>unter</b>') + ' Plan.</div>' : '')
         + '</div>'
       : '';
     var schlechter = a.zeilen.filter(function (z) { return z.richtung === 'schlechter'; }).length;
@@ -2406,7 +2408,7 @@ function _renderAIServerAnalysis(a) {
       + '<tbody>' + reihen + '</tbody></table>'
       + '<div class="abw-deckung">' + a.zeilen.length + ' von ' + gesamt + ' Kennzahlen vergleichbar'
       + (a.zeilen.length < gesamt
-          ? ' \u2014 die \u00fcbrigen lagen zu einem der beiden Zeitpunkte nicht vor und werden <b>nicht</b> gesch\u00e4tzt.'
+          ? '. Die \u00fcbrigen lagen zu einem der beiden Zeitpunkte nicht vor und werden <b>nicht</b> gesch\u00e4tzt.'
           : '.')
       + '</div></div>';
   }
@@ -2461,7 +2463,7 @@ function _renderAIServerAnalysis(a) {
       + (alt.empfehlung ? '<span>Urteil damals: <span class="dp-pa-empf" style="background:' + (_stA ? _stA.farbe : 'var(--wl-c9a84c,#C9A84C)') + '">' + _escClean(_stA ? _stA.label : alt.empfehlung) + '</span></span>' : '')
       + (_kpA ? '<span>empfohlener Kaufpreis damals: <b>' + _kpA + '</b></span>' : '') + '</div>'
       + (has(alt.empfehlung_begruendung) ? p(alt.empfehlung_begruendung) : '')
-      + '<div class="dp-pa-fuss">Das war die Kaufentscheidung. Im Bestand spricht der Pilot keine Empfehlung aus – wie das Objekt heute dasteht, zeigt die Übersicht; die Zahlen damals gegen heute stehen in der Tafel darüber.</div></div>';
+      + '<div class="dp-pa-fuss">Das war die Kaufentscheidung. Im Bestand spricht der Pilot keine Empfehlung aus. Wie das Objekt heute dasteht, zeigt die Übersicht. Die Zahlen damals gegen heute stehen in der Tafel darüber.</div></div>';
   })();
   /* v2160 · N62.6 — der Steuer-Text des Modells gehoert AN die Tafel:
      die Tafel zeigt die Zahlen, der Text erklaert ihre Bewegung. */
@@ -2474,7 +2476,7 @@ function _renderAIServerAnalysis(a) {
   var pSt = sec('', I.bank, 'STEUERLICHE ZUSAMMENFASSUNG');
   pSt += has(a.steuer_zusammenfassung)
     ? '<div class="dp-pa-card">' + p(a.steuer_zusammenfassung)
-      + '<div class="dp-pa-fuss">Eine Einordnung aus deinen Eingaben im Reiter Steuer — keine Steuerberatung. '
+      + '<div class="dp-pa-fuss">Eine Einordnung aus deinen Eingaben im Reiter Steuer, keine Steuerberatung. '
       + 'Lass sie von deinem Steuerberater bestätigen.</div></div>'
     : '<div class="dp-pa-card"><div class="dp-pa-fuss" style="margin-top:0">Diese Analyse wurde vor der steuerlichen '
       + 'Zusammenfassung erstellt. Beim nächsten Abruf steht sie hier.</div></div>';
@@ -2500,21 +2502,21 @@ function _renderAIServerAnalysis(a) {
          _klasse = 'fremd';
          _text = '<b>Diese Analyse geh\u00f6rt zu einem anderen Objekt</b>'
                + (_f.adresse ? ' (' + _escClean(_f.adresse) + ')' : '')
-               + ' \u2014 bitte neu abrufen, bevor du dich darauf st\u00fctzt.';
+               + '. Bitte neu abrufen, bevor du dich darauf st\u00fctzt.';
        } else if (_ab && _ab.length) {
          _klasse = 'alt';
          _text = '<b>Stand ' + _datum + '</b>' + (_tage ? ' (vor ' + _tage + ' Tagen)' : '')
-               + ' \u2014 seitdem ' + (_ab.length === 1 ? 'hat sich ' : 'haben sich ')
+               + '. Seitdem ' + (_ab.length === 1 ? 'hat sich ' : 'haben sich ')
                + '<b>' + _ab.map(_escClean).join(', ') + '</b> ge\u00e4ndert. '
-               + 'Die Texte unten k\u00f6nnen \u00fcberholt sein \u2014 neu abrufen.';
+               + 'Die Texte unten k\u00f6nnen \u00fcberholt sein, bitte neu abrufen.';
        } else if (_ab) {
          _text = '<b>Stand ' + _datum + '</b>' + (_tage ? ' (vor ' + _tage + ' Tagen)' : '')
-               + ' \u2014 die Zahlen haben sich seitdem nicht ge\u00e4ndert.';
+               + '. Die Zahlen haben sich seitdem nicht ge\u00e4ndert.';
        } else {
          /* Stempel ohne Abdruck: Alter ja, Gueltigkeit NICHT behauptet. */
          _klasse = 'unbekannt';
          _text = '<b>Stand ' + _datum + '</b>' + (_tage ? ' (vor ' + _tage + ' Tagen)' : '')
-               + ' \u2014 ob sich die Zahlen seitdem ge\u00e4ndert haben, ist nicht feststellbar.';
+               + '. Ob sich die Zahlen seitdem ge\u00e4ndert haben, ist nicht feststellbar.';
        }
        /* v2945 · NEUERER MARKTBERICHT. Der Abdruck oben sieht nur Formularfelder.
           Gemessen an Westerfeldstr. 140: Analyse vom 13.10. zitiert im Reiter
@@ -2601,7 +2603,7 @@ function _renderAIServerAnalysis(a) {
         + '</p><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px">'
         + (_mfhJa ? '<button type="button" class="btn btn-outline btn-sm" onclick="try{DpMfhEinheiten.oeffnen(1)}catch(e){}">Einheiten erfassen öffnen</button>' : '')
         + '<button type="button" class="btn btn-outline btn-sm" onclick="try{switchTab(2)}catch(e){}">Zum Reiter Miete</button></div>'
-        + '<p class="dp-pa-p" style="margin-top:10px;font-size:12.5px;color:#7A7370">Danach die Pilot-Analyse neu abrufen – dann steht hier die Tafel mit allen drei Stufen und dem Absatz des Piloten.</p></div>'), false);
+        + '<p class="dp-pa-p" style="margin-top:10px;font-size:12.5px;color:#7A7370">Danach die Pilot-Analyse neu abrufen. Dann steht hier die Tafel mit allen drei Stufen und dem Absatz des Piloten.</p></div>'), false);
     }
     _rail = tab('briefing', 'Briefing', true) +
       tab('sr', 'St\u00e4rken &amp; Risiken', false) +

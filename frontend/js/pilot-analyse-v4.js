@@ -1754,7 +1754,10 @@
       try { setTimeout(function () { window.DpViviReiter.mountAll(); }, 0); } catch (eV) {}
     }
     /* v3440 · o.si ist ein Objekt mit den Teilen (ui.js); als Text (ältere Aufrufer) wie bis v3439 */
-    if (o.si && typeof o.si === 'object') { if (o.si.pot || o.si.sollIst || o.si.leer) add('si', bestand ? 'Ankauf · Bestand · Zielbild' : 'Ankauf · Soll · Zielbild', siReiter(bestand, o.si, o.analyse)); }
+    /* v4460e · Objekt-Cockpit ohne Ankauf-Stand: kein Ankauf-Vergleich, sondern der Weg dorthin */
+    var _ohneAK = false; try { _ohneAK = bestand && !(window.DealPilotAnkauf && window.DealPilotAnkauf.vorhanden()); } catch (eAK) {}
+    if (_ohneAK) add('si', 'Ankauf · Bestand · Zielbild', '<div class="dp-pa-card" data-dp-pa-ohne-ankauf="1"><p class="dp-pa-p"><b>Kein Ankauf-Stand gespeichert.</b> Der Vergleich Ankauf gegen heute braucht den eingefrorenen Stand vom Kauf. Du schreibst ihn im Reiter Deal-Aktion unter Gewonnen fest. Dafür muss im Reiter Objekt der Nutzen- und Lastenwechsel eingetragen sein.</p></div>');
+    else if (o.si && typeof o.si === 'object') { if (o.si.pot || o.si.sollIst || o.si.leer) add('si', bestand ? 'Ankauf · Bestand · Zielbild' : 'Ankauf · Soll · Zielbild', siReiter(bestand, o.si, o.analyse)); }
     else add('si', bestand ? 'Ankauf · Bestand · Zielbild' : 'Ankauf · Soll · Zielbild', o.si ? '<div class="dp-pa-e dp-pa4-mini" data-dp-pa4-mini="abz"></div>' + o.si : o.si);
     /* Wert & Lage ist immer da (v3420): ohne Bericht mit dem Weg zur KI-Bewertung, darunter Lage & Markt */
     /* v3440 · oben der Ergebnissatz mit dem Hauptknopf (ersetzt die Karte „Wert im Jahresabgleich“ und die Kacheln
