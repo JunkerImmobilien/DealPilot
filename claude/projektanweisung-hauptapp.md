@@ -45310,3 +45310,9 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** staging 5e922961, main a9da5da1 + eaf89878 (Version), Merge zurück e2591f2f.
 - **Nachweis:** prompt-lecks, ki-deckel, grafiken-neu 49, vorschau, buster-ebenen sauber; Staging-Browser Demostraße 5 und Westerfeldstr. 146 neu abgerufen; Prod: Sicherung haupt-20261124-0935-ss, Backend healthy, Buster v4450, Prompt im Container.
 - **Rest:** 390 px nicht per Fenster gemessen · KI-Prozentangabe "unter/über" kann kippen (Prompt fordert nur Zahlen aus dem Langtext).
+
+### Rollout 1.0.167 · 24.11.2026 · landing-partner-preise-1
+- **Was:** partner.html (Für Partner) zeigt statt der alten Partnerkarte (99 € + Mandanten-Staffel) dieselben vier Partner-Pakete Solo, Büro, Kanzlei, Netzwerk wie preise.html, mit Umschalter Monat/Jahr, Mengen und "Jetzt buchen"; darunter "In jedem Paket enthalten". Rechnung aus js/kundenplatz-staffel.js und js/teamplatz-staffel.js über partner-pakete.js (setzt .on am Umschalter jetzt selbst, idempotent). HTML-Rückfall = Kopie des Blocks aus preise.html, teamplatz-pruefen L2 prüft Gleichheit Zeichen für Zeichen (Gegenprobe). Startseite unverändert. Black-Friday-Preise gelten nicht für Partner.
+- **Commit:** staging ad03263d, main 5ea7ce80 + 4e2309c2 (Version), Merge main → staging.
+- **Nachweis:** teamplatz-pruefen 123/123, landing-zaehlen 27, buster-ebenen sauber; Staging-Browser: Monat 99/253/367/772 €, Jahr 1.089/2.783/4.037/8.492 €, Buchen-Links kundenplaetze 0/5/10/25, teamplaetze 0/1/2/7; 390 px (iframe) ohne Querscrollen, Karten 323 px; preise.html Umschalter weiter richtig. Prod: dealpilot.immo/partner.html und app.dealpilot.immo/landing/partner.html 200, 4 Pakete, keine alte Staffel. Sicherung haupt-20261124-0943-tt.
+- **Rest:** keiner.
