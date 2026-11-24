@@ -531,6 +531,41 @@
       '.dp-ja-wechsel{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 14px;border:1px solid ' + GOLD + ';border-radius:10px;padding:8px 8px 8px 14px;margin:0 0 10px;background:var(--gold-bg, color-mix(in srgb, ' + GOLD + ' 8%, #fff));font:400 13px/1.45 Inter,sans-serif;color:' + T + '}',
       '@keyframes dpJaBlink{0%,100%{box-shadow:0 0 0 0 transparent}20%,60%{box-shadow:0 0 0 4px color-mix(in srgb, ' + GOLD + ' 45%, transparent)}}',
       '.dp-ja-blink{animation:dpJaBlink 1.3s ease-in-out 2;border-radius:8px}',
+      /* v4560 · Zeitstrahl über die Finanzierungsdauer, kleine Karten, Knopfleiste darunter, Mieterhöhung als Kennzahlen */
+      '.dp-ja-erg{flex-wrap:nowrap;align-items:flex-end;gap:14px;padding:2px 0 12px;margin-bottom:12px}',
+      '.dp-ja-strahl{flex:1 1 auto;min-width:0;display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:thin;padding:2px 0 2px}',
+      '.dp-pa-wrap .dp-ja-strahl button.dp-ja-sj{flex:1 0 50px;display:flex !important;flex-direction:column;align-items:center;gap:3px;position:relative;background:none !important;border:none !important;box-shadow:none !important;padding:0 2px 4px !important;min-height:0 !important;height:auto !important;border-radius:8px !important;cursor:pointer;color:' + T + ' !important}',
+      '.dp-ja-sj::before{content:"";position:absolute;top:8px;left:0;right:0;height:2px;background:' + RA + '}',
+      '.dp-ja-sj:first-child::before{left:50%}.dp-ja-sj:last-child::before{right:50%}',
+      '.dp-ja-sp{position:relative;z-index:1;width:18px;height:18px;border-radius:50%;box-sizing:border-box;border:2px solid ' + RA + ';background:#fff;display:grid;place-items:center;color:#fff}',
+      '.dp-ja-sp svg{width:9px;height:9px}',
+      '.dp-ja-sj.ok .dp-ja-sp,.dp-ja-sj.fest .dp-ja-sp{background:#3FA56C;border-color:#3FA56C}',
+      '.dp-ja-sj.teil .dp-ja-sp{background:#C99A2E;border-color:#C99A2E}',
+      '.dp-ja-sj.offen .dp-ja-sp{background:#fff;border-color:#B8625C}',
+      '.dp-ja-sj.laeuft .dp-ja-sp{background:#fff;border-color:' + GOLD + ';box-shadow:0 0 0 3px color-mix(in srgb, ' + GOLD + ' 22%, transparent)}',
+      '.dp-ja-sj b{font:600 12.5px Inter,sans-serif;font-variant-numeric:tabular-nums}',
+      '.dp-ja-sj small{font:500 9.5px "JetBrains Mono",monospace;letter-spacing:.04em;text-transform:uppercase;color:' + LE + ';white-space:nowrap}',
+      '.dp-ja-sj .dp-ja-mini{height:10px}',
+      '.dp-pa-wrap .dp-ja-strahl button.dp-ja-sj.kommt{cursor:default;opacity:.45}',
+      '.dp-pa-wrap .dp-ja-strahl button.dp-ja-sj[aria-pressed="true"]{background:color-mix(in srgb, ' + GOLD + ' 13%, #fff) !important}',
+      '.dp-ja-sj[aria-pressed="true"] b{text-decoration:underline;text-decoration-color:' + GOLD + ';text-decoration-thickness:2px;text-underline-offset:3px}',
+      '.dp-pa-wrap .dp-ja-strahl button.dp-ja-sj:not(.kommt):hover{background:color-mix(in srgb, ' + GOLD + ' 7%, #fff) !important}',
+      '.dp-ja-erg>.dp-ja-jk{flex:0 0 auto;margin-left:0;padding-bottom:6px}',
+      '.dp-ja-schritt{padding:10px 14px;gap:2px}',
+      '.dp-ja-schritte .dp-ja-w{font-size:17px}',
+      '.dp-ja-fuehrung{grid-template-columns:minmax(0,1fr) auto;padding:7px 10px 7px 14px;margin:8px 0 0}',
+      '.dp-ja-fuehrung.fertig{grid-template-columns:1fr}',
+      '.dp-ja-pot{grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"k p n" "k b n" "r r r";gap:8px 20px;padding:12px 16px}',
+      '.dp-ja-pot-k{grid-area:k;display:flex;flex-direction:column;gap:2px}.dp-ja-pot-k small{font-size:11px;color:' + LE + '}',
+      '.dp-ja-pks{grid-area:p;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}',
+      '.dp-ja-pk{display:flex;flex-direction:column;gap:1px;min-width:0;cursor:help}',
+      '.dp-ja-pk b{font:600 15px "Space Grotesk",Inter,sans-serif;font-variant-numeric:tabular-nums;color:' + T + ';white-space:nowrap}',
+      '.dp-ja-pk b.dp-ja-gold-t{color:#8a6d1f}',
+      '.dp-ja-pot>.dp-ja-balken{grid-area:b;height:6px}',
+      '.dp-ja-pot-kn{grid-area:n}',
+      '.dp-ja-pot-rot{grid-area:r;font:500 12px Inter,sans-serif}',
+      '@media (max-width:760px){.dp-ja-erg{flex-wrap:wrap}.dp-ja-erg>.dp-ja-jk{flex:1 1 100%}.dp-pa-wrap .dp-ja-strahl button.dp-ja-sj{flex:0 0 52px}'
+        + '.dp-ja-pot{grid-template-columns:1fr;grid-template-areas:"k" "p" "b" "n" "r"}.dp-ja-pks{grid-template-columns:repeat(2,minmax(0,1fr))}.dp-ja-schritt{padding:9px 10px}}',
       '@media (max-width:760px){.dp-ja-fuehrung{grid-template-columns:1fr;padding:10px}.dp-ja-f-p{flex-wrap:nowrap}.dp-ja-f-k{justify-content:flex-start}.dp-ja-f-p button:not(.an) .w{display:none}.dp-pa-wrap .dp-ja-f-p button:not(.an){padding:4px !important}}',   /* v4090b · am Handy nur der aktive Schritt mit Wort */
       '@media (max-width:760px){.dp-ja-schritte{grid-template-columns:repeat(2,minmax(0,1fr))}.dp-ja-schritt:nth-child(2n){border-right:none}.dp-ja-schritt:nth-child(-n+2){border-bottom:1px solid ' + LI + '}'
         + '.dp-ja-pot{grid-template-columns:1fr}.dp-ja-satz{font-size:15px}.dp-ja-schritt{padding:11px 10px;gap:5px}.dp-ja-w{font-size:17px}'
@@ -561,8 +596,11 @@
     var festKn = '', _alt = lauf ? '' : (fest
       ? '<button type="button" class="btn-clean dp-ja-fest an" data-ja-aktion="freigeben" data-ja-schritt-k="' + k + '" title="Festgeschrieben am ' + esc(datumText(fest)) + '. Wieder freigeben, um ' + titel + ' ' + jahr + ' zu ändern.">' + SCHLOSS + ' wieder freigeben</button>'
       : '<button type="button" class="btn-clean dp-ja-fest" data-ja-aktion="festschreiben" data-ja-schritt-k="' + k + '" title="' + titel + ' ' + jahr + ' abschließen. Danach lässt sich der Schritt nicht mehr ändern, bis er freigegeben ist.">' + SCHLOSS + ' festschreiben</button>');
-    return '<div class="dp-ja-schritt' + (fest ? ' fest' : '') + '" data-ja-schritt="' + k + '" data-ja-k="' + k + '"><div class="dp-ja-kk"><span class="dp-ja-nr">' + nr + '</span><b>' + titel + '</b><span class="st dp-ja-st-' + (fest ? 'fest' : s[k]) + '">' + stW + '</span></div>'
-      + '<div class="dp-ja-w">' + wert + '</div><div class="dp-ja-vgl">' + vgl + '</div><p>' + text + '</p></div>';   /* v4150 · Knöpfe stehen nur in der Führungsleiste (_kn je Schritt) */
+    /* v4560 · Marcel 24.11.2026: „Karten total verzerrt … viel zu viel Information“. Die Karte zeigt nur Titel, Stand, Zahl
+       und Vergleich, der Satz steht im Überfahren (title). Knöpfe stehen nur in der Leiste darüber (_kn je Schritt). */
+    var tt = String(text || '').replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+    return '<div class="dp-ja-schritt' + (fest ? ' fest' : '') + '" data-ja-schritt="' + k + '" data-ja-k="' + k + '" title="' + esc(titel + ' ' + jahr + ': ' + stW + '. ' + tt) + '"><div class="dp-ja-kk"><span class="dp-ja-nr">' + nr + '</span><b>' + titel + '</b><span class="st dp-ja-st-' + (fest ? 'fest' : s[k]) + '">' + stW + '</span></div>'
+      + '<div class="dp-ja-w">' + wert + '</div><div class="dp-ja-vgl">' + vgl + '</div></div>';
   }
   function abschnitt(t, eti) { return '<div class="dp-ja-abs"><h4>' + t + '</h4>' + (eti ? '<span class="dp-ja-eti">' + eti + '</span>' : '') + '</div>'; }
 
@@ -590,12 +628,28 @@
     var genutzt = !lauf && ungenutzt > 0 && gen.length && mp.ungenutzt_jahr <= Math.max(5, ungenutzt * 1.2);
     var wort = genutzt ? 'genutzt' : (ungenutzt > 0 ? vz(ungenutzt) + ' / Monat' : (U.ueber ? 'über der Grenze' : 'ausgeschöpft'));
     if (genutzt) ungenutzt = 0;   /* v4220 · B15: festgeschriebene Miete des Jahres bietet keine Mieterhöhung mehr an (Knöpfe unten) */
-    return '<div class="dp-ja-pot" data-ja-pot="' + z.jahr + '"><div><div class="dp-ja-eti">Mieterhöhung ' + z.jahr + '</div><div class="dp-ja-w' + (ungenutzt > 0 ? '' : (U.ueber ? ' dp-ja-schlecht' : ' dp-ja-gut')) + '">' + wort + '</div>'
-      + (genutzt ? '<div class="dp-ja-vgl">' + vz(Math.round(mp.zul - mp.ist)) + ' / Monat ab ' + mmjj(gen[0].datum) + '</div>' : '') + '</div>'
-      + '<div><div class="dp-ja-balken" role="img" aria-label="eingetragen ' + quote + ' % der zulässigen Miete"><i style="width:' + quote + '%"></i></div><p>' + t + '</p></div>'
-      + (ungenutzt > 0 && !(festJahr(z.jahr) || {}).miete ? '<span>' + knopf('mieterhoehung', 'Mieterhöhung vorbereiten', true)
-        + (global.DpViviMieterhoehung && global.DpViviMieterhoehung.verfuegbar() ? ' ' + knopf('vivi-mh', 'In ViVi anlegen', false) : '') + '</span>' : '<span></span>') + '</div>'
-      + '<p class="dp-ja-hin">Gerechnet wie die Potenzialanalyse (Kappung, Sperrfrist, Vergleichsmiete). Frühere Jahre mit der heutigen Vergleichsmiete, den damaligen Mietspiegel kennt DealPilot nicht.</p>';
+    /* v4560 · Marcel 24.11.2026: „die Kachel Mieterhöhung, diese Bullet Points, das sieht scheiße aus“. Jetzt vier kleine
+       Kennzahlen (eingetragen, zulässig, Luft, ab wann) mit Balken, die ganze Rechnung im Überfahren. Nur eine Zeile bleibt
+       sichtbar: wenn eine eingetragene Erhöhung über § 558 liegt (das muss man sehen). */
+    var tt = String(t).replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim()
+      + ' Gerechnet wie die Potenzialanalyse (Kappung, Sperrfrist, Vergleichsmiete). Frühere Jahre mit der heutigen Vergleichsmiete.';
+    var kz = function (eti, wert, kl, tip) { return '<div class="dp-ja-pk"' + (tip ? ' title="' + esc(tip) + '"' : '') + '><span class="dp-ja-eti">' + eti + '</span><b' + (kl ? ' class="' + kl + '"' : '') + '>' + wert + '</b></div>'; };
+    var abW = genutzt ? 'genutzt ab ' + mmjj(gen[0].datum) : (ungenutzt > 0 && mp.wirksam_ab ? mmjj(mp.wirksam_ab) : '–');
+    var abTip = genutzt ? 'Die Erhöhung ist eingetragen.' : (ungenutzt > 0 && mp.verlangbar_ab ? 'Verlangbar ab ' + mmjj(mp.verlangbar_ab) + ', wirksam ab ' + mmjj(mp.wirksam_ab) + ' (Zustimmungsfrist).' : '');
+    var rot = U.erh.length ? '<div class="dp-ja-pot-rot dp-ja-schlecht">' + U.erh.map(function (x) { return 'Erhöhung zum ' + datumText(x.datum) + ' auf ' + eur(x.auf) + ' liegt über ' + eur(x.zul) + ' zulässig'; }).join(' · ') + '</div>'
+      : (U.ueber ? '<div class="dp-ja-pot-rot dp-ja-schlecht">Kaltmiete ' + z.jahr + ' liegt über der zulässigen Miete</div>' : '');
+    return '<div class="dp-ja-pot" data-ja-pot="' + z.jahr + '" title="' + esc(tt) + '">'
+      + '<div class="dp-ja-pot-k"><span class="dp-ja-eti">Mieterhöhung ' + z.jahr + '</span>' + (mp.wohnungen.length > 1 ? '<small>' + mp.wohnungen.length + ' Wohnungen</small>' : '') + '</div>'
+      + '<div class="dp-ja-pks">'
+      + kz('eingetragen', eur(mp.ist), '', 'Kaltmiete der Wohnungen im Monat, wie eingetragen.')
+      + kz('zulässig § 558', eur(mp.zul), '', 'Zulässig zum 01.01.' + z.jahr + ' nach Kappung, Sperrfrist und Vergleichsmiete.')
+      + kz('Luft', wort, ungenutzt > 0 ? 'dp-ja-gold-t' : (U.ueber ? 'dp-ja-schlecht' : 'dp-ja-gut'), ungenutzt > 0 && mp.ungenutzt_jahr > 0 ? (lauf ? 'Bis Jahresende ohne Erhöhung ' + eur(mp.ungenutzt_jahr) + ' weniger.' : 'Im Jahr nicht genutzt: ' + eur(mp.ungenutzt_jahr) + '.') : '')
+      + kz('ab', abW, '', abTip)
+      + '</div>'
+      + '<div class="dp-ja-balken" role="img" aria-label="eingetragen ' + quote + ' % der zulässigen Miete"><i style="width:' + quote + '%"></i></div>'
+      + (ungenutzt > 0 && !(festJahr(z.jahr) || {}).miete ? '<span class="dp-ja-pot-kn">' + knopf('mieterhoehung', 'Mieterhöhung vorbereiten', true)
+        + (global.DpViviMieterhoehung && global.DpViviMieterhoehung.verfuegbar() ? ' ' + knopf('vivi-mh', 'In ViVi anlegen', false) : '') + '</span>' : '')
+      + rot + '</div>';
   }
 
   /* v4500 · Marcel 24.11.2026: „Bericht 2026 abgerufen, den hast du für 24 eingetragen“. Gemessen Demostraße 5: Bericht 616 vom
@@ -679,38 +733,37 @@
     var z = Z.filter(function (x) { return x.jahr === _gewaehlt; })[0], s = stand(z, weg, L), h = s._haus;
     var pl = planZeile(z.jahr), pr = projZeile(z.jahr), lauf = z.jahr >= heuteJahr();
 
-    var out = '<div class="dp-ja" data-dp-ja="1">';
+    var out = '<div class="dp-ja" data-dp-ja="1" data-dp-kp-nie="1">';   /* v4560 · keine automatischen Stichpunkte (punkteAus) im Jahresabgleich */
     /* v4150 · Hinweiszeile wechselHtml entfällt, der Knopf steht an der Jahresauswahl (jahrKn) */
     /* v4016 · Die Erinnerung „Jahresabgleich 2025: 2 von 4" stand oben über JEDEM gewählten Jahr (Marcel 23.11.2026:
        „bleibt beim Wechsel der Jahre stehen"). Jetzt sagt der Kopf nur das gewählte Jahr; offene Jahre zeigt die
        Jahresleiste mit Punkt und Zahl. */
 
-    /* Jahresleiste oben, darunter der Ergebnissatz des gewählten Jahres */
-    var dm = istZahl(z.miete_ist) && istZahl(z.miete_basis) ? z.miete_ist - z.miete_basis : null;
-    var cfPlan = pl && istZahl(pl.cfop_y) ? pl.cfop_y : null, cfIst = pr && istZahl(pr.cfop_y) ? pr.cfop_y : null;
-    var satz = '<b>' + esc(standText(s, z.jahr)) + '.</b> '
-      + (!lauf && s.offen.length && s.nFest < 4 ? 'Offen: ' + esc(s.offen.join(', ')) + '. ' : '')
-      + (dm != null ? (Math.abs(dm) < 0.5 ? 'Miete wie ' + (z.ohne_plan ? 'die Projektion' : 'im Plan vom Kauf') : 'Miete ' + vz(dm) + (dm > 0 ? ' über' : ' unter') + (z.ohne_plan ? ' der Projektion' : ' dem Plan vom Kauf')) : 'Für dieses Jahr gibt es keinen Plan vom Kauf')
-      + (cfPlan != null && cfIst != null ? ', Cashflow ' + vz(cfIst - cfPlan) : '') + '.'
-      + (lauf ? ' Abgleich ab Februar ' + (z.jahr + 1) + ', wenn Steuer, Abrechnung und Protokoll da sind.' : '');
-    /* v4110 · Marcel 23.11.2026: „Der Button ‚2025 fertig machen‘ könnte auch oben mit unter ‚2025 ist vorbei. Du kannst es
-       jetzt abschließen.‘, ist sonst doppelt.“ Der Knopf steht nur noch in der Hinweiszeile (wechselHtml), die dem gewählten
-       Jahr folgt. */
-    /* v4150 · Marcel 23.11.2026: „nicht ganz übersichtlich mit dem 2025 oder 2024 fertig machen … irgendwo anders besser
-       positionieren“. EIN Knopf an der Jahresauswahl, er folgt dem gewählten Jahr: vorbei und offen „<Jahr> fertig machen“
-       (öffnet den Assistenten, festgeschrieben wird dort in Schritt 5), ganz festgeschrieben „wieder freigeben“, laufendes
-       Jahr kein Knopf. Die Hinweiszeile „<Jahr> ist vorbei“ (wechselHtml, v4100/v4110) entfällt. */
-    var jahrKn = lauf ? '<span class="dp-ja-jk-t">' + z.jahr + ' läuft noch</span>' : (s.nFest === 4
-      ? '<span class="dp-ja-jk"><span class="dp-ja-jk-t">' + SCHLOSS + ' ' + z.jahr + ' festgeschrieben</span><button type="button" class="btn-clean dp-ja-fest an" data-ja-aktion="freigeben" title="Alle vier Schritte von ' + z.jahr + ' wieder freigeben.">wieder freigeben</button></span>'
-      : '<span class="dp-ja-jk"><span class="dp-ja-jk-t">' + (s.n === 4 ? 'Alles erledigt, nur noch festschreiben' : z.jahr + ' ist vorbei') + '</span>' + knopf('fertig', z.jahr + ' fertig machen', true, z.jahr) + '</span>');
-    out += '<div class="dp-ja-erg"><div class="dp-ja-jahre" role="group" aria-label="Jahr wählen">' + Z.slice().reverse().map(function (x) {
+    /* v4560 · Marcel 24.11.2026: „Oben die Jahre … ein kompletter Zeitstrahl über die Finanzierungsdauer. Welches läuft und
+       welche noch nicht da sind, ein bisschen ausgrauen. Ganz am Schluss das Jahr, was man anklickt, ob man das fertig machen
+       kann … Wir brauchen dann auch nicht so viel Text daneben.“ Zeitstrahl vom Kaufjahr bis zum Ende der Zinsbindung
+       (mindestens bis zum laufenden Jahr), künftige Jahre grau und nicht wählbar. Der Ergebnissatz entfällt, den Stand zeigen
+       Punkt und Kästchen je Jahr. Rechts EIN Knopf für das gewählte Jahr: vorbei und offen „<Jahr> abschließen“ (Assistent),
+       ganz festgeschrieben „wieder freigeben“, laufendes Jahr „<Jahr> vorbereiten“ (Eingabe im Reiter). */
+    var vonJ = jahre.reduce(function (a, b) { return Math.min(a, b); }, heuteJahr());
+    var bindj = 10; try { var _bj = Number(global.State && global.State.bindj); if (isFinite(_bj) && _bj > 0) bindj = Math.round(_bj); } catch (e) {}
+    var bisJ = Math.max(heuteJahr(), vonJ + bindj);
+    var strahl = [];
+    for (var yy = vonJ; yy <= bisJ; yy++) strahl.push(yy);
+    var jahrKn = lauf ? knopf('eintragen', z.jahr + ' vorbereiten', false, z.jahr)
+      : (s.nFest === 4 ? '<button type="button" class="btn-clean dp-ja-fest an" data-ja-aktion="freigeben" title="' + z.jahr + ' ist festgeschrieben. Alle vier Schritte wieder freigeben.">' + SCHLOSS + ' ' + z.jahr + ' freigeben</button>'
+        : knopf('fertig', z.jahr + ' abschließen', true, z.jahr));
+    out += '<div class="dp-ja-erg"><div class="dp-ja-strahl" role="group" aria-label="Jahr wählen">' + strahl.map(function (y) {
+        var x = Z.filter(function (q) { return q.jahr === y; })[0];
+        var marke = y === vonJ ? 'Kauf' : (y === vonJ + bindj ? 'Zinsbindung' : '');
+        if (!x) return '<button type="button" class="btn-clean dp-ja-sj kommt" disabled title="' + y + ' kommt noch' + (marke ? ' (Ende der Zinsbindung)' : '') + '"><i class="dp-ja-sp"></i><b>' + y + '</b><small>' + (marke || '&nbsp;') + '</small></button>';
         var sx = stand(x, weg, L), xl = x.jahr >= heuteJahr();
-        var tt = standText(sx, x.jahr) + (!xl && sx.offen.length ? '. Offen: ' + sx.offen.join(', ') : '');
-        /* je Schritt ein Kästchen in der Reihenfolge Miete, Steuer, Wert, Haus: grün erledigt, gelb teilweise, rot offen */
-        return '<button type="button" class="btn-clean" data-ja-jahr="' + x.jahr + '" aria-pressed="' + (x.jahr === _gewaehlt) + '" title="' + esc(tt) + '" aria-label="' + esc(tt) + '">' + x.jahr
-          + (xl ? '<small>läuft</small>' : sx.nFest === 4 ? '<small class="dp-ja-schl">' + SCHLOSS + '</small>'
-            : '<span class="dp-ja-mini">' + SCHRITTE.map(function (y) { return '<i class="dp-ja-' + (sx[y[0]] === 'ok' ? 'ok' : sx[y[0]]) + '"></i>'; }).join('') + '</span>') + '</button>';
-      }).join('') + '</div>' + jahrKn + '<div class="dp-ja-satz">' + satz + '</div></div>';
+        var kl = xl ? 'laeuft' : (sx.nFest === 4 ? 'fest' : (sx.n === 4 ? 'ok' : (sx.n >= 2 ? 'teil' : 'offen')));
+        var tt = xl ? y + ' läuft' : (sx.nFest === 4 ? y + ' festgeschrieben' : standText(sx, y) + (sx.offen.length ? '. Offen: ' + sx.offen.join(', ') : ''));
+        return '<button type="button" class="btn-clean dp-ja-sj ' + kl + '" data-ja-jahr="' + y + '" aria-pressed="' + (y === _gewaehlt) + '" title="' + esc(tt) + '" aria-label="' + esc(tt) + '"><i class="dp-ja-sp">' + (kl === 'fest' ? SCHLOSS : '') + '</i><b>' + y + '</b>'
+          + (xl ? '<small>' + (marke || 'läuft') + '</small>' : sx.nFest === 4 ? '<small>' + (marke || 'fest') + '</small>'
+            : '<span class="dp-ja-mini">' + SCHRITTE.map(function (q) { return '<i class="dp-ja-' + (sx[q[0]] === 'ok' ? 'ok' : sx[q[0]]) + '"></i>'; }).join('') + '</span>') + '</button>';
+      }).join('') + '</div><div class="dp-ja-jk">' + jahrKn + '</div></div>';
     out += frageHtml(z.jahr) + protokollHtml(z.jahr);
 
     /* die vier Schritte als eine Leiste */
@@ -760,8 +813,8 @@
     }
     var akt = aktiverSchritt(z, s, lauf);
     sch = SCHRITTE.map(function (x) { var t = teile[x[0]] || ''; return x[0] === akt ? t.replace('class="dp-ja-schritt', 'class="dp-ja-schritt dp-ja-akt') : t; }).join('');
+    out += '<div class="dp-ja-schritte">' + sch + '</div>';   /* v4560 · Karten zuerst, darunter die Knopfleiste des gewählten Schritts */
     out += fuehrungHtml(z, s, lauf, akt, weg);
-    out += '<div class="dp-ja-schritte">' + sch + '</div>';
     if (_eingabe === z.jahr && JB() && JB().eingabeHtml) out += '<div class="dp-ja-eingabe" data-ja-eingabe="' + z.jahr + '"><div class="dp-ja-eingabe-k"><b>' + z.jahr + ' eintragen</b><span>Ist-Miete, Leerstand, Restschuld laut Kontoauszug, Stand der Steuer und Notiz</span><button type="button" class="btn-clean dp-ja-ein-x" data-ja-aktion="ein-zu" aria-label="Eingabe schließen">✕</button></div>' + JB().eingabeHtml(z.jahr) + '</div>';
 
     /* v4500 · die ViVi-Zeile (viviHtml) entfällt, die Abweichungen stehen im Schritt Steuer (viviKurz) */
@@ -989,7 +1042,8 @@
       return '<li><button type="button" class="btn-clean dp-ja-f-' + (st === 'ok' ? 'ok' : st) + (x[0] === akt ? ' an' : '') + '" data-ja-aktion="f-wahl" data-ja-k="' + x[0] + '" aria-current="' + (x[0] === akt ? 'step' : 'false') + '" title="' + x[1] + ': ' + (st === 'ok' ? 'erledigt' : WORT[st]) + '">'
         + '<i>' + (st === 'ok' ? '✓' : (i + 1)) + '</i><span class="w">' + x[1] + '</span></button></li>';
     }).join('') + '</ol>';
-    if (!akt) return '<div class="dp-ja-fuehrung fertig">' + punkte + '<div class="dp-ja-f-t"><b>' + z.jahr + ' ist abgeglichen.</b> ' + (s.nFest === 4 ? 'Alle Schritte sind festgeschrieben.' : 'Schreib das Jahr fest, dann bleibt es so stehen.') + '</div></div>';
+    /* v4560 · die Punkte 1 bis 4 entfallen, die Karten darunter wählen den Schritt. Die Leiste ist eine schmale Zeile mit den Knöpfen, die Aufgabe steht im Überfahren. */
+    if (!akt) return '<div class="dp-ja-fuehrung fertig"><div class="dp-ja-f-t"><span class="dp-ja-eti">' + z.jahr + ' · ' + (s.nFest === 4 ? 'festgeschrieben' : 'alle Schritte erledigt') + '</span></div></div>';
     var i = ks.indexOf(akt), st = s.fest && s.fest[akt] ? 'ok' : s[akt], fest = s.fest && s.fest[akt];
     /* v4150 · Marcel 23.11.2026: „in der Strecke ja auch kein Weiter und Zurück, sondern geben dann nur die Buttons an“.
        Die Punkte und die Karten wählen den Schritt, hier stehen nur seine Knöpfe (dieselben wie bisher in der Karte) und
@@ -998,8 +1052,8 @@
     var festK = lauf ? '' : (fest
       ? '<button type="button" class="btn-clean dp-ja-fest an" data-ja-aktion="freigeben" data-ja-schritt-k="' + akt + '" title="Festgeschrieben am ' + esc(datumText(fest)) + '. Wieder freigeben, um ' + SCHRITTE[i][1] + ' ' + z.jahr + ' zu ändern.">' + SCHLOSS + ' wieder freigeben</button>'
       : '<button type="button" class="btn-clean dp-ja-fest" data-ja-aktion="festschreiben" data-ja-schritt-k="' + akt + '" title="' + SCHRITTE[i][1] + ' ' + z.jahr + ' abschließen. Danach lässt sich der Schritt nicht mehr ändern, bis er freigegeben ist.">' + SCHLOSS + ' Schritt festschreiben</button>');
-    return '<div class="dp-ja-fuehrung' + (lauf ? ' lauf' : '') + '">' + punkte
-      + '<div class="dp-ja-f-t"><span class="dp-ja-eti">' + (lauf ? z.jahr + ' · ' + SCHRITTE[i][1] + ' · läuft' : 'Schritt ' + (i + 1) + ' von 4 · ' + SCHRITTE[i][1] + ' · ' + (st === 'ok' ? 'erledigt' : WORT[st])) + '</span><span>' + esc(a.t) + '</span></div>'
+    return '<div class="dp-ja-fuehrung' + (lauf ? ' lauf' : '') + '" title="' + esc(a.t) + '">'
+      + '<div class="dp-ja-f-t"><span class="dp-ja-eti">' + (lauf ? z.jahr + ' · ' + SCHRITTE[i][1] + ' · läuft' : 'Schritt ' + (i + 1) + ' von 4 · ' + SCHRITTE[i][1] + ' · ' + (st === 'ok' ? 'erledigt' : WORT[st])) + '</span></div>'
       + '<div class="dp-ja-f-k">' + a.kn + festK + '</div></div>';
   }
   /* v4090 · Rückfrage vor dem Freigeben und Protokoll des Jahres */

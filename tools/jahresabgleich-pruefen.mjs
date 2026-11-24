@@ -389,8 +389,12 @@ const K = c.DpMietpotenzial, E = c.DpErhoehungen, JA = c.DpJahresabgleich, HV = 
   ok(as.includes("ov.querySelector('.oabi-foot').innerHTML = knopf('zu', 'Schließen', false)"), 'E erster Fuß-Knopf ist Schließen (das × der Leiste klickt ihn)');
   ok(as.includes("(anlageVErlaubt() ? knopf('anlage-v'") && as.includes('JA().zuAnlageV(J)'), 'E Absprung zur Anlage V nur mit Stufe und bis zur Anlage V');
   ok(/function zuAnlageV\(\) \{[\s\S]{0,420}yearly-tax-form-box[\s\S]{0,700}nav\.tabs[\s\S]{0,400}scrollBy\(\{ top: dy/.test(ja) && ja.includes("if (a === 'steuer') { zuAnlageV(); return; }"), 'E Absprung wartet auf die Anlage V und rollt hin');
-  ok(!ja.includes('dp-ja-fertig-k') && !/function wechselHtml/.test(ja) && !/out \+= wechselHtml/.test(ja) && (ja.match(/knopf\('fertig'/g) || []).length === 1 && /var jahrKn = lauf[\s\S]{0,900}knopf\('fertig', z\.jahr \+ ' fertig machen', true, z\.jahr\)/.test(ja), 'L „fertig machen“ genau einmal, an der Jahresauswahl des gewählten Jahres (v4150)');
-  ok(/var jahrKn = lauf \? '<span class="dp-ja-jk-t">' \+ z\.jahr \+ ' läuft noch/.test(ja) && /s\.nFest === 4[\s\S]{0,300}data-ja-aktion="freigeben"/.test(ja), 'L laufendes Jahr ohne Knopf, festgeschrieben: wieder freigeben an derselben Stelle');
+  ok(!ja.includes('dp-ja-fertig-k') && !/function wechselHtml/.test(ja) && !/out \+= wechselHtml/.test(ja) && (ja.match(/knopf\('fertig'/g) || []).length === 1 && /var jahrKn = lauf[\s\S]{0,900}knopf\('fertig', z\.jahr \+ ' abschließen', true, z\.jahr\)/.test(ja), 'L „<Jahr> abschließen“ genau einmal, rechts am Zeitstrahl für das gewählte Jahr (v4560)');
+  ok(/var jahrKn = lauf \? knopf\('eintragen', z\.jahr \+ ' vorbereiten'/.test(ja) && /s\.nFest === 4[\s\S]{0,300}data-ja-aktion="freigeben"/.test(ja), 'L laufendes Jahr „vorbereiten“, festgeschrieben: freigeben an derselben Stelle (v4560)');
+  /* v4560 · Marcel 24.11.2026: Karten klein, Zeitstrahl über die Finanzierungsdauer, kein Ergebnissatz, Mieterhöhung als Kennzahlen */
+  ok(!/<p>' \+ text \+ '<\/p>/.test(ja) && /title="' \+ esc\(titel \+ ' ' \+ jahr/.test(ja), 'L v4560 Karte ohne Satz, der Satz steht im Überfahren');
+  ok(!/dp-ja-satz">' \+ satz/.test(ja) && /dp-ja-strahl/.test(ja) && /bisJ = Math\.max\(heuteJahr\(\), vonJ \+ bindj\)/.test(ja) && /dp-ja-sj kommt" disabled/.test(ja), 'L v4560 Zeitstrahl Kaufjahr bis Ende Zinsbindung, künftige Jahre grau und nicht wählbar, kein Ergebnissatz');
+  ok(/data-dp-kp-nie="1"/.test(ja) && /dp-ja-pks/.test(ja) && !/<p>' \+ t \+ '<\/p>/.test(ja), 'L v4560 keine automatischen Stichpunkte, Mieterhöhung als vier Kennzahlen statt Fließtext');
   ok(!/knopf\('zurueck'/.test(as) && /knopf\('weiter', 'Weiter: ' \+ SCHRITTE\[i \+ 1\]\[1\]/.test(as), 'L Assistent ohne Zurück, Weiter nennt den nächsten Schritt');
 }
 
