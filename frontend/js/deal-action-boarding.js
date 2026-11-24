@@ -123,7 +123,8 @@
       kachel('invest_voll', IC_CHART, 'Investment-PDF <span class="dab-doc-badge">Empfohlen</span>', 'Alle Kapitel, bank-fertig.', 'PDF abrufen', { gold: true }) +
       kachel('invest_kurz', IC_CHART, 'Investment-Kurzfassung', 'Das Wichtigste auf fünf bis sechs Seiten.', 'PDF abrufen') +
       kachel('track', IC_STERN, 'Track Record', 'Gewonnene Deals als Einzel- oder Sammel-PDF.', 'Auswählen') +
-      kachel('selbst', IC_PERSON, 'Selbstauskunft <span class="dab-doc-badge" style="background:#EDE8DC;color:#6A6360">Demo</span>', 'Für die Bank, Bestand und Darlehen vorausgefüllt.', 'PDF abrufen') +
+      /* v4580 · Marcel 24.11.2026: Demo-PDF Selbstauskunft erst mal raus (Kachel ausgeblendet, Weg dahinter bleibt) */
+      (false ? kachel('selbst', IC_PERSON, 'Selbstauskunft <span class="dab-doc-badge" style="background:#EDE8DC;color:#6A6360">Demo</span>', 'Für die Bank, Bestand und Darlehen vorausgefüllt.', 'PDF abrufen') : '') +
       kachel('bmf', IC_FA, 'Finanzamt-PDF', 'Werbungskosten für die Anlage V, je Steuerjahr.', 'PDF', { attr: ' data-dok="fa"', jahr: true }) +
       '<div id="dab-st-fehlt" class="dab-st-fehlt" style="display:none"></div>' +
       kachel('kpa', IC_BLATT, 'Kaufpreisaufteilung', 'Herleitung und Aufteilung für Finanzamt und Berater.', 'PDF abrufen', { attr: ' data-steuer="kpa"' }) +

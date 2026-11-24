@@ -1355,7 +1355,20 @@ function _calcImmediate(){
     try { var _aw = localStorage.getItem('dp_wert_anker'); if (_aw === 'mpi_mit' || _aw === 'mpi_ohne') _ankWahl = _aw; } catch (_e2) {}
     var _mpiM = _wzW && _wzW.marktpreisindikation ? _wzW.marktpreisindikation.mitte : null;
     var _mpiO = _wzW && _wzW.ohne_abschlag ? _wzW.ohne_abschlag.mitte : null;
-    if (_wzW && _ankWahl === 'massgebend' && _wzW.fuehrend) {
+    /* v4580 · Marcel 24.11.2026 (Westerfeldstr. 146): „wir rechnen teilweise mit dem Ertragswert, obwohl das nur stützend ist … eher mit
+       dem führenden Verfahren das Ganze berechnen“. Ist das Haus in Wohnungseigentum aufgeteilt, führt seit v3322 (Marcel 12.11.2026) der
+       Vergleichswert je Wohnung (Summe nach Aufteilungskosten, wert-zielbild.js mitAufteilung). Bis v4570 blieb der Anker trotzdem beim
+       führenden Verfahren des Berichts (Ertragswert des Hauses als Ganzes): Übersicht „Vergleichswert führend 985.200 €“, gerechnet
+       wurde mit 740.000 €. Jetzt ist derselbe Wert der Anker. Der Aufteilerwert kommt aus dem Potenzial-Lauf (Ereignis dp:potenzial,
+       wert-zielbild.js ruft calc() danach neu). */
+    if (_wzW && _ankWahl === 'massgebend' && window.DpWertZielbild && typeof window.DpWertZielbild._mitAufteilung === 'function') {
+      try {
+        var _wzA = window.DpWertZielbild._mitAufteilung(window.DpWertZielbild._wertDaten(_wzB));
+        if (_wzA && _wzA.aufteilung && _wzA.aufteilung.wert > 0) _mbAnker = { wert: Math.max(0, _wzA.aufteilung.wert - _erbAbzug), art: 'aufteiler',
+          datum: _wzW.wert_stichtag || _wzW.bericht_datum, erstellt: _wzW.bericht_datum, stichtag_eigen: !!_wzW.wert_stichtag };
+      } catch (_eAuf) {}
+    }
+    if (_wzW && !_mbAnker && _ankWahl === 'massgebend' && _wzW.fuehrend) {
       var _fv = _wzW[_wzW.fuehrend];
       if (_fv && _fv.wert > 0 && !_fv.vorlaeufig) _mbAnker = { wert: Math.max(0, _fv.wert - _erbAbzug), art: _wzW.fuehrend, datum: _wzW.wert_stichtag || _wzW.bericht_datum, erstellt: _wzW.bericht_datum, stichtag_eigen: !!_wzW.wert_stichtag };
       /* Stufe M: führt der Vergleichswert ohne amtliche Basis, IST er die Marktpreisindikation nach Abschlag */
@@ -1387,7 +1400,7 @@ function _calcImmediate(){
     jahr: (function () { var d = _mbAnker.datum ? new Date(_mbAnker.datum) : null; return d && !isNaN(d) ? d.getFullYear() : null; })(),
     monat: (function () { var d = _mbAnker.datum ? new Date(_mbAnker.datum) : null; return d && !isNaN(d) ? d.getMonth() + 1 : null; })() } : null;
   State.wert_basis_text = _wbQuelle === 'verkehrswert' ? (State.svw_label || 'Wertangabe') + ' (Reiter Objekt)'
-    : _wbQuelle === 'marktbericht' ? ({ ertragswert: 'Ertragswert', sachwert: 'Sachwert', vergleichswert: 'Vergleichswert', vergleichswert_m: 'Vergleichswert', mpi_mit: 'Marktpreisindikation nach Abschlag', mpi_ohne: 'Marktpreisindikation ohne Abschlag' }[_mbAnker.art] || 'Wert') + ' aus dem Marktbericht'
+    : _wbQuelle === 'marktbericht' ? ({ aufteiler: 'Vergleichswert je Wohnung (Summe nach Aufteilungskosten)', ertragswert: 'Ertragswert', sachwert: 'Sachwert', vergleichswert: 'Vergleichswert', vergleichswert_m: 'Vergleichswert', mpi_mit: 'Marktpreisindikation nach Abschlag', mpi_ohne: 'Marktpreisindikation ohne Abschlag' }[_mbAnker.art] || 'Wert') + ' aus dem Marktbericht'
     : _wbQuelle === 'bankbewertung' ? 'Bankbewertung' : 'Kaufpreis';
   var gs_a=v('gsfl')*(v('mea')/100);
   st('gs_ant',gs_a.toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2})+' m²');  /* v3023: stand „58.60 m²" */st('bodenwert',fE(gs_a*v('brw')));
@@ -2623,6 +2636,10 @@ function _calcImmediate(){
      Bis v4390 tat das nur die Kachel (r-wpuff), der Score blieb beim Formularfeld. Backend: objektRechnung.js liest
      denselben Wert aus dem gespeicherten _wert_anker (storage.js). */
   try { var _waK = State.wert_anker; if (_waK && _waK.wert > 0 && svw > 0 && /^(marktbericht|indikation)$/.test(_svwHerk || '') && Math.abs(_waK.wert - svw) > 1) wp_kpi = _waK.wert - kp; } catch (_eWk) {}
+  /* v4580 · dieselbe Rangfolge wie wert_basis (v2996): eine Wertangabe ohne Gutachten oder Bankbewertung (Herkunft „eigene“, auch ohne
+     Auswahl) tritt hinter den Marktbericht zurück. Gemessen Westerfeldstr. 146: Feld 567.000 € ohne Herkunft (Demodaten), Anker 740.000 €,
+     Wertpuffer und Investment-PDF nannten trotzdem +22.000 € und „Marktwert (eigene Schätzung)“. */
+  try { var _waE = State.wert_anker; if (_waE && _waE.wert > 0 && svw > 0 && _svwHerk === 'eigene') wp_kpi = _waE.wert - kp; } catch (_eWe) {}
   var btj=parseInt(g('btj')||'20');
   /* v816-CUT: Privat-Objekt-Cut bei Ueberfuehrung. Gated ueber Feld 'ueberf_ende' (Datum).
      Kappt btj auf volle Jahre bis zum Stichtagsjahr; letztes Jahr wird anteilig (Monat/12) gerechnet.

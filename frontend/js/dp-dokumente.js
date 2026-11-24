@@ -169,6 +169,19 @@
     if (!svw || !/^(marktbericht|indikation)$/.test(S.svw_herkunft || '')) return false;
     return !!(S.wert_anker && S.wert_anker.wert && Math.abs(Number(S.wert_anker.wert) - svw) > 1);
   }
+  /* v4580 · der maßgebende Objektwert, mit dem die App rechnet (calc.js wert_basis / wert_anker), mit Verfahren und Stichtag. null, wenn
+     ein Gutachten oder eine Bankbewertung aus dem Reiter Objekt führt (dann steht die Formularangabe mit ihrem Namen) oder nur der Kaufpreis. */
+  var ANKER_NAME = { aufteiler: 'Vergleichswert je Wohnung', ertragswert: 'Ertragswert', sachwert: 'Sachwert', vergleichswert: 'Vergleichswert',
+    vergleichswert_m: 'Vergleichswert (indikativ, aus Angebotspreisen)', mpi_mit: 'Marktpreisindikation nach Abschlag', mpi_ohne: 'Marktpreisindikation ohne Abschlag' };
+  function massgebend(B) {
+    var S = St(), A = S.wert_anker;
+    if (S.wert_basis_quelle !== 'marktbericht' || !A || !(Number(A.wert) > 0)) return null;
+    var st = A.datum ? new Date(A.datum) : null, stT = st && !isNaN(st) ? st.toLocaleDateString('de-DE', { month: '2-digit', year: 'numeric' }) : '';
+    var fuehrt = /^(aufteiler|ertragswert|sachwert|vergleichswert|vergleichswert_m)$/.test(A.art);
+    return { wert: Number(A.wert), art: A.art, name: ANKER_NAME[A.art] || 'Objektwert',
+      titel: 'Objektwert · ' + (ANKER_NAME[A.art] || 'Marktbericht') + (fuehrt ? ', führend' : ''),
+      det: (A.art === 'aufteiler' ? 'Summe der Wohnungen nach Aufteilungskosten · ' : '') + 'DealPilot-Marktbericht' + (stT ? ', Stichtag ' + stT : '') };
+  }
   function finanzierungVoll(K, B, kurz) {
     var S = St(), kp = K.kp || zahlAus('kp') || 0, nk = nebenkosten(kp), nkSum = nk.reduce(function (a, x) { return a + x.eur; }, 0);
     var moebl = zahlAus('moebl'), san = zahlAus('san');
@@ -210,8 +223,14 @@
     var bis = zellText('r-bindend'); if (bis) fin.push(['Zinsbindung bis', bis]);
     fin.push(['Restschuld am Ende der Zinsbindung', B.eur(S.rs)]);
     fin.push(['Finanzierungsstruktur', (aus ? (d2an ? 'Tilgungsaussetzung + Bausparvertrag + Zusatzdarlehen' : 'Tilgungsaussetzung mit Bausparvertrag') : (d2an ? 'Annuitätendarlehen + Zusatzdarlehen' : 'Annuitätendarlehen')) + (_dwL.length ? ' + ' + _dwL.length + (_dwL.length === 1 ? ' weiteres Darlehen' : ' weitere Darlehen') : ''), { umbruch: 1 }]);   /* v3215; v3223 Umbruch */
-    var svw = svwVeraltet() ? null : zahlAus('svwert');   /* v4380 */
-    if (svw) {
+    /* v4580 · Marcel 24.11.2026 (Westerfeldstr. 146, Seite 3): „Marktwert, eigene Schätzung … ich habe keine Schätzung gemacht“. Das Feld
+       im Reiter Objekt trug 567.000 € ohne Herkunft (Demodaten), gerechnet wurde längst mit dem maßgebenden Wert des Marktberichts.
+       Jetzt steht hier der Wert, mit dem gerechnet wird, mit seinem Verfahren. Die Formularangabe nur, wenn sie selbst führt. */
+    var _mw = massgebend(B), svw = svwVeraltet() ? null : zahlAus('svwert');   /* v4380 */
+    if (_mw) {
+      fin.push([_mw.titel, B.eur(_mw.wert), { det: _mw.det }]);
+      if (da(K.wp_kpi)) fin.push(['Sofortiger Wertpuffer gegenüber dem Kaufpreis', B.eurS(K.wp_kpi), { art: 'ende', farbe: 1 }]);
+    } else if (svw) {
       fin.push([S.svw_label || 'Wertangabe (Reiter Objekt)', B.eur(svw)]);
       if (da(K.wp_kpi)) fin.push(['Sofortiger Wertpuffer gegenüber dem Kaufpreis', B.eurS(K.wp_kpi), { art: 'ende', farbe: 1 }]);
     }
@@ -397,9 +416,19 @@
     ], { flaeche: [0, 1], titel: 'Vermögensaufbau' });
     var ek0 = da(rows[0].eq_y) !== null ? rows[0].eq_y : 0;
     var jz = rows.filter(function (r, i) { return rows.length <= 12 || i % 2 === 0 || i === rows.length - 1; });
+    var tz = jz.map(function (r) { return { w: [String(r.cal || r.y), B.eur(r.wert_y), B.eur(r.rs), B.eur(r.eq_y), B.eurS((r.eq_y || 0) - ek0)] }; }), tk = 'Jahr';
+    /* v4580 · Marcel 24.11.2026: „beim Vermögenszuwachs im Detail fehlt das letzte Jahr, die 2045“. Die Grafik darüber (grafiken-bewertung.js
+       vermDaten) zeigt den Stand jeweils zu Jahresbeginn bis zum Ende der Betrachtung (2045, Eigenkapital 739 T€), die Tabelle las die
+       Jahreszeilen (Wert zu Jahresbeginn, Restschuld zum Jahresende) und hörte 2044 auf. Jetzt dieselben Punkte wie die Grafik. */
+    var GV = null; try { GV = (gbKarte('_aufbauHtml') && window.DpGrafikenBewertung && DpGrafikenBewertung._vermDaten) ? DpGrafikenBewertung._vermDaten() : null; } catch (e) { GV = null; }
+    if (GV && GV.Z && GV.Z.length) {
+      var e0 = GV.w0 - GV.rs0, P = [{ j: (GV.Z[0].j - 1), wert: GV.w0, rs: GV.rs0, ek: e0 }].concat(GV.Z);
+      var pz = P.filter(function (z, i) { return P.length <= 12 || i % 2 === 0 || i === P.length - 1; });
+      tk = 'Stand 1.1.';
+      tz = pz.map(function (z, i) { return { w: [String(z.j) + (i === 0 ? ' (Kauf)' : '') + (z === P[P.length - 1] ? ' (Ende)' : ''), B.eur(z.wert), B.eur(z.rs), B.eur(z.ek), B.eurS(z.ek - e0)], art: z === P[P.length - 1] ? 'ende' : '' }; });
+    }
     var h = '<div class="block">' + (gbKarte('_aufbauHtml') || lin) + '<p class="det">Der Objektwert ist eine Annahme aus der hinterlegten Wertsteigerung, keine Bewertung nach § 194 BauGB.</p></div>'
-      + '<h3>Vermögenszuwachs im Detail</h3>' + tab(B, ['Jahr', 'Immobilienwert', 'Restschuld', 'Eigenkapital im Objekt', 'Zuwachs gegenüber heute'],
-        jz.map(function (r) { return { w: [String(r.cal || r.y), B.eur(r.wert_y), B.eur(r.rs), B.eur(r.eq_y), B.eurS((r.eq_y || 0) - ek0)] }; }), 'dicht');
+      + '<h3>Vermögenszuwachs im Detail</h3>' + tab(B, [tk, 'Immobilienwert', 'Restschuld', 'Eigenkapital im Objekt', 'Zuwachs gegenüber Kauf'], tz, 'dicht');
     if (da(vz.verm_zuwachs) !== null) {
       var sm = function (f) { return rows.reduce(function (a, r) { return a + (Number(r[f]) || 0); }, 0); };
       h += '<div class="zwei"><div class="block"><h3>Woraus der Vermögenszuwachs besteht (' + rows.length + ' Jahre)</h3>' + B.liste([
@@ -443,20 +472,39 @@
       + '<div class="block"><h3>Ist gegen Soll</h3>' + B.liste(z) + '<p class="det">' + B.esc(M.sollAbJahr ? 'Die Cashflow-Rechnung setzt die Soll-Miete ab Jahr ' + M.sollAbJahr + ' an; davor und danach gilt die hinterlegte Mietentwicklung.' : 'Die Cashflow-Rechnung rechnet durchgehend mit der Ist-Miete – die Soll-Miete ist hier nur nachrichtlich.') + '</p></div>';
   }
   /* Werte je Verfahren als Spannen gegen den Kaufpreis (wie die Wertlandschaft der Bankfassung) */
+  /* v4580 · Marcel 24.11.2026: „die Grafik bei Werte je Verfahren … unten nicht richtig angegeben“. Gemessen Westerfeldstr. 146: keine
+     Achse und keine Zahlen, der führende Wert fehlte (pdf-wert-zielbild.js ART ohne aufteiler), die Namen in Versalien. Jetzt: Achse in T€,
+     je Zeile Spanne (Band), Mitte (Punkt) mit Zahl, führend in Gold, Kaufpreis als Linie mit Beschriftung oben. */
   function wertSpannen(V, kp, B) {
     var werte = [].concat.apply([], V.map(function (v) { return [v.unten, v.mitte, v.oben]; })).concat([kp]).filter(function (x) { return da(x) !== null; });
     if (!werte.length) return '';
-    var min = Math.min.apply(null, werte) * 0.92, max = Math.max.apply(null, werte) * 1.06, W = 520, L = 150, R = 14, zh = 22, H = V.length * zh + 30;
+    var lo = Math.min.apply(null, werte), hi = Math.max.apply(null, werte), spn = hi - lo || hi * 0.2 || 1;
+    var stp = Math.pow(10, Math.floor(Math.log10(spn / 4))); [1, 2, 2.5, 5, 10].some(function (m) { if (spn / (stp * m) <= 5) { stp *= m; return true; } return false; });
+    var min = Math.floor(lo * 0.97 / stp) * stp, max = Math.ceil(hi * 1.03 / stp) * stp;
+    var W = 520, L = 168, R = 46, zh = 20, T = 16, H = T + V.length * zh + 22;
     var X = function (v) { return L + (v - min) / (max - min) * (W - L - R); };
+    var tsd = function (v) { return B.zahl(v / 1000, 0) + ' T€'; };
     var s = '<svg viewBox="0 0 ' + W + ' ' + H + '" class="dg" role="img" aria-label="Werte je Verfahren">';
+    for (var t = min; t <= max + 1; t += stp) s += '<line x1="' + X(t).toFixed(1) + '" x2="' + X(t).toFixed(1) + '" y1="' + (T - 4) + '" y2="' + (H - 18) + '" class="g"/>'
+      + '<text x="' + X(t).toFixed(1) + '" y="' + (H - 7) + '" text-anchor="middle" class="a">' + B.esc(tsd(t)) + '</text>';
     V.forEach(function (v, i) {
-      var y = 14 + i * zh, u = da(v.unten) !== null ? v.unten : v.mitte, o = da(v.oben) !== null ? v.oben : v.mitte;
-      s += '<text x="0" y="' + (y + 4) + '" class="bt">' + B.esc(v.name + (v.fuehrend ? ' (führend)' : '')) + '</text>'
-        + '<rect x="' + X(u).toFixed(1) + '" y="' + (y - 4) + '" width="' + Math.max(2, X(o) - X(u)).toFixed(1) + '" height="8" rx="2" class="' + (v.fuehrend ? 'b1' : 'f1') + '"/>'
-        + '<circle cx="' + X(v.mitte).toFixed(1) + '" cy="' + y + '" r="3.2" class="b3"/>';
+      var y = T + 6 + i * zh, u = da(v.unten) !== null ? v.unten : v.mitte, o = da(v.oben) !== null ? v.oben : v.mitte;
+      var nm = String(v.name || '').split(' · ')[0];
+      s += '<text x="0" y="' + (y + 3) + '" class="bt"' + (v.fuehrend ? ' font-weight="700"' : '') + '>' + B.esc(nm + (v.fuehrend ? ' · führend' : '')) + '</text>'
+        + (o > u ? '<rect x="' + X(u).toFixed(1) + '" y="' + (y - 4) + '" width="' + Math.max(2, X(o) - X(u)).toFixed(1) + '" height="8" rx="2" class="f1"/>' : '')
+        + '<circle cx="' + X(v.mitte).toFixed(1) + '" cy="' + y + '" r="' + (v.fuehrend ? 4.2 : 3.2) + '" class="' + (v.fuehrend ? 'b1' : 'b3') + '"/>'
+        + '<text x="' + (Math.max(X(o), X(v.mitte)) + 6).toFixed(1) + '" y="' + (y + 3) + '" class="a"' + (v.fuehrend ? ' font-weight="700"' : '') + '>' + B.esc(tsd(v.mitte)) + '</text>';
     });
-    if (da(kp) !== null) s += '<line x1="' + X(kp).toFixed(1) + '" x2="' + X(kp).toFixed(1) + '" y1="4" y2="' + (H - 18) + '" class="l2"/><text x="' + X(kp).toFixed(1) + '" y="' + (H - 6) + '" text-anchor="middle" class="a">Kaufpreis ' + B.esc(B.zahl(kp / 1000, 0)) + ' T€</text>';
-    return s + '</svg>';
+    if (da(kp) !== null) s += '<line x1="' + X(kp).toFixed(1) + '" x2="' + X(kp).toFixed(1) + '" y1="' + (T - 4) + '" y2="' + (H - 18) + '" class="l2" stroke-dasharray="3 2"/>'
+      + '<text x="' + X(kp).toFixed(1) + '" y="' + (T - 7) + '" text-anchor="middle" class="a">Kaufpreis ' + B.esc(tsd(kp)) + '</text>';
+    return s + '</svg><p class="det">Band: Spanne des Verfahrens. Punkt: Wert (Mitte). Gold: führendes Verfahren. Rote Linie: Kaufpreis.</p>';
+  }
+  /* v4580 · Marcel 24.11.2026: „Ertragswert Bestand. Ist das jetzt überhaupt führend? Da steige ich gar nicht durch.“ Die Rolle des
+     Ertragswerts steht jetzt an der Überschrift: führend nur, wenn er der maßgebende Wert ist (calc.js wert_anker). */
+  function ewRolle() {
+    var A = St().wert_anker, auf = A && A.art === 'aufteiler';
+    if (!A) return '';
+    return A.art === 'ertragswert' ? ' (führend)' : (auf ? ' (Haus als Ganzes, stützend)' : ' (stützend)');
   }
   function wertZielbild(K, B, WZ, PD, kurz, bank) {
     if (!WZ && !PD) return '';
@@ -499,7 +547,7 @@
         var UZ = PZ.ueberleitungZeilen(PD.bruecke) || [], um = Math.max.apply(null, UZ.filter(function (z) { return z.schritt; }).map(function (z) { return Math.abs(z.w); }).concat([1]));
         var farbe = { bestand: '#2A2727', kosten: 'var(--rot)', soll: 'color-mix(in srgb,var(--gold) 55%,#fff)', ziel: 'var(--gold-d)' };
         /* v3181 · Marcel: Seitenumbruch vor der Wertueberleitung (sie riss sonst zwischen zwei Seiten) */
-        h += '<h3 style="break-before:page;page-break-before:always">Wertüberleitung · Ertragswert je Stufe</h3><table><tbody>' + UZ.map(function (z) {
+        h += '<h3 style="break-before:page;page-break-before:always">Wertüberleitung · Ertragswert je Stufe' + B.esc(ewRolle()) + '</h3><table><tbody>' + UZ.map(function (z) {
           var bar = '';
           if (z.schritt) {
             var b = Math.abs(z.w) / um * 48;
