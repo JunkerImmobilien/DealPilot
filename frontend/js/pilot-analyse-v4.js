@@ -991,6 +991,9 @@
     var satz = bestand
       ? 'Je Jahr: hast du eigene Angaben gemacht (Belege eingelesen oder von Hand), oder rechnet die App nur mit ihrem Vorschlag? Für abgelaufene Jahre ohne eigene Angaben fehlen die Belege.'
       : 'Im Ankauf ist die Steuer ein Plan aus deinen Eingaben. Belege kommen nach dem Kauf: Hausgeld- und Nebenkostenabrechnungen, Grundsteuer, Handwerker- und Versicherungsrechnungen.';
+    /* v4550 · Marcel 24.11.2026 („im Ankauf brauchen wir jetzt ja noch keine Rechnung“): im Ankauf nur der Satz, ohne Einlese-Knopf
+       (Unterlagen liest Haus & Unterlagen ein) und ohne den doppelten Sprung zum Reiter Steuer */
+    if (!bestand) return karte(kopfzeile('Belege') + '<p class="dp-pa-p" style="margin:0">' + satz + '</p>', 'dp-pa4-mt');
     return karte(kopfzeile('Belege') + chips + '<p class="dp-pa-p" style="margin:0 0 10px">' + satz + '</p>'
       + '<div style="display:flex;gap:8px;flex-wrap:wrap">' + '<button type="button" class="btn-clean dp-pa4-btn" onclick="if(window.DpEingang)DpEingang.oeffnen();else if(window.DealPilotBelegImport)DealPilotBelegImport.open(\'wk\')">Belege, Unterlagen &amp; Rechnungen einlesen</button>'
       + '<button type="button" class="btn-clean dp-pa4-btn leise" onclick="try{var t=document.querySelector(\'.tab[data-target-sec]\');var b=[].filter.call(document.querySelectorAll(\'.tab\'),function(x){return /Steuer/.test(x.textContent||\'\')})[0];if(b)b.click();}catch(e){}">Zum Reiter Steuer</button></div>'
@@ -1503,6 +1506,58 @@
      (Kaufpreis & Offerte, Bank, Lage, Anschluss & Exit, Unterlagen). Gemessen: Anschluss & Exit war in
      Einfach und Detail gleich lang (5.887 Zeichen) - „Einfach und Detail funktioniert nicht immer".
      Lange Absätze: Einfach erster Satz, Detail ganz; Listen: Einfach drei Punkte; Fußnoten nur Detail. */
+  /* v4550 · Marcel 24.11.2026 („das gilt für alle Tabs, wenn die in einfach sind … kleine Kacheln, wenig Text“): die zwei
+     reinen Kaufreiter bekommen oben dieselbe Kachelleiste wie Übersicht und Steuer. Gemessen Hauptstr. 51 (einfach): Kaufpreis &
+     Offerte 1.838 Zeichen in elf Sätzen, die Offerte stand nur als Zahl in der Karte mitten im Text. RECHNET NICHTS: Kaufpreis und
+     Bankkennzahlen aus State.kpis, Marktpreis aus dem Marktbericht (wertDaten), die Offerte aus der Analyse. Eine Offerte über dem
+     Kaufpreis erscheint nicht (dieselbe Regel wie ui.js v2946). */
+  function offerteWert(a) {
+    var r = a && a.kaufpreis_offerte && typeof a.kaufpreis_offerte === 'object' && a.kaufpreis_offerte.empfohlen != null ? String(a.kaufpreis_offerte.empfohlen) : '';
+    var w = parseFloat(r.replace(/[^0-9.,]/g, '').replace(/\.(?=\d{3}(\D|$))/g, '').replace(',', '.'));
+    var kp = Number(kpis().kp);
+    return isFinite(w) && w > 0 && !(kp > 0 && w > kp) ? w : null;
+  }
+  function leiste(z) { return z.length ? '<div class="dp-pa4-zahlen' + (z.length === 4 ? ' l4' : '') + '" data-dp-pa4-kauf="1">' + z.join('') + '</div>' : ''; }
+  function nachKopf(html, vorn) {   /* die Leiste unter die erste Abschnittszeile (VERHANDLUNG & OFFERTE, BANK) */
+    if (!vorn) return html; html = html || '';
+    var e = '<span class="dp-pa-rule"></span></div>', i = html.indexOf(e);
+    return i >= 0 && i < 400 ? html.slice(0, i + e.length) + vorn + html.slice(i + e.length) : vorn + html;
+  }
+  function verhKacheln(a) {
+    var k = kpis(), kp = Number(k.kp), off = offerteWert(a), w = wertDaten(), z = [];
+    var mpi = w && w.marktpreisindikation && zahl(w.marktpreisindikation.mitte) ? w.marktpreisindikation.mitte : null;
+    if (!(kp > 0)) return '';
+    z.push(zahlKachel('Kaufpreis', eur(kp), 'Forderung des Verkäufers', '#E6DCC2'));
+    if (off) z.push(zahlKachel('Offerte des Piloten', eur(off), de((off - kp) / kp * 100, 1).replace('-', '−') + ' % zum Kaufpreis', C.gut,
+      { t: 'Offerte des Piloten', a: 'Vorschlag aus Marktbericht, Lage, Zustand und deinen Zahlen. Sie liegt nie über dem Kaufpreis. Begründung und Argumente stehen unter Detail.',
+        r: [['Abstand zum Kaufpreis', eur(kp - off)]] }));
+    if (mpi) { var ab = (kp - mpi) / mpi * 100;
+      z.push(zahlKachel('Marktpreis Ø', eur(mpi), 'Kaufpreis ' + (ab >= 0 ? '+' : '−') + de(Math.abs(ab), 1) + ' % ' + (ab >= 0 ? 'darüber' : 'darunter'), ab > 10 ? C.rot : ab < 0 ? C.gut : 'var(--wl-c9a84c,#C9A84C)',
+        { t: 'Marktpreisindikation', a: 'Aus aktuellen Angebotspreisen vergleichbarer Objekte abgeleitet, abzüglich des üblichen Verhandlungsabschlags. Kein Verkehrswert.',
+          r: [['Spanne', zahl(w.marktpreisindikation.unten) && zahl(w.marktpreisindikation.oben) ? eur(w.marktpreisindikation.unten) + ' bis ' + eur(w.marktpreisindikation.oben) : ''], ['Abstand Kaufpreis', eur(kp - mpi)]] })); }
+    if (off && mpi) z.push(zahlKachel('Offerte zum Marktpreis', (off >= mpi ? '+' : '−') + de(Math.abs((off - mpi) / mpi * 100), 1) + ' %', off >= mpi ? 'über dem Marktpreis' : 'unter dem Marktpreis', '#2A2727',
+      { t: 'Offerte gegen Marktpreis', a: 'Wie weit die Offerte vom Marktpreis aus Angebotspreisen entfernt liegt. Ein Wert nahe null heißt: du bietest, was der Markt hergibt.' }));
+    return leiste(z);
+  }
+  function bankKacheln() {
+    var k = kpis(), z = [];
+    if (zahl(k.ltv) && k.ltv > 0) z.push(zahlKachel('Beleihung (LTV)', de(k.ltv, 1) + ' %', k.ltv <= 80 ? 'im üblichen Rahmen' : k.ltv <= 100 ? 'hoch, Bank prüft genau' : 'über 100 %', k.ltv <= 80 ? C.gut : k.ltv <= 100 ? 'var(--wl-c9a84c,#C9A84C)' : C.rot,
+      { t: 'Beleihungsauslauf (LTV)', a: 'Darlehen im Verhältnis zum Kaufpreis. Bis 80 % finanzieren die meisten Banken ohne Aufschlag, darüber steigen Zins und Anforderungen.' }));
+    if (zahl(k.dscr) && k.dscr > 0) z.push(zahlKachel('DSCR', de(k.dscr, 2), k.dscr >= 1.2 ? 'Bank: trägt sich' : k.dscr >= 1 ? 'knapp über 1' : 'unter 1: Zuschuss nötig', k.dscr >= 1 ? C.gut : C.rot,
+      { t: 'DSCR (Kapitaldienstdeckung)', a: 'Wie oft der Reinertrag aus der Miete die Jahresrate aus Zins und Tilgung deckt. Banken erwarten meist 1,2 oder mehr. Volles Jahr, heutige Eingaben.' }));
+    if (zahl(k.ek) && k.ek > 0) z.push(zahlKachel('Eigenkapital', eur(k.ek), zahl(k.kp) && k.kp > 0 ? de(k.ek / k.kp * 100, 1) + ' % vom Kaufpreis' : '', '#2A2727',
+      { t: 'Eigenkapital', a: 'Was du selbst einbringst, mit den Nebenkosten des Kaufs. Mehr Eigenkapital senkt LTV und Zins.' }));
+    if (zahl(k.cf_m)) z.push(zahlKachel('Cashflow vor Steuer', sEur(k.cf_m) + ' / Monat', 'volles Jahr', k.cf_m >= 0 ? C.gut : C.rot,
+      { t: 'Cashflow vor Steuer', a: 'Was im Monat nach Bewirtschaftungskosten, Zins und Tilgung übrig bleibt. Banken sehen gern einen positiven Wert.' }));
+    return leiste(z);
+  }
+  function verhPanel(a, html) {
+    var vorn = verhKacheln(a);
+    /* die Offerte steht jetzt als Kachel: die Karte mit Preis, Begründung und Argumenten nur noch unter Detail. Eine ungültige
+       Offerte (über dem Kaufpreis) bleibt in Einfach stehen, weil ihre Karte den Hinweis trägt. */
+    if (vorn && offerteWert(a)) html = String(html || '').replace('class="dp-pa-card dp-pa-offerte"', 'class="dp-pa-card dp-pa-offerte dp-pa-d"');
+    return nachKopf(html, vorn);
+  }
   function kuerzen(html) {
     if (!html) return html;
     var box = document.createElement('div'); box.innerHTML = html;
@@ -1538,7 +1593,7 @@
      Protokolle, Mietverträge, Abrechnungen, Rechnungen - und der Verlauf, was wann eingelesen und übernommen wurde. */
   function unterlagenPanel(html, opt) {
     opt = opt || {};   /* v4007 · ohneEingang: Knopf steht oben im Hausverlauf; ohneVerlauf: Verlauf setzt der Aufrufer ans Ende */
-    var knoepfe = '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">' + '<button type="button" class="btn-clean dp-pa4-btn" onclick="if(window.DpEingang)DpEingang.oeffnen();else if(window.DealPilotBelegImport)DealPilotBelegImport.open(\'wk\')">Belege, Unterlagen &amp; Rechnungen einlesen</button>' + '</div>';
+    var knoepfe = '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">' + '<button type="button" class="btn-clean dp-pa4-btn" onclick="if(window.DpEingang)DpEingang.oeffnen();else if(window.DealPilotBelegImport)DealPilotBelegImport.open(\'wk\')">' + (opt.ankauf ? 'Unterlagen einlesen' : 'Belege, Unterlagen &amp; Rechnungen einlesen') + '</button>' + '</div>';   /* v4550 · im Ankauf heißt der Dialog „Unterlagen einlesen“ (v4530f), der Knopf jetzt auch */
     var verlauf = '';
     try { verlauf = opt.ohneVerlauf ? '' : eingangVerlauf(); } catch (e) { verlauf = ''; }
     /* v4530 · Marcel 24.11.2026 (professioneller, wenig Text): was woraus wird als vier kleine Kacheln statt eines Pfeil-Satzes */
@@ -1867,7 +1922,7 @@
        und „Belege, Unterlagen & Rechnungen einlesen“ (alle drei öffnen den Import), sie fallen, wo der Hausverlauf steht. */
     try { zeitH = hausH && window.DpHausverlauf.zeitleisteHtml ? window.DpHausverlauf.zeitleisteHtml() : ''; } catch (eZ) { zeitH = ''; }
     try { egH = eingangVerlauf(); } catch (eE) { egH = ''; }
-    var hausUl = teil('hausv', hausH, true) + teil('unterlagen', unterlagenPanel(o.unterlagen, { ohneEingang: !!hausH, ohneVerlauf: true }), !hausH)
+    var hausUl = teil('hausv', hausH, true) + teil('unterlagen', unterlagenPanel(o.unterlagen, { ohneEingang: !!hausH, ohneVerlauf: true, ankauf: !bestand }), !hausH)
       + (zeitH ? '<div id="dp-pa-hausv-zeit">' + zeitH + '</div>' : '') + (egH ? '<div id="dp-pa-eingang-verlauf">' + egH + '</div>' : '');
     if (bestand) {
       add('steuer', 'Steuer', o.steuer);
@@ -1881,8 +1936,8 @@
       add('steuer', 'Steuer', o.steuer);
       add('haus', 'Haus &amp; Unterlagen', hausUl);
       add('potx', 'Potenzial &amp; Risiken', unterReiter([['pot', potH], ['risk', o.risiko]], false));
-      add('verh', 'Kaufpreis &amp; Offerte', kuerzen(o.verhandlung));
-      add('bank', 'Finanzierung &amp; Bank', kuerzen(o.bank));
+      add('verh', 'Kaufpreis &amp; Offerte', o.verhandlung ? verhPanel(o.analyse || {}, kuerzen(o.verhandlung)) : o.verhandlung);   /* v4550 · Kachelleiste */
+      add('bank', 'Finanzierung &amp; Bank', o.bank ? nachKopf(kuerzen(o.bank), bankKacheln()) : o.bank);
     }
     var phase = bestand ? 'Bestand' : 'Ankauf', info = '', seit = '';
     try {
