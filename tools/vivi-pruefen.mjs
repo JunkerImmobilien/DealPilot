@@ -436,6 +436,7 @@ function speicherImArbeitsspeicher(objekte) {
     async idsSpeichern(o, ids, pid) { v[o].vivi_ids = JSON.parse(JSON.stringify(ids)); if (pid) v[o].vivi_objekt_id = pid; v[o].aktualisiert = zeit.jetzt; },
     async statusSetzen(o, s, f) { v[o].anlage_status = s; v[o].letzter_fehler = f || null; v[o].aktualisiert = zeit.jetzt; },
     async zuordnen(u, o, pid, acc) { if (v[o]) return null; v[o] = { object_id: o, user_id: u, vivi_objekt_id: pid, vivi_account_id: acc, vivi_ids: {}, herkunft: 'zugeordnet', anlage_status: 'fertig' }; return v[o]; },
+    async verknuepfteViviIds(u) { return Object.values(v).filter((x) => x.user_id === u && x.vivi_objekt_id).map((x) => String(x.vivi_objekt_id)); },   /* v4430 */
     async loesen(u, o) { if (!v[o] || v[o].user_id !== u) return false; delete v[o]; delete w[o]; return true; },
     async werteSchreiben(o, felder, info) { w[o] = []; Object.keys(felder).forEach((k) => w[o].push({ feld: k, jahr: 0, wert: felder[k].wert, vivi_quelle: felder[k].quelle, gelesen_am: new Date(zeit.jetzt).toISOString() }));
       Object.keys(info || {}).forEach((k) => { if (info[k] != null) w[o].push({ feld: '_info.' + k, jahr: 0, wert: info[k], vivi_quelle: null }); }); v[o].letzter_abruf = new Date(zeit.jetzt).toISOString(); },
@@ -603,13 +604,23 @@ ok(gelesen.length > 50 && !unbekannt.length, 'ausVivi liest nur Felder aus den R
   const vorher = A.st.anfragen.length, posts = A.st.posts;
   const neuOid = 'bbbbbbbb-0000-4000-8000-000000000009';
   objekte[neuOid] = { user: USER, data: FAELLE[2].d };
-  const r = await dienst.zuordnen(USER, neuOid, Object.keys(A.st.projekte)[2], null);
+  /* v4430 · ein noch nicht verknuepftes ViVi-Objekt (alle Attrappen-Projekte gehoeren schon zu OIDS); vorher lief der Test auf ein vergebenes */
+  const pidFrei = String(SP.v[OIDS[2]].vivi_objekt_id), gesichert = SP.v[OIDS[2]]; delete SP.v[OIDS[2]];   /* DealPilot-Seite kurz frei, danach zurueck */
+  const r = await dienst.zuordnen(USER, neuOid, pidFrei, null);
   ok(r.ok && A.st.posts === posts && A.st.anfragen.slice(vorher).every((a) => a.startsWith('GET ')), 'Zuordnen eines vorhandenen ViVi-Objekts: nur GET, kein POST');
   viviClient._fensterLeeren();   /* v3966 · der Abruf liest jetzt auch den Mietverlauf je Mietverhaeltnis */
   const w = await dienst.abrufen(USER, neuOid);
   ok(Object.keys(w.felder).length > 0 && !w.felder.kp && !w.felder.wfl && Array.isArray(w.info.stamm_aenderungen), 'zugeordnetes Objekt wird gelesen (Einheiten in ViVi-Reihenfolge), Stammdaten nur als Vergleich (v4050)');
   const l = await dienst.loesen(USER, neuOid);
+  SP.v[OIDS[2]] = gesichert;
   ok(l.ok && !SP.v[neuOid] && Object.keys(A.st.projekte).length === OIDS.length && A.st.posts === posts, 'Lösen entfernt nur die DealPilot-Seite, ViVi bleibt unverändert');
+  /* v4430 · dasselbe ViVi-Objekt an ein zweites DealPilot-Objekt: 409 vivi_objekt_vergeben, nichts wird geschrieben */
+  const pidV = String(SP.v[OIDS[2]] && SP.v[OIDS[2]].vivi_objekt_id), o2 = 'bbbbbbbb-0000-4000-8000-000000000012';
+  objekte[o2] = { user: USER, data: FAELLE[2].d };
+  let e2 = null; try { await dienst.zuordnen(USER, o2, pidV, null); } catch (e) { e2 = e; }
+  ok(e2 && e2.status === 409 && e2.code === 'vivi_objekt_vergeben' && !SP.v[o2], 'zweites DealPilot-Objekt auf dasselbe ViVi-Objekt: 409 vivi_objekt_vergeben (' + (e2 && (e2.status + ' ' + e2.code)) + ')');
+  const dq = lies('backend/src/services/vivi/viviDienst.js');
+  ok(dq.includes('.indexOf(String(viviObjektId)) >= 0) {') && dq.includes("e.code === '23505'"), 'Zuordnen prüft vorab und fängt den gleichzeitigen Unique-Fehler (23505) als 409');
 }
 
 /* ═══ F · Anfragebremse ══════════════════════════════════════════════════ */
@@ -826,7 +837,9 @@ kopf('K  Testbetrieb: Musteranschrift und Platzhalter, solange vivi Vorschau-Fun
   /* Zuordnen im Testbetrieb */
   const oid2 = 'bbbbbbbb-0000-4000-8000-000000000002';
   objs[oid2] = { user: USER, data: { objart: 'ETW' } };
+  const g4 = S4.v[oid]; delete S4.v[oid];   /* v4430 · das ViVi-Objekt gehoert sonst schon zu oid, Zuordnen wuerde 409 */
   await dienst.zuordnen(USER, oid2, proj.id || Object.keys(B.st.projekte)[0], null);
+  S4.v[oid] = g4;
   ok(S4.v[oid2] && S4.v[oid2].vivi_ids && S4.v[oid2].vivi_ids.muster_anschrift === true, 'Zuordnen im Testbetrieb: Musteranschrift gemerkt (Anschrift wird nicht zurückgelesen)');
   /* Gegenprobe: ohne Testbetrieb gilt die echte Anschrift */
   deps4(false);

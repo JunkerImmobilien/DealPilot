@@ -313,7 +313,17 @@ async function zuordnen(userId, objectId, viviObjektId, accountId, opt) {
   const cl = deps().client(await token(userId));
   try { await cl.get('/projects/' + encodeURIComponent(String(viviObjektId)), abfrage(accountId)); }
   catch (e) { throw alsAntwort(e); }
-  const z = await deps().speicher.zuordnen(userId, objectId, viviObjektId, accountId);
+  /* v4430 · ein ViVi-Objekt gehoert zu hoechstens einem DealPilot-Objekt (UNIQUE user_id, vivi_objekt_id, Migration 125).
+     Vorher lief das in den Unique-Fehler und kam als 500 zurueck. Jetzt vorab 409, und auch der gleichzeitige Fall wird 409. */
+  if ((await deps().speicher.verknuepfteViviIds(userId)).indexOf(String(viviObjektId)) >= 0) {
+    throw fehler(409, 'vivi_objekt_vergeben', 'Dieses ViVi-Objekt ist schon mit einem anderen DealPilot-Objekt verknüpft. Löse dort zuerst die Verknüpfung.');
+  }
+  let z;
+  try { z = await deps().speicher.zuordnen(userId, objectId, viviObjektId, accountId); }
+  catch (e) {
+    if (e && e.code === '23505') throw fehler(409, 'vivi_objekt_vergeben', 'Dieses ViVi-Objekt ist schon mit einem anderen DealPilot-Objekt verknüpft. Löse dort zuerst die Verknüpfung.');
+    throw e;
+  }
   if (!z) throw fehler(409, 'bereits_verknuepft', 'Dieses Objekt ist schon mit ViVi verknüpft.');
   /* v3951 · Im Testbetrieb tragen die ViVi-Objekte Musteranschriften: die Anschrift wird dann nicht zurueckgelesen */
   const muster = opt.muster_anschrift === undefined || opt.muster_anschrift === null ? await deps().testbetrieb() : !!opt.muster_anschrift;
