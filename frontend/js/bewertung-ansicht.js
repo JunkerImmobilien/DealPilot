@@ -78,7 +78,7 @@
       return { t: 'Eigenkapitalrendite',
         a: 'Wie sich dein eingesetztes Eigenkapital jedes Jahr laufend verzinst, vor Steuern und ohne Wertsteigerung.',
         r: [['Cashflow vor Steuern im Jahr', eur(basis, true)], ['geteilt durch Eigenkapital', eur(k.ek)], ['= Eigenkapitalrendite', pct(k.ekr), 1]],
-        h: 'Gerechnet mit Miete, Kosten und Rate wie eingegeben. Ab 8 % gilt sie als gut, unter 4 % als schwach. Die Tilgung zählt hier als Ausgabe, im IRR dagegen als Vermögen.' };
+        h: 'Gerechnet mit Miete, Kosten und Rate wie eingegeben, also für das erste volle Jahr. Der Cashflow links zeigt dagegen das laufende Jahr. Ab 8 % gilt sie als gut, unter 4 % als schwach. Die Tilgung zählt hier als Ausgabe, im IRR dagegen als Vermögen.' };
     },
     'kpi-bmy': function () {
       var k = K(); if (!k.kp) return null;
@@ -126,8 +126,8 @@
       var k = K(), x = R(); if (!x || !x.cf) return null;
       var be = k.be_cf, kum = k.be_kum, neg = 0, max = 0;
       x.cf.forEach(function (v, i) { if (be == null || i < be - 1) { if (v < 0) { neg += v; if (v < max) max = v; } } });
-      if (be == null) return { t: 'Break-even', a: 'In ' + x.cf.length + ' Jahren wird der jährliche Cashflow nicht positiv.', r: [['Zuzahlung zusammen', eur(neg)]], h: 'Mehr Eigenkapital, eine niedrigere Rate oder eine höhere Miete verschieben das.' };
-      var j = kalJahr(be), r = [['Zuzahlung bis dahin zusammen', eur(neg)], ['höchste Zuzahlung in einem Jahr', eur(max)]];
+      if (be == null) return { t: 'Break-even', a: 'In ' + x.cf.length + ' Jahren wird der jährliche Cashflow nicht positiv.', r: [['Zuzahlung zusammen', eur(Math.abs(neg))]], h: 'Mehr Eigenkapital, eine niedrigere Rate oder eine höhere Miete verschieben das.' };
+      var j = kalJahr(be), r = [['Zuzahlung bis dahin zusammen', eur(Math.abs(neg))], ['höchste Zuzahlung in einem Jahr', eur(Math.abs(max))]];
       if (x.cf[be - 1] != null) r.push(['Cashflow im Jahr ' + be, eur(x.cf[be - 1], true), 1]);
       var sprung = '';
       var vor = x.cf[be - 2], nach = x.cf[be - 1];
