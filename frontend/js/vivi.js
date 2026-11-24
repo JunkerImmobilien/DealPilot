@@ -413,13 +413,19 @@
       var ov = fenster(TITEL, SUB, '<p>Lade deine Objekte aus ViVi…</p>');
       inhalt(ov, '<p>Lade deine Objekte aus ViVi…</p>', fk('vivi-abbrechen', 'Abbrechen'));
       $('vivi-abbrechen').onclick = schliessen;
-      api('/vivi/projekte').then(function (r) {
-        var L = (r && r.projekte) || [];
+      Promise.all([api('/vivi/projekte'), api('/vivi/objekte').catch(function () { return {}; })]).then(function (x) {
+        var r = x[0];
+        /* v4400 · ViVi-Objekte, die schon mit einem DealPilot-Objekt verknüpft sind, stehen unten und sind nicht wählbar */
+        var belegt = {}; ((x[1] && x[1].objekte) || []).forEach(function (v) { if (v.vivi_objekt_id) belegt[String(v.vivi_objekt_id)] = [v.str, v.hnr].filter(Boolean).join(' '); });
+        var L = ((r && r.projekte) || []).slice().sort(function (a, b) { return (belegt[String(a.id)] ? 1 : 0) - (belegt[String(b.id)] ? 1 : 0); });
+        var frei0 = L.filter(function (p) { return !belegt[String(p.id)]; }).length;
         inhalt(ov,
           (L.length ? '<div class="vivi-wahlliste">' + L.map(function (p, i) {
-            return '<label class="vivi-wahl"><input type="radio" name="vivi-proj" value="' + esc(p.id) + '"' + (i === 0 ? ' checked' : '') + '> <span>' + esc([p.street, p.house_number].filter(Boolean).join(' ') + ', ' + [p.postal_code, p.city].filter(Boolean).join(' ')) + (p.name ? ' <span class="vivi-notiz">' + esc(p.name) + '</span>' : '') + '</span></label>';
-          }).join('') + '</div>' : '<p class="hint">In ViVi ist noch kein Objekt angelegt.</p>'),
-          fk('vivi-abbrechen', 'Abbrechen') + (L.length ? fk('vivi-los', 'Verknüpfen', true) : ''));
+            var b = belegt[String(p.id)];
+            return '<label class="vivi-wahl"' + (b ? ' style="opacity:.55;cursor:default"' : '') + '><input type="radio" name="vivi-proj" value="' + esc(p.id) + '"' + (b ? ' disabled' : (i === 0 ? ' checked' : '')) + '> <span>' + esc([p.street, p.house_number].filter(Boolean).join(' ') + ', ' + [p.postal_code, p.city].filter(Boolean).join(' ')) + (b ? ' <span class="vivi-notiz">schon verknüpft mit ' + esc(b) + '</span>' : (p.name ? ' <span class="vivi-notiz">' + esc(p.name) + '</span>' : '')) + '</span></label>';
+          }).join('') + '</div>' : '<p class="hint">In ViVi ist noch kein Objekt angelegt.</p>') +
+          (L.length && !frei0 ? '<p class="hint">Alle Objekte in ViVi sind schon mit DealPilot verknüpft. Lege das Objekt neu in ViVi an.</p>' : ''),
+          fk('vivi-abbrechen', 'Abbrechen') + (frei0 ? fk('vivi-los', 'Verknüpfen', true) : ''));
         $('vivi-abbrechen').onclick = schliessen;
         var los = $('vivi-los');
         if (los) los.onclick = function () {
