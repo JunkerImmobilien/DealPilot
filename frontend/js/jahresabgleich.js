@@ -48,7 +48,7 @@
 (function (global) {
   'use strict';
   if (global.DpJahresabgleich) return;
-  var VERSION = 'v4500a';
+  var VERSION = 'v4500b';
   var GOLD = 'var(--wl-c9a84c, #C9A84C)';
   /* v4090 · Marcel 23.11.2026: „ich würde die Reihenfolge ändern in Miete, Wert, Haus und dann Steuern" (die Steuer braucht die Zahlen der drei davor) */
   var SCHRITTE = [['miete', 'Miete'], ['wert', 'Wert'], ['haus', 'Haus'], ['steuer', 'Steuer']];
@@ -974,10 +974,13 @@
               : 'Lade Protokoll, Wirtschaftsplan und Abrechnung ' + J + ' hoch. DealPilot liest Hausgeld, Rücklage und Beschlüsse daraus.' + (viviVerknuepft() ? ' Das Hausgeld kann auch ViVi liefern.' : '')),
             kn: knopf('haus', 'Unterlagen hochladen', true) + (viviVerknuepft() ? ' ' + knopf('vivi-abgleich', 'Mit ViVi abgleichen', false, J) : '') })
       : { t: 'Kein Wohnungseigentum. Die Hauskosten stehen in der Anlage V, der Schritt folgt der Steuer.', kn: '' };
+    var vk = null; try { vk = viviKurz(z, viviDaten()); } catch (e) { vk = null; }   /* v4500 · Abweichungen zu ViVi im Schritt Steuer */
+    var vkT = vk && vk.n ? ' ' + vk.n + (vk.n === 1 ? ' Position der Anlage V weicht' : ' Positionen der Anlage V weichen') + ' von ViVi ab, im Reiter ViVi kannst du sie übernehmen oder bestätigen.' : '';
+    var vkK = vk && vk.n ? ' ' + knopf('vivi-reiter', vk.n + (vk.n === 1 ? ' Abweichung' : ' Abweichungen') + ' zu ViVi', false, J) : '';
     return ok
-      ? { t: 'Der Bescheid ' + J + ' liegt vor. Damit ist die Steuer abgeglichen.', kn: knopf('steuer', 'Anlage V ansehen', false) }
-      : { t: z.status === 'erklaert' ? 'Die Anlage V ' + J + ' ist erklärt. Sobald der Bescheid da ist, setz den Stand auf Bescheid.' : 'Füll die Anlage V ' + J + ' aus und setz danach den Stand auf erklärt oder Bescheid.',
-          kn: knopf('steuer', 'Anlage V ' + J + ' ' + (z.status === 'geplant' ? 'ausfüllen' : 'ansehen'), true) + ' ' + knopf('eintragen', 'Stand setzen', false, J) };
+      ? { t: 'Der Bescheid ' + J + ' liegt vor. Damit ist die Steuer abgeglichen.' + vkT, kn: knopf('steuer', 'Anlage V ansehen', false) + vkK }
+      : { t: (z.status === 'erklaert' ? 'Die Anlage V ' + J + ' ist erklärt. Sobald der Bescheid da ist, setz den Stand auf Bescheid.' : 'Füll die Anlage V ' + J + ' aus und setz danach den Stand auf erklärt oder Bescheid.') + vkT,
+          kn: knopf('steuer', 'Anlage V ' + J + ' ' + (z.status === 'geplant' ? 'ausfüllen' : 'ansehen'), true) + ' ' + knopf('eintragen', 'Stand setzen', false, J) + vkK };
   }
   function fuehrungHtml(z, s, lauf, akt, weg) {
     var ks = SCHRITTE.map(function (x) { return x[0]; });
