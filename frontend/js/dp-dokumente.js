@@ -374,6 +374,8 @@
     return '<div class="dp-gb dp-gb-pdf">' + svg.outerHTML + (leg ? leg.outerHTML : '') + '</div>';
   }
   function gbKarte(name, a, b) {
+    /* v4390 · hinter der Vorschau grafiken_neu wie die Reiter (seit 1.0.157 für alle frei, Migration 129); ohne Freigabe das alte Bild */
+    if (window.DpVorschau && typeof window.DpVorschau.frei === 'function' && !window.DpVorschau.frei('grafiken_neu')) return '';
     var G = window.DpGrafikenBewertung; if (!G || typeof G[name] !== 'function') return '';
     try { return gbDiagramm(G[name](a, b)); } catch (e) { try { console.warn('[dp-dokumente] ' + name, e); } catch (x) {} return ''; }
   }
