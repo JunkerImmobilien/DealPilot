@@ -8,9 +8,17 @@ Dort **ohne** Nummer: Nummern sind Reihenfolge, kein Name. Die verbleibenden
 Punkte werden fortlaufend neu durchnummeriert. Hängt etwas, kommt `**BLOCKIERT:**` mit einem Satz Begründung
 direkt unter den Punkt — nicht kommentarlos liegenlassen.
 
-## → PDF-Fassungen neu denken (Marcel 24.11.2026, zurückgestellt)
+## → Offen aus dem 24.11.2026 (Marcel entscheidet)
 
-Der Umbau v4370 (Kurz/Kompakt/Vollständig, Kombi) ist verworfen: „zu dünn, erst mal die alten“. Es gelten die alten PDFs, nur mit den neuen Diagrammen (v4380). Für später: Kurzfassung im Ankauf ohne Einordnung Ankauf·heute·Zielbild und ohne Score-Fingerabdruck. Investment-PDF für den Ankauf: „Wohin die Miete geht“, grobe steuerliche Betrachtung, Verlauf mit Steuern wählbar. Jede Wertangabe nur aus dem letzten Marktbericht, derselbe Wert wie die App. Muster in `Dateien/Investment-PDF/verworfen/`.
+Stand und Einzelheiten: `wissen/2026-11-24.md`, Abschnitt „Abendstand 24.11.2026“. Prod 1.0.190.
+
+1. **Investment-PDF neu gegliedert + Kurzfassung** — Muster `Dateien/Investment-PDF/v4580/*-v4580b*.pdf`, nicht live. Bei Freigabe dp-dokumente.js v4580h und PDF-Dienst auf Prod. (Ersetzt den zurückgestellten Punkt „PDF-Fassungen neu denken“.)
+2. **Portfolio-Cockpit neu** — zehn Demos `Dateien/Portfolio-Cockpit/Demos-2026-11-24/`, Empfehlung Demo 01 + Baukasten; Vermögenswert entscheiden.
+3. **EK-Rendite** — Marcel meldet sich.
+4. **Black Friday v2 / ViVi-Werbung** — Variante wählen, Hook, LinkedIn, ViVi-OK; nichts veröffentlichen ohne Freigabe.
+5. **Reiter Bank** — Tipps DSCR/CF nur mit Ziel?
+6. **Deal-Check-Testkauf Prod** — Marcel selbst.
+7. **Wortmarke design/logo/neu** aus Ersatzschrift — neu aufbauen?
 
 **Vorlagen und Bilder:** `design/` (Mockups, Logos). Siehe `design/README.md`.
 Marcel legt seine Screenshots **jedes Mal** in `design/mockups/` ab (lokal
