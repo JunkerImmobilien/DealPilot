@@ -310,6 +310,11 @@
       if (vorher === null && a.daten) {
         try { vorher = zahl(_kurzfassung(a.daten)[k.schluessel]); } catch (e) {}
       }
+      /* v4490 · alte Ankauf-Stände trugen den Brutto-DSCR (Westerfeldstr. 146: „Kauf gegen heute“ 1,67, Kennzahlen-Tabelle
+         darüber 1,34). Dieselbe Lesung wie pilot-analyse-v4.js (v4440): Dscr.ausGespeichert rechnet den Stand netto nach. */
+      if (k.schluessel === '_kpis_dscr' && vorher !== null && a.daten && window.Dscr && typeof window.Dscr.ausGespeichert === 'function') {
+        try { var dn = zahl(window.Dscr.ausGespeichert(a.daten)); if (dn !== null) vorher = dn; } catch (e) {}
+      }
       var nachher = zahl(jetzt[k.schluessel]);
       if (vorher === null || nachher === null) continue;
       var diff = nachher - vorher;
