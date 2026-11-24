@@ -704,6 +704,10 @@
   }
 
   async function investment(art) {
+    /* v4580 · erst den Potenzial-Lauf abwarten: bei aufgeteilten Häusern hängt der maßgebende Wert (calc.js) an ihm. Danach neu rechnen,
+       sonst nannte das PDF den Wertpuffer und den Vermögensaufbau noch zum Ertragswert des Hauses. */
+    var PZ0 = window.DpPotenzial;
+    try { if (PZ0 && PZ0.modell && PZ0.modell().aktiv) { await Promise.race([PZ0.rechnen(), new Promise(function (f) { setTimeout(f, 40000); })]); if (typeof window.calcNow === 'function') window.calcNow(); } } catch (e0) {}
     var B = D(), K = (window.State && State.kpis) || {}, o = objektKopf(), key = window._currentObjKey;
     var kurz = art === 'kurz', bank = art === 'bank';
     var name = kurz ? 'Investment Case · Kurzfassung' : 'Investment Case';   /* v3184: die vollständige Fassung ist die (frühere) Bankfassung */

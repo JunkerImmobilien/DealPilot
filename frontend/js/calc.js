@@ -1364,7 +1364,14 @@ function _calcImmediate(){
     if (_wzW && _ankWahl === 'massgebend' && window.DpWertZielbild && typeof window.DpWertZielbild._mitAufteilung === 'function') {
       try {
         var _wzA = window.DpWertZielbild._mitAufteilung(window.DpWertZielbild._wertDaten(_wzB));
-        if (_wzA && _wzA.aufteilung && _wzA.aufteilung.wert > 0) _mbAnker = { wert: Math.max(0, _wzA.aufteilung.wert - _erbAbzug), art: 'aufteiler',
+        var _aufW = _wzA && _wzA.aufteilung && _wzA.aufteilung.wert > 0 ? _wzA.aufteilung.wert : null;
+        /* Ist der letzte Potenzial-Lauf älter als die heutigen Angaben (Hash weicht ab, z. B. kurz nach dem Laden), gilt sein Ergebnis
+           bis zum nächsten Lauf weiter - sonst springt der Anker je nach Sitzung zwischen Haus und Wohnungen (gemessen Westerfeldstr. 146). */
+        if (_aufW == null && window._dpMfh && window._dpMfh.aufgeteilt && window._dpPotenzial && window._dpPotenzial.ergebnis && window.DpPotenzial && typeof window.DpPotenzial.aufteilungKurz === 'function') {
+          var _akA = window.DpPotenzial.aufteilungKurz(window._dpPotenzial.ergebnis, window.DpPotenzial.modell());
+          if (_akA && _akA.aufteiler && _akA.aufteiler.bestand && _akA.aufteiler.bestand.wert > 0) _aufW = _akA.aufteiler.bestand.wert;
+        }
+        if (_aufW != null) _mbAnker = { wert: Math.max(0, _aufW - _erbAbzug), art: 'aufteiler',
           datum: _wzW.wert_stichtag || _wzW.bericht_datum, erstellt: _wzW.bericht_datum, stichtag_eigen: !!_wzW.wert_stichtag };
       } catch (_eAuf) {}
     }
