@@ -653,7 +653,7 @@
     /* v4490 · Marcel 24.11.2026: „bei DSCR und Cashflow vor Steuern … einen Tipp drangeben, die natürlich immer nur dann angezeigt werden,
        wenn wir es in den Einstellungen auch eingegeben haben.“ Die Erklärung steht immer, dein Ziel und ob es erreicht ist nur mit eigenem
        Eintrag im Investmentprofil (load() ohne Vorbelegung, get() würde den Standard 1,20 liefern). */
-    var ziel = function (key) { try { var P = window.DealPilotInvestmentProfile, p = P && P.load ? P.load() : null, v = p ? p[key] : null; if (v == null || v === '') return null; v = parseFloat(String(v).replace(/\./g, '').replace(',', '.')); return isFinite(v) ? v : null; } catch (e) { return null; } };
+    var ziel = function (key) { try { var P = window.DealPilotInvestmentProfile, p = P && P.load ? P.load() : null, v = p ? p[key] : null; if (v == null || v === '') return null; if (typeof v !== 'number') { v = String(v).trim(); if (v.indexOf(',') >= 0) v = v.replace(/\./g, '').replace(',', '.'); v = parseFloat(v); } return isFinite(v) ? v : null; } catch (e) { return null; } };   /* v4490a · gespeichert als Zahl (1.2), nicht als Text */
     var zCf = ziel('min_cashflow_vor_st'), zDs = ziel('min_dscr');
     if (zahl(k.cf_m)) z.push(zahlKachel('Cashflow vor Steuer · volles Jahr', sEur(k.cf_m) + ' / Monat', zahl(k.cf_ns) ? 'nach Steuer ' + sEur(k.cf_ns / 12) + ' / Monat (volles Jahr)' : '', k.cf_m >= 0 ? C.gut : C.rot,
       { t: 'Cashflow vor Steuer', a: 'Was im Monat nach Bewirtschaftungskosten, Zins und Tilgung übrig bleibt, vor Steuern. Gerechnet für ein volles Jahr mit den heutigen Eingaben.',
