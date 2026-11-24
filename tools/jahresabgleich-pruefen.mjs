@@ -66,6 +66,18 @@ const K = c.DpMietpotenzial, E = c.DpErhoehungen, JA = c.DpJahresabgleich, HV = 
   const rM = JA.mpRein(qM, 2025, ctx, K, E);
   ok(rM.n === 2 && Math.abs(rM.ist - 1350) < 0.01 && Math.abs(rM.zul - (900.24 + 575)) < 0.01, 'M MFH: je Wohnung gerechnet und summiert (Whg. 2: 500 × 1,15 = 575 unter 600 Mietspiegel) (' + rM.zul + ')');
   ok(JA.mpRein([{ heute: 0, liste: [] }], 2025, ctx, K, E).n === 0, 'M leere Wohnung zählt nicht');
+  /* v4410 · Westerfeldstr. 146 (Staging, 24.11.2026): Kaltmiete 39.420 = (3.195 Wohnungen + 90 Stellplätze) × 12, zulässig
+     Wohnungen 3.282,35 × 12 = 39.388. Gleiche Grundlage: zulässig gesamt = Wohnungen + übrige Miete. */
+  {
+    const mpW = { ist: 3195, zul: 3282.35 };
+    const U = JA.mpUrteil(mpW, 90, 39420);
+    ok(U.zul_j === 40468 && U.zul_j > 39420, 'M v4410 zulässig gesamt inkl. Stellplätze 40.468 liegt über der Kaltmiete 39.420 (' + U.zul_j + ')');
+    ok(U.luft_m === 87 && !U.ueber, 'M v4410 Luft 87 €/Monat, nicht „über der Grenze“ (' + U.luft_m + ', ' + U.ueber + ')');
+    const U0 = JA.mpUrteil(mpW, 0, 39420);
+    ok(U0.ueber === true && U0.luft_m === 0, 'M v4410 Gegenprobe: ohne die übrige Miete wäre die Kaltmiete über „zulässig“ und es gibt keine Mieterhöhung');
+    ok(JA.mpUrteil({ ist: 900, zul: 900 }, 0, 10900).ueber === true, 'M v4410 Ist-Kaltmiete des Jahres über zulässig → keine Mieterhöhung');
+    ok(/mpUrteil\(mp, zus, z\.miete_ist\)/.test(lies('frontend/js/jahresabgleich.js')) && /mpUrteil\(mp, zusatzMonat\(\), z\.miete_ist\)/.test(lies('frontend/js/jahresabgleich.js')), 'M v4410 Karte und Tabelle rechnen mit derselben Funktion');
+  }
   ok(!/\bkappung\(|function sollFuer/.test(lies('frontend/js/jahresabgleich.js')), 'M keine zweite Rechnung: jahresabgleich.js ruft den Kern, rechnet § 558 nicht selbst');
 }
 

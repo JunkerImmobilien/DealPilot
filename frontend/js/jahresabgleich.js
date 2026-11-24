@@ -244,6 +244,24 @@
     if (!_mp.jahre[jahr]) _mp.jahre[jahr] = mpRein(_mp.q.quellen, jahr, _mp.q.ctx, global.DpMietpotenzial, global.DpErhoehungen);
     return _mp.jahre[jahr];
   }
+  /* v4410 · Marcel 24.11.2026 (Westerfeldstr. 146, 2026): „Kaltmiete 39.420, zulässig 39.388, ungenutzt. Und darüber
+     Mieterhöhung 2026 +87 €/Monat. Das passt ja gar nicht.“ Gemessen: die Spalte Kaltmiete trägt die GANZE Kaltmiete
+     ((3.195 Wohnungen + 90 Stellplätze/Zuschläge) × 12 = 39.420), „zulässig § 558“ nur die Wohnungen (3.282,35 × 12 = 39.388).
+     Die +87 €/Monat sind richtig (Whg. 3 bis 6 haben Luft), nur der Vergleich lief auf zwei Grundlagen. Jetzt eine Rechnung:
+     zulässig GESAMT = zulässige Wohnungsmiete + übrige Miete (Stellplätze, Zuschläge, unverändert). Liegt die Kaltmiete des
+     Jahres dennoch über dem zulässigen Gesamtbetrag, wird keine Mieterhöhung angeboten (Hinweis statt „ungenutzt“). */
+  function zusatzMonat() {
+    var d = doc(), e = d && d.getElementById('ze'), s = e ? String(e.value || '').trim() : '';
+    var v = typeof global.v === 'function' && e ? zahl(global.v('ze')) : (s.indexOf(',') >= 0 ? zahl(s.replace(/\./g, '').replace(',', '.')) : zahl(s));   /* calc.js v() wie die Kaltmiete */
+    return v != null && v > 0 ? v : 0;
+  }
+  function mpUrteil(mp, zus, mieteJahr) {
+    zus = zahl(zus) > 0 ? zahl(zus) : 0;
+    var r = { zul_j: Math.round((mp.zul + zus) * 12), wohn_zul_j: Math.round(mp.zul * 12), wohn_ist_j: Math.round(mp.ist * 12), zus_j: Math.round(zus * 12),
+      luft_m: Math.max(0, Math.round(mp.zul - mp.ist)), ueber: false };
+    if (istZahl(mieteJahr) && mieteJahr > r.zul_j + 6) { r.ueber = true; r.luft_m = 0; }
+    return r;
+  }
 
   /* ── ViVi je Jahr (v4017) ─────────────────────────────────────────────
      Marcel 23.11.2026: „bei ViVi-Verknüpfung die ViVi-Daten des Jahres zeigen und Differenzen je Jahr sichtbar
@@ -495,10 +513,11 @@
   function potenzialHtml(z, lauf) {
     var mp = mpJahr(z.jahr);
     if (!mp || !mp.n) return '';
-    var ungenutzt = Math.max(0, Math.round(mp.zul - mp.ist)), quote = mp.zul > 0 ? Math.min(100, Math.round(mp.ist / mp.zul * 100)) : 100;
+    var zus = zusatzMonat(), U = mpUrteil(mp, zus, z.miete_ist);   /* v4410 */
+    var ungenutzt = U.luft_m, quote = mp.zul > 0 ? Math.min(100, Math.round(mp.ist / mp.zul * 100)) : 100;
     var gen = mp.genutzt.filter(function (x) { return istZahl(x.auf); });
     var genT = gen.length ? ' ' + (gen.length === 1 ? 'Erhöhung' : 'Erhöhungen') + ' ' + gen.map(function (x) { return (x.nr ? 'Whg. ' + esc(x.nr) + ' ' : '') + 'auf ' + eur(x.auf) + ' ab ' + mmjj(x.datum); }).join(', ') + ' eingetragen.' : '';
-    var t = 'Zum 01.01.' + z.jahr + ' zulässig nach § 558 BGB: <b>' + eur(mp.zul) + '</b> im Monat, eingetragen <b>' + eur(mp.ist) + '</b>'
+    var t = 'Zum 01.01.' + z.jahr + ' zulässig nach § 558 BGB' + (zus > 0 ? ' für die Wohnungen' : '') + ': <b>' + eur(mp.zul) + '</b> im Monat, eingetragen <b>' + eur(mp.ist) + '</b>'
       + (ungenutzt > 0 && mp.verlangbar_ab ? ', verlangbar ab ' + mmjj(mp.verlangbar_ab) + ', wirksam ab ' + mmjj(mp.wirksam_ab) : '') + '.'
       + (mp.wohnungen.length > 1 ? ' Summe aus ' + mp.wohnungen.length + ' Wohnungen' + (mp.wohnungen.filter(function (w) { return w.plus > 0.5; }).length ? ', Luft in ' + mp.wohnungen.filter(function (w) { return w.plus > 0.5; }).map(function (w) { return 'Whg. ' + esc(w.nr); }).join(', ') : '') + '.' : '')
       + genT
@@ -506,10 +525,12 @@
       + (ungenutzt > 0 && mp.ungenutzt_jahr > 0 && lauf ? ' Bis Jahresende ohne Erhöhung: ' + eur(mp.ungenutzt_jahr) + ' weniger.' : '')
       + (mp.ohne_vgl ? ' Für ' + (mp.wohnungen.length > 1 ? 'einen Teil der Wohnungen' : 'die Wohnung') + ' ist keine Vergleichsmiete bekannt, dort rechnet § 558 nicht (Mietspiegel im Reiter Miete eintragen).' : '')
       + (mp.sperre ? ' Die Erhöhung davor ist nicht eingetragen, die Sperrfrist ist nicht geprüft.' : '')
-      + (ungenutzt <= 0 && !gen.length ? ' ' + esc((mp.wohnungen[0] && mp.wohnungen[0].grund) || 'Die Miete liegt an der zulässigen Grenze.') : '');
+      + (zus > 0 ? ' Stellplätze und Zuschläge (' + eur(zus) + ' im Monat) kommen unverändert dazu, zusammen zulässig ' + eur(U.zul_j) + ' im Jahr.' : '')
+      + (U.ueber ? ' Die Kaltmiete ' + z.jahr + ' von ' + eur(z.miete_ist) + ' liegt über der zulässigen Miete von ' + eur(U.zul_j) + ' im Jahr. Eine Mieterhöhung ist nicht möglich.' : '')
+      + (ungenutzt <= 0 && !gen.length && !U.ueber ? ' ' + esc((mp.wohnungen[0] && mp.wohnungen[0].grund) || 'Die Miete liegt an der zulässigen Grenze.') : '');
     /* im Jahr genutzt: die Erhöhung ist eingetragen und es blieb (fast) nichts liegen */
     var genutzt = !lauf && ungenutzt > 0 && gen.length && mp.ungenutzt_jahr <= Math.max(5, ungenutzt * 1.2);
-    var wort = genutzt ? 'genutzt' : (ungenutzt > 0 ? vz(ungenutzt) + ' / Monat' : 'ausgeschöpft');
+    var wort = genutzt ? 'genutzt' : (ungenutzt > 0 ? vz(ungenutzt) + ' / Monat' : (U.ueber ? 'über der Grenze' : 'ausgeschöpft'));
     if (genutzt) ungenutzt = 0;   /* v4220 · B15: festgeschriebene Miete des Jahres bietet keine Mieterhöhung mehr an (Knöpfe unten) */
     return '<div class="dp-ja-pot" data-ja-pot="' + z.jahr + '"><div><div class="dp-ja-eti">Mieterhöhung ' + z.jahr + '</div><div class="dp-ja-w' + (ungenutzt > 0 ? '' : ' dp-ja-gut') + '">' + wort + '</div>'
       + (genutzt ? '<div class="dp-ja-vgl">' + vz(Math.round(mp.zul - mp.ist)) + ' / Monat ab ' + mmjj(gen[0].datum) + '</div>' : '') + '</div>'
@@ -528,7 +549,8 @@
       var dscr = zahl(kz._kpis_dscr), score = zahl(kz._ds2_score);
       var planM = istZahl(z.miete_plan) ? eur(z.miete_plan) : (istZahl(z.miete_proj) ? '<span style="color:#9A9285">' + eur(z.miete_proj) + '</span><small>Projektion</small>' : '–');
       var gen = mp && mp.n && !lauf && mp.genutzt.length && mp.zul > mp.ist + 0.5 && mp.ungenutzt_jahr <= Math.max(5, (mp.zul - mp.ist) * 1.2);
-      var ung = mp && mp.n ? (gen ? '<small class="dp-ja-gut">genutzt</small>' : mp.ungenutzt_jahr > 0 ? '<small class="dp-ja-schlecht">' + vz(-mp.ungenutzt_jahr) + ' ungenutzt</small>' : (mp.zul > mp.ist + 0.5 ? '<small>ab ' + mmjj(mp.wirksam_ab) + '</small>' : '<small class="dp-ja-gut">ausgeschöpft</small>')) : '';
+      var U = mp && mp.n ? mpUrteil(mp, zusatzMonat(), z.miete_ist) : null;   /* v4410 · gleiche Grundlage wie die Spalte Kaltmiete */
+      var ung = mp && mp.n ? (U.ueber ? '<small class="dp-ja-schlecht">Ist darüber</small>' : gen ? '<small class="dp-ja-gut">genutzt</small>' : mp.ungenutzt_jahr > 0 ? '<small class="dp-ja-schlecht">' + vz(-mp.ungenutzt_jahr) + ' ungenutzt</small>' : (mp.zul > mp.ist + 0.5 ? '<small>ab ' + mmjj(mp.wirksam_ab) + '</small>' : '<small class="dp-ja-gut">ausgeschöpft</small>')) : '';
       var cfP = istZahl(z.cf_plan) ? z.cf_plan : z.cf_proj, cfI = istZahl(z.cf_stand) ? z.cf_stand : null;
       var rs = istZahl(z.rs_ist) ? z.rs_ist : z.rs_proj;
       return '<tr data-ja-jahr="' + z.jahr + '" class="' + (z.jahr === _gewaehlt ? 'an' : '') + '" title="Jahr ' + z.jahr + ' wählen">'
@@ -537,10 +559,14 @@
         + '<td>' + (istZahl(z.miete_ist) ? eur(z.miete_ist) : '–') + '<small>' + (lauf ? 'Projektion' : abw(z.miete_basis, z.miete_ist, true)) + '</small></td>'
         + (vd ? (function () { var vj = viviJahr(z.jahr, vd), m = vj && vj.miete, d = istZahl(m) && istZahl(z.miete_ist) ? z.miete_ist - m : null;
             return '<td>' + (istZahl(m) ? eur(m) : '–') + '<small' + (d != null && Math.abs(d) >= 1 ? ' class="dp-ja-schlecht">Δ ' + vz(d) : (d != null ? ' class="dp-ja-gut">gleich' : '>')) + '</small></td>'; })() : '')
-        + '<td>' + (mp && mp.n ? eur(mp.zul * 12) + ung : '–') + '</td>'
+        + '<td' + (U && U.zus_j > 0 ? ' title="Wohnungen zulässig ' + eur(U.wohn_zul_j) + ', dazu Stellplätze und Zuschläge ' + eur(U.zus_j) + ' unverändert"' : '') + '>' + (mp && mp.n ? eur(U.zul_j) + ung : '–') + '</td>'
         + '<td>' + eur(cfP) + '<small>' + (cfI != null ? 'Ist ' + eur(cfI) : (lauf ? 'läuft' : 'kein Stand')) + '</small></td>'
         + '<td>' + (z.steuer && istZahl(z.steuer.ergebnis) ? vz(z.steuer.ergebnis) : '–') + '<small>' + (pl && istZahl(pl.zve_y) ? 'Plan ' + vz(pl.zve_y) : '') + '</small><span class="dp-ja-stp ' + esc(z.status) + '">' + esc(JB().statusWort(z.status)) + '</span></td>'
-        + '<td>' + (z.mb ? eur(z.mb.wert) : '<span style="color:#9A9285">–</span>') + '<small>' + (pl && istZahl(pl.wert_y) ? 'Plan ' + eur(pl.wert_y) : '') + '</small></td>'
+        + (function () {   /* v4410 · führendes Verfahren vor der Marktpreisindikation, wie Schritt 2 im Assistenten */
+            var fu = z.mb && z.mb.fu && !z.mb.fu.stufe_m ? z.mb.fu : null;
+            return '<td' + (z.mb ? ' title="' + esc((fu ? fu.name + ' (führend) ' + eur(fu.wert) + ', ' : '') + 'Marktpreisindikation ' + eur(z.mb.wert) + ' aus Angebotspreisen, Bericht vom ' + datumText(z.mb.am)) + '"' : '') + '>'
+              + (z.mb ? eur(fu ? fu.wert : z.mb.wert) : '<span style="color:#9A9285">–</span>')
+              + '<small>' + (fu ? esc(fu.name.replace(' (vorläufig)', '')) + ' · ' : '') + (pl && istZahl(pl.wert_y) ? 'Plan ' + eur(pl.wert_y) : '') + '</small></td>'; })()
         + '<td>' + eur(rs) + '<small>' + (istZahl(z.rs_ist) ? 'Kontoauszug' : 'Projektion') + '</small></td>'
         + '<td>' + (dscr != null ? z2(dscr) : '–') + '</td>'
         + '<td>' + (score != null ? String(Math.round(score)) : '–') + '</td>'
@@ -999,7 +1025,7 @@
   }
 
   global.DpJahresabgleich = { VERSION: VERSION, stand: stand, hausStand: hausStand, hausJahr: hausJahr, erinnerung: erinnerung, mbAbrufen: mbAbrufen,
-    mpRein: mpRein, mpQuellen: mpQuellen, mpJahr: mpJahr, html: html, mountAll: mountAll, verfuegbar: verfuegbar, grafikOpt: grafikOpt,
+    mpRein: mpRein, mpQuellen: mpQuellen, mpJahr: mpJahr, mpUrteil: mpUrteil, html: html, mountAll: mountAll, verfuegbar: verfuegbar, grafikOpt: grafikOpt,
     standText: standText, viviMieteRein: viviMieteRein, viviJahr: viviJahr, viviLuecke: viviLuecke, lueckenText: lueckenText,   /* v4220 */   /* v4016, v4017 */
     SCHRITTE: SCHRITTE, aktiverSchritt: aktiverSchritt, aufgabe: aufgabe, fuehrungHtml: fuehrungHtml,   /* v4090 · für den Prüfer */
     hgViviRein: hgViviRein, hausMitViviRein: hausMitViviRein, offenListe: offenListe, fertigErgebnis: fertigErgebnis,   /* v4100 */

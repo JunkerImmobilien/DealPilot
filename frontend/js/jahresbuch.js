@@ -344,6 +344,17 @@
     } catch (e) { return { nkm: null, titel: null }; }
   }
   var _mb = { key: null, liste: null, laedt: null };
+  /* v4410 · führendes Verfahren eines Berichts: { art, name, wert, vorlaeufig, stufe_m } oder null. Stufe M (Vergleichswert
+     ohne amtliche Basis) heißt: die Marktpreisindikation nach Abschlag führt. */
+  function fuehrendAus(D) {
+    if (!D || !D.fuehrend) return null;
+    var N = { ertragswert: 'Ertragswert', sachwert: 'Sachwert', vergleichswert: 'Vergleichswert' }, f = D[D.fuehrend];
+    if (f && f.wert > 0) return { art: D.fuehrend, name: N[D.fuehrend] + (f.vorlaeufig ? ' (vorläufig)' : ''), wert: f.wert, vorlaeufig: !!f.vorlaeufig, stufe_m: false,
+      lzs: D.fuehrend === 'ertragswert' && f.lzs_pct != null ? { pct: f.lzs_pct, stufe: f.lzs_stufe || null } : null };
+    if (D.fuehrend === 'vergleichswert' && D.marktpreisindikation && D.marktpreisindikation.mitte > 0)
+      return { art: 'vergleichswert_m', name: 'Marktpreisindikation', wert: D.marktpreisindikation.mitte, vorlaeufig: false, stufe_m: true, lzs: null };
+    return null;
+  }
   function mbLaden() {
     var k = global._currentObjKey;
     if (!k || !global.Auth || typeof global.Auth.apiCall !== 'function') return Promise.resolve([]);
@@ -353,7 +364,13 @@
     _mb.laedt = global.Auth.apiCall('/marktbericht/objects/history?key=' + encodeURIComponent('dp:' + k), { method: 'GET' }).then(function (j) {
       if (global._currentObjKey !== k) return [];
       _mb.liste = ((j && j.history) || []).filter(function (h) { return h && h.market_value != null && h.created_at; })
-        .map(function (h) { return { wert: Number(h.market_value), am: String(h.created_at).slice(0, 10) }; });
+        .map(function (h) {
+          /* v4410 · Marcel 24.11.2026: „im Jahresabgleich unter 2 im Wert das führende Verfahren oben, darunter die
+             Marktpreisindikation“. Dieselbe Lesung wie Reiter Bewertung und Pilot-Analyse (DpWertZielbild._wertDaten). */
+          var D = null; try { D = global.DpWertZielbild && global.DpWertZielbild._wertDaten ? global.DpWertZielbild._wertDaten(h) : null; } catch (e) { D = null; }
+          return { wert: Number(h.market_value), am: String(h.created_at).slice(0, 10), fu: fuehrendAus(D), stichtag: D && D.wert_stichtag || null,
+            abschlag: D && D.abschlag_pct != null ? D.abschlag_pct : null, ohne: D && D.ohne_abschlag ? D.ohne_abschlag.mitte : null };
+        });
       _mb.laedt = null; return _mb.liste;
     }, function () { _mb.laedt = null; _mb.liste = []; return []; });
     return _mb.laedt;

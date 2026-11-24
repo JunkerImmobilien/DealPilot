@@ -122,7 +122,18 @@
   function schrittWert(r) {
     var J = _z.jahr, z = r.z, fest = r.s.fest && r.s.fest.wert;
     var h = '<h4>Wert ' + J + '</h4>';
-    if (z.mb) h += '<p class="dp-jab-satz">Für ' + J + ' liegt ein Marktbericht vor.</p><div class="dp-jab-zahl"><span>Wert laut Bericht<b>' + eur(z.mb.wert) + '</b></span><span>Bericht vom<b>' + esc(datumText(z.mb.am)) + '</b></span><span>Stand<b>erledigt</b></span></div>';
+    /* v4410 · Marcel 24.11.2026: oben das führende Verfahren mit Wert, darunter die Marktpreisindikation */
+    if (z.mb) {
+      var fu = z.mb.fu, st = z.mb.stichtag ? datumText(z.mb.stichtag) : '';
+      var mpiT = 'aus aktuellen Angebotspreisen' + (istZahl(z.mb.abschlag) ? ', nach ' + String(z.mb.abschlag).replace('.', ',') + ' % Verhandlungsabschlag' : '') + ', kein Verkehrswert';
+      h += '<p class="dp-jab-satz">Für ' + J + ' liegt ein Marktbericht vor' + (st ? ', Wertermittlungsstichtag ' + esc(st) : '') + '.</p>'
+        + '<div class="dp-jab-zahl">'
+        + (fu && !fu.stufe_m ? '<span title="' + esc(fu.name + ', führendes Verfahren des Berichts. An ihm misst sich der Preis.' + (fu.lzs ? ' Liegenschaftszins ' + String(fu.lzs.pct).replace('.', ',') + ' %' + (fu.lzs.stufe ? ', Stufe ' + fu.lzs.stufe : '') + '.' : '')) + '">' + esc(fu.name) + ' · führend<b>' + eur(fu.wert) + '</b></span>' : '')
+        + '<span title="' + esc(mpiT) + '">Marktpreisindikation' + (fu && fu.stufe_m ? ' · führend' : '') + '<b>' + eur(z.mb.wert) + '</b></span>'
+        + '<span>Bericht vom<b>' + esc(datumText(z.mb.am)) + '</b></span>'
+        + (fu && !fu.stufe_m ? '' : '<span>Stand<b>erledigt</b></span>') + '</div>'
+        + '<p class="dp-jab-satz"><small>Marktpreisindikation: ' + esc(mpiT) + '.' + (fu && fu.stufe_m ? ' Für diese Lage gibt es keine amtliche Kaufpreisbasis, deshalb führt sie hier (indikativ).' : '') + '</small></p>';
+    }
     else if (fest) h += '<p class="dp-jab-satz">Für ' + J + ' gibt es keinen Marktbericht. Der Schritt ist abgeschlossen.</p>';
     else h += '<p class="dp-jab-satz">Für ' + J + ' liegt kein Marktbericht vor.<small>Ein neuer Bericht zählt für das laufende Jahr. Gab es ' + J + ' keinen, schließ den Schritt so ab.</small></p>'
       + '<div class="dp-jab-reihe">' + knopf('wert-nein', 'Kein Bericht für ' + J + ', Schritt abschließen', true) + knopf('wert-abrufen', 'Marktbericht abrufen', false) + '</div>';
