@@ -148,6 +148,10 @@
     var kp = kaufpreis();
     var D = {
       bericht_datum: h.created_at || null, bericht_id: zahl(h.report_id != null ? h.report_id : h.id),
+      /* v4390 · der Wert gilt zum Wertermittlungsstichtag (kam als JSON-Text {datum, eigen}), sonst zum Erstellungsdatum */
+      wert_stichtag: (function () { var w = h.wertermittlungsstichtag; if (!w) return null;
+        try { var o = typeof w === 'string' ? JSON.parse(w) : w; w = o && typeof o === 'object' ? o.datum : o; } catch (e) {}
+        return /^\d{4}-\d{2}-\d{2}/.test(String(w || '')) ? String(w).slice(0, 10) : null; })(),
       fuehrend: fu, fuehrend_grund: h.fuehrend_grund ? String(h.fuehrend_grund) : null,
       marktpreisindikation: { unten: lo, mitte: mw, oben: hi },
       abschlag_pct: ab, abschlag_herkunft: mitAb ? herkunftAbschlag(h.angebot_abschlag_herkunft) : null,

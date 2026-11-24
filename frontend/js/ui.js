@@ -1021,7 +1021,7 @@ function _buildAIPayload() {
           var S = window.State || {}, A = S.wert_anker;
           if (!(S.wert_basis > 0)) return null;
           return { wert: Math.round(A && A.wert > 0 ? A.wert : S.wert_basis), quelle: S.wert_basis_quelle || null,
-            art: A ? A.art : null, jahr: A ? A.jahr : null, text: S.wert_basis_text || null, wahl: S.wert_anker_wahl || 'massgebend' };
+            art: A ? A.art : null, jahr: A ? A.jahr : null, stichtag: A ? (A.datum || null) : null, erstellt: A ? (A.erstellt || null) : null,   /* v4390 */ text: S.wert_basis_text || null, wahl: S.wert_anker_wahl || 'massgebend' };
         } catch (e) { return null; }
       })()
     },

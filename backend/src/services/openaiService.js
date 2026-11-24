@@ -1198,6 +1198,7 @@ function buildPrompt(payload, opts) {
       var wa = k.wert_anker; if (!wa || !(Number(wa.wert) > 0)) return '';
       var WAHL = { massgebend: 'Wert des maßgebenden Verfahrens', mpi_mit: 'Marktpreisindikation nach Abschlag', mpi_ohne: 'Marktpreisindikation ohne Abschlag' };
       var t = 'Objektwert, von dem die App rechnet (Wertentwicklung, Vermögen, Exit): ' + fmtEur(Number(wa.wert))
+        + (wa.stichtag && /^\d{4}-\d{2}/.test(String(wa.stichtag)) ? ' zum Wertermittlungsstichtag ' + String(wa.stichtag).slice(0, 10).split('-').reverse().join('.') + ' (danach mit der Wertsteigerung fortgeschrieben)' : '')   /* v4390 */
         + (wa.text ? ' (' + String(wa.text).slice(0, 160) + ')' : '')
         + (wa.quelle === 'marktbericht' ? '. Gewählt in den Einstellungen: ' + (WAHL[wa.wahl] || WAHL.massgebend) + ', immer aus dem letzten Marktbericht' : '');
       if (Number(k.kp) > 0) { var d = (Number(k.kp) - Number(wa.wert)) / Number(wa.wert) * 100; t += '. Kaufpreis dazu: ' + (d >= 0 ? '+' : '') + d.toFixed(1).replace('.', ',') + ' %'; }

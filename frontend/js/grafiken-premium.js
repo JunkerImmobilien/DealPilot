@@ -648,7 +648,7 @@
       var artText = A0 ? ({ ertragswert: 'Ertragswert', sachwert: 'Sachwert', vergleichswert: 'Vergleichswert', vergleichswert_m: 'Vergleichswert aus Angeboten', mpi_mit: 'Marktpreisindikation nach Abschlag', mpi_ohne: 'Marktpreisindikation ohne Abschlag' }[A0.art] || 'Objektwert') + ' laut Marktbericht' : null;
       if (kp0 > 0 && ow > 0 && S0.wert_basis_quelle && S0.wert_basis_quelle !== 'kaufpreis') {
         var d0 = ow - kp0;
-        B.unshift({ name: 'Objektwert' + (A0 && A0.jahr ? ' ' + A0.jahr : ''), notiz: artText || S0.wert_basis_text || 'Objektwert', wert: ow, ziel: kp0, zielText: 'Kaufpreis', hoch: true, ohneSchwelle: true,
+        /* v4390 · der Wert gilt zum Wertermittlungsstichtag des Berichts (Demostraße 5: 03/2024), nicht zum Erstellungsjahr */ B.unshift({ name: 'Objektwert' + (A0 && A0.jahr ? ' (Stichtag ' + (A0.monat ? String(A0.monat).padStart(2, '0') + '/' : '') + A0.jahr + ')' : ''), notiz: artText || S0.wert_basis_text || 'Objektwert', wert: ow, ziel: kp0, zielText: 'Kaufpreis', hoch: true, ohneSchwelle: true,
           lo: Math.min(ow, kp0) * 0.85, hi: Math.max(ow, kp0) * 1.15, fmt: function (v) { return eur(v); },
           wort: (d0 >= 0 ? '✓ ' : '✕ ') + eur(Math.abs(d0)) + (d0 >= 0 ? ' über' : ' unter') + ' Kaufpreis' });
       }
