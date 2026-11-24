@@ -152,6 +152,14 @@
     '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-zahlen{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:0;border:1px solid #EFEAE0;border-radius:10px;overflow:hidden;margin:0 0 20px}',
     '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-zahlen.l4{grid-template-columns:repeat(4,minmax(0,1fr))}',
     '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-zahlen.l5{grid-template-columns:repeat(5,minmax(0,1fr))}',   /* v4410 · führend + Marktpreis */
+    /* v4490 · führend, stützend und Marktpreis: sechs Kacheln, darunter drei je Zeile, am Handy zwei */
+    '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-zahlen.l6{grid-template-columns:repeat(6,minmax(0,1fr))}',
+    '@media (max-width:1180px){.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-zahlen.l6{grid-template-columns:repeat(3,minmax(0,1fr))}}',
+    '@media (max-width:640px){.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-zahlen.l6{grid-template-columns:repeat(2,minmax(0,1fr))}}',
+    '.dp-pa5-haken{display:flex;align-items:center;gap:6px;margin-top:4px;font:400 11.5px/1.3 Inter,sans-serif;color:#6B645A;cursor:pointer;white-space:normal;text-transform:none;letter-spacing:0}',
+    '.dp-pa5-haken input{margin:0;width:14px;height:14px;accent-color:var(--wl-c9a84c,#C9A84C)}',
+    /* v4490 · Kauf gegen heute im Detail nur noch als Tabelle der Abweichungen (Marcel: „was sich bewegt hat … Pilot beim Ankauf … kann alles raus“) */
+    '.dp-pa5-sischlank .abw-bewegt,.dp-pa5-sischlank [data-dp-si-pilot],.dp-pa5-sischlank [data-dp-rechenstand],.dp-pa5-sischlank .abw-tafel-host>p,.dp-pa5-sischlank .abw-kopf h4{display:none!important}',
     '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-z{border:0;border-right:1px solid #EFEAE0;padding:12px 14px;gap:2px;min-width:0}',
     '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-z:last-child{border-right:0}',
     '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-z span{font:500 10.5px/1.3 "JetBrains Mono",monospace;letter-spacing:.07em;color:#6B645A}',
@@ -590,19 +598,37 @@
     var ERK = { ertragswert: 'Aus der nachhaltig erzielbaren Miete nach ImmoWertV abgeleitet, abzüglich der Bewirtschaftungskosten und mit dem Liegenschaftszins kapitalisiert.',
       sachwert: 'Aus Bodenwert und Herstellungskosten des Gebäudes nach ImmoWertV abgeleitet und an den Markt angepasst.',
       vergleichswert: 'Aus amtlichen Kaufpreisen vergleichbarer Objekte nach ImmoWertV abgeleitet.' };
+    /* v4490 · Marcel 24.11.2026: „daneben das stützende Verfahren, wenn es das gibt. Das wäre dann das Ertragswert-Verfahren.“ Ist das Haus
+       aufgeteilt, führt der Vergleichswert je Wohnung (wert-zielbild.js mitAufteilung, dieselbe Lesung wie Reiter Bewertung) und der Wert
+       des Hauses als Ganzes stützt. Sonst stützt das nächste Verfahren des Berichts mit Wert. Bis v4480 stand hier bei Westerfeldstr. 146
+       „Ertragswert · führend“, während der Reiter Bewertung den Vergleichswert je Wohnung führend nannte. */
+    var auf = w && w.aufteilung && zahl(w.aufteilung.wert) > 0 ? w.aufteilung : null, gezeigt = null;
     if (S.wert_basis_quelle === 'verkehrswert' && /^(gutachten|bank)$/.test(String(S.svw_herkunft || '')) && zahl(S.wert_basis) > 0) {   /* nur ein belastbares Gutachten geht dem Bericht vor (calc.js _svwBelastbar) */
       gutachten = true;
       out.push(zahlKachel((S.svw_label || 'Verkehrswert') + ' · führend', eur(S.wert_basis), 'deine Angabe im Reiter Objekt', C.c1,
         { t: (S.svw_label || 'Verkehrswert') + ', führend', a: 'Deine Wertangabe aus Gutachten oder Bankbewertung geht jedem Marktbericht vor. An ihr misst sich der Preis.' }));
+    } else if (auf) {
+      gezeigt = 'aufteiler';
+      out.push(zahlKachel('Vergleichswert je Wohnung · führend', eur(auf.wert), (auf.n ? auf.n + ' Wohnungen einzeln' : 'Wohnungen einzeln') + (auf.kosten > 0 ? ', nach Aufteilungskosten' : ''), C.c1,
+        { t: 'Vergleichswert je Wohnung, führend', a: 'Das Haus ist in Wohnungseigentum aufgeteilt. Jede Wohnung ist einzeln über das Vergleichswertverfahren bewertet. Die Summe nach Aufteilungskosten führt, der Wert des Hauses als Ganzes stützt.',
+          r: [['Herkunft', auf.bezeichnung || ''], ['Summe der Wohnungen', zahl(auf.summe) ? eur(auf.summe) : ''], ['Aufteilungskosten', auf.kosten > 0 ? eur(auf.kosten) : ''], ['Marktbericht vom', bericht]] }));
     } else if (w && w.fuehrend && w[w.fuehrend] && zahl(w[w.fuehrend].wert) > 0) {
-      fu = w.fuehrend; var f = w[fu], nm = N[fu] + (f.vorlaeufig ? ' (vorläufig)' : '');
+      fu = w.fuehrend; gezeigt = fu; var f = w[fu], nm = N[fu] + (f.vorlaeufig ? ' (vorläufig)' : '');
       out.push(zahlKachel(N[fu] + ' · führend', eur(f.wert), (st ? 'Stichtag ' + st : '') + (f.vorlaeufig ? (st ? ', ' : '') + 'vorläufig' : ''), C.c1,
         { t: nm + ', führendes Verfahren', a: ERK[fu] + ' An ihm misst sich der Preis, die übrigen Werte sind die Gegenprobe.',
           r: [['Wertermittlungsstichtag', st], ['Liegenschaftszins', fu === 'ertragswert' && zahl(f.lzs_pct) ? de(f.lzs_pct, 2) + ' %' + (f.lzs_stufe ? ', Stufe ' + f.lzs_stufe : '') : ''],
             ['Spanne', fu === 'ertragswert' && zahl(f.von) && zahl(f.bis) ? eur(f.von) + ' bis ' + eur(f.bis) : ''], ['Marktbericht vom', bericht]] }));
     }
+    var stu = null, folge = (w && w.fuehrend && (gutachten || auf) ? [w.fuehrend] : []).concat(['ertragswert', 'sachwert', 'vergleichswert']);
+    for (var si0 = 0; si0 < folge.length && !stu; si0++) { var k0 = folge[si0]; if (k0 !== gezeigt && w && w[k0] && zahl(w[k0].wert) > 0) stu = k0; }
+    if (stu) {
+      var sv = w[stu], lz = stu === 'ertragswert' && zahl(sv.lzs_pct) ? de(sv.lzs_pct, 2) + ' %' + (sv.lzs_stufe ? ', Stufe ' + sv.lzs_stufe : '') : '';
+      out.push(zahlKachel(N[stu] + ' · stützend', eur(sv.wert), auf ? 'Haus als Ganzes' : (sv.vorlaeufig ? 'vorläufig' : (lz ? 'LZS ' + lz.replace(/, Stufe.*/, '') : (st ? 'Stichtag ' + st : ''))), C.c1,
+        { t: N[stu] + (sv.vorlaeufig ? ' (vorläufig)' : '') + ', stützendes Verfahren', a: ERK[stu] + ' Es ist die Gegenprobe zum führenden Wert' + (auf ? ' und bewertet das Haus als Ganzes' : '') + '.',
+          r: [['Wertermittlungsstichtag', st], ['Liegenschaftszins', lz], ['Spanne', zahl(sv.von) && zahl(sv.bis) ? eur(sv.von) + ' bis ' + eur(sv.bis) : ''], ['Marktbericht vom', bericht]] }));
+    }
     if (mpi) {
-      var stufeM = !fu && !gutachten && w.fuehrend === 'vergleichswert';
+      var stufeM = !fu && !gutachten && !auf && w.fuehrend === 'vergleichswert';
       var oh = w.ohne_abschlag && zahl(w.ohne_abschlag.mitte) ? eur(w.ohne_abschlag.mitte) : '';
       out.push(zahlKachel('Marktpreis Ø' + (stufeM ? ' · führend' : ''), eur(mpi.mitte), oh ? 'ohne Abschlag ' + oh : (st ? 'Stichtag ' + st : ''), 'var(--wl-c9a84c,#C9A84C)',
         { t: 'Marktpreisindikation' + (stufeM ? ', führend' : ''),
@@ -610,7 +636,7 @@
             + '. Kein Verkehrswert und kein Verfahren der ImmoWertV.' + (stufeM ? ' Für diese Lage gibt es keine amtliche Kaufpreisbasis, deshalb führt sie hier (indikativ).' : ''),
           r: [['Spanne', zahl(mpi.unten) && zahl(mpi.oben) ? eur(mpi.unten) + ' bis ' + eur(mpi.oben) : ''], ['ohne Abschlag', oh], ['Wertermittlungsstichtag', st], ['Marktbericht vom', bericht]] }));
     }
-    return { kacheln: out, fu: fu };
+    return { kacheln: out, fu: fu || gezeigt };
   }
   function abschnitt(titel, inhalt) { return inhalt ? '<div class="dp-pa4-a"><h4>' + esc(titel) + '</h4>' + inhalt + '</div>' : ''; }
   function absatz(t) { return has(t) ? '<p>' + txt(t) + '</p>' : ''; }
@@ -624,15 +650,23 @@
   function kennzahlen(bestand, vier) {
     var k = kpis(), w = wertDaten(), z = [];
     if (zahl(k.kp) && k.kp > 0) z.push(zahlKachel(bestand ? 'Kaufpreis (Ankauf)' : 'Kaufpreis', eur(k.kp), zahl(k.bmy) ? 'Bruttorendite ' + de(k.bmy, 2) + ' %' : '', '#E6DCC2'));
-    if (zahl(k.cf_m)) z.push(zahlKachel('Cashflow vor Steuer · volles Jahr', sEur(k.cf_m) + ' / Monat', zahl(k.cf_ns) ? 'nach Steuer ' + sEur(k.cf_ns / 12) + ' / Monat (volles Jahr)' : '', k.cf_m >= 0 ? C.gut : C.rot));
-    if (zahl(k.dscr) && k.dscr > 0) z.push(zahlKachel('DSCR', de(k.dscr, 2), k.dscr >= 1.2 ? 'Bank: trägt sich' : k.dscr >= 1 ? 'knapp über 1' : 'unter 1: Zuschuss nötig', k.dscr >= 1 ? C.gut : C.rot));
+    /* v4490 · Marcel 24.11.2026: „bei DSCR und Cashflow vor Steuern … einen Tipp drangeben, die natürlich immer nur dann angezeigt werden,
+       wenn wir es in den Einstellungen auch eingegeben haben.“ Die Erklärung steht immer, dein Ziel und ob es erreicht ist nur mit eigenem
+       Eintrag im Investmentprofil (load() ohne Vorbelegung, get() würde den Standard 1,20 liefern). */
+    var ziel = function (key) { try { var P = window.DealPilotInvestmentProfile, p = P && P.load ? P.load() : null, v = p ? p[key] : null; if (v == null || v === '') return null; v = parseFloat(String(v).replace(/\./g, '').replace(',', '.')); return isFinite(v) ? v : null; } catch (e) { return null; } };
+    var zCf = ziel('min_cashflow_vor_st'), zDs = ziel('min_dscr');
+    if (zahl(k.cf_m)) z.push(zahlKachel('Cashflow vor Steuer · volles Jahr', sEur(k.cf_m) + ' / Monat', zahl(k.cf_ns) ? 'nach Steuer ' + sEur(k.cf_ns / 12) + ' / Monat (volles Jahr)' : '', k.cf_m >= 0 ? C.gut : C.rot,
+      { t: 'Cashflow vor Steuer', a: 'Was im Monat nach Bewirtschaftungskosten, Zins und Tilgung übrig bleibt, vor Steuern. Gerechnet für ein volles Jahr mit den heutigen Eingaben.',
+        r: zCf != null ? [['dein Mindest-Cashflow', sEur(zCf) + ' / Monat'], ['Stand', k.cf_m >= zCf ? 'erreicht' : 'nicht erreicht, es fehlen ' + eur(zCf - k.cf_m) + ' im Monat']] : [] }));
+    if (zahl(k.dscr) && k.dscr > 0) z.push(zahlKachel('DSCR', de(k.dscr, 2), k.dscr >= 1.2 ? 'Bank: trägt sich' : k.dscr >= 1 ? 'knapp über 1' : 'unter 1: Zuschuss nötig', k.dscr >= 1 ? C.gut : C.rot,
+      { t: 'DSCR (Kapitaldienstdeckung)', a: 'Wie oft der Reinertrag aus der Miete die Jahresrate aus Zins und Tilgung deckt. Ab 1,0 trägt sich das Objekt selbst, Banken erwarten meist 1,2 oder mehr. Gerechnet für ein volles Jahr mit den heutigen Eingaben.',
+        r: zDs != null ? [['dein Mindest-DSCR', de(zDs, 2)], ['Stand', k.dscr >= zDs ? 'erreicht' : 'nicht erreicht']] : [] }));
     var WK = wertKacheln(w); z = z.concat(WK.kacheln);   /* v4410 · führend + Marktpreis mit Erklärung */
-    if (WK.fu !== 'ertragswert' && w && w.ertragswert && zahl(w.ertragswert.wert)) z.push(zahlKachel('Ertragswert', eur(w.ertragswert.wert), w.ertragswert.vorlaeufig ? 'vorläufig' : (zahl(w.ertragswert.lzs_pct) ? 'LZS ' + de(w.ertragswert.lzs_pct, 2) + ' %' : ''), C.c1));
-    var nVier = WK.kacheln.length > 1 ? 5 : 4;
+    var nVier = Math.max(4, Math.min(6, 3 + WK.kacheln.length));   /* v4490 · das stützende Verfahren kommt aus wertKacheln */
     var sc = vier ? null : sichtbarerScore();
     if (sc) z.push(zahlKachel(sc.name, String(sc.wert), (window.ScoreTier && window.ScoreTier.stufe ? window.ScoreTier.stufe(sc.wert).wort : ''), '#2A2727'));
     if (vier) z = z.slice(0, nVier);
-    return '<div class="dp-pa4-zahlen' + (vier && z.length === 4 ? ' l4' : '') + (vier && z.length === 5 ? ' l5' : '') + '" data-dp-pa4-kz="' + (bestand ? 'b' : 'a') + (vier ? '4' : '') + '"' + (z.length ? '' : ' style="display:none"') + '>' + z.join('') + '</div>';
+    return '<div class="dp-pa4-zahlen' + (vier && z.length === 4 ? ' l4' : '') + (vier && z.length === 5 ? ' l5' : '') + (vier && z.length === 6 ? ' l6' : '') + '" data-dp-pa4-kz="' + (bestand ? 'b' : 'a') + (vier ? '4' : '') + '"' + (z.length ? '' : ' style="display:none"') + '>' + z.join('') + '</div>';
   }
   /* Der Marktbericht (DpWertZielbild) lädt oft erst nach dem Zeichnen - dann die Kacheln neu */
   function kzNeu() {
@@ -1541,38 +1575,63 @@
     var mfh = false; try { mfh = !!(window.DpMfhEinheiten && window.DpMfhEinheiten.artMitEinheiten && window.DpMfhEinheiten.artMitEinheiten()); } catch (e) {}
     return { D: D, Z: Z, ab: ab, zA: zA, auf: auf, mfh: mfh };
   }
+  /* v4490 · Marcel 24.11.2026: „bei Maßnahmenkosten oder direkt bei Wert nach Aufteilung … ein kleines Häkchen für Aufteilerkosten
+     mit in Maßnahmenkosten integrieren. Dann werden die dazugerechnet oder auch nicht.“ Merker je Nutzer, Vorgabe: eingerechnet. */
+  function aufInMassnahmen() { try { return localStorage.getItem('dp_auft_in_massnahmen') !== '0'; } catch (e) { return true; } }
+  var _akMb = null;
+  /* v4490 · Marcel 24.11.2026 (Westerfeldstr. 146): „Und warum haben wir diese Aufteilung nicht gemacht für das Zielbild im Ankauf? …
+     warum stehen erst mal vorne keine Ertragswerte und Marktpreisindikationen?“ Gemessen: der eingefrorene Ankauf-Stand trägt keinen
+     Marktbericht (_mb_state leer), die Spalte Ankauf blieb deshalb bei Ertragswert und Marktpreis leer. Jetzt nimmt sie den Bericht,
+     dessen Wertermittlungsstichtag im Ankaufjahr liegt (Regel v4390/v4430: ein Bericht zählt für das Jahr seines Stichtags), zuerst den
+     aktuellen, sonst den aus der Berichtsliste des Jahresbuchs. Die Aufteilung ist keine eigene Spalte mehr: „Wert nach Aufteilung“ steht
+     als Zeile unter jeder Stufe (DpPotenzial.aufteilungKurz rechnet heute, nach Mieterhöhung und Zielbild), die Herkunft unter dem Namen
+     der Zeile. Die Absätze unter der Tabelle (Mietausfall seit dem Ankauf, § 558, Ausblick, Steuer Ankauf gegen heute) sind raus. */
   function siTabelle(bestand) {
     var d = siDaten(bestand), Z = d.Z, zA = d.zA, S = Z ? Z.stufen : {}, J = (Z && Z.jahre) || {};
     var hatAnkauf = bestand && Object.keys(zA).length > 0;
     if (!Z && !hatAnkauf) return null;
-    var T = d.auf && d.auf.aufteiler && d.auf.aufteiler.bestand ? d.auf.aufteiler.bestand : null;
-    var mitAuf = !!(T || (d.auf && d.auf.gesperrt));
+    var TA = d.auf && d.auf.aufteiler ? d.auf.aufteiler : null;
+    var T = TA ? (TA.bestand || TA.mieterhoehung || TA.zielbild || null) : null; if (!T) TA = null;
+    var KA = d.auf && d.auf.kosten > 0 ? Number(d.auf.kosten) : 0, inM = aufInMassnahmen();
+    var nW = d.auf && Array.isArray(d.auf.je_wohnung) ? d.auf.je_wohnung.filter(function (x) { return x.art !== 'gewerbe'; }).length : 0;
     var sp = [];
     if (hatAnkauf) sp.push({ k: 'ankauf', t: 'Ankauf', u: datumDe(d.ab.stichtag) });
     if (Z || hatAnkauf) sp.push({ k: 'bestand', t: bestand ? 'Heute' : 'Ankauf', u: bestand ? String(new Date().getFullYear()) : 'heute gerechnet' });
     if (S.mieterhoehung) sp.push({ k: 'mieterhoehung', t: 'nach Mieterhöhung', u: J.mieterhoehung ? 'ab ' + J.mieterhoehung : 'Mieter bleibt', kl: 'hebel' });
     if (S.zielbild) sp.push({ k: 'zielbild', t: 'Zielbild', u: J.zielbild ? String(J.zielbild) : 'Jahr offen', kl: 'hebel' });
-    if (mitAuf) sp.push({ k: 'aufteilung', t: 'Aufteilung', u: d.auf.je_wohnung && d.auf.je_wohnung.length ? d.auf.je_wohnung.filter(function (w) { return w.art !== 'gewerbe'; }).length + ' Wohnungen einzeln' : 'in Eigentumswohnungen', kl: 'hebel' });
     var A = function (s) { var z = zA[s]; return z && zahl(z.ankauf) ? Number(z.ankauf) : null; };
     var H = function (s) { var z = zA[s]; return z && zahl(z.bestand) ? Number(z.bestand) : null; };
-    /* v4440 · Rohstand des Ankaufs und heutige Eingaben: DSCR netto, Zuschlaege, geaenderte Annahmen */
+    /* v4440 · Rohstand des Ankaufs und heutige Eingaben: DSCR netto, Zuschlaege */
     var AKD = null; try { var _st = hatAnkauf && window.DealPilotAnkauf && window.DealPilotAnkauf.stand ? window.DealPilotAnkauf.stand() : null; AKD = _st && _st.daten ? _st.daten : null; } catch (e) { AKD = null; }
     var ein = function (s) { if (s == null || s === '') return null; var x = String(s).trim(); if (x.indexOf(',') >= 0) x = x.replace(/\./g, '').replace(',', '.'); x = parseFloat(x); return isFinite(x) ? x : null; };
     var feldHeute = function (id) { var el = document.getElementById(id); return el ? ein(el.value) : null; };
     var zeJahr = function (k) { var z = k === 'ankauf' ? (AKD ? ein(AKD.ze) : null) : feldHeute('ze'); return z > 0 ? z * 12 : 0; };
-    /* Wert einer Kennzahl je Spalte; die Spalte Heute nimmt die Stufe Bestand, ohne Zielbild-Modell den Abgleich */
     var w = function (feld, k) {
-      if (k === 'aufteilung') return null;
       if (k === 'ankauf') return { miete_jahr: A('_kpis_miete_j') != null ? A('_kpis_miete_j') : (A('nkm') != null ? A('nkm') * 12 + zeJahr('ankauf') : null), miete_qm: A('_nkm_qm'), bmy: A('_kpis_bmy'), cf_monat: A('_kpis_cf_vs') != null ? A('_kpis_cf_vs') / 12 : null,
-        /* v4440 · alte Ankauf-Staende trugen den Brutto-DSCR, die anderen Spalten sind netto */
         dscr: AKD && window.Dscr && window.Dscr.ausGespeichert ? window.Dscr.ausGespeichert(AKD) : A('_kpis_dscr') }[feld];
       var st = S[k];
-      /* v4440 · die Stufen fuehren die Kaltmiete der Wohnungen, Cashflow und DSCR rechnen mit Zuschlaegen und Stellplaetzen: Zeile auf dieselbe Basis */
       if (feld === 'miete_jahr' && st && st.miete_jahr != null) return st.miete_jahr + zeJahr(k);
       if (st && st[feld] != null) return st[feld];
       if (k === 'bestand' && hatAnkauf) return { miete_jahr: H('_kpis_miete_j') != null ? H('_kpis_miete_j') : (H('nkm') != null ? H('nkm') * 12 + zeJahr('bestand') : null), miete_qm: H('_nkm_qm'), bmy: H('_kpis_bmy'), cf_monat: H('_kpis_cf_vs') != null ? H('_kpis_cf_vs') / 12 : null, dscr: H('_kpis_dscr') }[feld];
       return null;
     };
+    /* Bericht für die Spalte Ankauf */
+    var aB = null;
+    if (hatAnkauf) {
+      var akJ = String(d.ab.stichtag || '').slice(0, 4), wd = wertDaten();
+      if (akJ && wd && String(wd.wert_stichtag || wd.bericht_datum || '').slice(0, 4) === akJ) {
+        aB = { ew: wd.ertragswert && zahl(wd.ertragswert.wert) ? Number(wd.ertragswert.wert) : null, mpi: wd.marktpreisindikation && zahl(wd.marktpreisindikation.mitte) ? Number(wd.marktpreisindikation.mitte) : null,
+          ohne: wd.ohne_abschlag && zahl(wd.ohne_abschlag.mitte) ? Number(wd.ohne_abschlag.mitte) : null, st: wd.wert_stichtag || wd.bericht_datum };
+      } else if (akJ && window.DpJahresbuch && window.DpJahresbuch.mbImJahr) {
+        var hb = null; try { hb = window.DpJahresbuch.mbImJahr(akJ); } catch (e) { hb = null; }
+        if (hb) aB = { ew: hb.fu && hb.fu.art === 'ertragswert' ? hb.fu.wert : null, mpi: zahl(hb.wert) ? Number(hb.wert) : null, ohne: zahl(hb.ohne) ? Number(hb.ohne) : null, st: hb.stichtag || hb.am };
+        else if (window.DpJahresbuch.mbLaden && _akMb !== window._currentObjKey) {   /* einmal je Objekt laden, dann neu zeichnen */
+          _akMb = window._currentObjKey;
+          try { window.DpJahresbuch.mbLaden().then(function (l) { if (l && l.length) siBald(); }); } catch (e) {}
+        }
+      }
+    }
+    var aBst = aB && aB.st ? 'Bericht, Stichtag ' + mmjjIso(aB.st) : '';
     var kopf = [{ t: 'Kennzahl' }].concat(sp.map(function (c) { return { t: c.t, u: c.u, kl: c.kl }; }));
     var zeile = function (titel, f, opt) {
       opt = opt || {};
@@ -1583,23 +1642,44 @@
     };
     var sub = function (h, s) { return s ? h + '<small>' + s + '</small>' : h; };
     var ewGesperrt = !!(Z && Z.ertragswert_gesperrt);
+    var ewH = S.bestand && zahl(S.bestand.ertragswert) ? Number(S.bestand.ertragswert) : null;
+    /* Maßnahmenkosten der Stufe, mit Häkchen samt Kosten der Aufteilung (nur in Spalten, für die ein Aufteilerwert vorliegt) */
+    var massn = function (k, mitAuf) {
+      if (k === 'ankauf') return null;
+      var st = S[k], b = k === 'bestand' ? 0 : (st ? Number(st.kosten || 0) : null);
+      if (b == null) return null;
+      return b + (mitAuf && TA && TA[k] && KA ? KA : 0);
+    };
+    var zjB = zeJahr('bestand');
     var zeilen = [{ gr: 'Miete und Rendite' },
-      zeile('Kaltmiete im Jahr', function (k) { var v = w('miete_jahr', k); if (v == null) return null; var zj = k === 'aufteilung' ? 0 : zeJahr(k); var u = [w('miete_qm', k) != null ? de(w('miete_qm', k), 2) + ' €/m² im Monat' : '', zj > 0 ? 'davon Stellplätze und Zuschläge ' + eur(zj) : ''].filter(Boolean).join('<br>'); return sub(eur(v), u); }),
+      zeile('Kaltmiete im Jahr', function (k) { var v = w('miete_jahr', k); if (v == null) return null; return sub(eur(v), w('miete_qm', k) != null ? de(w('miete_qm', k), 2) + ' €/m²' : ''); },
+        { u: zjB > 0 ? 'mit Stellplätzen und Zuschlägen ' + eur(zjB) + ', €/m² im Monat' : '€/m² im Monat' }),
       zeile('Bruttomietrendite', function (k) { var v = w('bmy', k); return v == null ? null : pct(v); }, { u: 'auf Kaufpreis und Maßnahmen' }),
       zeile('Cashflow vor Steuer im Monat', function (k) { var v = w('cf_monat', k); return v == null ? null : { h: sEur(v), kl: v < 0 ? 'schlecht' : '' }; }),
       zeile('DSCR', function (k) { var v = w('dscr', k); return v == null ? null : { h: de(v, 2), kl: v < 1 ? 'schlecht' : '' }; }, { d: true }),
       { gr: 'Wert' },
-      zeile('Maßnahmenkosten', function (k) { if (k === 'aufteilung') return d.auf && d.auf.kosten > 0 ? sub(eur(d.auf.kosten), 'Kosten der Aufteilung') : null; if (k === 'ankauf' || k === 'bestand') return null; var st = S[k]; return st ? eur(st.kosten || 0) : null; }),
+      zeile('Maßnahmenkosten', function (k) { var v = massn(k, inM); if (v == null || (k === 'bestand' && !v)) return null; return sub(eur(v), inM && TA && TA[k] && KA ? 'davon Aufteilung ' + eur(KA) : ''); }),
+      TA && KA ? zeile('Kosten der Aufteilung', function (k) { return TA[k] ? eur(KA) : null; },
+        { u: '<label class="dp-pa5-haken"><input type="checkbox" data-dp-auf-mass="1"' + (inM ? ' checked' : '') + '>in Maßnahmenkosten einrechnen</label>' }) : null,
       ewGesperrt ? zeile('Ertragswert', function (k) { return k === 'bestand' ? 'mit Stufe 3' : null; }) :
-      zeile('Ertragswert', function (k) { var st = S[k]; return st && st.ertragswert != null ? sub('<b>' + eur(st.ertragswert) + '</b>', st.rnd != null ? 'RND ' + de(st.rnd, 0) + ' J.' : '') : null; },
+      zeile('Ertragswert', function (k) {
+        if (k === 'ankauf') return aB && zahl(aB.ew) ? sub('<b>' + eur(aB.ew) + '</b>', aBst) : null;
+        var st = S[k]; return st && st.ertragswert != null ? sub('<b>' + eur(st.ertragswert) + '</b>', st.rnd != null ? 'RND ' + de(st.rnd, 0) + ' J.' : '') : null; },
         { u: Z && Z.lzs && Z.lzs.pct != null ? 'Liegenschaftszins ' + de(Z.lzs.pct, 2) + ' %' + (Z.lzs.stufe ? ' · Stufe ' + esc(Z.lzs.stufe) : '') : '' }),
-      ewGesperrt ? null : zeile('Marktpreisindikation', function (k) { var st = S[k]; return st && st.marktpreisindikation != null ? sub(eur(st.marktpreisindikation), st.mpi_ohne_abschlag != null ? 'ohne Abschlag ' + eur(st.mpi_ohne_abschlag) : '') : null; },
+      ewGesperrt ? null : zeile('Marktpreisindikation', function (k) {
+        if (k === 'ankauf') return aB && zahl(aB.mpi) ? sub(eur(aB.mpi), aB.ohne != null ? 'ohne Abschlag ' + eur(aB.ohne) : aBst) : null;
+        var st = S[k]; return st && st.marktpreisindikation != null ? sub(eur(st.marktpreisindikation), st.mpi_ohne_abschlag != null ? 'ohne Abschlag ' + eur(st.mpi_ohne_abschlag) : '') : null; },
         { d: true, u: S.bestand && S.bestand.mpi_abschlag_pct > 0 ? 'Angebote am Ort, nach ' + de(S.bestand.mpi_abschlag_pct, 1) + ' % Abschlag' : 'Angebote am Ort' }),
-      T ? zeile('Wert nach Aufteilung', function (k) { return k === 'aufteilung' ? sub('<b>' + eur(T.wert) + (T.vollstaendig ? '' : '*') + '</b>', esc(T.bezeichnung || 'Vergleichswert') + ' führend') : null; }, { u: 'Wohnungen einzeln, nach Aufteilungskosten' }) : null,
-      ewGesperrt ? null : zeile('Wertzuwachs nach Kosten', function (k) {
-        if (k === 'aufteilung') return T && zahl(T.potenzial) ? (T.potenzial < 0 ? { h: 'kein Potenzial', kl: 'schlecht' } : { h: '+' + eur(T.potenzial), kl: 'gut' }) : null;
+      TA ? zeile('Wert nach Aufteilung', function (k) { var t = k === 'ankauf' ? null : TA[k]; return t && zahl(t.summe) ? '<b>' + eur(t.summe) + (t.vollstaendig ? '' : '*') + '</b>' : null; },
+        { u: 'aus ' + esc(String(T.bezeichnung || 'Vergleichswert').replace(/\s*\(indikativ, aus Angebotspreisen abgeleitet\)/, ', indikativ aus Angebotspreisen')) + (nW ? ', ' + nW + ' Wohnungen einzeln' : '') + ', vor Aufteilungskosten' + (T.vollstaendig ? '' : '. * nicht jede Wohnung hat einen Wert') }) : null,
+      ewGesperrt ? null : zeile(TA ? 'Wertzuwachs ohne Aufteilung' : 'Wertzuwachs nach Kosten', function (k) {
+        if (k === 'ankauf') return null;
         var v = Z && Z.wertzuwachs_nach_kosten ? Z.wertzuwachs_nach_kosten[k] : null; return v == null ? null : { h: sEur(v), kl: v >= 0 ? 'gut' : 'schlecht' }; },
-        { kl: 'su', u: 'Ertragswert der Stufe − heute − Maßnahmen' })];
+        { kl: TA ? '' : 'su', u: 'Ertragswert der Stufe − heute − Maßnahmen' + (TA ? ' ohne Aufteilung' : '') }),
+      TA && ewH != null && !ewGesperrt ? zeile('Wertzuwachs mit Aufteilung', function (k) {
+        var t = k === 'ankauf' ? null : TA[k]; if (!t || !zahl(t.summe)) return null;
+        var v = Number(t.summe) - ewH - massn(k, inM); return { h: sEur(v), kl: v >= 0 ? 'gut' : 'schlecht' }; },
+        { kl: 'su', u: 'Wert nach Aufteilung − Ertragswert heute − Maßnahmen' + (inM ? '' : ', Aufteilungskosten nicht eingerechnet') }) : null];
     /* Finanzierung und Steuer: Ankauf gegen heute (die Stufen ändern Finanzierung und Steuer nicht) */
     var R = window.State && Array.isArray(window.State.cfRows) ? window.State.cfRows : [], heute = new Date().getFullYear();
     var rsH = (R.filter(function (r) { return r.cal === heute; })[0] || {}).rs;
@@ -1620,25 +1700,21 @@
     var zw = Z && Z.wertzuwachs_nach_kosten ? Z.wertzuwachs_nach_kosten.zielbild : null;
     var zk = (S.zielbild && S.zielbild.kosten) || 0;
     if (zahl(zw) && !ewGesperrt) satz.push((satz.length ? 'das Zielbild bringt ' : 'Das Zielbild bringt ') + (zk > 0 ? 'nach ' + eur(zk) + ' Kosten ' : 'ohne Maßnahmenkosten ') + '<b>' + sEur(zw) + ' Wert</b>');
-    if (T && zahl(T.potenzial) && T.potenzial > 0) satz.push((satz.length ? 'die Aufteilung ' : 'Die Aufteilung bringt ') + '<b>+' + eur(T.potenzial) + '</b>' + (satz.length ? '' : ' Wert'));
+    var aufH = TA && TA.bestand && zahl(TA.bestand.summe) && ewH != null ? Number(TA.bestand.summe) - ewH - massn('bestand', inM) : null;
+    if (zahl(aufH) && aufH > 0) satz.push((satz.length ? 'die Aufteilung ' : 'Die Aufteilung bringt ') + '<b>+' + eur(aufH) + '</b>' + (satz.length ? '' : ' Wert'));
     var s = satz.length ? satz.join(', ').replace(/^(.)/, function (c) { return c.toUpperCase(); }) + '.' : (hatAnkauf ? 'Der Ankauf-Stand vom ' + datumDe(d.ab.stichtag) + ' gegen heute, Kennzahl für Kennzahl.' : 'Was in dem Objekt steckt: heute, nach Mieterhöhung und im Zielbild.');
     var hin = [];
-    if (!mitAuf && d.mfh) hin.push('Aufteilung: der Aufteilerwert erscheint, sobald die Ertragswerte gerechnet sind und das Haus aufgeteilt werden kann.');   /* v4042c · Marcel 23.11.2026: bei ETW gar kein Hinweis zur Aufteilung. v4042d · ohne Aufteilung ist d.auf null: der else-Zweig brach bei jeder ETW ab und die ganze Kennzahlen-Tabelle fehlte */
-    else if (mitAuf && !T && d.auf && d.auf.gesperrt) hin.push('Aufteilung: ' + esc(d.auf.gesperrt));
-    /* v4440 · Marcel 24.11.2026 (Westerfeldstr.): die Spalte Ankauf bleibt eingefroren, sagt aber, welche Annahmen sich seither geaendert haben */
-    if (hatAnkauf && AKD) {
-      var anders = [];
-      [['mietausfall', 'Mietausfall', 'eurj'], ['hg_nul', 'nicht umlagefähiges Hausgeld', 'eurj'], ['d1', 'Darlehen', 'eur'], ['d1z', 'Zins', 'pct'], ['d1t', 'Tilgung', 'pct'], ['d2', 'zweites Darlehen', 'eur'], ['d2z', 'Zins des zweiten Darlehens', 'pct']].forEach(function (f) {
-        var a = ein(AKD[f[0]]), h = feldHeute(f[0]); a = a == null ? 0 : a; h = h == null ? 0 : h;
-        if (Math.abs(a - h) < (f[2] === 'pct' ? 0.005 : 1)) return;
-        var fm = function (x) { return f[2] === 'pct' ? de(x, 2) + ' %' : eur(x) + (f[2] === 'eurj' ? ' im Jahr' : ''); };
-        anders.push(f[1] + ' im Ankauf ' + fm(a) + ', heute ' + fm(h));
-      });
-      if (anders.length) hin.push('Seit dem Ankauf geändert: ' + esc(anders.join(', ')) + '. Die Spalte Ankauf zeigt die Rechnung von damals.');
-    }
-    if (S.mieterhoehung) hin.push('Mieterhöhung nach § 558 BGB' + (J.mieterhoehung ? ' ab ' + J.mieterhoehung : '') + ', Mieter bleibt.');
-    if (Z && Z.kurz_ausblick) hin.push(esc(Z.kurz_ausblick));
+    if (!TA && d.mfh && !(d.auf && d.auf.gesperrt)) hin.push('Aufteilung: der Aufteilerwert erscheint, sobald die Ertragswerte gerechnet sind und das Haus aufgeteilt werden kann.');
+    else if (!TA && d.auf && d.auf.gesperrt) hin.push('Aufteilung: ' + esc(d.auf.gesperrt));
     return { satz: s, html: tabelle(kopf, zeilen.filter(Boolean)), hinweis: hin.join(' '), Z: Z, hatAnkauf: hatAnkauf };
+  }
+  if (typeof document !== 'undefined' && document.addEventListener && !document.__dpAufMass) {
+    document.__dpAufMass = true;
+    document.addEventListener('change', function (e) {
+      var t = e.target; if (!t || !t.matches || !t.matches('[data-dp-auf-mass]')) return;
+      try { localStorage.setItem('dp_auft_in_massnahmen', t.checked ? '1' : '0'); } catch (x) {}
+      try { siZeichnen(); } catch (x) {}
+    });
   }
   function zielBalken() {
     var J = window.DpJahresstaende, z = null;
@@ -1661,7 +1737,6 @@
       h += ergebnis(t.satz, Z && Z.ertragswert_hinweis ? '<button type="button" class="btn-clean dp-pa5-knopf" data-dp-pot-rechnen="1">Ertragswerte rechnen</button>' : '');
       if (Z && Z.ertragswert_hinweis) h += hinweis(esc(Z.ertragswert_hinweis));
       h += abKopf('Kennzahlen', bestand ? 'Ankauf eingefroren · heute aus den Reitern · Hebel aus Bewertung' : 'Hebel aus dem Reiter Bewertung') + t.html + hinweis(t.hinweis);
-      if (bestand && teile.steuerText) h += '<div class="dp-pa-d">' + hinweis('<b>Steuerlich, Ankauf gegen heute:</b> ' + txt(teile.steuerText)) + '</div>';
     } else if (teile.leer) h += teile.leer;
     if (bestand) h += zielBalken();
     return h;
@@ -1679,9 +1754,8 @@
     var h = (teile.zbf || '') + '<div data-dp-pa5-si="' + (bestand ? 'b' : 'a') + '">' + siInhalt(bestand, _siTeile[bestand ? 'b' : 'a']) + '</div>';
     /* v3441 · gemessen v3440 (Bestands-MFH, 1280 px): mit „Kauf gegen heute“ und „Pilot beim Ankauf“ auch im Einfach war der
        Reiter 2.302 px lang (v3420: 938). Einfach zeigt den Weg dorthin, Detail die ganze Tafel. */
-    if (teile.sollIst) h += '<div class="dp-pa-e">' + abKopf('Kauf gegen heute, alle Kennzahlen', 'im Detail') + hinweis('Alle Kennzahlen des Ankauf-Stands gegen heute, mit Abweichung, und was der Pilot beim Kauf gesagt hat. '
-        + '<button type="button" class="btn-clean dp-pa4-link" data-dp-pa-modus-setzen="detail">Im Detail zeigen</button>') + '</div>'
-      + '<div class="dp-pa-d">' + abKopf('Kauf gegen heute, alle Kennzahlen', 'Ertrag · Kosten · Finanzierung · Steuer') + teile.sollIst + '</div>';
+    /* v4490 · Einfach ohne Wegweiser, Detail nur die Tabelle der Abweichungen (CSS .dp-pa5-sischlank) */
+    if (teile.sollIst) h += '<div class="dp-pa-d dp-pa5-sischlank">' + abKopf('Kauf gegen heute', 'Abweichung je Kennzahl') + teile.sollIst + '</div>';
     /* v3442 · gemessen v3441: mit der offenen DpPotenzial-Karte war das Detail 3.691 px lang (v3420: 3.156) - jetzt zugeklappt */
     if (teile.pot) h += '<details class="dp-pa-d dp-pa5-mehr" data-dp-pa5-pot="1"><summary>Rechenweg, Marktpreise und Aufteilung<span class="dp-pa5-eti">aus dem Reiter Bewertung</span></summary>' + teile.pot + '</details>';
     return h;

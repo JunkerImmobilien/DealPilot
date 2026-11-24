@@ -629,12 +629,14 @@
     var K = (window.State && window.State.kpis) || {}, Pt = portfolioSchnitt(), ak = {};
     if (mitAnkauf) { try { var AK = window.DealPilotAnkauf; var ab = AK && AK.vorhanden && AK.vorhanden() ? AK.abweichung() : null; (ab && ab.zeilen || []).forEach(function (z) { ak[z.schluessel] = zahl(z.ankauf); }); } catch (e) {} }
     var cfAk = ak._kpis_cf_vs != null ? ak._kpis_cf_vs / 12 : null;
+    /* v4490 · alte Ankauf-Staende trugen den Brutto-DSCR (Westerfeldstr.: Einordnung „Ankauf 1,67“, Tabelle darunter 1,34). Dieselbe Lesung wie die Kennzahlen-Tabelle (pilot-analyse-v4.js v4440) */
+    var dscrAk = ak._kpis_dscr; if (mitAnkauf && dscrAk != null) { try { var _stA = window.DealPilotAnkauf.stand(); if (_stA && _stA.daten && window.Dscr && window.Dscr.ausGespeichert) { var _dn = zahl(window.Dscr.ausGespeichert(_stA.daten)); if (_dn != null) dscrAk = _dn; } } catch (e) {} }
     /* v4280 · Marcel: „Ankauf, Bestand, Zielbild, dass wir da auch wirklich alles drin haben“. Zielbild aus DpPotenzial.kennzahlen
        (dieselbe Quelle wie die Tafel Ankauf · Bestand · Zielbild), nur lesen. Beleihung im Zielbild führt die App nicht. */
     var zb = {}; if (mitAnkauf) { try { var PZ = window.DpPotenzial, mo = PZ && PZ.modell ? PZ.modell() : null; if (mo && mo.aktiv && mo.stufen && mo.stufen.zielbild) zb = (PZ.kennzahlen(mo) || {}).zielbild || {}; } catch (e) { zb = {}; } }
     var B = [
       { name: 'Bruttomietrendite', wert: zahl(K.bmy), ziel: null, port: mitAnkauf ? null : Pt.bmy, ankauf: ak._kpis_bmy, zielbild: zahl(zb.bmy), lo: 0, hi: 9, fmt: function (v) { return pct(v, 2); }, hoch: true },
-      { name: 'DSCR', wert: zahl(K.dscr), ziel: profil('min_dscr'), zielText: 'dein Mindest-DSCR', port: mitAnkauf ? null : Pt.dscr, ankauf: ak._kpis_dscr, zielbild: zahl(zb.dscr), lo: 0, hi: 1.8, fmt: function (v) { return nf2.format(v); }, hoch: true },
+      { name: 'DSCR', wert: zahl(K.dscr), ziel: profil('min_dscr'), zielText: 'dein Mindest-DSCR', port: mitAnkauf ? null : Pt.dscr, ankauf: dscrAk, zielbild: zahl(zb.dscr), lo: 0, hi: 1.8, fmt: function (v) { return nf2.format(v); }, hoch: true },
       { name: 'Beleihung (LTV)', wert: zahl(K.ltv), ziel: profil('max_ltv'), zielText: 'dein maximaler LTV', port: mitAnkauf ? null : Pt.ltv, ankauf: ak._kpis_ltv, lo: 0, hi: 120, fmt: function (v) { return pct(v); }, hoch: false },
       { name: 'Cashflow vor Steuer im Monat', wert: zahl(K.cf_m), ziel: profil('min_cashflow_vor_st'), zielText: 'dein Mindest-Cashflow', port: mitAnkauf ? null : Pt.cfm, ankauf: cfAk, zielbild: zahl(zb.cf_m), lo: -400, hi: 400, fmt: function (v) { return eurV(v); }, hoch: true }
     ].filter(function (b) { return b.wert != null; });
@@ -995,7 +997,9 @@
       var rsi = reihe(si, 'si-oben', si.firstChild);   /* v4310 · Einordnung und Score-Fingerabdruck nebeneinander */
       var altSi = si.querySelector(':scope > [data-dp-gn="gx-einordnung-si"]'); if (altSi && altSi.parentNode) altSi.parentNode.removeChild(altSi);
       var ksi = kind(rsi, 'gx-einordnung-si'); var zbSig = ''; try { zbSig = JSON.stringify((window.DpPotenzial.kennzahlen(window.DpPotenzial.modell()) || {}).zielbild || ''); } catch (e) {} zeichneMit(h, ksi, sig + kpSig + 'a' + zbSig, function (k, w) { karteEinordnung(k, w, true); });
-      zeichneMit(h, kind(rsi, 'gx-finger'), sig + kpSig, function (k, w) { karteFingerabdruck(k, w); });
+      /* v4490 · Marcel 24.11.2026: „dass der Fingerabdruck bei Ankauf, Bestand, Zielbild rausgeht“. Die Einordnung steht allein in voller Breite */
+      var fAlt = rsi.querySelector('[data-dp-gn="gx-finger"]'); if (fAlt && fAlt.parentNode) fAlt.parentNode.removeChild(fAlt);
+      rsi.style.gridTemplateColumns = 'minmax(0,1fr)';
       /* v4310 · Zielerreichung als Karte statt der blauen Balken */
       var zAlt = si.querySelector('.dp-pa5-ziel:not(.dp-gn-weg)') || si.querySelector('.dp-pa5-ziel');
       var kzAlt = si.querySelector('[data-dp-gn="gx-ziel"]');
