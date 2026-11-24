@@ -88,6 +88,7 @@
           } catch (e) { try { console.warn('[grafiken-pdf]', n, e); } catch (x) {} return; }
           if (opt.ohneBericht && n === 'einordnung') [].forEach.call(k.querySelectorAll('.gx-bz'), function (z) { var t = z.querySelector('.n'); if (t && /^Objektwert/.test(String(t.textContent || '').trim())) z.remove(); });
           if (opt.ohneBericht && (n === 'markt' || n === 'lage')) return;
+          if (opt.ohneBericht && n === 'wertverlauf') [].forEach.call(k.querySelectorAll('.gx-fuss span'), function (sp) { if (/Noch kein Marktbericht/.test(sp.textContent)) sp.textContent = 'Der letzte Marktbericht passt nicht zum heutigen Objektstand und ist hier nicht eingezeichnet.'; });
           if (!k.innerHTML.trim()) return;
           k.classList.add('gx-still');
           [].forEach.call(k.querySelectorAll('[data-gx-tip]'), function (e) { e.removeAttribute('data-gx-tip'); });

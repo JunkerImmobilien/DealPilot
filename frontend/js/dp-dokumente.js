@@ -131,6 +131,7 @@
     else if (SCK && !SC) SC = { score: SCK.score, label: SCK.label };
     return SC || {};
   }
+  var _ohneBerichtKz = false;   /* v4370e · von investment() gesetzt */
   function kennzahlen12(K, B, SC) {
     var S = St(), rows = S.cfRows || [];
     return B.kacheln([
@@ -144,7 +145,7 @@
       { l: 'Interner Zinsfuß', v: da(K.irr) === null ? 'n. b.' : B.pct(K.irr, 2), s: 'IRR' },
       { l: 'Kaltmiete', v: B.eur(da(K.nkm_j) !== null ? K.nkm_j : (rows[1] && rows[1].nkm_y)), s: 'p. a. inkl. Zusatzeinnahmen' },
       { l: 'Equity Multiple', v: da(K.em) === null ? '–' : B.zahl(K.em, 1) + 'x', s: 'über die Haltedauer' },
-      { l: 'Wertpuffer', v: B.eurS(K.wp_kpi), s: 'gegenüber Kaufpreis' },
+      svwVeraltet(_ohneBerichtKz) ? { l: 'Wertpuffer', v: '–', s: 'Marktbericht neu abrufen' } : { l: 'Wertpuffer', v: B.eurS(K.wp_kpi), s: 'gegenüber Kaufpreis' },
       { l: 'Deal Score', v: SC.score ? B.zahl(SC.score, 0) + ' / 100' : '–', s: SC.label || '', art: 'hi' }
     ]);
   }
@@ -160,7 +161,16 @@
     if (!z.length) return '';
     return '<div class="block"><h3>Ansprechpartner</h3><div class="kv">' + z.map(function (x) { return '<div><span>' + B.esc(x[0]) + '</span><span>' + B.esc(x[1]) + '</span></div>'; }).join('') + '</div></div>';
   }
-  function finanzierungVoll(K, B, kurz) {
+  /* v4370e · Wertangabe im Reiter Objekt, die aus einem Marktbericht übernommen wurde (svw_herkunft marktbericht/indikation):
+     veraltet, wenn der letzte Bericht nicht zum Objektstand passt oder der maßgebende Wert (State.wert_anker) ein anderer ist.
+     Gemessen Demostraße 5: Feld 111.000 € (früher übernommener vorläufiger Ertragswert), maßgebend 130.000 €. */
+  function svwVeraltet(ohneBericht) {
+    var S = St(), svw = zahlAus('svwert');
+    if (!svw || !/^(marktbericht|indikation)$/.test(S.svw_herkunft || '')) return false;
+    if (ohneBericht) return true;
+    return !!(S.wert_anker && S.wert_anker.wert && Math.abs(Number(S.wert_anker.wert) - svw) > 1);
+  }
+  function finanzierungVoll(K, B, kurz, ohneBericht) {
     var S = St(), kp = K.kp || zahlAus('kp') || 0, nk = nebenkosten(kp), nkSum = nk.reduce(function (a, x) { return a + x.eur; }, 0);
     var moebl = zahlAus('moebl'), san = zahlAus('san');
     var inv = [['Kaufpreis', B.eur(kp)]];
@@ -201,7 +211,7 @@
     var bis = zellText('r-bindend'); if (bis) fin.push(['Zinsbindung bis', bis]);
     fin.push(['Restschuld am Ende der Zinsbindung', B.eur(S.rs)]);
     fin.push(['Finanzierungsstruktur', (aus ? (d2an ? 'Tilgungsaussetzung + Bausparvertrag + Zusatzdarlehen' : 'Tilgungsaussetzung mit Bausparvertrag') : (d2an ? 'Annuitätendarlehen + Zusatzdarlehen' : 'Annuitätendarlehen')) + (_dwL.length ? ' + ' + _dwL.length + (_dwL.length === 1 ? ' weiteres Darlehen' : ' weitere Darlehen') : ''), { umbruch: 1 }]);   /* v3215; v3223 Umbruch */
-    var svw = zahlAus('svwert');
+    var svw = svwVeraltet(ohneBericht) ? null : zahlAus('svwert');   /* v4370e */
     if (svw) {
       fin.push([S.svw_label || 'Wertangabe (Reiter Objekt)', B.eur(svw)]);
       if (da(K.wp_kpi)) fin.push(['Sofortiger Wertpuffer gegenüber dem Kaufpreis', B.eurS(K.wp_kpi), { art: 'ende', farbe: 1 }]);
@@ -648,7 +658,7 @@
     /* v4370e · nur der LETZTE Marktbericht und nur, wenn er zum heutigen Objektstand passt (grafiken-pdf.js berichtPruefen).
        Passt er nicht: keine Wertzahl aus ihm, Wert-Seite mit Hinweis „Marktbericht neu abrufen“. */
     var BP = null; try { if (window.DpGrafikenPdf && DpGrafikenPdf.letzterBericht) BP = DpGrafikenPdf.berichtPruefen(await DpGrafikenPdf.letzterBericht()); } catch (e) { BP = null; }
-    var ohneBericht = !!(BP && !BP.ok && BP.bericht);
+    var ohneBericht = !!(BP && !BP.ok && BP.bericht); _ohneBerichtKz = ohneBericht;
     var GX = null; try { if (window.DpGrafikenPdf) GX = await Promise.race([DpGrafikenPdf.karten(GXL, { halb: ['finger', 'markt', 'lage', 'hebel', 'ausstieg'], ohneBericht: ohneBericht }), new Promise(function (f) { setTimeout(function () { f(null); }, 20000); })]); } catch (e) { GX = null; }
     var g = function (n) { return (GX && GX.html && GX.html[n]) || ''; };
     /* v4370 · Im Bestand sind Cashflow v. St. und n. St. die Zeile des Steuerjahres (calc.js v3314a), Miete, Zins und Tilgung
@@ -669,7 +679,7 @@
       S.push(B.seite(c, 'Objekt und Finanzierung', B.abschnitt(ab(), 'Objekt und Finanzierung')
         + '<div class="kv">' + [['Objektart', o.art], ['Baujahr', B.jahr(o.bj)], ['Wohnfläche', o.wfl ? B.zahl(o.wfl, 0) + ' m²' : '–'], ['Grundstück', o.gs ? B.zahl(o.gs, 0) + ' m²' : '–'],
           ['Kaufdatum', B.datum(feld('kaufdat')) || '–'], ['Energieklasse', feld('ds2_energie') || '–']].map(function (k) { return '<div><span>' + k[0] + '</span><span>' + B.esc(k[1]) + '</span></div>'; }).join('') + '</div>'
-        + finanzierungVoll(K, B, false) + (voll ? gesellschaft(B) : '') + (voll && !galerie && feld('ds2_energie') ? '<h3>Energieeffizienz</h3>' + B.energieSkala(feld('ds2_energie')) : '')));
+        + finanzierungVoll(K, B, false, ohneBericht) + (voll ? gesellschaft(B) : '') + (voll && !galerie && feld('ds2_energie') ? '<h3>Energieeffizienz</h3>' + B.energieSkala(feld('ds2_energie')) : '')));
       if (voll && galerie) S.push(B.seite(c, 'Ansichten', B.abschnitt(ab(), 'Ansichten und Energie') + galerie + (feld('ds2_energie') ? '<h3>Energieeffizienz</h3>' + B.energieSkala(feld('ds2_energie')) : '')));
     };
     var wertSeite = function (karteDazu) {
@@ -710,7 +720,7 @@
       } else {
         S.push(B.seite(c, 'Drei Phasen', B.abschnitt(ab(), 'Finanzierung in drei Phasen', 'Jahr 1, Ende der Zinsbindung und Anschlussfinanzierung, darunter der Cashflow je Jahr') + phasenVoll(K, B) + '<h3>Cashflow je Jahr · ' + (St().cfRows || []).length + ' Jahre</h3>' + cfJahre(B)));
         S.push(B.seite(c, 'Vermögensaufbau', B.abschnitt(ab(), 'Vermögensaufbau', 'Wert, Restschuld und Eigenkapital') + vermoegenVoll(K, B, g('wertverlauf'))));
-        if (g('faecher') || g('lage')) S.push(B.seite(c, 'Spanne und Lage', B.abschnitt(ab(), 'Spanne und Lage', 'Wie sich dein Vermögen im Objekt entwickeln kann und wie sich die Lage laut Marktbericht entwickelt') + g('faecher') + paar('lage')));
+        if (g('faecher') || g('lage')) S.push(B.seite(c, 'Spanne und Lage', B.abschnitt(ab(), 'Spanne und Lage', (g('lage') ? 'Wie sich dein Vermögen im Objekt entwickeln kann und wie sich die Lage laut Marktbericht entwickelt' : 'Wie sich dein Vermögen im Objekt entwickeln kann')) + g('faecher') + paar('lage')));
         var ml = mieterliste(K, B); if (ml) S.push(B.seite(c, 'Einheiten und Zustand', B.abschnitt(ab(), 'Einheiten und Zustand') + ml));
         wertSeite('');
         if (g('hausgeld')) S.push(B.seite(c, 'Haus und Hausgeld', B.abschnitt(ab(), 'Haus und Hausgeld', 'Hausgeld je Jahr aus den Abrechnungen') + g('hausgeld')));
