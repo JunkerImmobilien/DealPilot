@@ -225,6 +225,7 @@
   /* ── Ansicht anpassen ─────────────────────────────────────────────────── */
   var ANSICHT = [
     { k: 'score', t: 'Gesamturteil und Deal Score', g: 'an', fest: true, w: 'Der Score, den du in den Einstellungen gewählt hast.' },
+    { k: 'wichtig', t: 'Das Wichtigste', g: 'an', w: 'Drei bis fünf Stichpunkte aus der Pilot-Analyse, mit Ampel.' },
     { k: 'kz', t: 'Kennzahlen auf einen Blick', g: 'an', fest: true, w: 'Cashflow, Rendite, Finanzierung, Risiko und Preis mit Erklärung beim Darüberfahren.' },
     { k: 'rechnung', t: 'Cashflow, korrekte Berechnung', g: 'an', w: 'Von der Warmmiete bis zum Cashflow nach Steuern, je Phase.' },
     { k: 'wert', t: 'Wert und Zielbild', g: 'an', w: 'Was das Objekt nach jedem Verfahren wert ist und wohin es geht.' },
@@ -243,7 +244,7 @@
     return {
       rechnung: c2 && c2.children[0], alle: c2 && c2.children[1],
       wert: q('#card-wert-zielbild'), vz: q('#card-vermoegen-zuwachs'), verm: q('#dp-gb-verm'), bank: q('#dp-gb-bank'),
-      proj: q('#card-cashflow-projektion'), bewertung: q('#kpi-eval-card'), phasen: q('#s6 > .phase-compare-card'), zaer: q('#s6 > .zaer-card')
+      wichtig: q('#bwa-wichtig'), proj: q('#card-cashflow-projektion'), bewertung: q('#kpi-eval-card'), phasen: q('#s6 > .phase-compare-card'), zaer: q('#s6 > .zaer-card')
     };
   }
   var _ans = null, _server = false, _frei = false, _offen = false;
@@ -324,7 +325,49 @@
     _offen = true; setTimeout(function () { leiste(); anwenden(); var p = document.querySelector('#s6 > .bwa-panel'); if (p) try { p.scrollIntoView({ block: 'start', behavior: 'smooth' }); } catch (e) {} }, 300);
   };
 
+  /* v4450a · Marcel: „auch Bewertung-Tab mit Bullet Points“. Oben „Das Wichtigste“: die Stichpunkte der Einordnung aus der
+     gespeicherten Pilot-Analyse (window._aiAnalysis.kernpunkte, dieselben wie dort), keine zweite KI-Abfrage. Ohne
+     Stichpunkte ein Hinweis mit dem Weg zur Pilot-Analyse. */
+  function wichtigesHtml() {
+    var a = window._aiAnalysis, k = a && a.kernpunkte && typeof a.kernpunkte === 'object' ? a.kernpunkte : null;
+    var norm = function (x, ton) { var t = typeof x === 'string' ? x : (x && (x.t || x.text)) || ''; t = String(t).replace(/\s+[–—]\s+/g, ', ').replace(/\s*;\s*/g, ', ').replace(/\*\*/g, '').trim();
+      var o = x && typeof x === 'object' ? String(x.ton || '').toLowerCase() : ''; return { t: t, ton: ton || (o === 'gut' || o === 'schlecht' ? o : 'neutral') }; };
+    var p = [];
+    if (k && Array.isArray(k.einordnung)) p = k.einordnung.map(function (x) { return norm(x); });
+    if (k && p.length < 3 && Array.isArray(k.risiken)) p = p.concat(k.risiken.map(function (x) { return norm(x, 'schlecht'); }));
+    p = p.filter(function (x) { return x.t && !/^\.\.\./.test(x.t); }).slice(0, 5);
+    var link = '<button type="button" class="bwa-knopf" onclick="var t=document.querySelector(\'.tab[data-target-sec]\');Array.prototype.forEach.call(document.querySelectorAll(\'nav.tabs .tab\'),function(b){if(/Pilot-Analyse/.test(b.textContent))t=b;});if(t)t.click();">Zur Pilot-Analyse</button>';
+    if (!p.length) return '<div class="bwa-w-k"><b>Das Wichtigste</b>' + link + '</div><p class="bwa-w-hin">' + (a ? 'Mit der nächsten Pilot-Analyse steht hier das Wichtigste in Stichpunkten.' : 'Sobald eine Pilot-Analyse vorliegt, steht hier das Wichtigste in Stichpunkten.') + '</p>';
+    return '<div class="bwa-w-k"><b>Das Wichtigste</b>' + link + '</div><ul class="bwa-w">' + p.map(function (x) { return '<li class="' + x.ton + '">' + esc(x.t) + '</li>'; }).join('') + '</ul>';
+  }
+  function wichtigesZeigen() {
+    var s6 = document.getElementById('s6'); if (!s6) return;
+    var c = document.getElementById('bwa-wichtig');
+    if (!c) {
+      c = document.createElement('div'); c.id = 'bwa-wichtig'; c.className = 'card bwa-wichtig';
+      var m = document.getElementById('dpsh-mount');
+      if (m && m.parentNode === s6) s6.insertBefore(c, m.nextSibling); else { var d = s6.querySelector(':scope > .sec-desc'); s6.insertBefore(c, d ? d.nextSibling : s6.firstChild); }
+    }
+    c.innerHTML = wichtigesHtml();
+    if (_frei) c.classList.toggle('bwa-aus', !sichtbar('wichtig'));
+  }
+  function wichtigStil() {
+    if (document.getElementById('bwa-wichtig-stil')) return;
+    var st = document.createElement('style'); st.id = 'bwa-wichtig-stil';
+    st.textContent = '#bwa-wichtig{padding:14px 18px;margin:12px 0;background:#F8F6F1;border:1px solid #E4DED2;border-radius:12px}'
+      + '#bwa-wichtig .bwa-w-k{display:flex;align-items:center;justify-content:space-between;gap:10px}'
+      + '#bwa-wichtig .bwa-w-k b{font:600 15px/1.3 "Space Grotesk",Inter,sans-serif;color:#2A2727}'
+      + '#bwa-wichtig .bwa-w{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:7px;font:400 13.5px/1.45 Inter,system-ui,sans-serif;color:#2A2727}'
+      + '#bwa-wichtig .bwa-w li{position:relative;padding-left:18px}'
+      + '#bwa-wichtig .bwa-w li::before{content:"";position:absolute;left:2px;top:.5em;width:8px;height:8px;border-radius:50%;background:#A39E95}'
+      + '#bwa-wichtig .bwa-w li.gut::before{background:#3FA56C}#bwa-wichtig .bwa-w li.schlecht::before{background:#B8625C}'
+      + '#bwa-wichtig .bwa-w-hin{margin:6px 0 0;font:400 12.5px/1.5 Inter,system-ui,sans-serif;color:#6B645A}';
+    document.head.appendChild(st);
+  }
+
   function start() {
+    wichtigStil();
+    document.addEventListener('dp:object-ready', function () { setTimeout(wichtigesZeigen, 300); });
     erklaerungStart();
     try {
       if (window.DpVorschau) window.DpVorschau.frei('grafiken_neu').then(function (an) {
@@ -334,7 +377,7 @@
     /* Reiter werden nachgerendert (dp-gb-*, Wert & Zielbild): beim Öffnen des Reiters erneut anwenden */
     document.addEventListener('click', function (e) {
       var t = e.target.closest && e.target.closest('.tab[data-target-sec="s6"]');
-      if (t) setTimeout(function () { markieren(); anwenden(); }, 400);
+      if (t) setTimeout(function () { markieren(); anwenden(); wichtigesZeigen(); }, 400);
     });
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();

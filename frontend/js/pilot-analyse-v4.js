@@ -386,6 +386,7 @@
       '.dp-pa4-kp > li{position:relative;padding-left:18px}',
       '.dp-pa4-kp:not(.n) > li::before{content:"";position:absolute;left:2px;top:.5em;width:8px;height:8px;border-radius:50%;background:#A39E95}',
       '.dp-pa4-kp > li.gut::before{background:#3FA56C}.dp-pa4-kp > li.schlecht::before{background:#B8625C}',
+      '.dp-pa4-kpbox{margin:6px 0 8px}.dp-pa4-kpbox .dp-pa4-kp{margin-top:4px}.dp-pa4-kplbl{display:block;font:600 13px/1.4 Inter,system-ui,sans-serif;color:#2A2727}',
       '.dp-pa4-kp.n{counter-reset:kp}.dp-pa4-kp.n > li{counter-increment:kp;padding-left:26px}',
       '.dp-pa4-kp.n > li::before{content:counter(kp);position:absolute;left:0;top:0;width:19px;height:19px;border-radius:50%;background:#F8F6F1;border:1px solid #E4DED2;font:600 11px/19px "JetBrains Mono",monospace;text-align:center;color:#2A2727}',
       '.dp-pa4-mehr{margin-top:10px;border:1px solid #E6DCC2;background:#fff;border-radius:9px;padding:7px 12px;font:600 12.5px "Space Grotesk",Inter,sans-serif;cursor:pointer;color:#2A2727}',
@@ -745,6 +746,55 @@
   }
   function kpFehlen(a) { return !(a && a.kernpunkte && typeof a.kernpunkte === 'object'); }
 
+  /* v4450a · Marcel: „Die Tabs bitte durchgehen“. Lange Absätze in den Unterreitern kommen oft aus anderen Modulen
+     (Jahresabgleich, Potenzial, Hausverlauf, Wert & Lage). Einfach zeigt sie als Stichpunkte: der Absatz wird an
+     Satzenden geteilt (nie mitten im Satz), höchstens vier Punkte, Detail zeigt den Absatz ganz. Ein Gedankenstrich
+     zwischen Begriff und Erklärung wird zum Doppelpunkt. Läuft nach jedem Zeichnen über den sichtbaren Inhalt. */
+  var PUNKTE_AB = 170;
+  function satzListe(t) {
+    t = String(t || '').replace(/\s+/g, ' ').trim();
+    var teile = t.split(/(?<=[.!?])(?<!(?:^|[\s(])(?:z|B|u|a|d|h|v|o|ca|bzw|ggf|inkl|etc|Nr|Str|evtl|max|min|rd|sog|vgl|Mio|Mrd|Tsd|Abs|S|Dr|St|zzgl|abzgl)\.)\s+(?=[A-ZÄÖÜ„"(0-9])/);
+    return teile.map(function (x) { return x.replace(/\s+[–—]\s+/, ': ').replace(/\s+[–—]\s+/g, ', ').replace(/\s*;\s*/g, ', ').trim(); }).filter(Boolean);
+  }
+  function punkteAus(root) {
+    if (!root) return;
+    var kand = root.querySelectorAll('p, .dp-pa-kv');
+    Array.prototype.forEach.call(kand, function (el) {
+      if (el.hasAttribute('data-dp-kp')) return;
+      if (el.closest('.dp-pa-d, .dp-pa-e, table, .dp-pa4-kp, .dp-pa5-erg, .dp-pa4-szk, [data-dp-kp-nie], .dpsh-tip, .dp-pa4-tippop, svg')) return;
+      if (el.querySelector('p, ul, ol, table, input, button, select')) return;
+      var text = (el.textContent || '').replace(/\s+/g, ' ').trim();
+      if (text.length < PUNKTE_AB) return;
+      var lbl = '', rest = text, st = el.classList.contains('dp-pa-kv') ? el.querySelector('strong, b') : null;
+      if (st && text.indexOf((st.textContent || '').trim()) === 0) { lbl = (st.textContent || '').trim(); rest = text.slice(lbl.length).trim(); }
+      var s = satzListe(rest);
+      if (s.length < 2) return;
+      el.setAttribute('data-dp-kp', '1');
+      var box = document.createElement('div'); box.className = 'dp-pa-e dp-pa4-kpbox';
+      box.innerHTML = (lbl ? '<b class="dp-pa4-kplbl">' + esc(lbl.replace(/:$/, '')) + '</b>' : '')
+        + '<ul class="dp-pa4-kp">' + s.slice(0, 4).map(function (x) { return '<li class="neutral">' + esc(x) + '</li>'; }).join('') + '</ul>';
+      el.classList.add('dp-pa-d');
+      el.parentNode.insertBefore(box, el);
+    });
+  }
+  var _kpT = null;
+  function punkteBald() {
+    clearTimeout(_kpT);
+    _kpT = setTimeout(function () { Array.prototype.forEach.call(document.querySelectorAll('.dp-pa-wrap[data-dp-pa-v4]'), punkteAus); }, 120);
+  }
+  (function punkteBeobachten() {
+    try {
+      var mo = new MutationObserver(function (ms) {
+        for (var i = 0; i < ms.length; i++) {
+          var t = ms[i].target; if (t && t.closest && t.closest('.dp-pa-wrap[data-dp-pa-v4]') && !(t.closest('.dp-pa4-kpbox'))) { punkteBald(); return; }
+          var add = ms[i].addedNodes; for (var j = 0; j < add.length; j++) { if (add[j].nodeType === 1 && (add[j].matches('.dp-pa-wrap[data-dp-pa-v4]') || (add[j].querySelector && add[j].querySelector('.dp-pa-wrap[data-dp-pa-v4]')))) { punkteBald(); return; } }
+        }
+      });
+      var go = function () { mo.observe(document.body, { childList: true, subtree: true }); };
+      if (document.body) go(); else document.addEventListener('DOMContentLoaded', go);
+    } catch (e) {}
+  })();
+
   function uebersicht(a, bestand, extra) {
     extra = extra || {};
     window._dpPaLetzte = a;
@@ -828,7 +878,7 @@
       + szk('Plan', 'deine Eingaben, heute gerechnet', '#2A2727', '', plan, true)
       + szk('Best Case', 'Miete +5 %, höhere Wertsteigerung', C.gut, sz.best_case)
       + '</div>'
-      + erkl('Worst und Best Case hat der Pilot mit den genannten Annahmen beschrieben. <b>Plan</b> ist kein Text des Piloten, sondern deine heutige Rechnung (Reiter Kennzahlen) – er steht dazwischen, damit man die beiden Fälle gegen etwas lesen kann. '
+      + erkl('Worst und Best Case hat der Pilot mit den genannten Annahmen beschrieben. <b>Plan</b> ist kein Text des Piloten, sondern deine heutige Rechnung (Reiter Kennzahlen). Er steht dazwischen, damit man die beiden Fälle gegen etwas lesen kann. '
         + 'Eigene Annahmen durchspielen kannst du im Reiter Kennzahlen bei den Szenarien.'), 'dp-pa4-mt');
     if (extra.optisch) h += '<div class="dp-pa-d">' + extra.optisch + '</div>';
     if (extra.anschluss) h += '<div class="dp-pa-d">' + extra.anschluss + '</div>';
@@ -898,7 +948,7 @@
     }).join('') + '</div>';
     var satz = bestand
       ? 'Je Jahr: hast du eigene Angaben gemacht (Belege eingelesen oder von Hand), oder rechnet die App nur mit ihrem Vorschlag? Für abgelaufene Jahre ohne eigene Angaben fehlen die Belege.'
-      : 'Im Ankauf ist die Steuer ein Plan aus deinen Eingaben. Belege kommen nach dem Kauf – Hausgeld- und Nebenkostenabrechnungen, Grundsteuer, Handwerker- und Versicherungsrechnungen.';
+      : 'Im Ankauf ist die Steuer ein Plan aus deinen Eingaben. Belege kommen nach dem Kauf: Hausgeld- und Nebenkostenabrechnungen, Grundsteuer, Handwerker- und Versicherungsrechnungen.';
     return karte(kopfzeile('Belege') + chips + '<p class="dp-pa-p" style="margin:0 0 10px">' + satz + '</p>'
       + '<div style="display:flex;gap:8px;flex-wrap:wrap">' + '<button type="button" class="btn-clean dp-pa4-btn" onclick="if(window.DpEingang)DpEingang.oeffnen();else if(window.DealPilotBelegImport)DealPilotBelegImport.open(\'wk\')">Belege, Unterlagen &amp; Rechnungen einlesen</button>'
       + '<button type="button" class="btn-clean dp-pa4-btn leise" onclick="try{var t=document.querySelector(\'.tab[data-target-sec]\');var b=[].filter.call(document.querySelectorAll(\'.tab\'),function(x){return /Steuer/.test(x.textContent||\'\')})[0];if(b)b.click();}catch(e){}">Zum Reiter Steuer</button></div>'
@@ -972,7 +1022,7 @@
       + (has(a.steuer_zusammenfassung)
         ? (kpListe(a, 'steuer') ? '<div class="dp-pa-e">' + kpHtml(kpListe(a, 'steuer')) + '</div>' : '<p class="dp-pa-p dp-pa-e">' + txt(kurz(a.steuer_zusammenfassung, 220)) + '</p>') + '<p class="dp-pa-p dp-pa-d">' + txt(a.steuer_zusammenfassung) + '</p>'
         : '<div class="dp-pa-fuss" style="margin-top:0">Diese Analyse wurde vor der steuerlichen Zusammenfassung erstellt. Beim nächsten Abruf steht sie hier.</div>')
-      + '<div class="dp-pa-fuss dp-pa-d">Eine Einordnung aus deinen Eingaben im Reiter Steuer – keine Steuerberatung. Lass sie von deinem Steuerberater bestätigen.</div>', 'dp-pa4-mt');
+      + '<div class="dp-pa-fuss dp-pa-d">Eine Einordnung aus deinen Eingaben im Reiter Steuer, keine Steuerberatung. Lass sie von deinem Steuerberater bestätigen.</div>', 'dp-pa4-mt');
     /* v3323 · Marcel 12.11.2026: „steuerlich Ankauf gegen heute … die Steuersachen zu Steuern“ - stand bis hier unter Ankauf · Bestand · Zielbild */
     /* v3440 · „Steuerlich: Ankauf gegen heute" (a.soll_ist_steuer) steht jetzt in Ankauf · Bestand · Zielbild unter der Kennzahlen-Tabelle */
     h += belegeHtml(bestand);
@@ -1186,7 +1236,7 @@
         zk: [null, null, null, ab == null ? null : (ab >= 0 ? 'gut' : 'schlecht')] };
     });
     host.innerHTML = abKopf('Wert gegen Plan', 'Plan-Wert · Restschuld · Berichte') + '<div data-dp-pa4-g></div>'
-      + erkl('<b>So liest du die Grafik:</b> Die gestrichelte Linie ist dein <b>Plan-Wert</b> – der Kaufpreis, fortgeschrieben mit der Wertsteigerung aus deinen Eingaben. Die blaue Linie mit der Fläche ist die <b>Restschuld</b> deiner Darlehen; der Abstand zwischen beiden ist das Eigenkapital im Objekt nach Plan. '
+      + erkl('<b>So liest du die Grafik:</b> Die gestrichelte Linie ist dein <b>Plan-Wert</b>, also der Kaufpreis, fortgeschrieben mit der Wertsteigerung aus deinen Eingaben. Die blaue Linie mit der Fläche ist die <b>Restschuld</b> deiner Darlehen. Der Abstand zwischen beiden ist das Eigenkapital im Objekt nach Plan. '
         + 'Die Punkte sind die <b>Marktpreisindikationen</b> deiner Marktberichte: gefüllt mit dem Abschlag auf Angebotspreise (aktueller Marktdurchschnitt), hohl ohne Abschlag.')
 ;
     linien(host.querySelector('[data-dp-pa4-g]'), {
@@ -1219,7 +1269,7 @@
         satz = 'Marktpreis laut Bericht vom ' + d.toLocaleDateString('de-DE') + ' <b>' + eur(letzter.wert) + '</b>'
           + (dk != null ? ', der Kaufpreis liegt <b>' + (Math.abs(dk) < 0.5 ? 'gleichauf' : de(Math.abs(dk), 1) + ' % ' + (dk < 0 ? 'darunter' : 'darüber')) + '</b>.' : '.');
       }
-    } else satz = bestand ? 'Noch kein Marktbericht zu diesem Objekt. Ein Bericht im Jahr reicht für den Jahresabgleich; jeder bleibt gespeichert und steht hier gegen deinen Plan-Wert.'
+    } else satz = bestand ? 'Noch kein Marktbericht zu diesem Objekt. Ein Bericht im Jahr reicht für den Jahresabgleich. Jeder bleibt gespeichert und steht hier gegen deinen Plan-Wert.'
       : 'Noch keine Bewertung. Der Marktbericht bewertet das Objekt aus amtlichen Daten (Bodenrichtwert, Liegenschaftszins, Sachwertfaktor) und den Mieten und Angeboten vor Ort.';
     var dringend = !letzter || (bestand && alt != null && alt >= 12);
     return ergebnis(satz, knopf(bestand ? 'Neuen Marktbericht abrufen' : 'Objekt mit KI bewerten', 'try{if(window.DpJahresabgleich)DpJahresabgleich.mbAbrufen()}catch(e){}', !dringend));
@@ -1351,7 +1401,7 @@
     if (zahl(r0.cfop_y) && zahl(r0.tax_y) && zahl(r0.cfns_y)) {
       var k = kpis(), ue = String((document.getElementById('wirtschaftlicher_uebergang') || document.getElementById('kaufdat') || {}).value || '');
       var ueT = /^\d{4}-\d{2}-\d{2}/.test(ue) ? ue.slice(8, 10) + '.' + ue.slice(5, 7) + '.' : '';
-      satz = '<p class="dp-pa4-erkl" style="margin-top:4px">Die Linie summiert den Cashflow nach Steuer <b>je Kalenderjahr</b> – mit den Erstattungen aus dem Reiter Steuer. '
+      satz = '<p class="dp-pa4-erkl" style="margin-top:4px">Die Linie summiert den Cashflow nach Steuer <b>je Kalenderjahr</b>, mit den Erstattungen aus dem Reiter Steuer. '
         + r0.cal + (ueT ? ' (ab ' + ueT + ')' : '') + ': vor Steuer ' + sEur(r0.cfop_y) + ', ' + (r0.tax_y <= 0 ? 'Erstattung ' + sEur(-r0.tax_y) : 'Steuer ' + eur(r0.tax_y)) + ', nach Steuer <b>' + sEur(r0.cfns_y) + '</b>.'
         + (zahl(k.cf_ns) ? ' Die Kachel „Cashflow“ oben rechnet dagegen ein volles, eingeschwungenes Jahr (' + sEur(k.cf_ns / 12) + ' / Monat nach Steuer).' : '') + '</p>';
     }
@@ -1410,8 +1460,10 @@
     var frei = function (el) { return !el.closest('.dp-pa-e,.dp-pa-d,.dp-pa4-szk,[data-dp-bestand],table'); };
     Array.prototype.forEach.call(box.querySelectorAll('p.dp-pa-p'), function (p) {
       if (!frei(p) || (p.textContent || '').length < 170) return;
-      var e = document.createElement('p'); e.className = 'dp-pa-p dp-pa-e'; e.textContent = kurz(p.textContent, 170);
-      p.classList.add('dp-pa-d'); p.parentNode.insertBefore(e, p);
+      var _s = satzListe(p.textContent), e;   /* v4450a · Stichpunkte statt erster Satz */
+      if (_s.length >= 2) { e = document.createElement('div'); e.className = 'dp-pa-e dp-pa4-kpbox'; e.innerHTML = '<ul class="dp-pa4-kp">' + _s.slice(0, 4).map(function (x) { return '<li class="neutral">' + esc(x) + '</li>'; }).join('') + '</ul>'; }
+      else { e = document.createElement('p'); e.className = 'dp-pa-p dp-pa-e'; e.textContent = kurz(p.textContent, 170); }
+      p.setAttribute('data-dp-kp', '1'); p.classList.add('dp-pa-d'); p.parentNode.insertBefore(e, p);
     });
     Array.prototype.forEach.call(box.querySelectorAll('.dp-pa-kv'), function (k) {
       if (!frei(k) || (k.textContent || '').length < 170) return;

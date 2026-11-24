@@ -1201,7 +1201,10 @@ function buildPrompt(payload, opts) {
         + (wa.stichtag && /^\d{4}-\d{2}/.test(String(wa.stichtag)) ? ' zum Wertermittlungsstichtag ' + String(wa.stichtag).slice(0, 10).split('-').reverse().join('.') + ' (danach mit der Wertsteigerung fortgeschrieben)' : '')   /* v4390 */
         + (wa.text ? ' (' + String(wa.text).slice(0, 160) + ')' : '')
         + (wa.quelle === 'marktbericht' ? '. Gewählt in den Einstellungen: ' + (WAHL[wa.wahl] || WAHL.massgebend) + ', immer aus dem letzten Marktbericht' : '');
-      if (Number(k.kp) > 0) { var d = (Number(k.kp) - Number(wa.wert)) / Number(wa.wert) * 100; t += '. Kaufpreis dazu: ' + (d >= 0 ? '+' : '') + d.toFixed(1).replace('.', ',') + ' %'; }
+      /* v4450a · die KI rechnete den Abstand falsch herum ("Marktwert 11,5 % unter Kaufpreis" statt Kaufpreis 11,5 % darueber,
+         Wert 10,3 % darunter). Beide Richtungen kommen fertig gerechnet als Satz, die KI rechnet keinen eigenen Prozentwert. */
+      var vg = _wertVergleich(Number(k.kp), Number(wa.wert));
+      if (vg) t += '. ' + vg.satz + ' VERGLEICH KAUFPREIS UND OBJEKTWERT NUR MIT GENAU DIESEN ZAHLEN UND RICHTUNGEN, keinen eigenen Prozentwert rechnen';
       return t + '. Ordne den Kaufpreis und die Gesamtbewertung an DIESEM Wert ein und nenne ihn mit seiner Herkunft.';
     })(),
     'Gesamtinvestition: ' + fmtEur(k.gi),
@@ -2312,6 +2315,52 @@ const ANTI_RUECKFRAGE = [
   ''
 ].join('\n');
 
+/* v4450a · Abstand Kaufpreis zu Objektwert in beiden Richtungen, fertig gerechnet (Prompt und Nachpruefung). */
+function _wertVergleich(kp, wert) {
+  if (!(kp > 0) || !(wert > 0)) return null;
+  var f = function (x) { return (Math.round(x * 10) / 10).toFixed(1).replace('.', ','); };
+  var ueber = (kp - wert) / wert * 100, unter = (kp - wert) / kp * 100;   /* Kaufpreis ueber dem Wert | Wert unter dem Kaufpreis */
+  var satz = Math.abs(ueber) < 0.05 ? 'Kaufpreis und Objektwert sind gleich.'
+    : ueber > 0 ? 'Der Kaufpreis liegt ' + f(ueber) + ' % über dem Objektwert, der Objektwert ' + f(unter) + ' % unter dem Kaufpreis.'
+      : 'Der Kaufpreis liegt ' + f(-ueber) + ' % unter dem Objektwert, der Objektwert ' + f(-unter) + ' % über dem Kaufpreis.';
+  return { ueber: ueber, unter: unter, kpUeber: f(Math.abs(ueber)), wertUnter: f(Math.abs(unter)), kpHoeher: ueber > 0, satz: satz };
+}
+/* v4450a · Nachpruefung (Prinzip lib/ki_text_pruefung.js): Saetze, die Kaufpreis und Markt-/Objektwert mit einem Prozentwert
+   vergleichen, bekommen die richtige Zahl zur genannten Richtung. Nur die Zahl wird ersetzt, nie die Aussage; passt die
+   Richtung nicht zum Vorzeichen ("Wert ueber Kaufpreis", obwohl der Kaufpreis hoeher ist), wird der Satz auf die Richtung
+   des Kaufpreises umgestellt. Gezaehlt in a._wertvergleich_korrigiert. */
+function _wertVergleichPruefen(a, payload) {
+  try {
+    var k = payload && payload.kennzahlen, wa = k && k.wert_anker;
+    var vg = wa ? _wertVergleich(Number(k.kp), Number(wa.wert)) : null;
+    if (!vg || Math.abs(vg.ueber) < 0.05) return a;
+    var n = 0, W = '(Markt|Objekt|Verkehrs)wert(?:es|s)?';
+    var reWert = new RegExp(W + '([^.%]{0,25}?)(\\d{1,3}(?:,\\d)?) ?% (unter|ueber|über) (?:dem |den )?Kaufpreis', 'g');
+    var reKp = new RegExp('Kaufpreis([^.%]{0,25}?)\\+?(\\d{1,3}(?:,\\d)?) ?% (unter|ueber|über) (?:dem |den )?' + W, 'g');
+    var fix = function (t) {
+      if (typeof t !== 'string') return t;
+      var r = t.replace(reWert, function (m0, art, mitte, zahl, ri) {
+        var soll = vg.kpHoeher ? 'unter' : 'über', neu = m0.replace(/(\d{1,3}(?:,\d)?) ?% (unter|ueber|über)/, vg.wertUnter + ' % ' + soll);
+        if (zahl !== vg.wertUnter || ri.replace('ue', 'ü') !== soll) { n++; return neu; } return m0;
+      });
+      r = r.replace(reKp, function (m0, mitte, zahl, ri, art) {
+        var soll = vg.kpHoeher ? 'über' : 'unter', neu = m0.replace(/(\d{1,3}(?:,\d)?) ?% (unter|ueber|über)/, vg.kpUeber + ' % ' + soll);
+        if (zahl !== vg.kpUeber || ri.replace('ue', 'ü') !== soll) { n++; return neu; } return m0;
+      });
+      return r;
+    };
+    var tief = function (x) {
+      if (typeof x === 'string') return fix(x);
+      if (Array.isArray(x)) return x.map(tief);
+      if (x && typeof x === 'object') { Object.keys(x).forEach(function (key) { x[key] = tief(x[key]); }); return x; }
+      return x;
+    };
+    tief(a);
+    if (n) a._wertvergleich_korrigiert = n;
+  } catch (e) {}
+  return a;
+}
+
 /* v2264 · Die Offerte liegt nie ueber dem Kaufpreis - auch wenn das Modell die
    Regel im Prompt ueberliest. Gedeckelt wird auf den Kaufpreis, mit Vermerk. */
 function _offerteDeckeln(a, payload) {
@@ -2462,7 +2511,7 @@ async function analyze(payload, opts) {
        strukturierten Quellenfelder - die LANGTEXTE
        (`makrolage_recherche`, `kaufpreisniveau`, …) tragen ihre Links im
        Fliesstext und kamen dort nie an. */
-    analysis: _bestandModus(_offerteDeckeln(_analyseQuellenNeutral(_analyseUrlsSaeubern(parsed)), payload), payload),
+    analysis: _wertVergleichPruefen(_bestandModus(_offerteDeckeln(_analyseQuellenNeutral(_analyseUrlsSaeubern(parsed)), payload), payload), payload),   /* v4450a */
     raw_text: parsed ? null : used.text  // bei Parse-Fail Text zurückgeben für Debug
   };
 }
@@ -4878,3 +4927,6 @@ module.exports = {
   _analyseQuellenNeutral,   /* v2972 · fuer den Pruefer */
   extractJson
 };
+
+module.exports._wertVergleich = _wertVergleich;
+module.exports._wertVergleichPruefen = _wertVergleichPruefen;
