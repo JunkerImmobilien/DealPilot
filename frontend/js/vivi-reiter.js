@@ -373,8 +373,13 @@
     }
     stil();
     var alt = $('vr-fenster'); if (alt) alt.remove();
-    var ov = doc.createElement('div'); ov.id = 'vr-fenster';
-    ov.innerHTML = '<div class="vr-ov-box"><button type="button" class="btn-clean vr-ov-zu" data-vr="zu" aria-label="Schließen">×</button><div data-dp-vivi-host="1"></div></div>';
+    /* v4430 · Marcel 24.11.2026: Fenster im DealPilot-Design wie die übrigen ViVi-Fenster (.oabi-ov, modal-boarding-skin.js legt
+       Obsidian-Leiste mit × und Gold-Kopf darüber, Farben aus den Whitelabel-Token). Kein Schließen per Klick daneben, nur ×, Schließen, Esc. */
+    var ov = doc.createElement('div'); ov.id = 'vr-fenster'; ov.className = 'oabi-ov';
+    ov.innerHTML = '<div class="oabi-modal" role="dialog" aria-modal="true" aria-label="Abgleich mit ViVi"><div class="oabi-head"><span></span><h3>Abgleich mit ViVi</h3></div>'
+      + '<div class="oabi-sub">Was ViVi zu diesem Objekt meldet, Jahr für Jahr gegen DealPilot.</div>'
+      + '<div class="oabi-body"><div data-dp-vivi-host="1"></div></div>'
+      + '<div class="oabi-foot"><button type="button" class="oabi-btn" data-vr="zu">Schließen</button></div></div>';
     doc.body.appendChild(ov);
     mountAll();
     return true;
@@ -436,6 +441,7 @@
     }
   });
   global.addEventListener('dp:vivi-stand', function () { setTimeout(mountAll, 700); });
+  doc.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') { var o = $('vr-fenster'); if (o) o.remove(); } });   /* v4430 · Esc schliesst */
   global.addEventListener('dp:object-ready', function () { _jahr = null; _offen = {}; _letzte = {}; var o = $('vr-fenster'); if (o) o.remove(); });
 
   /* ── Stil ───────────────────────────────────────────────────────── */
@@ -487,7 +493,8 @@
       '.vr-bw{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:6px 0 10px}',
       '.vr-bw>div{background:#FBF6E9;border:1px solid color-mix(in srgb,var(--wl-c9a84c,#C9A84C) 18%,transparent);border-radius:2px;padding:8px 10px}',
       '.vr-bw span{display:block;font:700 9.5px "JetBrains Mono",monospace;letter-spacing:.06em;text-transform:uppercase;color:#6B645A}.vr-bw b{display:block;font:600 17px "Space Grotesk",sans-serif}.vr-bw small{color:#7A7370;font-size:11px}',
-      '#vr-fenster{position:fixed;inset:0;z-index:100050;background:rgba(5,5,5,.6);display:flex;align-items:flex-start;justify-content:center;padding:24px 12px;overflow:auto}',
+      '#vr-fenster.oabi-ov{z-index:100050}#vr-fenster .oabi-modal{width:min(980px,100%);max-height:92vh}#vr-fenster .oabi-body{padding:12px 18px 14px}#vr-fenster .oabi-foot{flex:none;justify-content:flex-end}',   /* v4430 */
+      '@media (max-width:640px){#vr-fenster.oabi-ov{padding:0;align-items:stretch}#vr-fenster .oabi-modal{max-height:none;height:100%;width:100%;border-radius:0;border:0}#vr-fenster .oabi-body{padding:10px 12px}}',
       '#vr-fenster .vr-ov-box{background:#FDFCFA;border-radius:12px;max-width:980px;width:100%;padding:44px 16px 18px;position:relative}',
       '#vr-fenster .vr-ov-zu{position:absolute;top:8px;right:10px;border:0;background:none;font-size:24px;cursor:pointer;color:#5E5856;min-width:36px;min-height:36px}',
       '@media (max-width:640px){.vr-tab td,.vr-tab th{padding:6px 3px}.vr-tab{font-size:11.5px}.vr-etage{grid-template-columns:minmax(0,1fr)!important}.vr-kopf .vr-k{margin-left:0}}'

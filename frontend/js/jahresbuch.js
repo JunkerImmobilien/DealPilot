@@ -377,7 +377,9 @@
   }
   function mbImJahr(jahr) {
     var l = (_mb.key === global._currentObjKey && _mb.liste) || [];
-    var im = l.filter(function (x) { return x.am.slice(0, 4) === String(jahr); }).sort(function (a, b) { return a.am < b.am ? -1 : 1; });
+    /* v4430 · ein Bericht zaehlt fuer das Jahr seines Wertermittlungsstichtags (Regel v4390), ohne Stichtag fuer das Erstellungsjahr.
+       Demostrasse: Bericht 616, erstellt 24.11.2026, Stichtag 01.03.2024 -> 2024. Je Jahr gilt der zuletzt erstellte. */
+    var im = l.filter(function (x) { return String(x.stichtag || x.am).slice(0, 4) === String(jahr); }).sort(function (a, b) { return a.am < b.am ? -1 : 1; });
     return im.length ? im[im.length - 1] : null;
   }
   function vertragsErhoehungen(E) {
@@ -761,6 +763,6 @@
     istMieteSetzen: istMieteSetzen, istMiete: istMiete,   /* v3710 */ istHerkunft: istHerkunft, viviIstSetzen: viviIstSetzen,   /* v4037 */
     FEST_SCHRITTE: FEST_SCHRITTE, festAus: festAus, festNeu: festNeu, fest: fest, festSetzen: festSetzen, festGesperrt: festGesperrt,   /* v4016 */
     FELD_SCHRITT: FELD_SCHRITT, feldGesperrtRein: feldGesperrtRein, feldGesperrt: feldGesperrt, istFest: istFest, erhoehungenSchuetzenRein: erhoehungenSchuetzenRein, erhoehungenSchuetzen: erhoehungenSchuetzen, steuerSperreEinhaengen: steuerSperreEinhaengen,   /* v4090 */
-    html: html, eingabeHtml: eingabeHtml, eingabeBinden: eingabeBinden,   /* v4090 */ mountAll: mountAll, oeffnen: oeffnen, schliessen: schliessen, vorbelegen: vorbelegen, mbLaden: mbLaden, aktion: aktion   /* v3430 */
+    html: html, eingabeHtml: eingabeHtml, eingabeBinden: eingabeBinden,   /* v4090 */ mountAll: mountAll, oeffnen: oeffnen, schliessen: schliessen, vorbelegen: vorbelegen, mbLaden: mbLaden, mbImJahr: mbImJahr, _mbSetzen: function (k, l) { _mb.key = k; _mb.liste = l; }, aktion: aktion   /* v3430 */
   };
 })(typeof window !== 'undefined' ? window : globalThis);

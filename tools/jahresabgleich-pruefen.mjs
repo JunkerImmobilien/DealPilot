@@ -392,5 +392,28 @@ const K = c.DpMietpotenzial, E = c.DpErhoehungen, JA = c.DpJahresabgleich, HV = 
   ok(!zf.abgleich && zo.abgleich && zo.abgleich.art === 'vorschlag', 'N Vorschlag „übernehmen“ nur im offenen Jahr (fest: ' + JSON.stringify(zf.abgleich) + ', offen: ' + (zo.abgleich && zo.abgleich.art) + ')');
 }
 
+/* ── S · v4430 Marktbericht zählt für das Jahr seines Wertermittlungsstichtags (Regel v4390) ── */
+{
+  const cS = kontext();
+  for (const f of ['mieterhoehungen.js', 'jahresbuch.js']) vm.runInContext(lies('frontend/js/' + f), cS);
+  const B = cS.DpJahresbuch;
+  cS._currentObjKey = 'demo';
+  B._mbSetzen('demo', [
+    { wert: 130000, am: '2026-11-24', stichtag: '2024-03-01' },
+    { wert: 120000, am: '2025-06-10', stichtag: null },
+    { wert: 125000, am: '2025-09-01', stichtag: '2025-08-31' },
+  ]);
+  const m24 = B.mbImJahr(2024), m26 = B.mbImJahr(2026), m25 = B.mbImJahr(2025);
+  ok(m24 && m24.wert === 130000, 'S Bericht erstellt 2026 mit Stichtag 03/2024 zählt für 2024 (' + (m24 && m24.wert) + ')');
+  ok(m26 === null, 'S derselbe Bericht zählt NICHT mehr für das Erstellungsjahr 2026');
+  ok(m25 && m25.wert === 125000, 'S ohne Stichtag gilt das Erstellungsdatum, je Jahr der zuletzt erstellte (' + (m25 && m25.wert) + ')');
+  /* Gegenprobe: Zuordnung nach Erstellungsdatum muss rot werden */
+  const alt = lies('frontend/js/jahresbuch.js').replace('String(x.stichtag || x.am).slice(0, 4)', 'x.am.slice(0, 4)');
+  const cG = kontext();
+  vm.runInContext(lies('frontend/js/mieterhoehungen.js'), cG); vm.runInContext(alt, cG);
+  cG._currentObjKey = 'demo'; cG.DpJahresbuch._mbSetzen('demo', [{ wert: 130000, am: '2026-11-24', stichtag: '2024-03-01' }]);
+  ok(cG.DpJahresbuch.mbImJahr(2024) === null && cG.DpJahresbuch.mbImJahr(2026) !== null, 'S Gegenprobe: mit Erstellungsjahr fiele der Bericht ins falsche Jahr');
+}
+
 console.log(`jahresabgleich-pruefen (v3430): ${gruen} von ${gruen + rot} ok`);
 process.exit(rot ? 1 : 0);

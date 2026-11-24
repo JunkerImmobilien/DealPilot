@@ -639,7 +639,7 @@
       'Ergebnis Anlage V · ' + stW + '.', (lauf && !anlageVErlaubt() ? '' : knopf('steuer', z.status === 'geplant' ? 'Anlage V ' + z.jahr + ' ausfüllen' : 'Anlage V ansehen', s.steuer === 'offen')) + ' ' + knopf('eintragen', 'Stand setzen', false, z.jahr), z.jahr);
     var wP = pl && istZahl(pl.wert_y) ? pl.wert_y : null, wI = z.mb ? z.mb.wert : null;
     teile.wert = schritt('wert', 'Wert', s, wI != null ? eur(wI) : '–', (wP != null ? 'Plan ' + eur(wP) : 'kein Plan') + (abw(wP, wI, true) ? ' · ' + abw(wP, wI, true) : ''),
-      z.mb ? 'Marktbericht vom ' + datumText(z.mb.am) + '.' : 'Kein Marktbericht in ' + z.jahr + '.', knopf(z.mb ? 'wert-sehen' : 'wert', z.mb ? 'Alle Berichte' : 'Marktbericht abrufen', s.wert === 'offen'), z.jahr);
+      z.mb ? 'Marktbericht vom ' + datumText(z.mb.am) + (z.mb.stichtag && z.mb.stichtag !== z.mb.am ? ', Wertermittlungsstichtag ' + datumText(z.mb.stichtag) : '') + '.' : 'Kein Marktbericht in ' + z.jahr + '.', knopf(z.mb ? 'wert-sehen' : 'wert', z.mb ? 'Alle Berichte' : 'Marktbericht abrufen', s.wert === 'offen'), z.jahr);
     if (weg) {
       var hgW = istZahl(h.hg_ist_j) ? eur(h.hg_ist_j) : (istZahl(h.hg_plan_m) ? eur(h.hg_plan_m * 12) : '–');
       var hgV = istZahl(h.hg_plan_m) ? 'Plan ' + eur(h.hg_plan_m * 12) + (istZahl(h.hg_ist_j) ? ' · ' + abw(h.hg_plan_m * 12, h.hg_ist_j, false) : ' · Wirtschaftsplan') : (istZahl(h.hg_ist_j) ? (h.hg_quelle === 'vivi' ? 'Hausgeld laut ViVi' : 'Hausgeld laut Abrechnung') : 'Hausgeld im Jahr');
@@ -860,7 +860,7 @@
       : { t: 'Trag ein, was ' + J + ' wirklich an Kaltmiete eingegangen ist. Erhöhungen im Jahr gehören in den Reiter Miete.', kn: knopf('eintragen', 'Ist-Miete ' + J + ' eintragen', true, J) + ' ' + knopf('miete', 'Mieterhöhung eintragen', false) };
     if (k === 'wert') return ok
       ? { t: 'Für ' + J + ' liegt ein Marktbericht vor. Der Wert steht gegen den Plan vom Kauf.', kn: knopf('wert-sehen', 'Alle Berichte', false) }
-      : { t: 'Für ' + J + ' fehlt ein Marktbericht. Ein neuer Bericht zählt für das laufende Jahr. Gibt es keinen für ' + J + ', schreib den Schritt fest.', kn: knopf('wert', 'Marktbericht abrufen', true) };
+      : { t: 'Für ' + J + ' fehlt ein Marktbericht. Ein Bericht zählt für das Jahr seines Wertermittlungsstichtags. Gibt es keinen für ' + J + ', schreib den Schritt fest.', kn: knopf('wert', 'Marktbericht abrufen', true) };
     if (k === 'haus') return weg
       ? (ok ? { t: 'Protokoll und Abrechnung ' + J + ' sind da. Hausgeld, Rücklage und Beschlüsse stehen im Schritt Haus.', kn: knopf('haus-sehen', 'Haus ansehen', false) }
         : { t: (s._haus && s._haus.hg_quelle === 'vivi' ? 'Das Hausgeld ' + J + ' kommt aus ViVi. Lade noch Protokoll und Abrechnung ' + J + ' hoch, DealPilot liest Rücklage und Beschlüsse daraus.'
