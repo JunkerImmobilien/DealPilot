@@ -180,6 +180,8 @@
     return { eur: g, wie: 'ganzes Haus' };
   }
   function nachreichen() {   /* v3017 · Unterlagen in der Pilot-Analyse nachreichen */
+    /* v4530f · Marcel 24.11.2026: auch im Ankauf derselbe Beleg-Dialog (unterlagen-eingang.js) statt des alten Imports */
+    if (window.DpEingang && typeof window.DpEingang.oeffnen === 'function') { window.DpEingang.oeffnen(); return; }
     if (window.ObjectActions && typeof window.ObjectActions.openImport === 'function') window.ObjectActions.openImport(null, { ergaenzen: true });
   }
   async function auswerten(dokumente, opts) {

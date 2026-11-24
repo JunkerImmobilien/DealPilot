@@ -325,7 +325,10 @@ const SCHEMATA = {
          betrag_eur bleibt als Name des Gesamtbetrags, damit alte und neue Auswertungen gleich gelesen werden */
       '  "sonderumlagen_geplant": [{"beschreibung": string, "betrag_eur": number (Betrag der ganzen Gemeinschaft), "betrag_einheit_eur": number|null (Betrag einer bestimmten Wohnung, nur wenn im Dokument genannt), "jahr": number (Jahr der Faelligkeit), "faellig": string|null DD.MM.JJJJ, "raten": [{"faellig": string|null DD.MM.JJJJ, "jahr": number|null, "betrag_gesamt_eur": number|null, "betrag_einheit_eur": number|null}], "status": "beschlossen"|"angekuendigt"}],',
       '  "beschluesse_wichtig": [string],',
-      '  "geplante_sanierungen": [{"gewerk": string, "jahr": number, "kosten_geschaetzt_eur": number}],',
+      /* v4530f · Marcel 24.11.2026: „WEG-Protokolle … eine komplette Aufstellung (Beschlüsse, Sonderumlagen, Rücklage, Maßnahmen,
+         Streitpunkte mit Datum und Betrag)“. Jeder Tagesordnungspunkt mit Ergebnis und Betrag; beschluesse_wichtig bleibt für ältere Leser */
+      '  "beschluesse": [{"top": string|null (TOP-Nummer), "titel": string (kurz, was beschlossen oder abgestimmt wurde), "ergebnis": "angenommen"|"abgelehnt"|"vertagt"|"zur Kenntnis", "betrag_eur": number|null (Betrag der ganzen Gemeinschaft, wenn genannt), "frist": string|null (Datum oder Jahr der Umsetzung)}] (ALLE Tagesordnungspunkte mit Abstimmung, nicht nur die wichtigen),',
+      '  "geplante_sanierungen": [{"gewerk": string, "jahr": number, "kosten_geschaetzt_eur": number, "status": "beschlossen"|"geplant"|"angeboten"|"erledigt"|null}],',
       /* v3016 · Marcel 28.10.2026: „WEG Protokolle sollen ausgewertet werden und die
          wichtigsten Punkte rausgezogen werden und risiken beschrieben werden" */
       '  "art": "Protokoll"|"Einladung"|"Wirtschaftsplan"|"Jahresabrechnung",',

@@ -484,6 +484,119 @@
       { name: 'Rücklage', typ: 'linie', strich: 'ist', farbe: G.TINTE || '#5B544C', werte: rl, ende: false }] });
     return panels.length ? { jahre: jahre, heute: new Date().getFullYear(), panels: panels, titel: 'Hausgeld und Rücklage je Jahr' } : null;
   }
+  /* ── v4530f · WEG-Protokolle im Einzelnen ─────────────────────────────────────────────────────────────
+     Marcel 24.11.2026: „WEG-Protokolle: beim Auslesen eine komplette Aufstellung (Beschlüsse, Sonderumlagen,
+     Instandhaltungsrücklage, Maßnahmen, Streitpunkte mit Datum und Betrag) und die unter Haus & Unterlagen übersichtlich
+     zeigen“. Je Protokoll eine Karte: Kacheln (Rücklage, Zuführung, Hausgeld, Sonderumlagen, Maßnahmen), die wichtigsten
+     Punkte als Stichpunkte, die ganze Aufstellung aufklappbar. Quelle ist d.protokoll (object-actions.js
+     _protokollAufstellung, gespeichert beim Übernehmen). Ältere Protokolle ohne diese Aufstellung zeigen, was die
+     Gesamtauswertung für das Jahr der Versammlung nennt, mit dem Hinweis, dass Neueinlesen die volle Liste bringt. */
+  function protCss() {
+    if (typeof document === 'undefined' || document.getElementById('dp-hv-prot-css')) return;
+    var s = document.createElement('style'); s.id = 'dp-hv-prot-css';
+    var g = 'var(--wl-c9a84c, #C9A84C)';
+    s.textContent = '.dp-hv-prots{display:grid;gap:10px;margin:6px 0 4px}'
+      + '.dp-hv-pk{border:1px solid color-mix(in srgb,' + g + ' 24%,transparent);border-radius:10px;background:#fff;padding:12px 14px}'
+      + '.dp-hv-pk-k{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;margin-bottom:8px}'
+      + '.dp-hv-pk-k b{font:600 14px/1.3 "Space Grotesk",Inter,sans-serif;color:var(--ch,#2A2727)}'
+      + '.dp-hv-pk-k .d{font:600 11.5px/1 "JetBrains Mono",ui-monospace,monospace;color:var(--wl-9a7f33,#9a7f33)}'
+      + '.dp-hv-pk-k .v{font-size:11.5px;color:var(--muted,#7A7370)}'
+      + '.dp-hv-pk-kz{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:6px;margin:0 0 8px}'
+      + '.dp-hv-pk-kz div{border:1px solid rgba(42,39,39,.08);border-radius:8px;padding:6px 9px;background:#FDFCFA}'
+      + '.dp-hv-pk-kz small{display:block;font:600 9.5px/1.2 "JetBrains Mono",monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--muted,#7A7370)}'
+      + '.dp-hv-pk-kz b{font:600 13.5px/1.35 Inter,sans-serif;font-variant-numeric:tabular-nums;color:var(--ch,#2A2727)}'
+      + '.dp-hv-pk-kz div.rot b{color:#B8625C}'
+      + '.dp-hv-pk ul.kurz{margin:0 0 6px;padding:0 0 0 16px;font-size:12.5px;line-height:1.5}'
+      + '.dp-hv-pk details summary{cursor:pointer;font-size:12px;color:var(--wl-9a7f33,#9a7f33);font-weight:600;padding:4px 0;list-style:none}'
+      + '.dp-hv-pk details summary::-webkit-details-marker{display:none}'
+      + '.dp-hv-pk details summary::after{content:"";display:inline-block;width:5px;height:5px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(45deg);margin:0 0 3px 8px}'
+      + '.dp-hv-pk details[open] summary::after{transform:rotate(-135deg);margin-bottom:-1px}'
+      + '.dp-hv-pk h5{margin:10px 0 4px;font:600 10px/1.2 "JetBrains Mono",monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--muted,#7A7370)}'
+      + '.dp-hv-pz{display:grid;grid-template-columns:44px minmax(0,1fr) auto auto;gap:4px 10px;align-items:baseline;padding:5px 0;border-top:1px solid rgba(42,39,39,.06);font-size:12.5px}'
+      + '.dp-hv-pz .t{font:500 10.5px/1.4 "JetBrains Mono",monospace;color:var(--muted,#7A7370)}'
+      + '.dp-hv-pz .b{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;font-weight:600}'
+      + '.dp-hv-pz .b small{display:block;font-weight:400;color:var(--muted,#7A7370);font-size:10.5px}'
+      + '.dp-hv-pz .s{font:600 10px/1 Inter,sans-serif;padding:3px 7px;border-radius:999px;border:1px solid rgba(42,39,39,.15);color:var(--muted,#7A7370);white-space:nowrap}'
+      + '.dp-hv-pz .s.ja{border-color:rgba(63,165,108,.5);color:#2f7d52}.dp-hv-pz .s.nein{border-color:rgba(184,98,92,.5);color:#B8625C}'
+      + '.dp-hv-pk ul.l{margin:0;padding:0 0 0 16px;font-size:12.5px;line-height:1.5}.dp-hv-pk ul.l.rot li{color:#B8625C}'
+      + '.dp-hv-pk .alt{font-size:11.5px;color:var(--muted,#7A7370);margin:6px 0 0}'
+      + '@media (max-width:640px){.dp-hv-pz{grid-template-columns:minmax(0,1fr) auto}.dp-hv-pz .t{grid-column:1/-1}.dp-hv-pz .s{grid-column:1;justify-self:start}}';
+    document.head.appendChild(s);
+  }
+  function protokolle(L, w) {
+    var doks = (L.doks || []).filter(function (d) { return d && artDok(d) === 'protokoll'; });
+    if (!doks.length) return [];
+    var J = L.jahre || [];
+    return doks.map(function (d) {
+      var dt = datumAus(d.datum), j = dt ? dt.jahr : (zahl(d.jahr) || jahrAus(d.label));
+      var p = d.protokoll && typeof d.protokoll === 'object' ? d.protokoll : null;
+      if (!p) {
+        /* Rückfall: was die Gesamtauswertung für das Jahr der Versammlung führt */
+        var z = J.filter(function (x) { return x.jahr === j; })[0] || null;
+        var san = (Array.isArray(w.sanierungen) ? w.sanierungen : []).filter(function (s) { return s && zahl(s.jahr) === j; });
+        var ev = (L.liste || []).filter(function (e) { return e.jahr === j; });
+        p = { alt: true, datum: dt ? dt.text : '', verwalter: z && z.verwalter || '',
+          ruecklage: z ? z.ruecklage_stand : null, zufuehrung: z ? z.ruecklage_zufuehrung : null, hausgeld_monat: z ? z.hausgeld_plan_monat : null,
+          beschluesse: (z ? z.beschluesse : []).map(function (t) { return { titel: t }; }),
+          sonderumlagen: z && z.su_gesamt ? [{ titel: 'Sonderumlage', betrag: z.su_gesamt, anteil: z.su_anteil, jahr: j }] : [],
+          massnahmen: san.map(function (s) { return { titel: s.massnahme || s.gewerk || '', jahr: zahl(s.jahr), betrag: zahl(s.kosten_eur != null ? s.kosten_eur : s.kosten_geschaetzt_eur), status: s.status || '' }; }).filter(function (m) { return m.titel; }),
+          maengel: ev.filter(function (e) { return e.art === 'mangel' || e.art === 'schaden'; }).map(function (e) { return e.titel + (e.text ? ': ' + e.text : ''); }),
+          streit: ev.filter(function (e) { return e.art === 'rechtsstreit'; }).map(function (e) { return e.titel + (e.text ? ': ' + e.text : ''); }) };
+      }
+      return { iso: dt ? dt.iso : String(j || ''), jahr: j, datum: p.datum || (dt ? dt.text : (j || '')), datei: d.datei || d.label || '', p: p };
+    }).sort(function (a, b) { return String(b.iso).localeCompare(String(a.iso)); });
+  }
+  function protokolleHtml(L, w) {
+    var P = protokolle(L, w); if (!P.length) return '';
+    protCss();
+    var ergK = function (e) { e = String(e || '').toLowerCase(); return /angenommen|beschlossen/.test(e) ? 'ja' : /abgelehnt/.test(e) ? 'nein' : ''; };
+    var eurN = function (v) { return v != null && isFinite(v) ? eur(v) : ''; };
+    var karten = P.map(function (x, ix) {
+      var p = x.p, L1 = function (a) { return Array.isArray(a) ? a : []; };
+      var su = L1(p.sonderumlagen), ma = L1(p.massnahmen), be = L1(p.beschluesse), mg = L1(p.maengel), st = L1(p.streit);
+      var suS = su.reduce(function (s, v) { return s + (zahl(v.betrag) || 0); }, 0), maS = ma.reduce(function (s, v) { return s + (zahl(v.betrag) || 0); }, 0);
+      var kz = [];
+      if (p.ruecklage != null) kz.push(['Rücklage', eur(p.ruecklage)]);
+      if (p.zufuehrung != null) kz.push(['Zuführung im Jahr', eur(p.zufuehrung)]);
+      if (p.hausgeld_monat != null) kz.push(['Hausgeld im Monat', eur(p.hausgeld_monat)]);
+      if (su.length) kz.push(['Sonderumlagen', suS ? eur(suS) : su.length + '×', 'rot']);
+      if (ma.length) kz.push(['Maßnahmen', maS ? eur(maS) : String(ma.length)]);
+      if (be.length) kz.push(['Beschlüsse', String(be.length)]);
+      if (st.length) kz.push(['Streitpunkte', String(st.length), 'rot']);
+      /* die wichtigsten Punkte: Sonderumlagen, Streit, Beschlüsse mit Betrag, Rückstände */
+      var kurz = [];
+      su.slice(0, 2).forEach(function (s) { kurz.push('Sonderumlage ' + (s.titel || '') + (s.betrag ? ' ' + eur(s.betrag) : '') + (s.jahr ? ' (' + s.jahr + ')' : '') + (s.status ? ', ' + s.status : '')); });
+      st.slice(0, 1).forEach(function (s) { kurz.push('Streit: ' + s); });
+      be.filter(function (b) { return zahl(b.betrag); }).slice(0, 2).forEach(function (b) { kurz.push((b.titel || '') + ' ' + eur(zahl(b.betrag)) + (b.ergebnis ? ', ' + b.ergebnis : '')); });
+      if (p.rueckstaende) kurz.push('Hausgeldrückstände: ' + p.rueckstaende);
+      if (!kurz.length) be.slice(0, 3).forEach(function (b) { kurz.push(b.titel + (b.ergebnis ? ', ' + b.ergebnis : '')); });
+      kurz = kurz.slice(0, 4);
+      var zeile = function (top, titel, status, betrag, unter) {
+        return '<div class="dp-hv-pz"><span class="t">' + esc(top || '') + '</span><span>' + esc(titel) + '</span>'
+          + (status ? '<span class="s ' + ergK(status) + '">' + esc(status) + '</span>' : '<span></span>')
+          + '<span class="b">' + esc(betrag || '') + (unter ? '<small>' + esc(unter) + '</small>' : '') + '</span></div>';
+      };
+      var voll = '';
+      if (be.length) voll += '<h5>Beschlüsse</h5>' + be.map(function (b) { return zeile(b.top ? 'TOP ' + b.top : '', b.titel, b.ergebnis, eurN(zahl(b.betrag)), b.frist || ''); }).join('');
+      if (su.length) voll += '<h5>Sonderumlagen</h5>' + su.map(function (s) { return zeile(s.jahr ? String(s.jahr) : '', s.titel || 'Sonderumlage', s.status, eurN(zahl(s.betrag)), (s.anteil ? 'Anteil ' + eur(s.anteil) : '') + (s.faellig ? (s.anteil ? ', ' : '') + 'fällig ' + s.faellig : '')); }).join('');
+      if (ma.length) voll += '<h5>Maßnahmen</h5>' + ma.map(function (m) { return zeile(m.jahr ? String(m.jahr) : '', m.titel, m.status, eurN(zahl(m.betrag)), ''); }).join('');
+      if (mg.length) voll += '<h5>Mängel und Schäden</h5><ul class="l">' + mg.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul>';
+      if (st.length) voll += '<h5>Streitpunkte</h5><ul class="l rot">' + st.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul>';
+      var sonst = [];
+      if (p.rueckstaende) sonst.push('Hausgeldrückstände: ' + p.rueckstaende);
+      if (p.verwalterwechsel) sonst.push('Verwaltung: ' + p.verwalterwechsel);
+      if (sonst.length) voll += '<h5>Weiteres</h5><ul class="l">' + sonst.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul>';
+      var nPunkte = be.length + su.length + ma.length + mg.length + st.length + sonst.length;
+      return '<div class="dp-hv-pk"><div class="dp-hv-pk-k"><span class="d">' + esc(x.datum || 'ohne Datum') + '</span><b>Eigentümerversammlung</b>'
+        + (p.verwalter ? '<span class="v">Verwaltung ' + esc(p.verwalter) + '</span>' : '') + '</div>'
+        + (kz.length ? '<div class="dp-hv-pk-kz">' + kz.map(function (k) { return '<div' + (k[2] ? ' class="' + k[2] + '"' : '') + '><small>' + esc(k[0]) + '</small><b>' + esc(k[1]) + '</b></div>'; }).join('') + '</div>' : '')
+        + (kurz.length ? '<ul class="kurz">' + kurz.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul>' : '')
+        + (voll ? '<details' + (ix === 0 ? ' class="dp-hv-pk-neu"' : '') + '><summary>Ganze Aufstellung (' + nPunkte + (nPunkte === 1 ? ' Punkt' : ' Punkte') + ')</summary>' + voll + '</details>' : '')
+        + (p.alt ? '<p class="alt">Aus der Gesamtauswertung für ' + esc(x.jahr || '') + '. Liest du das Protokoll neu ein, steht hier jeder Tagesordnungspunkt mit Ergebnis und Betrag.</p>' : '')
+        + '</div>';
+    });
+    return abschnitt('Protokolle im Einzelnen', P.length + (P.length === 1 ? ' Versammlung' : ' Versammlungen') + ', die jüngste zuerst') + '<div class="dp-hv-prots">' + karten.join('') + '</div>';
+  }
   function abschnitt(t, eti) { return '<div class="dp-hv-abs"><h4>' + t + '</h4>' + (eti ? '<span>' + esc(eti) + '</span>' : '') + '</div>'; }
   function html(opt) {
     if (typeof document === 'undefined') return '';
@@ -511,6 +624,7 @@
     if (J.length) h += abschnitt('Jahr für Jahr', 'aus Protokollen, Wirtschaftsplänen, Abrechnungen') + tabelle(J)
       + '<p class="dp-pa-fuss" style="margin-top:6px">P Protokoll · W Wirtschaftsplan · A Jahresabrechnung. Ein Jahr ist im Jahresabgleich erledigt, wenn das Protokoll und der Wirtschaftsplan oder die Abrechnung des Jahres vorliegen.'
       + (!(w.jahre && w.jahre.length) ? ' Diese Auswertung ist älter als die Jahreswerte (v3430): Hausgeld und Rücklage je Jahr stehen hier, sobald du Unterlagen nachreichst.' : '') + '</p>';
+    h += protokolleHtml(L, w);   /* v4530f */
     /* v4007 · die Karten hoch/mittel/niedrig stehen unter „Jahr für Jahr“ (vorher im Teil Unterlagen, nur in Einfach) */
     if (R.gesamt) h += abschnitt('Risiken aus den Unterlagen', R.gesamt + (R.gesamt === 1 ? ' Risiko' : ' Risiken') + ', Einzelheiten unter Detail') + risAmpel(R);
     h += '</div>';
@@ -565,6 +679,6 @@
     if (card) Array.prototype.forEach.call(card.querySelectorAll('[data-dp-hv-e="' + art + '"]'), function (e) { e.style.display = an ? '' : 'none'; });
   });
 
-  g.DpHausverlauf = { VERSION: 'v4007', ereignisse: ereignisse, wegJahre: wegJahre, urteil: urteil, artDok: artDok, html: html, zeitleisteHtml: zeitleisteHtml, risikenJe: risikenJe, kurz: kurz, lesen: lesen, jahrDaten: jahrDaten, grafikSpec: grafikSpec, mountGrafik: mountGrafik, ARTEN: ARTEN };
+  g.DpHausverlauf = { VERSION: 'v4530g', protokolle: protokolle, ereignisse: ereignisse, wegJahre: wegJahre, urteil: urteil, artDok: artDok, html: html, zeitleisteHtml: zeitleisteHtml, risikenJe: risikenJe, kurz: kurz, lesen: lesen, jahrDaten: jahrDaten, grafikSpec: grafikSpec, mountGrafik: mountGrafik, ARTEN: ARTEN };
   if (typeof module !== 'undefined' && module.exports) module.exports = g.DpHausverlauf;
 })(typeof window !== 'undefined' ? window : globalThis);

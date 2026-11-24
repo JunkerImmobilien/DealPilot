@@ -2946,17 +2946,19 @@
     _qcPendingMerged = {};
     _merged = {}; _files = []; _importPhotos = [];
     /* v4080 · Marcel 23.11.2026: „Belege je Jahr“ im selben Fenster wie „Belege einlesen“, als eigener Reiter */
-    var _jr = _eingang && window.DpEingang && typeof window.DpEingang.jahresInRahmen === 'function';
+    var _ankaufE = _eingang && !!(opts && opts.ankauf);   /* v4530f · Ankauf: Unterlagen zuerst, Rechnungen nachrangig, ohne Belege je Jahr */
+    var _jr = _eingang && !_ankaufE && window.DpEingang && typeof window.DpEingang.jahresInRahmen === 'function';
     /* v4470 · Marcel 24.11.2026: „das Einlesen und das Belege je Jahr alles kombinieren … ein breites Modal, ungefähr so
        breit wie die Hilfe“. Statt zweier Reiter EIN Fenster (1180 px wie #help-modal, gemessen): links Einlesen, rechts die
        Jahre mit Aufstellung nach Anlage V und der Liste der Belege. Am Handy untereinander. */
     var ov = document.createElement('div'); ov.className = 'oabi-ov' + (_jr ? ' oabi-kombi' : ''); ov.id = 'oabi-ov';
     ov.innerHTML =
       '<div class="oabi-modal">' +
-        '<div class="oabi-head"><span style="color:var(--gold,#C9A84C)">' + svg('upload', 22) + '</span><h3>' + (_eingang ? 'Belege, Unterlagen & Rechnungen einlesen' : _ergaenzen ? 'Unterlagen nachreichen' : 'Unterlagen einlesen: PDF oder Foto, Exposé, Marktbericht, Dokumente') + '</h3></div>' +
+        '<div class="oabi-head"><span style="color:var(--gold,#C9A84C)">' + svg('upload', 22) + '</span><h3>' + (_ankaufE ? 'Unterlagen einlesen' : _eingang ? 'Belege, Unterlagen & Rechnungen einlesen' : _ergaenzen ? 'Unterlagen nachreichen' : 'Unterlagen einlesen: PDF oder Foto, Exposé, Marktbericht, Dokumente') + '</h3></div>' +
         (_jr ? '<div class="oabi-kombi-grid"><div id="oabi-r-ein" class="oabi-spalte"><div class="oabi-spalte-t">Belege und Unterlagen einlesen</div>' : '') +
         /* v4530 · im Eingang (Belege, Unterlagen, Rechnungen) ein kurzer Satz statt zweier Absätze; die übrigen Wege unverändert */
-        (_eingang ? '<div class="oabi-sub">PDFs oder Fotos anhängen. Die Art jeder Datei wird erkannt und ist umstellbar.' + (_ergaenzen ? ' Die bisherige Auswertung bleibt, Neues wird ergänzt.' : '') + ' Übernommen wird nur, was du auswählst.</div>' :
+        (_ankaufE ? '<div class="oabi-sub">Mietverträge, WEG-Protokolle, Wirtschaftsplan, Jahresabrechnung und Teilungserklärung als PDF oder Foto. Die Art jeder Datei wird erkannt und ist umstellbar.' + (_ergaenzen ? ' Die bisherige Auswertung bleibt, Neues wird ergänzt.' : '') + ' Rechnungen gehen auch, gebraucht werden sie meist erst nach dem Kauf.</div>' :
+        _eingang ? '<div class="oabi-sub">PDFs oder Fotos anhängen. Die Art jeder Datei wird erkannt und ist umstellbar.' + (_ergaenzen ? ' Die bisherige Auswertung bleibt, Neues wird ergänzt.' : '') + ' Übernommen wird nur, was du auswählst.</div>' :
         (_ergaenzen ? '<div class="oabi-sub" style="border-left:3px solid var(--gold,#C9A84C);padding-left:9px">Die bisherige Auswertung bleibt die Grundlage. Gelesen werden nur die neuen PDFs, dann wird zusammengeführt. Vor der Übernahme siehst du, was sich in Risiken, These, Hausgeld und Steuer ändert.</div>' : '') +
         '<div class="oabi-sub">Mehrere PDFs oder Fotos (JPG, PNG) gleichzeitig anhängen. Der Typ wird automatisch erkannt (inkl. OCR bei Scan-/Grafik-PDFs) und ist pro Datei umstellbar. Alle Werte werden zusammengeführt (Marktbericht führt bei Konflikt).</div>') +
         '<div class="oabi-body">' +
@@ -3017,7 +3019,7 @@
       '<select ' + (f.status === 'reading' ? 'disabled' : '') + '><option value="auto"' + (f.userType ? '' : ' selected') + '>Auto</option>' +
         '<option value="market"' + (f.userType === 'market' || (!f.userType && f.type === 'market') ? ' selected' : '') + '>Marktbericht</option>' +
         '<option value="expose"' + (f.userType === 'expose' || (!f.userType && f.type === 'expose') ? ' selected' : '') + '>Exposé</option>' +
-        (window.DokumentImport ? '<option value="dokument"' + (f.userType === 'dokument' || (!f.userType && f.type === 'dokument') ? ' selected' : '') + '>' + (f.dokLabel ? escH(f.dokLabel) : 'Dokument (Grundbuch, Vertrag, Gutachten …)') + '</option>' : '') +
+        (window.DokumentImport ? '<option value="dokument"' + (f.userType === 'dokument' || (!f.userType && f.type === 'dokument') ? ' selected' : '') + '>' + (f.dokLabel ? escH(f.dokLabel) : 'Dokument (Mietvertrag, WEG-Protokoll, Grundbuch …)') + '</option>' : '') +
         (window.DpEingang ? '<option value="rechnung"' + (f.type === 'rechnung' ? ' selected' : '') + '>Rechnung / Beleg</option>' : '') + '</select>' +
       '<span class="oabi-st">' + (f.status === 'reading' ? 'lese …' : f.status === 'gesperrt' ? 'persönlich · nicht ausgelesen' : f.status === 'err' ? (f.fehler || 'kein Text') : (f.type === 'market' ? 'Marktbericht' : f.type === 'dokument' ? escH(f.dokLabel || 'Dokument') : f.type === 'rechnung' ? 'Rechnung · Werbungskosten' : 'Exposé')) + '</span>';
     /* v3154 · Prüfansicht je Datei (Bild links, gelesene Werte rechts) und Warnung, wenn nichts kam */
@@ -3321,6 +3323,31 @@
      umlagefähig + Rücklage, wenn alle drei genannt sind (so rechnet die Abrechnung das Hausgeld), sonst kosten_jahr. */
   /* v4200 · B14 · Vorschläge je Dokument für den Jahresabschluss (Jahr, Feld, Betrag; Sonderumlagen als Anteil des Objekts).
      Ein Wirtschaftsplan, zu dessen Jahr die Abrechnung vorliegt, schlägt keine Steuer vor (v3993, _hgWahl.ohneSteuer). */
+  /* v4530f · Aufstellung eines WEG-Protokolls aus dem Schema (dokumentSchemas.js weg_protokoll), nur gelesene Felder, gekürzt.
+     Alte Auswertungen ohne „beschluesse“ nehmen beschluesse_wichtig (nur Text). Nichts wird erfunden. */
+  function _protokollAufstellung(ex) {
+    if (!ex || typeof ex !== 'object') return null;
+    var n = function (v) { var z = Number(v); return v != null && v !== '' && isFinite(z) ? Math.round(z) : null; };
+    var t = function (v, m) { v = v == null ? '' : String(v).trim(); return v ? v.slice(0, m || 220) : ''; };
+    var L = function (a) { return Array.isArray(a) ? a : []; };
+    var p = {
+      datum: t(ex.versammlungsdatum, 20), verwalter: t(ex.verwalter, 120),
+      ruecklage: n(ex.ruecklage_stand_eur != null ? ex.ruecklage_stand_eur : ex.instandhaltungsruecklage_eur), zufuehrung: n(ex.ruecklage_zufuehrung_jahr_eur),
+      hausgeld_monat: n(ex.hausgeld_monatlich_eur),
+      beschluesse: L(ex.beschluesse).filter(function (b) { return b && b.titel; }).slice(0, 40).map(function (b) {
+        return { top: t(b.top, 12), titel: t(b.titel), ergebnis: t(b.ergebnis, 20), betrag: n(b.betrag_eur), frist: t(b.frist, 30) }; }),
+      sonderumlagen: L(ex.sonderumlagen_geplant).filter(function (s) { return s && (s.beschreibung || s.betrag_eur); }).slice(0, 20).map(function (s) {
+        return { titel: t(s.beschreibung), betrag: n(s.betrag_eur), anteil: n(s.betrag_einheit_eur), jahr: n(s.jahr), faellig: t(s.faellig, 20), status: t(s.status, 20) }; }),
+      massnahmen: L(ex.geplante_sanierungen).filter(function (s) { return s && s.gewerk; }).slice(0, 20).map(function (s) {
+        return { titel: t(s.gewerk), jahr: n(s.jahr), betrag: n(s.kosten_geschaetzt_eur), status: t(s.status, 20) }; }),
+      maengel: L(ex.maengel).map(function (s) { return t(s); }).filter(Boolean).slice(0, 15),
+      streit: L(ex.rechtsstreitigkeiten).map(function (s) { return t(s); }).filter(Boolean).slice(0, 10),
+      rueckstaende: t(ex.hausgeldrueckstaende), verwalterwechsel: t(ex.verwalterwechsel)
+    };
+    if (!p.beschluesse.length) p.beschluesse = L(ex.beschluesse_wichtig).map(function (s) { return { titel: t(s), ergebnis: '', betrag: null, top: '', frist: '' }; }).filter(function (b) { return b.titel; }).slice(0, 30);
+    var leer = !p.beschluesse.length && !p.sonderumlagen.length && !p.massnahmen.length && !p.maengel.length && !p.streit.length && p.ruecklage == null && !p.rueckstaende;
+    return leer ? null : p;
+  }
   function _vorschlaegeFuerDok(x) {
     var D = window.DokumentImport, aus = { steuer: [], su: [] }; if (!D || !x) return aus;
     var ex = x.extracted || {}, ktx = _kontext();
@@ -3401,6 +3428,8 @@
         if (ex.art && typeof ex.art === 'string') o.art = ex.art; if (typeof ex.jahr === 'number' && ex.jahr > 1950 && ex.jahr < 2100) o.jahr = ex.jahr;
         /* v3977 · F1: die Zahlen des Dokuments reisen mit - der Jahresabgleich ordnet sie dem Jahr DIESES Dokuments zu (hausverlauf.js wegJahre) */
         if (x.typ === 'hausgeld') { var _w = _hgWerte(ex); if (_w) o.werte = _w; }
+        /* v4530f · WEG-Protokoll: die komplette Aufstellung reist mit dem Dokument (hausverlauf.js protokolleHtml) */
+        if (x.typ === 'weg_protokoll') { try { var _pa = _protokollAufstellung(ex); if (_pa) o.protokoll = _pa; } catch (_e2) {} }
         /* v4200 · B14 (Musterhof 8, 23.11.2026): die Steuer- und Sonderumlage-Vorschläge einer Abrechnung oder eines Protokolls
            stehen in der Übernahme bewusst nicht vorgehakt (v3088a, Marcel: „aktiv anstoßen“). Wer sie nicht anhakte, verlor sie:
            Erhaltung 14.000 €, Sonderumlage 15.000 €, Verwaltung je Jahr kamen nie in der Anlage V an. Jetzt reisen sie mit dem

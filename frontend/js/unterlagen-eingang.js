@@ -61,7 +61,12 @@
     /* v4470 · Einlesen und Belege je Jahr stehen jetzt nebeneinander: ohne Jahr zeigt die rechte Spalte das jüngste Jahr mit Belegen */
     var _j = wie && wie.jahr;
     if (!_j) { try { var _J = _jahre(), _m = Object.keys(_J.mitBelegen).map(Number).sort(function (x, y) { return y - x; }); if (_m.length) _j = _m[0]; } catch (e) {} }
-    OA.openImport(wie && typeof wie.fertig === 'function' ? wie.fertig : null, { ergaenzen: ergaenzen, eingang: true, reiter: wie && wie.reiter, jahr: _j });   /* v4100 · fertig: Rückruf nach dem Schließen (Assistent Jahresabschluss) */
+    /* v4530f · Marcel 24.11.2026: im ANKAUF (Pilot-Analyse sichtbar, Ansicht ankauf) liest der Dialog vor allem Mietverträge,
+       WEG-Protokolle, Wirtschaftsplan und Teilungserklärung. Rechnungen gehen auch, stehen aber hinten, und die Spalte Belege je Jahr
+       fällt weg (Steuerjahre gibt es vor dem Kauf nicht). Wer ausdrücklich ein Jahr will (wie.reiter, wie.jahr), bekommt sie weiter. */
+    var _ankauf = false;
+    try { var _w = Array.prototype.filter.call(document.querySelectorAll('.dp-pa-wrap[data-dp-pa-ansicht]'), function (x) { return !!x.offsetParent; })[0]; _ankauf = !(wie && (wie.reiter || wie.jahr)) && !!(_w && _w.offsetParent && _w.getAttribute('data-dp-pa-ansicht') === 'ankauf'); } catch (e) {}
+    OA.openImport(wie && typeof wie.fertig === 'function' ? wie.fertig : null, { ergaenzen: ergaenzen, eingang: true, ankauf: _ankauf, reiter: wie && wie.reiter, jahr: _j });   /* v4100 · fertig: Rückruf nach dem Schließen (Assistent Jahresabschluss) */
   }
   /* v4100 · Marcel 23.11.2026: im Reiter Steuer nur noch EIN Knopf „Belege & Unterlagen“. Liegen schon Belege vor, öffnet
      das Fenster auf „Belege je Jahr“ (jüngstes Jahr mit Belegen), sonst auf „Einlesen“. */
@@ -773,7 +778,7 @@
   }
 
   try { _grundCss(); } catch (e) {}
-  window.DpEingang = { VERSION: 'v4530e', schonHtml: schonHtml, start: start, jahresAnsicht: jahresAnsicht, jahresInRahmen: jahresInRahmen, oeffnen: oeffnen, istRechnung: istRechnung, belegeAuslesen: belegeAuslesen,
+  window.DpEingang = { VERSION: 'v4530g', schonHtml: schonHtml, start: start, jahresAnsicht: jahresAnsicht, jahresInRahmen: jahresInRahmen, oeffnen: oeffnen, istRechnung: istRechnung, belegeAuslesen: belegeAuslesen,
     einheiten: einheiten, mvVorschlag: mvVorschlag, mvOptionen: mvOptionen, mvText: mvText, mvUebernehmen: mvUebernehmen, mvFelder: mvFelder,
     jahrStand: jahrStand, protokoll: protokoll, verlaufHtml: verlaufHtml, lesen: lesen,
     /* v3154 */ txStart: txStart, txEnde: txEnde, feldStand: feldStand, feldGeaendert: feldGeaendert,
