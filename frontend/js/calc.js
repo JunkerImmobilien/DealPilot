@@ -1355,27 +1355,10 @@ function _calcImmediate(){
     try { var _aw = localStorage.getItem('dp_wert_anker'); if (_aw === 'mpi_mit' || _aw === 'mpi_ohne') _ankWahl = _aw; } catch (_e2) {}
     var _mpiM = _wzW && _wzW.marktpreisindikation ? _wzW.marktpreisindikation.mitte : null;
     var _mpiO = _wzW && _wzW.ohne_abschlag ? _wzW.ohne_abschlag.mitte : null;
-    /* v4580 · Marcel 24.11.2026 (Westerfeldstr. 146): „wir rechnen teilweise mit dem Ertragswert, obwohl das nur stützend ist … eher mit
-       dem führenden Verfahren das Ganze berechnen“. Ist das Haus in Wohnungseigentum aufgeteilt, führt seit v3322 (Marcel 12.11.2026) der
-       Vergleichswert je Wohnung (Summe nach Aufteilungskosten, wert-zielbild.js mitAufteilung). Bis v4570 blieb der Anker trotzdem beim
-       führenden Verfahren des Berichts (Ertragswert des Hauses als Ganzes): Übersicht „Vergleichswert führend 985.200 €“, gerechnet
-       wurde mit 740.000 €. Jetzt ist derselbe Wert der Anker. Der Aufteilerwert kommt aus dem Potenzial-Lauf (Ereignis dp:potenzial,
-       wert-zielbild.js ruft calc() danach neu). */
-    if (_wzW && _ankWahl === 'massgebend' && window.DpWertZielbild && typeof window.DpWertZielbild._mitAufteilung === 'function') {
-      try {
-        var _wzA = window.DpWertZielbild._mitAufteilung(window.DpWertZielbild._wertDaten(_wzB));
-        var _aufW = _wzA && _wzA.aufteilung && _wzA.aufteilung.wert > 0 ? _wzA.aufteilung.wert : null;
-        /* Ist der letzte Potenzial-Lauf älter als die heutigen Angaben (Hash weicht ab, z. B. kurz nach dem Laden), gilt sein Ergebnis
-           bis zum nächsten Lauf weiter - sonst springt der Anker je nach Sitzung zwischen Haus und Wohnungen (gemessen Westerfeldstr. 146). */
-        if (_aufW == null && window._dpMfh && window._dpMfh.aufgeteilt && window._dpPotenzial && window._dpPotenzial.ergebnis && window.DpPotenzial && typeof window.DpPotenzial.aufteilungKurz === 'function') {
-          var _akA = window.DpPotenzial.aufteilungKurz(window._dpPotenzial.ergebnis, window.DpPotenzial.modell());
-          if (_akA && _akA.aufteiler && _akA.aufteiler.bestand && _akA.aufteiler.bestand.wert > 0) _aufW = _akA.aufteiler.bestand.wert;
-        }
-        if (_aufW != null) _mbAnker = { wert: Math.max(0, _aufW - _erbAbzug), art: 'aufteiler',
-          datum: _wzW.wert_stichtag || _wzW.bericht_datum, erstellt: _wzW.bericht_datum, stichtag_eigen: !!_wzW.wert_stichtag };
-      } catch (_eAuf) {}
-    }
-    if (_wzW && !_mbAnker && _ankWahl === 'massgebend' && _wzW.fuehrend) {
+    /* v4580b · Marcel 24.11.2026: „Nee, der Aufteilerwert steht nur daneben.“ Bei aufgeteilten Häusern rechnet der Anker mit dem Wert
+       des Hauses als Ganzes (führendes Verfahren des Berichts). Der Vergleichswert je Wohnung (wert-zielbild.js mitAufteilung) ist eine
+       zusätzliche Angabe „Wert nach Aufteilung“ und rechnet nicht mit. v4580/a hatte ihn kurz als Anker (1.0.185). */
+    if (_wzW && _ankWahl === 'massgebend' && _wzW.fuehrend) {
       var _fv = _wzW[_wzW.fuehrend];
       if (_fv && _fv.wert > 0 && !_fv.vorlaeufig) _mbAnker = { wert: Math.max(0, _fv.wert - _erbAbzug), art: _wzW.fuehrend, datum: _wzW.wert_stichtag || _wzW.bericht_datum, erstellt: _wzW.bericht_datum, stichtag_eigen: !!_wzW.wert_stichtag };
       /* Stufe M: führt der Vergleichswert ohne amtliche Basis, IST er die Marktpreisindikation nach Abschlag */
@@ -1407,7 +1390,7 @@ function _calcImmediate(){
     jahr: (function () { var d = _mbAnker.datum ? new Date(_mbAnker.datum) : null; return d && !isNaN(d) ? d.getFullYear() : null; })(),
     monat: (function () { var d = _mbAnker.datum ? new Date(_mbAnker.datum) : null; return d && !isNaN(d) ? d.getMonth() + 1 : null; })() } : null;
   State.wert_basis_text = _wbQuelle === 'verkehrswert' ? (State.svw_label || 'Wertangabe') + ' (Reiter Objekt)'
-    : _wbQuelle === 'marktbericht' ? ({ aufteiler: 'Vergleichswert je Wohnung (Summe nach Aufteilungskosten)', ertragswert: 'Ertragswert', sachwert: 'Sachwert', vergleichswert: 'Vergleichswert', vergleichswert_m: 'Vergleichswert', mpi_mit: 'Marktpreisindikation nach Abschlag', mpi_ohne: 'Marktpreisindikation ohne Abschlag' }[_mbAnker.art] || 'Wert') + ' aus dem Marktbericht'
+    : _wbQuelle === 'marktbericht' ? ({ ertragswert: 'Ertragswert', sachwert: 'Sachwert', vergleichswert: 'Vergleichswert', vergleichswert_m: 'Vergleichswert', mpi_mit: 'Marktpreisindikation nach Abschlag', mpi_ohne: 'Marktpreisindikation ohne Abschlag' }[_mbAnker.art] || 'Wert') + ' aus dem Marktbericht'
     : _wbQuelle === 'bankbewertung' ? 'Bankbewertung' : 'Kaufpreis';
   var gs_a=v('gsfl')*(v('mea')/100);
   st('gs_ant',gs_a.toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2})+' m²');  /* v3023: stand „58.60 m²" */st('bodenwert',fE(gs_a*v('brw')));
