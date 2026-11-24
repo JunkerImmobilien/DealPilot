@@ -45250,3 +45250,9 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** main 015d68b (staging 015d68b, fast-forward), davor d039ad8. Von Hand ausgerollt (gleiche Schritte wie rollout-prod.ps1: Gold-Audit RC 0, vorschau-pruefen, beide Sicherungen 0843 mit Kopf, Version, Merge im Worktree, Pull, Build backend + mb-backend), weil das Skript an fremden, nicht committeten Dateien eines parallelen Forks abbricht.
 - **Nachweis:** vivi-pruefen 327, Buster sauber; Staging Demostraße gemessen (0,91 / 0,83 „DSCR 2026“), zwei Nicht-Admin-Konten grafiken_neu frei (vorschau.fuerKonto); Prod: Migration 129, grafiken_neu t, Backend healthy, HTTP 200, Version 1.0.157, Buster v4360.
 - **Rest:** Sperren `grafiken_neu` im Code in späterer Version entfernen · Browser-Messung als echter Nicht-Admin und bei 390 px nicht nachgeholt.
+
+### Rollout 1.0.158 · 24.11.2026 · landing-blackfriday-1/1a
+- **Was:** Landing: Black-Friday-Fenster (wie ERSTFLUG) und durchgestrichene Preise Investor/Pro bis 01.12.2026 23:59 MEZ, danach still; Flyer-Gäste sehen nur ERSTFLUG.
+- **Commit:** main e5f109ab (cherry-pick ea6745a8, 56e9c8cc), staging 002ca3d6 (Merge main zurück). PDF v4370 bewusst NICHT mit ausgerollt.
+- **Nachweis:** Staging-Browser Desktop und 390 px (iframe), Umschalter Jahr, Ablauf per Testuhr; Prod: dealpilot.immo und /preise.html laden blackfriday.js?v=landing-blackfriday-1a (200), version 1.0.158. Gold-Audit RC 0, vorschau sauber, landing-zaehlen 27.
+- **Rest:** JSON-LD-Preise bleiben regulär · nach dem 01.12. Datei und Script-Zeilen entfernen (Aufräumen, nicht eilig).
