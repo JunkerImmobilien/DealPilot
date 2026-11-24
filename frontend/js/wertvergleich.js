@@ -274,11 +274,46 @@
         + (ew != null ? ' Gegenüber dem Ertragswert liegt er ' + lageDar(abw(kp, ew)) + '.' : ''));
     }
 
+    /* v4520 · Marcel 24.11.2026: „unter der Marktpreisindikation Ertragswert und Sachwert ganz viel Text … deutlich
+       professioneller … mit diesen Bullets“. Einfach: kleine Kacheln mit kurzer Einordnung, der ganze Absatz steht in der
+       Erklärkarte beim Darüberfahren (data-dp-pa4-tip, pilot-analyse-v4.js tipStart). Detail: die Absätze wie bisher, in
+       einer Hülle mit dp-pa-d und data-dp-kp-nie, damit punkteAus sie nicht zu Stichpunkten zerschneidet.
+       pdf-wert-zielbild.js liest weiter h4.dp-wv-h und p.dp-pa-p, die Kacheln tragen keine dieser Klassen. */
+    var ohneTags = function (x) { return String(x || '').replace(/<[^>]+>/g, '').replace(/&amp;/g, '&').replace(/\s+[–—]\s+/g, ', ').replace(/\s+/g, ' ').trim(); };
+    var kach = [];
+    var kachel = function (lbl, wert, unter, farbe, tipT, tipA) {
+      kach.push('<div class="dp-pa4-z dp-pa4-ztip" tabindex="0" style="--c:' + (farbe || '#E6DCC2') + '" data-dp-pa4-tip="' + esc(JSON.stringify({ t: tipT, a: ohneTags(tipA) })).replace(/"/g, '&quot;') + '">'
+        + '<span>' + esc(lbl) + '</span><b>' + esc(wert) + '</b>' + (unter ? '<em>' + esc(unter) + '</em>' : '') + '</div>');
+    };
+    var GOLD = 'var(--wl-c9a84c, #C9A84C)', GRUEN = '#3FA56C', ROT = '#B8625C', HELL = '#E6DCC2';
+    if (AUF) kachel('Führend', 'Je Einheit', AUF.n + ' Wohnungen einzeln bewertet', GOLD, 'Vergleichswert je Einheit, führend', w[0] || '');
+    else if (fu && VERF[fu]) kachel('Führend', VERF[fu], 'an ihm misst sich der Preis', GOLD, VERF[fu] + ', führendes Verfahren', w[0] || '');
+    if (ew != null) {
+      var dE = abw(ew, mw), wortE = Math.abs(dE) <= 5 ? 'Miete und Marktpreis passen' : (dE < 0 ? 'Miete trägt den Marktpreis nicht ganz' : 'Miete trägt mehr als der Markt');
+      kachel('Ertragswert', abwText(dE), wortE, Math.abs(dE) <= 5 ? HELL : (dE < 0 ? ROT : GRUEN), 'Ertragswert gegen Marktpreisindikation',
+        ewt + ' ' + (w.filter(function (x) { return /Ertragswert (liegt|und Marktpreis)/.test(x); })[0] || ''));
+    }
+    if (sw != null) {
+      var dS = abw(sw, mw);
+      kachel('Sachwert', swVorl ? 'Gegenprobe' : abwText(dS), swVorl ? 'Baukosten, keine Marktaussage' : (Math.abs(dS) <= 10 ? 'Substanz passt zum Markt' : (dS < 0 ? 'Markt zahlt mehr als die Substanz' : 'Substanz über dem Markt')),
+        HELL, 'Sachwert', swt);
+    }
+    if (mitAb) kachel('Abschlag Angebote', pct(ab) + ' %', 'ohne Abschlag ' + eur(roh), HELL, 'Abschlag auf Angebotspreise', mpi);
+    if (kp != null) {
+      var dK = abw(kp, mw), inSpK = lo != null && hi != null && kp >= lo && kp <= hi;
+      kachel('Dein Kaufpreis', abwText(dK), inSpK ? 'innerhalb der Spanne' : (dK < 0 ? 'unter der Spanne' : 'über der Spanne'), dK <= 0 ? GRUEN : ROT, 'Kaufpreis gegen Marktpreisindikation',
+        w.filter(function (x) { return /^Dein Kaufpreis/.test(x); })[0] || '');
+    }
+    var kachelHtml = kach.length ? '<div class="dp-pa-e dp-wv-kurz" data-dp-kp-nie="1"><div class="dp-pa4-zahlen">' + kach.join('') + '</div>'
+      + '<div class="dp-wv-hinweis">Fahr über eine Kachel für die Erklärung. Die Rechenwege stehen unter Detail.</div></div>' : '';
     return '<div class="dp-pa-card dp-wv">'
       + '<div class="abw-kopf"><h4>Marktpreisindikation, Ertragswert und Sachwert</h4><span class="abw-stand">Marktbericht vom ' + esc(datum(h.created_at)) + '</span></div>'
       + t
+      + kachelHtml
+      + '<div class="dp-pa-d" data-dp-kp-nie="1">'
       + '<h4 class="dp-wv-h">Wie sich die Werte zusammensetzen</h4>' + e.map(function (x) { return '<p class="dp-pa-p">' + x + '</p>'; }).join('')
       + (w.length ? '<h4 class="dp-wv-h">Warum sie auseinanderliegen</h4>' + w.map(function (x) { return '<p class="dp-pa-p">' + x + '</p>'; }).join('') : '')
+      + '</div>'
       + '<div class="dp-pa-fuss">Marktpreisindikation, Sach- und Ertragswert sind indikativ nach ImmoWertV-Logik, kein Gutachten nach § 194 BauGB. '
       + 'Den Rechenweg Zeile für Zeile zeigt der Marktbericht.</div></div>';
   }
@@ -293,6 +328,8 @@
       + '.dp-wv-tafel td:nth-child(5){white-space:nowrap}'
       + '.dp-wv-fehlt{margin:12px 0 4px;padding:11px 14px;border:1px solid color-mix(in srgb, #D8564C 45%, transparent);border-left-width:3px;border-radius:6px;font-size:12.5px;line-height:1.5}'
       + '.dp-wv-fehlt ul{margin:6px 0 6px 18px;padding:0}.dp-wv-fehlt li{margin:3px 0}.dp-wv-fehlt span{display:block;font-size:11.5px;color:var(--muted,#8A8272)}'
+      + '.dp-wv-kurz{margin:14px 0 4px}.dp-wv-kurz .dp-pa4-zahlen{margin:0 0 6px!important}.dp-wv-kurz .dp-pa4-z em{line-height:1.35}'
+      + '.dp-wv-hinweis{font-size:11.5px;color:var(--muted,#8A8272)}'
       + '.dp-wv-h{margin:16px 0 4px;font:600 13px/1.3 "Space Grotesk",system-ui,sans-serif;color:var(--dp-ink-1,#E8E3D8)}';
     document.head.appendChild(s);
   }

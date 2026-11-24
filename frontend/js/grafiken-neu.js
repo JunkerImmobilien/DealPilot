@@ -387,7 +387,7 @@
     var R = (window.State && Array.isArray(window.State.cfRows)) ? window.State.cfRows : [];
     return R.slice(0, 15).map(function (r) {
       return { j: +r.cal, nkm: zahl(r.nkm_y), bwk: zahl(r.bwk_cf_y), zins: zahl(r.zy), tilg: zahl(r.ty), su: zahl(r.su_y) || 0, bspar: zahl(r.bspar_y) || 0,
-        cfop: zahl(r.cfop_y), cfns: zahl(r.cfns_y), rs: zahl(r.rs), wert: zahl(r.wert_y), steuer: zahl(r.tax_y), afa: zahl(r.afa_y), vuv: zahl(r.zve_y) };
+        cfop: zahl(r.cfop_y), cfns: zahl(r.cfns_y), rs: zahl(r.rs), wert: zahl(r.wert_y), steuer: zahl(r.tax_y), afa: zahl(r.afa_y), vuv: typeof r.zve_steuer === 'number' && isFinite(r.zve_steuer) ? r.zve_steuer : zahl(r.zve_y) };   /* v4520 · steuerliches Ergebnis mit Einmalkosten (calc.js v3314a), wie der Reiter Steuer */
     }).filter(function (r) { return r.j > 1900; });
   }
   function sigJ(J) { return J.map(function (r) { return [r.j, Math.round(r.cfop || 0), Math.round(r.cfns || 0), Math.round(r.rs || 0), Math.round(r.wert || 0), Math.round(r.vuv || 0)].join(','); }).join(';'); }
@@ -475,13 +475,42 @@
   /* 6 · Ergebnis aus Vermietung */
   function ergebnisVuV(k, w, J) {
     var R = J.filter(function (r) { return r.vuv != null; }); if (R.length < 2) { k.innerHTML = ''; return; }
-    var H = heuteJahr(), erst = R.filter(function (r) { return r.vuv > 0; })[0];
-    var titel = R[0].vuv > 0 ? 'Das Objekt erzielt von Anfang an einen steuerlichen Überschuss' : (erst ? 'Ab ' + erst.j + ' wird aus dem Verlust ein Überschuss' : 'In den nächsten ' + R.length + ' Jahren bleibt ein steuerlicher Verlust');
-    k.innerHTML = karteHtml('vuv', titel, 'Ergebnis Anlage V im Jahr · ein Verlust senkt deine Steuer, ein Überschuss erhöht sie',
-      saeulen({ id: 'vuv', breite: w, hoehe: 220, x: R.map(function (r) { return r.j; }), heute: H, projAb: H + 1, aria: 'Ergebnis aus Vermietung je Jahr',
-        reihen: [{ name: 'Ergebnis', werte: R.map(function (r) { return r.vuv; }), farbe: function (v) { return v < 0 ? 'var(--gn-gold-h)' : 'var(--gn-gold-d)'; } }] }),
-      legende([{ name: 'Verlust (Steuer sinkt)', farbe: 'var(--gn-gold-h)' }, { name: 'Überschuss (Steuer steigt)', farbe: 'var(--gn-gold-d)' }]));
-    tipBinden(k, function (i) { var r = R[i]; if (!r) return ''; return '<div class="gn-tip-j">' + r.j + (r.j > H ? ' · Projektion' : '') + '</div>Ergebnis <b>' + eurV(r.vuv) + '</b><br>davon AfA <b>' + eur(r.afa) + '</b><br>Steuer <b>' + (r.steuer <= 0 ? 'Erstattung ' + eur(-r.steuer) : eur(r.steuer)) + '</b>'; });
+    /* v4520 · Marcel 24.11.2026: „hat auch keine Überschrift. Was soll der aussagen? … Farben angleichen, auch mit dem Rot
+       und mit dem Grün … wie in dem unteren Chart … vielleicht auch die Zusammensetzung“. Kopfzeile wie „Verlauf mit Steuern“
+       (grafiken-premium.js), Farben nach der Steuerwirkung wie dort: grün wo die Steuer Geld bringt (Verlust), rot wo sie
+       Geld kostet (Überschuss). Zusammensetzung je Jahr in der Erklärkarte und für heute als Zeile unter der Grafik:
+       Miete minus Zinsen minus AfA minus übrige Werbungskosten (der Rest bis zum Ergebnis, mit Einmalkosten des Jahres).
+       Titel aus den Abschnitten gleichen Vorzeichens, nicht nur aus dem ersten Wechsel (Westerfeldstr. 146: Verlust bis 2030,
+       Überschuss 2031 bis 2034, ab 2035 wieder Verlust, weil der Anschlusszins steigt). */
+    var H = heuteJahr(), corp = false; try { corp = !!(window._dpBegriff && window._dpBegriff().corp); } catch (e) {}
+    var abs = []; R.forEach(function (r) { var p = r.vuv > 0, l = abs[abs.length - 1]; if (l && l.p === p) l.bis = r.j; else abs.push({ p: p, von: r.j, bis: r.j }); });
+    var wo = function (p) { return p ? 'Überschuss' : 'Verlust'; };
+    var titel = abs.length === 1 ? (abs[0].p ? 'In jedem Jahr ein steuerlicher Überschuss' : 'In jedem Jahr bis ' + abs[0].bis + ' ein steuerlicher Verlust')
+      : abs.length === 2 ? 'Ab ' + abs[1].von + ' wird aus dem ' + wo(abs[0].p) + ' ein ' + wo(abs[1].p)
+      : abs.length === 3 ? wo(abs[1].p) + ' von ' + abs[1].von + ' bis ' + abs[1].bis + ', davor und danach ' + wo(abs[0].p)
+      : 'Das Ergebnis wechselt mehrfach zwischen Verlust und Überschuss';
+    var teile = function (r) {
+      var m = zahl(r.nkm) || 0, z = zahl(r.zins) || 0, a = zahl(r.afa) || 0;
+      return { miete: m, zins: z, afa: a, rest: m - z - a - r.vuv };
+    };
+    var GN = 'var(--gn-gruen)', RT = 'var(--gn-rot)';
+    var saeule = saeulen({ id: 'vuv', breite: w, hoehe: 220, x: R.map(function (r) { return r.j; }), heute: H, projAb: H + 1, aria: 'Ergebnis aus Vermietung je Jahr',
+      reihen: [{ name: 'Ergebnis', werte: R.map(function (r) { return r.vuv; }), farbe: function (v) { return v > 0 ? RT : GN; } }] });
+    var rH = R.filter(function (r) { return r.j === H; })[0] || R[0], tH = teile(rH);
+    var chip = function (n, v, f) { return '<span style="display:inline-flex;gap:6px;align-items:baseline;white-space:nowrap"><span style="color:var(--gn-leise)">' + n + '</span><b style="font:600 12px Inter,sans-serif' + (f ? ';color:' + f : '') + '">' + v + '</b></span>'; };
+    var zus = '<div class="dp-gn-vuv-zus" style="display:flex;flex-wrap:wrap;gap:6px 16px;margin:10px 0 2px;padding:9px 12px;border-radius:10px;background:color-mix(in srgb,currentColor 4%,transparent);font:400 12px/1.4 Inter,sans-serif">'
+      + '<span style="font:600 10.5px/1.6 \'JetBrains Mono\',monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--gn-leise)">' + rH.j + ' zusammengesetzt</span>'
+      + chip(corp ? 'Einnahmen' : 'Miete', eurV(tH.miete)) + chip('Zinsen', eurV(-tH.zins)) + chip('AfA', eurV(-tH.afa)) + chip(corp ? 'übrige Kosten' : 'übrige Werbungskosten', eurV(-tH.rest))
+      + chip('= Ergebnis', eurV(rH.vuv), rH.vuv > 0 ? RT : GN) + '</div>';
+    k.innerHTML = '<div style="font:600 10.5px/1 \'JetBrains Mono\',ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--gn-gold);margin:0 0 8px">'
+      + (corp ? 'Ergebnis des Objekts · steuerlich' : 'Ergebnis aus Vermietung · Anlage V') + '</div>'
+      + karteHtml('vuv', titel, 'Einnahmen minus ' + (corp ? 'Betriebsausgaben' : 'Werbungskosten') + ' je Jahr. Ein Verlust senkt deine Steuer, auf einen Überschuss zahlst du Steuer. Rechts von ' + H + ' Projektion.',
+        saeule, legende([{ name: 'Verlust, Steuer sinkt', farbe: GN }, { name: 'Überschuss, Steuer fällig', farbe: RT }, { name: 'Projektion', farbe: 'var(--gn-gold)', muster: true }])) + zus;
+    tipBinden(k, function (i) {
+      var r = R[i]; if (!r) return ''; var t = teile(r);
+      return '<div class="gn-tip-j">' + r.j + (r.j > H ? ' · Projektion' : '') + '</div>' + (corp ? 'Einnahmen' : 'Miete') + ' <b>' + eurV(t.miete) + '</b><br>Zinsen <b>' + eurV(-t.zins) + '</b><br>AfA <b>' + eurV(-t.afa)
+        + '</b><br>übrige Kosten <b>' + eurV(-t.rest) + '</b><br>Ergebnis <b>' + eurV(r.vuv) + '</b><br>Steuer <b>' + (r.steuer <= 0 ? 'Erstattung ' + eur(-r.steuer) : eur(r.steuer)) + '</b>';
+    });
   }
 
   /* 4b · v4160 · Verlauf im Jahresabgleich: EIN Bild je Jahr mit Plan vom Kauf, Ist, Projektion (gestrichelt),

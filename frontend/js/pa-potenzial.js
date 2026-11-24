@@ -21,6 +21,15 @@
   function eur(v) { return (v < 0 ? '− ' : '') + Math.round(Math.abs(v)).toLocaleString('de-DE') + ' €'; }
   function sEur(v) { var r = Math.round(v); return (r > 0 ? '+ ' : r < 0 ? '− ' : '') + Math.abs(r).toLocaleString('de-DE') + ' €'; }
   function saetze(t, n) { try { return window.DpPilotV4 && window.DpPilotV4.saetze ? window.DpPilotV4.saetze(t, n) : String(t || ''); } catch (e) { return String(t || ''); } }
+  /* v4520 · Gedankenstrich als Trenner wird Komma (Kundentext nur Punkt und Komma) */
+  function ohneStrich(t) { return String(t == null ? '' : t).replace(/\s+[–—]\s+/g, ', ').replace(/\s*;\s*/g, ', ').replace(/,\s*,/g, ',').replace(/[–—]\s*$/, '').trim(); }
+  /* v4520 · Kurzkarte: Begriff, kurzer Wert (bis zum ersten Komma oder Klammer), alles Weitere in der Erklärkarte */
+  function rkKarte(k, v, u, art) {
+    var lang = ohneStrich(v), kurzV = lang.length > 34 ? lang.split(/,\s| \(/)[0] : lang;
+    var tipA = (kurzV !== lang ? lang + '. ' : '') + ohneStrich(u || '');
+    var tip = tipA.trim() ? ' tabindex="0" data-dp-pa4-tip="' + esc(JSON.stringify({ t: k, a: tipA.trim() })) + '"' : '';
+    return '<div class="dp-pap-rkk' + (art ? ' ' + art : '') + (tip ? ' dp-pa4-ztip' : '') + '"' + tip + '><small>' + esc(k) + '</small><b>' + esc(kurzV) + '</b></div>';
+  }
   function karte(inner, kl) { return '<div class="dp-pa-card' + (kl ? ' ' + kl : '') + '">' + inner + '</div>'; }
   function kopf(lbl) { return '<div class="dp-pa-sec"><span class="dp-pa-bar"></span><span class="dp-pa-lbl">' + esc(lbl) + '</span><span class="dp-pa-rule"></span></div>'; }
 
@@ -92,6 +101,15 @@
       '.dp-pa-wrap .dp-pap-h p{margin:0;font:400 12.5px/1.55 Inter,sans-serif;color:#4A4542;text-align:left !important;hyphens:auto}',
       '.dp-pap-h.aus{background:#FBF6E9}',
       '.dp-pap-mr{display:grid;gap:6px}',
+      '.dp-pap-mr-u{display:block;font-size:11.5px;line-height:1.45;color:#7A7370;margin-top:1px}',
+      /* v4520 · Kurzkarten in Einfach */
+      '.dp-pap-rk{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px}',
+      '.dp-pap-rkk{border:1px solid #E6DCC2;border-top:3px solid #E6DCC2;border-radius:10px;background:#fff;padding:9px 12px;display:grid;gap:3px;min-width:0}',
+      '.dp-pap-rkk small{font:600 10px "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:#6B645A}',
+      '.dp-pap-rkk b{font:600 13.5px/1.3 "Space Grotesk",Inter,sans-serif;color:#2A2727;overflow-wrap:anywhere}',
+      '.dp-pap-rkk.warn{border-top-color:var(--wl-c9a84c,#C9A84C)}.dp-pap-rkk.bad{border-top-color:#B8625C}',
+      '.dp-pap-rk-h{margin-top:8px;font-size:11.5px;color:#8A8272}',
+      '@media (max-width:620px){.dp-pap-rk{grid-template-columns:repeat(2,minmax(0,1fr))}}',
       '.dp-pap-mr div{display:grid;grid-template-columns:150px minmax(0,1fr);gap:4px 12px;font:400 12.5px/1.5 Inter,sans-serif;color:#2A2727}',
       '.dp-pap-mr span{color:#7A7370}.dp-pap-mr .w{color:#8a6d1f}',
       '@media (max-width:620px){.dp-pap-mr div{grid-template-columns:1fr}}',
@@ -164,8 +182,13 @@
     }
     if (d.im && d.im.zeile) hebel.push(['Indexmiete', 'Indexvertrag', String(d.im.zeile)]);
     /* v3440 · die Hebel als Tabelle (Hebel · Wirkung · Was gilt) wie die Demo */
-    if (hebel.length) h += karte(kopf('Deine Hebel') + '<div class="dp-pa5-tab"><table><thead><tr><th>Hebel</th><th>Wirkung</th><th style="text-align:left">Was gilt</th></tr></thead><tbody>' + hebel.map(function (x) {
-      return '<tr><td>' + esc(x[0]) + '</td><td><b>' + esc(x[1]) + '</b></td><td style="text-align:left;white-space:normal;min-width:220px">' + (x[2] ? esc(x[2]) : '') + '</td></tr>';
+    /* v4520 · Marcel 24.11.2026: „Was rechtlich gilt … sehr unübersichtlich. Lieber einfach mit Karten … im Detail so wie jetzt,
+       aber auch ganz kurz und knapp. Das gilt für alle Tabs“. Einfach: Hebel und Recht als kleine Karten, der Satz dazu in der
+       Erklärkarte (data-dp-pa4-tip, pilot-analyse-v4.js). Detail: Tabelle bzw. Liste wie bisher, die Erläuterung als leise Zeile. */
+    if (hebel.length) h += karte(kopf('Deine Hebel')
+      + '<div class="dp-pa-e" data-dp-kp-nie="1"><div class="dp-pap-rk">' + hebel.map(function (x) { return rkKarte(x[0], x[1], x[2], ''); }).join('') + '</div></div>'
+      + '<div class="dp-pa-d dp-pa5-tab" data-dp-kp-nie="1"><table><thead><tr><th>Hebel</th><th>Wirkung</th><th style="text-align:left">Was gilt</th></tr></thead><tbody>' + hebel.map(function (x) {
+      return '<tr><td>' + esc(x[0]) + '</td><td><b>' + esc(x[1]) + '</b></td><td style="text-align:left;white-space:normal;min-width:220px">' + (x[2] ? esc(ohneStrich(x[2])) : '') + '</td></tr>';
     }).join('') + '</tbody></table></div>', 'dp-pa4-mt');
     /* Ohne Soll-Miete und Zielbild: was eingetragen werden muss, und was rechtlich gilt */
     if (!S) {
@@ -177,8 +200,12 @@
         + '<button type="button" class="btn-clean dp-pa4-btn leise" onclick="try{switchTab(0)}catch(e){}">Zum Reiter Objekt</button></div>');
     }
     if (d.mr && Array.isArray(d.mr.zeilen) && d.mr.zeilen.length)
-      h += karte(kopf('Was rechtlich gilt') + '<div class="dp-pap-mr">' + d.mr.zeilen.map(function (z) {
-        return '<div><span>' + esc(z.k) + '</span><p style="margin:0"' + (z.warn ? ' class="w"' : '') + '><b>' + esc(z.v) + '</b>' + (z.u ? ' – ' + esc(z.u) : '') + '</p></div>';
+      h += karte(kopf('Was rechtlich gilt')
+        + '<div class="dp-pa-e" data-dp-kp-nie="1"><div class="dp-pap-rk">' + d.mr.zeilen.filter(function (z) { return z.k !== 'Rechenweg'; }).map(function (z) {
+          return rkKarte(z.k, z.v, z.u, z.bad ? 'bad' : (z.warn ? 'warn' : ''));
+        }).join('') + '</div><div class="dp-pap-rk-h">Fahr über eine Karte für die Erklärung. Rechenweg und Fundstellen stehen unter Detail.</div></div>'
+        + '<div class="dp-pa-d dp-pap-mr" data-dp-kp-nie="1">' + d.mr.zeilen.map(function (z) {
+        return '<div><span>' + esc(z.k) + '</span><p style="margin:0"' + (z.warn ? ' class="w"' : '') + '><b>' + esc(ohneStrich(z.v)) + '</b>' + (z.u ? '<small class="dp-pap-mr-u">' + esc(ohneStrich(z.u)) + '</small>' : '') + '</p></div>';
       }).join('') + '</div>', 'dp-pa4-mt');
     /* Der Absatz des Piloten: Einfach zwei ganze Sätze, Detail ganz */
     if (hatText) h += karte(kopf('Was der Pilot dazu sagt') + '<p class="dp-pa-p dp-pa-e">' + txt(saetze(a.potenzial_text, 2)) + '</p><p class="dp-pa-p dp-pa-d">' + txt(a.potenzial_text) + '</p>', 'dp-pa4-mt');
