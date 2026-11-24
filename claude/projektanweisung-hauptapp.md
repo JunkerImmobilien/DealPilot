@@ -45341,3 +45341,9 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** main 2d9857e6 (nur v4460-Dateien per eigenem Worktree), staging 1c6ed97f…77b61678, 2855a6c9.
 - **Nachweis:** Staging Demostraße 5 (gewonnen): Leiste „Objekt-Cockpit | Objekt | … | Deal-Aktion“, Unterreiter Bestand; Status testweise auf nicht gewonnen: „… Steuer | Pilot-Analyse | Bewertung …“ ohne Neuladen; Lindenallee 14 (Ankauf): Pilot-Analyse an altem Platz; 390 px Cockpit bei x=0. Schreibzugriffe abgefangen, DB-md5 beider Objekte unverändert. buster-ebenen, vorschau, grafiken-neu 49, jahresabgleich 160 grün. Prod: Sicherung haupt-20261124-1019-uu, Backend healthy, curl objekt-cockpit.js?v=v4460d 200.
 - **Rest:** Gewonnen ohne Ankauf-Stand zeigt im Cockpit die Ankauf-Unterreiter.
+
+### Rollout 1.0.172 · 24.11.2026 · v4460e
+- **Was:** Objekt-Cockpit immer mit Bestand-Unterreitern, auch ohne Ankauf-Stand („Kein Ankauf-Stand gespeichert“ statt Ankauf-Reitern). Stand-Zeile und Fußzeilen im Kopf der Analyse ohne Gedankenstrich und Semikolon.
+- **Commit:** main 0420eb0a, staging ebff5df9.
+- **Nachweis:** Staging Demostraße 5, Ankauf-Stand im Speicher weggenommen: 8 Bestand-Unterreiter, Hinweis da; Stand-Zeile „Stand 24.11.2026. Die Zahlen haben sich seitdem nicht geändert.“; DB-md5 unverändert. buster-ebenen, grafiken-neu 49, jahresabgleich 160 grün. Prod: Sicherung haupt-20261124-1026-uu2, Backend healthy, curl ui.js/pilot-analyse-v4.js v4460e.
+- **Rest:** keiner.
