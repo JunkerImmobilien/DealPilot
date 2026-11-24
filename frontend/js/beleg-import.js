@@ -407,7 +407,7 @@
           '<button class="bi-btn" id="bi-take" type="button" disabled onclick="DealPilotBelegImport.apply()">' + (_modus === 'wk' ? 'In die Werbungskosten übernehmen' : 'In die Anschaffungskosten übernehmen') + '</button></div>' +
       '</div>';
     document.body.appendChild(ov);
-    ov.addEventListener('click', function (e) { if (e.target === ov) close(); });
+    /* v4470 · Marcel 24.11.2026: kein Schließen per Klick daneben, nur × oder Abbrechen */
     document.getElementById('bi-folder').addEventListener('change', function (e) { _onPick(e.target.files); });
     document.getElementById('bi-files').addEventListener('change', function (e) { _onPick(e.target.files); });
   }
@@ -415,6 +415,8 @@
   function close() {
     var ov = document.getElementById('beleg-import-ov');
     if (ov && ov.parentNode) ov.parentNode.removeChild(ov);
+    /* v4470 · das kombinierte Fenster (Einlesen + Belege je Jahr) zeichnet seine Jahre danach neu */
+    if (ov) try { window.dispatchEvent(new CustomEvent('dp:belege-geaendert')); } catch (e) {}
   }
 
   function _onPick(fileList) {
