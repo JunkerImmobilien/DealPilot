@@ -48,7 +48,7 @@
 (function (global) {
   'use strict';
   if (global.DpJahresabgleich) return;
-  var VERSION = 'v4330';
+  var VERSION = 'v4500';
   var GOLD = 'var(--wl-c9a84c, #C9A84C)';
   /* v4090 · Marcel 23.11.2026: „ich würde die Reihenfolge ändern in Miete, Wert, Haus und dann Steuern" (die Steuer braucht die Zahlen der drei davor) */
   var SCHRITTE = [['miete', 'Miete'], ['wert', 'Wert'], ['haus', 'Haus'], ['steuer', 'Steuer']];
@@ -179,24 +179,36 @@
      Je Wohnung: Miete am 01.01. (mieteMonat), letzte Erhöhung VOR dem Tag (ableiten der Liste bis dahin,
      ohne Liste die Felder des Reiters Miete, wenn sie davor liegen), dann sollFuer() mit heute = JJJJ-01.
      Ungenutzt im Jahr: ab dem Wirksamwerden je Monat zulässig minus tatsächlich (nie negativ). */
-  function mpRein(quellen, jahr, ctx, K, E) {
-    var iso = jahr + '-01-01', ym = jahr + '-01';
-    var r = { jahr: jahr, stichtag: iso, ist: 0, zul: 0, plus: 0, ungenutzt_jahr: 0, verlangbar_ab: null, wirksam_ab: null, genutzt: [], wohnungen: [], ohne_vgl: false, sperre: false, n: 0 };
+  /* v4500 · § 558 zu einem beliebigen Tag (01.01. oder Tag einer Erhöhung): letzte Erhöhung VOR dem Tag, Miete istAm */
+  function sollAm(q, L, iso, istAm, ctx, K, E) {
+    var letzte = null, betrag = null;
+    if (L.length) {
+      var bis = L.filter(function (x) { return x.datum < iso; });
+      var ab = E.ableiten(bis, iso); letzte = ab.letzte; betrag = ab.betrag;
+      if (!letzte && /^\d{4}-\d{2}-\d{2}$/.test(String(q.letzte || '')) && q.letzte < iso && q.letzte < L[0].datum) { letzte = q.letzte; betrag = zahl(q.betrag); }
+    } else if (/^\d{4}-\d{2}-\d{2}$/.test(String(q.letzte || '')) && q.letzte < iso) { letzte = q.letzte; betrag = zahl(q.betrag); }
+    return K.sollFuer({ ist: istAm, wfl: q.wfl, status: 'vermietet', vgl_qm: q.vgl_eigen || '', mv_art: q.mv_art || '', art: q.art || 'wohnen',
+      mv_letzte_erhoehung: letzte || '', mv_letzte_erhoehung_betrag: betrag != null ? betrag : '', massnahmen: [] },
+      { kapp: ctx && ctx.kapp, vgl_qm: q.vgl_qm, vgl_art: q.vgl_art || null, heute: iso.slice(0, 7) });
+  }
+  function tagDavor(iso) { var d = new Date(iso + 'T12:00:00Z'); d.setUTCDate(d.getUTCDate() - 1); return d.toISOString().slice(0, 10); }
+  /* v4500 · Marcel 24.11.2026 (Demostraße 5, 2025): „zulässig sagt er, wir sind drüber … verstehe ich nicht“. Gemessen: die
+     Spalte verglich die Kaltmiete des GANZEN Jahres mit der zum 01.01. zulässigen Miete × 12. Jede Erhöhung im Lauf des
+     Jahres sah damit wie „darüber“ aus, auch eine erlaubte. Jetzt: je Monat die zulässige Miete (vor dem Termin die Miete
+     am 01.01., ab Wirksamkeit die § 558-Grenze, ab einer eingetragenen Erhöhung ihr Betrag, höchstens die am Tag der
+     Erhöhung zulässige Miete), und jede § 558-Erhöhung des Jahres wird an ihrem eigenen Tag geprüft (ueber_erh).
+     opt.monate: Monate ab Übergang (Kaufjahr), sonst 12. */
+  function mpRein(quellen, jahr, ctx, K, E, opt) {
+    var iso = jahr + '-01-01';
+    var mon = opt && opt.monate != null ? Math.max(0, Math.min(12, opt.monate)) : 12, vonM = 13 - Math.max(1, mon || 12);
+    var r = { jahr: jahr, stichtag: iso, ist: 0, zul: 0, plus: 0, ungenutzt_jahr: 0, verlangbar_ab: null, wirksam_ab: null, genutzt: [], wohnungen: [], ohne_vgl: false, sperre: false, n: 0, zul_jahr: 0, monate: mon, ueber_erh: [] };
     if (!K || !E || !K.sollFuer) return r;
     (quellen || []).forEach(function (q) {
       if (!q || !(zahl(q.heute) > 0)) return;
       var L = E.sortiert ? E.sortiert(q.liste) : (q.liste || []);
       var ist0 = E.mieteMonat({ liste: L, heute: q.heute, letzte: q.letzte, betrag: q.betrag }, iso);
       if (!(ist0 > 0)) return;
-      var letzte = null, betrag = null;
-      if (L.length) {
-        var bis = L.filter(function (x) { return x.datum < iso; });
-        var ab = E.ableiten(bis, iso); letzte = ab.letzte; betrag = ab.betrag;
-        if (!letzte && /^\d{4}-\d{2}-\d{2}$/.test(String(q.letzte || '')) && q.letzte < iso && q.letzte < L[0].datum) { letzte = q.letzte; betrag = zahl(q.betrag); }
-      } else if (/^\d{4}-\d{2}-\d{2}$/.test(String(q.letzte || '')) && q.letzte < iso) { letzte = q.letzte; betrag = zahl(q.betrag); }
-      var s = K.sollFuer({ ist: ist0, wfl: q.wfl, status: 'vermietet', vgl_qm: q.vgl_eigen || '', mv_art: q.mv_art || '', art: q.art || 'wohnen',
-        mv_letzte_erhoehung: letzte || '', mv_letzte_erhoehung_betrag: betrag != null ? betrag : '', massnahmen: [] },
-        { kapp: ctx && ctx.kapp, vgl_qm: q.vgl_qm, vgl_art: q.vgl_art || null, heute: ym });
+      var s = sollAm(q, L, iso, ist0, ctx, K, E);
       var zul = s.miete != null ? K.teil558(s, ist0) : ist0;
       var w = { nr: q.nr || '', ist: Math.round(ist0 * 100) / 100, zul: Math.round(zul * 100) / 100, plus: Math.max(0, Math.round((zul - ist0) * 100) / 100),
         verlangbar_ab: s.miete != null && zul > ist0 + 0.5 ? s.verlangbar_ab || null : null, wirksam_ab: s.miete != null && zul > ist0 + 0.5 ? s.ab || null : null,
@@ -208,6 +220,27 @@
       }
       w.ungenutzt_jahr = Math.round(w.ungenutzt_jahr);
       L.filter(function (x) { return String(x.datum).slice(0, 4) === String(jahr) && x.art !== 'neuvermietung'; }).forEach(function (x) { w.genutzt.push({ datum: x.datum, auf: zahl(x.auf), nr: q.nr || '' }); });
+      /* v4500 · Erhöhungen des Jahres an ihrem Tag prüfen, zulässige Miete je Monat summieren */
+      var stufen = [];
+      L.filter(function (x) { return String(x.datum).slice(0, 4) === String(jahr) && istZahl(zahl(x.auf)); }).forEach(function (x) {
+        var d = String(x.datum), mo = +d.slice(5, 7) + (+d.slice(8, 10) > 1 ? 1 : 0), auf = zahl(x.auf), grenze = auf;
+        if (!x.art || String(x.art) === '558') {
+          var vor = E.mieteMonat({ liste: L, heute: q.heute, letzte: q.letzte, betrag: q.betrag }, tagDavor(d));
+          if (vor > 0) {
+            var sx = sollAm(q, L, d, vor, ctx, K, E), zx = sx.miete != null ? K.teil558(sx, vor) : vor;
+            if (auf > zx + 0.5) { grenze = zx; r.ueber_erh.push({ nr: q.nr || '', datum: d, von: Math.round(vor * 100) / 100, auf: auf, zul: Math.round(zx * 100) / 100, grund: sx.grund || null }); }
+          }
+        }
+        if (mo <= 12) stufen.push({ ab: mo, wert: grenze });
+      });
+      w.zul_jahr = 0;
+      if (mon > 0) for (var k = vonM; k <= 12; k++) {
+        var ymk = jahr + '-' + String(k).padStart(2, '0'), erl = (w.wirksam_ab && ymk >= w.wirksam_ab) ? zul : ist0;
+        stufen.forEach(function (st) { if (k >= st.ab && st.wert > erl) erl = st.wert; });
+        w.zul_jahr += erl;
+      }
+      w.zul_jahr = Math.round(w.zul_jahr * 100) / 100;
+      r.zul_jahr += w.zul_jahr;
       if (s.grund === 'Keine Vergleichsmiete eingetragen.') r.ohne_vgl = true;
       if (w.sperre) r.sperre = true;
       r.ist += w.ist; r.zul += w.zul; r.plus += w.plus; r.ungenutzt_jahr += w.ungenutzt_jahr; r.n++;
@@ -216,7 +249,7 @@
       if (w.wirksam_ab && (!r.wirksam_ab || w.wirksam_ab < r.wirksam_ab)) r.wirksam_ab = w.wirksam_ab;
       r.wohnungen.push(w);
     });
-    r.ist = Math.round(r.ist * 100) / 100; r.zul = Math.round(r.zul * 100) / 100; r.plus = Math.round(r.plus * 100) / 100;
+    r.ist = Math.round(r.ist * 100) / 100; r.zul = Math.round(r.zul * 100) / 100; r.zul_jahr = Math.round(r.zul_jahr); r.plus = Math.round(r.plus * 100) / 100;
     return r;
   }
   /** Die Quellen des offenen Objekts aus dem Modell von potenzial.js (Vergleichsmiete und Kappung, wie dort) */
@@ -241,7 +274,7 @@
     var k = global._currentObjKey + '|' + (global._dpMfh ? JSON.stringify((global._dpMfh.einheiten || []).map(function (e) { return e && [e.ist, e.erhoehungen && e.erhoehungen.length]; })) : '') + '|' + ((global.DpErhoehungen && global.DpErhoehungen.objektListe) ? global.DpErhoehungen.objektListe().length : '');
     if (_mp.key !== k) { _mp = { key: k, q: mpQuellen(), jahre: {} }; }
     if (!_mp.q) return null;
-    if (!_mp.jahre[jahr]) _mp.jahre[jahr] = mpRein(_mp.q.quellen, jahr, _mp.q.ctx, global.DpMietpotenzial, global.DpErhoehungen);
+    if (!_mp.jahre[jahr]) _mp.jahre[jahr] = mpRein(_mp.q.quellen, jahr, _mp.q.ctx, global.DpMietpotenzial, global.DpErhoehungen, { monate: monateJahr(jahr) });
     return _mp.jahre[jahr];
   }
   /* v4410 · Marcel 24.11.2026 (Westerfeldstr. 146, 2026): „Kaltmiete 39.420, zulässig 39.388, ungenutzt. Und darüber
@@ -250,6 +283,10 @@
      Die +87 €/Monat sind richtig (Whg. 3 bis 6 haben Luft), nur der Vergleich lief auf zwei Grundlagen. Jetzt eine Rechnung:
      zulässig GESAMT = zulässige Wohnungsmiete + übrige Miete (Stellplätze, Zuschläge, unverändert). Liegt die Kaltmiete des
      Jahres dennoch über dem zulässigen Gesamtbetrag, wird keine Mieterhöhung angeboten (Hinweis statt „ungenutzt“). */
+  function monateJahr(jahr) {   /* v4500 · Monate ab Übergang wie die Ist-Miete des Jahresbuchs (anteilig.js) */
+    try { var A = global.DealPilotAnteilig; if (A && typeof A.getWuMonths === 'function') { var n = Number(A.getWuMonths(+jahr)); if (isFinite(n)) return Math.max(0, Math.min(12, n)); } } catch (e) {}
+    return 12;
+  }
   function zusatzMonat() {
     var d = doc(), e = d && d.getElementById('ze'), s = e ? String(e.value || '').trim() : '';
     var v = typeof global.v === 'function' && e ? zahl(global.v('ze')) : (s.indexOf(',') >= 0 ? zahl(s.replace(/\./g, '').replace(',', '.')) : zahl(s));   /* calc.js v() wie die Kaltmiete */
@@ -257,9 +294,11 @@
   }
   function mpUrteil(mp, zus, mieteJahr) {
     zus = zahl(zus) > 0 ? zahl(zus) : 0;
-    var r = { zul_j: Math.round((mp.zul + zus) * 12), wohn_zul_j: Math.round(mp.zul * 12), wohn_ist_j: Math.round(mp.ist * 12), zus_j: Math.round(zus * 12),
-      luft_m: Math.max(0, Math.round(mp.zul - mp.ist)), ueber: false };
-    if (istZahl(mieteJahr) && mieteJahr > r.zul_j + 6) { r.ueber = true; r.luft_m = 0; }
+    /* v4500 · mit zul_jahr (Monat für Monat, mpRein) statt „zulässig am 01.01. × 12“, sonst wie bisher */
+    var mon = istZahl(mp.monate) ? mp.monate : 12, jz = istZahl(mp.zul_jahr) && mp.zul_jahr > 0;
+    var r = { zul_j: Math.round((jz ? mp.zul_jahr : mp.zul * mon) + zus * mon), wohn_zul_j: Math.round(jz ? mp.zul_jahr : mp.zul * mon), wohn_ist_j: Math.round(mp.ist * mon), zus_j: Math.round(zus * mon),
+      luft_m: Math.max(0, Math.round(mp.zul - mp.ist)), ueber: false, erh: (mp.ueber_erh || []).slice() };
+    if (r.erh.length || (istZahl(mieteJahr) && mieteJahr > r.zul_j + 6)) { r.ueber = true; r.luft_m = 0; }
     return r;
   }
 
@@ -349,6 +388,18 @@
     if (vj && vj.gezahlt != null && vj.soll_warm != null && vj.soll_warm > 0 && vj.gezahlt / vj.soll_warm < 0.97) zu = ' <span class="dp-ja-schlecht">' + Math.round((1 - vj.gezahlt / vj.soll_warm) * 100) + ' % weniger Miete eingegangen als vereinbart.</span>';
     return '<div class="dp-ja-vivi dp-ja-vivi-kurz" data-ja-vivi="' + z.jahr + '"><span><b>ViVi:</b> ' + (n ? '<span class="dp-ja-schlecht">' + n + (n === 1 ? ' Abweichung' : ' Abweichungen') + '</span>' : '<span class="dp-ja-gut">stimmt mit ViVi überein</span>') + zu + '</span>'
       + knopf('vivi-reiter', n ? 'zum Abgleich' : 'ansehen', false, z.jahr) + '</div>';
+  }
+  /* v4500 · Marcel 24.11.2026: „zwei Abweichungen zeigt er mir im Jahresabgleich. Was sollen das für Abweichungen sein?“
+     Gemessen: die Zahl ist DpViviReiter.abweichungen(jahr), also Positionen der Anlage V, die von ViVi abweichen, plus die
+     Jahresmiete. Die eigene Zeile über der Mieterhöhung entfällt. Die Zahl steht jetzt im Schritt Steuer als Knopf zum Reiter
+     ViVi („2 Abweichungen zu ViVi“), der Hinweis „weniger Miete eingegangen“ im Schritt Miete. */
+  function viviKurz(z, vd) {
+    var R = global.DpViviReiter; if (!vd || !R || !R.abweichungen || !R.sichtbar || !R.sichtbar()) return null;
+    var n = null; try { n = R.abweichungen(z.jahr); } catch (e) { n = null; }
+    if (n == null) return null;
+    var vj = null; try { vj = viviJahr(z.jahr, vd); } catch (e) { vj = null; }
+    var weniger = vj && vj.gezahlt != null && vj.soll_warm != null && vj.soll_warm > 0 && vj.gezahlt / vj.soll_warm < 0.97 ? Math.round((1 - vj.gezahlt / vj.soll_warm) * 100) : 0;
+    return { n: n, weniger: weniger };
   }
   function viviBlockAlt(z, vd) {
     var vj = viviJahr(z.jahr, vd); if (!vj) return '';
@@ -442,6 +493,10 @@
       '.dp-ja-tab table{width:100%;border-collapse:collapse;font:400 12.5px Inter,sans-serif;color:' + T + ';min-width:780px}',
       '.dp-ja-tab th,.dp-ja-tab td{text-align:right;padding:8px 7px;border-bottom:1px solid #F1EBDD;font-variant-numeric:tabular-nums;white-space:nowrap;vertical-align:top}',
       '.dp-ja-tab tbody tr:last-child td{border-bottom:none}',
+      /* v4500 · Anlage-V-Aktion in der Zeile, Hilfe im Spaltenkopf */
+      '.dp-ja-tab .dp-ja-av{display:block;margin:3px 0 0 auto;padding:1px 7px;border:1px solid var(--wl-c9a84c, #C9A84C);border-radius:999px;background:transparent;color:' + T + ';font:500 10.5px/1.5 Inter,sans-serif;cursor:pointer;white-space:nowrap}',
+      '.dp-ja-tab .dp-ja-av:hover{background:color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 14%,transparent)}',
+      '.dp-ja-tab th .dp-tip{margin-left:3px;vertical-align:middle}',
       '.dp-ja-tab th:first-child,.dp-ja-tab td:first-child{text-align:left}',
       '.dp-ja-tab th{font:500 10px/1.35 "JetBrains Mono",monospace;letter-spacing:.06em;text-transform:uppercase;color:' + M + ';border-bottom:1px solid ' + RA + ';vertical-align:bottom}',
       '.dp-ja-tab td small{display:block;color:' + LE + ';font-size:11px;font-weight:400}',
@@ -526,7 +581,9 @@
       + (mp.ohne_vgl ? ' Für ' + (mp.wohnungen.length > 1 ? 'einen Teil der Wohnungen' : 'die Wohnung') + ' ist keine Vergleichsmiete bekannt, dort rechnet § 558 nicht (Mietspiegel im Reiter Miete eintragen).' : '')
       + (mp.sperre ? ' Die Erhöhung davor ist nicht eingetragen, die Sperrfrist ist nicht geprüft.' : '')
       + (zus > 0 ? ' Stellplätze und Zuschläge (' + eur(zus) + ' im Monat) kommen unverändert dazu, zusammen zulässig ' + eur(U.zul_j) + ' im Jahr.' : '')
-      + (U.ueber ? ' Die Kaltmiete ' + z.jahr + ' von ' + eur(z.miete_ist) + ' liegt über der zulässigen Miete von ' + eur(U.zul_j) + ' im Jahr. Eine Mieterhöhung ist nicht möglich.' : '')
+      + (U.erh.length ? ' ' + U.erh.map(function (x) { return 'Die Erhöhung ' + (x.nr ? 'Whg. ' + esc(x.nr) + ' ' : '') + 'zum ' + datumText(x.datum) + ' auf ' + eur(x.auf) + ' liegt über der an diesem Tag nach § 558 BGB zulässigen Miete von ' + eur(x.zul) + (x.grund ? ' (' + esc(String(x.grund).replace(/.$/, '')) + ')' : '') + '.'; }).join(' ')
+          + ' Prüf die Mieterhöhung oder die Vergleichsmiete im Reiter Miete. War es eine Neuvermietung, Index- oder Staffelmiete, trag sie dort mit dieser Art ein.'
+        : (U.ueber ? ' Die Kaltmiete ' + z.jahr + ' von ' + eur(z.miete_ist) + ' liegt über der zulässigen Miete von ' + eur(U.zul_j) + ' im Jahr. Eine Mieterhöhung ist nicht möglich.' : ''))
       + (ungenutzt <= 0 && !gen.length && !U.ueber ? ' ' + esc((mp.wohnungen[0] && mp.wohnungen[0].grund) || 'Die Miete liegt an der zulässigen Grenze.') : '');
     /* im Jahr genutzt: die Erhöhung ist eingetragen und es blieb (fast) nichts liegen */
     var genutzt = !lauf && ungenutzt > 0 && gen.length && mp.ungenutzt_jahr <= Math.max(5, ungenutzt * 1.2);
@@ -540,23 +597,51 @@
       + '<p class="dp-ja-hin">Gerechnet wie die Potenzialanalyse (Kappung, Sperrfrist, Vergleichsmiete). Frühere Jahre mit der heutigen Vergleichsmiete, den damaligen Mietspiegel kennt DealPilot nicht.</p>';
   }
 
+  /* v4500 · Marcel 24.11.2026: „Bericht 2026 abgerufen, den hast du für 24 eingetragen“. Gemessen Demostraße 5: Bericht 616 vom
+     24.11.2026, Wertermittlungsstichtag 01.03.2024 von Hand gesetzt (eigen). Er bewertet also den Kaufzeitpunkt und steht zu Recht
+     unter 2024 (Regel v4390/v4430). Jetzt steht beides sichtbar da: Stichtag und Abrufdatum. */
+  function anderswo(jahr) {   /* v4500 · in diesem Jahr abgerufen, aber zu einem anderen Stichtag */
+    var l = []; try { l = JB() && JB().mbListe ? JB().mbListe() : []; } catch (e) { l = []; }
+    var x = l.filter(function (b) { return b.stichtag && String(b.am).slice(0, 4) === String(jahr) && String(b.stichtag).slice(0, 4) !== String(jahr); }).pop();
+    return x ? ' Der Bericht vom ' + datumText(x.am) + ' bewertet zum ' + datumText(x.stichtag) + ' und steht deshalb unter ' + String(x.stichtag).slice(0, 4) + '.' : '';
+  }
+  function stichtagKurz(mb) {
+    if (!mb || !mb.stichtag) return '';
+    return String(mb.stichtag).slice(0, 4) !== String(mb.am).slice(0, 4) ? 'Stichtag ' + mmjj(mb.stichtag) + ', abgerufen ' + mmjj(mb.am) : '';
+  }
+  /* v4500 · Marcel 24.11.2026: der Hinweis „In der Anlage V steht noch der Vorschlag …“ stand unter der Tabelle. Jetzt als
+     kleine Aktion in der Zeile des Jahres, die Erklärung im Überfahren. */
+  function avKnopf(z) {
+    var a = z && z.abgleich; if (!a) return '';
+    if (a.art === 'vorschlag') {
+      var gl = z.av && istZahl(z.av.wert) && istZahl(z.miete_ist) && Math.abs(z.av.wert - z.miete_ist) < 1;
+      var t = gl ? 'In der Anlage V ' + z.jahr + ' steht die Mieteinnahme ' + eur(z.av.wert) + ' nur als Vorschlag. Klick bestätigt sie als deine Angabe.'
+        : 'In der Anlage V ' + z.jahr + ' steht noch der Vorschlag ' + eur(z.av.wert) + '. Klick übernimmt die tatsächliche Kaltmiete ' + eur(z.miete_ist) + ' als Mieteinnahme.';
+      return '<button type="button" class="btn-clean dp-ja-av" data-ja-aktion="av" data-ja-j="' + z.jahr + '" title="' + esc(t) + '">' + (gl ? 'in Anlage V bestätigen' : 'in Anlage V übernehmen') + '</button>';
+    }
+    if (a.art === 'abweichung') return '<small class="dp-ja-schlecht" title="' + esc(a.text) + '">Anlage V ' + eur(z.av.wert) + '</small>';
+    return '';
+  }
   function tabelleHtml(Z, weg, L, vd) {
     var J = global.DpJahresstaende;
-    var kopf = '<tr><th>Jahr</th><th>Kaltmiete<br>Plan</th><th>Kaltmiete<br>Ist</th>' + (vd ? '<th>Kaltmiete<br>laut ViVi</th>' : '') + '<th>zulässig<br>§ 558</th><th>Cashflow v. St.<br>Plan · Ist</th><th>Ergebnis<br>V+V</th><th>Wert</th><th>Rest&shy;schuld</th><th>DSCR</th><th>Score</th><th>Abgleich</th></tr>';
+    /* v4500 · Marcel 24.11.2026: „Kaltmiete Plan und Kaltmiete Ist … kann ich nicht nachvollziehen“. Klare Worte und Hilfe zum Überfahren. */
+    var tip = function (id, t) { return '<button type="button" class="dp-tip" data-tip-id="' + id + '" tabindex="-1" aria-label="' + t + '"></button>'; };
+    var kopf = '<tr><th>Jahr</th><th>Kaltmiete<br>geplant' + tip('pa.ja_miete_plan', 'Was heißt geplant?') + '</th><th>Kaltmiete<br>tatsächlich' + tip('pa.ja_miete_ist', 'Was heißt tatsächlich?') + '</th>' + (vd ? '<th>Kaltmiete<br>laut ViVi</th>' : '') + '<th>zulässig<br>§ 558' + tip('pa.ja_zulaessig', 'Was heißt zulässig?') + '</th><th>Cashflow v. St.<br>Plan · Ist</th><th>Ergebnis<br>V+V</th><th>Wert</th><th>Rest&shy;schuld</th><th>DSCR</th><th>Score</th><th>Abgleich</th></tr>';
     var body = Z.map(function (z) {
       var sx = stand(z, weg, L), lauf = z.jahr >= heuteJahr(), pl = planZeile(z.jahr), mp = mpJahr(z.jahr);
       var st = J && J.standJahr ? J.standJahr(z.jahr) : null, kz = (st && st.kz) || {};
       var dscr = zahl(kz._kpis_dscr), score = zahl(kz._ds2_score);
-      var planM = istZahl(z.miete_plan) ? eur(z.miete_plan) : (istZahl(z.miete_proj) ? '<span style="color:#9A9285">' + eur(z.miete_proj) + '</span><small>Projektion</small>' : '–');
+      var planM = istZahl(z.miete_plan) ? eur(z.miete_plan) : (istZahl(z.miete_proj) ? '<span style="color:#9A9285">' + eur(z.miete_proj) + '</span><small>kein Plan vom Kauf</small>' : '–');
       var gen = mp && mp.n && !lauf && mp.genutzt.length && mp.zul > mp.ist + 0.5 && mp.ungenutzt_jahr <= Math.max(5, (mp.zul - mp.ist) * 1.2);
       var U = mp && mp.n ? mpUrteil(mp, zusatzMonat(), z.miete_ist) : null;   /* v4410 · gleiche Grundlage wie die Spalte Kaltmiete */
-      var ung = mp && mp.n ? (U.ueber ? '<small class="dp-ja-schlecht">Ist darüber</small>' : gen ? '<small class="dp-ja-gut">genutzt</small>' : mp.ungenutzt_jahr > 0 ? '<small class="dp-ja-schlecht">' + vz(-mp.ungenutzt_jahr) + ' ungenutzt</small>' : (mp.zul > mp.ist + 0.5 ? '<small>ab ' + mmjj(mp.wirksam_ab) + '</small>' : '<small class="dp-ja-gut">ausgeschöpft</small>')) : '';
+      var ung = mp && mp.n ? (U.ueber ? '<small class="dp-ja-schlecht"' + (U.erh.length ? ' title="' + esc(U.erh.map(function (x) { return 'Erhöhung zum ' + datumText(x.datum) + ' auf ' + eur(x.auf) + ', zulässig ' + eur(x.zul); }).join(', ')) + '"' : '') + '>' + (U.erh.length ? 'Erhöhung zu hoch' : 'tatsächlich darüber') + '</small>' : gen ? '<small class="dp-ja-gut">genutzt</small>' : mp.ungenutzt_jahr > 0 ? '<small class="dp-ja-schlecht">' + vz(-mp.ungenutzt_jahr) + ' ungenutzt</small>' : (mp.zul > mp.ist + 0.5 ? '<small>ab ' + mmjj(mp.wirksam_ab) + '</small>' : '<small class="dp-ja-gut">ausgeschöpft</small>')) : '';
       var cfP = istZahl(z.cf_plan) ? z.cf_plan : z.cf_proj, cfI = istZahl(z.cf_stand) ? z.cf_stand : null;
       var rs = istZahl(z.rs_ist) ? z.rs_ist : z.rs_proj;
       return '<tr data-ja-jahr="' + z.jahr + '" class="' + (z.jahr === _gewaehlt ? 'an' : '') + '" title="Jahr ' + z.jahr + ' wählen">'
         + '<td><b>' + z.jahr + '</b>' + (lauf ? '<small>läuft</small>' : '') + '<button type="button" class="btn-clean dp-ja-ein" data-ja-aktion="eintragen" data-ja-j="' + z.jahr + '" title="Steuerstand, Restschuld laut Kontoauszug, Leerstand und Notiz für ' + z.jahr + '">eintragen</button></td>'
         + '<td>' + planM + '</td>'
-        + '<td>' + (istZahl(z.miete_ist) ? eur(z.miete_ist) : '–') + '<small>' + (lauf ? 'Projektion' : abw(z.miete_basis, z.miete_ist, true)) + '</small></td>'
+        + '<td>' + (istZahl(z.miete_ist) ? eur(z.miete_ist) : '–') + '<small>' + [lauf ? 'Hochrechnung' : (z.miete_eigen ? 'eingetragen' : (z.miete_vivi ? 'laut ViVi' : 'gerechnet')), lauf ? '' : abw(z.miete_basis, z.miete_ist, true)].filter(Boolean).join(' · ') + '</small>'
+          + avKnopf(z) + '</td>'
         + (vd ? (function () { var vj = viviJahr(z.jahr, vd), m = vj && vj.miete, d = istZahl(m) && istZahl(z.miete_ist) ? z.miete_ist - m : null;
             return '<td>' + (istZahl(m) ? eur(m) : '–') + '<small' + (d != null && Math.abs(d) >= 1 ? ' class="dp-ja-schlecht">Δ ' + vz(d) : (d != null ? ' class="dp-ja-gut">gleich' : '>')) + '</small></td>'; })() : '')
         + '<td' + (U && U.zus_j > 0 ? ' title="Wohnungen zulässig ' + eur(U.wohn_zul_j) + ', dazu Stellplätze und Zuschläge ' + eur(U.zus_j) + ' unverändert"' : '') + '>' + (mp && mp.n ? eur(U.zul_j) + ung : '–') + '</td>'
@@ -564,9 +649,9 @@
         + '<td>' + (z.steuer && istZahl(z.steuer.ergebnis) ? vz(z.steuer.ergebnis) : '–') + '<small>' + (pl && istZahl(pl.zve_y) ? 'Plan ' + vz(pl.zve_y) : '') + '</small><span class="dp-ja-stp ' + esc(z.status) + '">' + esc(JB().statusWort(z.status)) + '</span></td>'
         + (function () {   /* v4410 · führendes Verfahren vor der Marktpreisindikation, wie Schritt 2 im Assistenten */
             var fu = z.mb && z.mb.fu && !z.mb.fu.stufe_m ? z.mb.fu : null;
-            return '<td' + (z.mb ? ' title="' + esc((fu ? fu.name + ' (führend) ' + eur(fu.wert) + ', ' : '') + 'Marktpreisindikation ' + eur(z.mb.wert) + ' aus Angebotspreisen, Bericht vom ' + datumText(z.mb.am)) + '"' : '') + '>'
+            return '<td' + (z.mb ? ' title="' + esc((fu ? fu.name + ' (führend) ' + eur(fu.wert) + ', ' : '') + 'Marktpreisindikation ' + eur(z.mb.wert) + ' aus Angebotspreisen, Bericht vom ' + datumText(z.mb.am) + (z.mb.stichtag ? ', bewertet zum ' + datumText(z.mb.stichtag) + '. Ein Bericht steht im Jahr seines Wertermittlungsstichtags.' : '')) + '"' : '') + '>'
               + (z.mb ? eur(fu ? fu.wert : z.mb.wert) : '<span style="color:#9A9285">–</span>')
-              + '<small>' + [fu ? esc(fu.name.replace(' (vorläufig)', '')) : '', pl && istZahl(pl.wert_y) ? 'Plan ' + eur(pl.wert_y) : ''].filter(Boolean).join(' · ') + '</small></td>'; })()
+              + '<small>' + [fu ? esc(fu.name.replace(' (vorläufig)', '')) : '', stichtagKurz(z.mb), pl && istZahl(pl.wert_y) ? 'Plan ' + eur(pl.wert_y) : ''].filter(Boolean).join(' · ') + '</small></td>'; })()
         + '<td>' + eur(rs) + '<small>' + (istZahl(z.rs_ist) ? 'Kontoauszug' : 'Projektion') + '</small></td>'
         + '<td>' + (dscr != null ? z2(dscr) : '–') + '</td>'
         + '<td>' + (score != null ? String(Math.round(score)) : '–') + '</td>'
@@ -628,18 +713,25 @@
     var erh = (z.erhoehungen || []).map(function (e) { return datumText(e.datum) + (e.nr ? ' (Whg. ' + e.nr + ')' : '') + (istZahl(zahl(e.auf)) ? ' auf ' + eur(zahl(e.auf)) : ''); });
     var listeLeer = false; try { var E = global.DpErhoehungen; listeLeer = !!(E && E.alle && !E.alle().length); } catch (e) {}
     var mPlan = z.miete_plan != null ? z.miete_plan : z.miete_proj;
+    var vd = null; try { vd = viviDaten(); } catch (e) { vd = null; }
+    var vk = null; try { vk = viviKurz(z, vd); } catch (e) { vk = null; }   /* v4500 */
     var sch = '', teile = {};
     teile.miete = schritt('miete', 'Miete', s, eur(z.miete_ist), (z.miete_plan != null ? 'Plan ' : 'Projektion ') + eur(mPlan) + (abw(mPlan, z.miete_ist, true) ? ' · ' + abw(mPlan, z.miete_ist, true) : ''),
       (erh.length ? 'Erhöhung ' + esc(erh.join(', ')) + '.' : 'Keine Erhöhung in diesem Jahr eingetragen.') + (listeLeer && !lauf ? ' Ohne Liste rechnet DealPilot vergangene Jahre mit der heutigen Miete.' : '')
-        + (!lauf ? (z.miete_eigen ? ' Ist-Miete von dir eingetragen.' : (z.miete_vivi ? ' Ist-Miete aus ViVi übernommen.' : ' Die Ist-Miete ' + z.jahr + ' fehlt noch. Trag ein, was wirklich eingegangen ist.')) : ''),
+        + (!lauf ? (z.miete_eigen ? ' Ist-Miete von dir eingetragen.' : (z.miete_vivi ? ' Ist-Miete aus ViVi übernommen.' : ' Die Ist-Miete ' + z.jahr + ' fehlt noch. Trag ein, was wirklich eingegangen ist.')) : '')
+        + (vk && vk.weniger ? ' <span class="dp-ja-schlecht">Laut ViVi ' + vk.weniger + ' % weniger Miete eingegangen als vereinbart.</span>' : ''),
       (!lauf && !z.miete_eigen && !z.miete_vivi ? knopf('eintragen', 'Ist-Miete ' + z.jahr + ' eintragen', true, z.jahr) + ' ' : '') + knopf('miete', 'Mieterhöhung eintragen', listeLeer && !lauf), z.jahr);
     var stW = { geplant: 'nicht erklärt', erklaert: 'erklärt, Bescheid fehlt', bescheid: 'Bescheid liegt vor' }[z.status] || 'nicht erklärt';
     var stI = z.steuer ? z.steuer.ergebnis : null, stP = pl && istZahl(pl.zve_y) ? pl.zve_y : null;
     teile.steuer = schritt('steuer', 'Steuer', s, istZahl(stI) ? vz(stI) : '–', (stP != null ? 'Plan ' + vz(stP) : 'kein Plan') + (abw(stP, stI, true) ? ' · ' + abw(stP, stI, true) : ''),
-      'Ergebnis Anlage V · ' + stW + '.', (lauf && !anlageVErlaubt() ? '' : knopf('steuer', z.status === 'geplant' ? 'Anlage V ' + z.jahr + ' ausfüllen' : 'Anlage V ansehen', s.steuer === 'offen')) + ' ' + knopf('eintragen', 'Stand setzen', false, z.jahr), z.jahr);
+      'Ergebnis Anlage V · ' + stW + '.' + (vk ? (vk.n ? ' ' + vk.n + (vk.n === 1 ? ' Position weicht' : ' Positionen weichen') + ' von ViVi ab.' : ' Stimmt mit ViVi überein.') : ''),
+      (lauf && !anlageVErlaubt() ? '' : knopf('steuer', z.status === 'geplant' ? 'Anlage V ' + z.jahr + ' ausfüllen' : 'Anlage V ansehen', s.steuer === 'offen')) + ' ' + knopf('eintragen', 'Stand setzen', false, z.jahr)
+        + (vk && vk.n ? ' ' + knopf('vivi-reiter', vk.n + (vk.n === 1 ? ' Abweichung' : ' Abweichungen') + ' zu ViVi', false, z.jahr) : ''), z.jahr);
     var wP = pl && istZahl(pl.wert_y) ? pl.wert_y : null, wI = z.mb ? z.mb.wert : null;
     teile.wert = schritt('wert', 'Wert', s, wI != null ? eur(wI) : '–', (wP != null ? 'Plan ' + eur(wP) : 'kein Plan') + (abw(wP, wI, true) ? ' · ' + abw(wP, wI, true) : ''),
-      z.mb ? 'Marktbericht vom ' + datumText(z.mb.am) + (z.mb.stichtag && z.mb.stichtag !== z.mb.am ? ', Wertermittlungsstichtag ' + datumText(z.mb.stichtag) : '') + '.' : 'Kein Marktbericht in ' + z.jahr + '.', knopf(z.mb ? 'wert-sehen' : 'wert', z.mb ? 'Alle Berichte' : 'Marktbericht abrufen', s.wert === 'offen'), z.jahr);
+      z.mb ? 'Marktbericht vom ' + datumText(z.mb.am) + (z.mb.stichtag && z.mb.stichtag !== z.mb.am ? ', bewertet zum ' + datumText(z.mb.stichtag) : '') + '.'
+        + (z.mb.stichtag && String(z.mb.stichtag).slice(0, 4) !== String(z.mb.am).slice(0, 4) ? ' Ein Bericht steht im Jahr seines Wertermittlungsstichtags.' : '')
+        : 'Kein Marktbericht zum Stichtag in ' + z.jahr + '.' + anderswo(z.jahr), knopf(z.mb ? 'wert-sehen' : 'wert', z.mb ? 'Alle Berichte' : 'Marktbericht abrufen', s.wert === 'offen'), z.jahr);
     if (weg) {
       var hgW = istZahl(h.hg_ist_j) ? eur(h.hg_ist_j) : (istZahl(h.hg_plan_m) ? eur(h.hg_plan_m * 12) : '–');
       var hgV = istZahl(h.hg_plan_m) ? 'Plan ' + eur(h.hg_plan_m * 12) + (istZahl(h.hg_ist_j) ? ' · ' + abw(h.hg_plan_m * 12, h.hg_ist_j, false) : ' · Wirtschaftsplan') : (istZahl(h.hg_ist_j) ? (h.hg_quelle === 'vivi' ? 'Hausgeld laut ViVi' : 'Hausgeld laut Abrechnung') : 'Hausgeld im Jahr');
@@ -668,9 +760,7 @@
     out += '<div class="dp-ja-schritte">' + sch + '</div>';
     if (_eingabe === z.jahr && JB() && JB().eingabeHtml) out += '<div class="dp-ja-eingabe" data-ja-eingabe="' + z.jahr + '"><div class="dp-ja-eingabe-k"><b>' + z.jahr + ' eintragen</b><span>Ist-Miete, Leerstand, Restschuld laut Kontoauszug, Stand der Steuer und Notiz</span><button type="button" class="btn-clean dp-ja-ein-x" data-ja-aktion="ein-zu" aria-label="Eingabe schließen">✕</button></div>' + JB().eingabeHtml(z.jahr) + '</div>';
 
-    /* v4017 · ViVi des Jahres mit Differenz zu DealPilot */
-    var vd = null; try { vd = viviDaten(); } catch (e) { vd = null; }
-    try { out += viviHtml(z, vd); } catch (e) { try { console.warn('[jahresabgleich] ViVi', e); } catch (x) {} }
+    /* v4500 · die ViVi-Zeile (viviHtml) entfällt, die Abweichungen stehen im Schritt Steuer (viviKurz) */
 
     /* Mieterhöhungspotenzial des Jahres */
     try { out += potenzialHtml(z, lauf); } catch (e) { try { console.warn('[jahresabgleich] Mietpotenzial', e); } catch (x) {} }
@@ -679,15 +769,15 @@
     out += abschnitt('Jahr für Jahr', 'Plan vom Kauf gegen Ist · Zeile wählt das Jahr');
     out += tabelleHtml(Z, weg, L, null);   /* v4042 · Spalte „laut ViVi“ entfällt, der Vergleich steht im Reiter ViVi */
     var hin = '';
-    if (z.abgleich && z.abgleich.art !== 'gleich') hin += '<div class="dp-ja-notiz">' + esc(z.abgleich.text) + (z.abgleich.art === 'vorschlag' ? ' ' + knopf('av', 'übernehmen', false, z.jahr) : '') + '</div>';
+    /* v4500 · der Anlage-V-Hinweis steht jetzt als Aktion in der Zeile (avKnopf) */
     if (z.ziel_erreicht && z.ziel_fassung && z.ziel_fassung.status !== 'erreicht') hin += '<div class="dp-ja-notiz ok">Die Ist-Miete ' + z.jahr + ' erreicht das Ziel von ' + esc(z.ziel_titel || 'Zielbild') + '. <button type="button" class="btn-clean dp-pa4-btn" data-ja-aktion="erreicht" data-ja-fassung="' + esc(z.ziel_fassung.id) + '">als erreicht kennzeichnen</button></div>';
     if (z.notiz) hin += '<div class="dp-ja-notiz">Notiz ' + z.jahr + ': ' + esc(z.notiz) + '</div>';
     out += hin;
     var nSt = 0; try { nSt = global.DpJahresstaende && global.DpJahresstaende.liste ? global.DpJahresstaende.liste().length : 0; } catch (e) {}
-    out += '<div class="dp-ja-fuss"><span>Plan ist die Rechnung vom Kauf, eingefroren. DSCR und Score je Jahr merkt sich DealPilot beim Speichern (' + nSt + (nSt === 1 ? ' Jahr' : ' Jahre') + '). '
-      + (z.ohne_plan ? 'Ohne eingefrorenen Plan steht grau die heutige Projektion. ' : '') + '</span>'
-      + '<span class="dp-ja-fh"><button type="button" class="btn-clean dp-pa4-btn" data-ja-aktion="festhalten">Kennzahlen ' + heuteJahr() + ' jetzt sichern</button>'
-      + '<button type="button" class="dp-tip" data-tip-id="pa.ja_kennzahlen_sichern" tabindex="-1" aria-label="Was heißt Kennzahlen sichern?"></button></span></div>';   /* v4090 · hieß „Stand JJJJ festhalten" */
+    /* v4500 · Marcel 24.11.2026: „Kennzahlen 2026 jetzt sichern … verstehe ich überhaupt nicht“. Der Knopf tat nur, was jedes
+       Speichern ohnehin tut (DpJahresstaende.beimSpeichern). Er entfällt, der Satz sagt es. */
+    out += '<div class="dp-ja-fuss"><span>Geplant ist die Rechnung vom Kauf, eingefroren. Tatsächlich ist, was du eingetragen hast, was aus ViVi kommt oder, solange beides fehlt, was DealPilot aus dem Reiter Miete rechnet. DSCR und Score je Jahr merkt sich DealPilot bei jedem Speichern von selbst (' + nSt + (nSt === 1 ? ' Jahr' : ' Jahre') + ').'
+      + (z.ohne_plan ? ' Ohne eingefrorenen Plan steht grau die heutige Projektion.' : '') + '</span></div>';
 
     /* Verlauf */
     out += abschnitt('Verlauf', 'Kaltmiete und Cashflow · Plan gegen Ist') + '<div data-dp-jb-grafik="1" data-ja-grafik="1"></div>';
@@ -727,8 +817,21 @@
   function mountAll() {
     var d = doc(); if (!d || !d.querySelectorAll) return;
     var hs = d.querySelectorAll('[data-dp-ja-host]');
+    /* v4500 · Marcel 24.11.2026: „immer wenn ich auf Kennzahlen oder Übernehmen klicke, kommt kurz ein Diagramm“. Gemessen:
+       jedes Neuzeichnen setzte die alten Karten (jahresbuch-grafik.js) 170 ms sichtbar ein, erst 220 ms später ersetzte
+       grafiken-neu.js sie durch den Verlauf und spielte dessen Anlauf neu ab. Jetzt wandert der fertige Verlauf (data-dp-gn)
+       über das Neuzeichnen mit, die alten Karten sind darunter sofort versteckt (dp-gn-weg). Gleiche Signatur = kein Neuzeichnen. */
+    var mit = [];
+    for (var j = 0; j < hs.length; j++) { var gh = hs[j].querySelector('[data-ja-grafik]'); mit.push(gh ? Array.prototype.slice.call(gh.querySelectorAll('[data-dp-gn]')) : []); }
     for (var i = 0; i < hs.length; i++) { try { hs[i].innerHTML = html(); binden(hs[i]); eingabeBinden(hs[i]); } catch (e) { hs[i].innerHTML = ''; try { console.warn('[jahresabgleich]', e); } catch (x) {} } }
     try { if (hs.length && global.DpJahresbuchGrafik) global.DpJahresbuchGrafik.mountAll(grafikOpt()); } catch (e) {}
+    var gnAn = !!(d.body && d.body.classList && d.body.classList.contains('dp-gn-an'));
+    for (var u = 0; u < hs.length; u++) {
+      var ng = hs[u].querySelector('[data-ja-grafik]'); if (!ng || !gnAn) continue;
+      var ka = ng.querySelector('.jbg-karten');
+      if (ka) ka.classList.add('dp-gn-weg');
+      (mit[u] || []).forEach(function (k) { if (ka && ka.parentNode) ka.parentNode.insertBefore(k, ka); else ng.appendChild(k); });
+    }
     reiterMarke();
     if (hs.length && JB() && JB().mbLaden && mountAll._mb !== global._currentObjKey) {
       mountAll._mb = global._currentObjKey;

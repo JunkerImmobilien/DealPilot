@@ -39,7 +39,7 @@
 (function (global) {
   'use strict';
   if (global.DpJahresbuch) return;
-  var VERSION = 'v4330';
+  var VERSION = 'v4500';
   var STATUS = [['geplant', 'geplant'], ['erklaert', 'erklärt'], ['bescheid', 'Bescheid']];
 
   function doc() { return global.document || null; }
@@ -763,6 +763,6 @@
     istMieteSetzen: istMieteSetzen, istMiete: istMiete,   /* v3710 */ istHerkunft: istHerkunft, viviIstSetzen: viviIstSetzen,   /* v4037 */
     FEST_SCHRITTE: FEST_SCHRITTE, festAus: festAus, festNeu: festNeu, fest: fest, festSetzen: festSetzen, festGesperrt: festGesperrt,   /* v4016 */
     FELD_SCHRITT: FELD_SCHRITT, feldGesperrtRein: feldGesperrtRein, feldGesperrt: feldGesperrt, istFest: istFest, erhoehungenSchuetzenRein: erhoehungenSchuetzenRein, erhoehungenSchuetzen: erhoehungenSchuetzen, steuerSperreEinhaengen: steuerSperreEinhaengen,   /* v4090 */
-    html: html, eingabeHtml: eingabeHtml, eingabeBinden: eingabeBinden,   /* v4090 */ mountAll: mountAll, oeffnen: oeffnen, schliessen: schliessen, vorbelegen: vorbelegen, mbLaden: mbLaden, mbImJahr: mbImJahr, _mbSetzen: function (k, l) { _mb.key = k; _mb.liste = l; }, aktion: aktion   /* v3430 */
+    html: html, eingabeHtml: eingabeHtml, eingabeBinden: eingabeBinden,   /* v4090 */ mountAll: mountAll, oeffnen: oeffnen, schliessen: schliessen, vorbelegen: vorbelegen, mbLaden: mbLaden, mbImJahr: mbImJahr, mbListe: function () { return (_mb.key === global._currentObjKey && _mb.liste) || []; },   /* v4500 */ _mbSetzen: function (k, l) { _mb.key = k; _mb.liste = l; }, aktion: aktion   /* v3430 */
   };
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -79,6 +79,30 @@ const K = c.DpMietpotenzial, E = c.DpErhoehungen, JA = c.DpJahresabgleich, HV = 
     ok(/mpUrteil\(mp, zus, z\.miete_ist\)/.test(lies('frontend/js/jahresabgleich.js')) && /mpUrteil\(mp, zusatzMonat\(\), z\.miete_ist\)/.test(lies('frontend/js/jahresabgleich.js')), 'M v4410 Karte und Tabelle rechnen mit derselben Funktion');
   }
   ok(!/\bkappung\(|function sollFuer/.test(lies('frontend/js/jahresabgleich.js')), 'M keine zweite Rechnung: jahresabgleich.js ruft den Kern, rechnet § 558 nicht selbst');
+  /* v4500 · Demostraße 5 (Staging 24.11.2026, erfundene Zahlen): 68 m², Vergleichsmiete 7,40 €/m² (503,20 €), Miete 520 €,
+     Erhöhungen 01.12.2025 auf 570 und 01.11.2026 auf 620 (§ 558). „zulässig: drüber“ kam aus Jahresmiete gegen 01.01. × 12. */
+  {
+    const ctx = { kapp: { pct: 15 } };
+    const q = [{ nr: '1', liste: [{ datum: '2023-07-01', art: '558', von: 800, auf: 850 }, { datum: '2025-04-01', art: '558', von: 850, auf: 900 }], heute: 900, wfl: 62, vgl_qm: 14.52, vgl_art: 'mietspiegel_qualifiziert' }];
+    const L = [{ datum: '2025-12-01', art: '558', von: 520, auf: 570 }, { datum: '2026-11-01', art: '558', von: 570, auf: 620 }];
+    const qD = [{ nr: '', liste: L, heute: 620, wfl: 68, vgl_qm: 7.4, vgl_art: 'mietspiegel_qualifiziert' }];
+    const d25 = JA.mpRein(qD, 2025, ctx, K, E);
+    ok(d25.ueber_erh.length === 1 && d25.ueber_erh[0].datum === '2025-12-01' && d25.ueber_erh[0].auf === 570 && d25.ueber_erh[0].zul === 520, 'M v4500 Demo 2025: Erhöhung 01.12.2025 auf 570 über der an dem Tag zulässigen 520 € erkannt (' + JSON.stringify(d25.ueber_erh) + ')');
+    ok(d25.zul_jahr === 6240, 'M v4500 Demo 2025: zulässig im Jahr 12 × 520 = 6.240, die zu hohe Erhöhung zählt nur bis zur Grenze (' + d25.zul_jahr + ')');
+    const U25 = JA.mpUrteil(d25, 40, 6770);
+    ok(U25.ueber && U25.erh.length === 1 && U25.zul_j === 6720, 'M v4500 Demo 2025: Urteil „Erhöhung zu hoch“, mit Stellplatz 40 €/Monat zulässig 6.720 (' + U25.zul_j + ')');
+    const r25b = JA.mpRein(q, 2025, ctx, K, E);
+    ok(r25b.ueber_erh.length === 0, 'M v4500 erlaubte Erhöhung 01.04.2025 auf 900 (zulässig 900,24) ist nicht „zu hoch“');
+    ok(r25b.zul_jahr === Math.round(850 * 3 + 900.24 * 9), 'M v4500 zulässig je Monat: Jan. bis März 850, ab April 900,24 (' + r25b.zul_jahr + ')');
+    ok(!JA.mpUrteil(r25b, 0, 850 * 3 + 900 * 9).ueber, 'M v4500 Jahresmiete mit erlaubter Erhöhung liegt nicht über zulässig');
+    const rK = JA.mpRein(q, 2025, ctx, K, E, { monate: 10 });
+    ok(rK.monate === 10 && rK.zul_jahr === Math.round(850 + 900.24 * 9), 'M v4500 Kaufjahr: nur Monate ab Übergang (10, ab März) (' + rK.zul_jahr + ')');
+    const ja = lies('frontend/js/jahresabgleich.js'), tc = lies('frontend/js/tooltip-content.js');
+    ok(!/data-ja-aktion="festhalten"/.test(ja) && !/out \+= viviHtml/.test(ja), 'M v4500 Knopf „Kennzahlen jetzt sichern“ und eigene ViVi-Zeile entfallen');
+    ok(/Kaltmiete<br>geplant/.test(ja) && /Kaltmiete<br>tatsächlich/.test(ja) && /'pa\.ja_miete_plan'/.test(tc) && /'pa\.ja_miete_ist'/.test(tc) && /'pa\.ja_zulaessig'/.test(tc), 'M v4500 Spalten geplant und tatsächlich, Hilfe zum Überfahren');
+    ok(/avKnopf\(z\)/.test(ja) && !/knopf\('av', 'übernehmen'/.test(ja), 'M v4500 Anlage-V-Vorschlag als Aktion in der Zeile, nicht unter der Tabelle');
+    ok(/mit\[u\]/.test(ja) && /ka\.classList\.add\('dp-gn-weg'\)/.test(ja), 'M v4500 Verlauf wandert beim Neuzeichnen mit, alte Karten sofort versteckt');
+  }
 }
 
 /* ── S · Stand je Schritt ───────────────────────────────────── */
@@ -258,7 +282,7 @@ const K = c.DpMietpotenzial, E = c.DpErhoehungen, JA = c.DpJahresabgleich, HV = 
   ok(!/[–—;]/.test(texte), 'A Kundentext des Ablaufs ohne Gedankenstrich und Semikolon');
   const js = lies('frontend/js/jahresabgleich.js');
   ok(/function warteSichtbar\(/.test(js) && /a === 'miete'\) \{ zuMiete\('erh'\)/.test(js) && /det\.open = true/.test(js) && /einheitOeffnen\(wohnungMitLuft\(\)\)/.test(js), 'A Mieterhöhung eintragen: wartet auf das Ziel, klappt die Eingabe auf, MFH öffnet die Wohnung');
-  ok(/Kennzahlen ' \+ heuteJahr\(\) \+ ' jetzt sichern/.test(js) && /data-tip-id="pa\.ja_kennzahlen_sichern"/.test(js) && /'pa\.ja_kennzahlen_sichern'/.test(lies('frontend/js/tooltip-content.js')) && !/festhalten<\/button>/.test(js), 'A „Stand festhalten" heißt „Kennzahlen JJJJ jetzt sichern", Hilfe nur über den Tooltip-Schalter');
+  ok(!/data-ja-aktion="festhalten"/.test(js) && !/festhalten<\/button>/.test(js) && /von selbst/.test(js), 'A v4500 Knopf „Kennzahlen JJJJ jetzt sichern“ entfällt (tat nur, was jedes Speichern tut), der Fußsatz sagt es');
   /* Grafik: Karten je Kennzahl, Kopf mit Ist, Plan und Abstand in Worten */
   const sp = G5.ausAlt({ jahre: [{ jahr: 2024, miete_plan: 6000, miete_ist: 6200, cf_plan: -1000, cf_ist: null }, { jahr: 2025, miete_plan: 6240, miete_ist: 6770, cf_plan: -2000, cf_ist: -1500 }], heute: 2026, gewaehlt: 2025, karten: true });
   ok(sp.karten === true && sp.panels.every((p) => p.serien.some((s) => s.rolle === 'ist') && p.serien.some((s) => s.rolle === 'plan')), 'A Grafik: Karten, jede mit Ist und Plan');
