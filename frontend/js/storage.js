@@ -2592,7 +2592,7 @@ async function loadSaved(k) {
       if (typeof setMainView === 'function') setMainView('single');
       // V63.77 FIX: Falls User im Quick-Check-Standalone war → diesen sauber verlassen, dann zu Tab Objekt
       if (typeof exitQuickCheckMode === 'function') exitQuickCheckMode();
-      if (typeof switchTab === 'function') switchTab(0);
+      /* v4540 · Bestand: Objekt-Cockpit, Ankauf: Objekt */ if (window.DpObjektCockpit && typeof window.DpObjektCockpit.startReiter === 'function') window.DpObjektCockpit.startReiter(); else if (typeof switchTab === 'function') switchTab(0);
       // V63.48: Workflow-Bar nach Daten-Load aktualisieren (Felder sind jetzt befüllt)
       if (window.DealPilotWorkflow && typeof DealPilotWorkflow.renderProgressBar === 'function') {
         setTimeout(DealPilotWorkflow.renderProgressBar, 100);
@@ -2624,7 +2624,7 @@ async function loadSaved(k) {
       if (typeof setMainView === 'function') setMainView('single');
       // V63.77 FIX: Falls User im Quick-Check-Standalone war → diesen sauber verlassen, dann zu Tab Objekt
       if (typeof exitQuickCheckMode === 'function') exitQuickCheckMode();
-      if (typeof switchTab === 'function') switchTab(0);
+      /* v4540 · Bestand: Objekt-Cockpit, Ankauf: Objekt */ if (window.DpObjektCockpit && typeof window.DpObjektCockpit.startReiter === 'function') window.DpObjektCockpit.startReiter(); else if (typeof switchTab === 'function') switchTab(0);
       if (window.DealPilotWorkflow && typeof DealPilotWorkflow.renderProgressBar === 'function') {
         setTimeout(DealPilotWorkflow.renderProgressBar, 100);
       }

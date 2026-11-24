@@ -1,4 +1,4 @@
-/* v4460 · Objekt-Cockpit (Marcel 24.11.2026):
+/* v4460 · v4540 · Objekt-Cockpit (Marcel 24.11.2026):
    „wenn wir ein Objekt in der Deal-Aktion auf gewonnen setzen, dass wir ganz vorne vor dem Tab Objekt dann das
    Objekt-Cockpit hinsetzen … nur wenn Objekte gewonnen sind … die Pilot-Analyse ist wirklich nur im Ankauf …
    goldfarben hinterlegen, dass es sich ein bisschen abhebt“.
@@ -160,7 +160,46 @@
     }, 150);
   }
 
-  window.DpObjektCockpit = { aktiv: aktiv, name: name, anwenden: anwenden, oeffnen: oeffnen };
+  /* v4540 · Marcel 24.11.2026: „wenn wir in ein Objekt gehen, was im Bestand ist, geht der automatisch in das
+     Objektcockpit, also immer in den ersten Tab. Und wenn der im Ankauf ist, geht der natürlich in Tab Objekt.“
+     storage.js loadSaved ruft das statt switchTab(0). Gewonnen und nicht in der Ankauf-Ansicht: Reiter s5 und dort der
+     erste Unterreiter (Übersicht). Die Analyse zeichnet sich nach dem Laden oft neu und behält dabei den zuletzt
+     offenen Unterreiter (ui.js _dpPaNeuZeichnen, v3154g), also den des VORIGEN Objekts. Deshalb wird der erste
+     Unterreiter nach dem Laden noch einige Male nachgesetzt, aber nur solange der Nutzer nichts angeklickt hat,
+     dasselbe Objekt offen ist und s5 noch der offene Bereich ist. */
+  var _benutzt = 0;
+  ['pointerdown', 'keydown'].forEach(function (ev) {
+    document.addEventListener(ev, function (e) { if (e && e.isTrusted !== false) _benutzt = Date.now(); }, true);
+  });
+  function ersterUnter() {
+    var r = document.querySelector('#s5 .dp-pa-rail');
+    if (!r) return;
+    var b = [].filter.call(r.querySelectorAll('.dp-pa-tab'), function (x) { return x.offsetParent !== null || x.style.display !== 'none'; })[0];
+    if (b && !b.classList.contains('active')) { try { b.click(); } catch (e) {} }
+  }
+  function startReiter() {
+    var tabs = [].slice.call(document.querySelectorAll('.tab'));
+    var i5 = tabs.findIndex(function (t) { return t.getAttribute('data-target-sec') === 's5'; });
+    if (!aktiv() || i5 < 0 || typeof window.switchTab !== 'function') {
+      if (typeof window.switchTab === 'function') window.switchTab(0);
+      return false;
+    }
+    anwenden(true);
+    window.switchTab(i5);
+    var key = window._currentObjKey, ab = Date.now();
+    [0, 300, 900, 1800, 3200].forEach(function (ms) {
+      setTimeout(function () {
+        try {
+          if (_benutzt > ab || window._currentObjKey !== key) return;
+          var s5 = document.getElementById('s5'); if (!s5 || !s5.classList.contains('active')) return;
+          ersterUnter();
+        } catch (e) {}
+      }, ms);
+    });
+    return true;
+  }
+
+  window.DpObjektCockpit = { aktiv: aktiv, name: name, anwenden: anwenden, oeffnen: oeffnen, startReiter: startReiter };
 
   function los() {
     anwenden(true); weiterAnpassen();
