@@ -14,7 +14,8 @@
 <link rel="stylesheet" href="dp2-teile.css?v=gold-hell-1">
 <link rel="stylesheet" href="dp2-live.css?v=landing-strecke-4">
 <link rel="stylesheet" href="dp2-loesungen.css?v=landing-loesungen-1c">
-<link rel="stylesheet" href="partner.css?v=gold-hell-1">
+<link rel="stylesheet" href="partner.css?v=landing-partner-preise-1">
+<link rel="stylesheet" href="partner-pakete.css?v=landing-partner-preise-1"><!-- landing-partner-preise-1 · Partner-Pakete wie auf preise.html -->
 </head><body class="lz-body">
 
 <svg style="display:none" aria-hidden="true">
@@ -123,52 +124,111 @@
      Pakete“. Karte und Staffel sind Zeichen für Zeichen aus preise.html (#partner-plan) übernommen, gleiche
      Klassen aus dp2-teile.css (.pcard, .pinc, .pstaffel), Werte unverändert. Ändert sich dort ein Preis,
      hier mitziehen. -->
+<!-- landing-partner-preise-1 (24.11.2026, Marcel: „die Preiskarten für Partner müssen auch in die Subpage Für Partner“).
+     Dieselben vier Pakete wie preise.html #partner-plan. Die Zahlen unten sind nur der Rückfall ohne Skript und eine
+     Kopie des Blocks aus preise.html. partner-pakete.js rechnet aus js/kundenplatz-staffel.js und js/teamplatz-staffel.js
+     neu. tools/teamplatz-pruefen.mjs (L2) prüft, dass der Block hier Zeichen für Zeichen dem auf preise.html gleicht. -->
 <section class="sec sec-dark" id="preis"><div class="wrap">
+  <div class="ppk-wrap" id="partner-plan">
   <div class="head ctr rv"><div class="eye ctr">Was es kostet</div>
-    <h2>Ein Grundpreis. <span class="ac">Plätze nach Bedarf.</span></h2>
-    <p>Kunden mit eigenem Abo belegen keinen Platz. Alle Pakete im Vergleich stehen auf der <a href="preise.html" style="color:var(--gdh)">Preisseite</a>.</p></div>
-  <div class="pbox on">
-    <div class="pcard rv" id="partner-preis">
-      <span class="pbadge">★ WHITELABEL</span>
-      <div class="pcard-l">
-        <div class="tag">Makler · Sachverständige · Steuerberater · Finanzierer</div>
-        <h3>Partner</h3>
-        <p class="lead">Deine Kunden und Mandanten rechnen unter deiner Marke. Du prüfst, gibst frei und
-          behältst jeden Vorgang im Blick, ohne Mail-Pingpong und ohne eigene IT.</p>
-        <div class="pr" data-m="99 €" data-j="1.089 €">99 €<small> / Monat</small></div>
-        <div class="prn" data-m="oder 1.089 €/Jahr, 1 Monat geschenkt"
-             data-j="entspricht rund 91 €/Monat, 1 Monat geschenkt">oder 1.089 €/Jahr, 1 Monat geschenkt</div>
-        <a class="pcta" href="https://app.dealpilot.immo/?register=1&amp;partner_kauf=1">Partner-Plan buchen →</a><!-- v3610 · direkt buchen (Konto anlegen oder anmelden, Plätze wählen, Stripe) -->
-        <p class="phint">Konto anlegen oder anmelden, Kundenplätze wählen und direkt buchen. Keine Testphase,
-          Kündigung jederzeit zum Ende der Laufzeit. Fragen vorab? <a href="mailto:info@dealpilot.immo?subject=Partner-Anfrage%20%E2%80%93%20DealPilot&amp;body=Name%3A%0AKanzlei%20%C2%B7%20B%C3%BCro%3A%0ARolle%3A%0AEtwa%20wie%20viele%20Mandanten%3A%0A%0AMeine%20Frage%3A%0A" style="color:inherit;text-decoration:underline">Schreib uns</a>.</p>
+    <h2>Vier Größen. <span class="ac">Jede anpassbar.</span></h2>
+    <p>Ein Grundpreis, Kundenplätze und Logins nach Bedarf. Kunden mit eigenem Abo belegen keinen Platz. Alle Pakete im Vergleich stehen auf der <a href="preise.html" style="color:var(--gdh)">Preisseite</a>.</p></div>
+  <div class="pseg rv">
+    <div class="seg" id="segZeit">
+      <button class="on" data-zeit="m">Monatlich</button>
+      <button data-zeit="j">Jährlich<span class="spar">−17 %</span></button>
+    </div>
+  </div>
+    <div class="tkg ppk-g" id="teamplaetze">
+      <div class="tk ppk rv" data-paket="solo" data-kunden="0" data-logins="1">
+        <div class="tk-stub">
+          <div class="tk-stars">★</div>
+          <div class="tk-tag">Einzelberater</div>
+          <div class="tk-name">Solo</div>
+          <div class="tk-class">Economy</div>
+        </div>
+        <div class="tkperf"></div>
+        <div class="tk-body">
+          <div class="tk-price"><b class="zahl-wechsel" data-o="gesamt">99</b><span class="cur">€</span><span class="per">/ Monat</span></div>
+          <div class="tk-note ppk-schnitt" data-o="schnitt">ohne Kundenplätze</div>
+          <div class="ppk-mengen"><div class="tkm"><div class="tkm-k">Kunden</div><div class="tkm-w"><div class="step"><button type="button" data-k="kunden" data-d="-1" aria-label="Kundenplätze weniger">−</button><input type="number" min="0" max="500" value="0" inputmode="numeric" data-k="kunden" aria-label="Kundenplätze"><button type="button" data-k="kunden" data-d="1" aria-label="Kundenplätze mehr">+</button></div></div></div><div class="tkm"><div class="tkm-k">Logins</div><div class="tkm-w"><div class="step"><button type="button" data-k="logins" data-d="-1" aria-label="Logins mit dir weniger">−</button><input type="number" min="1" max="50" value="1" inputmode="numeric" data-k="logins" aria-label="Logins mit dir"><button type="button" data-k="logins" data-d="1" aria-label="Logins mit dir mehr">+</button></div></div></div></div>
+          <div class="tkr" data-o="rechnung"><div><span>Partner-Plan<small>du als Inhaber</small></span><b>99 €</b></div><div><span>0 Kundenplätze<small>nach Bedarf dazu</small></span><b>0 €</b></div><div><span>Kein Teamplatz<small>nur du</small></span><b>0 €</b></div></div>
+          <div class="ppk-fuell"></div>
+          <a class="tk-cta" data-o="buchen" href="https://app.dealpilot.immo/?register=1&amp;partner_kauf=1&amp;intervall=monthly&amp;kundenplaetze=0&amp;teamplaetze=0">Jetzt buchen →</a>
+        </div>
+        <div class="tk-rip"><span>✈ BOARDING PASS</span><b>DP-P1</b></div>
       </div>
-      <div class="pcard-r">
-        <div class="tag" style="margin-bottom:14px">Enthalten</div>
-        <ul class="pinc">
-          <li>Partner-Cockpit: Kunden einladen, Plätze vergeben, Freigaben und Aufgaben im Blick</li><!-- landing-partner-1 · vorher „Mandanten-Konsole“ -->
-          <li>Whitelabel: dein Logo, deine Farben, dein Name</li>
-          <li>Anmerkungen direkt am Feld und Rückmeldung an den Kunden, auf Wunsch per E-Mail in deiner Marke</li>
-          <li>Voller Pro-Funktionsumfang für deinen Zugang</li>
-          <li>Mandanten-Plätze buchst du nach Bedarf dazu, 19, 15 oder 12 € je Platz, keiner ist im Grundpreis enthalten</li>
-          <li data-team-ab>Du bist im Plan enthalten. Weitere Logins für dein Team ab 39 € im Monat, <a href="preise.html#teamplaetze" style="color:inherit;text-decoration:underline">Staffel und Rechner</a></li><!-- v3947 · Zahl = DpTeamplatz.ab('monthly'), tools/teamplatz-pruefen.mjs -->
-          <li>Individuelle Prozesse, Homepage-Einbindung und Schnittstellen <a href="loesungen.html" style="color:inherit;text-decoration:underline">auf Anfrage</a></li>
-        </ul>
+      <div class="tk ppk rv" data-paket="buero" data-kunden="5" data-logins="2">
+        <div class="tk-stub">
+          <div class="tk-stars">★★</div>
+          <div class="tk-tag">Kleines Büro</div>
+          <div class="tk-name">Büro</div>
+          <div class="tk-class">Premium Economy</div>
+        </div>
+        <div class="tkperf"></div>
+        <div class="tk-body">
+          <div class="tk-price"><b class="zahl-wechsel" data-o="gesamt">253</b><span class="cur">€</span><span class="per">/ Monat</span></div>
+          <div class="tk-note ppk-schnitt" data-o="schnitt">im Schnitt 50,60 € je Kunde</div>
+          <div class="ppk-mengen"><div class="tkm"><div class="tkm-k">Kunden</div><div class="tkm-w"><div class="step"><button type="button" data-k="kunden" data-d="-1" aria-label="Kundenplätze weniger">−</button><input type="number" min="0" max="500" value="5" inputmode="numeric" data-k="kunden" aria-label="Kundenplätze"><button type="button" data-k="kunden" data-d="1" aria-label="Kundenplätze mehr">+</button></div></div></div><div class="tkm"><div class="tkm-k">Logins</div><div class="tkm-w"><div class="step"><button type="button" data-k="logins" data-d="-1" aria-label="Logins mit dir weniger">−</button><input type="number" min="1" max="50" value="2" inputmode="numeric" data-k="logins" aria-label="Logins mit dir"><button type="button" data-k="logins" data-d="1" aria-label="Logins mit dir mehr">+</button></div></div></div></div>
+          <div class="tkr" data-o="rechnung"><div><span>Partner-Plan<small>du als Inhaber</small></span><b>99 €</b></div><div><span>5 Kundenplätze<small>5 × 19 €</small></span><b>95 €</b></div><div><span>1 Teamplatz<small>1 × 59 €</small></span><b>59 €</b></div></div>
+          <div class="ppk-fuell"></div>
+          <a class="tk-cta" data-o="buchen" href="https://app.dealpilot.immo/?register=1&amp;partner_kauf=1&amp;intervall=monthly&amp;kundenplaetze=5&amp;teamplaetze=1">Jetzt buchen →</a>
+        </div>
+        <div class="tk-rip"><span>✈ BOARDING PASS</span><b>DP-P2</b></div>
+      </div>
+      <div class="tk ppk best rv" data-paket="kanzlei" data-kunden="10" data-logins="3">
+        <div class="tk-stub">
+          <div class="tk-stars">★★★</div>
+          <span class="tk-bs">★ Für Kanzleien</span>
+          <div class="tk-tag">Kanzlei mit Team</div>
+          <div class="tk-name">Kanzlei</div>
+          <div class="tk-class">Business</div>
+        </div>
+        <div class="tkperf"></div>
+        <div class="tk-body">
+          <div class="tk-price"><b class="zahl-wechsel" data-o="gesamt">367</b><span class="cur">€</span><span class="per">/ Monat</span></div>
+          <div class="tk-note ppk-schnitt" data-o="schnitt">im Schnitt 36,70 € je Kunde</div>
+          <div class="ppk-mengen"><div class="tkm"><div class="tkm-k">Kunden</div><div class="tkm-w"><div class="step"><button type="button" data-k="kunden" data-d="-1" aria-label="Kundenplätze weniger">−</button><input type="number" min="0" max="500" value="10" inputmode="numeric" data-k="kunden" aria-label="Kundenplätze"><button type="button" data-k="kunden" data-d="1" aria-label="Kundenplätze mehr">+</button></div></div></div><div class="tkm"><div class="tkm-k">Logins</div><div class="tkm-w"><div class="step"><button type="button" data-k="logins" data-d="-1" aria-label="Logins mit dir weniger">−</button><input type="number" min="1" max="50" value="3" inputmode="numeric" data-k="logins" aria-label="Logins mit dir"><button type="button" data-k="logins" data-d="1" aria-label="Logins mit dir mehr">+</button></div></div></div></div>
+          <div class="tkr" data-o="rechnung"><div><span>Partner-Plan<small>du als Inhaber</small></span><b>99 €</b></div><div><span>10 Kundenplätze<small>10 × 15 €</small></span><b>150 €</b></div><div><span>2 Teamplätze<small>2 × 59 €</small></span><b>118 €</b></div></div>
+          <div class="ppk-fuell"></div>
+          <a class="tk-cta" data-o="buchen" href="https://app.dealpilot.immo/?register=1&amp;partner_kauf=1&amp;intervall=monthly&amp;kundenplaetze=10&amp;teamplaetze=2">Jetzt buchen →</a>
+        </div>
+        <div class="tk-rip"><span>✈ BOARDING PASS</span><b>DP-P3</b></div>
+      </div>
+      <div class="tk ppk rv" data-paket="netzwerk" data-kunden="25" data-logins="8">
+        <div class="tk-stub">
+          <div class="tk-stars">★★★★</div>
+          <div class="tk-tag">Viele Berater</div>
+          <div class="tk-name">Netzwerk</div>
+          <div class="tk-class">First</div>
+        </div>
+        <div class="tkperf"></div>
+        <div class="tk-body">
+          <div class="tk-price"><b class="zahl-wechsel" data-o="gesamt">772</b><span class="cur">€</span><span class="per">/ Monat</span></div>
+          <div class="tk-note ppk-schnitt" data-o="schnitt">im Schnitt 30,88 € je Kunde</div>
+          <div class="ppk-mengen"><div class="tkm"><div class="tkm-k">Kunden</div><div class="tkm-w"><div class="step"><button type="button" data-k="kunden" data-d="-1" aria-label="Kundenplätze weniger">−</button><input type="number" min="0" max="500" value="25" inputmode="numeric" data-k="kunden" aria-label="Kundenplätze"><button type="button" data-k="kunden" data-d="1" aria-label="Kundenplätze mehr">+</button></div></div></div><div class="tkm"><div class="tkm-k">Logins</div><div class="tkm-w"><div class="step"><button type="button" data-k="logins" data-d="-1" aria-label="Logins mit dir weniger">−</button><input type="number" min="1" max="50" value="8" inputmode="numeric" data-k="logins" aria-label="Logins mit dir"><button type="button" data-k="logins" data-d="1" aria-label="Logins mit dir mehr">+</button></div></div></div></div>
+          <div class="tkr" data-o="rechnung"><div><span>Partner-Plan<small>du als Inhaber</small></span><b>99 €</b></div><div><span>25 Kundenplätze<small>25 × 12 €</small></span><b>300 €</b></div><div><span>7 Teamplätze<small>3 × 59 € + 4 × 49 €</small></span><b>373 €</b></div></div>
+          <div class="ppk-fuell"></div>
+          <a class="tk-cta" data-o="buchen" href="https://app.dealpilot.immo/?register=1&amp;partner_kauf=1&amp;intervall=monthly&amp;kundenplaetze=25&amp;teamplaetze=7">Jetzt buchen →</a>
+        </div>
+        <div class="tk-rip"><span>✈ BOARDING PASS</span><b>DP-P4</b></div>
       </div>
     </div>
-
-    <div class="pstaffel rv">
-      <div class="pstaffel-h"><svg class="ico"><use href="#i-ebenen"/></svg>
-        <div><b>Mandanten-Plätze: Mengenstaffel</b>
-          <span>Jeder Platz wird zum Partner-Paket dazugebucht. Je mehr Mandanten, desto günstiger jeder einzelne Platz.</span></div></div>
-      <div class="pstaffel-g">
-        <div><div class="st">1 – 9 MANDANTEN</div><div class="pv">19 € / Platz</div></div>
-        <div><div class="st">10 – 24 MANDANTEN</div><div class="pv">15 € / Platz</div></div>
-        <div><div class="st">AB 25 MANDANTEN</div><div class="pv">12 € / Platz</div></div>
-      </div>
-      <div class="pstaffel-f">Dein Mandant arbeitet mit einem Werkzeug, das einzeln 34,99 € kostet,
-        du zahlst ab 12 €. Wird ein Mandat beendet, wird der Platz frei und ist sofort neu
-        vergebbar. Monatlich oder jährlich, jährlich mit einem Freimonat.</div>
+    <ul class="ppk-nutzen rv"><li>Deine Marke, nicht unsere</li><li>Dein Kunde behält seine Daten</li><li>Ein Cockpit für alle Kunden</li></ul>
+    <div class="ppk-enthalten rv">
+      <div class="tag">In jedem Paket enthalten</div>
+      <ul class="pinc">
+        <li>Partner-Cockpit: Kunden einladen, Plätze vergeben, Freigaben und Aufgaben im Blick</li>
+        <li>Whitelabel: dein Logo, deine Farben, dein Name</li>
+        <li>Anmerkungen direkt am Feld und Rückmeldung an den Kunden, auf Wunsch per E-Mail in deiner Marke</li>
+        <li>Voller Pro-Funktionsumfang für deinen Zugang</li>
+        <li data-team-ab>Du bist im Plan enthalten. Weitere Logins für dein Team ab 39 € im Monat, <a href="preise.html#teamplaetze" style="color:inherit;text-decoration:underline">Staffel und Rechner</a></li><!-- v3947 · Zahl = DpTeamplatz.ab('monthly'), tools/teamplatz-pruefen.mjs -->
+        <li>Individuelle Prozesse, Homepage-Einbindung und Schnittstellen <a href="loesungen.html" style="color:inherit;text-decoration:underline">auf Anfrage</a></li>
+      </ul>
     </div>
+    <p class="ppk-fuss rv">Du als Inhaber bist im Partner-Plan enthalten, mit vollem Pro-Umfang. Keine Testphase, Kündigung jederzeit zum Ende der Laufzeit.
+      Plätze änderst du später im Partner-Cockpit. <a href="#strecke">So läuft es ab</a> · <a href="mailto:info@dealpilot.immo?subject=Partner-Anfrage%20DealPilot">Schreib uns</a>
+      <span class="ppk-staffel" data-o="staffel">Kundenplatz 19 € für 1 bis 9 Kunden, 15 € für 10 bis 24 Kunden, 12 € ab 25 Kunden, alle Plätze zum Satz der erreichten Stufe. Teamplatz 59 € für den 2. bis 4. Login, 49 € für den 5. bis 9. Login, 39 € ab dem 10. Login, jeder zum Satz seiner Stufe. Preise je Monat.</span></p>
   </div>
 </div></section>
 
@@ -425,5 +485,6 @@
 <script src="dp2.js?v=landing-zaehlen-1"></script>
 <script src="landing-zahlen.js?v=landing-zahlen-live-1"></script><!-- landing-zahlen-live-1 · Zahlen live aus GET /api/v1/public/datenumfang, das HTML bleibt Rückfall -->
 <script src="partner.js?v=landing-strecke-5"></script>
+<script src="partner-pakete.js?v=landing-partner-preise-1"></script><!-- landing-partner-preise-1 · rechnet die Pakete aus js/kundenplatz-staffel.js und js/teamplatz-staffel.js -->
   <script src="assets/umgebung.js?v=v1644"></script><!-- v1644 · Landing zeigt auf DIE App, in der sie steht -->
 </body></html>

@@ -464,7 +464,18 @@ const angebotSB = (team) => ({ plan: { monthly: 9900, yearly: 108900 },
 ok(K.abweichungen(angebotSB(true)).length === 0, 'DpKundenplatz.abweichungen(Angebot in Stripe-Form) leer: Preisfenster und Quelle stimmen überein');
 const rpS = text('frontend/js/reseller-portal.js');
 ok(K.STUFEN.every((s) => new RegExp('bis: ' + (s.bis == null ? 'Infinity' : s.bis) + ',\\s+monat: ' + s.monat + ', jahr: ' + s.jahr).test(rpS)), 'reseller-portal.js STAFFEL (Vorschau im alten Kaufpanel) = Quelle');
-ok(K.STUFEN.every((s) => partnerHtml.indexOf((s.bis == null ? 'AB ' + s.von : s.von + ' – ' + s.bis) + ' MANDANTEN</div><div class="pv">' + s.monat + ' € / Platz') >= 0), 'partner.html Mandanten-Staffel = Quelle');
+/* landing-partner-preise-1 (24.11.2026): partner.html führt statt der alten Mandanten-Staffel dieselben vier Pakete wie preise.html.
+   L2: Kartenblock Zeichen für Zeichen gleich (eine Quelle für den Rückfall), Skript und Stylesheet eingebunden, Staffel-Zeile gleich. */
+const kartenBlock = (h) => { const a = h.indexOf('<div class="tkg ppk-g" id="teamplaetze">'), b = h.indexOf('<ul class="ppk-nutzen rv">', a); return a < 0 || b < 0 ? null : h.slice(a, b).replace(/\s+$/, ''); };
+const _kbP = kartenBlock(preise), _kbT = kartenBlock(partnerHtml);
+ok(_kbP && _kbT && _kbP === _kbT, 'partner.html: Partner-Pakete (Solo, Büro, Kanzlei, Netzwerk) Zeichen für Zeichen wie auf preise.html');
+ok(/<script src="partner-pakete\.js\?v=[^"]+"/.test(partnerHtml) && /href="partner-pakete\.css\?v=[^"]+"/.test(partnerHtml) && /id="segZeit"/.test(partnerHtml),
+  'partner.html lädt partner-pakete.js/.css und hat den Umschalter Monat/Jahr');
+const _stz = (h) => ((/<span class="ppk-staffel" data-o="staffel">([\s\S]*?)<\/span>/.exec(h) || [])[1] || null);
+ok(_stz(preise) && _stz(preise) === _stz(partnerHtml), 'partner.html: Staffel-Zeile unter den Paketen = preise.html');
+ok(!/class="pstaffel|class="pcard/.test(partnerHtml), 'partner.html: alte Partnerkarte und alte Mandanten-Staffel sind weg');
+{ const _kaputt = partnerHtml.replace('data-kunden="10" data-logins="3"', 'data-kunden="12" data-logins="3"');
+  ok(kartenBlock(_kaputt) !== _kbP, 'Gegenprobe: Kanzlei mit 12 Kunden nur auf partner.html wird rot'); }
 
 // ══ L · Pakete: Rechenproben ════════════════════════════════════════════════
 kopf('L Rechenproben der vier Pakete (Hand-Tabelle, Monat und Jahr)');
