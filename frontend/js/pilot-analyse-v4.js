@@ -1916,6 +1916,9 @@
       + '</div>' + seg() + '</div>';
     try { localStorage.setItem('dp_pa_si_ansicht', m === 'detail' ? 'genau' : 'einfach'); } catch (e) {}
     try { setTimeout(function () { leisteMessen(); minisZeichnen(); if (window.DpWertZielbild && window.DpWertZielbild.laden) window.DpWertZielbild.laden().then(function () { kzNeu(); minisZeichnen(); wegNeu(); siZeichnen(); mbHinweis(); }, function () {}); }, 0); } catch (e) {}
+    /* v4490c · gemessen Westerfeldstr. 146: der Aufteilerwert (wert-zielbild.js mitAufteilung, braucht _dpMfh.aufgeteilt) kommt oft erst nach
+       allen Ereignissen an, die Leiste blieb bei „Ertragswert · führend“. Zweimal nachziehen, kzNeu tauscht nur die Leiste. */
+    try { [1500, 4000].forEach(function (ms) { setTimeout(function () { try { kzNeu(); } catch (e) {} }, ms); }); } catch (e) {}
     return '<div class="dp-pa-wrap' + (bestand ? ' dp-pa-bestand' : '') + '" data-dp-pa-v4="1" data-dp-pa-modus="' + m + '" data-dp-pa-ansicht="' + (bestand ? 'bestand' : 'ankauf') + '">'
       + kopf + '<div data-dp-pa-mbfehlt="1" data-vorschau="grafiken_neu" style="display:none"></div>' + leiste
       + '<div class="dp-pa-content">' + inhalt.join('') + '</div></div>';
