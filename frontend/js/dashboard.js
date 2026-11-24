@@ -2254,11 +2254,12 @@
       _mx.y2 = { position:'right', grid:{ drawOnChartArea:false }, ticks:{ color:axisCol, callback:function(v){ return yfmt(v); } },
                  title:{ display:true, text:'Restschuld · Eigenkapital (€)', color:axisCol, font:{size:10}, padding:{ top:0, bottom:6 } } };   /* v3325b: rechte Achse - top schob den Titel an die Zahlen (gemessen 360 px) */
       mk('dpc-proj-mix',{type:'bar',data:{labels:labels,datasets:[
-        {type:'bar',label:'Miete',data:PR.map(function(r){return Math.round(r.miete);}),backgroundColor:_wlrgba(.28),borderRadius:2,yAxisID:'y',order:4},
-        {type:'line',label:'Cashflow vor Steuer',data:PR.map(function(r){return Math.round(r.cfVor);}),borderColor:'#7A7370',backgroundColor:'#7A7370',pointRadius:0,borderWidth:2,tension:.3,yAxisID:'y',order:1},
-        {type:'line',label:'Cashflow nach Steuer',data:PR.map(function(r){return Math.round(r.cfNach);}),borderColor:'#3FA56C',backgroundColor:'#3FA56C',borderDash:[5,4],pointRadius:0,borderWidth:2,tension:.3,yAxisID:'y',order:1},
+        /* v4480 · Farben wie die Pilot-Analyse: Miete neutral, vor Steuer gestrichelt, nach Steuer dunkel, Eigenkapital grün */
+        {type:'bar',label:'Miete',data:PR.map(function(r){return Math.round(r.miete);}),backgroundColor:isDark()?'rgba(232,226,212,.14)':'rgba(42,39,39,.10)',borderRadius:2,yAxisID:'y',order:4},
+        {type:'line',label:'Cashflow vor Steuer',data:PR.map(function(r){return Math.round(r.cfVor);}),borderColor:'#8A8276',backgroundColor:'#8A8276',borderDash:[5,4],pointRadius:0,borderWidth:2,tension:.3,yAxisID:'y',order:1},
+        {type:'line',label:'Cashflow nach Steuer',data:PR.map(function(r){return Math.round(r.cfNach);}),borderColor:isDark()?'#F2ECDC':'#2A2727',backgroundColor:isDark()?'#F2ECDC':'#2A2727',pointRadius:0,borderWidth:2.4,tension:.3,yAxisID:'y',order:1},
         {type:'line',label:'Restschuld',data:PR.map(function(r){return Math.round(r.rest);}),borderColor:DEBT,backgroundColor:DEBT,pointRadius:0,borderWidth:2,tension:.3,yAxisID:'y2',order:2},
-        {type:'line',label:'Eigenkapital',data:PR.map(function(r){return Math.round(r.eq);}),borderColor:GOLD,backgroundColor:GOLD,pointRadius:0,borderWidth:2.6,tension:.3,yAxisID:'y2',order:2}
+        {type:'line',label:'Eigenkapital',data:PR.map(function(r){return Math.round(r.eq);}),borderColor:'#3FA56C',backgroundColor:'#3FA56C',pointRadius:0,borderWidth:2.6,tension:.3,yAxisID:'y2',order:2}
       ]},options:{scales:_mx,plugins:{legend:{display:true},tooltip:{callbacks:{label:function(c){ return ' '+c.dataset.label+': '+EURF(c.parsed.y)+' €'; }}}}}});
     }
 
@@ -2646,7 +2647,7 @@
       type: 'line',
       data: { datasets: [
         { label: 'Tarif § 32a EStG', data: kurve, parsing: false,
-          borderColor: SER[0], borderWidth: 2, pointRadius: 0, tension: 0,
+          borderColor: isDark() ? '#E8E2D4' : '#2A2727', borderWidth: 2, pointRadius: 0, tension: 0,   /* v4480 · Tarif dunkel wie die Linien der Pilot-Analyse, Gold nur für Werte */
           fill: false, order: 3 },
         { label: 'Weg deiner Objekte', data: punkte, parsing: false,
           showLine: true, borderColor: isDark() ? 'rgba(232,226,212,.45)' : 'rgba(42,39,39,.35)',

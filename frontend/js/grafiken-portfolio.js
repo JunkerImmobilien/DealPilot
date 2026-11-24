@@ -137,7 +137,9 @@
       B + ' .gp-t em{font-style:normal;color:var(--dp-gold-txt,#7d682f);background:color-mix(in srgb,' + GOLD + ' 22%,transparent);border-radius:5px;padding:0 5px}',
       B + ' .gp-u{font-size:11.5px;color:var(--c-pmut,#6b6660);margin:2px 0 10px}',
       /* je Objekt: drei Spalten Balken */
-      B + ' .gp-ob{display:grid;grid-template-columns:minmax(90px,1.1fr) repeat(3,minmax(0,1fr));gap:3px 10px;align-items:center;font-size:12px}',
+      B + ' .gp-ob-w{overflow-x:auto;-webkit-overflow-scrolling:touch}',
+      B + ' .gp-ob{display:grid;grid-template-columns:minmax(110px,1.1fr) repeat(4,minmax(0,1fr));gap:3px 10px;align-items:center;font-size:12px;min-width:760px}',   /* v4480 · fünf Spalten, schmal waagerecht scrollen */
+      B + ' .gp-ob .gp-on{position:sticky;left:0;z-index:1;background:var(--gx-karte,#fff)}',
       B + ' .gp-ob .gp-oh{font:600 10px/1.2 Inter,sans-serif;letter-spacing:.05em;text-transform:uppercase;color:var(--c-pmut,#6b6660);padding-bottom:4px;border-bottom:1px solid var(--c-line,#e0dbd3)}',
       B + ' .gp-ob .gp-on{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
       B + ' .gp-bar{position:relative;height:18px}',
@@ -168,7 +170,7 @@
       B + ' .gp-tip{position:absolute;pointer-events:none;background:#050505;color:#FDFCFA;font-size:11.5px;line-height:1.45;padding:7px 9px;border-radius:7px;z-index:5;white-space:nowrap;display:none}',
       '@media (max-width:1100px){' + B + ' .gp-klein{grid-template-columns:repeat(4,minmax(0,1fr))}' + B + ' .gp-raster{grid-template-columns:minmax(0,1fr)}}',
       '@media (max-width:640px){' + B + ' .gp-gross{grid-template-columns:repeat(2,minmax(0,1fr))}' + B + ' .gp-klein{grid-template-columns:repeat(2,minmax(0,1fr))}'
-        + B + ' .gp-v{font-size:18px}' + B + ' .gp-ob{grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1fr)}' + B + ' .gp-ob .gp-on{grid-column:1/-1;margin-top:6px;font-weight:600}' + B + ' .gp-ob .gp-oh:first-child{display:none}'
+        + B + ' .gp-v{font-size:18px}' + B + ' .gp-ob{min-width:640px;grid-template-columns:96px repeat(4,minmax(0,1fr))}'
         + B + ' .gp-bk{grid-template-columns:44px minmax(0,1fr) auto}' + B + ' .gp-bk .gp-p2{display:none}' + B + ' .gp-karte{padding:12px}}',
       '@media (prefers-reduced-motion:no-preference){' + B + ' .gp-bar i{animation:gpWachs .5s ease-out both}@keyframes gpWachs{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}}'
     ].join('\n');
@@ -257,20 +259,23 @@
     /* je Objekt: Miete, Cashflow nach Steuer, Steuereffekt */
     var obR = rows.slice().sort(function (a, b) { return (b.cfns == null ? -1e12 : b.cfns) - (a.cfns == null ? -1e12 : a.cfns); });
     var mit = obR.filter(function (r) { return r.cfns != null; }), plus = mit.filter(function (r) { return r.cfns > 0; }).length;
-    var bM = bereich(obR, function (r) { return r.mieteJ; }), bC = bereich(obR, function (r) { return r.cfns; }), bS = bereich(obR, function (r) { return r.steuer; });
+    var bM = bereich(obR, function (r) { return r.mieteJ; }), bC = bereich(obR, function (r) { return r.cfns; }), bS = bereich(obR, function (r) { return r.steuer; }), bV = bereich(obR, function (r) { return r.cfvs; });   /* v4480 · vor Steuer dazu */
+    var NEUTRAL = 'color-mix(in srgb,var(--gx-tinte2,#6b6660) 38%,transparent)';
     var stS = summe(obR, function (r) { return r.steuer; });
-    var ob = '<div class="gp-ob" role="table" aria-label="Je Objekt: Miete, Cashflow nach Steuer, Steuereffekt"><div class="gp-oh">Objekt</div><div class="gp-oh">Miete im Jahr</div><div class="gp-oh">Cashflow n. St.</div><div class="gp-oh">Steuereffekt</div>'
+    /* v4480 · Marcel 24.11.2026: Cashflow vor und nach Steuer und was die Steuer ausmacht nebeneinander. Reihenfolge wie die Rechnung: vor Steuer, Steuer, nach Steuer */
+    var ob = '<div class="gp-ob-w"><div class="gp-ob" role="table" aria-label="Je Objekt: Miete, Cashflow vor Steuer, Steuereffekt, Cashflow nach Steuer"><div class="gp-oh">Objekt</div><div class="gp-oh">Miete ' + J0 + '</div><div class="gp-oh">Cashflow vor Steuer</div><div class="gp-oh" title="nach Steuer minus vor Steuer">Steuereffekt</div><div class="gp-oh">Cashflow nach Steuer</div>'
       + obR.map(function (r, i) {
         return '<div class="gp-tr" data-gp-i="' + i + '"><div class="gp-on" title="' + esc(r.name) + '">' + esc(r.name) + '</div>'
-          + zelle(r.mieteJ, bM[0], bM[1], 'color-mix(in srgb,' + GOLD + ' 55%,transparent)', r.mieteJ != null ? nf0.format(Math.round(r.mieteJ / 100) / 10) + ' T€' : '')
-          + zelle(r.cfns, bC[0], bC[1], r.cfns >= 0 ? GRUEN : ROT, eurV(r.cfns))
-          + zelle(r.steuer, bS[0], bS[1], r.steuer >= 0 ? GRUEN : ROT, eurV(r.steuer)) + '</div>';
+          + zelle(r.mieteJ, bM[0], bM[1], NEUTRAL, r.mieteJ != null ? nf0.format(Math.round(r.mieteJ / 100) / 10) + ' T€' : '')
+          + zelle(r.cfvs, bV[0], bV[1], r.cfvs >= 0 ? GRUEN : ROT, eurV(r.cfvs))
+          + zelle(r.steuer, bS[0], bS[1], r.steuer >= 0 ? GRUEN : ROT, eurV(r.steuer))
+          + zelle(r.cfns, bC[0], bC[1], r.cfns >= 0 ? GRUEN : ROT, eurV(r.cfns)) + '</div>';
       }).join('')
-      + (obR.length > 1 ? '<div class="gp-on gp-sum">Summe</div><div class="gp-sum">' + eur(summe(obR, function (r) { return r.mieteJ; })) + '</div><div class="gp-sum ' + ton(CFns) + '">' + eurV(summe(obR, function (r) { return r.cfns; })) + '</div><div class="gp-sum ' + ton(stS) + '">' + eurV(stS) + '</div>' : '')
-      + '</div>';
+      + (obR.length > 1 ? '<div class="gp-on gp-sum">Summe</div><div class="gp-sum">' + eur(summe(obR, function (r) { return r.mieteJ; })) + '</div><div class="gp-sum ' + ton(CFvs) + '">' + eurV(summe(obR, function (r) { return r.cfvs; })) + '</div><div class="gp-sum ' + ton(stS) + '">' + eurV(stS) + '</div><div class="gp-sum ' + ton(CFns) + '">' + eurV(summe(obR, function (r) { return r.cfns; })) + '</div>' : '')
+      + '</div></div>';
     var fehlCf = rows.filter(function (r) { return r.cfns == null; });
     var obT = rows.length > 1 ? '<em>' + plus + ' von ' + rows.length + '</em> Objekten bringen nach Steuer Geld' : esc(rows[0].name);
-    var obU = 'Je Objekt im Jahr · die Steuer ' + (stS >= 0 ? 'entlastet' : 'kostet') + ' zusammen ' + eur(Math.abs(stS)) + (fehlCf.length ? ' · ohne Cashflow: ' + esc(fehlCf.map(function (r) { return r.name; }).join(', ')) : '');
+    var obU = 'Je Objekt, volles Jahr ' + J0 + ' · die Steuer ' + (stS >= 0 ? 'entlastet' : 'kostet') + ' zusammen ' + eur(Math.abs(stS)) + (fehlCf.length ? ' · ohne Cashflow: ' + esc(fehlCf.map(function (r) { return r.name; }).join(', ')) : '');
 
     /* Zinsbindung */
     var K = bindKalender(rows), kMax = K.L.reduce(function (m, x) { return Math.max(m, x.rest); }, 0) || 1;
@@ -300,6 +305,7 @@
     var P = [], ok = function (b, t, art) { P.push({ ok: b, t: t, art: art || 'fehler' }); };
     ok(Math.abs(summe(rows, function (r) { return r.cfns; }) - CFns) < 1, 'Cashflow nach Steuer je Objekt ergibt die Summe ' + eurV(CFns));
     ok(Math.abs(summe(rows, function (r) { return r.mieteJ; }) - MJ) < 1, 'Miete je Objekt ergibt die Summe ' + eur(MJ));
+    ok(Math.abs(summe(rows, function (r) { return r.cfvs; }) - CFvs) < 1, 'Cashflow vor Steuer je Objekt ergibt die Summe ' + eurV(CFvs));   /* v4480 */
     ok(Math.abs(stS - (CFns - CFvs)) < 1, 'Steuereffekte je Objekt ergeben Cashflow nach minus vor Steuer (' + eurV(CFns - CFvs) + ')');
     ok(Math.abs(proj[0].netto - (Wert - Rest)) < 1, 'Projektion ' + J0 + ' gleich Vermögen netto heute');
     var bindR = summe(rows.filter(function (r) { return /^\d{4}/.test(String(r.bindEnde || '')) && r.rsBind != null; }), function (r) { return r.rsBind; });
@@ -336,6 +342,7 @@
     { k: 'vb-bilanz', t: 'Vermögensbilanz heute', g: 'an', w: 'Was du besitzt gegen das, was der Bank gehört.' },
     { k: 'vb-objekte', t: 'Vermögen nach Objekt und Lage', g: 'an', w: 'Wo dein Vermögen steckt, mit Klumpen nach Ort.' },
     { k: 'vb-quellen', t: 'Woraus das Vermögen wächst', g: 'aus', w: 'Zuwachs je Jahr aus Tilgung, Wertsteigerung und Überschuss.' },
+    { k: 'vb-cf', t: 'Cashflow vor und nach Steuer im Verlauf', g: 'an', w: 'Wie sich der Cashflow aller Objekte über die Jahre entwickelt und was die Steuer ausmacht.' },   /* v4480 */
     { k: 'ob', t: 'Cashflow und Steuer je Objekt', g: 'an', w: 'Welches Objekt Geld bringt und welches kostet.' },
     { k: 'bk', t: 'Finanzierung und Anschluss', g: 'an', w: 'Wann wie viel Restschuld neu finanziert wird.' },
     { k: 'zielbild', t: 'Bestand und Zielbild', g: 'an', w: 'Was in Mieterhöhung und Maßnahmen steckt.' },
@@ -370,7 +377,7 @@
   function ansichtZiele(app) {
     var q = function (s) { return app ? app.querySelector(s) : null; };
     return {
-      'vb-eq': q('[data-gp-k="vb-eq"]'), 'vb-bilanz': q('[data-gp-k="vb-bilanz"]'), 'vb-objekte': q('[data-gp-k="vb-objekte"]'), 'vb-quellen': q('[data-gp-k="vb-quellen"]'),
+      'vb-eq': q('[data-gp-k="vb-eq"]'), 'vb-bilanz': q('[data-gp-k="vb-bilanz"]'), 'vb-objekte': q('[data-gp-k="vb-objekte"]'), 'vb-quellen': q('[data-gp-k="vb-quellen"]'), 'vb-cf': q('[data-gp-k="vb-cf"]'),
       ob: q(':scope > [data-dp-gp="ob"]'), bk: q(':scope > [data-dp-gp="bk"]'), det: q(':scope > [data-dp-gp="det"]'),
       zielbild: q(':scope > .cp-sek[data-sek="zielbild"]'), steuer: q(':scope > .cp-sek[data-sek="steuer"]'),
       gesamtproj: q(':scope > .cp-sek[data-sek="gesamtproj"]'), pp: q(':scope > #dp-pp-slot')
@@ -382,7 +389,7 @@
     Object.keys(Z).forEach(function (k) { if (Z[k]) Z[k].classList.toggle('gp-aus', !sichtbar(k)); });
     /* Projektion & Verlauf ganz weg, wenn alle vier Karten aus sind */
     var pr = app.querySelector(':scope > .cp-sek[data-sek="projektion"]');
-    if (pr) pr.classList.toggle('gp-aus', ['vb-eq', 'vb-bilanz', 'vb-objekte', 'vb-quellen'].every(function (k) { return !sichtbar(k); }));
+    if (pr) pr.classList.toggle('gp-aus', ['vb-eq', 'vb-bilanz', 'vb-objekte', 'vb-quellen', 'vb-cf'].every(function (k) { return !sichtbar(k); }));
   }
   function panelHtml() {
     if (!_ansOffen) return '';
@@ -474,7 +481,7 @@
         var v = r.werte[j] || 0; if (!v) return;
         var a = v >= 0 ? oben : unten, b = a + v; if (v >= 0) oben = b; else unten = b;
         var yA = ys(Math.max(a, b)), yB = ys(Math.min(a, b));
-        out.push('<rect class="gx-fade" x="' + f1(x) + '" y="' + f1(yA) + '" width="' + f1(sw) + '" height="' + f1(Math.max(0.5, yB - yA)) + '" rx="1.5" style="fill:' + r.f + ';animation-delay:' + (j * 12) + 'ms"/>');
+        out.push('<rect class="gx-fade" x="' + f1(x) + '" y="' + f1(yA) + '" width="' + f1(sw) + '" height="' + f1(Math.max(0.5, yB - yA)) + '" rx="1.5" style="fill:' + (v < 0 && r.fNeg ? r.fNeg : r.f) + ';animation-delay:' + (j * 12) + 'ms"/>');
       });
       out.push('<rect x="' + f1(m.l + j * bw) + '" y="' + m.t + '" width="' + f1(bw) + '" height="' + (H - m.t - m.b) + '" style="fill:transparent"' + tipA(d.tip(j)) + '/>');
       if (j % schritt === 0) out.push('<text class="gx-ax" x="' + f1(m.l + j * bw + bw / 2) + '" y="' + (H - 6) + '" text-anchor="middle">' + d.x[j] + '</text>');
@@ -513,47 +520,70 @@
     document.body.classList.add('dp-gp-vb');   /* vorher: .vb-charts ist sonst ein Raster und die Karten messen nur eine Spalte */
     var F = G.farben || {}, pz = function (v) { return nf1.format(v * 100) + ' %'; };
     var annahme = 'Modell: Wertansatz Kaufpreis, Wert ' + pz(A.wert || 0.02) + ' und Miete ' + pz(A.miete || 0.015) + ' im Jahr, Zins rund ' + pz(A.zins || 0.035) + '. Kein Verkehrswert.';
-    host.innerHTML = '<div class="gp-vb-raster"><div class="gp-vbk gp-breit" data-gp-k="vb-eq"></div><div class="gp-vbk" data-gp-k="vb-bilanz"></div><div class="gp-vbk" data-gp-k="vb-objekte"></div><div class="gp-vbk gp-breit" data-gp-k="vb-quellen"></div></div><p class="gp-vb-fuss">' + esc(annahme) + '</p>';
+    host.innerHTML = '<div class="gp-vb-raster"><div class="gp-vbk gp-breit" data-gp-k="vb-eq"></div><div class="gp-vbk" data-gp-k="vb-bilanz"></div><div class="gp-vbk" data-gp-k="vb-objekte"></div><div class="gp-vbk gp-breit" data-gp-k="vb-cf"></div><div class="gp-vbk gp-breit" data-gp-k="vb-quellen"></div></div><p class="gp-vb-fuss">' + esc(annahme) + '</p>';
     var el = function (k) { return host.querySelector('[data-gp-k="' + k + '"]'); };
 
     /* 1 · Eigenkapital-Entwicklung */
     var zuw = last.eq - H.ek;
-    var i1 = G.karte(el('vb-eq'), { eyebrow: 'Vermögen · Projektion', titel: 'Dein Eigenkapital wächst bis ' + last.yr + ' auf ' + mio(last.eq), unter: 'Heute ' + mio(H.ek) + ', das sind ' + (zuw >= 0 ? '+' : '−') + mio(Math.abs(zuw)) + ' in ' + PR.length + ' Jahren. Die Fläche ist dein Anteil am Objektwert.', chips: ['Modell'] });
-    G.verlauf(i1, { x: X, heute: X[0], band: { lo: PR.map(function (r) { return r.rest; }), hi: PR.map(function (r) { return r.wert; }), ohneRand: true },
-      reihen: [{ werte: PR.map(function (r) { return r.wert; }), farbe: F.tinte2, dick: 1.4 }, { werte: PR.map(function (r) { return r.rest; }), farbe: F.tinte3, dick: 1.6, gestrichelt: true }, { werte: PR.map(function (r) { return r.eq; }), farbe: F.gold, dick: 2.8 }],
-      legende: [{ n: 'Objektwert', f: F.tinte2 }, { n: 'Restschuld', f: F.tinte3 }, { n: 'Eigenkapital', f: F.gold }],
+    var i1 = G.karte(el('vb-eq'), { eyebrow: 'Vermögen · Projektion', titel: 'Dein Eigenkapital wächst bis ' + last.yr + ' auf ' + mio(last.eq), unter: 'Heute ' + mio(H.ek) + ', das sind ' + (zuw >= 0 ? '+' : '−') + mio(Math.abs(zuw)) + ' in ' + PR.length + ' Jahren. Die grüne Fläche zwischen Wert und Restschuld ist dein Anteil.', chips: ['Modell'] });
+    /* v4480 · Stil wie Wertverlauf der Pilot-Analyse: grün, wo dir etwas gehört, rot, wo die Restschuld den Wert übersteigt, Gold nur für den Wert */
+    var gruenF = 'color-mix(in srgb,' + F.gruen + ' 16%,transparent)', rotF = 'color-mix(in srgb,' + F.rot + ' 18%,transparent)', ueber = PR.some(function (r) { return r.wert < r.rest; });
+    G.verlauf(i1, { x: X, heute: X[0],
+      baender: [{ ohneRand: true, farbe: gruenF, lo: PR.map(function (r) { return r.wert >= r.rest ? r.rest : null; }), hi: PR.map(function (r) { return r.wert >= r.rest ? r.wert : null; }) },
+        { ohneRand: true, farbe: rotF, lo: PR.map(function (r) { return r.wert < r.rest ? r.wert : null; }), hi: PR.map(function (r) { return r.wert < r.rest ? r.rest : null; }) }],
+      reihen: [{ werte: PR.map(function (r) { return r.wert; }), farbe: F.gold, dick: 2.4 }, { werte: PR.map(function (r) { return r.rest; }), farbe: F.tinte2, dick: 2 }, { werte: PR.map(function (r) { return r.eq; }), farbe: F.gruen, dick: 2.4, gestrichelt: true }],
+      legende: [{ n: 'Objektwert', f: F.gold }, { n: 'Restschuld', f: F.tinte2 }, { n: 'Eigenkapital', f: F.gruen }, { n: 'dein Anteil', f: gruenF }].concat(ueber ? [{ n: 'Restschuld über Wert', f: rotF }] : []),
       tip: function (i, j) { var r = PR[i]; return '<b>' + j + '</b><br>Objektwert ' + eur(r.wert) + '<br>Restschuld ' + eur(r.rest) + '<br>Eigenkapital ' + eur(r.eq) + '<br>Beleihung ' + (r.wert ? nf1.format(r.rest / r.wert * 100) + ' %' : 'keine Angabe'); } },
       { aria: 'Eigenkapital-Entwicklung' });
 
     /* 2 · Vermögensbilanz heute */
     var objs = H.objs.slice().sort(function (a, b) { return b.wert - a.wert; }), tot = Math.max(H.wert, H.rest + Math.max(H.ek, 0)) || 1;
-    var toene = [F.gold, F.goldD, F.goldH], ekQ = H.wert > 0 ? H.ek / H.wert * 100 : null;
+    var toene = [F.tinte2, F.tinte3, F.neutral], ekQ = H.wert > 0 ? H.ek / H.wert * 100 : null;
     var i2 = G.karte(el('vb-bilanz'), { eyebrow: 'Vermögen · heute', titel: 'Dir gehören ' + (ekQ != null ? nf0.format(Math.round(ekQ)) + ' %' : 'keine Angabe') + ' deines Portfolios', unter: 'Aktiva ' + mio(H.wert) + ' zu Kaufpreisen. Passiva: Restschuld ' + mio(H.rest) + ' und Eigenkapital ' + mio(H.ek) + '.' });
     i2.innerHTML = '<div class="gp-bil"><div class="gp-bil-z"><span>Aktiva</span>' + stapelZeile(objs.map(function (x, i) { return { v: x.wert, f: 'color-mix(in srgb,' + toene[i % 3] + ' ' + (100 - Math.min(i, 8) * 7) + '%,transparent)', tip: '<b>' + esc(x.name) + '</b><br>' + eur(x.wert) + ' · ' + nf1.format(x.wert / (H.wert || 1) * 100) + ' %' }; }), tot) + '<b>' + mio(H.wert) + '</b></div>'
-      + '<div class="gp-bil-z"><span>Passiva</span>' + stapelZeile([{ v: H.rest, f: F.tinte3, tip: '<b>Restschuld</b><br>' + eur(H.rest) }, { v: Math.max(H.ek, 0), f: F.gold, tip: '<b>Eigenkapital</b><br>' + eur(H.ek) }], tot) + '<b>' + mio(H.rest + H.ek) + '</b></div></div>'
-      + legende([{ n: 'Restschuld ' + mio(H.rest), f: F.tinte3 }, { n: 'Eigenkapital ' + mio(H.ek), f: F.gold }])
+      + '<div class="gp-bil-z"><span>Passiva</span>' + stapelZeile([{ v: H.rest, f: F.tinte3, tip: '<b>Restschuld</b><br>' + eur(H.rest) }, { v: Math.max(H.ek, 0), f: F.gruen, tip: '<b>Eigenkapital</b><br>' + eur(H.ek) }], tot) + '<b>' + mio(H.rest + H.ek) + '</b></div></div>'
+      + legende([{ n: 'Restschuld ' + mio(H.rest), f: F.tinte3 }, { n: 'Eigenkapital ' + mio(H.ek), f: F.gruen }])
       + (H.ek < 0 ? '<p class="gx-s" style="color:' + F.rot + '">Die Restschuld liegt über dem Wertansatz, das Eigenkapital ist negativ.</p>' : '');
 
     /* 3 · Vermögen nach Objekt und Lage */
     var mx = 0; objs.forEach(function (x) { mx = Math.max(mx, x.wert, x.rest); }); mx = mx || 1;
     var byOrt = {}; objs.forEach(function (x) { byOrt[x.ort] = (byOrt[x.ort] || 0) + x.wert; });
     var orte = Object.keys(byOrt).sort(function (a, b) { return byOrt[b] - byOrt[a]; }), top1 = objs[0];
-    var i3 = G.karte(el('vb-objekte'), { eyebrow: 'Vermögen · je Objekt', titel: top1 && H.wert > 0 ? 'Größtes Objekt trägt ' + nf0.format(Math.round(top1.wert / H.wert * 100)) + ' %, größter Ort ' + nf0.format(Math.round(byOrt[orte[0]] / H.wert * 100)) + ' %' : 'Vermögen nach Objekt', unter: 'Balken: grau der Teil der Bank, gold dein Eigenkapital.' });
+    var i3 = G.karte(el('vb-objekte'), { eyebrow: 'Vermögen · je Objekt', titel: top1 && H.wert > 0 ? 'Größtes Objekt trägt ' + nf0.format(Math.round(top1.wert / H.wert * 100)) + ' %, größter Ort ' + nf0.format(Math.round(byOrt[orte[0]] / H.wert * 100)) + ' %' : 'Vermögen nach Objekt', unter: 'Balken: grau der Teil der Bank, grün dein Eigenkapital, rot die Restschuld über dem Wert.' });
     i3.innerHTML = '<div class="gp-vo">' + objs.map(function (x) {
       return '<div class="gp-vo-z"' + tipA('<b>' + esc(x.name) + '</b><br>Wert ' + eur(x.wert) + '<br>Restschuld ' + eur(x.rest) + '<br>Eigenkapital ' + eur(x.ek)) + '><span class="gp-vo-n" title="' + esc(x.name) + '">' + esc(x.name) + '<small>' + esc(x.ort) + '</small></span>'
-        + stapelZeile([{ v: Math.min(x.rest, x.wert), f: F.tinte3 }, { v: Math.max(x.ek, 0), f: F.gold }, { v: Math.max(x.rest - x.wert, 0), f: F.rot }], mx)
+        + stapelZeile([{ v: Math.min(x.rest, x.wert), f: F.tinte3 }, { v: Math.max(x.ek, 0), f: F.gruen }, { v: Math.max(x.rest - x.wert, 0), f: F.rot }], mx)
         + '<span class="gp-vo-v">' + mio(x.wert) + '<small style="color:' + (x.ek >= 0 ? F.gruen : F.rot) + '">EK ' + mio(x.ek) + '</small></span></div>';
     }).join('') + '</div>'
       + '<div class="gp-ort"><span class="gx-eye">Verteilung nach Lage · ' + orte.length + ' Ort' + (orte.length === 1 ? '' : 'e') + '</span>' + stapelZeile(orte.map(function (o, i) { return { v: byOrt[o], f: 'color-mix(in srgb,' + toene[i % 3] + ' ' + (100 - Math.floor(i / 3) * 25) + '%,transparent)', tip: '<b>' + esc(o) + '</b><br>' + nf1.format(byOrt[o] / (H.wert || 1) * 100) + ' %' }; }), H.wert || 1)
       + legende(orte.slice(0, 6).map(function (o, i) { return { n: o + ' ' + nf0.format(Math.round(byOrt[o] / (H.wert || 1) * 100)) + ' %', f: 'color-mix(in srgb,' + toene[i % 3] + ' ' + (100 - Math.floor(i / 3) * 25) + '%,transparent)' }; }).concat(orte.length > 6 ? [{ n: '+ ' + (orte.length - 6) + ' weitere', f: 'transparent' }] : [])) + '</div>';
 
     /* 4 · Woraus das Vermögen wächst */
-    var R = [{ n: 'Schuldenabbau (Tilgung)', f: F.tinte3, werte: PR.map(function (r) { return r.tilg; }) },
-      { n: 'Wertsteigerung', f: F.gold, werte: PR.map(function (r, i) { return i ? r.wert - PR[i - 1].wert : 0; }) },
-      { n: 'Überschuss nach Steuer', f: F.goldH, werte: PR.map(function (r) { return r.cfNach; }) }];
+    /* v4480 · Quellen in Grün abgestuft wie der Vermögenszuwachs im Reiter Bewertung, ein Minus rot */
+    var R = [{ n: 'Schuldenabbau (Tilgung)', f: 'color-mix(in srgb,' + F.gruen + ' 35%,transparent)', fNeg: F.rot, werte: PR.map(function (r) { return r.tilg; }) },
+      { n: 'Wertsteigerung', f: 'color-mix(in srgb,' + F.gruen + ' 65%,transparent)', fNeg: F.rot, werte: PR.map(function (r, i) { return i ? r.wert - PR[i - 1].wert : 0; }) },
+      { n: 'Überschuss nach Steuer', f: F.gruen, fNeg: 'color-mix(in srgb,' + F.rot + ' 75%,transparent)', werte: PR.map(function (r) { return r.cfNach; }) }];
     var sumZ = 0; for (var q = 0; q < PR.length; q++) R.forEach(function (r) { sumZ += r.werte[q] || 0; });
     var i4 = G.karte(el('vb-quellen'), { eyebrow: 'Vermögen · Zuwachs je Jahr', titel: 'Zusammen ' + mio(sumZ) + ' Zuwachs in ' + PR.length + ' Jahren', unter: 'Je Jahr aus Tilgung, Wertsteigerung und Überschuss nach Steuer.', chips: ['Modell'] });
     saeulen(i4, { x: X, reihen: R, aria: 'Woraus das Vermögen wächst', tip: function (j) { var s = 0; return '<b>' + X[j] + '</b>' + R.map(function (r) { s += r.werte[j] || 0; return '<br>' + esc(r.n) + ' ' + eurV(r.werte[j]); }).join('') + '<br><b>Zuwachs ' + eurV(s) + '</b>'; } });
+
+    /* 5 · v4480 · Cashflow vor und nach Steuer im Verlauf, Stil „Verlauf mit Steuern" der Pilot-Analyse */
+    var cfEl = el('vb-cf');
+    if (cfEl && PR.some(function (r) { return r.cfVor != null; })) {
+      var c0 = PR[0], cE = last, stS = 0; PR.forEach(function (r) { stS += (r.cfNach || 0) - (r.cfVor || 0); });
+      var plusJ = null; for (var u = 0; u < PR.length; u++) if ((PR[u].cfNach || 0) >= 0) { plusJ = PR[u].yr; break; }
+      var i5 = G.karte(cfEl, { eyebrow: 'Cashflow · Verlauf', titel: 'Nach Steuer ' + eurV(c0.cfNach / 12) + ' im Monat ' + c0.yr + ', ' + eurV(cE.cfNach / 12) + ' im Monat ' + cE.yr,
+        unter: 'Alle Objekte zusammen je Jahr. Grüne Fläche: die Steuer bringt Geld. Rote Fläche: sie kostet Geld. Über ' + PR.length + ' Jahre wirkt die Steuer mit ' + eurV(stS) + '.', chips: ['Modell'] });
+      var mk5 = []; if (plusJ && plusJ !== X[0]) mk5.push({ j: plusJ, text: 'nach Steuer im Plus', farbe: F.gruen, zeile: 0 });
+      G.verlauf(i5, { x: X, heute: X[0],
+        baender: [{ ohneRand: true, farbe: gruenF, lo: PR.map(function (r) { return r.cfNach >= r.cfVor ? r.cfVor : null; }), hi: PR.map(function (r) { return r.cfNach >= r.cfVor ? r.cfNach : null; }) },
+          { ohneRand: true, farbe: rotF, lo: PR.map(function (r) { return r.cfNach < r.cfVor ? r.cfNach : null; }), hi: PR.map(function (r) { return r.cfNach < r.cfVor ? r.cfVor : null; }) }],
+        reihen: [{ werte: PR.map(function (r) { return r.cfVor; }), farbe: F.tinte3, dick: 2, gestrichelt: true }, { werte: PR.map(function (r) { return r.cfNach; }), farbe: F.tinte, dick: 2.6 }],
+        marken: mk5,
+        legende: [{ n: 'vor Steuer', f: F.tinte3 }, { n: 'nach Steuer', f: F.tinte }, { n: 'Steuer bringt Geld', f: gruenF }, { n: 'Steuer kostet Geld', f: rotF }],
+        tip: function (q, j) { var r = PR[q]; return '<b>' + j + '</b><br>Miete ' + eur(r.miete) + '<br>vor Steuer ' + eurV(r.cfVor) + '<br>Steuer ' + eurV((r.cfNach || 0) - (r.cfVor || 0)) + '<br>nach Steuer ' + eurV(r.cfNach); } },
+        { aria: 'Cashflow vor und nach Steuer über die Jahre' });
+    }
 
     host.setAttribute('data-gp-sig', sig);
     document.body.classList.add('dp-gp-vb');
@@ -584,6 +614,9 @@
     var s = document.createElement('style'); s.id = 'dp-gp-stil3';
     var B = '#dashboard-main';
     s.textContent = [
+      '#dp-stage.cp-genau .gp-kpbox{display:none}', '#dp-stage.cp-einfach .gp-kp-orig{display:none}',
+      '#dp-stage .gp-kpbox{margin:4px 0 8px;padding-left:18px;font-size:12.5px;line-height:1.55;color:var(--gx-tinte,#2A2727)}', '#dp-stage .gp-kpbox li{margin:2px 0}', '#dp-stage .gp-kpbox li::marker{color:var(--gx-tinte3,#8A8276)}',   /* v4480 */
+      '#dashboard-main i.zb-wh-m{background:color-mix(in srgb,#3FA56C 55%,transparent)}', '#dashboard-main i.zb-wh-z{background:#3FA56C}',   /* v4480 · Woher das Plus: grün abgestuft statt Gold/Schwarz */
       B + ' .gp-sz{position:relative;display:flex;height:14px;border-radius:4px;overflow:hidden;background:color-mix(in srgb,currentColor 6%,transparent);flex:1;min-width:0}',
       B + ' .gp-sz i{display:block;height:100%}',
       B + ' .gp-bil{display:flex;flex-direction:column;gap:12px;margin:6px 0 10px}',
@@ -647,9 +680,48 @@
     /* v4260 · die übrigen Cockpit-Grafiken im neuen Stil (zeichnen nur, wenn sich ihre Daten geändert haben) */
     try { vbZeichnen(app); } catch (e) { try { console.warn('[grafiken-portfolio] Vermögen', e); } catch (x) {} }
     try { skZeichnen(app); } catch (e) { try { console.warn('[grafiken-portfolio] Steuer', e); } catch (x) {} }
+    try { textPflege(document.getElementById('dp-stage')); } catch (e) {}   /* v4480 */
     if (sig && host.getAttribute('data-gp-sig') === sig) { ansichtAnwenden(); return; }
     if (zeichnen(host, hosts)) { host.setAttribute('data-gp-sig', sig); document.body.classList.add('dp-gp-an'); panelNeu(); }
     ansichtAnwenden();
+  }
+  /* v4480 · Marcel 24.11.2026: „mit Bullet Points arbeiten, übersichtlich". Lange Sätze im Cockpit werden in der Ansicht
+     Einfach zu Stichpunkten (der Absatz bleibt für Genau stehen, CSS wählt). Dazu Kundentext ohne Gedankenstrich und
+     Semikolon (Regel seit 22.11.): nur Anzeige, die Quelltexte in dashboard.js bleiben unverändert. */
+  function saetze(s) {
+    var out = [], buf = '';
+    String(s).replace(/\s+/g, ' ').trim().split(/(?<=[.!?])\s+(?=[A-ZÄÖÜ0-9„"])/).forEach(function (x) {
+      x = x.trim(); if (!x) return;
+      var ganz = (buf + x).trim();
+      if (/(^|\s)(z|d|u|v|vgl|ca|bzw|inkl|ggf|Nr|S|Abs|B|h|a|Mio|Tsd)\.$/.test(ganz)) { buf = ganz + ' '; return; }   /* Abkürzung am Ende: mit dem nächsten Stück verbinden */
+      out.push(ganz); buf = '';
+    });
+    if (buf) out.push(buf.trim());
+    return out.filter(function (x) { return x.length > 1; });
+  }
+  function textPflege(app) {
+    if (!app) return;
+    /* Gedankenstrich und Semikolon im sichtbaren Text */
+    try {
+      var W = document.createTreeWalker(app, NodeFilter.SHOW_TEXT), n, L = [];
+      while ((n = W.nextNode())) { if (/ [–—] |; /.test(n.nodeValue) && !(n.parentElement && n.parentElement.closest('script,style,textarea,input,[contenteditable]'))) L.push(n); }
+      L.forEach(function (n) {
+        n.nodeValue = n.nodeValue.replace(/ [—–] (?=\d+ KPI)/g, ' · ').replace(/ [–—] /g, ', ').replace(/; (\S)/g, function (m, c) { return '. ' + c.toUpperCase(); });
+      });
+    } catch (e) {}
+    /* Stichpunkte: Absätze ab 140 Zeichen mit mindestens zwei Sätzen */
+    var K = app.querySelectorAll('#dp-einfach p, #dp-einfach .ke2-satz, #dp-pp-slot p, .gp-karte .gp-u, .cp-sek p.cp-erkl, .cp-sek .zb-det-satz');
+    Array.prototype.forEach.call(K, function (el) {
+      if (el.hasAttribute('data-gp-kp') || el.closest('table, details, .gp-kpbox, svg, .gp-tip')) return;
+      if (el.querySelector('p, ul, ol, table, input, button, select, a')) return;
+      var tx = (el.textContent || '').replace(/\s+/g, ' ').trim(); if (tx.length < 140) return;
+      var s = saetze(tx); if (s.length < 2 && tx.split(' · ').length >= 3) s = tx.split(' · ');
+      if (s.length < 2) return;
+      el.setAttribute('data-gp-kp', '1'); el.classList.add('gp-kp-orig');
+      var ul = document.createElement('ul'); ul.className = 'gp-kpbox';
+      ul.innerHTML = s.slice(0, 5).map(function (x) { return '<li>' + esc(x.replace(/[.]$/, '')) + '</li>'; }).join('');
+      el.parentNode.insertBefore(ul, el);
+    });
   }
   function spaeter() { if (_timer) clearTimeout(_timer); _timer = setTimeout(function () { try { lauf(); } catch (e) { try { console.warn('[grafiken-portfolio]', e); } catch (x) {} } }, 260); }
   function start() {
