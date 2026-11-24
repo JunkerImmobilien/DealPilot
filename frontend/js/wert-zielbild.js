@@ -895,6 +895,17 @@
     karteBald(false);   /* Tab Bewertung geöffnet */
   });
   global.addEventListener('dp:object-ready', function () { _hist.key = null; _hist.eintrag = null; karteBald(true); });
+  /* v4580 · der Anker (calc.js) nimmt bei aufgeteilten Häusern den Vergleichswert je Wohnung aus dem Potenzial-Lauf. Kommt der Lauf
+     nach dem Rechnen an, einmal neu rechnen - nur wenn sich der Anker dadurch ändert und kein Gutachten/keine Bankbewertung führt. */
+  global.addEventListener('dp:potenzial', function () {
+    try {
+      var S = global.State || {}; if (typeof global.calc !== 'function') return;
+      if (S.wert_basis_quelle === 'verkehrswert' && (S.svw_herkunft === 'gutachten' || S.svw_herkunft === 'bank')) return;
+      var W = mitAufteilung(wertDaten(bericht())), soll = W && W.aufteilung && W.aufteilung.wert > 0 ? W.aufteilung.wert : null;
+      var ist = S.wert_anker && S.wert_anker.art === 'aufteiler' ? S.wert_anker.wert : null;
+      if (soll != null && (ist == null || Math.abs(ist - soll) > 1)) setTimeout(function () { try { global.calc(); } catch (e) {} }, 0);
+    } catch (e) {}
+  });
   global.addEventListener('dp:potenzial', function () { karteBald(false); setTimeout(function () {
     einfachNeu();
     /* v2843 · auch die Tafel unter „Genau" auf den neuen Lauf (vorher stand dort weiter der Abruf) */

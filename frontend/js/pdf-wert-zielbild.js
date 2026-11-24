@@ -107,7 +107,9 @@
    */
   /* Vertrag von wert-zielbild.js (v2840, Tab Bewertung) in die Form dieses
      Segments uebersetzen. Nichts wird gerechnet, nur umbenannt. */
-  var ART = { mpi: 'mpi', mpi_roh: 'roh', ertragswert: 'ew', sachwert: 'sw', vergleichswert: 'vw', kaufpreis: 'kp' };
+  /* v4580 · aufteiler (wert-zielbild.js mitAufteilung, Vergleichswert je Wohnung, führend) fehlte: die Tabelle „Werte je Verfahren“
+     im Investment-PDF zeigte bei Westerfeldstr. 146 nur stützende Zeilen und keinen führenden Wert */
+  var ART = { mpi: 'mpi', mpi_roh: 'roh', aufteiler: 'auf', ertragswert: 'ew', sachwert: 'sw', vergleichswert: 'vw', kaufpreis: 'kp' };
   function ausWertZielbild(D) {
     if (!D) return null;
     var X = {};

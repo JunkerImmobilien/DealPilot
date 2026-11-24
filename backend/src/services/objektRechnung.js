@@ -273,6 +273,9 @@ function rechnen(daten, opt) {
      gegen den Kaufpreis. Ohne gespeicherten Anker bleibt alles wie bisher. */
   const wak = d._wert_anker && Number(d._wert_anker.wert) > 0 ? Number(d._wert_anker.wert) : null;
   if (wak != null && (wa2.wert || 0) > 0 && /^(marktbericht|indikation)$/.test(String(wa2.herkunft || '')) && Math.abs(wak - wa2.wert) > 1) wp = wak - kp;
+  /* v4580 · Spiegel von calc.js: eine Wertangabe ohne Gutachten/Bankbewertung (Herkunft „eigene“ oder ohne Auswahl) tritt hinter den
+     gespeicherten maßgebenden Wert zurück (dieselbe Rangfolge wie wert_basis). */
+  if (wak != null && (wa2.wert || 0) > 0 && !/^(gutachten|bank|marktbericht|indikation)$/.test(String(wa2.herkunft || ''))) wp = wak - kp;
   r.wpAnker = wak != null && wp === wak - kp ? wak : null;
   r.svw2 = svw2; r.svwIndikation = svwIndikation; r.wp = wp;
   r.wpAngenommen = !(svw2 > 0) && !svwIndikation;
