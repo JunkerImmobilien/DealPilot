@@ -82,15 +82,20 @@
   }
   function appBasis() { return /(^|\.)staging\.dealpilot\.immo$/.test(location.hostname) ? 'https://app.staging.dealpilot.immo/' : 'https://app.dealpilot.immo/'; }
   function api(p) { return apiBasis() + '/public/einzelcheck' + p; }
+  var _laeuft = 0;   /* einzelcheck-2 · laufende Anfragen (Hochladen, Auslesen, Kauf, Bericht) */
   function holeJson(url, init) {
+    var schreibt = !!(init && init.method && init.method !== 'GET');
+    if (schreibt) _laeuft++;
+    var fertig = function () { if (schreibt) _laeuft = Math.max(0, _laeuft - 1); };
     return fetch(url, init || {}).then(function (r) {
-      return r.text().then(function (t) { var j = null; try { j = t ? JSON.parse(t) : {}; } catch (e) { j = {}; } j._status = r.status; j._ok = r.ok; return j; });
-    });
+      return r.text().then(function (t) { var j = null; try { j = t ? JSON.parse(t) : {}; } catch (e) { j = {}; } j._status = r.status; j._ok = r.ok; fertig(); return j; });
+    }, function (e) { fertig(); throw e; });
   }
 
   /* ── Kerne nachladen (Buster wie frontend/index.html, tools/buster-ebenen-pruefen.mjs) ── */
   var KERNE = { DpDokument: 'js/dp-dokument.js?v=v4380', DpMietpotenzial: 'js/mietpotenzial-kern.js?v=v4220', DealScore2: 'js/dealscore2.js?v=v3254',
-    DpDarlehenWeitere: 'js/darlehen-weitere.js?v=v3256' };   /* v3946 · Monatsplan der Darlehen (Restschuld, Anschluss) */
+    DpDarlehenWeitere: 'js/darlehen-weitere.js?v=v3256',
+    pdfjsLib: 'vendor/cdn/pdf.js/3.11.174/pdf.min.js' };   /* einzelcheck-2 · Fotos aus dem Exposé (wie js/pdf-import.js) */   /* v3946 · Monatsplan der Darlehen (Restschuld, Anschluss) */
   var _geladen = {};
   function lade(name) {
     if (window[name]) return Promise.resolve(true);
@@ -179,16 +184,22 @@
     fenster = document.createElement('div');
     fenster.className = 'ec-fenster';
     fenster.hidden = true;
-    fenster.innerHTML = '<div class="ec-dunkel" data-zu></div><div class="ec-box" role="dialog" aria-modal="true" aria-labelledby="ecTitel">'
-      + '<div class="ec-leiste"><span class="ec-marke">Einzel-Check</span><span class="ec-demo">Staging · Abnahme läuft</span><button type="button" class="ec-x" data-zu aria-label="Schließen">×</button></div>'
+    fenster.innerHTML = '<div class="ec-dunkel"></div><div class="ec-box" role="dialog" aria-modal="true" aria-labelledby="ecTitel">'
+      + '<div class="ec-leiste"><span class="ec-marke">Einzel-Check</span>' + (/(^|\.)staging\./.test(location.hostname) ? '<span class="ec-demo">Staging · Abnahme läuft</span>' : '') + '<button type="button" class="ec-x" data-zu aria-label="Schließen">×</button></div>'
       + '<ol class="ec-schritte" aria-hidden="true"><li>Grundangaben</li><li>Unterlagen</li><li>Auslesen</li><li>Ergebnis</li><li>Bericht</li></ol>'
       + '<div class="ec-inhalt" aria-live="polite"></div></div>';
     document.body.appendChild(fenster);
     inhalt = $('.ec-inhalt', fenster);
-    fenster.addEventListener('click', function (e) { if (e.target.closest('[data-zu]')) zu(); });
+    /* einzelcheck-2 (Marcel 24.11.2026): Klick daneben schliesst NICHT mehr, nur × und Esc.
+       Laeuft gerade ein Hochladen, Auslesen oder Kauf, fragt das Fenster vorher nach. */
+    fenster.addEventListener('click', function (e) {
+      if (e.target.closest('[data-zu-ja]')) { frageWeg(); zu(true); return; }
+      if (e.target.closest('[data-zu-nein]')) { frageWeg(); return; }
+      if (e.target.closest('[data-zu]')) zu();
+    });
     document.addEventListener('keydown', function (e) {
       if (fenster.hidden) return;
-      if (e.key === 'Escape') { zu(); return; }
+      if (e.key === 'Escape') { if ($('.ec-frage', fenster)) frageWeg(); else zu(); return; }
       if (e.key === 'Tab') {
         var f = $$('button:not([disabled]),a[href],input:not([disabled]),[tabindex="0"]', $('.ec-box', fenster)).filter(function (x) { return x.offsetParent !== null; });
         if (!f.length) return;
@@ -205,8 +216,19 @@
     else if (grundFehlt(S.grund).length) zeigeGrund();   /* v3946 · erst die Grundangaben */
     else zeigeUnterlagen();
   }
-  function zu() {
+  function frageWeg() { var q = fenster && $('.ec-frage', fenster); if (q) q.remove(); }
+  function zu(sicher) {
     if (!fenster) return;
+    if (!sicher && _laeuft > 0) {
+      if ($('.ec-frage', fenster)) return;
+      var q = document.createElement('div'); q.className = 'ec-frage'; q.setAttribute('role', 'alertdialog');
+      q.innerHTML = '<p><b>Gerade läuft noch etwas.</b> Wenn du jetzt schließt, wird das Hochladen oder Auslesen abgebrochen. Deine Angaben bleiben gespeichert.</p>'
+        + '<div class="ec-frage-k"><button type="button" class="btn-p" data-zu-nein>Weiter warten</button><button type="button" class="btn-l" data-zu-ja>Trotzdem schließen</button></div>';
+      $('.ec-box', fenster).appendChild(q);
+      try { $('[data-zu-nein]', q).focus(); } catch (e) {}
+      return;
+    }
+    frageWeg();
     fenster.hidden = true; document.documentElement.classList.remove('ec-offen');
     if (zuvor && zuvor.focus) try { zuvor.focus({ preventScroll: true }); } catch (e) {}
   }
@@ -806,12 +828,128 @@
       + (d.fin && d.fin.anschluss ? '<div><span>Rate im Anschluss</span><b>' + esc(eur(d.fin.anschluss.rate_m)) + '</b></div>' : '') + '</div>' : '';
     setze('<h3 id="ecTitel">Dein Bericht ist fertig.</h3>' + kopf + wertZeile
       + (d.aus_zahlenstand ? meldung('Gerechnet mit den gespeicherten Zahlen aus dem kostenlosen Teil. Lade alle Unterlagen noch einmal hoch, dann liest der Bericht sie vollständig.', 'warn') : '')
+      + '<div class="ec-titelbild" hidden><span class="ec-l">Bild oben im Bericht</span><p class="ec-fein">Wähl ein Foto, das das Objekt selbst zeigt. Ohne Wahl steht oben die Lagekarte.</p><div class="ec-fotos"></div></div>'
       + '<div class="ec-knoepfe"><button type="button" class="btn-p ec-pdf">Bericht ansehen und als PDF speichern</button></div>'
+      + mailBox(d)
       + (an ? '<div class="ec-schutz"><b>Anrechnung.</b> Buchst du bis ' + esc(datum(an.bis)) + ' ein Paket, rechnet DealPilot ' + esc(dez(an.cents / 100, 2)) + ' € an. Dein Code ' + esc(an.code) + ' steht schon in den Links unten. ' + esc(KOMBI) + ' Das Objekt kommt mit den Zahlen in dein Konto.</div>'
         : '<p class="ec-fein">Das Objekt kommt mit den Zahlen in dein Konto, wenn du über eine der Karten unten startest.</p>')
       + '<div class="ec-pakete"><span class="ec-l">Weiter in DealPilot</span><div class="ec-pk"></div></div>', '.ec-pdf');
     paketeEinsetzen($('.ec-pk', inhalt), z, r, an ? an.code : null);
     $('.ec-pdf', inhalt).addEventListener('click', function () { pdf(d); });
+    mailVerdrahten(d);
+    fotoWahl(d);
+  }
+
+  /* ── einzelcheck-2 · Titelbild aus dem Exposé (Marcel 24.11.2026: „wenn wir ein Bild … auslesen können, dann könnten wir
+     auch das Bild auswählen. Es muss aber das Objekt zeigen. Ansonsten … diese Karte“). Ob ein Bild das Objekt zeigt,
+     entscheidet der Käufer: die Fotos stehen zur Wahl, ohne Wahl gilt die Lagekarte. Gelesen wird nur im Browser. ── */
+  var _fotosGeholt = null;
+  function fotosHolen() {
+    if (_fotosGeholt) return _fotosGeholt;
+    var dateien = S.dateien.slice().sort(function (a, b) { return (artRaten(b.name) === 'Exposé') - (artRaten(a.name) === 'Exposé'); }).slice(0, 4);
+    _fotosGeholt = lade('pdfjsLib').then(function (da) {
+      var L = window.pdfjsLib; if (!da || !L || !dateien.length) return [];
+      try { L.GlobalWorkerOptions.workerSrc = appBasis() + 'vendor/cdn/pdf.js/3.11.174/pdf.worker.min.js'; } catch (e) {}
+      var fotos = [];
+      var eine = function (f) {
+        if (fotos.length >= 6) return Promise.resolve();
+        return f.arrayBuffer().then(function (buf) { return L.getDocument({ data: buf }).promise; }).then(function (doc) {
+          var seiten = Math.min(doc.numPages, 6), kette = Promise.resolve();
+          for (var i = 1; i <= seiten; i++) (function (n) { kette = kette.then(function () { if (fotos.length < 6) return bilderDerSeite(doc, n, fotos); }); })(i);
+          return kette.then(function () { try { doc.destroy(); } catch (e) {} });
+        }).catch(function () {});
+      };
+      return dateien.reduce(function (k, f) { return k.then(function () { return eine(f); }); }, Promise.resolve()).then(function () { return fotos; });
+    }).catch(function () { return []; });
+    return _fotosGeholt;
+  }
+  function bilderDerSeite(doc, n, fotos) {
+    var OPS = (window.pdfjsLib && window.pdfjsLib.OPS) || {};
+    return doc.getPage(n).then(function (page) {
+      return page.getOperatorList().then(function (ops) {
+        for (var k = 0; k < ops.fnArray.length && fotos.length < 6; k++) {
+          if (ops.fnArray[k] !== (OPS.paintImageXObject || 85)) continue;
+          var name = ops.argsArray[k] && ops.argsArray[k][0], o = null;
+          try { o = page.objs.has(name) ? page.objs.get(name) : null; } catch (e) { o = null; }
+          /* nur echte Fotos: groß genug, kein Strich, kein Logo (wie pdf-import.js) */
+          if (!o || !o.width || !o.height || o.width < 400 || o.height < 260) continue;
+          var q = o.width / o.height; if (q < 0.6 || q > 2.4) continue;
+          var url = bildAlsUrl(o); if (url && fotos.indexOf(url) < 0) fotos.push(url);
+        }
+      });
+    }).catch(function () {});
+  }
+  function bildAlsUrl(o) {
+    try {
+      var sk = Math.min(1, 1400 / o.width), c = document.createElement('canvas');
+      c.width = Math.round(o.width * sk); c.height = Math.round(o.height * sk);
+      var x = c.getContext('2d');
+      if (o.bitmap) { x.drawImage(o.bitmap, 0, 0, c.width, c.height); return c.toDataURL('image/jpeg', 0.85); }
+      if (!o.data) return null;
+      var roh = document.createElement('canvas'); roh.width = o.width; roh.height = o.height;
+      var rx = roh.getContext('2d'), id = rx.createImageData(o.width, o.height), d = o.data, px = o.width * o.height;
+      if (d.length === px * 4) id.data.set(d);
+      else if (d.length === px * 3) { for (var i = 0, j = 0; i < px; i++, j += 3) { id.data[i * 4] = d[j]; id.data[i * 4 + 1] = d[j + 1]; id.data[i * 4 + 2] = d[j + 2]; id.data[i * 4 + 3] = 255; } }
+      else return null;
+      rx.putImageData(id, 0, 0); x.drawImage(roh, 0, 0, c.width, c.height);
+      return c.toDataURL('image/jpeg', 0.85);
+    } catch (e) { return null; }
+  }
+  function fotoWahl(d) {
+    var box = $('.ec-titelbild', inhalt); if (!box || !S.dateien.length) return;
+    var nr = schritt;
+    fotosHolen().then(function (fotos) {
+      if (nr !== schritt || !fotos.length) return;
+      S.fotos = fotos;
+      var karte = d.m && d.m.karte;
+      var kachel = function (src, i, text) { return '<button type="button" class="ec-foto' + ((S.fotoWahl == null ? -1 : S.fotoWahl) === i ? ' an' : '') + '" data-i="' + i + '" aria-pressed="' + ((S.fotoWahl == null ? -1 : S.fotoWahl) === i) + '">'
+        + (src ? '<img src="' + src + '" alt="">' : '<span>' + esc(text) + '</span>') + '<small>' + esc(text) + '</small></button>'; };
+      $('.ec-fotos', box).innerHTML = kachel(karte || null, -1, karte ? 'Lagekarte' : 'Ohne Foto') + fotos.map(function (f, i) { return kachel(f, i, 'Foto ' + (i + 1)); }).join('');
+      box.hidden = false;
+      $('.ec-fotos', box).addEventListener('click', function (e) {
+        var b = e.target.closest('.ec-foto'); if (!b) return;
+        var i = +b.getAttribute('data-i'); S.fotoWahl = i < 0 ? null : i;
+        $$('.ec-foto', box).forEach(function (x) { var an = x === b; x.classList.toggle('an', an); x.setAttribute('aria-pressed', String(an)); });
+      });
+    });
+  }
+
+  /* ── einzelcheck-2 · Bericht per Mail (Backend: POST /public/einzelcheck/mail, PDF-Dienst, mailerService) ── */
+  function mailBox(d) {
+    var st = (d && d.status) || S.status || {};
+    if (!tokenLesen() || st.mails_rest === 0) return '';
+    return '<form class="ec-mail" novalidate><span class="ec-l">Bericht per E-Mail</span>'
+      + '<p class="ec-fein">Wir schicken dir den Bericht als PDF, dazu den Weg in DealPilot' + (st.anrechnung ? ' und deinen Code für die Anrechnung' : '') + '. Die Adresse speichern wir nicht.</p>'
+      + '<div class="ec-mail-z"><input type="email" class="ec-mail-in" autocomplete="email" placeholder="name@beispiel.de" aria-label="E-Mail-Adresse" required>'
+      + '<button type="submit" class="btn-l ec-mail-los">Bericht senden</button></div><p class="ec-mail-m" role="status"></p></form>';
+  }
+  function mailVerdrahten(d) {
+    var f = $('.ec-mail', inhalt); if (!f) return;
+    f.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var inp = $('.ec-mail-in', f), b = $('.ec-mail-los', f), m = $('.ec-mail-m', f);
+      var a = String(inp.value || '').trim();
+      if (!/^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(a)) { m.textContent = 'Bitte eine gültige E-Mail-Adresse eintragen.'; m.className = 'ec-mail-m warn'; inp.focus(); return; }
+      b.disabled = true;
+      logoAlsData().then(function () {
+      var doc = pdf(d, true);
+      if (doc) doc.html = doc.html.split(location.origin + '/fonts/').join(appBasis() + 'fonts/');
+      if (!doc) { b.disabled = false; m.textContent = 'Der Bericht ließ sich gerade nicht zusammenstellen.'; m.className = 'ec-mail-m warn'; return; }
+      b.disabled = true; m.textContent = 'Wird gesendet, das dauert einen Moment.'; m.className = 'ec-mail-m';
+      holeJson(api('/mail'), { method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: tokenLesen(), email: a, html: doc.html, titel: doc.titel }) }).then(function (j) {
+        if (j._ok) { m.textContent = 'Gesendet an ' + a + '. Schau auch im Spam-Ordner nach.'; m.className = 'ec-mail-m ok'; if (j.mails_rest === 0) b.disabled = true; else b.disabled = false; return; }
+        m.textContent = j.error || 'Das hat gerade nicht geklappt. Bitte gleich noch einmal.'; m.className = 'ec-mail-m warn'; b.disabled = j.code === 'mails_aufgebraucht';
+      }).catch(function () { m.textContent = 'Keine Verbindung. Bitte gleich noch einmal.'; m.className = 'ec-mail-m warn'; b.disabled = false; });
+      });
+    });
+  }
+  function logoAlsData() {
+    if (LOGO_DATA) return Promise.resolve();
+    return fetch(location.origin + '/assets/dealpilot-logo-2026.png').then(function (r) { return r.ok ? r.blob() : null; }).then(function (bl) {
+      if (!bl) return;
+      return new Promise(function (ok) { var fr = new FileReader(); fr.onload = function () { LOGO_DATA = String(fr.result || '') || null; ok(); }; fr.onerror = function () { ok(); }; fr.readAsDataURL(bl); });
+    }).catch(function () {});
   }
 
   /* ── v3946 · DER BERICHT ALS DOKUMENT ──────────────────────────────────────────────────────────────────
@@ -821,6 +959,15 @@
      Fußzeile mit Absender und Stand, Kapitel mit Überschrift. Hier wird nichts gerechnet, nur gesetzt. */
   var ART_NAME = { ETW: 'Eigentumswohnung', EFH: 'Einfamilienhaus', ZFH: 'Zweifamilienhaus', DHH: 'Doppelhaushälfte', RH: 'Reihenhaus', MFH: 'Mehrfamilienhaus', GEW: 'Gewerbeobjekt' };
   var VW_KURZ = { ertragswert: 'Ertragswert', sachwert: 'Sachwert', vergleichswert: 'Vergleichswert' };
+  var VW_LANG = { ertragswert: 'Ertragswert, führend', sachwert: 'Sachwert, führend', vergleichswert: 'Vergleichswert, führend' };   /* einzelcheck-2 */
+  /* einzelcheck-2 · DSCR erklärt, mit den Beträgen aus dem Kern (Reinertrag = DSCR × Kapitaldienst, nichts neu gerechnet) */
+  function dscrSatz(r, f) {
+    var kd = r.k.d_total, re = r.k.dscr * kd;
+    var s = 'DSCR ' + dez(r.k.dscr, 2) + ', volles Jahr mit den heutigen Eingaben: Reinertrag ' + eur(re) + ' im Jahr (Kaltmiete und Zusatzeinnahmen minus nicht umlagefähige Kosten) geteilt durch Zins und Tilgung ' + eur(kd) + '.';
+    if (f && f.bindung) s += ' In den ' + f.bindung.jahre + ' Jahren Zinsbindung bleibt er so, weil Miete und Rate gleich bleiben.';
+    if (f && f.anschluss && f.anschluss.dscr > 0) s += ' Im Anschluss ' + dez(f.anschluss.dscr, 2) + ' bei ' + dez(f.anschluss.zins, 1) + ' % Zins.';
+    return s;
+  }
   var MARKE = { company: 'DealPilot', name: 'Junker Solution', email: 'info@dealpilot.immo' };
   /* Deckblatt-Bild: Obsidian mit Runway (Bildsprache Luftfahrt). Feste Markenfarben, var() geht in Data-URIs nicht. */
   function deckBild() {
@@ -835,7 +982,8 @@
       + '</svg>';
     return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
   }
-  function logoUrl() { try { return location.origin + '/assets/dealpilot-logo-2026.png';   /* v3946a · neues Logo ohne „by Junker Immobilien“ */ } catch (e) { return null; } }
+  var LOGO_DATA = null;   /* einzelcheck-2 · fuer die Mail: der PDF-Dienst laedt nur data: und Dateien der App */
+  function logoUrl() { if (LOGO_DATA) return LOGO_DATA; try { return location.origin + '/assets/dealpilot-logo-2026.png';   /* v3946a · neues Logo ohne „by Junker Immobilien“ */ } catch (e) { return null; } }
   /* Überschriften des KI-Texts: nie ein Buchstabe davor (das Backend benennt sie schon um, hier zur Sicherheit) */
   function kapitel(t) {
     var K = { A: 'Zusammenfassung und Empfehlung', B: 'Objekt, Lage und Markt', C: 'Bewertung, Rendite und Ausblick', D: 'Entwicklung, Ableitung und Prognose' };
@@ -896,16 +1044,17 @@
       zeile('Cashflow nach Finanzierung im Monat', D.eurS(h.cf_nach_m), a && D.eurS(a.cf_nach_m), { art: 'ende', farbe: 1, det: 'vor Steuern, nach Zins und Tilgung' }),
       zeile('DSCR', dez(h.dscr, 2), a && dez(a.dscr, 2), { det: 'Kapitaldienstdeckung, ab 1,2 gilt sie als solide' })
     ], ['', 'Heute', kopfA]);
+    out = out.replace(/<table>/g, '<table class="dicht">');
     if (a) {
-      out += '<h3>Anschlussfinanzierung</h3>' + D.liste([
+      out += '<div class="zwei block"><div><h3>Anschlussfinanzierung</h3>' + D.liste([
         ['Annahme', dez(a.zins, 1) + ' % Zins, ' + dez(a.tilg, 2) + ' % Tilgung'],
         ['Rate gegenüber heute', Math.abs(a.mehr_m) < 0.5 ? 'gleich' : D.eur(Math.abs(a.mehr_m)) + (a.mehr_m > 0 ? ' mehr' : ' weniger') + ' im Monat', { det: 'Rate auf die Restschuld gerechnet, mit Anschlusszins und derselben Tilgung' }],
         a.rs_10 != null ? ['Restschuld zehn Jahre nach dem Anschluss', D.eur(a.rs_10)] : null,
         ['Schuldenfrei nach', a.laufzeit_monate ? dez(a.gesamt_jahre, 1) + ' Jahren ab heute' : 'mehr als 100 Jahren', { art: 'ende', det: a.laufzeit_monate ? 'davon ' + dez(a.laufzeit_monate / 12, 1) + ' Jahre im Anschluss' : 'mit dieser Tilgung' }]
-      ].filter(Boolean));
-    }
+      ].filter(Boolean)) + '</div><div>';
+    } else out += '<div class="block"><div>';
     out += '<div class="hinweis">Gerechnet Monat für Monat wie der Tilgungsplan einer Bank, mit den Rechenkernen der App. Die Miete bleibt in allen Phasen gleich, Steuern sind nicht enthalten. '
-      + 'Der Anschlusszins von ' + dez(ANSCHLUSS_ZINS, 1) + ' % ist eine vorsichtige Annahme, keine Prognose. Keine Finanzierungsberatung.</div>';
+      + 'Der Anschlusszins von ' + dez(ANSCHLUSS_ZINS, 1) + ' % ist eine vorsichtige Annahme, keine Prognose. Keine Finanzierungsberatung.</div></div></div>';
     return out;
   }
 
@@ -915,7 +1064,7 @@
     if (!m || !m.verfuegbar) return '<p>' + D.esc(m && m.grund === 'ohne_ort' ? 'In Grundangaben und Unterlagen stand kein Ort. Ohne Postleitzahl oder Ort rechnet die Wertermittlung nicht.' : 'Der Marktbericht war gerade nicht erreichbar. In DealPilot holst du ihn mit einem Klick nach.') + '</p>';
     if (!w || !w.verfuegbar) {
       return '<p>' + D.esc((w && w.text) || 'Für dieses Objekt liegt keine Wertermittlung vor.') + '</p>'
-        + (m.markt && m.markt.wert > 0 ? '<h3>Marktpreisindikation</h3>' + D.liste(wertZeilen(m).map(function (x) { return [x[0], x[1], { det: x[2] }]; }), ['Kennzahl', 'Betrag']) : '');
+        + (m.markt && m.markt.wert > 0 ? '<h3>Marktpreisindikation aus Angebotspreisen</h3><p>Kein Verfahren der ImmoWertV und kein Verkehrswert. Aktuelle Angebotspreise vergleichbarer Objekte, abzüglich des üblichen Abschlags zwischen Angebots- und Kaufpreis.</p>' + D.liste(wertZeilen(m).map(function (x) { return [x[0], x[1], { det: x[2] }]; }), ['Kennzahl', 'Betrag']) : '');
     }
     var bo = w.boden || {}, wi = w.wertindikation;
     var out = D.kacheln([
@@ -929,10 +1078,15 @@
       var det = [v.herkunft, v.stufe ? 'Stufe ' + v.stufe : '', v.art === 'ertragswert' && v.lzs_pct != null ? 'Liegenschaftszinssatz ' + dez(v.lzs_pct, 2) + ' %' : '',
         v.rnd_j && v.gnd_j ? 'Restnutzungsdauer ' + dez(v.rnd_j, v.rnd_j % 1 ? 1 : 0) + ' von ' + dez(v.gnd_j, 0) + ' Jahren' : '',
         v.miete_qm ? 'Miete ' + dez(v.miete_qm, 2) + ' €/m²' : '', v.rechnung || '', v.weg || ''].filter(Boolean).join(', ');
-      return [v.name + rolle, D.eur(v.wert_eur), { det: det, art: v.art === w.fuehrend ? 'ende' : '' }];
+      /* einzelcheck-2 · ein Vergleichswert ohne amtliche Kaufpreisbasis (Stufe M) sagt das im Namen */
+      return [v.name + rolle + (v.art === 'vergleichswert' && v.stufe === 'M' ? ', mangels amtlicher Kaufpreise aus Angebotspreisen' : ''), D.eur(v.wert_eur), { det: det, art: v.art === w.fuehrend ? 'ende' : '' }];
     });
-    out += '<h3>Verfahren</h3>' + D.liste(zl, ['Verfahren', 'Wert']);
-    if (m.markt && m.markt.wert > 0) out += '<h3>Zum Vergleich: Angebotspreise</h3>' + D.liste(wertZeilen(m).map(function (x) { return [x[0], x[1], { det: x[2] }]; }), ['Kennzahl', 'Betrag']);
+    out += '<div class="block"><h3>Wertermittlung nach ImmoWertV</h3>' + D.liste(zl, ['Verfahren', 'Wert']) + '</div>';
+    /* einzelcheck-2 (Marcel 24.11.2026: „klar unterscheiden … Marktpreisindikation auf Angebotspreisen und
+       Vergleichswertverfahren"): eigener Block, eigene Überschrift, nie in der Verfahrenstabelle */
+    if (m.markt && m.markt.wert > 0) out += '<div class="block"><h3>Marktpreisindikation aus Angebotspreisen</h3>'
+      + '<p>Kein Verfahren der ImmoWertV und kein Verkehrswert. Abgeleitet aus aktuellen Angebotspreisen vergleichbarer Objekte, abzüglich des üblichen Abschlags zwischen Angebots- und Kaufpreis. Sie zeigt, wo der Markt gerade anbietet.</p>'
+      + D.liste(wertZeilen(m).map(function (x) { return [x[0], x[1], { det: x[2] }]; }), ['Kennzahl', 'Betrag']) + '</div>';
     var s = [];
     if (w.fuehrend) s.push('Führend ist das ' + ({ ertragswert: 'Ertragswertverfahren', sachwert: 'Sachwertverfahren', vergleichswert: 'Vergleichswertverfahren' })[w.fuehrend] + '. ' + (w.fuehrend_grund || ''));
     if (w.stuetzend) s.push('Stützend ist das ' + ({ ertragswert: 'Ertragswertverfahren', sachwert: 'Sachwertverfahren', vergleichswert: 'Vergleichswertverfahren' })[w.stuetzend] + '.');
@@ -957,9 +1111,9 @@
     return s;
   }
 
-  function pdf(d) {
+  function pdf(d, nurHtml) {
     var D = window.DpDokument;
-    if (!D) { alert('Die Vorlage für das PDF ist nicht geladen. Bitte die Seite neu laden.'); return; }
+    if (!D) { if (nurHtml) return null; alert('Die Vorlage für das PDF ist nicht geladen. Bitte die Seite neu laden.'); return; }
     var r = d.r, z = d.z, m = d.m || {}, ds2 = d.ds2 && d.ds2.r, g = ds2 && ds2.gesamt, w = m.wert || {}, gr = S.grund || {};
     var art = gr.art || z.art, ortZeile = [gr.plz || z.plz, gr.ort || z.ort || (m.lage && m.lage.ort)].filter(Boolean).join(' ');
     var titel = (ART_NAME[art] || 'Objekt') + (ortZeile ? ' in ' + ortZeile : '');
@@ -970,7 +1124,10 @@
     var wfl = gr.wfl || z.wfl, bj = gr.bj || z.bj;
 
     /* Deckblatt: oben der Bodenrichtwert (Marcel: „oben … den Bodenrichtwert mit ausgeben“) */
-    seiten.push(D.deckblatt(c, { bild: deckBild(), eyebrow: 'DealPilot Einzel-Check', titel: titel,
+    /* einzelcheck-2 (Marcel 24.11.2026): oben ein Foto des Objekts, wenn der Käufer eins aus dem Exposé gewählt hat,
+       sonst die Lagekarte wie im Marktbericht, ohne beides das Runway-Bild */
+    var deckFoto = (S.fotoWahl != null && S.fotos && S.fotos[S.fotoWahl]) ? S.fotos[S.fotoWahl] : null;
+    seiten.push(D.deckblatt(c, { bild: deckFoto || m.karte || deckBild(), eyebrow: 'DealPilot Einzel-Check', titel: titel,
       unter: [wfl ? dez(wfl, 0) + ' m² Wohnfläche' : '', bj ? 'Baujahr ' + Math.round(bj) : '', r && r.e.kp ? 'Kaufpreis ' + eur(r.e.kp) : ''].filter(Boolean).join(' · '),
       wertLabel: wi ? 'Wertindikation · ' + wi.name : (g ? 'Investor Deal Score' : (r && r.k ? 'Deal Score' : null)),
       wert: wi ? eur(wi.wert_eur) : (g ? g.score + ' / 100' : (r && r.k ? r.ds.score + ' / 100' : null)),
@@ -986,10 +1143,14 @@
     /* Auf einen Blick */
     var blick = fazit(d);
     seiten.push(D.seite(c, 'Auf einen Blick', D.abschnitt('Zusammenfassung', 'Auf einen Blick', 'Die wichtigsten Zahlen dieses Berichts. Die Kapitel danach zeigen, woher sie kommen.')
-      + D.kacheln([{ l: 'Kaufpreis', v: r && r.e.kp ? eur(r.e.kp) : 'fehlt' }, { l: 'Wertindikation', v: wi ? eur(wi.wert_eur) : 'keine', s: wi ? VW_KURZ[wi.verfahren] + ', führend' : '', art: 'hi' },
-        { l: 'Marktpreisindikation', v: m.markt && m.markt.wert > 0 ? eur(m.markt.wert) : 'keine', s: 'aus Angebotspreisen' }, { l: 'Bodenrichtwert', v: bo.verfuegbar ? dez(bo.brw_qm, 0) + ' €/m²' : 'kein Wert' }])
+      /* einzelcheck-2 · Wertindikation des führenden Verfahrens und Marktpreisindikation klar getrennt,
+         DSCR mit derselben Wortwahl wie die App („volles Jahr, heutige Eingaben") */
+      + D.kacheln([{ l: 'Kaufpreis', v: r && r.e.kp ? eur(r.e.kp) : 'fehlt' },
+        { l: wi ? (VW_LANG[wi.verfahren] || 'Wertindikation') : 'Wertindikation', v: wi ? eur(wi.wert_eur) : 'keine', s: wi ? 'führendes Verfahren, ImmoWertV' + (wi.stufe === 'M' ? ', aus Angebotspreisen abgeleitet' : '') : 'kein führendes Verfahren', art: 'hi' },
+        { l: 'Marktpreisindikation', v: m.markt && m.markt.wert > 0 ? eur(m.markt.wert) : 'keine', s: 'Angebotspreise abzüglich Verhandlungsabschlag, kein Verkehrswert' }, { l: 'Bodenrichtwert', v: bo.verfuegbar ? dez(bo.brw_qm, 0) + ' €/m²' : 'kein Wert' }])
       + (r && r.k ? D.kacheln([{ l: 'Bruttorendite', v: D.pct(r.k.bmy), s: 'Faktor ' + D.zahl(r.k.fak, 1) }, { l: 'Nettorendite', v: D.pct(r.k.nmy) },
-        { l: 'Cashflow', v: D.eurS(r.k.cf_m), s: 'im Monat nach Finanzierung', art: r.k.cf_m < 0 ? 'schlecht' : 'gut' }, { l: 'DSCR', v: r.k.d_total > 0 ? D.zahl(r.k.dscr, 2) : 'entfällt' }]) : '')
+        { l: 'Cashflow', v: D.eurS(r.k.cf_m), s: 'im Monat nach Finanzierung', art: r.k.cf_m < 0 ? 'schlecht' : 'gut' }, { l: 'DSCR', v: r.k.d_total > 0 ? D.zahl(r.k.dscr, 2) : 'entfällt', s: 'volles Jahr, heutige Eingaben' }]) : '')
+      + (r && r.k && r.k.d_total > 0 ? '<p class="sub">' + D.esc(dscrSatz(r, d.fin)) + '</p>' : '')
       + (g ? D.scoreRing(g.score, g.empfehlung ? g.empfehlung.text : '') : (r && r.k ? D.scoreRing(r.ds.score, r.st.wort) : ''))
       + (blick.length ? '<h3>Kurz gesagt</h3><ul>' + blick.map(function (x) { return '<li>' + D.esc(x) + '</li>'; }).join('') + '</ul>' : '')
       + '<div class="hinweis">Orientierung für deine Entscheidung, keine Rechts-, Steuer- oder Finanzierungsberatung. Alle Werte sind indikativ.</div>'));
@@ -1043,7 +1204,7 @@
         + (lz.length ? D.kacheln(lz) : '<p>Für diesen Ort liegen keine Lagekennzahlen vor.</p>')
         + (istZahl(m.lage.bevoelkerung_trend_pct) ? '<p>Bevölkerung in der Region: ' + (m.lage.bevoelkerung_trend_pct >= 0 ? '+' : '−') + D.zahl(Math.abs(m.lage.bevoelkerung_trend_pct), 1) + ' %.</p>' : '')
         + (trends.length ? '<p>Entwicklung: ' + D.esc(trends.join(', ')) + '.</p>' : '')
-        + '<h3>Marktpreisindikation</h3>' + (wertZeilen(m).length ? D.liste(wertZeilen(m).map(function (x) { return [x[0], x[1], { det: x[2] }]; }), ['Kennzahl', 'Betrag']) : '<p>Eine Marktpreisindikation lag für dieses Objekt nicht vor.</p>')
+        /* einzelcheck-2 · die Marktpreisindikation steht nur noch im Kapitel Wertermittlung (dort getrennt von den Verfahren) */
         + '<div class="hinweis">Indikative Werte, kein Verkehrswertgutachten nach § 194 BauGB. Jede Zahl nennt ihre Herkunft. Fehlt eine Zahl, erfindet DealPilot keine.</div>'));
       if (m.text && m.text.length) {
         var html = '', liste = [];
@@ -1062,8 +1223,9 @@
         + '<p>' + (m.grund === 'ohne_ort' ? 'In den Angaben stand kein Ort. Ohne Postleitzahl oder Ort rechnet der Marktbericht nicht.' : 'Der Marktbericht war gerade nicht erreichbar. In DealPilot holst du ihn mit einem Klick nach.') + '</p>'));
     }
 
-    /* Unterlagen und Hinweise */
-    var ud = d.unterlagen.length ? d.unterlagen : [];
+    /* einzelcheck-2 (Marcel 24.11.2026: „Unterlagen und Hinweise … den können wir vielleicht rauslassen“): Seite entfällt.
+       Was die Unterlagen ergeben, steht in Objekt, Finanzierung und Wertermittlung. */
+    var ud = [];
     if (ud.length) {
       seiten.push(D.seite(c, 'Unterlagen', D.abschnitt('Deine Unterlagen', 'Unterlagen und Hinweise', 'Personendaten wurden vor dem Auslesen geschwärzt.')
         + ud.map(function (u) {
@@ -1079,7 +1241,7 @@
     var STUFE_LANG = { A: 'amtlicher Wert des zuständigen Gutachterausschusses', B: 'amtlich, mit großer Streuung oder regional', C: 'indikativ, aus amtlichen Werten abgeleitet',
       D: 'gesetzlicher Auffangwert nach § 256 BewG', E: 'eigene Angabe', M: 'aus Angebotspreisen abgeleitet, indikativ', N: 'abgeleitet aus der DealPilot-Formel, nicht amtlich' };
     var qn = (w.quellen || []);
-    seiten.push(D.seite(c, 'Quellen und Methodik', D.abschnitt('Herkunft', 'Quellen und Methodik', 'Wie dieser Bericht rechnet und woher die amtlichen Werte stammen.')
+    var quellenHtml = (D.abschnitt('Herkunft', 'Quellen und Methodik', 'Wie dieser Bericht rechnet und woher die amtlichen Werte stammen.')
       + '<ul><li>Rendite, Cashflow, DSCR und Finanzierung rechnen die Rechenkerne der DealPilot-App, Monat für Monat wie ein Tilgungsplan.</li>'
       + '<li>Die Wertermittlung folgt der ImmoWertV: Bodenrichtwert, Ertrags-, Sach- und Vergleichswertverfahren mit den Daten des zuständigen Gutachterausschusses. Das führende Verfahren richtet sich nach der Art des Objekts (§ 6 Abs. 1 ImmoWertV).</li>'
       + '<li>Mietpotenzial und Obergrenze nach §§ 556d, 558 BGB mit der ortsüblichen Vergleichsmiete und der Kappungsgrenze der Gemeinde.</li>'
@@ -1088,17 +1250,20 @@
       + (qn.length ? '<h3>Quellennachweis</h3><ol class="quellen">' + qn.map(function (q) {
           return '<li>' + D.esc(q.vermerk) + (q.kennzahlen && q.kennzahlen.length ? ' (' + D.esc(q.kennzahlen.join(' und ')) + ')' : '') + (q.jahrgang ? ', Berichtsjahr ' + D.esc(String(q.jahrgang)) : '') + (q.lizenz ? ', ' + D.esc(q.lizenz) : '') + '</li>';
         }).join('') + '</ol>' : '')
-      + '<div class="hinweis">Indikative Wertermittlung, kein Verkehrswertgutachten nach § 194 BauGB. Keine Rechts-, Steuer- oder Finanzierungsberatung.</div>'));
+      + '<div class="hinweis">Indikative Wertermittlung, kein Verkehrswertgutachten nach § 194 BauGB. Keine Rechts-, Steuer- oder Finanzierungsberatung.</div>');
 
     /* Weg in die App */
     var an = d.status && d.status.anrechnung;
-    seiten.push(D.seite(c, 'Weiter in DealPilot', D.abschnitt('Der nächste Schritt', 'Weiter in DealPilot', 'Steuer, Finanzierung, Restnutzungsdauer und Wertermittlung im Detail.')
+    /* einzelcheck-2 · Quellen und der Weg in die App teilen sich eine Seite (vorher zwei halb leere) */
+    seiten.push(D.seite(c, 'Quellen und nächster Schritt', quellenHtml + '<div class="block">' + D.abschnitt('Der nächste Schritt', 'Weiter in DealPilot', 'Steuer, Finanzierung, Restnutzungsdauer und Wertermittlung im Detail.')
       + '<ul><li>Objekt anlegen: Die Zahlen dieses Berichts übernimmt DealPilot beim Start über die Pakete der Startseite.</li>'
       + (an ? '<li>Anrechnung: Buchst du bis ' + D.esc(datum(an.bis)) + ' ein Paket, rechnet DealPilot ' + D.esc(dez(an.cents / 100, 2)) + ' € an. Code ' + D.esc(an.code) + '. ' + D.esc(KOMBI) + '</li>' : '')
       + '<li>Kostenlos starten: vier Wochen voller Pro-Umfang ohne Zahlungsdaten, danach automatisch Free.</li></ul>'
-      + '<p>' + D.esc(appBasis()) + '</p>'
-      + '<div class="hinweis">Der Bericht ist eine Orientierung für deine Entscheidung, keine Rechts-, Steuer- oder Finanzierungsberatung. Werte sind indikativ.</div>'));
-    var doc = D.dokument('DealPilot Einzel-Check · ' + titel, seiten);
+      + '<p>' + D.esc(appBasis()) + '</p></div>'));
+    /* einzelcheck-2 (Marcel 24.11.2026: „immer ganze Seiten … relativ abgehackt“): Überschrift nie allein am Seitenende,
+       Tabellen, Kacheln und Blöcke nicht zerreißen, Zeilen etwas dichter, damit ein Kapitel auf seine Seite passt */
+    var doc = D.dokument('DealPilot Einzel-Check · ' + titel, seiten, { css: 'h2,h3{break-after:avoid;page-break-after:avoid}.block,.kz,.zwei,table,.hinweis,ul{break-inside:avoid;page-break-inside:avoid}td{padding-top:1.35mm;padding-bottom:1.35mm}h3{margin-top:5mm}' });
+    if (nurHtml) return { html: doc, titel: titel };   /* einzelcheck-2 · Mail: dasselbe Dokument, ohne Vorschau */
     D.vorschau(doc, 'Einzel-Check · ' + titel);
     return doc;
   }

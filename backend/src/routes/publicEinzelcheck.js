@@ -147,5 +147,23 @@ router.post('/bericht', bremseBericht, mitDateien, async function (req, res) {
   finally { aufraeumen(req); }
 });
 
+/* einzelcheck-2 · Bericht per Mail: der Browser schickt das fertige HTML des Berichts, der PDF-Dienst druckt es,
+   die Mail geht mit dem PDF und dem Weg in die App raus. Nur fuer einen bezahlten, gueltigen Kauf, hoechstens
+   MAX_MAILS je Kauf. Die Adresse wird nicht gespeichert. */
+const bremseMail = bremse(STUNDE, 6, 'Zu viele Mails in kurzer Zeit. Bitte später noch einmal.');
+router.post('/mail', bremseMail, express.json({ limit: '13mb' }), async function (req, res) {
+  try {
+    const b = req.body || {};
+    const z = await ec.kaufLesen(String(b.token || ''));
+    const darf = ec.mailErlaubt(z);
+    if (!darf.ok) return res.status(darf.code === 'nicht_bezahlt' ? 402 : 403).json({ error: darf.code === 'mails_aufgebraucht' ? 'Der Bericht ging schon ' + ec.MAX_MAILS + ' Mal per Mail raus.' : 'Die Mail braucht einen bezahlten, gültigen Kauf.', code: darf.code });
+    const r = await ec.berichtMailen(z, b.email, b.html, b.titel);
+    res.json({ ok: true, mails_rest: r.rest });
+  } catch (e) {
+    if (e && e.status && e.code) return res.status(e.status).json({ error: e.message, code: e.code });
+    fehler(res, e, 'mail');
+  }
+});
+
 module.exports = router;
 module.exports._bremsen = { bremseAuslesen, bremseKaufen, bremseStatus, bremseBericht };

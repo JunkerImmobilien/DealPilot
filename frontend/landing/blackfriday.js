@@ -231,7 +231,7 @@
     });
     d.querySelector('.nein').addEventListener('click', zu);
     d.querySelector('.x').addEventListener('click', zu);
-    d.addEventListener('click', function (e) { if (e.target === d) zu(); });
+    /* einzelcheck-2 (Marcel 24.11.2026): Klick daneben schliesst nicht mehr, nur ×, Später und Esc */
     document.addEventListener('keydown', function esc(e) {
       if (e.key === 'Escape') { zu(); document.removeEventListener('keydown', esc); }
     });

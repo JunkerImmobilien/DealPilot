@@ -233,3 +233,7 @@
 .dk-ablauf li::before{content:counter(dka);position:absolute;left:14px;top:12px;width:24px;height:24px;border-radius:50%;background:var(--ob);color:var(--gdh);font:700 12px/24px var(--mono);text-align:center}
 .dk-ablauf li:last-child::before{background:var(--runway);color:#1a1508}
 .dk-ablauf b{color:var(--ink)}
+/* einzelcheck-2 · Wege anklickbar */
+.dk-ablauf li.dk-wahl{cursor:pointer;transition:border-color .15s,box-shadow .15s,transform .15s}
+.dk-ablauf li.dk-wahl:hover,.dk-ablauf li.dk-wahl:focus-visible{border-color:var(--wl-c9a84c,#C9A84C);box-shadow:0 4px 14px rgba(0,0,0,.08);outline:none;transform:translateY(-1px)}
+.dk-ablauf li.dk-wahl.an{border-color:var(--wl-c9a84c,#C9A84C);box-shadow:0 0 0 2px var(--wl-c9a84c,#C9A84C) inset}
