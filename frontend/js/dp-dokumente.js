@@ -507,7 +507,7 @@
   function fussKnapp(B, PD) {
     var f = klar(PD.fuss || ''), A = St().wert_anker, pk = [];
     var lzs = f.match(/Liegenschaftszins (\d+,\d+ %(?: \([^)]*\))?(?: bzw\. \d+,\d+ %(?: \([^)]*\))?)?)/), jahre = f.match(/Jahre: ([^]*?)\.?\s*$/), ks = f.match(/Kappungsgrenze (\d+ %)/), vm = f.match(/Vergleichsmiete (\d+,\d+ €\/m²)/);
-    if (A && A.art) pk.push('Führend: ' + (ANKER_NAME[A.art] || 'Wert aus dem Marktbericht') + '. Der Ertragswert' + ewRolle().replace(/[()]/g, '').replace(/^ /, ', ') + '.');
+    if (A && A.art) pk.push('Führend: ' + (ANKER_NAME[A.art] || 'Wert aus dem Marktbericht') + '. ' + (A.art === 'ertragswert' ? 'Die übrigen Verfahren stützen.' : A.art === 'aufteiler' ? 'Der Ertragswert des Hauses als Ganzes stützt.' : 'Der Ertragswert stützt.'));
     pk.push('Mieterhöhung: Wert zum heutigen Stichtag, Erhöhungen erst ab Wirksamkeit und abgezinst.');
     pk.push('Zielbild: Ausblick mit umgesetzten Maßnahmen, kein heutiger Verkehrswert.');
     pk.push('Marktpreisindikation: aus Angebotspreisen am Ort, sie hängt nicht an der Miete.');
@@ -587,7 +587,7 @@
       h += '<h3>Ertragswert je Stufe</h3>' + tab(B, ['Stufe', 'Ertragswert', 'Maßnahmen', 'Marktpreisindikation'], WZ.stufen.map(function (s) { return [s.titel, B.eur(s.wert), s.kosten ? B.eur(s.kosten) : '–', s.mpi != null ? B.eur(s.mpi) : '–']; }));
     }
     if (WZ) {
-      if (WZ.ausblick) h += '<div class="hinweis">' + B.esc(klar(WZ.ausblick)) + '</div>';
+      if (WZ.ausblick && !_knapp) h += '<div class="hinweis">' + B.esc(klar(WZ.ausblick)) + '</div>';
       (WZ.stau || []).forEach(function (s) { h += '<p><b>Sanierungsstau ' + B.esc(s.titel) + ':</b> ' + B.esc(klar(s.satz)) + '</p>'; });
       if (WZ.kern && WZ.kern.length) h += '<div class="block"><h3>Kernaussagen</h3>' + B.liste(WZ.kern.map(function (k) { return [k.titel, k.wert_text || '', { det: k.text ? klar(k.text) : '' }]; })) + '</div>';
       /* v3180c · Bankfassung ohne die Erklaertexte des Marktberichts (Methodik) - die Zahlen stehen in den Tabellen darueber */
@@ -845,9 +845,16 @@
         + '<div class="zwei"><div>' + steck + (feld('ds2_energie') ? B.energieSkala(feld('ds2_energie')) : '') + '</div><div>'
         + (bild ? '<img class="karte" src="' + bild + '" alt="" style="height:58mm;width:100%;object-fit:cover">' : '') + '</div></div>'
         + '<h3>Die wichtigsten Zahlen</h3>' + kern9 + aufteilungZeile()));
-      var ai = window._aiAnalysis || null, pk = [], rk = [];
-      try { pk = ((ai && (ai.staerken || ai.strengths)) || []).slice(0, 3); } catch (e) {}
-      try { rk = ((ai && (ai.risiken || ai.schwaechen || ai.risks)) || []).slice(0, 2); } catch (e) {}
+      /* Punkte aus den gerechneten Zahlen, nicht aus dem KI-Text: der kann älter sein als die Zahlen (gemessen Westerfeldstr. 146:
+         „Cashflow nach Steuer 6.447 €“ im Text, 4.936 € in der Kachel darüber). Eine Bank liest hier jede Zahl nach. */
+      var pk = [], rk = [], sw0 = window.DealPilotSchwellen ? DealPilotSchwellen.get() : {}, dg = Number(sw0.dscrGruen) > 0 ? Number(sw0.dscrGruen) : 1.2;
+      if (mw && K.kp && mw.wert > K.kp) pk.push('Der Kaufpreis liegt ' + B.eur(mw.wert - K.kp) + ' (' + B.pct((mw.wert - K.kp) / mw.wert * 100, 1) + ') unter dem ' + mw.name + '.');
+      if (da(K.bmy) !== null) pk.push('Bruttomietrendite ' + B.pct(K.bmy, 2) + ' auf den Kaufpreis, Kaufpreisfaktor ' + B.zahl(K.fak, 1) + '.');
+      if ((K.cf_m || 0) >= 0) pk.push('Die Miete trägt Zins, Tilgung und Bewirtschaftung: Cashflow vor Steuern ' + B.eurS(K.cf_m) + ' im Monat.');
+      if (da(K.dscr) !== null && K.dscr >= dg) pk.push('DSCR ' + B.zahl(K.dscr, 2) + ', über der üblichen Schwelle von ' + B.zahl(dg, 2) + '.');
+      if (da(K.dscr) !== null && K.dscr < dg) rk.push('DSCR ' + B.zahl(K.dscr, 2) + ', unter der üblichen Schwelle von ' + B.zahl(dg, 2) + '.');
+      if (da(K.ltv) !== null && K.ltv > 80) rk.push('Beleihungsauslauf ' + B.pct(K.ltv, 1) + (S0.ltv_basis_label ? ' auf ' + S0.ltv_basis_label : '') + (mw && mw.wert > 0 && zahlAus('d1') ? ', auf den ' + mw.name + ' ' + B.pct(zahlAus('d1') / mw.wert * 100, 1) : '') + '.');
+      if (da(K.rate_an_m) !== null && da(K.cf_op_an) !== null) rk.push('Nach der Zinsbindung (Annahme ' + B.pct(zahlAus('anschl_z'), 2) + ') Rate ' + B.eur(K.rate_an_m) + ' im Monat, Cashflow vor Steuern ' + B.eurS(K.cf_op_an / 12) + ' im Monat.');
       var kernH = (WZ && WZ.kern && WZ.kern.length) ? B.kacheln(WZ.kern.slice(0, 6).map(function (k) { return { l: k.titel, v: k.wert_text || '' }; }), true) : '';
       var punkte = function (titel, arr) { return arr.length ? '<h3>' + titel + '</h3><ul>' + arr.map(function (x) { return '<li>' + B.esc(ersterSatz(x)) + '</li>'; }).join('') + '</ul>' : ''; };
       Sx.push(B.seite(c, 'Kernaussagen', B.abschnitt('Kurzfassung', 'Kernaussagen') + kernH + punkte('Was dafür spricht', pk) + punkte('Worauf zu achten ist', rk)
