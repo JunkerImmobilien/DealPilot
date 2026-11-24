@@ -1496,7 +1496,8 @@
     var knoepfe = '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">' + '<button type="button" class="btn-clean dp-pa4-btn" onclick="if(window.DpEingang)DpEingang.oeffnen();else if(window.DealPilotBelegImport)DealPilotBelegImport.open(\'wk\')">Belege, Unterlagen &amp; Rechnungen einlesen</button>' + '</div>';
     var verlauf = '';
     try { verlauf = opt.ohneVerlauf ? '' : eingangVerlauf(); } catch (e) { verlauf = ''; }
-    var erklaerung = '<p class="dp-pa-p">Wirtschaftsplan und Jahresabrechnung → Werbungskosten mit Jahr · Protokolle → Beschlüsse und Sonderumlagen · Mietverträge → passende Einheit und Mieter · Rechnungen → Werbungskosten. Nichts wird ohne deine Bestätigung übernommen.</p>';
+    /* v4530 · Marcel 24.11.2026 (professioneller, wenig Text): was woraus wird als vier kleine Kacheln statt eines Pfeil-Satzes */
+    var erklaerung = '<ul class="dp-eg-wohin"><li><b>Wirtschaftsplan, Abrechnung</b><span>Werbungskosten mit Jahr</span></li><li><b>Protokolle</b><span>Beschlüsse und Sonderumlagen</span></li><li><b>Mietverträge</b><span>passende Einheit und Mieter</span></li><li><b>Rechnungen</b><span>Werbungskosten nach Anlage V</span></li></ul><p class="dp-pa-p" style="font-size:12px;color:#7A7370">Übernommen wird nur, was du bestätigst.</p>';
     if (html) return kuerzen(html) + verlauf + (opt.ohneEingang ? '' : karte(kopfzeile('Neue Unterlagen') + erklaerung + knoepfe, 'dp-pa4-mt'));
     if (opt.ohneEingang) return verlauf;   /* v4007 · ohne Auswertung und mit Hausverlauf: dessen Knopf trägt das Hochladen */
     return karte(kopfzeile('Unterlagen & WEG') + '<p class="dp-pa-p">Noch keine Unterlagen ausgewertet.</p>' + erklaerung + knoepfe) + verlauf;

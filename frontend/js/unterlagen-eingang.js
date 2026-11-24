@@ -440,34 +440,96 @@
     var v = o.verlauf.slice().reverse(), ae = (o.einheiten_aenderungen || []).slice().reverse();
     if (!v.length && !ae.length) return '';
     var datum = function (s) { try { return new Date(s).toLocaleDateString('de-DE'); } catch (x) { return ''; } };
-    /* v4007 · Marcel 23.11.2026: „Verlauf einlesen/übernommen einfacher und verständlicher“. Bis v4006 eine Tabelle mit
-       vier Spalten (min. 620 px, am Handy quer zu schieben). Jetzt je Einlesen eine Zeile: Datum und ein Satz
-       („3 Unterlagen gelesen, 5 Werte übernommen“), die Knöpfe rechts, Warnungen sichtbar, die Einzelheiten aufklappbar. */
-    var kb = 'font:600 11.5px/1 inherit;padding:6px 10px;border-radius:6px;cursor:pointer;white-space:nowrap;min-height:32px;';
-    var h = '<p class="dp-pa-p" style="margin:0 0 8px;font-size:12px;color:#7A7370">Jedes Einlesen mit dem, was daraus ins Objekt übernommen wurde. Zurücknehmen setzt die Werte auf den Stand davor, Löschen entfernt nur den Eintrag.</p>'
-      + '<div class="dp-eg-liste" style="display:grid;gap:8px">'
+    _grundCss();
+    /* v4530 · Marcel 24.11.2026: „Tabelle Einlesen und übernommen … professioneller“. Statt einzelner Kästen mit
+       Satz und zugeklappten Einzelheiten eine Liste mit Spalten: Datum, gelesene Unterlagen (als Marken mit Art und
+       Dateiname, sofort sichtbar), übernommene Werte (Zahl, die Werte aufklappbar), Knöpfe. Am Handy untereinander. */
+    var h = '<div class="dp-eg-tab" role="table"><div class="dp-eg-kopf" role="row"><span>Datum</span><span>Gelesen</span><span>Übernommen</span><span></span></div>'
       + v.map(function (x) {
-        var nd = (x.dokumente || []).length, nu = (x.uebernommen || []).length;
-        var satz = nd + (nd === 1 ? ' Unterlage' : ' Unterlagen') + ' gelesen, ' + (nu ? nu + (nu === 1 ? ' Wert' : ' Werte') + ' übernommen' : 'nichts übernommen');
-        var ng = (x.nicht_gelesen || []).length
-          ? '<div style="margin-top:6px;color:#B8625C;font-weight:600">Nichts gelesen aus: ' + x.nicht_gelesen.map(esc).join(', ') + '. Bitte von Hand prüfen.</div>' : '';
+        var nu = (x.uebernommen || []).length, docs = x.dokumente || [];
+        var marken = docs.map(function (d) { return '<span class="dp-eg-dok" title="' + esc(d.name) + '">' + (d.typ ? '<i>' + esc(d.typ) + '</i>' : '') + esc(d.name) + '</span>'; }).join('')
+          + (x.nicht_gelesen || []).map(function (n) { return '<span class="dp-eg-dok warn" title="Nichts gelesen. Bitte von Hand prüfen.">' + '<i>nichts gelesen</i>' + esc(n) + '</span>'; }).join('');
         var zr = x.zurueck
-          ? '<div style="margin-top:6px;color:#8a7a55"><b>Zurückgenommen am ' + esc(datum(x.zurueck.am)) + '</b> (' + x.zurueck.anzahl + ' Wert(e))'
-            + (x.zurueck.konflikt && x.zurueck.konflikt.length ? ', belassen, weil seitdem geändert: ' + x.zurueck.konflikt.map(esc).join(', ') : '')
-            + (x.zurueck.nicht && x.zurueck.nicht.length ? ', nicht automatisch: ' + x.zurueck.nicht.map(esc).join(', ') : '') + '</div>' : '';
+          ? '<div class="dp-eg-hin">Zurückgenommen am ' + esc(datum(x.zurueck.am)) + ', ' + x.zurueck.anzahl + (x.zurueck.anzahl === 1 ? ' Wert' : ' Werte')
+            + (x.zurueck.konflikt && x.zurueck.konflikt.length ? '. Belassen, weil seitdem geändert: ' + x.zurueck.konflikt.map(esc).join(', ') : '')
+            + (x.zurueck.nicht && x.zurueck.nicht.length ? '. Nicht automatisch: ' + x.zurueck.nicht.map(esc).join(', ') : '') + '</div>' : '';
+        var werte = nu
+          ? '<details class="dp-eg-werte"><summary><b>' + nu + '</b> ' + (nu === 1 ? 'Wert' : 'Werte') + '</summary><ul>' + x.uebernommen.map(function (w) { return '<li>' + esc(w) + '</li>'; }).join('') + '</ul></details>'
+          : '<span class="dp-eg-nichts">nichts</span>';
         var kannZurueck = !x.zurueck && (x.aenderungen || []).some(function (a) { return a.t !== 'nicht'; });
-        var aktion = (kannZurueck ? '<button type="button" data-eg-knopf="zurueck:' + esc(x.id) + '" style="' + kb + 'border:1px solid var(--wl-c9a84c,#C9A84C);background:transparent;color:inherit" onclick="DpEingang.knopf(\'zurueck\',\'' + esc(x.id) + '\',this)">' + knopfText('zurueck', x.id) + '</button>' : '')
-          + '<button type="button" data-eg-knopf="loeschen:' + esc(x.id) + '" style="' + kb + 'border:1px solid rgba(184,98,92,.55);background:transparent;color:#B8625C" onclick="DpEingang.knopf(\'loeschen\',\'' + esc(x.id) + '\',this)" title="Nur den Eintrag entfernen, übernommene Werte bleiben">' + knopfText('loeschen', x.id) + '</button>';
-        return '<div class="dp-eg-z" style="border:1px solid #EFE8D6;border-radius:8px;background:#fff;padding:9px 12px' + (x.zurueck ? ';opacity:.6' : '') + '">'
-          + '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px"><b style="font:600 12px \'JetBrains Mono\',monospace;color:#6B645A">' + esc(datum(x.am)) + '</b>'
-          + '<span style="flex:1 1 200px;min-width:0;font-size:13px">' + esc(satz) + '</span><span style="display:flex;gap:6px;flex-wrap:wrap">' + aktion + '</span></div>'
-          + ng + zr
-          + '<details style="margin-top:4px"><summary style="cursor:pointer;font-size:12px;color:#7A7370;min-height:28px;display:flex;align-items:center">Einzelheiten</summary>'
-          + '<div style="font-size:12.5px;line-height:1.55;margin-top:4px"><b>Gelesen:</b> ' + (x.dokumente || []).map(function (d) { return esc((d.typ ? d.typ + ': ' : '') + d.name); }).join(', ')
-          + '<br><b>Übernommen:</b> ' + (nu ? x.uebernommen.map(esc).join(', ') : 'nichts') + '</div></details></div>';
-      }).join('') + '</div>';
-    if (ae.length) h += '<p class="dp-pa-p" style="margin-top:10px"><b>Mietverträge den Einheiten zugeordnet:</b> ' + ae.map(function (a) { return esc(a.einheit) + ' (' + esc(datum(a.am)) + ', vorher ' + (a.vorher.ist ? esc(a.vorher.ist) + ' €' : '–') + ')'; }).join(' · ') + '</p>';
+        var aktion = (kannZurueck ? '<button type="button" class="dp-eg-k" data-eg-knopf="zurueck:' + esc(x.id) + '" onclick="DpEingang.knopf(\'zurueck\',\'' + esc(x.id) + '\',this)" title="Die übernommenen Werte auf den Stand davor setzen">' + knopfText('zurueck', x.id) + '</button>' : '')
+          + '<button type="button" class="dp-eg-k rot" data-eg-knopf="loeschen:' + esc(x.id) + '" onclick="DpEingang.knopf(\'loeschen\',\'' + esc(x.id) + '\',this)" title="Nur den Eintrag entfernen, übernommene Werte bleiben">' + knopfText('loeschen', x.id) + '</button>';
+        return '<div class="dp-eg-z' + (x.zurueck ? ' zurueck' : '') + '" role="row">'
+          + '<span class="dp-eg-dat">' + esc(datum(x.am)) + '</span>'
+          + '<span class="dp-eg-doks">' + (marken || '<span class="dp-eg-nichts">keine Datei</span>') + zr + '</span>'
+          + '<span class="dp-eg-uw">' + werte + '</span>'
+          + '<span class="dp-eg-akt">' + aktion + '</span></div>';
+      }).join('') + '</div>'
+      + '<p class="dp-eg-fuss">Zurücknehmen setzt die Werte auf den Stand davor. Löschen entfernt nur den Eintrag.</p>';
+    if (ae.length) h += '<p class="dp-eg-fuss"><b>Mietverträge den Einheiten zugeordnet:</b> ' + ae.map(function (a) { return esc(a.einheit) + ' (' + esc(datum(a.am)) + (a.vorher.ist ? ', vorher ' + esc(a.vorher.ist) + ' €' : '') + ')'; }).join(' · ') + '</p>';
     return h;
+  }
+
+  /* v4530 · Marcel 24.11.2026: „unter Unterlagen hochladen … dass wir dann auch noch sehen, welche wir hochgeladen haben“.
+     Die Dateien aus dem Verlauf (ohne zurückgenommene), jüngste zuerst, je Dateiname einmal. Steht im Einlese-Fenster
+     unter dem Ablagefeld. Die Originale liegen nicht auf dem Server (v3163), gezeigt werden Name, Art und Datum. */
+  function schonHtml() {
+    var o = lesen(), seen = {}, L = [];
+    o.verlauf.slice().reverse().forEach(function (x) {
+      if (x.zurueck) return;
+      (x.dokumente || []).forEach(function (d) { var k = String(d.name || '').toLowerCase(); if (!k || seen[k]) return; seen[k] = 1; L.push({ name: d.name, typ: d.typ, am: x.am }); });
+    });
+    if (!L.length) return '';
+    _grundCss();
+    var datum = function (s) { try { return new Date(s).toLocaleDateString('de-DE'); } catch (x) { return ''; } };
+    var zeile = function (d) { return '<li><span class="n" title="' + esc(d.name) + '">' + esc(d.name) + '</span><span class="t">' + esc(d.typ || 'Dokument') + '</span><span class="d">' + esc(datum(d.am)) + '</span></li>'; };
+    var vorn = L.slice(0, 6), rest = L.slice(6);
+    return '<div class="dp-eg-schon"><div class="dp-eg-schon-t">Bereits eingelesen <b>' + L.length + '</b></div><ul>' + vorn.map(zeile).join('') + '</ul>'
+      + (rest.length ? '<details><summary>' + rest.length + ' weitere zeigen</summary><ul>' + rest.map(zeile).join('') + '</ul></details>' : '') + '</div>';
+  }
+  /* v4530 · Grundgestaltung, früh geladen: Verlauf, „Bereits eingelesen“, ViVi im Rahmen der Belege je Jahr und die leere
+     Grafikfläche im Reiter Haus & Unterlagen. Marcel 24.11.2026: „unter Übersicht … so eine graue Pille … über Hausverlauf,
+     die muss raus“. Gemessen: div.dp-gn.dp-gx[data-dp-gn=gx-hausgeld], leer (Hausgeld je Jahr braucht zwei Jahre), mit
+     Rand und Innenabstand der Kartenregel 36 px hoch. Eine leere Grafikfläche bleibt jetzt unsichtbar. */
+  function _grundCss() {
+    if (el('dp-eg-css')) return;
+    var s = document.createElement('style'); s.id = 'dp-eg-css';
+    var g = 'var(--wl-c9a84c, #C9A84C)';
+    s.textContent = '.dp-pa-wrap .dp-gn.dp-gx:empty{display:none!important}'
+      + '.dp-eg-tab{border:1px solid color-mix(in srgb,' + g + ' 22%,transparent);border-radius:10px;overflow:hidden;background:#fff;font-family:Inter,system-ui,sans-serif;color:var(--ch,#2A2727)}'
+      + '.dp-eg-kopf,.dp-eg-z{display:grid;grid-template-columns:92px minmax(0,1fr) 120px auto;gap:10px;align-items:start;padding:9px 12px}'
+      + '.dp-eg-kopf{background:color-mix(in srgb,' + g + ' 7%,#fff);font:600 10px/1.2 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--muted,#7A7370);padding-top:7px;padding-bottom:7px}'
+      + '.dp-eg-z{border-top:1px solid rgba(42,39,39,.07);font-size:12.5px}.dp-eg-z.zurueck{opacity:.6}'
+      + '.dp-eg-dat{font:600 12px/1.6 "JetBrains Mono",ui-monospace,monospace;color:#6B645A;font-variant-numeric:tabular-nums}'
+      + '.dp-eg-doks{display:flex;flex-wrap:wrap;gap:5px;min-width:0}'
+      + '.dp-eg-dok{display:inline-flex;align-items:center;gap:6px;max-width:100%;border:1px solid rgba(42,39,39,.12);border-radius:6px;padding:3px 8px;font-size:12px;line-height:1.35;background:#FDFCFA;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}'
+      + '.dp-eg-dok i{font-style:normal;font:600 9.5px/1 "JetBrains Mono",monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--wl-9a7f33,#9a7f33)}'
+      + '.dp-eg-dok.warn{border-color:rgba(184,98,92,.5);color:#B8625C}.dp-eg-dok.warn i{color:#B8625C}'
+      + '.dp-eg-hin{flex-basis:100%;font-size:11.5px;color:#8a7a55;margin-top:2px}'
+      + '.dp-eg-uw summary{cursor:pointer;list-style:none;font-size:12.5px;line-height:1.6}.dp-eg-uw summary::-webkit-details-marker{display:none}'
+      + '.dp-eg-uw summary b{font-variant-numeric:tabular-nums}.dp-eg-uw summary::after{content:" ▾";color:var(--muted,#7A7370);font-size:10px}.dp-eg-uw details[open] summary::after{content:" ▴"}'
+      + '.dp-eg-uw ul{margin:4px 0 0;padding:0 0 0 14px;font-size:11.5px;line-height:1.5;color:var(--muted,#5f5a55)}'
+      + '.dp-eg-nichts{color:var(--muted,#7A7370);font-size:12px;line-height:1.6}'
+      + '.dp-eg-akt{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap}'
+      + '.dp-eg-k{font:600 11.5px/1 Inter,system-ui,sans-serif;padding:7px 10px;border-radius:6px;cursor:pointer;white-space:nowrap;min-height:30px;border:1px solid ' + g + ';background:transparent;color:inherit}'
+      + '.dp-eg-k.rot{border-color:rgba(184,98,92,.55);color:#B8625C}'
+      + '.dp-eg-fuss{margin:8px 0 0;font-size:11.5px;color:var(--muted,#7A7370)}'
+      + '.dp-eg-schon{margin-top:12px;border:1px solid color-mix(in srgb,' + g + ' 22%,transparent);border-radius:10px;padding:10px 12px;background:#fff}'
+      + '.dp-eg-schon-t{font:600 10.5px/1.2 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--muted,#7A7370);margin-bottom:6px}'
+      + '.dp-eg-schon-t b{color:var(--wl-9a7f33,#9a7f33);margin-left:4px}'
+      + '.dp-eg-schon ul{list-style:none;margin:0;padding:0}'
+      + '.dp-eg-schon li{display:grid;grid-template-columns:minmax(0,1fr) auto 76px;gap:10px;align-items:center;padding:5px 0;border-top:1px solid rgba(42,39,39,.06);font-size:12px}'
+      + '.dp-eg-schon li:first-child{border-top:0}.dp-eg-schon .n{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}'
+      + '.dp-eg-schon .t{font:600 9.5px/1 "JetBrains Mono",monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--wl-9a7f33,#9a7f33)}'
+      + '.dp-eg-schon .d{text-align:right;font:500 11px/1 "JetBrains Mono",monospace;color:var(--muted,#7A7370)}'
+      + '.dp-eg-schon summary{cursor:pointer;font-size:12px;color:var(--muted,#7A7370);padding-top:6px}'
+      + '.ue-bj-vivi .vst-jahre{display:none!important}'
+      + '.dp-eg-wohin{list-style:none;margin:6px 0 4px;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px}'
+      + '.dp-eg-wohin li{border:1px solid color-mix(in srgb,' + g + ' 22%,transparent);border-radius:8px;padding:8px 10px;background:#fff;font-size:12px;line-height:1.35}'
+      + '.dp-eg-wohin b{display:block;font-weight:600;color:var(--ch,#2A2727)}.dp-eg-wohin span{color:var(--muted,#7A7370)}'
+      + '@media (max-width:640px){.dp-eg-kopf{display:none}.dp-eg-z{grid-template-columns:minmax(0,1fr) auto}.dp-eg-dat{grid-column:1}.dp-eg-uw{grid-column:2;grid-row:1;text-align:right}'
+      + '.dp-eg-doks{grid-column:1/-1}.dp-eg-akt{grid-column:1/-1;justify-content:flex-start}.dp-eg-schon li{grid-template-columns:minmax(0,1fr) 70px}.dp-eg-schon .t{display:none}}';
+    document.head.appendChild(s);
   }
 
   /* ── v3154 · PRÜFANSICHT: links das eingescannte Bild, rechts die gelesenen Werte ─────────────
@@ -540,9 +602,9 @@
       var bel = B.filter(function (b) { return b.feld === f; }), summe = bel.reduce(function (s, b) { return s + (Number(b.betrag) || 0); }, 0);
       if (!wert && !bel.length) return;
       var rest = Math.round((wert - summe) * 100) / 100, art;
-      if (st.override == null) art = bel.length ? 'Der Posten zeigt den von der App berechneten Wert – die Belege sind darin nicht enthalten.' : 'von der App berechnet (kein eigener Wert eingetragen)';
+      if (st.override == null) art = bel.length ? 'Der Posten zeigt den von der App berechneten Wert. Die Belege sind darin nicht enthalten.' : 'von der App berechnet (kein eigener Wert eingetragen)';
       else if (Math.abs(rest) < 0.5) art = bel.length ? '' : 'eingetragen';
-      else if (rest < 0) art = 'Der Posten ist um ' + eur2(-rest) + ' kleiner als die Belege – nach der Übernahme von Hand gesenkt?';
+      else if (rest < 0) art = 'Der Posten ist um ' + eur2(-rest) + ' kleiner als die Belege. Nach der Übernahme von Hand gesenkt?';
       else if (h[f] && h[f].quelle === 'Unterlage') art = 'aus der Unterlage „' + (h[f].dok || '') + '“';
       else art = bel.length ? 'von Hand eingetragen oder ohne Einzelnachweis übernommen' : 'von Hand eingetragen' + (h[f] && h[f].quelle === 'Beleg' ? ' bzw. aus Belegen vor dem 04.11.2026 (ohne Einzelnachweis)' : '');
       zeilen.push({ feld: f, label: p[1], wert: wert, schaetzung: st.override == null, belege: bel, summe: summe, rest: st.override == null ? null : rest, art: art });
@@ -608,17 +670,26 @@
   function _viviVerknuepft() { try { var v = window.DpVivi && window.DpVivi.stand && window.DpVivi.stand(); return !!(v && v.verknuepft); } catch (e) { return false; } }
   function _viviTeil(jahr, opt) {
     if (!_viviVerknuepft()) return '';
+    /* v4530 · Marcel 24.11.2026: „oben schon die Jahreszahlen … brauchen wir das unten in ViVi Steuer 24 und dass man dann auch 2025
+       und 26 auswählen kann, nicht … wenn wir auf 2027 klicken, wird ViVi ja eh ausgeblendet“. ViVi folgt dem Jahr der Leiste oben,
+       die eigene Jahresauswahl von DpViviSteuer.html ist im Rahmen ausgeblendet (.ue-bj-vivi .vst-jahre). Führt ViVi für das Jahr
+      nichts, fällt der Teil ganz weg. Nur solange ViVi noch gar kein Jahr geliefert hat, steht eine Zeile mit dem Knopf zum Holen. */
     var VS = window.DpViviSteuer, J = VS && VS.jahre ? VS.jahre() : [], inhalt = '';
     if (J.indexOf(jahr) >= 0 && VS.html) {
       inhalt = VS.html(jahr);
       if (!inhalt) inhalt = '<p class="oabi-sub" style="padding:0">Der Abgleich der Steuer mit ViVi ist in den Einstellungen ausgeschaltet.</p>';
-    } else inhalt = '<p class="oabi-sub" style="padding:0">ViVi führt für ' + jahr + ' noch keine Buchungen der Anlage V. Gleich ab, um sie zu holen.</p>';
+    } else if (!J.length && jahr <= new Date().getFullYear()) inhalt = '<p class="oabi-sub" style="padding:0">Noch keine Buchungen aus ViVi geholt.</p>';
+    else return '';
     return '<div class="ue-bj-vivi' + (opt && opt.festesJahr ? ' fest' : '') + '"><div class="ue-bj-gruppe"><span>Laut ViVi</span><button type="button" class="oabi-btn" data-bj-vivi>Mit ViVi abgleichen</button></div>' + inhalt + '</div>';
   }
   function _jahre() {
     var jahre = ((typeof window.dpWkJahre === 'function' ? window.dpWkJahre() : []) || []).slice();
     var o = lesen(), mitBelegen = {};
     (o.buchungen || []).forEach(function (b) { mitBelegen[b.jahr] = (mitBelegen[b.jahr] || 0) + 1; });
+    /* v4530 · Belege gibt es nur für vergangene und laufende Jahre: die Leiste zeigt kein Jahr nach dem laufenden (bis v4470
+       standen dort Jahre bis 2040 aus der Projektion), außer es liegen schon Belege dafür vor */
+    var _heute = new Date().getFullYear();
+    jahre = jahre.filter(function (j) { return j <= _heute || mitBelegen[j]; });
     Object.keys(mitBelegen).forEach(function (j) { if (jahre.indexOf(Number(j)) < 0) jahre.push(Number(j)); });
     jahre.sort(function (a, b) { return a - b; });
     return { jahre: jahre, mitBelegen: mitBelegen };
@@ -701,7 +772,8 @@
     setTimeout(function () { a.remove(); URL.revokeObjectURL(url); }, 0);
   }
 
-  window.DpEingang = { VERSION: 'v4470', start: start, jahresAnsicht: jahresAnsicht, jahresInRahmen: jahresInRahmen, oeffnen: oeffnen, istRechnung: istRechnung, belegeAuslesen: belegeAuslesen,
+  try { _grundCss(); } catch (e) {}
+  window.DpEingang = { VERSION: 'v4530', schonHtml: schonHtml, start: start, jahresAnsicht: jahresAnsicht, jahresInRahmen: jahresInRahmen, oeffnen: oeffnen, istRechnung: istRechnung, belegeAuslesen: belegeAuslesen,
     einheiten: einheiten, mvVorschlag: mvVorschlag, mvOptionen: mvOptionen, mvText: mvText, mvUebernehmen: mvUebernehmen, mvFelder: mvFelder,
     jahrStand: jahrStand, protokoll: protokoll, verlaufHtml: verlaufHtml, lesen: lesen,
     /* v3154 */ txStart: txStart, txEnde: txEnde, feldStand: feldStand, feldGeaendert: feldGeaendert,

@@ -2955,12 +2955,15 @@
       '<div class="oabi-modal">' +
         '<div class="oabi-head"><span style="color:var(--gold,#C9A84C)">' + svg('upload', 22) + '</span><h3>' + (_eingang ? 'Belege, Unterlagen & Rechnungen einlesen' : _ergaenzen ? 'Unterlagen nachreichen' : 'Unterlagen einlesen: PDF oder Foto, Exposé, Marktbericht, Dokumente') + '</h3></div>' +
         (_jr ? '<div class="oabi-kombi-grid"><div id="oabi-r-ein" class="oabi-spalte"><div class="oabi-spalte-t">Belege und Unterlagen einlesen</div>' : '') +
+        /* v4530 · im Eingang (Belege, Unterlagen, Rechnungen) ein kurzer Satz statt zweier Absätze; die übrigen Wege unverändert */
+        (_eingang ? '<div class="oabi-sub">PDFs oder Fotos anhängen. Die Art jeder Datei wird erkannt und ist umstellbar.' + (_ergaenzen ? ' Die bisherige Auswertung bleibt, Neues wird ergänzt.' : '') + ' Übernommen wird nur, was du auswählst.</div>' :
         (_ergaenzen ? '<div class="oabi-sub" style="border-left:3px solid var(--gold,#C9A84C);padding-left:9px">Die bisherige Auswertung bleibt die Grundlage. Gelesen werden nur die neuen PDFs, dann wird zusammengeführt. Vor der Übernahme siehst du, was sich in Risiken, These, Hausgeld und Steuer ändert.</div>' : '') +
-        '<div class="oabi-sub">Mehrere PDFs oder Fotos (JPG, PNG) gleichzeitig anhängen. Der Typ wird automatisch erkannt (inkl. OCR bei Scan-/Grafik-PDFs) und ist pro Datei umstellbar. Alle Werte werden zusammengeführt (Marktbericht führt bei Konflikt).</div>' +
+        '<div class="oabi-sub">Mehrere PDFs oder Fotos (JPG, PNG) gleichzeitig anhängen. Der Typ wird automatisch erkannt (inkl. OCR bei Scan-/Grafik-PDFs) und ist pro Datei umstellbar. Alle Werte werden zusammengeführt (Marktbericht führt bei Konflikt).</div>') +
         '<div class="oabi-body">' +
           '<div class="oabi-drop" id="oabi-drop">📁 PDFs oder Fotos auswählen oder hierher ziehen<br><span style="font-size:11px;color:var(--muted,#7A7370)">mehrere Dateien möglich · max 100 MB je Datei</span>' +
             '<input type="file" id="oabi-input" accept="application/pdf,.pdf,image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" multiple style="display:none"></div>' +
           '<div class="oabi-files" id="oabi-files"></div><div id="oabi-result"></div>' +
+          (_eingang ? '<div id="oabi-schon"></div>' : '') +   /* v4530 · „Bereits eingelesen“ (unterlagen-eingang.js schonHtml) */
         '</div>' +
         (_jr ? '</div><div class="oabi-spalte oabi-spalte-jahre"><div class="oabi-spalte-t">Belege je Jahr</div><div class="oabi-body" id="oabi-r-jahre"></div></div></div>' : '') +
         '<div class="oabi-foot"><button type="button" class="oabi-btn" id="oabi-cancel">Schließen</button>' +
@@ -2987,7 +2990,9 @@
       _fireOabiDone();
     }
     function _escZu(e) { if (e.key === 'Escape' && !document.getElementById('beleg-import-ov') && !document.getElementById('dp-eg-vorschau') && !document.getElementById('dp-beleg-lupe')) close(); }
-    function _jahreNeu() { var b = $('oabi-r-jahre'); if (b && _jr) try { window.DpEingang.jahresInRahmen(b); } catch (e) {} }
+    function _schonNeu() { var s = $('oabi-schon'); if (s && window.DpEingang && typeof window.DpEingang.schonHtml === 'function') try { s.innerHTML = window.DpEingang.schonHtml(); } catch (e) {} }
+    function _jahreNeu() { var b = $('oabi-r-jahre'); if (b && _jr) try { window.DpEingang.jahresInRahmen(b); } catch (e) {} _schonNeu(); }
+    _schonNeu();
     document.addEventListener('keydown', _escZu);
     window.addEventListener('dp:belege-geaendert', _jahreNeu);
     $('oabi-cancel').addEventListener('click', close);
