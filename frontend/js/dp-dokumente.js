@@ -144,7 +144,7 @@
       { l: 'Interner Zinsfuß', v: da(K.irr) === null ? 'n. b.' : B.pct(K.irr, 2), s: 'IRR' },
       { l: 'Kaltmiete', v: B.eur(da(K.nkm_j) !== null ? K.nkm_j : (rows[1] && rows[1].nkm_y)), s: 'p. a. inkl. Zusatzeinnahmen' },
       { l: 'Equity Multiple', v: da(K.em) === null ? '–' : B.zahl(K.em, 1) + 'x', s: 'über die Haltedauer' },
-      { l: 'Wertpuffer', v: B.eurS(K.wp_kpi), s: 'gegenüber Kaufpreis' },
+      svwVeraltet() ? { l: 'Wertpuffer', v: B.eurS(Number(St().wert_anker.wert) - (K.kp || 0)), s: 'Objektwert gegenüber Kaufpreis' } : { l: 'Wertpuffer', v: B.eurS(K.wp_kpi), s: 'gegenüber Kaufpreis' },   /* v4380 */
       { l: 'Deal Score', v: SC.score ? B.zahl(SC.score, 0) + ' / 100' : '–', s: SC.label || '', art: 'hi' }
     ]);
   }
@@ -159,6 +159,15 @@
     if (b.website) z.push(['Web', String(b.website).replace(/^https?:\/\//, '')]);
     if (!z.length) return '';
     return '<div class="block"><h3>Ansprechpartner</h3><div class="kv">' + z.map(function (x) { return '<div><span>' + B.esc(x[0]) + '</span><span>' + B.esc(x[1]) + '</span></div>'; }).join('') + '</div></div>';
+  }
+  /* v4380 · Regel (Marcel 24.11.2026): Wertangaben im PDF nur aus dem letzten Bericht und mit demselben maßgebenden Wert wie
+     die App (State.wert_anker). Eine im Reiter Objekt aus einem Marktbericht übernommene Wertangabe (svw_herkunft marktbericht
+     oder indikation), die vom maßgebenden Wert abweicht, ist veraltet und erscheint nicht. Gemessen Demostraße 5: Feld 111.000 €
+     (früher übernommener vorläufiger Ertragswert), maßgebend 130.000 €; das PDF nannte 111.000 und einen Wertpuffer von −34.000 €. */
+  function svwVeraltet() {
+    var S = St(), svw = zahlAus('svwert');
+    if (!svw || !/^(marktbericht|indikation)$/.test(S.svw_herkunft || '')) return false;
+    return !!(S.wert_anker && S.wert_anker.wert && Math.abs(Number(S.wert_anker.wert) - svw) > 1);
   }
   function finanzierungVoll(K, B, kurz) {
     var S = St(), kp = K.kp || zahlAus('kp') || 0, nk = nebenkosten(kp), nkSum = nk.reduce(function (a, x) { return a + x.eur; }, 0);
@@ -201,7 +210,7 @@
     var bis = zellText('r-bindend'); if (bis) fin.push(['Zinsbindung bis', bis]);
     fin.push(['Restschuld am Ende der Zinsbindung', B.eur(S.rs)]);
     fin.push(['Finanzierungsstruktur', (aus ? (d2an ? 'Tilgungsaussetzung + Bausparvertrag + Zusatzdarlehen' : 'Tilgungsaussetzung mit Bausparvertrag') : (d2an ? 'Annuitätendarlehen + Zusatzdarlehen' : 'Annuitätendarlehen')) + (_dwL.length ? ' + ' + _dwL.length + (_dwL.length === 1 ? ' weiteres Darlehen' : ' weitere Darlehen') : ''), { umbruch: 1 }]);   /* v3215; v3223 Umbruch */
-    var svw = zahlAus('svwert');
+    var svw = svwVeraltet() ? null : zahlAus('svwert');   /* v4380 */
     if (svw) {
       fin.push([S.svw_label || 'Wertangabe (Reiter Objekt)', B.eur(svw)]);
       if (da(K.wp_kpi)) fin.push(['Sofortiger Wertpuffer gegenüber dem Kaufpreis', B.eurS(K.wp_kpi), { art: 'ende', farbe: 1 }]);
@@ -353,12 +362,27 @@
         + B.esc(window.DpSanierungPlan && DpSanierungPlan.einmaligText ? DpSanierungPlan.einmaligText(rows) : '') + '</p>';   /* v3214 N137 */
   }
   /* v3203 · Kurzfassung: der Vermögenszuwachs als ein Bild (derselbe Wasserfall wie in der vollständigen Fassung, aus State._vz) */
+  /* v4380 · Marcel 24.11.2026: „lassen wir genauso wie bis jetzt, außer die Diagramme, die wir geändert haben, da die
+     aktuellen reinnehmen, dass Farben passen“. Aus den Karten des Reiters Bewertung (grafiken-bewertung.js) nur das Diagramm
+     und seine Legende, ohne Kopf und Text: Seiten, Reihenfolge und Texte des Dokuments bleiben. Ohne Karte bleibt das alte Bild. */
+  function gbDiagramm(html) {
+    if (!html) return '';
+    var d = document.createElement('div'); d.innerHTML = html;
+    var svg = d.querySelector('svg'); if (!svg) return '';
+    [].forEach.call(svg.querySelectorAll('.gb-treff'), function (e) { e.remove(); });
+    var leg = d.querySelector('.gb-leg');
+    return '<div class="dp-gb dp-gb-pdf">' + svg.outerHTML + (leg ? leg.outerHTML : '') + '</div>';
+  }
+  function gbKarte(name, a, b) {
+    var G = window.DpGrafikenBewertung; if (!G || typeof G[name] !== 'function') return '';
+    try { return gbDiagramm(G[name](a, b)); } catch (e) { try { console.warn('[dp-dokumente] ' + name, e); } catch (x) {} return ''; }
+  }
   function zuwachsKurz(B) {
     var S = St(), rows = S.cfRows || [], vz = S._vz || {};
     if (rows.length < 2 || da(vz.verm_zuwachs) === null || typeof B.wasserfall !== 'function') return '';
     return '<div class="block"><h3>Vermögenszuwachs über ' + rows.length + ' Jahre</h3>'
-      + B.wasserfall([{ name: 'Tilgung', wert: vz.tilgung_kum, klasse: 'b1' }, { name: 'CF-Überschuss', wert: vz.cf_ueberschuss_konto, klasse: 'b2' },
-        { name: 'Steuervorteil', wert: vz.steuervorteil, klasse: 'b2' }, { name: 'Wertsteigerung', wert: vz.wertsteig_kum, klasse: 'b2' }], 'Zuwachs')
+      + (gbKarte('_zuwachsHtml') || B.wasserfall([{ name: 'Tilgung', wert: vz.tilgung_kum, klasse: 'b1' }, { name: 'CF-Überschuss', wert: vz.cf_ueberschuss_konto, klasse: 'b2' },
+        { name: 'Steuervorteil', wert: vz.steuervorteil, klasse: 'b2' }, { name: 'Wertsteigerung', wert: vz.wertsteig_kum, klasse: 'b2' }], 'Zuwachs'))   /* v4380 */
       + '<p class="det">Wertsteigerung als Annahme aus den Einstellungen, keine Bewertung nach § 194 BauGB.</p></div>';
   }
   function vermoegenVoll(K, B) {
@@ -371,7 +395,7 @@
     ], { flaeche: [0, 1], titel: 'Vermögensaufbau' });
     var ek0 = da(rows[0].eq_y) !== null ? rows[0].eq_y : 0;
     var jz = rows.filter(function (r, i) { return rows.length <= 12 || i % 2 === 0 || i === rows.length - 1; });
-    var h = '<div class="block">' + lin + '<p class="det">Der Objektwert ist eine Annahme aus der hinterlegten Wertsteigerung, keine Bewertung nach § 194 BauGB.</p></div>'
+    var h = '<div class="block">' + (gbKarte('_aufbauHtml') || lin) + '<p class="det">Der Objektwert ist eine Annahme aus der hinterlegten Wertsteigerung, keine Bewertung nach § 194 BauGB.</p></div>'
       + '<h3>Vermögenszuwachs im Detail</h3>' + tab(B, ['Jahr', 'Immobilienwert', 'Restschuld', 'Eigenkapital im Objekt', 'Zuwachs gegenüber heute'],
         jz.map(function (r) { return { w: [String(r.cal || r.y), B.eur(r.wert_y), B.eur(r.rs), B.eur(r.eq_y), B.eurS((r.eq_y || 0) - ek0)] }; }), 'dicht');
     if (da(vz.verm_zuwachs) !== null) {
@@ -384,8 +408,8 @@
           ['Kumulierte Mieteinnahmen (Kaltmiete)', B.eur(sm('nkm_y'))], ['abzüglich Bewirtschaftung', B.eurS(-sm('bwk_cf_y')), { art: 'ein' }], ['abzüglich Zinsen', B.eurS(-sm('zy')), { art: 'ein' }],
           ['abzüglich Tilgung', B.eurS(-sm('ty')), { art: 'ein' }], sm('bspar_y') > 0 ? ['abzüglich Bausparraten', B.eurS(-sm('bspar_y')), { art: 'ein' }] : null,
           ['Cashflow-Überschuss nach Tilgung, vor Steuern', B.eurS(vz.cf_ueberschuss_konto), { art: 'ende' }]]) + '</div></div>'
-        + B.wasserfall([{ name: 'Tilgung', wert: vz.tilgung_kum, klasse: 'b1' }, { name: 'CF-Überschuss', wert: vz.cf_ueberschuss_konto, klasse: 'b2' },
-          { name: 'Steuervorteil', wert: vz.steuervorteil, klasse: 'b2' }, { name: 'Wertsteigerung', wert: vz.wertsteig_kum, klasse: 'b2' }], 'Zuwachs');
+        + (gbKarte('_zuwachsHtml') || B.wasserfall([{ name: 'Tilgung', wert: vz.tilgung_kum, klasse: 'b1' }, { name: 'CF-Überschuss', wert: vz.cf_ueberschuss_konto, klasse: 'b2' },
+          { name: 'Steuervorteil', wert: vz.steuervorteil, klasse: 'b2' }, { name: 'Wertsteigerung', wert: vz.wertsteig_kum, klasse: 'b2' }], 'Zuwachs'));   /* v4380 */
     }
     var w = [];
     if (da(S.wert_basis) !== null) w.push(['Wert-Anker heute', B.eur(S.wert_basis)], ['Angenommene Wertsteigerung p. a.', B.pct(zahlAus('wertstg'), 1)],
@@ -520,6 +544,10 @@
     var dscr = B.linien([{ name: 'DSCR', klasse: 'l1', werte: reihe(CD.dscrArr) }, { name: 'solide ab ' + B.zahl(sw.dscrGruen, 2), klasse: 'l3', werte: flach(sw.dscrGruen) }, { name: 'Deckung ' + B.zahl(sw.dscrGelb, 2), klasse: 'l2', werte: flach(sw.dscrGelb) }],
       { null: true, h: kurz ? 120 : 160, fmt: function (v) { return B.zahl(v, 2); }, titel: 'DSCR im Verlauf' });
     var ltv = B.linien([{ name: 'LTV', klasse: 'l1', werte: reihe(CD.ltvArr) }], { null: true, h: kurz ? 120 : 150, fmt: function (v) { return B.zahl(v, 0) + ' %'; }, titel: 'LTV im Verlauf' });
+    /* v4380 · DSCR und LTV wie im Reiter Bewertung (grafiken-bewertung.js verlaufHtml), mit denselben Daten (BankCharts._lastCockpitData) */
+    var sw2 = window.DealPilotSchwellen ? DealPilotSchwellen.get() : {}, zz = function (v, d) { v = Number(v); return isFinite(v) && v > 0 ? v : d; };
+    var Dgb = { S: St(), K: St().kpis || {}, C: CD, sw: { dg: zz(sw2.dscrGruen, 1.2), dy: zz(sw2.dscrGelb, 1.0), lg: zz(sw2.ltvGruen, 90), lr: zz(sw2.ltvRot, 100) } };
+    dscr = gbKarte('_verlaufHtml', Dgb, 'dscr') || dscr; ltv = gbKarte('_verlaufHtml', Dgb, 'ltv') || ltv;
     if (kurz) return '<div class="zwei"><div class="block"><h3>DSCR im Verlauf</h3>' + dscr + '</div><div class="block"><h3>LTV im Verlauf</h3>' + ltv + '</div></div>';
     return '<div class="block"><h3>Schuldendienstdeckung (DSCR) im Verlauf</h3>' + B.kacheln([{ l: 'DSCR Jahr 1', v: B.zahl(CD.dscrToday, 2), s: 'erstes volles Jahr' }, { l: 'DSCR Ende Zinsbindung', v: B.zahl(CD.dscrEzb, 2), s: CD.bindj ? 'Jahr ' + CD.bindj : '' }, { l: 'DSCR Ende', v: B.zahl(CD.dscrEnd, 2), s: 'Betrachtungsende' }], true) + dscr + '</div>'
       + '<div class="block"><h3>Beleihungsauslauf (LTV) im Verlauf</h3>' + B.kacheln([{ l: 'LTV heute', v: B.pct(CD.ltvToday, 1) }, { l: 'LTV Ende Zinsbindung', v: B.pct(CD.ltvEzb, 1), s: CD.bindj ? 'Jahr ' + CD.bindj : '' }, { l: 'LTV Ende', v: B.pct(CD.ltvEnd, 1), s: 'Betrachtungsende' }], true) + ltv + '</div>';
@@ -1532,7 +1560,7 @@
     return TYPEN[typ](opt || {});
   }
   window.DpDokumente = {
-    VERSION: 'v3481a', TYPEN: Object.keys(TYPEN), dokument: dokument,
+    VERSION: 'v4380', TYPEN: Object.keys(TYPEN), dokument: dokument,
     oeffnen: function (typ, opt) { return dokument(typ, opt).then(function (h) { D().vorschau(h, typ); }); }
   };
 })();
