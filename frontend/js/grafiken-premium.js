@@ -886,11 +886,13 @@
     var i = karte(k, { eyebrow: 'Wertverlauf', titel: titel, unter: 'Plan-Wert (Kaufpreis mit deiner Wertsteigerung) über der Restschuld, die grüne Fläche ist dein Eigenkapital im Objekt. Punkte: Marktberichte, Raute: Kaufpreis.',
       chips: [lw != null ? 'gemessen' : 'Plan'], fuss: lw == null ? ['Noch kein Marktbericht. Mit einem Bericht im Jahr steht hier der Marktpreis gegen deinen Plan.'] : [] });
     var ziel = document.createElement('div'); i.appendChild(ziel);
-    verlauf(ziel, { x: X, heute: P.heute, band: { ohneRand: true, farbe: 'color-mix(in srgb,' + F.gruen + ' 16%,transparent)', lo: J.map(function (r) { return r.rs; }), hi: J.map(function (r) { return r.wert; }) },   /* v4310 · Eigenkapital grün wie Vermögensaufbau im Reiter Bewertung */
+    verlauf(ziel, { x: X, heute: P.heute, /* v4310b · gemessen Demostraße 5: Restschuld 2024 über dem Plan-Wert, die Fläche war trotzdem grün. Jetzt grün, wo dir etwas gehört, rot, wo die Restschuld den Wert übersteigt */
+      baender: [{ ohneRand: true, farbe: 'color-mix(in srgb,' + F.gruen + ' 16%,transparent)', lo: J.map(function (r) { return r.wert >= r.rs ? r.rs : null; }), hi: J.map(function (r) { return r.wert >= r.rs ? r.wert : null; }) },
+        { ohneRand: true, farbe: 'color-mix(in srgb,' + F.rot + ' 18%,transparent)', lo: J.map(function (r) { return r.wert < r.rs ? r.wert : null; }), hi: J.map(function (r) { return r.wert < r.rs ? r.rs : null; }) }],   /* v4310 · Eigenkapital grün wie Vermögensaufbau im Reiter Bewertung */
       reihen: [{ name: 'Plan-Wert', werte: J.map(function (r) { return r.wert; }), farbe: F.gold, dick: 2.4 }, { name: 'Restschuld', werte: J.map(function (r) { return r.rs; }), farbe: F.tinte2, dick: 2 }],
       streu: streu,
       tip: function (q, j) { var r = J[q]; return '<div class="t">' + j + (j > P.heute ? ' · Projektion' : '') + '</div>Plan-Wert <b>' + eur(r.wert) + '</b><br>Restschuld <b>' + eur(r.rs) + '</b><br>dein Eigenkapital <b>' + eur(r.wert - r.rs) + '</b>'; },
-      legende: [{ n: 'Plan-Wert', f: F.gold }, { n: 'Restschuld', f: F.tinte2 }, { n: 'Eigenkapital', f: 'color-mix(in srgb,' + F.gruen + ' 16%,transparent)' }, { n: 'Kaufpreis', f: F.creme }].concat(lw != null ? [{ n: 'Marktbericht', f: F.goldH }] : []) }, { breite: w - 2, aria: 'Wertverlauf' });
+      legende: [{ n: 'Plan-Wert', f: F.gold }, { n: 'Restschuld', f: F.tinte2 }, { n: 'Eigenkapital', f: 'color-mix(in srgb,' + F.gruen + ' 16%,transparent)' }].concat(J.some(function (r) { return r.wert < r.rs; }) ? [{ n: 'Restschuld über Wert', f: 'color-mix(in srgb,' + F.rot + ' 18%,transparent)' }] : []).concat([{ n: 'Kaufpreis', f: F.creme }]).concat(lw != null ? [{ n: 'Marktbericht', f: F.goldH }] : []) }, { breite: w - 2, aria: 'Wertverlauf' });
   }
   function karteMarkt(k, w, P) {
     var H0 = _hist || [], h = H0.length ? H0[H0.length - 1] : null, R = P.J, r = R.filter(function (x) { return x.j === P.heute; })[0] || R[0];
