@@ -17,7 +17,7 @@
  * ═══════════════════════════════════════════════════════════════════════════════════════════════════════════════ */
 (function (global) {
   'use strict';
-  var VERSION = 'v4510';
+  var VERSION = 'v4510a';
   if (!global.document || global.DpViviReiter) return;
   var doc = global.document;
   var _jahr = null, _offen = {};
@@ -336,7 +336,7 @@
       var n = 0; try { n = abgleichJahr(j).offen; } catch (e) { n = 0; }
       return '<button type="button" class="btn-clean" data-vr="jahr" data-vr-jahr="' + j + '" aria-pressed="' + (j === _jahr) + '">' + j + (n ? '<i>' + n + '</i>' : '') + '</button>';
     }).join('');
-    var kopf = '<div class="vr-kopf"><span class="vr-marke">ViVi</span><b>Abgleich mit ViVi</b><span class="vr-stand">' + (st && st.letzter_abruf ? 'Stand ' + esc(datumText(String(st.letzter_abruf).slice(0, 10))) : (st ? '' : 'lädt…')) + '</span>'
+    var kopf = '<div class="vr-kopf"><span class="vr-marke">ViVi</span><b>Abgleich mit ViVi</b><span class="vr-stand">' + (global.DpVivi && global.DpVivi.stand && global.DpVivi.stand() ? '' : st && st.letzter_abruf ? 'Stand ' + esc(datumText(String(st.letzter_abruf).slice(0, 10))) : (st ? '' : 'lädt…')) + '</span>'
       + '</div>';
     if (!st) return '<div class="vr">' + kopf + '<p class="vr-klein">Der Stand aus ViVi wird geladen.</p></div>';
     /* v4510 · Marcel 24.11.2026: Stand und Aktionen der Verknüpfung (vorher Leiste im Reiter Objekt) als eine Zeile unter
