@@ -656,11 +656,12 @@
     var ziel = function (key) { try { var P = window.DealPilotInvestmentProfile, p = P && P.load ? P.load() : null, v = p ? p[key] : null; if (v == null || v === '') return null; if (typeof v !== 'number') { v = String(v).trim(); if (v.indexOf(',') >= 0) v = v.replace(/\./g, '').replace(',', '.'); v = parseFloat(v); } return isFinite(v) ? v : null; } catch (e) { return null; } };   /* v4490a · gespeichert als Zahl (1.2), nicht als Text */
     var zCf = ziel('min_cashflow_vor_st'), zDs = ziel('min_dscr');
     if (zahl(k.cf_m)) z.push(zahlKachel('Cashflow vor Steuer · volles Jahr', sEur(k.cf_m) + ' / Monat', zahl(k.cf_ns) ? 'nach Steuer ' + sEur(k.cf_ns / 12) + ' / Monat (volles Jahr)' : '', k.cf_m >= 0 ? C.gut : C.rot,
-      { t: 'Cashflow vor Steuer', a: 'Was im Monat nach Bewirtschaftungskosten, Zins und Tilgung übrig bleibt, vor Steuern. Gerechnet für ein volles Jahr mit den heutigen Eingaben.',
-        r: zCf != null ? [['dein Mindest-Cashflow', sEur(zCf) + ' / Monat'], ['Stand', k.cf_m >= zCf ? 'erreicht' : 'nicht erreicht, es fehlen ' + eur(zCf - k.cf_m) + ' im Monat']] : [] }));
+      /* v4490e · Marcel 24.11.2026: Tipp NUR mit eigenem Ziel im Investmentprofil, ohne Ziel kein Tipp */
+      zCf == null ? null : { t: 'Cashflow vor Steuer', a: 'Was im Monat nach Bewirtschaftungskosten, Zins und Tilgung übrig bleibt, vor Steuern. Gerechnet für ein volles Jahr mit den heutigen Eingaben.',
+        r: [['dein Mindest-Cashflow', sEur(zCf) + ' / Monat'], ['Stand', k.cf_m >= zCf ? 'erreicht' : 'nicht erreicht, es fehlen ' + eur(zCf - k.cf_m) + ' im Monat']] }));
     if (zahl(k.dscr) && k.dscr > 0) z.push(zahlKachel('DSCR', de(k.dscr, 2), k.dscr >= 1.2 ? 'Bank: trägt sich' : k.dscr >= 1 ? 'knapp über 1' : 'unter 1: Zuschuss nötig', k.dscr >= 1 ? C.gut : C.rot,
-      { t: 'DSCR (Kapitaldienstdeckung)', a: 'Wie oft der Reinertrag aus der Miete die Jahresrate aus Zins und Tilgung deckt. Ab 1,0 trägt sich das Objekt selbst, Banken erwarten meist 1,2 oder mehr. Gerechnet für ein volles Jahr mit den heutigen Eingaben.',
-        r: zDs != null ? [['dein Mindest-DSCR', de(zDs, 2)], ['Stand', k.dscr >= zDs ? 'erreicht' : 'nicht erreicht']] : [] }));
+      zDs == null ? null : { t: 'DSCR (Kapitaldienstdeckung)', a: 'Wie oft der Reinertrag aus der Miete die Jahresrate aus Zins und Tilgung deckt. Ab 1,0 trägt sich das Objekt selbst, Banken erwarten meist 1,2 oder mehr. Gerechnet für ein volles Jahr mit den heutigen Eingaben.',
+        r: [['dein Mindest-DSCR', de(zDs, 2)], ['Stand', k.dscr >= zDs ? 'erreicht' : 'nicht erreicht']] }));
     var WK = wertKacheln(w); z = z.concat(WK.kacheln);   /* v4410 · führend + Marktpreis mit Erklärung */
     var nVier = Math.max(4, Math.min(6, 3 + WK.kacheln.length));   /* v4490 · das stützende Verfahren kommt aus wertKacheln */
     var sc = vier ? null : sichtbarerScore();
