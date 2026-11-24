@@ -4642,11 +4642,13 @@ async function extractDokument(text, typ, opts) {
   /* v3973 · hausgeld dazu: Wirtschaftsplan/Abrechnung mit 13 Positionen, Einzel- und Gesamtplan kam im Gesamtflow-Test 22.11.2026
      zweimal als „KI-Antwort konnte nicht ausgewertet werden“ zurück (1.400 Token reichen für die Positionsliste nicht sicher). */
   const _lang = { weg_protokoll: 1, teilungserklaerung: 1, mietaufstellung: 1, grundbuch: 1, energieausweis: 1, mietvertrag: 1, hausgeld: 1 };
-  let r = await callOpenAI(prompt, Object.assign({ maxTokens: _lang[typ] ? 3500 : 1400, noWebSearch: true /* v3318 */ }, opts || {}));
+  /* v4530f · WEG-Protokoll mit ALLEN Tagesordnungspunkten (beschluesse) braucht mehr Platz: 6.000 Token */
+  const _grenze = typ === 'weg_protokoll' ? 6000 : _lang[typ] ? 3500 : 1400;
+  let r = await callOpenAI(prompt, Object.assign({ maxTokens: _grenze, noWebSearch: true /* v3318 */ }, opts || {}));
   let parsed = extractJson(r.text);
   /* v3016g · gemessen 28.10.: die Mieterliste kam EINMAL als nicht lesbares JSON, beim zweiten
      Lauf sauber. Ein zweiter Versuch, bevor der Import auf den Exposé-Weg zurückfällt. */
-  if (!parsed) { r = await callOpenAI(prompt, Object.assign({ maxTokens: 4000, noWebSearch: true /* v3318 */ }, opts || {})); parsed = extractJson(r.text); }
+  if (!parsed) { r = await callOpenAI(prompt, Object.assign({ maxTokens: Math.max(4000, _grenze), noWebSearch: true /* v3318 */ }, opts || {})); parsed = extractJson(r.text); }
   if (!parsed) {
     return { success: false, error: 'KI-Antwort konnte nicht ausgewertet werden.', raw_text: r.text };
   }
