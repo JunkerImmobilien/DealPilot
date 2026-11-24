@@ -16,7 +16,8 @@
    (nur Privatvermögen). */
 (function () {
   'use strict';
-  var C = { verlust: '#3FA56C', gewinn: 'var(--wl-c9a84c, #C9A84C)', linie: '#2A2727', marke: 'var(--wl-b8932f, #b8932f)', neg: '#B8625C' };
+  /* v4570 · Gewinnjahre rot wie „Steuer kostet Geld“ im Verlauf mit Steuern und im Reiter Steuer der Pilot-Analyse (vorher Gold), Marcel 24.11.2026 „einheitlich“ */
+  var C = { verlust: '#3FA56C', gewinn: '#B8625C', linie: '#2A2727', marke: 'var(--wl-b8932f, #b8932f)', neg: '#B8625C' };
   function el(id) { return document.getElementById(id); }
   function wert(id) { var e = el(id); return e ? e.value : null; }
   function eur(v) { return (v < 0 ? '− ' : '') + Math.round(Math.abs(v)).toLocaleString('de-DE') + ' €'; }
