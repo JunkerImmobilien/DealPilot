@@ -827,8 +827,9 @@
     var steck = '<div class="kv">' + [['Objektart', o.art], ['Baujahr', B.jahr(o.bj)], ['Wohnfläche', o.wfl ? B.zahl(o.wfl, 0) + ' m²' : '–'], ['Grundstück', o.gs ? B.zahl(o.gs, 0) + ' m²' : '–'],
       ['Kaufdatum', B.datum(feld('kaufdat')) || '–'], ['Energieklasse', feld('ds2_energie') || '–']].map(function (k) { return '<div><span>' + k[0] + '</span><span>' + B.esc(k[1]) + '</span></div>'; }).join('') + '</div>';
     var bild = fotos[0] || info.karte || null;
+    var mpiV = (WZ && WZ.verfahren || []).filter(function (v) { return v.art === 'mpi' && da(v.mitte) !== null; })[0] || null;
     var kern9 = B.kacheln([
-      mw ? { l: mw.name + ' · führend', v: B.eur(mw.wert), s: mw.det } : null,
+      mw ? { l: mw.name + ' · führend', v: B.eur(mw.wert), s: mw.det } : (mpiV ? { l: 'Marktpreisindikation', v: B.eur(mpiV.mitte), s: 'aus Angebotspreisen, kein Verkehrswert' } : null),
       { l: 'Kaufpreis', v: B.eur(K.kp), s: K.gi ? 'Gesamtinvestition ' + B.eur(K.gi) : '' },
       { l: 'Kaltmiete p. a.', v: B.eur(K.nkm_j), s: 'Bruttomietrendite ' + B.pct(K.bmy, 2) },
       { l: 'DSCR', v: B.zahl(K.dscr, 2), s: 'Schuldendienstdeckung', art: K.dscr >= 1.2 ? 'gut' : 'schlecht' },
