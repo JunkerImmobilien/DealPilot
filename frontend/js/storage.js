@@ -560,6 +560,7 @@ function collectData() {
     d._kpis_dscr = State.kpis.dscr;
     d._kpis_dscr_art = 'netto';         /* v3031: DSCR ist netto (Reinertrag / Kapitaldienst) */
     d._kpis_ltv = State.kpis.ltv;       // V110: LTV mitspeichern für Sidebar-Toggle DSCR↔LTV
+    d._wert_anker = (State.wert_anker && State.wert_anker.wert > 0) ? { wert: State.wert_anker.wert, art: State.wert_anker.art || null, datum: State.wert_anker.datum || null } : null;   /* v4420 · maßgebender Objektwert für den Score im Backend (objektRechnung.js) */
     /* v3161 · Protokoll Portfolio-Strategie 03.11.2026 (P3): Restschuld am Ende der Zinsbindung, Anschlussrate,
        Bindungsende und Bauspar-Luecke - aus derselben Rechnung wie der Reiter Finanzierung (calc.js). */
     if (isFinite(State.rs)) d._kpis_rs_bindung = Math.round(State.rs);
@@ -952,6 +953,7 @@ function loadData(d) {
       _o351._kpis_dscr = State.kpis.dscr;
       _o351._kpis_dscr_art = 'netto';   /* v3031 */
       _o351._kpis_ltv  = State.kpis.ltv;
+      _o351._wert_anker = (State.wert_anker && State.wert_anker.wert > 0) ? { wert: State.wert_anker.wert, art: State.wert_anker.art || null, datum: State.wert_anker.datum || null } : null;   /* v4420 · maßgebender Objektwert für den Score im Backend (objektRechnung.js) */
       if (State.kpis.nkm_j != null && isFinite(State.kpis.nkm_j)) _o351._kpis_miete_j = State.kpis.nkm_j;   /* v2931 */
       if (State.kpis.nmy != null && isFinite(State.kpis.nmy)) _o351._kpis_nmy = State.kpis.nmy;
       if (typeof DealScore !== 'undefined' && typeof DealScore.compute === 'function') {

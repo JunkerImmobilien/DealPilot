@@ -2617,6 +2617,12 @@ function _calcImmediate(){
      „Potenzial") und das Bank-PDF („Sofortiger Wertpuffer") ihn trotzdem mit, waehrend
      die Kachel ihn ausblendete - zwei Antworten auf dieselbe Frage. */
   var wp_kpi=(svw>0 && _svwHerk !== 'indikation')?svw-kp:0;
+  /* v4420 · Marcel 24.11.2026 („ja ändern, so dass es passt“): Score, Kachel und PDF rechnen den Wertpuffer mit DEMSELBEN
+     Wert. Stammt die Wertangabe im Reiter Objekt aus einem Marktbericht und weicht vom maßgebenden Objektwert
+     (State.wert_anker, Stichtag v4390) ab, gilt der maßgebende Wert gegen den Kaufpreis (Demostraße 5: 130.000 − 145.000).
+     Bis v4390 tat das nur die Kachel (r-wpuff), der Score blieb beim Formularfeld. Backend: objektRechnung.js liest
+     denselben Wert aus dem gespeicherten _wert_anker (storage.js). */
+  try { var _waK = State.wert_anker; if (_waK && _waK.wert > 0 && svw > 0 && /^(marktbericht|indikation)$/.test(_svwHerk || '') && Math.abs(_waK.wert - svw) > 1) wp_kpi = _waK.wert - kp; } catch (_eWk) {}
   var btj=parseInt(g('btj')||'20');
   /* v816-CUT: Privat-Objekt-Cut bei Ueberfuehrung. Gated ueber Feld 'ueberf_ende' (Datum).
      Kappt btj auf volle Jahre bis zum Stichtagsjahr; letztes Jahr wird anteilig (Monat/12) gerechnet.
@@ -3274,7 +3280,7 @@ function _calcImmediate(){
   st('r-dscr2',fN(dscr,2));
   st('r-dscr-netto',fN(dscr_netto,2));
   st('r-ltv2',fP(ltv,1));
-  /* v4390 · wie das PDF (dp-dokumente.js svwVeraltet, v4380): stammt die Wertangabe im Reiter Objekt aus einem Marktbericht und weicht vom maßgebenden Objektwert (State.wert_anker) ab, zeigt die Kachel den maßgebenden Wert gegen den Kaufpreis (Demostraße 5: 130.000 − 145.000 statt 111.000 − 145.000). Der Score (wp_kpi) bleibt unverändert. */ var _wpAnz = wp_kpi; try { var _waP = State.wert_anker; if (_waP && _waP.wert > 0 && svw > 0 && /^(marktbericht|indikation)$/.test(_svwHerk || '') && Math.abs(_waP.wert - svw) > 1) _wpAnz = _waP.wert - kp; } catch (_eWp) {} st('r-wpuff',_wpAnz!==0?fE(_wpAnz,0,true):'Kein Verkehrswert');st('r-zaer-kpi',fE(zaer_m,0)+'/Mon.');
+  /* v4390/v4420 · die Kachel zeigt wp_kpi, seit v4420 rechnet wp_kpi selbst mit dem maßgebenden Objektwert (siehe oben) */ var _wpAnz = wp_kpi; st('r-wpuff',_wpAnz!==0?fE(_wpAnz,0,true):'Kein Verkehrswert');st('r-zaer-kpi',fE(zaer_m,0)+'/Mon.');
   // V63.36: Vermögenszuwachs-Aufschlüsselung
   // Mieter-Anteil: Anteil der Tilgung der durch Mieteinnahmen finanziert wurde
   var tilg_durch_einnahmen = Math.min(tilgung_kum, Math.max(0, cfkum + tilgung_kum));
@@ -5819,5 +5825,6 @@ window._dpKpisNachziehen = function () {
     o._kpis_dscr  = State.kpis.dscr;
     o._kpis_dscr_art = 'netto';   /* v3031 */
     o._kpis_ltv   = State.kpis.ltv;
+    o._wert_anker = (State.wert_anker && State.wert_anker.wert > 0) ? { wert: State.wert_anker.wert, art: State.wert_anker.art || null, datum: State.wert_anker.datum || null } : null;   /* v4420 · maßgebender Objektwert für den Score im Backend (objektRechnung.js) */
   } catch (e) {}
 };
