@@ -399,10 +399,17 @@
         var v = b.dataset.v;
         if (el) el.value = (k === 'art' || VORBELEGBAR[k] === 'text') ? v : feldWertForm(VORBELEGBAR[k], Number(v));
         $$('button', w).forEach(function (x) { x.classList.toggle('an', x === b); x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
-        delete offen[k]; if (w.parentNode) w.parentNode.classList.remove('wahl');
+        delete offen[k]; if (w.parentNode) w.parentNode.classList.remove('wahl'); standWahl();
       }); });
-      if (el) el.addEventListener(k === 'art' ? 'change' : 'input', function () { delete offen[k]; if (w.parentNode) w.parentNode.classList.remove('wahl'); });
+      if (el) el.addEventListener(k === 'art' ? 'change' : 'input', function () { delete offen[k]; if (w.parentNode) w.parentNode.classList.remove('wahl'); standWahl(); });
     });
+    /* Zeile oben nachziehen, sobald gewählt ist */
+    function standWahl() {
+      var li = $('.ec-stand li.wahl', inhalt); if (!li) return;
+      var n = Object.keys(offen).length;
+      if (n) li.innerHTML = '<b>' + n + (n === 1 ? ' Angabe weicht' : ' Angaben weichen') + ' ab.</b> Bitte am Feld wählen, welcher Wert gilt.';
+      else { li.className = 'ok'; li.innerHTML = '<b>Gewählt.</b> Es gilt der Wert, der im Feld steht.'; }
+    }
     $('.ec-zurueck', inhalt).addEventListener('click', function () { S.ohneUnterlagen = false; zeigeUnterlagen(); });
     $('.ec-grund', inhalt).addEventListener('submit', function (e) {
       e.preventDefault();
