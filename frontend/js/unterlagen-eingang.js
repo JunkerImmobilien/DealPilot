@@ -497,7 +497,7 @@
     var g = 'var(--wl-c9a84c, #C9A84C)';
     s.textContent = '.dp-pa-wrap .dp-gn.dp-gx:empty{display:none!important}'
       + '.dp-eg-tab{border:1px solid color-mix(in srgb,' + g + ' 22%,transparent);border-radius:10px;overflow:hidden;background:#fff;font-family:Inter,system-ui,sans-serif;color:var(--ch,#2A2727)}'
-      + '.dp-eg-kopf,.dp-eg-z{display:grid;grid-template-columns:92px minmax(0,1fr) 110px 200px;gap:10px;align-items:start;padding:9px 12px}'
+      + '.dp-eg-kopf,.dp-eg-z{display:grid;grid-template-columns:92px minmax(0,1fr) 110px 228px;gap:10px;align-items:start;padding:9px 12px}'
       + '.dp-eg-kopf{background:color-mix(in srgb,' + g + ' 7%,#fff);font:600 10px/1.2 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--muted,#7A7370);padding-top:7px;padding-bottom:7px}'
       + '.dp-eg-z{border-top:1px solid rgba(42,39,39,.07);font-size:12.5px}.dp-eg-z.zurueck{opacity:.6}'
       + '.dp-eg-dat{font:600 12px/1.6 "JetBrains Mono",ui-monospace,monospace;color:#6B645A;font-variant-numeric:tabular-nums}'
@@ -773,7 +773,7 @@
   }
 
   try { _grundCss(); } catch (e) {}
-  window.DpEingang = { VERSION: 'v4530a', schonHtml: schonHtml, start: start, jahresAnsicht: jahresAnsicht, jahresInRahmen: jahresInRahmen, oeffnen: oeffnen, istRechnung: istRechnung, belegeAuslesen: belegeAuslesen,
+  window.DpEingang = { VERSION: 'v4530b', schonHtml: schonHtml, start: start, jahresAnsicht: jahresAnsicht, jahresInRahmen: jahresInRahmen, oeffnen: oeffnen, istRechnung: istRechnung, belegeAuslesen: belegeAuslesen,
     einheiten: einheiten, mvVorschlag: mvVorschlag, mvOptionen: mvOptionen, mvText: mvText, mvUebernehmen: mvUebernehmen, mvFelder: mvFelder,
     jahrStand: jahrStand, protokoll: protokoll, verlaufHtml: verlaufHtml, lesen: lesen,
     /* v3154 */ txStart: txStart, txEnde: txEnde, feldStand: feldStand, feldGeaendert: feldGeaendert,
