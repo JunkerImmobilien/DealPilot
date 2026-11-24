@@ -1667,8 +1667,34 @@ kopf('AB v4400 Anlegen/Verknüpfen nicht im Reiter Objekt, Fenster, Objektart de
   ok(!alle.some((w) => /[a-z]_[a-z]|house|apartment|commercial|land\b|other/i.test(String(w))) && alle.every(Boolean), 'AB7 Objektart in der Vorschau immer deutsch: ' + alle.join(', '));
   ok(/Mehrfamilienhaus|Eigentumswohnung/.test(String(mfh.zeile) + String(etw.zeile)) && /_house|apartment/.test(mfh.typ + etw.typ), 'AB8 an ViVi geht weiter der ViVi-Typ (' + mfh.typ + ', ' + etw.typ + ')');
   /* AB9 Gegenprobe: der alte Leisten-Knopf würde AB1 rot machen */
-  const alt = leisteFn.replace("l.style.display = 'none'; l.innerHTML = ''; return;", "knoepfe = '<button data-vivi=\"anlegen\">In ViVi anlegen</button>';");
+  const alt = leisteFn.replace('leisteWeg();', "var knoepfe = '<button data-vivi=\"anlegen\">In ViVi anlegen</button>';");   /* v4510 · leiste() raeumt nur noch ab */
   ok(/data-vivi="anlegen"/.test(alt), 'AB9 Gegenprobe: mit dem alten Knopf in der Leiste wäre AB1 rot');
+}
+/* ═══ AC · v4510 ViVi raus aus dem Reiter Objekt, Stand und Aktionen in Cockpit und Deal-Aktion, Fragen im Co-Piloten (Marcel 24.11.2026) ═══ */
+kopf('AC v4510 keine ViVi-Leiste im Reiter Objekt, Aktionen im Cockpit und in Deal-Aktion, Fragen an ViVi im Co-Piloten');
+{
+  const ohneKomm = (s) => s.replace(/\/\*[\s\S]*?\*\//g, '');
+  const vjc = ohneKomm(lies('frontend/js/vivi.js')), bhc = ohneKomm(lies('frontend/js/buchhaltung-verbinden.js'));
+  const vrc = ohneKomm(lies('frontend/js/vivi-reiter.js')), cpc = ohneKomm(lies('frontend/js/copilot-pillen.js'));
+  const fnVon = (s) => (/function leiste\(\) \{[\s\S]*?\n  \}\n/.exec(s) || [''])[0];
+  const baut = (s) => /id = 'vivi-leiste'/.test(s) || /data-vivi="/.test(fnVon(s));
+  ok(fnVon(vjc) && !baut(vjc) && /\$\('vivi-leiste'\); if \(l\) l\.remove\(\)/.test(vjc), 'AC1 Reiter Objekt: keine ViVi-Leiste mehr, eine alte wird abgeräumt');
+  const akFn = (/function aktionen\(knopfKlasse\) \{[\s\S]*?\n  \}\n/.exec(vjc) || [''])[0];
+  ok(['abgleichen', 'alle-selbst', 'alle-vivi', 'loesen'].every((k) => akFn.indexOf('data-vivi="' + k + '"') >= 0) && vjc.indexOf("closest('[data-vivi-akt] [data-vivi]')") >= 0 && /aktionen: aktionen/.test(vjc),
+    'AC2 aktionen(): Jetzt abgleichen, Alle selbst festlegen, Alle aus ViVi, Verknüpfung lösen, Klickgriff über data-vivi-akt');
+  ok(vrc.indexOf("DpVivi.aktionen('btn-clean vr-k')") >= 0 && vrc.indexOf('data-vivi-akt="1"') >= 0 && vrc.indexOf('DpViviCopilot.html') < 0, 'AC3 Cockpit › ViVi: Zeile mit Stand und Aktionen, keine Beispielfragen mehr im Reiter');
+  ok(bhc.indexOf('a.aktionen(key)') >= 0 && vjc.indexOf("aktionen: function () { var a = aktionen(); return a ? '<span data-vivi-akt=\"1\"") >= 0, 'AC4 Deal-Aktion: Knöpfe aus aktionen() des Anbieters');
+  ok(vrc.indexOf("DpObjektCockpit.oeffnen('vivi')") >= 0, 'AC5 „Abgleich mit ViVi“ öffnet bei gewonnenen Objekten das Objekt-Cockpit');
+  ok(cpc.indexOf("og.label = 'Fragen an ViVi'") >= 0 && cpc.indexOf('if (!an) { if (alt) alt.remove(); return; }') >= 0 && cpc.indexOf('DpVivi.stand()') >= 0, 'AC6 Co-Pilot: Bereich „Fragen an ViVi“ nur mit ViVi-Stand (Zugang und verknüpft)');
+  /* AC7: jede Frage löst beim Server das ViVi-Wissen aus, an der echten frageErkennen */
+  let fragen = [];
+  { const m = /function viviFragen\(\) \{([\s\S]*?)\n  \}/.exec(cpc); if (m) { try { fragen = new Function(m[1])() || []; } catch (e) { fragen = []; } } }
+  const VA = require(path.resolve('backend/src/services/vivi/viviAuskunft.js'));
+  const nicht = fragen.filter((f) => !VA.frageErkennen(f));
+  ok(fragen.length >= 4 && !nicht.length, 'AC7 jede der ' + fragen.length + ' Fragen an ViVi holt beim Server das ViVi-Wissen' + (nicht.length ? ': nicht erkannt ' + nicht.join(' | ') : ''));
+  ok(fragen.length && !fragen.some((f) => /[–—;]/.test(f)), 'AC8 Fragen ohne Gedankenstrich und Semikolon');
+  ok(VA.frageErkennen('Wie ist das Wetter morgen?') === null, 'AC9 Gegenprobe: eine Frage ohne ViVi-Bezug holt nichts');
+  ok(baut(vjc.replace('function leiste() {', "function leiste() { x = '<button data-vivi=\"abgleichen\">'; ")), 'AC10 Gegenprobe: ein Knopf in leiste() wäre AC1 rot');
 }
 
 console.log('\n' + (rot ? 'ROT · ' + rot + ' Befund(e), ' + gruen + ' grün' : 'SAUBER · ' + gruen + ' Prüfpunkte grün'));

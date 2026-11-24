@@ -258,10 +258,41 @@
     });
     sel.addEventListener('change', function () { var f = sel.value; sel.selectedIndex = 0; if (f) fragenSetzen(f); });
     w.appendChild(sel);
+    viviGruppe();
 
     bar.parentNode.insertBefore(w, bar);
     return true;
   }
+
+  /* v4510 · Marcel 24.11.2026: „Frag den Co-Piloten. Da hast du so Fragen reingesetzt [im Reiter ViVi]. Die können wir
+     doch rausnehmen. Das können wir doch unten, wenn wir auf Co-Pilot öffnen klicken, mit unter die Fragen setzen. Zum
+     Beispiel Fragen an ViVi.“ Eigener Bereich in „Weitere Fragen …“, nur mit ViVi-Zugang UND verknüpftem Objekt
+     (DpVivi.stand() liefert nur dann einen Stand). Jede Frage nennt ViVi oder ein Stichwort, an dem der Server das
+     ViVi-Wissen dazulegt (backend services/vivi/viviAuskunft.js frageErkennen). */
+  function viviFragen() {
+    var j = new Date().getFullYear() - 1;
+    return [
+      'Wann war laut ViVi die letzte Mieterhöhung je Wohnung?',
+      'Welche Belege gab es laut ViVi ' + j + '?',
+      'Gibt es in ViVi offene Vorgänge zu diesem Objekt?',
+      'Wie hoch ist die Restschuld laut ViVi heute?',
+      'Welche Handwerker waren laut ViVi zuletzt am Objekt?',
+      'Welche Mietverhältnisse führt ViVi für dieses Objekt?'
+    ];
+  }
+  function viviGruppe() {
+    var sel = document.querySelector('#dp-cp .dp-cpp-sel'); if (!sel) return;
+    var alt = sel.querySelector('optgroup[data-vivi]');
+    var an = false;
+    try { an = !!(window.DpVivi && typeof window.DpVivi.stand === 'function' && window.DpVivi.stand()); } catch (e) { an = false; }
+    if (!an) { if (alt) alt.remove(); return; }
+    if (alt) return;
+    var og = document.createElement('optgroup'); og.label = 'Fragen an ViVi'; og.setAttribute('data-vivi', '1');
+    viviFragen().forEach(function (f) { var o = document.createElement('option'); o.value = f; o.textContent = f; og.appendChild(o); });
+    sel.insertBefore(og, sel.children[1] || null);
+  }
+  window.addEventListener('dp:vivi-stand', function () { setTimeout(viviGruppe, 50); });
+  window.addEventListener('dp:object-ready', function () { var g = document.querySelector('#dp-cp .dp-cpp-sel optgroup[data-vivi]'); if (g) g.remove(); });   /* neuer Stand kommt per dp:vivi-stand */
 
   /* `copilot.js` baut `#dp-cp` erst beim Oeffnen des Reiters und kann es
      neu aufbauen. Deshalb beobachten statt einmal versuchen. */
@@ -274,5 +305,5 @@
     document.addEventListener('DOMContentLoaded', start);
   } else start();
 
-  window.DealPilotCoPilotPillen = { leiste: leiste, tiefe: antwortTiefe, fehlt: antwortFehlt };
+  window.DealPilotCoPilotPillen = { leiste: leiste, tiefe: antwortTiefe, fehlt: antwortFehlt, viviGruppe: viviGruppe };
 })();

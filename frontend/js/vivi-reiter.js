@@ -17,7 +17,7 @@
  * ═══════════════════════════════════════════════════════════════════════════════════════════════════════════════ */
 (function (global) {
   'use strict';
-  var VERSION = 'v4042a';
+  var VERSION = 'v4510';
   if (!global.document || global.DpViviReiter) return;
   var doc = global.document;
   var _jahr = null, _offen = {};
@@ -337,10 +337,15 @@
       return '<button type="button" class="btn-clean" data-vr="jahr" data-vr-jahr="' + j + '" aria-pressed="' + (j === _jahr) + '">' + j + (n ? '<i>' + n + '</i>' : '') + '</button>';
     }).join('');
     var kopf = '<div class="vr-kopf"><span class="vr-marke">ViVi</span><b>Abgleich mit ViVi</b><span class="vr-stand">' + (st && st.letzter_abruf ? 'Stand ' + esc(datumText(String(st.letzter_abruf).slice(0, 10))) : (st ? '' : 'lädt…')) + '</span>'
-      + '<button type="button" class="btn-clean vr-k" data-vr="abgleichen">Jetzt abgleichen</button></div>';
+      + '</div>';
     if (!st) return '<div class="vr">' + kopf + '<p class="vr-klein">Der Stand aus ViVi wird geladen.</p></div>';
-    return '<div class="vr">' + kopf
-      + (global.DpViviCopilot && global.DpViviCopilot.html ? global.DpViviCopilot.html() : '')   /* v4190 · Beispielfragen an den Co-Piloten unten (js/vivi-copilot.js) */
+    /* v4510 · Marcel 24.11.2026: Stand und Aktionen der Verknüpfung (vorher Leiste im Reiter Objekt) als eine Zeile unter
+       dem Kopf, kurze Punkte statt Satz. Die Beispielfragen an den Co-Piloten (v4190) stehen nicht mehr hier, sondern im
+       Co-Piloten unter „Weitere Fragen“ als Bereich „Fragen an ViVi“ (js/copilot-pillen.js). */
+    var ak = global.DpVivi && global.DpVivi.aktionen ? global.DpVivi.aktionen('btn-clean vr-k') : null;
+    var akZeile = ak ? '<div class="vr-akt" data-vivi-akt="1"><ul class="vr-punkte">' + ak.punkte.map(function (p) { return '<li>' + esc(p) + '</li>'; }).join('') + '</ul><span class="vr-akt-k">' + ak.knoepfe + '</span></div>'
+      : '<div class="vr-akt"><span class="vr-akt-k" style="margin-left:auto"><button type="button" class="btn-clean vr-k" data-vr="abgleichen">Jetzt abgleichen</button></span></div>';
+    return '<div class="vr">' + kopf + akZeile
       + stammHtml(st)
       + '<div class="vr-jahre" role="group" aria-label="Jahr">' + pills + '</div>'
       + jahrHtml(_jahr)
@@ -365,8 +370,11 @@
     if (istZahl(+jahr) && +jahr > 1900) { _jahr = +jahr; try { mountAll(); } catch (e) {} }   /* v4042 · Absprung aus dem Jahresabgleich mit Jahr */
     var b = imSichtbaren('#dp-pa-tab-vivi') || imSichtbaren(".dp-pa-tab[onclick*=\"'vivi'\"]");
     var p = imSichtbaren('#dp-pa-vivi');
+    /* v4510 · gewonnene Objekte: der Reiter ViVi liegt im Objekt-Cockpit (js/objekt-cockpit.js, Reiter s5 umbenannt).
+       Die Suche nach „Pilot“ im Reiternamen fand ihn dort nicht. */
+    try { if (global.DpObjektCockpit && global.DpObjektCockpit.aktiv && global.DpObjektCockpit.aktiv()) { global.DpObjektCockpit.oeffnen('vivi'); setTimeout(function () { try { var q = imSichtbaren('#dp-pa-vivi'); if (q) q.scrollIntoView({ block: 'start', behavior: 'smooth' }); } catch (e) {} }, 400); return true; } } catch (e) {}
     if (b && p) {
-      var t = Array.prototype.filter.call(doc.querySelectorAll('nav.tabs .tab'), function (x) { return /Pilot/.test(x.textContent || ''); })[0];
+      var t = doc.querySelector('nav.tabs .tab[data-target-sec="s5"]') || Array.prototype.filter.call(doc.querySelectorAll('nav.tabs .tab'), function (x) { return /Pilot/.test(x.textContent || ''); })[0];
       if (t) t.click();
       setTimeout(function () { try { global._dpPaTab('vivi', b); p.scrollIntoView({ block: 'start', behavior: 'smooth' }); } catch (e) {} }, 120);
       return true;
@@ -451,6 +459,11 @@
     s.textContent = [
       '.vr{font:400 12.5px/1.45 Inter,system-ui,sans-serif;color:#2A2727}',
       '.vr-kopf{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin:0 0 10px}.vr-kopf b{font:600 16px/1.3 "Space Grotesk",Inter,sans-serif}.vr-kopf .vr-k{margin-left:auto}',
+      /* v4510 · Zeile Stand und Aktionen */
+      '.vr-akt{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin:0 0 12px;padding:9px 12px;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 30%, transparent);border-radius:10px;background:#FBFAF6}',
+      '.vr-punkte{display:flex;flex-wrap:wrap;gap:4px 14px;margin:0;padding:0;list-style:none;flex:1 1 260px;min-width:0;font:400 12px/1.4 Inter,sans-serif;color:#4A4540}',
+      '.vr-punkte li{position:relative;padding-left:10px}.vr-punkte li::before{content:"";position:absolute;left:0;top:.55em;width:4px;height:4px;border-radius:50%;background:var(--wl-c9a84c,#C9A84C)}',
+      '.vr-akt-k{display:flex;flex-wrap:wrap;gap:6px}',
       '.vr-marke{font:600 10px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;padding:3px 6px;border:1px solid var(--wl-c9a84c,#C9A84C);border-radius:4px;color:var(--wl-b8932f,#b8932f)}',
       '.vr-stand{font:500 10.5px "JetBrains Mono",ui-monospace,monospace;color:#7A7370}',
       '.vr-jahre{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}.vr-jahre button{border:1px solid rgba(42,39,39,.18)!important;background:#fff!important;border-radius:14px;padding:4px 12px;font:500 12px Inter,sans-serif;cursor:pointer;color:inherit;min-height:30px}',
