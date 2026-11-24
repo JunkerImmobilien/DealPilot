@@ -1013,7 +1013,17 @@ function _buildAIPayload() {
       kp: k.kp, gi: k.gi, ek: k.ek, bmy: k.bmy, nmy: k.nmy,
       dscr: k.dscr, ltv: k.ltv, cf_m: k.cf_m, em: k.em, ekr: k.ekr != null ? k.ekr : null,   /* v2832: EK-Rendite eigens, em ist das Equity Multiple */
       nkm_j: k.nkm_j != null ? k.nkm_j : null, /* v947-mbsource: Nettokaltmiete/Jahr */
-      bwk: k.bwk != null ? k.bwk : null
+      bwk: k.bwk != null ? k.bwk : null,
+      /* v4300 · Marcel 24.11.2026: der Wert, von dem Wertentwicklung, Vermögen und Grafiken ausgehen (calc.js wert_basis,
+         Einstellung dp_wert_anker), gehört in Bewertungstext, Einordnung und „Was jetzt zu tun ist“. */
+      wert_anker: (function () {
+        try {
+          var S = window.State || {}, A = S.wert_anker;
+          if (!(S.wert_basis > 0)) return null;
+          return { wert: Math.round(A && A.wert > 0 ? A.wert : S.wert_basis), quelle: S.wert_basis_quelle || null,
+            art: A ? A.art : null, jahr: A ? A.jahr : null, text: S.wert_basis_text || null, wahl: S.wert_anker_wahl || 'massgebend' };
+        } catch (e) { return null; }
+      })()
     },
     finanzierung: {
       d1z_pct: k.d1z_pct, d1t_pct: k.d1t_pct, d1: k.d1,

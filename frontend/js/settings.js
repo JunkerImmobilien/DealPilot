@@ -788,6 +788,24 @@ function showSettings(initialTab) {
       /* v1355: PANE EINS - was Zahlen aendert. */
       '<div class="st-pane" data-pane="standardwerte" style="display:none">' +
         '<div id="ip-pane-host"><!-- wird beim Tab-Wechsel von DealPilotInvestmentProfile.renderPaneHtml() befüllt --></div>' +
+        /* v4300 · Marcel 24.11.2026: welcher Wert aus dem Marktbericht maßgebend ist (Anker der Wertentwicklung in Pilot-Analyse,
+           Bewertung, Vermögen). Merker dp_wert_anker, am Konto über vorgaben-sync.js; calc.js liest ihn. */
+        (function () {
+          var a = 'massgebend'; try { a = localStorage.getItem('dp_wert_anker') || 'massgebend'; } catch (e) {}
+          function opt(w, t, s2) {
+            return '<label style="display:flex;gap:10px;align-items:flex-start;padding:5px 0;cursor:pointer;font-size:13px;line-height:1.4">' +
+              '<input type="radio" name="set-wert-anker" value="' + w + '"' + (a === w ? ' checked' : '') +
+              ' onchange="try{localStorage.setItem(\'dp_wert_anker\',this.value);if(typeof calc===\'function\')calc();}catch(e){}" style="margin-top:3px;accent-color:var(--wl-c9a84c, #C9A84C)">' +
+              '<span><b>' + t + '</b>' + (s2 ? '<br><span style="opacity:.72;font-size:12px">' + s2 + '</span>' : '') + '</span></label>';
+          }
+          return '<div class="set-wert-anker" data-vorschau="grafiken_neu" role="radiogroup" aria-label="Wert aus dem Marktbericht" style="margin:16px 0;padding:12px 14px;border:1px solid var(--border, #e6dfcf);border-radius:12px">' +
+            '<div style="font-weight:600;font-size:13px;margin-bottom:2px">Objektwert aus dem Marktbericht</div>' +
+            '<div style="opacity:.72;font-size:12px;margin-bottom:6px">Von diesem Wert gehen Wertentwicklung, Vermögen und Grafiken aus. Ein Gutachten oder eine Bankbewertung im Reiter Objekt geht immer vor. Es gilt immer der letzte Bericht.</div>' +
+            opt('massgebend', 'Maßgebendes Verfahren', 'Der Wert des führenden Verfahrens im Bericht (Ertrags-, Sach- oder Vergleichswert).') +
+            opt('mpi_mit', 'Marktpreisindikation nach Abschlag', 'Angebotspreise vergleichbarer Objekte, abzüglich des Abschlags auf Angebotspreise.') +
+            opt('mpi_ohne', 'Marktpreisindikation ohne Abschlag', 'Das Angebotsniveau, wie es im Markt ausgeschrieben ist.') +
+          '</div>';
+        })() +
       '</div>' +
 
       /* v1355: PANE ZWEI - was nur die Ansicht aendert. Der Schnitt liegt

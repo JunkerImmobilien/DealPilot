@@ -1192,6 +1192,17 @@ function buildPrompt(payload, opts) {
     '',
     'Bruttomietrendite: ' + fmtPct(k.bmy, 2),
     'Kaufpreis: ' + fmtEur(k.kp),
+    /* v4300 · Marcel 24.11.2026: der Wert, von dem die App Wertentwicklung, Vermoegen und Exit rechnet (calc.js wert_basis,
+       Einstellung des Nutzers). Er gehoert in die Einordnung des Kaufpreises, die Gesamtbewertung und „Was jetzt zu tun ist“. */
+    (function () {
+      var wa = k.wert_anker; if (!wa || !(Number(wa.wert) > 0)) return '';
+      var WAHL = { massgebend: 'Wert des maßgebenden Verfahrens', mpi_mit: 'Marktpreisindikation nach Abschlag', mpi_ohne: 'Marktpreisindikation ohne Abschlag' };
+      var t = 'Objektwert, von dem die App rechnet (Wertentwicklung, Vermögen, Exit): ' + fmtEur(Number(wa.wert))
+        + (wa.text ? ' (' + String(wa.text).slice(0, 160) + ')' : '')
+        + (wa.quelle === 'marktbericht' ? '. Gewählt in den Einstellungen: ' + (WAHL[wa.wahl] || WAHL.massgebend) + ', immer aus dem letzten Marktbericht' : '');
+      if (Number(k.kp) > 0) { var d = (Number(k.kp) - Number(wa.wert)) / Number(wa.wert) * 100; t += '. Kaufpreis dazu: ' + (d >= 0 ? '+' : '') + d.toFixed(1).replace('.', ',') + ' %'; }
+      return t + '. Ordne den Kaufpreis und die Gesamtbewertung an DIESEM Wert ein und nenne ihn mit seiner Herkunft.';
+    })(),
     'Gesamtinvestition: ' + fmtEur(k.gi),
     'Eigenkapital: ' + fmtEur(k.ek),
     /* v2832 · hier stand „Eigenkapitalrendite (EK-Rendite): 3,7 %" - gemeint war
@@ -1407,9 +1418,14 @@ function buildPrompt(payload, opts) {
           var _tragend = a.fuehrend === 'sachwert' ? _sw
                        : a.fuehrend === 'ertragswert' ? _ew
                        : a.fuehrend === 'vergleichswert' ? _vw : null;   /* v2999 */
+          /* v4300 · Stufe M (CLAUDE.md): fuehrt der Vergleichswert OHNE amtliche Kaufpreisbasis, ist er die Marktpreisindikation
+             nach Abschlag. Gemessen Demostrasse 5 (24.11.2026): fuehrend vergleichswert, kein amtlicher Wert - der Prompt
+             nannte bisher KEINEN tragenden Wert. */
+          var _stufeM = a.fuehrend === 'vergleichswert' && _vw == null && a.market_value != null && Number(a.market_value) > 0;
+          if (_stufeM) _tragend = Number(a.market_value);
           if (_tragend != null) {
             L.push('- Der TRAGENDE Wert ist damit ' + fmtEur(_tragend)
-              + ' (' + _vn + ').');
+              + ' (' + _vn + (_stufeM ? ', indikativ aus Angebotspreisen nach Abschlag abgeleitet, keine amtliche Kaufpreisbasis' : '') + ').');
             L.push('  Nutze ihn als Anker fuer die Einordnung des Kaufpreises und');
             L.push('  sage ausdruecklich, aus welchem Verfahren er kommt und warum');
             L.push('  dieses Verfahren fuehrt.');

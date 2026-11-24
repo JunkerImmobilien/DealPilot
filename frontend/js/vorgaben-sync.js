@@ -47,6 +47,7 @@
     'dp_std_set',             /* Anlegerprofil-Set (standardwerte-karten.js) */
     'dp_investment_profile',  /* Investmentprofil inkl. Co-Pilot-Strategie */
     'dp_score_ansicht',       /* v3076 · Bewertung als ein Score oder zwei (nur Anzeige) */
+    'dp_wert_anker',          /* v4300 · Objektwert aus dem Marktbericht: massgebend | mpi_mit | mpi_ohne (calc.js) */
     'dp_miete_neu_faktor'     /* v3845 · Neuvermietung ohne Mietpreisbremse 110/115/120 % (miete-regel.js) */
   ];
   var LS_NUTZER = 'dp_vorgaben_nutzer';

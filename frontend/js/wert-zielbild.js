@@ -119,7 +119,9 @@
         _hist.eintrag = letzt; _hist.laedt = null;
         /* v2945 · der Anker der Wertsteigerung (calc.js wert_basis) kann am Bericht haengen -
            ohne Verkehrswert im Formular nach dem Laden einmal neu rechnen */
-        try { var S = global.State || {}; if (letzt && S.wert_basis_quelle && S.wert_basis_quelle !== 'verkehrswert' && typeof global.calc === 'function') global.calc(); } catch (e) {}
+        try { var S = global.State || {}; if (letzt && S.wert_basis_quelle && !(S.wert_basis_quelle === 'verkehrswert' && (S.svw_herkunft === 'gutachten' || S.svw_herkunft === 'bank')) && typeof global.calc === 'function') global.calc(); } catch (e) {}
+        /* v4300 · vorher nur ohne Formularwert: stand im Feld eine alte Übernahme aus dem Marktbericht (Herkunft „marktbericht“),
+           rechnete calc() nie mit dem geladenen Bericht neu (gemessen Demostraße 5: Anker 111.000 statt 130.000). */
         return daten();
       }, function () { _hist.laedt = null; return daten(); });
     return _hist.laedt;

@@ -178,7 +178,10 @@ export const MarketAnalysisService = {
       || /neubau_erstbezug|neubau_im_bau/.test(String(ref.baustatus || ''))
       || String(ref.condition || '') === 'erstbezug';
     const _saniert = ref.refurbished === true
-      || /kernsaniert|saniert|erstbezug_saniert/.test(String(ref.condition || '') + String(ref.baustatus || ''));
+      || /kernsaniert|saniert|erstbezug_saniert/.test(String(ref.condition || '') + String(ref.baustatus || ''))
+      /* v4300 · die App-Auswahl „Neubau / kernsaniert“ hat den Wert `neubau`: bei einem Altbau heisst das kernsaniert, der
+         Saniert-Filter griff dafuer bisher nicht (gemessen an den fuenf Werten von ds2_zustand in index.html). */
+      || (String(ref.condition || '') === 'neubau' && !_neubau);
     const _sanJahr = ref.reconstruction_year && ref.reconstruction_year > 1900 ? ref.reconstruction_year : null;
 
     const _flaeche = (pct) => (wfl

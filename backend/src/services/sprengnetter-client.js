@@ -119,7 +119,12 @@ function _mapRequest(inputs, opts) {
   var pa = fin(inputs.gsfl); if (pa) body.plot_area = pa;
   var modClass = _mapModernization(inputs.ds2_zustand); if (modClass) body.modernization_class = modClass;
   var eq = {};
-  var eqVal = _mapEquipmentValue(inputs.ausst); if (eqVal) eq.value = eqVal;
+  /* v4300 · Die Ausstattung kam aus `ausst`, dem versteckten Altfeld (index.html data-v363-ausst, immer „Normal“). Gemessen
+     Demostrasse 5 (24.11.2026): Standardstufe 3, ausst leer. Die Standardstufe (NHK 2010, Anlage 4 ImmoWertV) ist die
+     Ausstattungsqualitaet - dieselbe Zuordnung wie im Marktbericht (DealPilotObjectMapper STUFE_ZU_QUALITY). */
+  var _st = fin(inputs.standardstufe);
+  var eqVal = (_st >= 1 && _st <= 5) ? ({ 1: 'EINFACH', 2: 'EINFACH', 3: 'MITTEL', 4: 'GEHOBEN', 5: 'STARK_GEHOBEN' })[Math.round(_st)] : _mapEquipmentValue(inputs.ausst);
+  if (eqVal) eq.value = eqVal;
   var resArea = _mapResidentialArea(inputs.balkon_flae); if (resArea) eq.residential_area = resArea;
   /* v727-eq-matrix: feingranulare Ausstattung (Frontend liefert Enum direkt) */
   var _eqMap = { heating:'eq_heating', windows:'eq_windows', floor:'eq_floor', bath_room:'eq_bath',

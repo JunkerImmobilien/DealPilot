@@ -1345,11 +1345,26 @@ function _calcImmediate(){
     /* _wertDaten statt daten(): daten() zieht das Zielbild (DpPotenzial) mit - hier nur der Bericht, ohne Rueckweg in calc() */
     var _wzB = window.DpWertZielbild && window.DpWertZielbild.bericht ? window.DpWertZielbild.bericht() : null;
     var _wzW = _wzB && window.DpWertZielbild._wertDaten ? window.DpWertZielbild._wertDaten(_wzB) : null;
-    if (_wzW && _wzW.fuehrend) {
+    /* v4300 · Marcel 24.11.2026: „vom vorhandenen tatsächlichen Wert ausgehen … das Verfahren, was maßgebend ist … oder
+       halt die Marktpreisindikation mit oder ohne den Abschlägen, jeweils was wir gewählt haben“. Einstellung dp_wert_anker
+       (Einstellungen › Standardwerte, über vorgaben-sync am Konto): massgebend (Vorgabe) | mpi_mit | mpi_ohne.
+       Gemessen Demostraße 5 (Staging, Bericht 24.11.2026): führend „vergleichswert“ ohne amtlichen Vergleichswert
+       (Stufe M, der Angebotswert nach Abschlag FÜHRT, 130.000 €) - _wzW.vergleichswert ist dann null, der Anker fiel
+       still auf das Formularfeld svwert (111.000 €, eine alte Übernahme des VORLÄUFIGEN Ertragswerts). */
+    var _ankWahl = 'massgebend';
+    try { var _aw = localStorage.getItem('dp_wert_anker'); if (_aw === 'mpi_mit' || _aw === 'mpi_ohne') _ankWahl = _aw; } catch (_e2) {}
+    var _mpiM = _wzW && _wzW.marktpreisindikation ? _wzW.marktpreisindikation.mitte : null;
+    var _mpiO = _wzW && _wzW.ohne_abschlag ? _wzW.ohne_abschlag.mitte : null;
+    if (_wzW && _ankWahl === 'massgebend' && _wzW.fuehrend) {
       var _fv = _wzW[_wzW.fuehrend];
       if (_fv && _fv.wert > 0 && !_fv.vorlaeufig) _mbAnker = { wert: Math.max(0, _fv.wert - _erbAbzug), art: _wzW.fuehrend, datum: _wzW.bericht_datum };
+      /* Stufe M: führt der Vergleichswert ohne amtliche Basis, IST er die Marktpreisindikation nach Abschlag */
+      else if (_wzW.fuehrend === 'vergleichswert' && !_wzW.vergleichswert && _mpiM > 0) _mbAnker = { wert: Math.max(0, _mpiM - _erbAbzug), art: 'vergleichswert_m', datum: _wzW.bericht_datum };
     }
+    if (_wzW && !_mbAnker && _ankWahl !== 'mpi_ohne' && _mpiM > 0 && (_ankWahl === 'mpi_mit' || _wzW.ohne_abschlag)) _mbAnker = { wert: Math.max(0, _mpiM - _erbAbzug), art: 'mpi_mit', datum: _wzW.bericht_datum };
+    if (_wzW && !_mbAnker && _ankWahl === 'mpi_ohne' && (_mpiO > 0 || _mpiM > 0)) _mbAnker = { wert: Math.max(0, (_mpiO > 0 ? _mpiO : _mpiM) - _erbAbzug), art: _mpiO > 0 ? 'mpi_ohne' : 'mpi_mit', datum: _wzW.bericht_datum };
   } catch (_e) { _mbAnker = null; }
+  State.wert_anker_wahl = _ankWahl || 'massgebend';
   var wert_basis, _wbQuelle;
   /* v2996 · Gutachten/Bank > fuehrendes Verfahren des Berichts > uebrige Angabe > Bank > Kaufpreis */
   if (svw > 0 && _svwBelastbar) {
@@ -1365,8 +1380,12 @@ function _calcImmediate(){
   }
   State.wert_basis = wert_basis;
   State.wert_basis_quelle = _wbQuelle;
+  /* v4300 · Anker mit Jahr: der Bericht bewertet zu SEINEM Stichtag. Weiter unten (nach wstg) wird auf den Beginn der
+     Projektion zurueckgerechnet, damit wert_y im Berichtsjahr den Berichtswert trifft. */
+  State.wert_anker = (_wbQuelle === 'marktbericht' && _mbAnker) ? { wert: _mbAnker.wert, art: _mbAnker.art, datum: _mbAnker.datum || null,
+    jahr: (function () { var d = _mbAnker.datum ? new Date(_mbAnker.datum) : null; return d && !isNaN(d) ? d.getFullYear() : null; })() } : null;
   State.wert_basis_text = _wbQuelle === 'verkehrswert' ? (State.svw_label || 'Wertangabe') + ' (Reiter Objekt)'
-    : _wbQuelle === 'marktbericht' ? ({ ertragswert: 'Ertragswert', sachwert: 'Sachwert', vergleichswert: 'Vergleichswert' }[_mbAnker.art] || 'Wert') + ' aus dem Marktbericht'
+    : _wbQuelle === 'marktbericht' ? ({ ertragswert: 'Ertragswert', sachwert: 'Sachwert', vergleichswert: 'Vergleichswert', vergleichswert_m: 'Vergleichswert', mpi_mit: 'Marktpreisindikation nach Abschlag', mpi_ohne: 'Marktpreisindikation ohne Abschlag' }[_mbAnker.art] || 'Wert') + ' aus dem Marktbericht'
     : _wbQuelle === 'bankbewertung' ? 'Bankbewertung' : 'Kaufpreis';
   var gs_a=v('gsfl')*(v('mea')/100);
   st('gs_ant',gs_a.toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2})+' m²');  /* v3023: stand „58.60 m²" */st('bodenwert',fE(gs_a*v('brw')));
@@ -2653,6 +2672,18 @@ function _calcImmediate(){
   // Wertsteigerung 2 % zeigte der Vermögensaufbau-Chart 220k × 1.015^btj statt 220k × 1.02^btj —
   // also etwa 255k statt 268k bei 10 Jahren.
   State.wstg = wstg;
+  /* v4300 · Marcel 24.11.2026 „vom vorhandenen tatsaechlichen Wert ausgehen“: im Bestand beginnt die Projektion im Kaufjahr,
+     der Bericht bewertet heute. Bisher stand der Berichtswert im KAUFJAHR und wuchs bis heute weiter (Demostrasse: 2026
+     zeigte 111.000 x 1,015^2 statt des Berichtswerts). Jetzt Jahr 1 = Berichtswert / (1 + wstg)^(Berichtsjahr - Kaufjahr),
+     alle Stellen mit wert_basis x (1 + wstg)^(y - 1) treffen damit im Berichtsjahr genau den Bericht. */
+  try {
+    var _wa = State.wert_anker, _wa0 = (window.DealPilotAnteilig && DealPilotAnteilig.getBaseYear) ? DealPilotAnteilig.getBaseYear() : null;
+    if (_wa && _wa.jahr && _wa0 && _wa.jahr > _wa0 && _wa.jahr - _wa0 <= 40 && wstg > -0.5) {
+      wert_basis = _wa.wert / Math.pow(1 + wstg, _wa.jahr - _wa0);
+      State.wert_basis = wert_basis; _wa.basis_jahr = _wa0;
+      State.wert_basis_text = (State.wert_basis_text || 'Marktbericht') + ' ' + _wa.jahr + ', auf ' + _wa0 + ' zurückgerechnet';
+    }
+  } catch (_eWa) {}
   State.mstg = mstg;
   State.kstg = kstg;
   State.btj  = btj;

@@ -1522,6 +1522,24 @@
     return true;
   }
 
+  /* v4300 · Marcel 24.11.2026: „Wenn es keine Marktbewertung gibt, wäre es gut, dass er das prüft und direkt … mit abruft.
+     Weil wir ja den Marktbericht auch brauchen, um es besser einschätzen zu können.“ Der Bericht verbraucht eine Bewertung
+     aus dem Kontingent (dealpilot-mb.js run: mpi / mpi_plus / wev), deshalb kein stiller Abruf, sondern ein Knopf ganz oben.
+     Nach dem Abruf rechnet calc() mit dem neuen Wert (wert-zielbild.js laden), die Analyse lässt sich danach neu abrufen. */
+  function mbHinweis() {
+    try {
+      var h = document.querySelector('[data-dp-pa-mbfehlt]'); if (!h) return;
+      var W = window.DpWertZielbild, b = W && W.bericht ? W.bericht() : null;
+      if (b || !window._currentObjKey) { h.innerHTML = ''; h.style.display = 'none'; return; }
+      h.style.display = '';
+      h.innerHTML = '<div class="dp-pa-mbfehlt" style="display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;justify-content:space-between;'
+        + 'margin:0 0 12px;padding:10px 14px;border:1px solid var(--gx-linie,#E6DFCF);border-left:3px solid var(--wl-c9a84c,#C9A84C);border-radius:10px;background:var(--gx-flaeche,#F8F6F1);color:var(--gx-text,#2A2727);font-size:13px;line-height:1.45">'
+        + '<span><b>Noch kein Marktbericht zu diesem Objekt.</b><br><span style="opacity:.75">Mit Bericht rechnet die Analyse mit dem ermittelten Objektwert statt mit dem Kaufpreis und ordnet Wert und Lage genauer ein. Der Abruf verbraucht eine Bewertung aus deinem Kontingent.</span></span>'
+        + knopf('Marktbericht abrufen', 'try{if(window.DpJahresabgleich)DpJahresabgleich.mbAbrufen()}catch(e){}', false) + '</div>';
+      try { if (window.DpVorschau && DpVorschau.markieren) DpVorschau.markieren(); } catch (e) {}
+    } catch (e) {}
+  }
+
   /* ── Hülle ───────────────────────────────────────────────────────────── */
   function huelle(o) {
     stil();
@@ -1623,9 +1641,9 @@
       + '<button type="button" class="btn-clean dp-pa4-mehr-r" data-dp-pa4-blaettern="1" aria-label="Weitere Reiter" tabindex="-1">›</button>'
       + '</div>' + seg() + '</div>';
     try { localStorage.setItem('dp_pa_si_ansicht', m === 'detail' ? 'genau' : 'einfach'); } catch (e) {}
-    try { setTimeout(function () { leisteMessen(); minisZeichnen(); if (window.DpWertZielbild && window.DpWertZielbild.laden) window.DpWertZielbild.laden().then(function () { kzNeu(); minisZeichnen(); wegNeu(); siZeichnen(); }, function () {}); }, 0); } catch (e) {}
+    try { setTimeout(function () { leisteMessen(); minisZeichnen(); if (window.DpWertZielbild && window.DpWertZielbild.laden) window.DpWertZielbild.laden().then(function () { kzNeu(); minisZeichnen(); wegNeu(); siZeichnen(); mbHinweis(); }, function () {}); }, 0); } catch (e) {}
     return '<div class="dp-pa-wrap' + (bestand ? ' dp-pa-bestand' : '') + '" data-dp-pa-v4="1" data-dp-pa-modus="' + m + '" data-dp-pa-ansicht="' + (bestand ? 'bestand' : 'ankauf') + '">'
-      + kopf + leiste
+      + kopf + '<div data-dp-pa-mbfehlt="1" data-vorschau="grafiken_neu" style="display:none"></div>' + leiste
       + '<div class="dp-pa-content">' + inhalt.join('') + '</div></div>';
   }
 
