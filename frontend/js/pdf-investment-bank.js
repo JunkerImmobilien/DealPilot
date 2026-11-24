@@ -1716,9 +1716,10 @@
     try { if (window.DealPilotPdfWahl && typeof window.DealPilotPdfWahl.pilotAn === 'function') pilotAn = window.DealPilotPdfWahl.pilotAn(); } catch (e) { pilotAn = true; }
     if ((ai || aiText) && pilotAn) {
       /* v2900c · nicht immer neue Seite: gemessen standen die Annahmen sonst allein auf S. 4 */
-      if (KURZ) platz(120, 'Pilot-Analyse', (adr || 'Objekt') + ' · Kurzfassung');
-      platz(60, 'Pilot-Analyse', (adr || 'Objekt'));
-      abschnitt('Pilot-Analyse');   /* v2555a: Produktname statt KI-Investment-Analyse */
+      /* v4390b · Marcel 24.11.2026: der Abschnitt heißt „Gesamtbewertung“ (darunter Stärken, Schwächen, Was für die Finanzierung spricht) */
+      if (KURZ) platz(120, 'Gesamtbewertung', (adr || 'Objekt') + ' · Kurzfassung');
+      platz(60, 'Gesamtbewertung', (adr || 'Objekt'));
+      abschnitt('Gesamtbewertung');   /* v2555a: Produktname statt KI-Investment-Analyse */
       /* v2830 · die Abschnitte der Pilot-Analyse wie im Investment-PDF
          (pdf.js _renderAiJsonInPdf), mit denselben Haken „Bausteine im PDF"
          (_dpPdfSectionOn). Bisher standen hier nur Empfehlung, Offerte,
@@ -1735,15 +1736,15 @@
         doc.setFont('helvetica', 'bold'); doc.setFontSize(8.8); doc.setTextColor(26, 26, 26);
         doc.text(t, L, y); y += 5;
       }
-      function block(titel, text) {
+      function block(titel, text, kopf) {
         if (!text || !an(titel)) return;
-        kopfzeile(titel);
+        var _k = kopf == null ? titel : kopf; if (_k) kopfzeile(_k);
         String(text).split(/\n+/).forEach(function (p) { p = klar(p); if (p) { absatz(p, { groesse: 8.4, farbe: 60, zeile: 4.4 }); y += 1.6; } });
         y += 2;
       }
-      function liste(titel, arr) {
+      function liste(titel, arr, kopf) {
         if (!arr || !arr.length || !an(titel)) return;
-        kopfzeile(titel);
+        kopfzeile(kopf || titel);
         /* v2930 · Kurzfassung je zwei Punkte: gemessen an Westerfeld rutschten mit drei
            Punkten je Liste vier Zeilen und der Modellhinweis auf eine fuenfte Seite */
         arr.slice(0, KURZ ? 3 : 8).forEach(function (t) { punkt(klar(t), { groesse: 8.4, farbe: 60, zeile: 4.4 }); });
@@ -1760,9 +1761,9 @@
         if (offerte && typeof offerte === 'object') { offBeg = offerte.begruendung || null; offerte = offerte.empfohlen || offerte.betrag || offerte.wert || null; }
         if (offerte && an('Kaufpreis-Offerte')) zeile('Vorgeschlagene Kaufpreis-Offerte', typeof offerte === 'number' ? eur(offerte) : sauber(offerte).slice(0, 60));
         y += 2;
-        if (!KURZ) block('Gesamtbewertung', ai.gesamtbewertung || ai.fazit_kurz);
+        if (!KURZ) block('Gesamtbewertung', ai.gesamtbewertung || ai.fazit_kurz, '');
         liste('Stärken', ai.staerken || ai.strengths);
-        liste('Risiken', ai.risiken || ai.schwaechen || ai.risks);
+        liste('Risiken', ai.risiken || ai.schwaechen || ai.risks, 'Schwächen');
         if (!KURZ && ai.risikoanalyse && typeof ai.risikoanalyse === 'object') {
           var ra = ai.risikoanalyse;
           liste('Risikoanalyse', [ra.finanzierungsrisiko ? 'Finanzierungsrisiko: ' + ra.finanzierungsrisiko : null,
@@ -1776,7 +1777,7 @@
            finanzierung nicht, dort bleiben sie als eigene Liste. */
         var _bestB = false;
         try { _bestB = !!(window.DpBestand && window.DpBestand.istBestand()); } catch (e) { _bestB = false; }
-        if (!_bestB || KURZ) liste('Bankargumente', ai.bankargumente);
+        if (!_bestB || KURZ) liste('Bankargumente', ai.bankargumente, 'Was für die Finanzierung spricht');
         /* v2988 · seit v2985 sind anschlussfinanzierung/exit_strategien im Bestand Listen aus {frage, antwort} -
            gemessen stand im Bank-PDF der Parkstr. „[object Object],[object Object],…“ (Seite 15). */
         var _qa = function (v) { if (!Array.isArray(v)) return v; return v.map(function (e) { return e && typeof e === 'object' ? (e.frage ? e.frage + '\n' : '') + (e.antwort || '') : String(e || ''); }).filter(Boolean).join('\n\n'); };
@@ -1784,7 +1785,7 @@
            „Zinsänderungsrisiko" - der KI-Text nannte dazu eigene, abweichende Zahlen. Im Bestand bleibt er. */
         var _gedecktB = !_bestB && typeof window._dpPdfGedeckt === 'function' && window._dpPdfGedeckt('Anschlussfinanzierung (Ankauf)', _std);
         if (!KURZ && !_gedecktB) block('Anschlussfinanzierung', [_qa(ai.anschlussfinanzierung),
-          _bestB && ai.bankargumente && ai.bankargumente.length ? 'Argumente für die Bank:\n' + ai.bankargumente.map(function (x) { return '- ' + x; }).join('\n') : ''].filter(Boolean).join('\n'));
+          _bestB && ai.bankargumente && ai.bankargumente.length ? 'Was für die Finanzierung spricht:\n' + ai.bankargumente.map(function (x) { return '- ' + x; }).join('\n') : ''].filter(Boolean).join('\n'));
         if (!KURZ && ai.exit_strategien) block('Exit-Strategien', _qa(ai.exit_strategien));
         if (!KURZ) (function () {
           var t = [];

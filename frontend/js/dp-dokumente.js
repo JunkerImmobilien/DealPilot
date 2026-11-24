@@ -584,8 +584,10 @@
     if (!(ai || txt) || !an) return '';
     var on = function (t) { try { return typeof window._dpPdfSectionOn !== 'function' || window._dpPdfSectionOn(t); } catch (e) { return true; } };
     /* v3180d · lange Texte duerfen umbrechen (break-inside:avoid liess halbe Seiten leer); Absaetze und Punkte bleiben ganz */
-    var block = function (t, x) { if (!x || !on(t)) return ''; return '<div class="fliess"><h3>' + B.esc(t) + '</h3>' + String(x).split(/\n+/).map(function (p) { p = klar(p); return p ? '<p>' + B.esc(p) + '</p>' : ''; }).join('') + '</div>'; };
-    var liste = function (t, arr) { if (!arr || !arr.length || !on(t)) return ''; return '<div class="fliess"><h3>' + B.esc(t) + '</h3><ul>' + arr.slice(0, kurz ? 3 : 8).map(function (x) { return '<li>' + B.esc(klar(x)) + '</li>'; }).join('') + '</ul></div>'; };
+    /* v4390b · Marcel 24.11.2026: Abschnitt heißt „Gesamtbewertung“, darunter „Stärken“ und „Schwächen“, „Bankargumente“ heißt
+       „Was für die Finanzierung spricht“. kopf: angezeigte Überschrift (leer = keine), t bleibt der Schlüssel der Abschnittswahl. */
+    var block = function (t, x, kopf) { if (!x || !on(t)) return ''; var k = kopf == null ? t : kopf; return '<div class="fliess">' + (k ? '<h3>' + B.esc(k) + '</h3>' : '') + String(x).split(/\n+/).map(function (p) { p = klar(p); return p ? '<p>' + B.esc(p) + '</p>' : ''; }).join('') + '</div>'; };
+    var liste = function (t, arr, kopf) { if (!arr || !arr.length || !on(t)) return ''; return '<div class="fliess"><h3>' + B.esc(kopf || t) + '</h3><ul>' + arr.slice(0, kurz ? 3 : 8).map(function (x) { return '<li>' + B.esc(klar(x)) + '</li>'; }).join('') + '</ul></div>'; };
     var qa = function (v) { if (!Array.isArray(v)) return v; return v.map(function (e) { return e && typeof e === 'object' ? (e.frage ? e.frage + '\n' : '') + (e.antwort || '') : String(e || ''); }).filter(Boolean).join('\n\n'); };
     if (!ai) return '<p>' + B.esc(klar(String(txt).replace(/\s+/g, ' ').slice(0, kurz ? 900 : 2400))) + '</p>';
     var h = '', urteil = ai.empfehlung || ai.recommendation || '', off = ai.kaufpreis_offerte || ai.offerte || ai.kaufpreisempfehlung, offBeg = null;
@@ -607,19 +609,19 @@
     if (gb && ohneUrteil) gb = String(gb).split(/(?<=[.!?])\s+/).filter(function (x) {
       return !(/(halten|gehalten|verkauf|kaufen|gekauft|buy-&-hold|einstieg)/i.test(x) && /(sollte|empfehl|geeignet|lohnt|ratsam)/i.test(x));
     }).join(' ');
-    if (!kurz) h += block('Gesamtbewertung', gb);
+    if (!kurz) h += block('Gesamtbewertung', gb, '');
     /* v3180d · untereinander statt zweispaltig: im Blocksatz ohne Silbentrennung (Server-Chrome hat kein Trennwoerterbuch) rissen die schmalen Spalten Luecken */
-    h += liste('Stärken', ai.staerken || ai.strengths) + liste('Risiken', ai.risiken || ai.schwaechen || ai.risks);
+    h += liste('Stärken', ai.staerken || ai.strengths) + liste('Risiken', ai.risiken || ai.schwaechen || ai.risks, 'Schwächen');
     if (!kurz && !bank && ai.risikoanalyse && typeof ai.risikoanalyse === 'object') {   /* v3180c · Bank: steht in Risiken und Belastungsprobe */
       var ra = ai.risikoanalyse;
       h += liste('Risikoanalyse', [ra.finanzierungsrisiko ? 'Finanzierungsrisiko: ' + ra.finanzierungsrisiko : null, ra.cashflow_stabilitaet ? 'Cashflow-Stabilität: ' + ra.cashflow_stabilitaet : null,
         ra.annahmen_abhaengigkeit ? 'Abhängigkeit von Annahmen: ' + ra.annahmen_abhaengigkeit : null, 'Gerechnete Schuldendeckung je Zins- und Mietszenario: siehe Belastungsprobe.'].filter(Boolean));
     }
     var best = false; try { best = !!(window.DpBestand && DpBestand.istBestand()); } catch (e) {}
-    if (!best || kurz || bank) h += liste('Bankargumente', ai.bankargumente);
+    if (!best || kurz || bank) h += liste('Bankargumente', ai.bankargumente, 'Was für die Finanzierung spricht');
     var gedeckt = !best && typeof window._dpPdfGedeckt === 'function' && window._dpPdfGedeckt('Anschlussfinanzierung (Ankauf)', { phasen: true });
     /* v3180c · Bank: die Anschlussfinanzierung steht GERECHNET unter „Finanzierung in drei Phasen“ und „Zinsänderungsrisiko“ */
-    if (!kurz && !bank && !gedeckt) h += block('Anschlussfinanzierung', [qa(ai.anschlussfinanzierung), best && ai.bankargumente && ai.bankargumente.length ? 'Argumente für die Bank:\n' + ai.bankargumente.map(function (x) { return '– ' + x; }).join('\n') : ''].filter(Boolean).join('\n'));
+    if (!kurz && !bank && !gedeckt) h += block('Anschlussfinanzierung', [qa(ai.anschlussfinanzierung), best && ai.bankargumente && ai.bankargumente.length ? 'Was für die Finanzierung spricht:\n' + ai.bankargumente.map(function (x) { return '– ' + x; }).join('\n') : ''].filter(Boolean).join('\n'));
     if (!kurz) {
       if (!bank) h += block('Exit-Strategien', qa(ai.exit_strategien));   /* v3180c · Anlegerthema (Spekulationsfrist), nicht fuer die Bank */
       h += block('Lage & Markt', [ai.makrolage_recherche ? 'Makrolage: ' + ai.makrolage_recherche : '', ai.mikrolage_recherche ? 'Mikrolage: ' + ai.mikrolage_recherche : '', ai.kaufpreisniveau ? 'Kaufpreisniveau: ' + ai.kaufpreisniveau : ''].filter(Boolean).join('\n'));
@@ -703,7 +705,7 @@
       if (bc || sm) S.push(B.seite(c, 'Bank-Cockpit und Belastungsprobe', B.abschnitt(ab(), 'Bank-Cockpit und Belastungsprobe', 'Schuldendienstdeckung und Beleihungsauslauf im Verlauf, DSCR unter Zins- und Mietstress') + bc + sm));
     }
     var pa = pilotAnalyse(B, kurz, bank);
-    if (pa) S.push(B.seite(c, 'Pilot-Analyse', B.abschnitt(ab(), 'Pilot-Analyse') + pa));
+    if (pa) S.push(B.seite(c, 'Gesamtbewertung', B.abschnitt(ab(), 'Gesamtbewertung') + pa));   /* v4390b */
     S.push(B.seite(c, 'Annahmen', B.abschnitt('Anhang', 'Annahmen und Hinweise') + annahmenVoll(K, B, kurz)));
     return B.dokument(name + ' · ' + o.adresse, S);
   }
