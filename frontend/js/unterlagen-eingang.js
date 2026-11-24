@@ -489,7 +489,7 @@
   }
   /* v4530 · Grundgestaltung, früh geladen: Verlauf, „Bereits eingelesen“, ViVi im Rahmen der Belege je Jahr und die leere
      Grafikfläche im Reiter Haus & Unterlagen. Marcel 24.11.2026: „unter Übersicht … so eine graue Pille … über Hausverlauf,
-     die muss raus“. Gemessen: div.dp-gn.dp-gx[data-dp-gn=gx-hausgeld], leer (Hausgeld je Jahr braucht zwei Jahre), mit
+     die muss raus“. Gemessen: div.dp-gn.dp-gx (Schlüssel gx-hausgeld), leer (Hausgeld je Jahr braucht zwei Jahre), mit
      Rand und Innenabstand der Kartenregel 36 px hoch. Eine leere Grafikfläche bleibt jetzt unsichtbar. */
   function _grundCss() {
     if (el('dp-eg-css')) return;

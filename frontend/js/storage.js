@@ -874,6 +874,10 @@ function loadData(d) {
   if (d._bwk_pct_mode && typeof switchBwkPctMode === 'function') switchBwkPctMode(d._bwk_pct_mode);
 
   window._aiText = d._ai || '';
+  /* v4490d · gemessen Musterhof 8 (Staging, 24.11.2026): im Datensatz lag die Pilot-Analyse von Westerfeldstr. 146
+     (_fuer.objekt_id des anderen Objekts), das Cockpit zeigte „Diese Analyse gehört zu einem anderen Objekt“. Eine fremde
+     Analyse gilt beim Laden als nicht vorhanden, beim nächsten Speichern fällt sie aus dem Datensatz (_dpAiFremd). */
+  if (window._dpAiFremd && window._dpAiFremd(window._aiText)) window._aiText = '';
   // V63.57: D1-Typ-Sichtbarkeit nach Load syncen — sonst bleibt Bauspar-Card
   // versteckt obwohl Tilgungsaussetzung aktiv ist
   /* v3284: der gemerkte Tilgungssatz gehoert zum VORIGEN Objekt. Ohne das setzte
@@ -1232,6 +1236,9 @@ async function saveObj(opts) {
      (Ankauf-Stand, keine Soll-Ansicht, Kennzahlen dieses Objekts) stehen dort. */
   try { if (window.DpJahresstaende && typeof DpJahresstaende.beimSpeichern === 'function') DpJahresstaende.beimSpeichern(data, opts); } catch (e) {}
   var aiText = window._aiText || null;
+  /* v4490d · nie die Analyse eines anderen Objekts mitschreiben (Musterhof 8 trug die von Westerfeldstr. 146) */
+  if (aiText && window._dpAiFremd(aiText)) { aiText = null; window._aiText = ''; }
+  if (data && typeof data === 'object' && data._ai && window._dpAiFremd(data._ai)) data._ai = '';
   /* v2193 · N62.17 - URSACHE gefunden: collectData() traegt `_ai` aus
      _currentObjData mit, also den Text vom LADEN des Objekts. Nach einer
      neuen Analyse ging der neue Text in die Spalte ai_analysis, der alte
@@ -2519,6 +2526,15 @@ function _addNewBtn() {
 // ══════════════════════════════════════════════════
 // LOAD / DUPLICATE / DELETE
 // ══════════════════════════════════════════════════
+/* v4490d · gehört eine gespeicherte Pilot-Analyse (Text mit _fuer.objekt_id) zu einem anderen Objekt als dem offenen? */
+window._dpAiFremd = function (t) {
+  try {
+    if (!t || !window._currentObjKey) return false;
+    var a = typeof t === 'string' ? JSON.parse(t) : t;
+    var id = a && a._fuer ? a._fuer.objekt_id : null;
+    return !!(id && String(id) !== String(window._currentObjKey));
+  } catch (e) { return false; }
+};
 async function loadSaved(k) {
   /* v736-save-before-switch: aktuelles Objekt sichern bevor gewechselt/neu */
   /* v2852 · den Save ABWARTEN, bevor gewechselt wird. Ohne await lief saveObj()
