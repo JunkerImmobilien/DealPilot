@@ -127,5 +127,72 @@ dokumente = [{ typ: 'hausgeld', art: 'Jahresabrechnung', jahr: 2023 }];
 o = JSON.parse(JSON.stringify(JAB.unterlagenOffen(2023)));
 melde(o.steuer.length === 0 && o.su.length === 0, 'E1 Gegenprobe: ohne Vorschlaege am Dokument meldet Schritt Steuer nichts', o);
 
+/* ── F · v4340 Belege nach Anlage V: Gliederung, Vorschlag, Umbuchen ── */
+for (const datei of ['frontend/js/anlage-v-kern.js', 'frontend/js/anlage-v-2025.js', 'frontend/js/belege-anlage-v.js']) {
+  try { vm.runInContext(fs.readFileSync(path.join(WURZEL, datei), 'utf8'), sandbox, { filename: datei }); }
+  catch (e) { console.log('FEHL  ' + datei + ' laedt nicht: ' + e.message); process.exit(1); }
+}
+const BAV = sandbox.DpBelegeAv;
+melde(!!BAV && typeof BAV.umbuchen === 'function', 'F0 DpBelegeAv geladen', null);
+/* Steuerjahr 2025 wie tax.js: eigene Werte (ov) und Vorschlag der App (auto) */
+let ov = {}, auto = {}, gesperrt = false;
+sandbox.dpWkStand = (j, f) => ({ override: ov[j] && typeof ov[j][f] === 'number' ? ov[j][f] : null, auto: auto[f] != null ? auto[f] : null });
+sandbox._setYearOverride = (j, f, v) => { ov[j] = ov[j] || {}; if (v === '' || v == null) delete ov[j][f]; else ov[j][f] = Number(v); };
+sandbox.dpWkUebernehmen = (j, p) => { Object.keys(p).forEach((f) => { const alt = ov[j] && typeof ov[j][f] === 'number' ? ov[j][f] : null; sandbox._setYearOverride(j, f, alt == null ? p[f] : alt + p[f]); }); return { ok: true }; };
+sandbox.DpJahresbuch = { aenderungErlaubt: () => !gesperrt };
+feld('_dok_eingang');
+const setzeEingang = (buch) => { felder._dok_eingang.value = JSON.stringify({ herkunft: {}, verlauf: [], buchungen: buch }); };
+const buchungen = () => JSON.parse(felder._dok_eingang.value).buchungen;
+/* Muster: Handwerkerrechnung als Sonstiges eingelesen, Küche als Erhaltung, Hausverwaltung 1.680 als Sonstiges, Zinsbeleg */
+ov = { 2025: { sonst_kosten: 2100, erhaltungsaufwand: 4200, schuldzinsen: 900 } };
+auto = { hausverwaltung: 600, schuldzinsen: 3600, einnahmen_km: 7800 };
+setzeEingang([
+  { jahr: 2025, feld: 'sonst_kosten', betrag: 420, datei: 'rechnung-maler.pdf', position: 'Malerarbeiten Treppenhaus', kategorie: 'Sonstiges' },
+  { jahr: 2025, feld: 'erhaltungsaufwand', betrag: 3570, datei: 'kueche.pdf', position: 'Einbauküche Wohnung 2', kategorie: 'Erhaltungsaufwand / Reparatur' },
+  { jahr: 2025, feld: 'sonst_kosten', betrag: 1680, datei: 'hv-2025.pdf', position: 'Verwaltervergütung 2025', kategorie: 'Sonstiges' },
+  { jahr: 2025, feld: 'schuldzinsen', betrag: 900, datei: 'bank-q1.pdf', position: 'Zinsen 1. Quartal', kategorie: 'Schuldzinsen' }
+]);
+const zeilen = [
+  { feld: 'schuldzinsen', label: 'Schuldzinsen', wert: 900, summe: 900, rest: 0, art: '' },
+  { feld: 'erhaltungsaufwand', label: 'Erhaltungsaufwand', wert: 4200, summe: 3570, rest: 630, art: '' },
+  { feld: 'sonst_kosten', label: 'Sonstige Kosten', wert: 2100, summe: 2100, rest: 0, art: '' }
+];
+const G = JSON.parse(JSON.stringify(BAV.gruppen(2025, zeilen)));
+melde(G.map((g) => g.k).join('') === 'ACDE', 'F1 Bloecke in der Reihenfolge der Anlage V: Einnahmen, Finanzierung, Erhaltung, Laufende Kosten', G.map((g) => g.k));
+const pz = (k, f) => ((G.find((g) => g.k === k) || { posten: [] }).posten.find((p) => p.feld === f) || {});
+melde(pz('C', 'schuldzinsen').zeile === 48 && pz('D', 'erhaltungsaufwand').zeile === 55 && pz('E', 'sonst_kosten').zeile === 82, 'F2 Zeilen der Anlage V 2025: Schuldzinsen 48, Erhaltung 55, Sonstige 82', [pz('C', 'schuldzinsen').zeile, pz('D', 'erhaltungsaufwand').zeile, pz('E', 'sonst_kosten').zeile]);
+melde(pz('C', 'schuldzinsen').fest === true && pz('A', 'einnahmen_km').fest === true, 'F3 Schuldzinsen und Einnahmen sind fest', null);
+const vk = BAV.vorschlag(buchungen()[1]), vh = BAV.vorschlag(buchungen()[2]), vm0 = BAV.vorschlag(buchungen()[0]);
+melde(vk && vk.feld === 'sonst_bewegl_wg', 'F4 Einbauküche 3.570 € (über 800 € netto): Vorschlag AfA bewegliche Wirtschaftsgüter', vk);
+melde(vh && vh.feld === 'hausverwaltung', 'F5 Verwaltervergütung unter Sonstiges: Vorschlag Hausverwaltung', vh);
+melde(vm0 === null, 'F6 Malerarbeiten: kein Vorschlag (keine Regel greift, Zuordnung bleibt bei dir)', vm0);
+melde(BAV.vorschlag({ feld: 'erhaltungsaufwand', betrag: 600, position: 'Kühlschrank' }) === null, 'F7 Kühlschrank 600 € brutto (unter 800 € netto, sofort absetzbar): kein AfA-Vorschlag', null);
+/* Umbuchen: Malerarbeiten 420 von Sonstiges nach Erhaltung */
+let r = JSON.parse(JSON.stringify(BAV.umbuchen(0, 'erhaltungsaufwand')));
+melde(r.ok && ov[2025].sonst_kosten === 1680 && ov[2025].erhaltungsaufwand === 4620, 'F8 Umbuchen: Sonstige 2.100 → 1.680, Erhaltung 4.200 → 4.620', [r, ov[2025]]);
+melde(buchungen()[0].feld === 'erhaltungsaufwand' && buchungen()[0].zuordnung === 'hand' && buchungen()[0].umgebucht.length === 1, 'F9 die Position traegt die neue Zuordnung und ihre Herkunft', buchungen()[0]);
+const summeVor = 2100 + 4200, summeNach = ov[2025].sonst_kosten + ov[2025].erhaltungsaufwand;
+melde(summeVor === summeNach, 'F10 Summe der Werbungskosten unveraendert (keine Doppelzaehlung)', [summeVor, summeNach]);
+/* Verwaltung 1.680 nach Hausverwaltung: dort stand nur der Vorschlag der App (600) - der Beleg ersetzt ihn */
+r = BAV.umbuchen(2, 'hausverwaltung');
+melde(r.ok && ov[2025].hausverwaltung === 1680 && ov[2025].sonst_kosten === undefined, 'F11 Sonstige leer → eigener Wert faellt weg, Hausverwaltung 1.680 ersetzt den Vorschlag der App 600', ov[2025]);
+r = BAV.umbuchen(3, 'nk_n_umlf');
+melde(!r.ok && ov[2025].schuldzinsen === 900, 'F12 Schuldzinsen sind fest: keine Umbuchung', r);
+r = BAV.umbuchen(0, 'schuldzinsen');
+melde(!r.ok, 'F13 in die Schuldzinsen wird nicht umgebucht', r);
+ov[2025].erhaltungsaufwand = 100;
+r = BAV.umbuchen(1, 'sonst_bewegl_wg');
+melde(!r.ok && ov[2025].erhaltungsaufwand === 100 && ov[2025].sonst_bewegl_wg === undefined, 'F14 Posten von Hand unter die Position gesenkt: keine Umbuchung, nichts geaendert', [r, ov[2025]]);
+ov[2025].erhaltungsaufwand = 4620; gesperrt = true;
+r = BAV.umbuchen(1, 'sonst_bewegl_wg');
+melde(!r.ok && ov[2025].erhaltungsaufwand === 4620, 'F15 festgeschriebenes Jahr: keine Umbuchung', r);
+gesperrt = false;
+r = BAV.umbuchen(1, '');
+melde(r.ok && ov[2025].erhaltungsaufwand === 1050 && buchungen()[1].feld === '', 'F16 nicht absetzbar: Betrag faellt aus der Erhaltung, Position bleibt sichtbar', [ov[2025], buchungen()[1]]);
+r = BAV.umbuchen(1, 'sonst_bewegl_wg');
+melde(r.ok && ov[2025].sonst_bewegl_wg === 3570 && ov[2025].erhaltungsaufwand === 1050, 'F17 aus „nicht absetzbar“ zurueck in einen Posten: nur dort addiert', ov[2025]);
+/* Gegenprobe: ohne Abzug im Quellposten waere die Summe gewachsen */
+melde(ov[2025].erhaltungsaufwand + ov[2025].hausverwaltung + ov[2025].sonst_bewegl_wg === 1050 + 1680 + 3570, 'F18 Gegenprobe Summe der Ziele', ov[2025]);
+
 console.log('unterlagen-steuer-pruefen: ' + (geprueft - fehler) + ' von ' + geprueft + ' ok');
 process.exit(fehler ? 1 : 0);

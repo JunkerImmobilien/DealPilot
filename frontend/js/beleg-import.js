@@ -761,6 +761,15 @@
     }
     return { html: h, anzahl: n };
   }
+  /* v4340 · Marcel 24.11.2026: Belege nach der Gliederung der Anlage V. Das Ziel nennt Block und Zeile des Jahres,
+     damit der Vorschlag der KI schon beim Einlesen als Zeile der Anlage V lesbar ist (umbuchen später in „Belege je Jahr“). */
+  function _avOrt(jahr, f) {
+    var K = window.AnlageVKern; if (!K || !f) return '';
+    var T = { A: 'Einnahmen', B: 'Abschreibungen', C: 'Finanzierung', D: 'Erhaltungsaufwand', E: 'Laufende Kosten' };
+    var b = K.blockVon ? K.blockVon(f) : null, z = null;
+    try { z = jahr && K.zeileFuer ? K.zeileFuer(Number(jahr), f) : null; } catch (e) { z = null; }
+    return (T[b] ? ' (' + T[b] + (z ? ', Anlage V Z. ' + z.zeile : '') + ')' : '');
+  }
   function _waehle(i) { if (_liste[i] != null) { _sel = _liste[i]; _render(); } }
   function _render() {
     var box = document.getElementById('bi-review');
@@ -792,7 +801,7 @@
         + '<table><thead><tr><th></th><th>Position</th><th>Datum</th><th class="num">Brutto</th><th>Kategorie → Ziel</th></tr></thead><tbody>'
         + idx.map(function (i) {
             var r = _rows[i], f = _feldKarte()[r.kategorie];
-            var ziel = _modus === 'wk' ? (f === null ? 'wird nicht übernommen' : (f ? 'Steuer ' + (r.jahr || '?') + ' · ' + (LABELS_WK[f] || f) : '–')) : (f ? (_beschrift()[f] || f) : 'nur 15-%-Prüfung');
+            var ziel = _modus === 'wk' ? (f === null ? 'wird nicht übernommen' : (f ? 'Steuer ' + (r.jahr || '?') + ' · ' + (LABELS_WK[f] || f) + _avOrt(r.jahr, f) : '–')) : (f ? (_beschrift()[f] || f) : 'nur 15-%-Prüfung');
             return '<tr' + (r.keep ? '' : ' class="off"') + '><td><input type="checkbox"' + (r.keep ? ' checked' : '') + ' onchange="DealPilotBelegImport._keep(' + i + ',this.checked)"></td>'
               + '<td>' + _esc(r.beschreibung || r.aussteller || '—') + (r.pruefen && r.pruefen.length ? '<div class="bi-pr">⚠ ' + r.pruefen.map(_esc).join('<br>⚠ ') + '</div>' : '') + '</td>'
               + '<td style="white-space:nowrap">' + _esc(r.datum) + '</td>'

@@ -649,13 +649,14 @@
       + '<div class="ue-bj-summe"><span>Werbungskosten ohne AfA<b>' + eur2(sumWert) + '</b></span><span>davon einzeln aus Belegen<b>' + eur2(sumBel) + '</b></span><span>Belege ' + jahr + '<b>' + nDat + ' <small style="font-size:11px;font-weight:400;color:var(--muted,#7A7370)">(' + d.buchungen.length + (d.buchungen.length === 1 ? ' Position' : ' Positionen') + ')</small></b></span></div>'
       + _viviTeil(jahr, opt)
       + (_viviVerknuepft() ? '<div class="ue-bj-gruppe">In DealPilot gebucht</div>' : '')
-      + posten
+      + (window.DpBelegeAv && window.DpBelegeAv.an() ? window.DpBelegeAv.html(jahr, d.zeilen) : posten)   /* v4340 · Gliederung der Anlage V, Umbuchen (belege-anlage-v.js) */
       + '<div class="ue-bj-fuss"><span>Einzeln aufgeführt sind Belege, die seit dem 04.11.2026 eingelesen' + (_viviVerknuepft() ? ' oder aus ViVi übernommen' : '') + ' wurden. Wird ein Import im Verlauf zurückgenommen, verschwinden seine Belege hier mit.</span>'
       + (d.buchungen.length ? '<button type="button" class="oabi-btn" data-bj-csv>Liste als CSV</button>' : '') + '</div></div>';
     if (!box._bjKlick) {
       box._bjKlick = true;
       box.addEventListener('click', function (e) {
         var t = e.target, jb = t.closest && t.closest('[data-bj-jahr]');
+        if (window.DpBelegeAv && window.DpBelegeAv.klick(e, function () { jahresInRahmen(box, _jbJahr); })) return;   /* v4340 */
         if (jb) { jahresInRahmen(box, Number(jb.getAttribute('data-bj-jahr'))); return; }
         /* v4100 · ViVi: abgleichen (nur lesen), Jahr der Karte, nach „übernehmen“ neu zeichnen */
         if (t.closest && t.closest('[data-bj-vivi]')) {
