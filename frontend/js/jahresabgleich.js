@@ -886,7 +886,9 @@
     for (var u = 0; u < hs.length; u++) {
       var ng = hs[u].querySelector('[data-ja-grafik]'); if (!ng || !gnAn) continue;
       var ka = ng.querySelector('.jbg-karten');
-      if (ka) ka.classList.add('dp-gn-weg');
+      /* v4570 · nur verstecken, wenn ein fertiger Verlauf mitwandert. Ohne Pilot-Analyse zeichnet grafiken-neu.js keinen (Musterhof 8:
+         Abschnitt Verlauf leer, gemessen 24.11.2026); kommt er später, versteckt grafiken-neu.js die Karten selbst (weg(karten)). */
+      if (ka && (mit[u] || []).length) ka.classList.add('dp-gn-weg');
       (mit[u] || []).forEach(function (k) { if (ka && ka.parentNode) ka.parentNode.insertBefore(k, ka); else ng.appendChild(k); });
     }
     reiterMarke();
