@@ -45268,3 +45268,9 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** main c582e3aa (cherry-picks 4efd5ef3, 46cc56c6, fc49adde aus staging d82abaa9, 2b22329e, 29957d8a), davor fac529ee.
 - **Nachweis:** einzelcheck-pruefen GRÜN (17 neue Punkte), buster-ebenen sauber, landing-zaehlen 27, Gold-Audit RC 0; vorschau-pruefen ROT D (grafiken_neu in dp-dokumente.js, schon vor diesem Paket auf main). Sicherungen *-20261124-0820-kk. Prod: Backend healthy, Migration 130, /preis 404 wie gewollt, Landing lädt einzelcheck.js?v=einzelcheck-2a ohne sichtbaren zweiten Weg.
 - **Rest:** Freischaltung Prod (Live-Preis, Coupon, .env) wartet auf Marcel · DEALCHECK10 live ja/nein · Merge main → staging · Foto-Wahl nur mit echtem Exposé-Kauf abnehmbar.
+
+### Rollout 1.0.160 · 24.11.2026 · v4390–v4390b (Fork LL, per cherry-pick)
+- **Was:** v4390 Objektwert aus dem Marktbericht gilt zum Wertermittlungsstichtag (Fehler seit 1.0.156: Erstellungsjahr), Wertpuffer-Kachel = PDF (maßgebender Wert) · v4390a PDF-Diagramme hinter DpVorschau grafiken_neu (vorschau-pruefen grün) · v4390b PDF-Überschriften Gesamtbewertung / Stärken / Schwächen / Was für die Finanzierung spricht.
+- **Commit:** main f81fec2d (aus staging f9b862ba, 5704c964, 2c00c79d), Merge main → staging eded6934.
+- **Nachweis:** mietpotenzial 311, steuerjahr 36, prompt-lecks, grafiken-neu 49, vorschau sauber, Buster sauber, Gold-Audit Staging RC 0; Sicherungen 20261124-0830 mit Kopf; Prod backend healthy, Buster v4390/v4390b ausgeliefert.
+- **Rest:** Score-Eingang wp_kpi nutzt weiter das Formularfeld (Rückfrage) · echte PDF-Dateien nicht erzeugt, nur HTML der Fassungen geprüft.
