@@ -11,7 +11,7 @@
  *
  * Teile:
  *   verbindungKarte(host)   Einstellungen › Konto › Externe Anbieter: Token eintragen, Test-Abruf, Liste
- *   Leiste am Objekt        #vivi-leiste im Reiter Objekt, nur verknuepft: Status, abgleichen, loesen (v4400)
+ *   aktionen()              Stand und Knoepfe fuer Objekt-Cockpit › ViVi und Deal-Aktion (v4510, vorher Leiste im Reiter Objekt)
  *   Vorschau-Fenster        #vivi-ov: Werte, Hinweise, fehlende Angaben, Account, Bestaetigung
  * Kundentexte ohne Gedankenstrich und Semikolon, keine Datenquellennamen.
  * ═════════════════════════════════════════════════════════════════════════════════════════════════ */
@@ -185,46 +185,46 @@
     });
   }
 
-  /* ── Leiste am Objekt ────────────────────────────────────────────── */
-  function leisteHost() {
-    var l = $('vivi-leiste');
-    if (l) return l;
-    var kopf = $('oe-kopf'), s0 = $('s0');
-    if (!s0) return null;
-    l = document.createElement('div'); l.id = 'vivi-leiste'; l.className = 'vivi-leiste';
-    if (kopf && kopf.parentNode) kopf.parentNode.insertBefore(l, kopf.nextSibling); else s0.insertBefore(l, s0.firstChild);
-    return l;
-  }
-  function leiste() {
-    var l = leisteHost(); if (!l) return;
+  /* ── Stand und Aktionen (v4510) ─────────────────────────────────────
+     Marcel 24.11.2026: „Im Tab Objekt kann auf jeden Fall diese ViVi-Pille raus. Abgleich mit ViVi, jetzt abgleichen,
+     alles selbst festlegen, Verknüpfung löschen. Das gehört nicht in diesen Tab.“ Bis v4400 stand die Leiste
+     #vivi-leiste unter dem Kopf des Reiters Objekt (nur verknüpft). Seit v4510 gibt es sie dort nicht mehr. Stand und
+     Aktionen stehen jetzt an zwei Stellen, beide aus aktionen():
+       · Objekt-Cockpit › ViVi, Zeile unter dem Kopf (js/vivi-reiter.js)
+       · Deal-Aktion unter Gewonnen (js/buchhaltung-verbinden.js, Anbieter-Feld aktionen)
+     Die ausgegrauten Felder erklären sich weiter selbst (Schloss mit Hinweis, js/vivi-felder.js).
+     Die Knöpfe tragen data-vivi in einem Behälter mit data-vivi-akt, der Klick-Griff unten fängt sie überall. */
+  function aktionen(knopfKlasse) {
     var st = _stand || {};
-    var text, knoepfe = '';
-    if (!_key) { l.style.display = 'none'; return; }
-    l.style.display = '';
-    if (st.verknuepft) {
-      var n = Object.keys(st.felder || {}).length;
-      text = 'Mit ViVi verknüpft. ' + standText(st.letzter_abruf) + '. ' + (n ? n + ' Felder kommen aus ViVi und sind ausgegraut.' : 'Noch keine Werte gelesen.') + (st.letzter_fehler ? ' Letzter Abruf: ' + st.letzter_fehler : '');
-      if (st.info && st.info.restschuld_heute && st.info.restschuld_heute.wert != null) text += ' Restschuld laut ViVi ' + Math.round(st.info.restschuld_heute.wert).toLocaleString('de-DE') + ' €' +
-        (st.info.restschuld_heute.sondertilgung ? ' nach ' + Math.round(st.info.restschuld_heute.sondertilgung).toLocaleString('de-DE') + ' € Sondertilgung' : '') + '.';
-      /* v3996 · alle Schlösser auf einmal */
-      var ze = window.DpViviFelder && window.DpViviFelder.anzahlEigen ? window.DpViviFelder.anzahlEigen() : { alle: 0, eigen: 0 };
-      if (ze.eigen) text += ' ' + ze.eigen + ' davon legst du selbst fest.';
-      var alleKnopf = !ze.alle ? '' : (ze.eigen < ze.alle
-        ? '<button type="button" class="btn btn-sm btn-ghost" data-vivi="alle-selbst" title="Alle Werte aus ViVi in DealPilot selbst festlegen. Sie werden nicht nach ViVi übertragen.">Alle selbst festlegen</button>'
-        : '')
-        + (ze.eigen ? '<button type="button" class="btn btn-sm btn-ghost" data-vivi="alle-vivi" title="Alle eigenen Angaben verwerfen und die Werte aus ViVi übernehmen.">Alle aus ViVi übernehmen</button>' : '');
-      /* v4040 · Absprung in den Reiter ViVi der Pilot-Analyse */
-      knoepfe = (window.DpViviReiter && window.DpViviReiter.sichtbar() ? '<button type="button" class="btn btn-sm btn-gold" data-vivi="reiter">Abgleich mit ViVi</button>' : '') + '<button type="button" class="btn btn-sm btn-ghost" data-vivi="abgleichen">Jetzt abgleichen</button>' + alleKnopf + '<button type="button" class="btn btn-sm btn-ghost" data-vivi="loesen">Verknüpfung lösen</button>';
-    } else {
-      /* v4400 · Marcel 24.11.2026: „In ViVi anlegen“ und „Mit ViVi-Objekt verknüpfen“ gehören nicht in den Reiter Objekt.
-         Anlegen, Verknüpfen und Fortsetzen stehen jetzt in Deal-Aktion (js/buchhaltung-verbinden.js) und in den
-         Einstellungen › Externe Anbieter › ViVi (Objektliste). Im Reiter Objekt bleibt die Leiste nur für verknüpfte
-         Objekte, weil sie die ausgegrauten Felder erklärt. */
-      l.style.display = 'none'; l.innerHTML = ''; return;
-    }
-    l.innerHTML = '<span class="vivi-marke">ViVi</span><span class="vivi-text">' + esc(text) + '</span><span class="vivi-knoepfe">' + knoepfe + '</span>';
+    if (!_key || !st.verknuepft) return null;
+    var k = knopfKlasse || 'btn btn-sm btn-ghost';
+    var n = Object.keys(st.felder || {}).length;
+    var punkte = [];
+    punkte.push(standText(st.letzter_abruf));
+    punkte.push(n ? n + ' Felder kommen aus ViVi und sind ausgegraut' : 'noch keine Werte gelesen');
+    var ze = window.DpViviFelder && window.DpViviFelder.anzahlEigen ? window.DpViviFelder.anzahlEigen() : { alle: 0, eigen: 0 };
+    if (ze.eigen) punkte.push(ze.eigen + ' davon legst du selbst fest');
+    if (st.info && st.info.restschuld_heute && st.info.restschuld_heute.wert != null) punkte.push('Restschuld laut ViVi ' + Math.round(st.info.restschuld_heute.wert).toLocaleString('de-DE') + ' €' +
+      (st.info.restschuld_heute.sondertilgung ? ' nach ' + Math.round(st.info.restschuld_heute.sondertilgung).toLocaleString('de-DE') + ' € Sondertilgung' : ''));
+    if (st.letzter_fehler) punkte.push('Letzter Abruf: ' + st.letzter_fehler);
+    var knoepfe = '<button type="button" class="' + k + '" data-vivi="abgleichen" title="Holt den aktuellen Stand aus ViVi. Nach ViVi geht dabei nichts.">Jetzt abgleichen</button>'
+      + (ze.alle && ze.eigen < ze.alle ? '<button type="button" class="' + k + '" data-vivi="alle-selbst" title="Alle Werte aus ViVi in DealPilot selbst festlegen. Sie werden nicht nach ViVi übertragen.">Alle selbst festlegen</button>' : '')
+      + (ze.eigen ? '<button type="button" class="' + k + '" data-vivi="alle-vivi" title="Alle eigenen Angaben verwerfen und die Werte aus ViVi übernehmen.">Alle aus ViVi übernehmen</button>' : '')
+      + '<button type="button" class="' + k + '" data-vivi="loesen" title="In ViVi bleibt alles, wie es ist. Die Felder in DealPilot sind danach wieder frei.">Verknüpfung lösen</button>';
+    return { punkte: punkte, knoepfe: knoepfe };
   }
-  function leisteWeg() { var l = $('vivi-leiste'); if (l) l.style.display = 'none'; }
+  /* Neu zeichnen, wo Stand und Aktionen stehen. Die alte Leiste im Reiter Objekt wird nur noch abgeräumt. */
+  var _zeichnenT = null;
+  function leiste() {
+    leisteWeg();
+    clearTimeout(_zeichnenT);
+    _zeichnenT = setTimeout(function () {
+      try { if (window.DpViviReiter && window.DpViviReiter.mountAll) window.DpViviReiter.mountAll(); } catch (e) {}
+      try { if (window.DpBuchhaltung) window.DpBuchhaltung.zeigen(); } catch (e) {}
+      try { if (window.DealPilotCoPilotPillen && window.DealPilotCoPilotPillen.viviGruppe) window.DealPilotCoPilotPillen.viviGruppe(); } catch (e) {}
+    }, 200);
+  }
+  function leisteWeg() { var l = $('vivi-leiste'); if (l) l.remove(); }
 
   /* v4020 · jeder neue Stand geht an js/vivi-steuer-abgleich.js (Steuerjahre, Jahresabgleich, automatisch) */
   function standMelden() { try { window.dispatchEvent(new CustomEvent('dp:vivi-stand', { detail: { key: _key, stand: _stand } })); } catch (e) {} }
@@ -459,7 +459,7 @@
   }
 
   document.addEventListener('click', function (ev) {
-    var b = ev.target && ev.target.closest ? ev.target.closest('#vivi-leiste [data-vivi]') : null;
+    var b = ev.target && ev.target.closest ? ev.target.closest('[data-vivi-akt] [data-vivi]') : null;
     if (!b) return;
     ev.preventDefault();
     var was = b.getAttribute('data-vivi');
@@ -527,6 +527,7 @@
       uebernehmen: anlegen,
       verknuepfen: zuordnen,   /* v4400 · zweiter Knopf in Deal-Aktion */
       loesen: loesen,
+      aktionen: function () { var a = aktionen(); return a ? '<span data-vivi-akt="1" class="buha-akt">' + a.knoepfe + '</span>' : ''; },   /* v4510 */
       /* v4040 · Deal-Aktion nach „gewonnen“: Absprung in den Abgleich */
       abgleich: function () { if (window.DpViviReiter && window.DpViviReiter.sichtbar()) return window.DpViviReiter.oeffnen(); return false; }
     });
@@ -535,5 +536,6 @@
 
   window.DpVivi = { verbindungKarte: verbindungKarte, leiste: leiste, anlegen: anlegen, abgleichen: abgleichen, zuordnen: zuordnen, loesen: loesen, objektGeladen: objektGeladen,
     /* v4017 · der letzte Stand aus ViVi (felder, info: restschuld_heute, sondertilgungen) für den Jahresabgleich, nur lesen */
-    stand: function () { return _stand && _stand.verknuepft ? _stand : null; } };
+    stand: function () { return _stand && _stand.verknuepft ? _stand : null; },
+    aktionen: aktionen };
 })();

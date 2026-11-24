@@ -181,7 +181,7 @@ const aw = fs.readFileSync(path.join(WURZEL, 'backend/src/services/agentWerkzeug
 ['vivi_einheiten', 'vivi_belege', 'vivi_vorgaenge', 'vivi_handwerker', 'vivi_darlehen'].forEach(function (n) {
   ok(new RegExp("name: '" + n + "', stufe: 'lesen'").test(aw), 'J2 ' + n + ' steht als lesendes Werkzeug');
 });
-ok(/darf\(\{ id: ctx\.userId \}, 'vivi'\)/.test(aw), 'J3 Werkzeuge pruefen die Vorschau-Freigabe vivi');
+ok(/darf\(\{ id: ctx\.userId \}, 'vivi'\)/.test(aw) || /viviZugang'\)\.darf\(\{ id: ctx\.userId \}\)/.test(aw), 'J3 Werkzeuge pruefen den ViVi-Zugang (seit v4350 Plan-Merkmal)');   /* v4510 */
 const rv = fs.readFileSync(path.join(WURZEL, 'backend/src/routes/vivi.js'), 'utf8');
 ok(rv.indexOf("router.post('/objekt/:id/frage'") < 0, 'J4 eigene Frage-Route /objekt/:id/frage ist weg (v4190: ein Co-Pilot)');
 
@@ -218,7 +218,8 @@ ok(ke && ke.einheit === '2' && ke.einheiten.einheiten.length === 1 && ke.einheit
 ok(sauber({ roh: MIET[0] }).length > 0, 'K13 Gegenprobe: Rohdaten trügen Namen (Prüfer erkennt sie)');
 const ai = fs.readFileSync(path.join(WURZEL, 'backend/src/routes/ai.js'), 'utf8');
 const ow = ai.slice(ai.indexOf('async function _copilotObjektwissen'), ai.indexOf("router.post('/copilot'"));
-ok(ow.indexOf('copilotWissen(uid, oid, payload.message') >= 0 && ow.indexOf("_vorschau.darf({ id: uid }, 'vivi')") >= 0 && ow.indexOf('wissen.vivi = vw') >= 0, 'K14 _copilotObjektwissen legt wissen.vivi aus copilotWissen');
+/* v4510 · seit v4350 prüft der Server das Plan-Merkmal (viviZugang.darf) statt der Vorschau-Freigabe */
+ok(ow.indexOf('copilotWissen(uid, oid, payload.message') >= 0 && (ow.indexOf("_vorschau.darf({ id: uid }, 'vivi')") >= 0 || ow.indexOf('_viviZugang.darf({ id: uid })') >= 0) && ow.indexOf('wissen.vivi = vw') >= 0, 'K14 _copilotObjektwissen legt wissen.vivi aus copilotWissen');
 const fe = fs.readFileSync(path.join(WURZEL, 'frontend/js/vivi-copilot.js'), 'utf8');
 ok(fe.indexOf("apiCall") < 0 && /DealPilotBlase/.test(fe) && /dp-cp-in/.test(fe), 'K15 Reiter ViVi: keine eigene Route mehr, Beispielfragen gehen an den Co-Piloten unten');
 
