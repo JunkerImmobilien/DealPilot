@@ -1003,7 +1003,7 @@ function loadData(d) {
       try {
         var _JA0 = window.DpJahresabgleich;
         if (_JA0 && _JA0.verfuegbar && _JA0.verfuegbar() && _JA0.mountAll) {
-          aiContentEmpty.innerHTML += '<div class="dp-pa-wrap" style="margin-top:8px"><div class="dp-pa-card"><h3 style="margin:0 0 10px;font:600 16px \'Space Grotesk\',sans-serif">Jahresabgleich</h3><div data-dp-ja-host="1"></div></div></div>';
+          aiContentEmpty.innerHTML += '<div class="dp-pa-wrap" style="margin-top:8px;grid-template-columns:1fr"><div class="dp-pa-card"><h3 style="margin:0 0 10px;font:600 16px \'Space Grotesk\',sans-serif">Jahresabgleich</h3><div data-dp-ja-host="1"></div></div></div>';   /* v4350 · allein ohne Seitenleiste: eine Spalte (vorher in der 204-px-Spalte des Rasters, Musterweg 7) */
           setTimeout(function () { try { _JA0.mountAll(); } catch (e) {} }, 0);
         }
       } catch (_eJa) {}
