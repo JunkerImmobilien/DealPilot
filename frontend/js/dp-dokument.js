@@ -128,6 +128,12 @@
     '.dg{width:100%;height:auto;font-family:"JetBrains Mono",monospace}.dg .g{stroke:var(--line);stroke-width:.6}.dg .a{font-size:7px;fill:#5F5E66}',
     '.dg .l1{fill:none;stroke:var(--gold);stroke-width:1.8}.dg .l2{fill:none;stroke:var(--rot);stroke-width:1.6}.dg .l3{fill:none;stroke:var(--gruen);stroke-width:1.8}',
     '.dg .f1{fill:color-mix(in srgb,var(--gruen) 12%,#fff)}.dg .b1{fill:var(--gold)}.dg .b2{fill:var(--gruen)}.dg .b3{fill:color-mix(in srgb,var(--gold) 70%,#000)}.dg .bt{font-size:7.5px;fill:#16161A}',
+    /* v4380 · Diagramme aus dem Reiter Bewertung (grafiken-bewertung.js), feste Farben wie dort: Fläche #F8F6F1, Schrift #2A2727, Grün #3FA56C, Rot #B8625C */
+    '.dp-gb-pdf{color:#2A2727;--gb-gold:var(--wl-c9a84c,#C9A84C);--gb-gold-h:var(--wl-e8cc7a,#E8CC7A);--gb-gruen:#3FA56C;--gb-rot:#B8625C;--gb-netz:rgba(42,39,39,.10);--gb-leise:rgba(42,39,39,.62);--gb-neutral:rgba(42,39,39,.07);background:#F8F6F1;border:.2mm solid rgba(42,39,39,.10);border-radius:3mm;padding:3mm 4mm 2.5mm;margin:2mm 0 3mm;break-inside:avoid}',
+    '.dp-gb-pdf svg{display:block;width:100%;height:auto;overflow:visible}.dp-gb-pdf .gb-ax{font:400 11px "JetBrains Mono",monospace;fill:rgba(42,39,39,.62)}.dp-gb-pdf .gb-netz{stroke:rgba(42,39,39,.10);stroke-width:1}',
+    '.dp-gb-pdf .gb-schw{stroke-width:1;stroke-dasharray:4 3}.dp-gb-pdf .gb-lab{font:600 10.5px Inter,sans-serif}.dp-gb-pdf .gb-wert{font:600 11px "JetBrains Mono",monospace;fill:#2A2727}.dp-gb-pdf .gb-zone{fill-opacity:.07}',
+    '.dp-gb-pdf .gb-ezb{stroke:var(--wl-c9a84c,#C9A84C);stroke-width:1;stroke-dasharray:3 3}.dp-gb-pdf .gb-linie{fill:none;stroke-width:2;stroke-linejoin:round;stroke-linecap:round}',
+    '.dp-gb-pdf .gb-leg{display:flex;flex-wrap:wrap;gap:1mm 4mm;margin:2mm 0 0;font:400 7.6pt Inter,sans-serif;color:rgba(42,39,39,.62)}.dp-gb-pdf .gb-leg i{display:inline-block;width:14px;height:2px;margin-right:5px;vertical-align:3px}.dp-gb-pdf .gb-leg i.d{border-top:1px dashed currentColor;height:0;background:none}',
     '.legende{display:flex;gap:5mm;font-size:7.4pt;color:var(--muted);margin-top:1mm}.legende i{display:inline-block;width:3mm;height:1mm;margin-right:1.2mm;vertical-align:middle}',
     /* Energieskala */
     '.ek{margin:3mm 0 1mm}.ek-band{display:grid;grid-template-columns:repeat(9,1fr);gap:.8mm;height:11mm}',
