@@ -40,6 +40,8 @@
       '#da-buchhaltung:empty{display:none}',
       '#da-buchhaltung .buha-zeile{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:10px 0 0;padding:10px 12px;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 35%, transparent);border-radius:10px;font:400 12.5px/1.45 Inter,system-ui,sans-serif}',
       '#da-buchhaltung .buha-txt{flex:1 1 240px;min-width:0}',
+      /* v4400 · gemessen: die Deal-Aktion färbt jeden Knopf weiß (wie „Stand neu nehmen“). Der Hauptknopf bleibt Gold (Whitelabel-Token). */
+      '#da-buchhaltung .buha-zeile .btn-gold{background:linear-gradient(110deg,var(--wl-e8cc7a, #E8CC7A),var(--wl-c9a84c, #C9A84C) 55%,var(--wl-b8932f, #b8932f)) !important;color:#1a1407 !important;border-color:transparent !important}',
       '#da-buchhaltung .buha-marke{font:600 10.5px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;opacity:.75;margin-right:6px}'
     ].join('');
     document.head.appendChild(s);
