@@ -194,5 +194,54 @@ melde(r.ok && ov[2025].sonst_bewegl_wg === 3570 && ov[2025].erhaltungsaufwand ==
 /* Gegenprobe: ohne Abzug im Quellposten waere die Summe gewachsen */
 melde(ov[2025].erhaltungsaufwand + ov[2025].hausverwaltung + ov[2025].sonst_bewegl_wg === 1050 + 1680 + 3570, 'F18 Gegenprobe Summe der Ziele', ov[2025]);
 
+/* ── G · v4340b Zinsbelege gegen den Tilgungsplan (Marcel 24.11.2026) ── */
+try { vm.runInContext(fs.readFileSync(path.join(WURZEL, 'frontend/js/beleg-import.js'), 'utf8'), sandbox, { filename: 'beleg-import.js' }); }
+catch (e) { console.log('FEHL  beleg-import.js laedt nicht: ' + e.message); process.exit(1); }
+const BI = sandbox.DealPilotBelegImport;
+melde(!!BI && typeof BI._pruefstand === 'function', 'G0 Beleg-Import mit Pruefstand geladen', null);
+/* Jahreszins laut Tilgungsplan 4.624,28 € (Demostrasse 2025), kein eigener Wert */
+ov = { 2025: {} }; auto = { schuldzinsen: 4624.28 }; gesperrt = false;
+sandbox.dpWkJahre = () => [2025];
+setzeEingang([]);
+EIN.txStart = EIN.txStart || (() => {});
+const zeile = (name, pos, betrag, datum) => ({ name, beschreibung: pos, brutto: betrag, netto: betrag, ust: 0, jahr: 2025, datum, kategorie: 'Schuldzinsen', keep: true, pruefen: [] });
+let plan = JSON.parse(JSON.stringify(BI._pruefstand([zeile('bank-q1.pdf', 'Zinsen 1. Quartal 2025', 1156.07, '31.03.2025')])));
+const zz = plan.zeilen.find((z) => z.feld === 'schuldzinsen');
+melde(zz && zz.zins === true && Math.abs(zz.neu - 4624.28) < 0.01, 'G1 Vorschau beim Einlesen: Quartalsbeleg, angesetzt bleibt 4.624,28 €', zz);
+BI.apply();
+melde(ov[2025].schuldzinsen === undefined, 'G2 Quartalsbeleg senkt den Jahreswert nicht mehr (kein eigener Wert gesetzt)', ov[2025]);
+const bz = buchungen().filter((b) => b.feld === 'schuldzinsen');
+melde(bz.length === 1 && bz[0].betrag === 1156.07, 'G3 der Zinsbeleg ist als Buchung gemerkt', bz);
+let zp = JSON.parse(JSON.stringify(BAV.zinsPruefung(2025)));
+melde(zp.lage === 'teil' && zp.quartale.join() === '1' && zp.angesetzt === 4624.28 && /Q1 belegt, 1\.156,07 € von 4\.624,28 €/.test(zp.text), 'G4 Pruefung: „Q1 belegt, 1.156,07 € von 4.624,28 €“, Tilgungsplan angesetzt', zp);
+melde(!BAV.zinsWahl(2025, 'belege').ok && ov[2025].schuldzinsen === undefined, 'G5 nicht abgedeckt: Belege lassen sich nicht ansetzen', ov[2025]);
+/* Zweites Quartal per Halbjahresauszug, dann Q3 und Q4 */
+setzeEingang(buchungen().concat([{ jahr: 2025, feld: 'schuldzinsen', betrag: 1156.07, position: 'Zinsen April bis Juni', datei: 'bank-q2.pdf' }]));
+zp = BAV.zinsPruefung(2025);
+melde(zp.lage === 'teil' && /Q1 bis Q2 belegt, 2\.312,14 €/.test(zp.text), 'G6 „Q1 bis Q2 belegt, 2.312,14 € von 4.624,28 €“', zp.text);
+setzeEingang(buchungen().concat([{ jahr: 2025, feld: 'schuldzinsen', betrag: 1150, position: 'Zinsabrechnung', datum: '2025-09-30', datei: 'bank-q3.pdf' }, { jahr: 2025, feld: 'schuldzinsen', betrag: 1140, position: 'Zinsen 4. Quartal', datei: 'bank-q4.pdf' }]));
+zp = JSON.parse(JSON.stringify(BAV.zinsPruefung(2025)));
+melde(zp.voll && zp.lage === 'waehlen' && Math.abs(zp.summe - 4602.14) < 0.005 && zp.angesetzt === 4624.28, 'G7 ganzes Jahr belegt (Q3 aus dem Belegdatum), weicht ab: Wahl, bis dahin Tilgungsplan', zp);
+let w = BAV.zinsWahl(2025, 'belege');
+melde(w.ok && ov[2025].schuldzinsen === 4602.14 && BAV.zinsPruefung(2025).lage === 'gewaehlt', 'G8 Wahl „Belege“: 4.602,14 € angesetzt, Hinweis bleibt als entschieden', ov[2025]);
+w = BAV.zinsWahl(2025, 'plan');
+melde(w.ok && ov[2025].schuldzinsen === undefined && BAV.zinsPruefung(2025).angesetzt === 4624.28, 'G9 Wahl „Tilgungsplan“: eigener Wert faellt weg', ov[2025]);
+gesperrt = true;
+melde(!BAV.zinsWahl(2025, 'belege').ok && ov[2025].schuldzinsen === undefined, 'G10 festgeschriebenes Jahr: keine Wahl', ov[2025]);
+gesperrt = false;
+/* Altbestand: ein frueher eingelesener Beleg hat den Jahreswert ersetzt */
+setzeEingang([{ jahr: 2025, feld: 'schuldzinsen', betrag: 1156.07, position: 'Zinsen 1. Quartal', datei: 'bank-q1.pdf' }]);
+ov[2025].schuldzinsen = 1156.07;
+zp = BAV.zinsPruefung(2025);
+melde(zp.lage === 'alt_gesenkt', 'G11 Altbestand erkannt: Jahreszins durch Quartalsbeleg gesenkt', zp);
+w = BAV.zinsWahl(2025, 'plan');
+melde(w.ok && ov[2025].schuldzinsen === undefined, 'G12 Altbestand: „Tilgungsplan ansetzen“ stellt 4.624,28 € wieder her', ov[2025]);
+melde(BAV.quartale({ position: 'Jahreszinsbescheinigung 2025' }).join() === '1,2,3,4' && BAV.quartale({ position: 'Zinsen' }).length === 0, 'G13 Jahresbescheinigung = ganzes Jahr, ohne Angabe = nicht erkannt', null);
+/* Gegenprobe: andere Kategorien werden weiter addiert */
+ov = { 2025: { erhaltungsaufwand: 100 } };
+BI._pruefstand([Object.assign(zeile('maler.pdf', 'Malerarbeiten', 420, '01.05.2025'), { kategorie: 'Erhaltungsaufwand / Reparatur' })]);
+BI.apply();
+melde(ov[2025].erhaltungsaufwand === 520, 'G14 Gegenprobe: Erhaltung wird weiter addiert (100 + 420)', ov[2025]);
+
 console.log('unterlagen-steuer-pruefen: ' + (geprueft - fehler) + ' von ' + geprueft + ' ok');
 process.exit(fehler ? 1 : 0);

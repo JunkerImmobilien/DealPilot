@@ -726,6 +726,10 @@
       Object.keys(jeJahr[j]).forEach(function (f) {
         var st = (typeof window.dpWkStand === 'function') ? window.dpWkStand(j, f) : { override: null, auto: null };
         var b = jeJahr[j][f];
+        /* v4340b · Marcel 24.11.2026: Zinsbelege ersetzen den Jahreszins aus dem Tilgungsplan nicht mehr. Gemessen: ein
+           Quartalsauszug machte aus 4.624 € Jahreszins 1.156 €. Angesetzt bleibt der Wert der Anlage V, der Beleg wird
+           gemerkt und in „Belege je Jahr“ gegen den Tilgungsplan geprüft (belege-anlage-v.js zinsPruefung). */
+        if (f === 'schuldzinsen') { zeilen.push({ jahr: j, feld: f, label: LABELS_WK[f] || f, betrag: b, override: st.override, auto: st.auto, zins: true, neu: st.override != null ? st.override : (st.auto || 0) }); return; }
         zeilen.push({ jahr: j, feld: f, label: LABELS_WK[f] || f, betrag: b, override: st.override, auto: st.auto, neu: st.override != null ? st.override + b : b });
       });
     });
@@ -739,6 +743,7 @@
       var p = _planWk(); n = p.zeilen.length;
       h = '<table><thead><tr><th>Wohin</th><th class="num">bisher</th><th class="num">aus den Belegen</th><th class="num">neu</th></tr></thead><tbody>'
         + (p.zeilen.map(function (z) {
+            if (z.zins) return '<tr><td><b>Steuer ' + z.jahr + '</b> · ' + _esc(z.label) + '</td><td class="num">' + eur(z.neu) + '<div class="bi-k">' + (z.override != null ? 'eingetragen' : 'aus dem Tilgungsplan') + '</div></td><td class="num">' + eur(z.betrag) + '<div class="bi-k">wird geprüft, nicht addiert</div></td><td class="num"><b>' + eur(z.neu) + '</b><div class="bi-k">bleibt angesetzt</div></td></tr>';   /* v4340b */
             var bisher = z.override != null ? eur(z.override) + '<div class="bi-k">eingetragen – wird addiert</div>'
               : (z.auto > 0 ? eur(z.auto) + '<div class="bi-k">Schätzung der App – der Beleg ersetzt sie</div>' : '–');
             return '<tr><td><b>Steuer ' + z.jahr + '</b> · ' + _esc(z.label) + '</td><td class="num">' + bisher + '</td><td class="num">' + (z.betrag < 0 ? '− ' : '+ ') + eur(Math.abs(z.betrag)) + '</td><td class="num"><b>' + eur(z.neu) + '</b></td></tr>';
@@ -1141,7 +1146,9 @@
     var _E = window.DpEingang && window.DpEingang.txStart ? window.DpEingang : null;   /* v3154 · für „Zurücknehmen" */
     if (_E) _E.txStart();
     Object.keys(p.jeJahr).forEach(function (j) {
-      var r = window.dpWkUebernehmen(parseInt(j, 10), p.jeJahr[j], 'add');
+      var _pj = {}; Object.keys(p.jeJahr[j]).forEach(function (f) { if (f !== 'schuldzinsen') _pj[f] = p.jeJahr[j][f]; });   /* v4340b · Zinsen nur prüfen */
+      if (!Object.keys(_pj).length) return;
+      var r = window.dpWkUebernehmen(parseInt(j, 10), _pj, 'add');
       if (r && r.ok) n += r.anzahl;
     });
     try {
@@ -1161,7 +1168,8 @@
         uebernommen: p.zeilen.map(function (z) { return 'Steuer ' + z.jahr + ' · ' + z.label + ': ' + (z.override != null ? _fmtEur(z.override) + ' € → ' : '') + _fmtEur(z.neu) + ' € (' + (z.betrag < 0 ? '−' : '+') + _fmtEur(Math.abs(z.betrag)) + ' €)'; }),
         nicht_gelesen: _leer.map(function (x) { return x.name; }) });
     } catch (e) {}
-    try { if (window.toast) window.toast('✓ ' + n + (n === 1 ? ' Wert' : ' Werte') + ' in den Reiter Steuer übernommen.'); } catch (e) {}
+    var _zinsB = p.zeilen.some(function (z) { return z.zins; });   /* v4340b */
+    try { if (window.toast) window.toast('✓ ' + n + (n === 1 ? ' Wert' : ' Werte') + ' in den Reiter Steuer übernommen.' + (_zinsB ? ' Zinsbelege sind gemerkt und werden in „Belege je Jahr“ gegen den Tilgungsplan geprüft.' : '')); } catch (e) {}
     /* v3163 · keine Ablage der Originale (Marcel: nur auslesen, nichts speichern) */
     close();
   }
@@ -1195,6 +1203,8 @@
     /* v3120 · der gemeinsame Eingang (unterlagen-eingang.js) übergibt erkannte Rechnungen direkt */
     oeffnenMit: function (files, modus) { open(modus || 'wk'); if (files && files.length) setTimeout(function () { _onPick(files); }, 50); },
     _keep: _keep, _kat: _kat,
+    /* v4340b · nur Prüfstand (tools/unterlagen-steuer-pruefen.mjs): Positionen setzen, als von Hand bestätigt */
+    _pruefstand: function (rows) { _modus = 'wk'; _rows = rows; _geprueft = {}; rows.forEach(function (r) { _geprueft[r.name] = true; }); return _planWk(); },
     /* v3154 */ bilder: _fileToImages, _ansehen: _ansehen, _ansehenLeer: _ansehenLeer, /* v3155 */ _waehle: _waehle, /* v3156 */ _pruefung: _pruefung, _betragSetzen: _betragSetzen, /* v3166 */ _bildLesen: _bildLesen
   };
 })();

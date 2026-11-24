@@ -24,8 +24,8 @@
 
    FEST (nicht umbuchbar, weder Quelle noch Ziel)
      afa           kommt aus der AfA-Konfiguration, nie aus einem Beleg
-     schuldzinsen  kommt aus dem Tilgungsplan. Ein Beleg dorthin würde den
-                   Jahreswert der App ERSETZEN (dpWkUebernehmen ohne eigenen
+     schuldzinsen  kommt aus dem Tilgungsplan. Bis v4340b hätte ein Beleg dorthin den
+                   Jahreswert der App ERSETZT (dpWkUebernehmen ohne eigenen
                    Wert), ein Quartalsauszug also das ganze Jahr.
 
    SPERREN
@@ -37,7 +37,7 @@
    ═════════════════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
-  var VERSION = 'v4340';
+  var VERSION = 'v4340b';
 
   var FEST = { afa: 1, schuldzinsen: 1 };
   /* Ziele einer Umbuchung, in der Reihenfolge der Blöcke. Beschriftung wie POSTEN in unterlagen-eingang.js */
@@ -123,6 +123,83 @@
     f.value = JSON.stringify(o);
     try { f.dispatchEvent(new Event('input', { bubbles: true })); f.dispatchEvent(new Event('change', { bubbles: true })); } catch (e) {}
     return true;
+  }
+
+  /* ── v4340b · Zinsbelege gegen den Tilgungsplan ─────────────────────────
+     Marcel 24.11.2026 („ja"): ein Zinsbeleg ersetzt den Jahreszins nicht mehr. Die Belege eines Jahres werden
+     addiert, ihre Quartale bestimmt und gegen den Jahreszins aus dem Tilgungsplan (dpWkStand auto) geprüft.
+     Angesetzt bleibt der Tilgungsplan, solange die Belege nicht alle vier Quartale abdecken. Decken sie das Jahr ab
+     und weichen um mehr als 1 € ab: Hinweis mit beiden Zahlen und Wahl. Die Wahl liegt in _dok_eingang.zinsWahl. */
+  var MONATE = ['januar', 'februar', 'märz', 'april', 'mai', 'juni', 'juli', 'august', 'september', 'oktober', 'november', 'dezember'];
+  function quartale(b) {
+    var t = String([b.position, b.datei, b.kategorie].join(' ')).toLowerCase().replace(/maerz|marz/g, 'märz'), q = {};
+    if (/jahreszins|jahresbescheinigung|jahresabschluss|ganzj[äa]hrig|gesamtjahr|01\.01\.\d{0,4}\s*(bis|-|–)\s*31\.12\./.test(t)) return [1, 2, 3, 4];
+    var m, re = /([1-4])\.\s*quartal|\bq\s?([1-4])\b|quartal\s*([1-4])/g;
+    while ((m = re.exec(t))) q[Number(m[1] || m[2] || m[3])] = 1;
+    if (/1\.\s*halbjahr|erstes halbjahr/.test(t)) { q[1] = q[2] = 1; }
+    if (/2\.\s*halbjahr|zweites halbjahr/.test(t)) { q[3] = q[4] = 1; }
+    var mon = []; MONATE.forEach(function (n, i) { if (t.indexOf(n) >= 0) mon.push(i); });
+    if (mon.length >= 2 && /\bbis\b/.test(t)) { for (var i = Math.min.apply(null, mon); i <= Math.max.apply(null, mon); i++) q[Math.floor(i / 3) + 1] = 1; }
+    else mon.forEach(function (i) { q[Math.floor(i / 3) + 1] = 1; });
+    var k = Object.keys(q).map(Number);
+    if (k.length) return k.sort();
+    var d = String(b.datum || ''), mm = /^\d{4}-(\d{2})/.exec(d) || /^\d{1,2}\.(\d{1,2})\./.exec(d);
+    return mm ? [Math.floor((Number(mm[1]) - 1) / 3) + 1] : [];
+  }
+  function qText(q) {
+    if (!q.length) return 'Zeitraum nicht erkannt';
+    if (q.length === 4) return 'ganzes Jahr belegt';
+    var teile = [], a = q[0], v = q[0];
+    for (var i = 1; i <= q.length; i++) { if (q[i] === v + 1) { v = q[i]; continue; } teile.push(a === v ? 'Q' + a : 'Q' + a + ' bis Q' + v); a = v = q[i]; }
+    return teile.join(', ') + ' belegt';
+  }
+  function zinsPruefung(jahr) {
+    var j = Number(jahr), o = lesen(), B = (o.buchungen || []).filter(function (b) { return Number(b.jahr) === j && b.feld === 'schuldzinsen'; });
+    var st = { override: null, auto: null }; try { st = window.dpWkStand(j, 'schuldzinsen'); } catch (e) {}
+    var plan = r2(st.auto), summe = r2(B.reduce(function (s, b) { return s + zahl(b.betrag); }, 0)), q = {};
+    B.forEach(function (b) { quartale(b).forEach(function (x) { q[x] = 1; }); });
+    var ql = Object.keys(q).map(Number).sort(), voll = ql.length === 4;
+    var wahl = ((o.zinsWahl || {})['y' + j]) || null;
+    if (wahl && (Math.abs(r2(wahl.summe) - summe) > 0.005 || Math.abs(r2(wahl.plan) - plan) > 0.5)) wahl = null;   /* Zahlen geändert: neu entscheiden */
+    var angesetzt = st.override != null ? r2(st.override) : plan;
+    var abw = voll && Math.abs(summe - plan) > 1;
+    var r = { jahr: j, belege: B.length, summe: summe, plan: plan, quartale: ql, voll: voll, abw: abw, wahl: wahl ? wahl.wahl : null, angesetzt: angesetzt, eigen: st.override != null };
+    r.text = !B.length ? '' : qText(ql) + ', ' + eur(summe) + ' von ' + eur(plan) + ' laut Tilgungsplan.';
+    if (!B.length) r.lage = 'ohne';
+    else if (!voll) r.lage = st.override != null && r2(st.override) + 0.5 < plan ? 'alt_gesenkt' : 'teil';
+    else if (!abw) r.lage = 'gleich';
+    else r.lage = r.wahl ? 'gewaehlt' : 'waehlen';
+    return r;
+  }
+  /** Wahl bei Abweichung: 'belege' setzt die Summe der Belege an, 'plan' den Tilgungsplan (eigener Wert fällt weg). */
+  function zinsWahl(jahr, wahl) {
+    var z = zinsPruefung(jahr), j = z.jahr;
+    if (wahl !== 'belege' && wahl !== 'plan') return { ok: false, grund: 'Unbekannte Wahl.' };
+    if (wahl === 'belege' && !z.voll) return { ok: false, grund: 'Die Belege decken das Jahr nicht ab. Angesetzt bleibt der Tilgungsplan.' };
+    if (window.DpJahresbuch && typeof window.DpJahresbuch.aenderungErlaubt === 'function' && !window.DpJahresbuch.aenderungErlaubt(j)) return { ok: false, grund: 'Das Jahr ' + j + ' ist festgeschrieben.' };
+    if (typeof window._setYearOverride !== 'function') return { ok: false, grund: 'Steuer-Modul nicht geladen.' };
+    var E = window.DpEingang && window.DpEingang.txStart ? window.DpEingang : null;
+    if (E) E.txStart();
+    window._setYearOverride(j, 'schuldzinsen', wahl === 'belege' ? z.summe : '');
+    var aend = E ? E.txEnde() : [];
+    var o = lesen(); o.zinsWahl = o.zinsWahl || {};
+    o.zinsWahl['y' + j] = { wahl: wahl, summe: z.summe, plan: z.plan, am: new Date().toISOString().slice(0, 10) };
+    schreiben(o);
+    var txt = 'Steuer ' + j + ' · Schuldzinsen: ' + (wahl === 'belege' ? 'Belege ' + eur(z.summe) + ' angesetzt statt Tilgungsplan ' + eur(z.plan) : 'Tilgungsplan ' + eur(z.plan) + ' angesetzt');
+    try { if (E && E.protokoll) E.protokoll({ quelle: 'Zinsprüfung', aenderungen: aend, uebernommen: [txt] }); } catch (e) {}
+    ['renderYearlyTaxForm', 'renderTaxTimeline', 'renderTaxModule'].forEach(function (f) { try { if (typeof window[f] === 'function') window[f](); } catch (e) {} });
+    try { if (typeof window.calc === 'function') setTimeout(window.calc, 60); } catch (e) {}
+    return { ok: true, text: txt };
+  }
+  function zinsHtml(jahr) {
+    var z = zinsPruefung(jahr); if (z.lage === 'ohne') return '';
+    var k = function (w, t) { return '<button type="button" data-bav-zins="' + w + '" data-bav-jahr="' + z.jahr + '">' + t + '</button>'; };
+    if (z.lage === 'teil') return '<div class="bj-hin">' + esc(z.text) + ' Angesetzt bleibt der Tilgungsplan, bis die Belege das ganze Jahr abdecken.</div>';
+    if (z.lage === 'alt_gesenkt') return '<div class="bj-hin bj-warn">' + esc(z.text) + ' Ein früher eingelesener Beleg hat den Jahreszins auf ' + eur(z.angesetzt) + ' gesenkt. <div class="bav-um">' + k('plan', 'Tilgungsplan ' + eur(z.plan) + ' ansetzen') + '</div></div>';
+    if (z.lage === 'gleich') return '<div class="bj-hin">' + esc(z.text) + ' Belege und Tilgungsplan stimmen überein.</div>';
+    var hin = esc(z.text) + ' Die Belege weichen um ' + eur(Math.abs(z.summe - z.plan)) + ' ab.';
+    if (z.lage === 'gewaehlt') return '<div class="bj-hin">' + hin + ' Angesetzt: ' + (z.wahl === 'belege' ? 'Belege' : 'Tilgungsplan') + ' ' + eur(z.angesetzt) + '. <div class="bav-um">' + k(z.wahl === 'belege' ? 'plan' : 'belege', z.wahl === 'belege' ? 'Tilgungsplan ansetzen' : 'Belege ansetzen') + '</div></div>';
+    return '<div class="bav-vs">' + hin + ' Welcher Wert gilt? <div class="bav-um">' + k('belege', 'Belege ' + eur(z.summe)) + k('plan', 'Tilgungsplan ' + eur(z.plan)) + '</div></div>';
   }
 
   /** Gruppen eines Jahres: Blöcke A bis E (und „Nicht angesetzt“) mit ihren Posten und Positionen.
@@ -248,7 +325,7 @@
             + '<span class="bj-z">' + eur(b.betrag) + '</span></div>';
         }).join('');
         var hin = p.art ? '<div class="bj-hin' + (p.rest != null && p.rest < -0.5 ? ' bj-warn' : '') + '">' + (p.rest != null && Math.abs(p.rest) >= 0.5 && p.belege.length && p.rest > 0 ? 'Übriger Betrag ' + eur(p.rest) + ': ' : '') + esc(p.art) + '</div>' : '';
-        if (p.feld === 'schuldzinsen' && p.belege.length) hin += '<div class="bj-hin bj-warn">Schuldzinsen kommen aus dem Tilgungsplan. Ein eingelesener Zinsbeleg ersetzt dort den Jahreswert der App. Deckt er nicht das ganze Jahr ab, bitte im Reiter Steuer prüfen.</div>';
+        if (p.feld === 'schuldzinsen' && p.belege.length) hin = zinsHtml(jahr);   /* v4340b */
         h += '<details' + (p.belege.length ? ' open' : '') + '><summary><span class="bj-p">' + esc(p.label) + (p.zeile != null ? '<span class="bav-z" title="Anlage V ' + jahr + ', Zeile ' + p.zeile + '">Z. ' + p.zeile + '</span>' : '')
           + '<small>' + (p.fest ? '<span class="bav-fest">' + (p.feld === 'afa' ? 'fest aus der AfA' : p.feld === 'schuldzinsen' ? 'fest aus dem Tilgungsplan' : 'fest aus Miete und Bewirtschaftung') + '</span>' : '')
           + (p.belege.length ? p.belege.length + (p.belege.length === 1 ? ' Position' : ' Positionen') : '') + '</small></span>'
@@ -262,7 +339,14 @@
   }
   /** Klicks im Rahmen von „Belege je Jahr“. neu = function () zeichnet den Rahmen neu. */
   function klick(e, neu) {
-    var t = e.target, k = t.closest && (t.closest('[data-bav-um]') || t.closest('[data-bav-vs]'));
+    var t = e.target, zk = t.closest && t.closest('[data-bav-zins]');
+    if (zk) {
+      var zr = zinsWahl(Number(zk.getAttribute('data-bav-jahr')), zk.getAttribute('data-bav-zins'));
+      _msg = zr.ok ? { ok: true, text: zr.text + '. Im Verlauf zurücknehmbar.' } : { ok: false, text: zr.grund };
+      if (typeof neu === 'function') neu();
+      return true;
+    }
+    var k = t.closest && (t.closest('[data-bav-um]') || t.closest('[data-bav-vs]'));
     if (!k) return false;
     var idx, ziel;
     if (k.hasAttribute('data-bav-um')) {
@@ -277,5 +361,5 @@
     return true;
   }
 
-  window.DpBelegeAv = { VERSION: VERSION, an: an, html: html, klick: klick, gruppen: gruppen, umbuchen: umbuchen, vorschlag: vorschlag, blockVon: blockVon, ZIELE: ZIELE, FEST: FEST };
+  window.DpBelegeAv = { VERSION: VERSION, an: an, html: html, klick: klick, gruppen: gruppen, umbuchen: umbuchen, vorschlag: vorschlag, zinsPruefung: zinsPruefung, zinsWahl: zinsWahl, quartale: quartale, blockVon: blockVon, ZIELE: ZIELE, FEST: FEST };
 })();
