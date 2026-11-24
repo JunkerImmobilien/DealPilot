@@ -71,6 +71,7 @@
      deal-action-boarding.js _mbEnginePdf, aber mit ?autopdf=bytes: die Engine schickt das PDF als Bytes zurück, statt
      es zu speichern. Zusammengefügt wird im Browser mit pdf-lib 1.17.1 (vendor/cdn, nur bei Bedarf geladen). */
   function letzterBericht(key) {
+    if (window.DpGrafikenPdf && DpGrafikenPdf.letzterBericht) return DpGrafikenPdf.letzterBericht(key);   /* v4370e · eine Stelle */
     if (!key || !window.Auth || !Auth.apiCall) return Promise.resolve(null);
     return Auth.apiCall('/marktbericht/objects/history?key=' + encodeURIComponent('dp:' + key), { method: 'GET' }).then(function (d) {
       var h = ((d && d.history) || []).filter(function (x) { return x && x.report_id; });
@@ -113,7 +114,12 @@
   /* opt.mitMarktbericht: den Bericht parallel zum Dokument erzeugen; scheitert er, kommt das Dokument allein mit Hinweis */
   function berichtVorbereiten(opt) {
     if (!opt || !opt.mitMarktbericht) return null;
-    return letzterBericht(window._currentObjKey).then(function (h) { if (!h) throw new Error('Kein Marktbericht zum Objekt'); return berichtBytes(h.report_id); });
+    /* v4370e · nur der letzte Bericht und nur, wenn er zum Objektstand passt (DpGrafikenPdf.berichtPruefen) */
+    return letzterBericht(window._currentObjKey).then(function (h) {
+      var p = window.DpGrafikenPdf && DpGrafikenPdf.berichtPruefen ? DpGrafikenPdf.berichtPruefen(h) : { ok: !!h, grund: 'Kein Marktbericht zum Objekt' };
+      if (!p.ok) throw new Error(p.grund);
+      return berichtBytes(h.report_id);
+    });
   }
 
   async function schnell(art, opt) {
@@ -129,7 +135,7 @@
     var blob = await r.blob(), name = dateiname(r, art);
     if (opt && opt._mb) {   /* v4370 · Kombi */
       try { blob = await anhaengen(blob, await opt._mb); name = name.replace(/\.pdf$/i, '') + '-mit-Marktbericht.pdf'; }
-      catch (e) { hinweis('Marktbericht konnte nicht angehängt werden (' + (e && e.message || 'Fehler') + '). Das Dokument kommt ohne ihn.'); }
+      catch (e) { hinweis('Marktbericht nicht angehängt: ' + (e && e.message || 'Fehler') + ' Das Dokument kommt ohne ihn.'); }
     }
     herunterladen(blob, name);
     return true;

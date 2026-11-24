@@ -599,7 +599,7 @@
     if (ai.fazit || ai.summary) { var fz = klar(ai.fazit || ai.summary); if (kurz && fz.length > 600) { var e2 = fz.slice(0, 600).lastIndexOf('. '); fz = e2 > 200 ? fz.slice(0, e2 + 1) : fz.slice(0, 600) + ' …'; } h += '<div class="hinweis">' + B.esc(fz) + '</div>'; }
     return h + '<p class="det">Erzeugt von einem Sprachmodell aus den erfassten Angaben – eine Einschätzung, keine Beratung.</p>';
   }
-  function annahmenVoll(K, B, kurz) {
+  function annahmenVoll(K, B, kurz, ohneBericht) {   /* v4370e · ohneBericht: Wert-Anker aus einem unpassenden Bericht nicht nennen */
     var S = St(), dg = null; try { dg = window.DpDetailgrad && DpDetailgrad.annahmen ? DpDetailgrad.annahmen() : null; } catch (e) {}
     var z = [['Mietentwicklung', typeof window._dpPdfMiete === 'function' ? window._dpPdfMiete().text : B.pct(zahlAus('mietstg'), 1)], ['Kostensteigerung p. a.', B.pct(zahlAus('kostenstg'), 1)],
       ['Wertsteigerung p. a.', B.pct(zahlAus('wertstg'), 1)], ['Betrachtungszeitraum', S.btj ? S.btj + ' Jahre' : '–']];
@@ -607,7 +607,7 @@
     z.push(['Anschlusszins · Anschlusstilgung (Annahme)', B.pct(zahlAus('anschl_z'), 2) + ' · ' + B.pct(zahlAus('anschl_t'), 2)], ['Persönlicher Grenzsteuersatz', B.pct(zahlAus('grenz'), 2)],
       ['Gebäudeanteil am Kaufpreis', B.pct(zahlAus('geb_ant'), 0)], ['AfA-Satz Gebäude', zahlAus('afa_satz') != null ? B.pct(zahlAus('afa_satz'), 2) : (feld('afa_satz') || '–')], ['Grunderwerbsteuer (Land)', B.pct(zahlAus('gest_p'), 2)]);
     if (zahlAus('exit_bmy') != null) z.push(['Exit-Rendite (Verkaufsszenario)', B.pct(zahlAus('exit_bmy'), 1)]);
-    if (da(S.wert_basis) !== null && S.wert_basis !== K.kp) z.push(['Wert-Anker der Wertsteigerung', (S.wert_basis_text || (zahlAus('svwert') ? 'Verkehrswert' : 'Bankbewertung')) + ' · ' + B.eur(S.wert_basis)]);
+    if (!(ohneBericht && /Marktbericht/.test(S.wert_basis_text || '')) && da(S.wert_basis) !== null && S.wert_basis !== K.kp) z.push(['Wert-Anker der Wertsteigerung', (S.wert_basis_text || (zahlAus('svwert') ? 'Verkehrswert' : 'Bankbewertung')) + ' · ' + B.eur(S.wert_basis)]);
     if (K.d1IsAussetzung) z.push(['Darlehenstyp', 'Tilgungsaussetzung mit Bausparvertrag']);
     var h = '<div class="block"><h3>Annahmen</h3>' + B.liste(z) + '</div>';
     if (dg && dg.stufe < 3 && (dg.zeilen.length || dg.neutral || dg.weitere)) {
@@ -645,7 +645,11 @@
     /* v4370 · Grafiken */
     var GXL = kurz ? ['fahrplan', 'einordnung', 'finger', 'mieteuro', 'steuer', 'heatKompakt']
       : ['fahrplan', 'einordnung', 'finger', 'ziel', 'mieteuro', 'steuer', 'heat', 'wertverlauf', 'faecher', 'markt', 'lage', 'hebel', 'ausstieg'].concat(voll ? ['hausgeld'] : []);
-    var GX = null; try { if (window.DpGrafikenPdf) GX = await Promise.race([DpGrafikenPdf.karten(GXL, { halb: ['finger', 'markt', 'lage', 'hebel', 'ausstieg'] }), new Promise(function (f) { setTimeout(function () { f(null); }, 20000); })]); } catch (e) { GX = null; }
+    /* v4370e · nur der LETZTE Marktbericht und nur, wenn er zum heutigen Objektstand passt (grafiken-pdf.js berichtPruefen).
+       Passt er nicht: keine Wertzahl aus ihm, Wert-Seite mit Hinweis „Marktbericht neu abrufen“. */
+    var BP = null; try { if (window.DpGrafikenPdf && DpGrafikenPdf.letzterBericht) BP = DpGrafikenPdf.berichtPruefen(await DpGrafikenPdf.letzterBericht()); } catch (e) { BP = null; }
+    var ohneBericht = !!(BP && !BP.ok && BP.bericht);
+    var GX = null; try { if (window.DpGrafikenPdf) GX = await Promise.race([DpGrafikenPdf.karten(GXL, { halb: ['finger', 'markt', 'lage', 'hebel', 'ausstieg'], ohneBericht: ohneBericht }), new Promise(function (f) { setTimeout(function () { f(null); }, 20000); })]); } catch (e) { GX = null; }
     var g = function (n) { return (GX && GX.html && GX.html[n]) || ''; };
     /* v4370 · Im Bestand sind Cashflow v. St. und n. St. die Zeile des Steuerjahres (calc.js v3314a), Miete, Zins und Tilgung
        aber die Eingaben. Gemessen Demostraße 5: Betriebsergebnis 6.562 − 7.250 = −688, die Kette zeigte −1.216. Der Cashflow-Weg
@@ -669,6 +673,11 @@
       if (voll && galerie) S.push(B.seite(c, 'Ansichten', B.abschnitt(ab(), 'Ansichten und Energie') + galerie + (feld('ds2_energie') ? '<h3>Energieeffizienz</h3>' + B.energieSkala(feld('ds2_energie')) : '')));
     };
     var wertSeite = function (karteDazu) {
+      if (ohneBericht) {   /* v4370e */
+        S.push(B.seite(c, 'Wert', B.abschnitt(ab(), 'Wert des Objekts', 'Nach den Verfahren der Immobilienwertermittlung')
+          + '<div class="hinweis">' + B.esc(BP.grund) + ' Bis dahin enthält dieses Dokument keine Werte aus dem Marktbericht.</div>'));
+        return;
+      }
       var wz = wertZielbild(K, B, WZ, PD, kurz || kompakt, bank);
       if (!wz && !karteDazu) return;
       var mitZiel = WZ ? !WZ.ohneZiel : !!(PD && PD.hat_ziel !== false);
@@ -713,7 +722,7 @@
     }
     var pa = pilotAnalyse(B, kurz || kompakt, bank);
     if (pa) S.push(B.seite(c, 'Pilot-Analyse', B.abschnitt(ab(), 'Pilot-Analyse') + pa));
-    S.push(B.seite(c, 'Annahmen', B.abschnitt('Anhang', 'Annahmen und Hinweise') + annahmenVoll(K, B, kurz)));
+    S.push(B.seite(c, 'Annahmen', B.abschnitt('Anhang', 'Annahmen und Hinweise') + annahmenVoll(K, B, kurz, ohneBericht)));
     return B.dokument(name + ' · ' + o.adresse, S, { css: GX ? GX.css : '' });
   }
 

@@ -271,8 +271,10 @@
     var mbCb = ov.querySelector('#dpw-mb'), mbT = ov.querySelector('#dpw-mb-t');
     if (mbCb) DpDokWeiche.letzterBericht(window._currentObjKey).then(function (h) {
       if (!document.body.contains(mbCb)) return;
-      if (h) { mbCb.disabled = false; mbT.textContent = 'Bericht vom ' + new Date(h.created_at).toLocaleDateString('de-DE') + ' wird hinten angefügt, ein PDF.'; }
-      else { mbCb.disabled = true; mbCb.parentNode.style.opacity = '.55'; mbT.textContent = 'Zu diesem Objekt gibt es noch keinen Marktbericht. Er lässt sich im Reiter Bewertung abrufen.'; }
+      /* v4370e · nur der letzte Bericht und nur, wenn er zum Objektstand passt */
+      var p = window.DpGrafikenPdf && DpGrafikenPdf.berichtPruefen ? DpGrafikenPdf.berichtPruefen(h) : { ok: !!h, grund: 'Zu diesem Objekt gibt es noch keinen Marktbericht.' };
+      if (p.ok) { mbCb.disabled = false; mbT.textContent = p.grund + ', wird hinten angefügt, ein PDF.'; }
+      else { mbCb.disabled = true; mbCb.checked = false; mbCb.parentNode.style.opacity = '.55'; mbT.textContent = h ? p.grund : 'Zu diesem Objekt gibt es noch keinen Marktbericht. Er lässt sich im Reiter Bewertung abrufen.'; }
     });
     var erste = ov.querySelector('.dpw-an') || ov.querySelector('.dpw-k');
     if (erste) erste.focus();
