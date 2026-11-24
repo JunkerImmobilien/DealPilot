@@ -104,12 +104,13 @@ c._dpMfh = { aufgeteilt: true };
 c.DpPotenzial = Object.assign({}, P, { modell: () => M, ergebnis: () => R });
 const D = W._mitAufteilung(bericht());
 const zAuf = D.verfahren.find((v) => v.schluessel === 'aufteiler'), zEw = D.verfahren.find((v) => v.schluessel === 'ertragswert');
-pruefe('D Zeile „Vergleichswert je Einheit (Summe)“ führt mit 661.000', !!zAuf && zAuf.fuehrend === true && zAuf.mitte === 661000, zAuf && zAuf.zusatz);
+/* v4580b · Marcel 24.11.2026: „Nee, der Aufteilerwert steht nur daneben.“ */
+pruefe('D Zeile „Wert nach Aufteilung“ steht daneben mit 661.000, führt nicht', !!zAuf && zAuf.fuehrend === false && zAuf.zusaetzlich === true && zAuf.mitte === 661000, zAuf && zAuf.zusatz);
 pruefe('D steht nach der Marktpreisindikation, vor dem Ertragswert', D.verfahren.map((v) => v.schluessel).join(',') === 'mpi,aufteiler,ertragswert');
-pruefe('D Ertragswert des Hauses nicht mehr „führend“, als stützend benannt', !!zEw && zEw.fuehrend === false && /stützend/.test(zEw.zusatz), zEw && zEw.zusatz);
+pruefe('D Ertragswert des Hauses bleibt führend, als maßgebend benannt', !!zEw && zEw.fuehrend === true && /Haus als Ganzes, maßgebend/.test(zEw.zusatz), zEw && zEw.zusatz);
 pruefe('D genau EINE Zeile führt', D.verfahren.filter((v) => v.fuehrend).length === 1);
 pruefe('D Wertanker unberührt (W.fuehrend bleibt ertragswert, calc.js liest _wertDaten)', D.fuehrend === 'ertragswert');
-pruefe('D Klartext: Vergleichswert je Einheit führend, alter Führungssatz ersetzt', /^In Wohnungseigentum aufgeteilt: führend ist der Vergleichswert je Einheit/.test(D.klartext) && !/Führend ist der Ertragswert/.test(D.klartext), D.klartext);
+pruefe('D Klartext: Haus maßgebend, Wert nach Aufteilung zusätzlich, Führungssatz bleibt', /^In Wohnungseigentum aufgeteilt: maßgebend ist der Wert des Hauses als Ganzes/.test(D.klartext) && /Wert nach Aufteilung/.test(D.klartext) && !/führend ist der Vergleichswert/i.test(D.klartext), D.klartext);
 pruefe('D Zusatz nennt Zahl der Wohnungen, Kosten und Unvollständigkeit', !!zAuf && /5 Wohnungen einzeln/.test(zAuf.zusatz) && /Aufteilungskosten/.test(zAuf.zusatz) && /unvollständig/.test(zAuf.zusatz));
 
 /* ── E ── ohne Haken */

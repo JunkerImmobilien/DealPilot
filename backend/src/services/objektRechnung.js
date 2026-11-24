@@ -271,7 +271,8 @@ function rechnen(daten, opt) {
   /* v4420 · Spiegel von calc.js wp_kpi (Marcel 24.11.2026): stammt die Wertangabe aus einem Marktbericht und weicht vom
      maßgebenden Objektwert ab, den die App beim Speichern als _wert_anker ablegt (Stichtag-Regel v4390), gilt dieser
      gegen den Kaufpreis. Ohne gespeicherten Anker bleibt alles wie bisher. */
-  const wak = d._wert_anker && Number(d._wert_anker.wert) > 0 ? Number(d._wert_anker.wert) : null;
+  /* v4580b · ein Anker der Art „aufteiler“ (nur 1.0.185 gespeichert) gilt nicht: Marcel „der Aufteilerwert steht nur daneben“ */
+  const wak = d._wert_anker && d._wert_anker.art !== 'aufteiler' && Number(d._wert_anker.wert) > 0 ? Number(d._wert_anker.wert) : null;
   if (wak != null && (wa2.wert || 0) > 0 && /^(marktbericht|indikation)$/.test(String(wa2.herkunft || '')) && Math.abs(wak - wa2.wert) > 1) wp = wak - kp;
   /* v4580 · Spiegel von calc.js: eine Wertangabe ohne Gutachten/Bankbewertung (Herkunft „eigene“ oder ohne Auswahl) tritt hinter den
      gespeicherten maßgebenden Wert zurück (dieselbe Rangfolge wie wert_basis). */

@@ -507,7 +507,8 @@
   function fussKnapp(B, PD) {
     var f = klar(PD.fuss || ''), A = St().wert_anker, pk = [];
     var lzs = f.match(/Liegenschaftszins (\d+,\d+ %(?: \([^)]*\))?(?: bzw\. \d+,\d+ %(?: \([^)]*\))?)?)/), jahre = f.match(/Jahre: ([^]*?)\.?\s*$/), ks = f.match(/Kappungsgrenze (\d+ %)/), vm = f.match(/Vergleichsmiete (\d+,\d+ €\/m²)/);
-    if (A && A.art) pk.push('Führend: ' + (ANKER_NAME[A.art] || 'Wert aus dem Marktbericht') + '. ' + (A.art === 'ertragswert' ? 'Die übrigen Verfahren stützen.' : A.art === 'aufteiler' ? 'Der Ertragswert des Hauses als Ganzes stützt.' : 'Der Ertragswert stützt.'));
+    var aufg = !!(PD.wert_je_wohnung && PD.wert_je_wohnung.length);
+    if (A && A.art) pk.push('Maßgebend: ' + (ANKER_NAME[A.art] || 'Wert aus dem Marktbericht') + (aufg ? ' des Hauses als Ganzes' : '') + ', führendes Verfahren.' + (aufg ? ' Der Wert nach Aufteilung (Vergleichswert je Wohnung) ist eine zusätzliche Angabe und rechnet nicht mit.' : ''));
     pk.push('Mieterhöhung: Wert zum heutigen Stichtag, Erhöhungen erst ab Wirksamkeit und abgezinst.');
     pk.push('Zielbild: Ausblick mit umgesetzten Maßnahmen, kein heutiger Verkehrswert.');
     pk.push('Marktpreisindikation: aus Angebotspreisen am Ort, sie hängt nicht an der Miete.');
@@ -522,9 +523,10 @@
     return '<p class="det">Herkunft: ' + B.esc(l.join(' · ')) + '</p>';
   }
   function ewRolle() {
-    var A = St().wert_anker, auf = A && A.art === 'aufteiler';
+    /* v4580b · aufgeteilt: das Haus als Ganzes bleibt maßgebend (Marcel: „der Aufteilerwert steht nur daneben“) */
+    var A = St().wert_anker;
     if (!A) return '';
-    return A.art === 'ertragswert' ? ' (führend)' : (auf ? ' (Haus als Ganzes, stützend)' : ' (stützend)');
+    return A.art === 'ertragswert' ? ' (Haus als Ganzes, führend)' : ' (stützend)';
   }
   function wertZielbild(K, B, WZ, PD, kurz, bank) {
     if (!WZ && !PD) return '';
@@ -802,9 +804,10 @@
       { name: 'Cashflow nach Steuern', klasse: 'l3', werte: rows.map(function (r) { return { x: Number(r.cal || r.y), y: r.cfns_y }; }) }
     ], { null: true, h: 150, fmt: function (v) { return B.zahl(v / 1000, 1) + ' T€'; }, titel: 'Cashflow je Jahr' });
   }
-  function aufteilungZeile() {
-    var A = St().wert_anker; if (!A || A.art !== 'aufteiler') return '';
-    return '<p class="det">In Wohnungseigentum aufgeteilt: Wert als Summe der Wohnungen (Vergleichswert je Wohnung nach Aufteilungskosten), das Haus als Ganzes (Ertragswert) stützt.</p>';
+  function aufWert(WZ) { return ((WZ && WZ.verfahren) || []).filter(function (v) { return v.art === 'auf' && da(v.mitte) !== null; })[0] || null; }
+  function aufteilungZeile(B, WZ) {
+    var a = aufWert(WZ); if (!a) return '';
+    return '<p class="det">In Wohnungseigentum aufgeteilt. Zusätzlich angegeben: Wert nach Aufteilung ' + B.esc(B.eur(a.mitte)) + ' (Vergleichswert je Wohnung nach Aufteilungskosten). Gerechnet wird mit dem Wert des Hauses als Ganzes.</p>';
   }
   function ersterSatz(t) { t = klar(t); var e = t.indexOf('. '); return e > 40 ? t.slice(0, e + 1) : t; }
   async function investmentMuster(art) {
@@ -831,6 +834,7 @@
     var kern9 = B.kacheln([
       mw ? { l: mw.name + ' · führend', v: B.eur(mw.wert), s: mw.det } : (mpiV ? { l: 'Marktpreisindikation', v: B.eur(mpiV.mitte), s: 'aus Angebotspreisen, kein Verkehrswert' } : null),
       { l: 'Kaufpreis', v: B.eur(K.kp), s: K.gi ? 'Gesamtinvestition ' + B.eur(K.gi) : '' },
+      aufWert(WZ) ? { l: 'Wert nach Aufteilung', v: B.eur(aufWert(WZ).mitte), s: 'zusätzliche Angabe, rechnet nicht mit' } : null,
       { l: 'Kaltmiete p. a.', v: B.eur(K.nkm_j), s: 'Bruttomietrendite ' + B.pct(K.bmy, 2) },
       { l: 'DSCR', v: B.zahl(K.dscr, 2), s: 'Schuldendienstdeckung', art: K.dscr >= 1.2 ? 'gut' : 'schlecht' },
       { l: 'LTV', v: B.pct(K.ltv, 1), s: S0.ltv_basis_label ? 'auf ' + S0.ltv_basis_label : '' },
@@ -845,7 +849,7 @@
       Sx.push(B.seite(c, 'Auf einen Blick', B.abschnitt('Kurzfassung', 'Auf einen Blick', o.adresse + ' · ' + o.art)
         + '<div class="zwei"><div>' + steck + (feld('ds2_energie') ? B.energieSkala(feld('ds2_energie')) : '') + '</div><div>'
         + (bild ? '<img class="karte" src="' + bild + '" alt="" style="height:58mm;width:100%;object-fit:cover">' : '') + '</div></div>'
-        + '<h3>Die wichtigsten Zahlen</h3>' + kern9 + aufteilungZeile()));
+        + '<h3>Die wichtigsten Zahlen</h3>' + kern9 + aufteilungZeile(B, WZ)));
       /* Punkte aus den gerechneten Zahlen, nicht aus dem KI-Text: der kann älter sein als die Zahlen (gemessen Westerfeldstr. 146:
          „Cashflow nach Steuer 6.447 €“ im Text, 4.936 € in der Kachel darüber). Eine Bank liest hier jede Zahl nach. */
       var pk = [], rk = [], sw0 = window.DealPilotSchwellen ? DealPilotSchwellen.get() : {}, dg = Number(sw0.dscrGruen) > 0 ? Number(sw0.dscrGruen) : 1.2;
@@ -878,7 +882,7 @@
       var add = function (titel, unter, html) { if (!html) return; T.push([titel, unter]); P.push([titel, html]); };
       add('Überblick', 'Deal Score, Kennzahlen, Ansprechpartner', '<div class="zwei"><div>' + B.scoreRing(SC.score, SC.label) + '</div><div>'
         + B.kacheln([{ l: 'CF n. St. Jahr 1', v: B.eurS(K.cf_ns), art: (K.cf_ns || 0) >= 0 ? 'gut' : 'schlecht' }, { l: 'CF n. St. Ende Zinsbindung', v: B.eurS(K.cf_ns_ezb) }]).replace('class="kz"', 'class="kz" style="grid-template-columns:1fr 1fr"') + '</div></div>'
-        + '<h3>Kennzahlen</h3>' + kennzahlen12(K, B, SC) + aufteilungZeile() + ansprechpartner(c, B));
+        + '<h3>Kennzahlen</h3>' + kennzahlen12(K, B, SC) + aufteilungZeile(B, WZ) + ansprechpartner(c, B));
       var gal = fotos.length > 1 ? '<h3>Objektfotos</h3><div class="galerie">' + fotos.slice(1, 5).map(function (f) { return '<img src="' + f + '" alt="">'; }).join('') + '</div>' : '';
       add('Objekt', 'Steckbrief, Ansichten, Energieeffizienz', steck + (bild ? '<img class="karte" src="' + bild + '" alt="" style="height:70mm;width:100%;object-fit:cover;margin-top:3mm">' : '') + gal
         + (feld('ds2_energie') ? '<h3>Energieeffizienz</h3>' + B.energieSkala(feld('ds2_energie')) : '') + gesellschaft(B));

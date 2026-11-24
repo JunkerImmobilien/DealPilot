@@ -439,15 +439,18 @@
     var T = a && a.aufteiler && a.aufteiler.bestand;
     if (!T || T.wert == null) return W;
     var n = a.je_wohnung.filter(function (w) { return w.art !== 'gewerbe'; }).length, mw = W.marktpreisindikation.mitte;
-    W.verfahren.forEach(function (v) { if (v.fuehrend) { v.fuehrend = false; v.zusatz = (v.zusatz ? v.zusatz + ' · ' : '') + 'Haus als Ganzes, stützend'; } });
+    /* v4580b · Marcel 24.11.2026: „Nee, der Aufteilerwert steht nur daneben.“ Das Haus als Ganzes bleibt maßgebend (führendes Verfahren
+       des Berichts, Anker in calc.js), der Vergleichswert je Wohnung ist eine zusätzliche Angabe „Wert nach Aufteilung“. Bis v4580a
+       nahm er dem Haus das „führend“ ab (seit v3322). */
+    W.verfahren.forEach(function (v) { if (v.fuehrend) v.zusatz = (v.zusatz ? v.zusatz + ' · ' : '') + 'Haus als Ganzes, maßgebend'; });
     var pos = 0; while (pos < W.verfahren.length && /^mpi/.test(W.verfahren[pos].schluessel)) pos++;
-    W.verfahren.splice(pos, 0, { schluessel: 'aufteiler', name: 'Vergleichswert je Einheit (Summe)',
+    W.verfahren.splice(pos, 0, { schluessel: 'aufteiler', name: 'Wert nach Aufteilung (Vergleichswert je Wohnung)',
       zusatz: (T.bezeichnung || 'Vergleichswert') + ' · ' + n + ' Wohnungen einzeln' + (a.kosten > 0 ? ', abzüglich Aufteilungskosten ' + eur(a.kosten) : '') + (T.vollstaendig ? '' : ' · unvollständig'),
-      unten: null, mitte: T.wert, oben: null, fuehrend: true, abw_zur_mpi_pct: rund1(abw(T.wert, mw)) });
+      unten: null, mitte: T.wert, oben: null, fuehrend: false, zusaetzlich: true, abw_zur_mpi_pct: rund1(abw(T.wert, mw)) });
     W.aufteilung = { wert: T.wert, summe: T.summe, bezeichnung: T.bezeichnung || null, n: n, kosten: a.kosten > 0 ? a.kosten : 0 };   /* v3334a · kosten fehlte: Potenzialanalyse schrieb „nach 0 € Aufteilungskosten“ (Westerfeldstr. 146, richtig 10.800 €) */
-    W.klartext = 'In Wohnungseigentum aufgeteilt: führend ist der Vergleichswert je Einheit – ' + n + ' Wohnungen einzeln bewertet, zusammen ' + eur(T.wert)
-      + (T.vollstaendig ? '' : ' (unvollständig)') + '. Der Ertragswert des Hauses als Ganzes stützt. '
-      + String(W.klartext || '').replace(/^Führend ist der [^:]*: an ihm misst sich der Preis, die übrigen Werte sind die Gegenprobe\.\s*/, '');
+    W.klartext = 'In Wohnungseigentum aufgeteilt: maßgebend ist der Wert des Hauses als Ganzes. Zusätzlich angegeben ist der Wert nach Aufteilung, '
+      + n + ' Wohnungen einzeln über den Vergleichswert bewertet, zusammen ' + eur(T.wert) + (T.vollstaendig ? '' : ' (unvollständig)') + '. '
+      + String(W.klartext || '');
     return W;
   }
 
@@ -895,17 +898,6 @@
     karteBald(false);   /* Tab Bewertung geöffnet */
   });
   global.addEventListener('dp:object-ready', function () { _hist.key = null; _hist.eintrag = null; karteBald(true); });
-  /* v4580 · der Anker (calc.js) nimmt bei aufgeteilten Häusern den Vergleichswert je Wohnung aus dem Potenzial-Lauf. Kommt der Lauf
-     nach dem Rechnen an, einmal neu rechnen - nur wenn sich der Anker dadurch ändert und kein Gutachten/keine Bankbewertung führt. */
-  global.addEventListener('dp:potenzial', function () {
-    try {
-      var S = global.State || {}; if (typeof global.calc !== 'function') return;
-      if (S.wert_basis_quelle === 'verkehrswert' && (S.svw_herkunft === 'gutachten' || S.svw_herkunft === 'bank')) return;
-      var W = mitAufteilung(wertDaten(bericht())), soll = W && W.aufteilung && W.aufteilung.wert > 0 ? W.aufteilung.wert : null;
-      var ist = S.wert_anker && S.wert_anker.art === 'aufteiler' ? S.wert_anker.wert : null;
-      if (soll != null && (ist == null || Math.abs(ist - soll) > 1)) setTimeout(function () { try { global.calc(); } catch (e) {} }, 0);
-    } catch (e) {}
-  });
   global.addEventListener('dp:potenzial', function () { karteBald(false); setTimeout(function () {
     einfachNeu();
     /* v2843 · auch die Tafel unter „Genau" auf den neuen Lauf (vorher stand dort weiter der Abruf) */

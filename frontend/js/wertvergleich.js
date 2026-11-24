@@ -122,7 +122,7 @@
        mitAufteilung, v3322). Gemessen 12.11.2026 an Westerfeldstr. 146: Reiter Bewertung „Vergleichswert je
        Einheit 985.200 € führend", hier daneben „Ertragswert führend". Nichts neu gerechnet. */
     var AUF = aufteilung();
-    if (AUF) fu = 'aufteilung';
+    /* v4580b · Marcel 24.11.2026: „Nee, der Aufteilerwert steht nur daneben.“ Das führende Verfahren des Hauses bleibt führend. */
 
     function zeile(name, sub, a, m, b, fuehrend, ohneAbw) {
       var d = ohneAbw ? null : abw(m, mw);
@@ -138,10 +138,10 @@
       + '<th>Wert</th><th>untere</th><th>Mitte / Wert</th><th>obere</th><th>zur Marktpreis&shy;indikation</th></tr></thead><tbody>';
     t += zeile('Marktpreisindikation', mitAb ? 'nach ' + pct(ab) + ' % Abschlag auf Angebotspreise' : 'aus Angebotspreisen vergleichbarer Objekte', lo, mw, hi, fu === 'vergleichswert' && vw == null);
     if (mitAb) t += zeile('ohne Abschlag', 'Angebotsniveau, wie es im Markt ausgeschrieben ist', rohLo, roh, rohHi, false);
-    if (AUF) t += zeile('Vergleichswert je Einheit (Summe)', esc(AUF.bezeichnung || 'Vergleichswert') + ' · ' + AUF.n + ' Wohnungen einzeln'
-      + (AUF.kosten > 0 ? ', abzüglich Aufteilungskosten ' + eur(AUF.kosten) : '') + (AUF.vollstaendig ? '' : ' · unvollständig'), null, AUF.wert, null, true);
+    if (AUF) t += zeile('Wert nach Aufteilung', 'zusätzliche Angabe · ' + esc(AUF.bezeichnung || 'Vergleichswert') + ' je Wohnung, ' + AUF.n + ' Wohnungen einzeln'
+      + (AUF.kosten > 0 ? ', abzüglich Aufteilungskosten ' + eur(AUF.kosten) : '') + (AUF.vollstaendig ? '' : ' · unvollständig'), null, AUF.wert, null, false);
     if (ew != null) t += zeile(/vorläufig/.test(h.ertragswert_bezeichnung || '') ? 'Ertragswert (vorläufig)' : 'Ertragswert',
-      (ewV != null ? 'Spanne aus dem Liegenschaftszins' : '') + (AUF ? (ewV != null ? ' · ' : '') + 'Haus als Ganzes, stützend' : ''), ewV, ew, ewB, fu === 'ertragswert');
+      (ewV != null ? 'Spanne aus dem Liegenschaftszins' : '') + (AUF ? (ewV != null ? ' · ' : '') + 'Haus als Ganzes' : ''), ewV, ew, ewB, fu === 'ertragswert');
     /* v2979 · Marcel 27.10.2026 (Parkstr. 9, MFH Bj 1905: Sachwert 519.125 € neben Ertragswert 425.000 € und
        Kaufpreis 395.000 €), Variante B: ohne Sachwertfaktor ist der Sachwert eine Herstellungskostenrechnung,
        keine Marktaussage. Er bleibt stehen, aber als Plausibilitaet, mit Begruendung und ohne Prozentabstand -
@@ -233,9 +233,7 @@
 
     /* ── Warum sie auseinanderliegen ── */
     var w = [];
-    if (AUF) w.push('In Wohnungseigentum aufgeteilt: führend ist der <b>Vergleichswert je Einheit</b> – ' + AUF.n + ' Wohnungen einzeln bewertet, zusammen ' + eur(AUF.wert)
-      + '. Der Ertragswert des Hauses als Ganzes stützt.');
-    else if (fu && VERF[fu]) w.push('Für dieses Objekt ist der <b>' + VERF[fu] + '</b> das führende Verfahren' + (h.fuehrend_grund ? ': ' + esc(String(h.fuehrend_grund).replace(/\.$/, '')) : '') + '. An ihm misst sich der Preis, die anderen Werte sind die Gegenprobe.');
+    if (fu && VERF[fu]) w.push('Für dieses Objekt ist der <b>' + VERF[fu] + '</b> das führende Verfahren' + (h.fuehrend_grund ? ': ' + esc(String(h.fuehrend_grund).replace(/\.$/, '')) : '') + '. An ihm misst sich der Preis, die anderen Werte sind die Gegenprobe.');
     if (ew != null) {
       var d = abw(ew, mw), drin = lo != null && hi != null && ew >= lo && ew <= hi;
       var fak = ro ? ' Die Marktpreisindikation entspricht dem ' + pct(mw / ro) + '-Fachen des Jahresrohertrags, der Ertragswert dem ' + pct(ew / ro) + '-Fachen.' : '';
@@ -268,6 +266,8 @@
             : 'Die Substanz ist mehr wert, als vergleichbare Objekte am Markt kosten, etwa bei aufwendiger Bauweise oder großem Grundstück.'))
         + (swVorl ? ' Dazu ist der Sachwert hier nur vorläufig, ohne Sachwertfaktor.' : ''));
     }
+    if (AUF) w.push('In Wohnungseigentum aufgeteilt: zusätzlich angegeben ist der <b>Wert nach Aufteilung</b>, ' + AUF.n + ' Wohnungen einzeln über den Vergleichswert bewertet, zusammen ' + eur(AUF.wert)
+      + '. Er rechnet nicht mit, maßgebend bleibt der Wert des Hauses als Ganzes.');
     if (kp != null) {
       var dk = abw(kp, mw), inSp = lo != null && hi != null && kp >= lo && kp <= hi;
       w.push('Dein Kaufpreis liegt ' + lage(dk) + ' der Marktpreisindikation' + (inSp ? ', innerhalb ihrer Spanne' : (lo != null && kp < lo ? ', unter ihrer unteren Zahl' : (hi != null && kp > hi ? ', über ihrer oberen Zahl' : ''))) + '.'
@@ -289,11 +289,11 @@
         + '<span>' + esc(lbl) + '</span><b>' + esc(wert) + '</b>' + (unter ? '<em>' + esc(unter) + '</em>' : '') + '</div>');
     };
     var GOLD = 'var(--wl-c9a84c, #C9A84C)', GRUEN = '#3FA56C', ROT = '#B8625C', HELL = '#E6DCC2';
-    if (AUF) kachel('Führend', 'Je Einheit', AUF.n + ' Wohnungen einzeln bewertet', GOLD, 'Vergleichswert je Einheit, führend',
-      'Das Haus ist in Wohnungseigentum aufgeteilt. Jede Wohnung ist einzeln bewertet, der Ertragswert des ganzen Hauses stützt.',
-      [['Summe der Wohnungen', eur(AUF.wert)], ['Aufteilungskosten', AUF.kosten > 0 ? eur(AUF.kosten) : ''], ['Ertragswert Haus', ew != null ? eur(ew) : '']]);
-    else if (fu && VERF[fu]) kachel('Führend', VERF[fu], 'an ihm misst sich der Preis', GOLD, VERF[fu] + ', führendes Verfahren',
+    if (fu && VERF[fu]) kachel('Führend', VERF[fu], 'an ihm misst sich der Preis', GOLD, VERF[fu] + ', führendes Verfahren',
       zweiSaetze(w[0] || ''), [[VERF[fu], eur(fu === 'ertragswert' ? ew : fu === 'sachwert' ? sw : vw)], ['Marktpreisindikation', eur(mw)]]);
+    if (AUF) kachel('Nach Aufteilung', eur(AUF.wert), AUF.n + ' Wohnungen einzeln, zusätzliche Angabe', HELL, 'Wert nach Aufteilung',
+      'Das Haus ist in Wohnungseigentum aufgeteilt. Daneben steht, was die Wohnungen einzeln wert wären. Gerechnet wird mit dem Wert des Hauses als Ganzes.',
+      [['Summe der Wohnungen', eur(AUF.wert)], ['Aufteilungskosten', AUF.kosten > 0 ? eur(AUF.kosten) : ''], ['Ertragswert Haus', ew != null ? eur(ew) : '']]);
     if (ew != null) {
       var dE = abw(ew, mw), wortE = Math.abs(dE) <= 5 ? 'Miete und Marktpreis passen' : (dE < 0 ? 'Miete trägt den Marktpreis nicht ganz' : 'Miete trägt mehr als der Markt');
       kachel('Ertragswert', abwText(dE), wortE, Math.abs(dE) <= 5 ? HELL : (dE < 0 ? ROT : GRUEN), 'Ertragswert gegen Marktpreisindikation',
