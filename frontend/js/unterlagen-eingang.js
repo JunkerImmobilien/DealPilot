@@ -644,13 +644,13 @@
     }).join('') || '<p class="oabi-sub" style="padding:0">Für ' + jahr + ' steht kein Posten.</p>';
     var nDat = Object.keys(d.buchungen.reduce(function (a, b) { a[b.datei] = 1; return a; }, {})).length;
     box.innerHTML = '<div class="ue-bj">'
-      + '<div class="oabi-sub" style="padding:0 0 8px">Jedes Steuerjahr mit seinen Werbungskosten, und für jeden Posten, woher der Wert kommt: eingelesener Beleg, Unterlage, ViVi, von Hand oder von der App berechnet.</div>'
+      + '<div class="oabi-sub" style="padding:0 0 8px">Jedes Steuerjahr mit seinen Werbungskosten, und für jeden Posten, woher der Wert kommt: eingelesener Beleg, Unterlage, ' + (_viviVerknuepft() ? 'ViVi, ' : '') + 'von Hand oder von der App berechnet.</div>'   /* v4330: ohne ViVi-Anbindung kein ViVi im Text */
       + (opt.festesJahr ? '' : '<div class="ue-bj-jahre" role="tablist">' + jahre.map(function (j) { return '<button type="button" data-bj-jahr="' + j + '"' + (j === jahr ? ' class="an"' : '') + '>' + j + (mitBelegen[j] ? '<i title="' + mitBelegen[j] + ' Positionen aus Belegen">●</i>' : '') + '</button>'; }).join('') + '</div>')
       + '<div class="ue-bj-summe"><span>Werbungskosten ohne AfA<b>' + eur2(sumWert) + '</b></span><span>davon einzeln aus Belegen<b>' + eur2(sumBel) + '</b></span><span>Belege ' + jahr + '<b>' + nDat + ' <small style="font-size:11px;font-weight:400;color:var(--muted,#7A7370)">(' + d.buchungen.length + (d.buchungen.length === 1 ? ' Position' : ' Positionen') + ')</small></b></span></div>'
       + _viviTeil(jahr, opt)
       + (_viviVerknuepft() ? '<div class="ue-bj-gruppe">In DealPilot gebucht</div>' : '')
       + posten
-      + '<div class="ue-bj-fuss"><span>Einzeln aufgeführt sind Belege, die seit dem 04.11.2026 eingelesen oder aus ViVi übernommen wurden. Wird ein Import im Verlauf zurückgenommen, verschwinden seine Belege hier mit.</span>'
+      + '<div class="ue-bj-fuss"><span>Einzeln aufgeführt sind Belege, die seit dem 04.11.2026 eingelesen' + (_viviVerknuepft() ? ' oder aus ViVi übernommen' : '') + ' wurden. Wird ein Import im Verlauf zurückgenommen, verschwinden seine Belege hier mit.</span>'
       + (d.buchungen.length ? '<button type="button" class="oabi-btn" data-bj-csv>Liste als CSV</button>' : '') + '</div></div>';
     if (!box._bjKlick) {
       box._bjKlick = true;

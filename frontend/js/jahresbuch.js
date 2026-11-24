@@ -39,7 +39,7 @@
 (function (global) {
   'use strict';
   if (global.DpJahresbuch) return;
-  var VERSION = 'v4090a';
+  var VERSION = 'v4330';
   var STATUS = [['geplant', 'geplant'], ['erklaert', 'erklärt'], ['bescheid', 'Bescheid']];
 
   function doc() { return global.document || null; }
@@ -171,7 +171,9 @@
     z.notiz = ist.notiz || '';
     /* E7 · Abgleich Ist-Miete gegen die Mieteinnahmen der Anlage V */
     z.abgleich = null;
-    if (istZahl(z.miete_ist) && z.av) {
+    /* v4330 · festgeschriebene Steuer: kein „übernehmen“ anbieten, der Knopf liefe ins Leere (aenderungErlaubt) */
+    var _stFest = false; try { _stFest = istFest(q.jahr, 'steuer'); } catch (e) { _stFest = false; }
+    if (istZahl(z.miete_ist) && z.av && !(_stFest && !z.av.eigen)) {
       if (!z.av.eigen) z.abgleich = { art: 'vorschlag', text: 'In der Anlage V steht für ' + q.jahr + ' noch der Vorschlag (' + eur(z.av.wert) + '). Ist-Miete als Mieteinnahme übernehmen?' };
       else if (Math.abs(z.av.wert - z.miete_ist) > 1) z.abgleich = { art: 'abweichung', text: 'Anlage V ' + eur(z.av.wert) + ', Ist-Miete ' + eur(z.miete_ist) + '. Die Anlage V bleibt für die Steuer maßgeblich.' };
       else z.abgleich = { art: 'gleich', text: 'Ist-Miete und Anlage V stimmen überein.' };

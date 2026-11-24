@@ -18,7 +18,7 @@
  * ════════════════════════════════════════════════════════════════════════════════════════════════════════════════ */
 (function (global) {
   'use strict';
-  var VERSION = 'v4200';
+  var VERSION = 'v4330';
   var SCHRITTE = [['miete', 'Miete'], ['wert', 'Wert'], ['haus', 'Haus & Belege'], ['steuer', 'Steuer'], ['fest', 'Festschreiben']];
   var _z = null;                 /* { jahr, k, frage, vivi: 'laeuft' | null } */
   var _merk = {}, _gelesen = {}; /* Schritt je Objekt|Jahr · ViVi schon gelesen je Objekt|Jahr */
@@ -190,7 +190,7 @@
     var J = _z.jahr, B = JB(), t = null;
     try { var sj = typeof global._v269_getStartYear === 'function' ? global._v269_getStartYear() : null; if (sj != null && typeof global._computeYearTotal === 'function') t = global._computeYearTotal(J, J - sj); } catch (e) { t = null; }
     var st = B ? B.status(J) : 'geplant', fest = r.s.fest && r.s.fest.steuer;
-    var h = '<h4>Steuer ' + J + '</h4><p class="dp-jab-satz">Die Anlage V ' + J + ' aus dem Reiter Steuer, zusammengefasst.<small>Übernommene Belege und ViVi-Werte aus Schritt 3 sind eingerechnet.</small></p>';
+    var h = '<h4>Steuer ' + J + '</h4><p class="dp-jab-satz">Die Anlage V ' + J + ' aus dem Reiter Steuer, zusammengefasst.<small>Übernommene Belege' + (JA() && JA().viviVerknuepft && JA().viviVerknuepft() ? ' und ViVi-Werte' : '') + ' aus Schritt 3 sind eingerechnet.</small></p>';   /* v4330: ViVi nur mit Anbindung */
     h += '<div class="dp-jab-zahl"><span>Einnahmen<b>' + eur(t && t.einnahmen) + '</b></span><span>Werbungskosten<b>' + eur(t && t.werbungskosten) + '</b></span><span>Ergebnis V+V<b>' + (t ? vz(t.ergebnis) : '–') + '</b></span></div>';
     /* v4110 · eigene Wörter statt der Kurzform des Jahresbuchs (dort „geplant“) */
     var opts = [['geplant', 'nicht erklärt'], ['erklaert', 'erklärt'], ['bescheid', 'Bescheid liegt vor']].map(function (x) { return '<option value="' + x[0] + '"' + (x[0] === st ? ' selected' : '') + '>' + esc(x[1]) + '</option>'; }).join('');
@@ -218,7 +218,7 @@
     if (L.length) h += '<div class="dp-jab-box">Noch offen: ' + esc(L.join(', ')) + '. Du kannst trotzdem festschreiben, offene Schritte gelten dann als abgeschlossen.</div>';
     var _uo = unterlagenOffen(J), _un = _uo.steuer.length + _uo.su.length;   /* v4200 · B14: Musterhof 2023 ließ sich ohne Hinweis festschreiben */
     if (_un && !(s.fest && s.fest.steuer)) h += '<div class="dp-jab-box">' + _un + (_un === 1 ? ' Betrag' : ' Beträge') + ' aus den eingelesenen Unterlagen ' + J + ' fehlen in der Anlage V. ' + knopf('zu-schritt', 'Zum Schritt Steuer', false, ' data-jab-k="steuer"') + '</div>';
-    else h += '<div class="dp-jab-box gold">Alle vier Schritte von ' + J + ' sind erledigt.</div>';
+    else if (!L.length) h += '<div class="dp-jab-box gold">Alle vier Schritte von ' + J + ' sind erledigt.</div>';   /* v4330: stand bisher auch unter „Noch offen“ */
     if (_z.frage) h += '<div class="dp-jab-box rot"><b>' + J + ' festschreiben?</b> Danach lassen sich die Werte nur nach Freigabe ändern. Das Festschreiben wird mit Datum protokolliert.'
       + '<div class="dp-jab-reihe" style="margin:8px 0 0">' + knopf('fest-ja', 'Ja, festschreiben', true) + knopf('fest-nein', 'Noch nicht', false) + '</div></div>';
     else h += '<div class="dp-jab-reihe">' + knopf('fest-frage', J + ' festschreiben', true) + '</div>';

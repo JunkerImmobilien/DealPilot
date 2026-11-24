@@ -48,7 +48,7 @@
 (function (global) {
   'use strict';
   if (global.DpJahresabgleich) return;
-  var VERSION = 'v4110a';
+  var VERSION = 'v4330';
   var GOLD = 'var(--wl-c9a84c, #C9A84C)';
   /* v4090 · Marcel 23.11.2026: „ich würde die Reihenfolge ändern in Miete, Wert, Haus und dann Steuern" (die Steuer braucht die Zahlen der drei davor) */
   var SCHRITTE = [['miete', 'Miete'], ['wert', 'Wert'], ['haus', 'Haus'], ['steuer', 'Steuer']];
@@ -775,13 +775,17 @@
         var nav = d.querySelector('nav.tabs'), nb = nav ? nav.getBoundingClientRect() : null, unten = nb && nb.height > 0 && nb.bottom > 0 ? nb.bottom : 0;
         var dy = e.getBoundingClientRect().top - (unten + 12), sc = d.querySelector('.main-col');
         if (sc && sc.scrollHeight > sc.clientHeight + 4) sc.scrollBy({ top: dy, behavior: 'smooth' }); else global.scrollBy({ top: dy, behavior: 'smooth' });
+        /* v4330 · Nachkontrolle: liegt die Anlage V nach der Rolle nicht oben, ohne Animation nachziehen */
+        setTimeout(function () { try { var dy2 = e.getBoundingClientRect().top - (unten + 12); if (Math.abs(dy2) > 60) { if (sc && sc.scrollHeight > sc.clientHeight + 4) sc.scrollBy(0, dy2); else global.scrollBy(0, dy2); } } catch (x) {} }, 1300);
       } catch (x) { try { e.scrollIntoView(); } catch (y) {} }
       try { e.classList.remove('dp-ja-blink'); void e.offsetWidth; e.classList.add('dp-ja-blink'); setTimeout(function () { try { e.classList.remove('dp-ja-blink'); } catch (x) {} }, 2600); } catch (x) {}
     });
   }
   function warteSichtbar(finde, fertig, n) {
     var e = finde();
-    if (e && e.offsetParent && e.getBoundingClientRect().height > 0) { setTimeout(function () { fertig(finde() || e); }, 150); return; }
+    /* v4330 · GEMESSEN (Musterweg 7, 1568 px): der Reiterwechsel ruft _v236ScrollTop nach 30/50/200/250/300 ms mit smooth auf.
+       Nach 150 ms gestartet, brach diese Rolle nach oben unsere Rolle zur Anlage V ab, sie blieb bei 0. Erst nach 420 ms rollen. */
+    if (e && e.offsetParent && e.getBoundingClientRect().height > 0) { setTimeout(function () { fertig(finde() || e); }, 420); return; }
     if ((n || 0) > 30) { fertig(e); return; }
     setTimeout(function () { warteSichtbar(finde, fertig, (n || 0) + 1); }, 100);
   }

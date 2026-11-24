@@ -358,5 +358,27 @@ const K = c.DpMietpotenzial, E = c.DpErhoehungen, JA = c.DpJahresabgleich, HV = 
   ok(!/knopf\('zurueck'/.test(as) && /knopf\('weiter', 'Weiter: ' \+ SCHRITTE\[i \+ 1\]\[1\]/.test(as), 'L Assistent ohne Zurück, Weiter nennt den nächsten Schritt');
 }
 
+/* ── N · v4330 Objekt OHNE ViVi-Anbindung (Marcel 24.11.2026: „funktioniert das, wenn wir ViVi nicht angebunden haben?“) ── */
+{
+  const cN = kontext();
+  for (const f of ['mieterhoehungen.js', 'jahresbuch.js', 'hausverlauf.js', 'jahresabgleich.js', 'jahresabschluss.js']) vm.runInContext(lies('frontend/js/' + f), cN);
+  ok(cN.DpJahresabgleich.viviVerknuepft() === false && cN.DpJahresabgleich.viviHgJahr(2025) === null, 'N ohne DpVivi: nicht verknüpft, kein ViVi-Hausgeld');
+  const hN = cN.DpJahresabgleich.hausMitViviRein({ hg_ist_j: null }, null, false);
+  ok(hN.hg_ist_j === null && hN.hg_quelle !== 'vivi', 'N ohne ViVi bleibt das Hausgeld leer statt „laut ViVi“');
+  const as = lies('frontend/js/jahresabschluss.js'), ue = lies('frontend/js/unterlagen-eingang.js'), jb = lies('frontend/js/jahresbuch.js'), ja = lies('frontend/js/jahresabgleich.js');
+  ok(as.includes("if (!a || !a.viviVerknuepft || !a.viviVerknuepft()) return '';"), 'N Assistent: ViVi-Zeile nur mit Anbindung');
+  ok(as.includes("<small>Übernommene Belege' + (JA() && JA().viviVerknuepft && JA().viviVerknuepft() ? ' und ViVi-Werte' : '')") && !as.includes('Übernommene Belege und ViVi-Werte'), 'N Schritt Steuer nennt ViVi nur mit Anbindung');
+  ok(ue.includes("Unterlage, ' + (_viviVerknuepft() ? 'ViVi, ' : '') + 'von Hand") && ue.includes("eingelesen' + (_viviVerknuepft() ? ' oder aus ViVi übernommen' : '') + ' wurden.") && ue.includes("function _viviTeil(jahr, opt) {") && ue.includes("    if (!_viviVerknuepft()) return '';"), 'N Belege je Jahr: ohne Anbindung kein ViVi im Text und keine Spalte „Laut ViVi“');
+  ok(as.includes("else if (!L.length) h += '<div class=\"dp-jab-box gold\">Alle vier Schritte"), 'N Festschreiben: „Alle vier Schritte erledigt“ nur, wenn nichts offen ist');
+  ok(jb.includes("_stFest = istFest(q.jahr, 'steuer')") && jb.includes('!(_stFest && !z.av.eigen)'),'N festgeschriebene Steuer: kein „übernehmen“ in die Anlage V');
+  ok(ja.includes('fertig(finde() || e); }, 420)') && ja.includes('sc.scrollBy(0, dy2)'),'N Absprung rollt erst nach dem Reiterwechsel (420 ms) und zieht nach');
+  /* echter Lauf: Zeile mit festgeschriebener Steuer und Vorschlag in der Anlage V */
+  cN._currentObjData = { _jahre: { '2025': { fest: { steuer: '2026-11-24' } } } };
+  const zf = cN.DpJahresbuch.zeile({ jahr: 2025, plan: 7912, proj: 7680, ist: { nkm_j: 7500 }, av: { wert: 7680, eigen: false } });
+  cN._currentObjData = { _jahre: {} };
+  const zo = cN.DpJahresbuch.zeile({ jahr: 2025, plan: 7912, proj: 7680, ist: { nkm_j: 7500 }, av: { wert: 7680, eigen: false } });
+  ok(!zf.abgleich && zo.abgleich && zo.abgleich.art === 'vorschlag', 'N Vorschlag „übernehmen“ nur im offenen Jahr (fest: ' + JSON.stringify(zf.abgleich) + ', offen: ' + (zo.abgleich && zo.abgleich.art) + ')');
+}
+
 console.log(`jahresabgleich-pruefen (v3430): ${gruen} von ${gruen + rot} ok`);
 process.exit(rot ? 1 : 0);
