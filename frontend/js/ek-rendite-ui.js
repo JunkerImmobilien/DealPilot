@@ -109,7 +109,7 @@
       '.dp-ekr-pk{display:inline-flex;gap:3px;margin-left:6px;vertical-align:1px}' +
       '.dp-ekr-pk i{width:5px;height:5px;border-radius:50%;background:currentColor;opacity:.28;display:inline-block}' +
       '.dp-ekr-pk i.an{opacity:1;background:var(--gold,#C9A84C)}' +
-      '.dp-ekr-pop{position:fixed;z-index:9600;box-sizing:border-box;width:max-content;max-width:min(380px,calc(100vw - 24px));background:#FFFFFF;color:#2A2727;border:1px solid #E6E0D3;border-radius:12px;box-shadow:0 12px 32px rgba(20,16,8,.16);padding:12px 14px;font:400 12.5px/1.45 Inter,sans-serif;pointer-events:none;opacity:0;transition:opacity .12s;white-space:normal;overflow-wrap:anywhere}' +
+      '.dp-ekr-pop{position:fixed;z-index:9600;box-sizing:border-box;width:max-content;max-width:min(440px,calc(100vw - 24px));background:#FFFFFF;color:#2A2727;border:1px solid #E6E0D3;border-radius:12px;box-shadow:0 12px 32px rgba(20,16,8,.16);padding:12px 14px;font:400 12.5px/1.45 Inter,sans-serif;pointer-events:none;opacity:0;transition:opacity .12s;white-space:normal;overflow-wrap:anywhere}' +
       '.dp-ekr-pop.an{opacity:1}' +
       '.dp-ekr-pop b.t{display:block;font:600 13.5px/1.3 "Space Grotesk",Inter,sans-serif;margin-bottom:4px}' +
       '.dp-ekr-pop p{margin:0 0 8px}' +
@@ -149,8 +149,14 @@
     var vw = document.documentElement.clientWidth || window.innerWidth, vh = window.innerHeight;
     var left = Math.min(Math.max(12, b.left + b.width / 2 - pw / 2), vw - pw - 12);
     var top = b.bottom + 8;
-    if (top + ph > vh - 8) top = b.top - ph - 8;
-    if (top < 8) top = Math.max(8, vh - ph - 8);
+    if (top + ph > vh - 8) {
+      if (b.top - ph - 8 >= 8) top = b.top - ph - 8;                       /* darüber */
+      else {                                                               /* daneben, senkrecht mittig, im Fenster */
+        top = Math.min(Math.max(8, b.top + b.height / 2 - ph / 2), Math.max(8, vh - ph - 8));
+        if (b.right + 8 + pw <= vw - 8) left = b.right + 8;
+        else if (b.left - 8 - pw >= 8) left = b.left - 8 - pw;
+      }
+    }
     pop.style.left = Math.max(12, left) + 'px'; pop.style.top = top + 'px';
   }
   function weg() { if (pop) pop.classList.remove('an'); an = null; }
