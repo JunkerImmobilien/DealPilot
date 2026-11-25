@@ -282,21 +282,21 @@
   /* v4650 · drei Gestaltungen des Umschalters zur Wahl (Marcel 25.11.2026: „cooler darstellen“).
      html[data-dk-stil] = pille | reiter | runway. Ohne Attribut gilt die Optik von v4600.
      Wahl per ?dkstil=pille|reiter|runway|alt (wird gemerkt) oder DpDkStil('…').
-     Standard nur auf Staging-Hosts: pille. Auf Prod bleibt ohne Wahl die bisherige Optik. */
+     v4710 · Marcel 25.11.2026: Standard für alle Hosts ist reiter (Entwurf B). Neuer Merker dp_dk_stil2, damit Testwahlen aus v4650 nicht weiter gelten. */
   var DK_STILE = { pille: 1, reiter: 1, runway: 1, alt: 1 };
   var dkUrlGelesen = false;   /* ?dkstil= nur beim ersten Aufbau, danach gilt die gemerkte Wahl */
   function dkStil() {
     var w = null;
-    if (!dkUrlGelesen) { dkUrlGelesen = true; try { var m = /[?&]dkstil=([a-z]+)/.exec(location.search || ''); if (m && DK_STILE[m[1]]) { w = m[1]; localStorage.setItem('dp_dk_stil', w); } } catch (e) {} }
-    if (!w) { try { var g = localStorage.getItem('dp_dk_stil'); if (g && DK_STILE[g]) w = g; } catch (e) {} }
-    if (!w) w = /staging/i.test(String(location.hostname || '')) ? 'pille' : 'alt';
+    if (!dkUrlGelesen) { dkUrlGelesen = true; try { var m = /[?&]dkstil=([a-z]+)/.exec(location.search || ''); if (m && DK_STILE[m[1]]) { w = m[1]; localStorage.setItem('dp_dk_stil2', w); } } catch (e) {} }
+    if (!w) { try { var g = localStorage.getItem('dp_dk_stil2'); if (g && DK_STILE[g]) w = g; } catch (e) {} }
+    if (!w) w = 'reiter';
     if (w === 'alt') document.documentElement.removeAttribute('data-dk-stil');
     else document.documentElement.setAttribute('data-dk-stil', w);
     return w;
   }
   window.DpDkStil = function (w) {
     if (!DK_STILE[w]) return dkStil();
-    try { localStorage.setItem('dp_dk_stil', w); } catch (e) {}
+    try { localStorage.setItem('dp_dk_stil2', w); } catch (e) {}
     return dkStil();
   };
   function dkIco(art) {
