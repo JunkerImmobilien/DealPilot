@@ -724,12 +724,14 @@ function textAus(md, mitWert) {
 }
 /* einzelcheck-6 · Kürzen am Satzende: bis zur Grenze den letzten ganzen Satz behalten, gibt es keinen, am letzten
    Wort mit „…“. Vorher schnitt slice() mitten im Wort, Marcel sah im Herford-Bericht „Grundstücksmerkma“ und „Die Mar“. */
-function _satzKurz(t, n) {
+function _satzKurz(t, n, streng) {
   const s = String(t == null ? '' : t);
   if (s.length <= n) return s;
   const teil = s.slice(0, n);
   const ende = Math.max(teil.lastIndexOf('. '), teil.lastIndexOf('! '), teil.lastIndexOf('? '));
   if (ende > n * 0.4) return teil.slice(0, ende + 1);
+  /* hh4 (25.11.2026) · Stichpunkt ohne ganzen Satz fällt weg (MFH Herford: „… nicht für Mehrfamilienhäuser („Bei den …“) */
+  if (streng) return ende > 20 ? teil.slice(0, ende + 1) : null;
   return teil.slice(0, n - 1).replace(/\s+\S*$/, '') + ' …';
 }
 /* v3944 · Vergleichsmiete aus dem mb-Auszug, nur feste Felder. Kein Treffer heisst kein Wert. */
@@ -782,7 +784,7 @@ const STUFE_TEXT = {
   A: 'amtlich', B: 'amtlich, große Streuung oder regional', C: 'indikativ',
   D: 'gesetzlicher Auffangwert § 256 BewG', E: 'eigene Angabe', M: 'indikativ, aus Angebotspreisen abgeleitet', N: 'abgeleitet aus der DealPilot-Formel, nicht amtlich'
 };
-function _kunde(t, n) {
+function _kunde(t, n, streng) {
   if (typeof t !== 'string' || !t.trim()) return null;
   let s = t.replace(/https?:\/\/\S+/g, '').replace(/\bwww\.[\w.\/-]+/gi, '').replace(/\bBORIS[\w-]*/g, '')
     .replace(/\(\s*[,;]?\s*\)/g, '').replace(/,\s*\)/g, ')').replace(/\(\s*,\s*/g, '(').replace(/\(\s*\)/g, '');
@@ -790,7 +792,7 @@ function _kunde(t, n) {
   s = s.replace(/dl-de\/(by|zero)-2-0/gi, 'DLDE_$1_20');
   s = _satzzeichen(s).replace(/\s+([,.)])/g, '$1').replace(/\s{2,}/g, ' ').trim().replace(/DLDE_(by|zero)_20/gi, 'dl-de/$1-2-0');
   if (!s || !_ohneQuelle(s)) return null;
-  return _satzKurz(s, n || 400);   /* einzelcheck-6 · am Satzende kürzen, nicht mitten im Satz („rechnet der Bericht …“) */
+  return _satzKurz(s, n || 400, streng);   /* einzelcheck-6 · am Satzende kürzen, nicht mitten im Satz („rechnet der Bericht …“) */
 }
 function _stufe(x) { const s = String(x || '').trim().toUpperCase(); return /^[A-EMN]$/.test(s) ? s : null; }
 function _jahr(x) { const n = _n(x); return n > 0 ? Math.round(n * 10) / 10 : null; }
@@ -811,7 +813,7 @@ function wertAus(out) {
     aus.boden = { verfuegbar: true, brw_qm: _n(lv.value_sqm), stichtag: /^\d{4}-\d{2}-\d{2}$/.test(String(lv.stichtag || '')) ? String(lv.stichtag) : null,
       veraltet: !!lv.stichtag_veraltet, herkunft: 'amtlicher Bodenrichtwert des Gutachterausschusses',
       bodenwert_eur: (bw.vollstaendig !== false && _n(bw.wert) > 0) ? Math.round(_n(bw.wert)) : null,
-      hinweise: (Array.isArray(bw.hinweise) ? bw.hinweise : []).map(function (h) { return _kunde(h, 260); }).filter(Boolean).slice(0, 3) };
+      hinweise: (Array.isArray(bw.hinweise) ? bw.hinweise : []).map(function (h) { return _kunde(h, 260, true); }).filter(Boolean).slice(0, 3) };
   } else {
     aus.boden = { verfuegbar: false, grund: _kunde(lv.note, 260) || 'Für diese Lage liegt kein amtlicher Bodenrichtwert vor.' };
   }
@@ -860,7 +862,7 @@ function wertAus(out) {
   const nimm = function (a) { return aus.verfahren.filter(function (x) { return x.art === a; })[0] || null; };
   aus.fuehrend = VERFAHREN_NAME[vw.verfahren] ? vw.verfahren : null;
   aus.stuetzend = VERFAHREN_NAME[vw.stuetzend] && nimm(vw.stuetzend) && nimm(vw.stuetzend).verfuegbar ? vw.stuetzend : null;
-  aus.fuehrend_grund = _kunde(vw.grund, 300);
+  aus.fuehrend_grund = _kunde(vw.grund, 300, true);   /* hh4 · nur ganze Sätze */
   if (!aus.fuehrend && vw.nicht_gerechnet) aus.weg = _kunde(vw.weg, 320);
   const f = aus.fuehrend ? nimm(aus.fuehrend) : null;
   if (f && f.verfuegbar && !(f.art === 'sachwert' && !f.marktangepasst)) {
