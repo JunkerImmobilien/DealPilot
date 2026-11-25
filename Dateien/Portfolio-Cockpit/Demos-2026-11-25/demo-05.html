@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Portfolio-Cockpit · Demo 05 · Bank-Mappe</title>
+<link rel="stylesheet" href="kit.css">
+<style>
+.sich-k{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.sk-o{display:grid;grid-template-columns:64px minmax(0,1fr);gap:9px;align-items:center;border:1px solid var(--netz);border-radius:11px;padding:7px;cursor:default}
+.sk-o:hover{border-color:var(--gold)}
+.sk-o .ob{width:64px;height:48px}
+.sk-o b{display:block;font:600 12.5px/1.2 "Space Grotesk",Inter,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sk-o small{display:block;font:400 10.5px Inter,sans-serif;color:var(--leise)}
+.ltv-bar{position:relative;height:7px;border-radius:4px;background:color-mix(in srgb,var(--gold) 30%,transparent);margin-top:5px;overflow:hidden}
+.ltv-bar i{position:absolute;left:0;top:0;bottom:0;background:var(--tinte);opacity:.55}
+.ltv-bar i.hoch{background:var(--rot);opacity:.9}
+.ltv-bar u{position:absolute;top:-2px;bottom:-2px;width:2px;background:var(--tinte)}
+.argu{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.argu li{display:grid;grid-template-columns:18px 1fr;gap:8px;font-size:12.5px;line-height:1.4}
+.argu li::before{content:"✓";font-weight:700;color:var(--gruen)}
+.argu li.offen::before{content:"!";color:var(--gold-d)}
+.argu b{font-weight:600}
+</style>
+</head>
+<body>
+<div class="seite">
+ <div class="kopf">
+  <div><div class="marke"><i></i>Portfolio-Cockpit · Demo 05 von 10 · neu</div><h1>Bank-Mappe</h1><div class="unter">Der Bestand so, wie ihn eine Bank sieht: Sicherheiten, Beleihung, Kapitaldienst und was bis zur nächsten Anschlussfinanzierung fällig wird. Echte Werte des Demokontos, Stand 25.11.2026.</div></div>
+  <div class="leiste"><span id="ziel"></span><div class="schalter" id="thema"><button aria-pressed="true" data-t="light">Hell</button><button aria-pressed="false" data-t="dark">Dunkel</button></div></div>
+ </div>
+<div id="sk"></div>
+<div id="kz"></div>
+<div class="raster">
+ <div class="karte" style="--s:8" id="sich"></div>
+ <div class="karte" style="--s:4" id="argu"></div>
+ <div class="karte" style="--s:6" id="fj"></div>
+ <div class="karte" style="--s:6" id="zb"></div>
+ <div class="karte" style="--s:12" id="zs"></div>
+ <div class="karte" style="--s:12" id="bsz"></div>
+</div>
+ <div class="fuss">Beleihung = Restschuld geteilt durch Wertansatz (Ertragswert im Bestand, wo gerechnet, sonst Kaufpreis). Restschuld zum Ende der Zinsbindung vereinfacht mit heutiger Tilgung fortgeschrieben. EK-Rendite gerechnet mit ek-rendite.js der App.</div>
+</div>
+<script src="ek-rendite.js"></script>
+<script src="daten.js"></script>
+<script src="kit.js"></script>
+<script src="bausteine.js"></script>
+<script>
+var k = K.kennzahlen(), S = K.D.summe, O = K.D.objekte;
+var bis2030 = O.filter(function(o){ return o.zbJahr < 2031; });
+K.modul("#sk", function(){ return K.scoreKopf(); });
+K.modul('#kz', function(){ var z=K.ziele(); return K.kz([
+ {l:'Restschuld', v:K.mio(S.rest), s:'Darlehen bei Kauf '+K.mio(S.darl)},
+ {l:'Beleihung', v:K.pct(k.ltv,0), s:z?'Ziel höchstens '+K.pct(z.maxLtv,0):'Restschuld zu Wertansatz', c:z?(k.ltv<=z.maxLtv?'ok':'nok'):''},
+ {l:'DSCR', v:K.d2(S.dscr), s:'Kapitaldienst '+K.kurzEur(S.kdJ)+' im Jahr', c:z?(S.dscr>=z.minDscr?'ok':'nok'):''},
+ {l:'Bis Ende 2030 fällig', v:K.mio(K.summe(bis2030,function(o){return o.restZb})), s:bis2030.length+(bis2030.length===1?' Objekt':' Objekte')+' in der Anschlussfinanzierung', c:'warn'},
+ {l:'Eigenkapital im Bestand', v:K.mio(k.ekHeute), s:'Quote '+K.pct(k.ekHeute/k.wert*100,0)}
+], 5); });
+K.modul('#sich', function(){ var z=K.ziele(), os=O.slice().sort(function(a,b){return (b.rest/b.wert)-(a.rest/a.wert)});
+ return K.karte('Sicherheiten je Objekt','Dunkel die Restschuld, Gold der freie Wert dahinter. Sortiert nach Beleihung, höchste zuerst'+(z?', Strich ist dein Ziel '+K.pct(z.maxLtv,0)+'.':'.'),
+  '<div class="sich-k">'+os.map(function(o){ var l=o.rest/o.wert*100;
+   return '<div class="sk-o" data-tip="'+K.objTip(o)+'">'+K.bild(o)+'<div><b>'+K.esc(o.name)+'</b><small>'+K.kurzEur(o.rest)+' von '+K.kurzEur(o.wert)+' · '+K.pct(l,0)+'</small><div class="ltv-bar"><i class="'+(l>100||(z&&l>z.maxLtv)?'hoch':'')+'" style="width:'+Math.min(100,l).toFixed(1)+'%"></i>'+(z?'<u style="left:'+z.maxLtv+'%"></u>':'')+'</div></div></div>'; }).join('')+'</div>'); });
+K.modul('#argu', function(){ var z=K.ziele()||K.D.ziele, gut=O.filter(function(o){return o.dscr>=z.minDscr}), neg=O.filter(function(o){return o.cfVs<0}), hebel=K.D.zielbild.mieteZ-K.D.zielbild.mieteB;
+ var li=[
+  '<li><span><b>'+gut.length+' von '+O.length+' Objekten</b> tragen den Kapitaldienst mit DSCR über '+K.d2(z.minDscr)+'. Portfolio '+K.d2(S.dscr)+'.</span></li>',
+  '<li><span><b>'+K.mio(S.tilgJ*1)+'</b> Tilgung im Jahr, die Restschuld sinkt planmäßig.</span></li>',
+  '<li><span><b>'+K.kurzEur(hebel)+'</b> Mietpotenzial im Jahr bis zum Zielbild, belegt je Objekt.</span></li>',
+  '<li><span>EK-Rendite '+K.ekStufe().lang+' <b>'+K.pct(K.ekWert(K.D.ekrP),1)+'</b> auf '+K.mio(K.D.ekrP.ek)+' Eigenkapital.</span></li>',
+  '<li class="offen"><span><b>'+neg.length+' Objekte</b> mit Zuzahlung vor Steuer. Erklärung vorbereiten.</span></li>',
+  '<li class="offen"><span><b>'+bis2030.length+(bis2030.length===1?' Anschlussfinanzierung':' Anschlussfinanzierungen')+'</b> bis Ende 2030 ('+bis2030.map(function(o){return K.esc(o.name)}).join(', ')+'), früh anfragen.</span></li>'];
+ return K.karte('Was für die Finanzierung spricht','Für das Gespräch, aus deinen Zahlen.', '<ul class="argu">'+li.join('')+'</ul>'); });
+B.faelligJeJahr('#fj'); B.zinsbindung('#zb'); B.zinsStress('#zs');
+K.modul('#bsz', function(){ return K.karte('Bestand und Zielbild je Objekt','Was die Bank als Plan sehen will. Fahr über ein Objekt für die Details.', K.bszTabelle()); });
+K.zielSchalter('#ziel');
+document.getElementById('thema').addEventListener('click',function(e){var b=e.target.closest('button'); if(!b)return; document.documentElement.setAttribute('data-theme',b.getAttribute('data-t')); this.querySelectorAll('button').forEach(function(x){x.setAttribute('aria-pressed',x===b?'true':'false')});});
+(function(){ var t=new URLSearchParams(location.search).get('thema')||document.documentElement.getAttribute('data-theme'); if(t){ document.documentElement.setAttribute('data-theme',t); document.querySelectorAll('#thema button').forEach(function(x){x.setAttribute('aria-pressed',x.getAttribute('data-t')===t?'true':'false')}); } })();
+K.ausbau();
+if(/mass=1/.test(location.search)) setTimeout(function(){ var t=document.createElement('meta'); t.id='hoehe'; t.content=String(document.documentElement.scrollHeight); document.head.appendChild(t); }, 600);
+</script>
+</body>
+</html>

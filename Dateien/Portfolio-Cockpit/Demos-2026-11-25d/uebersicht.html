@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="de" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Portfolio-Cockpit Runde d</title>
+<link rel="stylesheet" href="kit.css">
+<style>
+.demos{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:14px}
+.demo{background:var(--karte);border:1px solid var(--netz);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
+.demo a.bild{display:block;height:200px;overflow:hidden;border-bottom:1px solid var(--netz)}
+.demo a.bild img{width:100%;display:block}
+.demo .t{padding:11px 14px 13px;display:flex;flex-direction:column;gap:6px;flex:1}
+.demo h3{margin:0;font:600 15px "Space Grotesk",Inter,sans-serif}
+.demo .nr{font:600 10px "JetBrains Mono",monospace;color:var(--gold-d);letter-spacing:.08em}
+.demo p{margin:0;font:400 12.5px/1.5 Inter,sans-serif;color:var(--leise)}
+.demo .links{margin-top:auto;display:flex;flex-wrap:wrap;gap:10px;font:600 12px Inter}
+.demo .links a{color:var(--gold-d);text-decoration:none}
+h2.sek{font:600 18px "Space Grotesk",Inter,sans-serif;margin:26px 0 10px}
+.set{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+.set>div{background:var(--karte);border:1px solid var(--netz);border-radius:12px;padding:10px 12px;font:400 12.5px/1.5 Inter}
+.set>div b{display:block;font:600 13px "Space Grotesk",Inter}
+.set>div small{display:block;color:var(--leise);font-size:11px;margin-top:3px}
+.set>div.std{border-left:3px solid var(--gold)}
+.vgl img{width:100%;border:1px solid var(--netz);border-radius:12px;display:block}
+.zwei-b{display:grid;grid-template-columns:1fr 1fr;gap:14px}@media (max-width:900px){.zwei-b{grid-template-columns:1fr}}
+.zwei-b img{width:100%;border:1px solid var(--netz);border-radius:12px}
+</style>
+</head>
+<body>
+<div class="seite">
+ <div class="kopf"><div><div class="marke"><i></i>Portfolio-Cockpit · Runde d · 25.11.2026</div><h1>Neun Demos, ein Baukasten, Grafiken wie das Objekt-Cockpit</h1>
+ <div class="unter">Echte Werte des Staging-Demokontos (18 Objekte im Bestand). Jede Demo ist ein Set aus Kennzahlen und Modulen, dieselben Sets sind die Vorlagen im Baukasten.</div></div></div>
+
+ <h2 class="sek" style="margin-top:4px">Grafik-Stil: Objekt-Cockpit › Steuer gegen Demo</h2>
+ <div class="vgl"><img src="bilder/vergleich-steuer-gegen-demo.jpg" alt="Links Verlauf mit Steuern auf Staging, rechts Restschuld und Wert in Demo 01"></div>
+ <p style="font:400 12.5px/1.6 Inter;color:var(--leise);max-width:1000px">Links „Verlauf mit Steuern“ auf Staging (Westerfeldstr. 146, Objekt-Cockpit › Steuer › Detail), rechts „Restschuld und Wert“ aus Demo 01. Gleich: Karte, Eyebrow in Gold-Mono mit Chip rechts, Titel als Satz, Unterzeile, Achsen in Mono, Gitter 10 %, Linie dunkel mit Punkten, gestrichelte Zweitlinie, Fläche grün, HEUTE-Strich, Marken, Legende mit Quadraten, Kennzahl-Kacheln darunter. Die Linien zeichnet dieselbe Funktion wie in der App (grafiken-premium.js, DpGrafiken.verlauf).</p>
+
+ <h2 class="sek">Neu in Runde d</h2>
+ <div class="set">
+  <div class="std"><b>Investor-Score wie auf Staging</b>Schwarze Leiste mit den bisherigen Farben, darunter Investment- und Finanzierungs-Score. Das einzige feste Element.<small>von „hell heißt hell“ ausgenommen</small></div>
+  <div class="std"><b>Kennzahlen im Baukasten</b>Alle Kennzahl-Karten wählbar, per Ziehen oder Pfeil sortierbar, 33 zur Auswahl. Die EK-Rendite-Karte schaltet per Klick die vier Stufen.<small>Ansicht anpassen › Kennzahlen oben</small></div>
+  <div class="std"><b>Vorlagen = die Demos</b>Demo 02 ist raus. Die Vorlagen im Baukasten sind genau die Sets der neun Demos.<small>01, 03 bis 10</small></div>
+  <div class="std"><b>Alle Grafiken im App-Stil</b>Karte, Titel, Achsen, Gitter, Legende und Tooltip wie Objekt-Cockpit › Steuer. Dunkle Hauptlinie, Grün und Rot nur für gut und schlecht, Gold als Akzent.<small>hell und dunkel gemessen: 0 Fremdflächen</small></div>
+ </div>
+
+ <h2 class="sek">Acht neue Grafiken, auch als Bausteine</h2>
+ <div class="set">
+  <div><b>Zinsbindungs-Treppe</b>Wie viel Restschuld in welchem Jahr neu verhandelt wird, und wie sich das aufsummiert.<small>Demo 03 und 05</small></div>
+  <div><b>Restschuld und Wert</b>Wert und Restschuld des Bestands über zehn Jahre, die Fläche dazwischen ist dein Eigenkapital.<small>Demo 01, 08, 10</small></div>
+  <div><b>Miete heute, Plan und Zielbild</b>Je Objekt die Miete heute gegen den Bestand-Plan und das Zielbild.<small>Demo 09</small></div>
+  <div><b>EK-Rendite, woraus sie besteht</b>Überschuss, Tilgung, Steuer und Wert je Objekt in Prozent vom Eigenkapital.<small>Demo 06</small></div>
+  <div><b>Hebel und Zins</b>Wie die EK-Rendite auf den Darlehenszins reagiert, mit dem Punkt, an dem der Hebel kippt.<small>Demo 06</small></div>
+  <div><b>Wert gegen Darlehen</b>Restschuld als Balken, Wertansatz als Strich, rot wo die Schuld über dem Wert liegt.<small>Demo 03 und 05</small></div>
+  <div><b>Wohin der Kapitaldienst geht</b>Zins an die Bank gegen Tilgung, die als Vermögen bleibt, je Objekt im Monat.<small>Demo 05</small></div>
+  <div><b>Mietrendite gegen Zins</b>Bruttomietrendite gegen Darlehenszins je Objekt. Darunter arbeitet das Darlehen gegen dich.<small>Demo 05 und 06</small></div>
+ </div>
+
+ <h2 class="sek">Die neun Demos</h2>
+ <div class="demos" id="demos"></div>
+
+ <h2 class="sek">Baukasten</h2>
+ <div class="zwei-b"><a href="demo-01.html?bk=offen"><img src="bilder/baukasten-hell-1440.jpg" alt="Ansicht anpassen hell"></a><a href="demo-05.html?bk=offen&thema=dark"><img src="bilder/baukasten-dunkel-1440.jpg" alt="Ansicht anpassen dunkel"></a></div>
+ <div class="fuss">Runde d vom 25.11.2026, lokal. Runde 3 in Demos-2026-11-25c, Runde 2 in Demos-2026-11-25, Runde 1 in Demos-2026-11-24. Nichts davon ist in der App eingebaut.</div>
+</div>
+<script>
+var D=[['01','Asset-Manager-Cockpit','Alles, was ein Bestandshalter am Montagmorgen sehen will.'],['03','Risiko-Radar','Tragfähigkeit, Zinsbindung, Energie, Leerstand, dazu Zinsbindungs-Treppe und Wert gegen Darlehen.'],['04','Steuer-Jahr','Was die Steuer aus dem Cashflow macht, je Objekt und je Halter.'],['05','Bank-Mappe','Sicherheiten, Kapitaldienst, Anschlussfinanzierung, Mietrendite gegen Zins.'],['06','Renditequellen','EK-Rendite in vier Stufen, woraus sie besteht und wie der Hebel auf den Zins reagiert.'],['07','Objektmatrix','Jedes Objekt als Karte zum Umdrehen.'],['08','Wert und Zielbild','Was der Bestand wert ist und was der Plan daraus macht.'],['09','Mieten-Hebel','Miete heute, Plan und Zielbild je Objekt, Mietniveau und Hebel.'],['10','Monatsbericht','Der Bestand in fünf Sätzen und den wichtigsten Grafiken.']];
+document.getElementById('demos').innerHTML=D.map(function(d){return '<div class="demo"><a class="bild" href="demo-'+d[0]+'.html"><img src="bilder/demo-'+d[0]+'-hell-1440.jpg" alt="Demo '+d[0]+'" loading="lazy"></a><div class="t"><div class="nr">DEMO '+d[0]+'</div><h3>'+d[1]+'</h3><p>'+d[2]+'</p><div class="links"><a href="demo-'+d[0]+'.html">Öffnen</a><a href="demo-'+d[0]+'.html?thema=dark">Dunkel</a><a href="demo-'+d[0]+'.html?bk=offen">Baukasten</a><a href="bilder/demo-'+d[0]+'-hell-390.jpg">Handy</a><a href="bilder/demo-'+d[0]+'-dunkel-1440.jpg">Bild dunkel</a></div></div></div>';}).join('');
+</script>
+</body>
+</html>

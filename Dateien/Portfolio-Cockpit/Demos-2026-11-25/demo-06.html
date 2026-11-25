@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Portfolio-Cockpit · Demo 06 · Renditequellen</title>
+<link rel="stylesheet" href="kit.css">
+<style>
+.umsch{list-style:none;margin:0;padding:0;display:grid;gap:7px}
+.umsch li{display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:10px;align-items:center;border:1px solid var(--netz);border-radius:11px;padding:6px 8px 6px 6px;cursor:default}
+.umsch li:hover{border-color:var(--gold)}
+.umsch .ob{width:52px;height:40px}
+.umsch b{font-weight:600}
+.umsch small{display:block;color:var(--leise);font-size:11px}
+.umsch .w{font:600 13px "Space Grotesk",Inter,sans-serif;text-align:right;white-space:nowrap}
+.umsch .w small{font:400 10px Inter,sans-serif}
+</style>
+</head>
+<body>
+<div class="seite">
+ <div class="kopf">
+  <div><div class="marke"><i></i>Portfolio-Cockpit · Demo 06 von 10 · neu</div><h1>Renditequellen</h1><div class="unter">Was dein Eigenkapital wirklich verdient, und woher: Überschuss, Tilgung, Steuer und Wertentwicklung. Oben umschalten zwischen den vier Stufen der EK-Rendite. Stand 25.11.2026.</div></div>
+  <div class="leiste"><span id="ziel"></span><div class="schalter" id="thema"><button aria-pressed="true" data-t="light">Hell</button><button aria-pressed="false" data-t="dark">Dunkel</button></div></div>
+ </div>
+<div id="sk"></div>
+<div id="kz"></div>
+<div class="raster">
+ <div class="karte" style="--s:5" id="rq"></div>
+ <div class="karte" style="--s:7" id="ek"></div>
+ <div class="karte" style="--s:6" id="streu"></div>
+ <div class="karte" style="--s:6" id="umsch"></div>
+ <div class="karte" style="--s:12" id="bsz"></div>
+</div>
+ <div class="fuss">EK-Rendite in vier Stufen, gerechnet mit ek-rendite.js der App (dieselbe Datei). Vermögensdelta im Jahr = Bewertung mal Wertsteigerungsannahme, solange seit Kauf kein volles Jahr mit Bewertung vorliegt. Eigenkapital = eingesetztes Eigenkapital je Objekt.</div>
+</div>
+<script src="ek-rendite.js"></script>
+<script src="daten.js"></script>
+<script src="kit.js"></script>
+<script src="bausteine.js"></script>
+<script>
+var S = K.D.summe, O = K.D.objekte, P = K.D.ekrP;
+function sm(f){ return K.summe(O.filter(function(o){return o.ekr}), f); }
+K.modul("#sk", function(){ return K.scoreKopf(); });
+K.modul('#kz', function(){ return K.kz([
+ {l:'Eigenkapital eingesetzt', v:K.mio(P.ek), s:O.length+' Objekte'},
+ {l:'Überschuss vor Steuer', v:K.kurzEur(sm(function(o){return o.ekr.cf_op})), s:'im Jahr, nach Zins und Tilgung', c:sm(function(o){return o.ekr.cf_op})>=0?'ok':'nok'},
+ {l:'Tilgung', v:K.kurzEur(sm(function(o){return o.ekr.tilg})), s:'im Jahr, Vermögensaufbau'},
+ {l:'Steuerwirkung', v:K.kurzEur(sm(function(o){return -o.ekr.steuer})), s:'im Jahr, + heißt Erstattung'},
+ {l:'Vermögensdelta', v:K.kurzEur(sm(function(o){return o.ekr.delta_pa||0})), s:'im Jahr, Wertentwicklung'}
+], 5); });
+K.modul('#rq', function(w){ return K.karte('Woher die Rendite kommt','Alle Objekte zusammen, Euro im Jahr. Gesamt geteilt durch das Eigenkapital ergibt '+K.pct(P.k4,1)+'.', K.renditeQuellen(w)+K.stufenListe(P)); });
+K.modul('#ek', function(w){ return K.karte('EK-Rendite je Objekt','Vier Stufen je Objekt, die gewählte kräftig. Fahr über ein Objekt für Formel und Zahlen.', K.ekJeObjekt(w)); });
+K.modul('#streu', function(w){ var os=O.filter(function(o){return o.ekr});
+ return K.karte('Wo dein Kapital arbeitet','Je Punkt ein Objekt. Rechts viel Eigenkapital, oben hohe EK-Rendite ('+K.ekStufe().kurz+'). Größe nach Kaltmiete.',
+  K.streu({w:w,h:280,aria:'Eigenkapital gegen EK-Rendite',xText:'Eigenkapital eingesetzt',fx:function(v){return K.kurz(v)},fy:function(v){return Math.round(v)+' %'},refY:4,
+   punkte:os.map(function(o){var v=K.ekWert(o.ekr); return {x:o.ek,y:v,r:o.mieteJ,lab:K.kurzName(o,200),f:v<0?'var(--rot)':v>=8?'var(--gruen)':'var(--gold)',tip:K.tipReg(function(){return '<div class="t-bild">'+K.bild(o,'ob-tip')+'</div>'+K.ekTipHtml(o.ekr,o.name)})}; })})); });
+K.modul('#umsch', function(){ var os=O.filter(function(o){return o.ekr}), med=os.map(function(o){return o.ek}).sort(function(a,b){return a-b})[Math.floor(os.length/2)];
+ var liste=[];
+ os.filter(function(o){return o.ek>=med && K.ekWert(o.ekr)<6}).forEach(function(o){ liste.push({o:o,t:'Viel Kapital, wenig Rendite. Refinanzierung oder Verkauf prüfen.'}); });
+ os.filter(function(o){return o.ekr.k1<0 && o.ekr.k4>0}).forEach(function(o){ if(!liste.some(function(x){return x.o===o})) liste.push({o:o,t:'Trägt sich nur über Steuer und Wert, operativ negativ.'}); });
+ os.filter(function(o){return o.ekr.k4>=20}).forEach(function(o){ liste.push({o:o,t:'Stark gehebelt, wenig Eigenkapital. Puffer bei Zinsanstieg prüfen.'}); });
+ return K.karte('Kapital umschichten?','Aus den vier Stufen abgeleitet, nicht als Rat zu verstehen.', '<ul class="umsch">'+liste.slice(0,7).map(function(x){var v=K.ekWert(x.o.ekr); return '<li data-tip="'+K.tipReg(function(){return K.ekTipHtml(x.o.ekr,x.o.name)})+'">'+K.bild(x.o)+'<span><b>'+K.esc(x.o.name)+'</b><small>'+x.t+'</small></span><span class="w '+K.ekKlasse(v)+'">'+K.pct(v,1)+'<small>EK '+K.kurzEur(x.o.ek)+'</small></span></li>';}).join('')+'</ul>'); });
+K.modul('#bsz', function(){ return K.karte('Bestand und Zielbild je Objekt','Der Plan je Objekt. Fahr über ein Objekt für die Details.', K.bszTabelle()); });
+K.zielSchalter('#ziel');
+document.getElementById('thema').addEventListener('click',function(e){var b=e.target.closest('button'); if(!b)return; document.documentElement.setAttribute('data-theme',b.getAttribute('data-t')); this.querySelectorAll('button').forEach(function(x){x.setAttribute('aria-pressed',x===b?'true':'false')});});
+(function(){ var t=new URLSearchParams(location.search).get('thema')||document.documentElement.getAttribute('data-theme'); if(t){ document.documentElement.setAttribute('data-theme',t); document.querySelectorAll('#thema button').forEach(function(x){x.setAttribute('aria-pressed',x.getAttribute('data-t')===t?'true':'false')}); } })();
+K.ausbau({ohneEk:true});
+if(/mass=1/.test(location.search)) setTimeout(function(){ var t=document.createElement('meta'); t.id='hoehe'; t.content=String(document.documentElement.scrollHeight); document.head.appendChild(t); }, 600);
+</script>
+</body>
+</html>
