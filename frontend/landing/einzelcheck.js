@@ -63,7 +63,7 @@
 (function () {
   'use strict';
   if (window.DpEinzelCheck) return;
-  var VERSION = 'einzelcheck-8b';
+  var VERSION = 'einzelcheck-9a';
   var ANSCHLUSS_ZINS = 5.0;     /* v3946 · Marcel 22.11.2026: „Anschlussfinanzierung, die wir einfach auf fünf Prozent rechnen mit derselben Tilgung“ */
   var ABLAGE_STUNDEN = 2;       /* v3946 · Unterlagen im Browser höchstens so lange (die Stripe-Kasse läuft nach 60 Minuten ab) */
   var SPEICHER = 'dp_ec_kauf';
@@ -1470,6 +1470,28 @@
       'Wertermittlungsstichtag ' + (stichtagText(m.stichtag) || d.stand) + '. Gerechnet mit dem Marktbericht von DealPilot auf Stufe 3, mit den amtlichen Werten der Gutachterausschüsse, soweit es sie gibt.');
     seiten.push(D.seite(c, 'Wertermittlung', wKopf + wsTeil[0]));
     if (wsTeil[1] && wsTeil[1].trim()) seiten.push(D.seite(c, 'Marktpreis', D.abschnitt('Wertermittlung', 'Marktpreis und Einordnung', 'Was der Markt gerade anbietet, und welches Verfahren hier führt.') + wsTeil[1]));
+    /* hh4 (Marcel 25.11.2026: „Die Rechnung fehlt noch im PDF, wenn es Ertragswert oder Sachwert ist.“) · Rechenweg je
+       gerechnetem Verfahren auf einer eigenen Seite, Zeilen aus dem Marktbericht (Staffel des Kerns), nichts neu gerechnet */
+    var mw = m && m.wert;
+    ((mw && mw.verfahren) || []).forEach(function (v) {
+      if (!v || !v.verfuegbar || !v.rechenweg || !v.rechenweg.length || (v.art !== 'ertragswert' && v.art !== 'sachwert')) return;
+      var rolle = v.art === mw.fuehrend ? 'führend' : (v.art === mw.stuetzend ? 'stützend' : '');
+      var zl = v.rechenweg.map(function (x) {
+        var betrag = x.wert != null ? D.eur(x.wert) : (x.faktor != null ? '× ' + dez(x.faktor, x.faktor >= 10 ? 2 : (Math.abs(x.faktor - Math.round(x.faktor * 100) / 100) > 0.00001 ? 4 : 2)) : '');
+        return [x.pos, betrag, { det: x.detail || '', art: x.summe ? 'ende' : '' }];
+      });
+      var her = v.art === 'ertragswert'
+        ? [v.lzs_pct != null ? 'Liegenschaftszinssatz ' + dez(v.lzs_pct, 2) + ' %' + (v.stufe ? ' (Stufe ' + v.stufe + (v.stufe === 'A' ? ', amtlich' : ', nicht amtlich') + ')' : '') : '',
+           v.rnd_j && v.gnd_j ? 'Restnutzungsdauer ' + dez(v.rnd_j, v.rnd_j % 1 ? 1 : 0) + ' von ' + dez(v.gnd_j, 0) + ' Jahren' : '',
+           v.miete_qm ? 'Miete ' + dez(v.miete_qm, 2) + ' €/m²' : '']
+        : [v.marktangepasst && v.swf ? 'Sachwertfaktor ' + dez(v.swf, 2) + ' des Gutachterausschusses (Stufe A)' : 'ohne Sachwertfaktor, vorläufiger Sachwert, kein Marktwert',
+           v.rnd_j && v.gnd_j ? 'Restnutzungsdauer ' + dez(v.rnd_j, v.rnd_j % 1 ? 1 : 0) + ' von ' + dez(v.gnd_j, 0) + ' Jahren' : ''];
+      var bo2 = mw.boden || {};
+      if (bo2.verfuegbar) her.push('Bodenwert aus dem amtlichen Bodenrichtwert (Stufe A)');
+      seiten.push(D.seite(c, 'Rechenweg', D.abschnitt('Wertermittlung', 'Rechenweg ' + v.name + (rolle ? ' (' + rolle + ')' : ''),
+        her.filter(Boolean).join(', ') + '. Die Zeilen stammen aus dem Marktbericht von DealPilot, nichts ist neu gerechnet.')
+        + D.liste(zl, ['Position', 'Betrag'])));
+    });
 
     /* einzelcheck-6 · Deal Score wie im Quick-Check (statt Investor Deal Score), dazu das Urteil getrennt nach
        Objekt und Finanzierung und was es bräuchte (Marcel 25.11.2026) */
