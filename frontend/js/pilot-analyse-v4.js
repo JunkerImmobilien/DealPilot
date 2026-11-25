@@ -1569,17 +1569,23 @@
       { t: 'Offerte gegen Marktpreis', a: 'Wie weit die Offerte vom Marktpreis aus Angebotspreisen entfernt liegt. Ein Wert nahe null heißt: du bietest, was der Markt hergibt.' }));
     return leiste(z, 'v');
   }
+  /* v4750 · Ziel aus dem Investmentprofil, nur eigener Eintrag (load() ohne Vorbelegung), sonst null. Gleiche Lesart wie kennzahlen() v4490a. */
+  function zielProfil(key) { try { var P = window.DealPilotInvestmentProfile, p = P && P.load ? P.load() : null, v = p ? p[key] : null; if (v == null || v === '') return null; if (typeof v !== 'number') { v = String(v).trim(); if (v.indexOf(',') >= 0) v = v.replace(/./g, '').replace(',', '.'); v = parseFloat(v); } return isFinite(v) ? v : null; } catch (e) { return null; } }
   function bankKacheln() {
     var k = kpis(), z = [];
     if (zahl(k.ltv) && k.ltv > 0) z.push(zahlKachel('Beleihung (LTV)', de(k.ltv, 1) + ' %', k.ltv <= 80 ? 'im üblichen Rahmen' : k.ltv <= 100 ? 'hoch, Bank prüft genau' : 'über 100 %', k.ltv <= 80 ? C.gut : k.ltv <= 100 ? 'var(--wl-c9a84c,#C9A84C)' : C.rot,
       { t: 'Beleihungsauslauf (LTV)', a: 'Darlehen im Verhältnis zum Kaufpreis. Bis 80 % finanzieren die meisten Banken ohne Aufschlag, darüber steigen Zins und Anforderungen.' }));
+    /* v4750 · Marcel 25.11.2026 („Reiter Bank, ja, das soll so sein“): Tipps an DSCR und Cashflow wie in den Übersichten (v4490e) NUR mit eigenem Ziel im Investmentprofil */
+    var zDsB = zielProfil('min_dscr'), zCfB = zielProfil('min_cashflow_vor_st');
     if (zahl(k.dscr) && k.dscr > 0) z.push(zahlKachel('DSCR', de(k.dscr, 2), k.dscr >= 1.2 ? 'Bank: trägt sich' : k.dscr >= 1 ? 'knapp über 1' : 'unter 1: Zuschuss nötig', k.dscr >= 1 ? C.gut : C.rot,
-      { t: 'DSCR (Kapitaldienstdeckung)', a: 'Wie oft der Reinertrag aus der Miete die Jahresrate aus Zins und Tilgung deckt. Banken erwarten meist 1,2 oder mehr. Volles Jahr, heutige Eingaben.' }));
+      zDsB == null ? null : { t: 'DSCR (Kapitaldienstdeckung)', a: 'Wie oft der Reinertrag aus der Miete die Jahresrate aus Zins und Tilgung deckt. Banken erwarten meist 1,2 oder mehr. Volles Jahr, heutige Eingaben.',
+        r: [['dein Mindest-DSCR', de(zDsB, 2)], ['Stand', k.dscr >= zDsB ? 'erreicht' : 'nicht erreicht']] }));
     if (zahl(k.ek) && k.ek > 0) z.push(zahlKachel('Eigenkapital', eur(k.ek), zahl(k.kp) && k.kp > 0 ? de(k.ek / k.kp * 100, 1) + ' % vom Kaufpreis' : '', '#2A2727',
       { t: 'Eigenkapital', a: 'Was du selbst einbringst, mit den Nebenkosten des Kaufs. Mehr Eigenkapital senkt LTV und Zins.' }));
     var EKB = ekKachel(k); if (EKB) z.push(EKB);   /* v4610 */
     if (zahl(k.cf_m)) z.push(zahlKachel('Cashflow vor Steuer', sEur(k.cf_m) + ' / Monat', 'volles Jahr', k.cf_m >= 0 ? C.gut : C.rot,
-      { t: 'Cashflow vor Steuer', a: 'Was im Monat nach Bewirtschaftungskosten, Zins und Tilgung übrig bleibt. Banken sehen gern einen positiven Wert.' }));
+      zCfB == null ? null : { t: 'Cashflow vor Steuer', a: 'Was im Monat nach Bewirtschaftungskosten, Zins und Tilgung übrig bleibt. Banken sehen gern einen positiven Wert.',
+        r: [['dein Mindest-Cashflow', sEur(zCfB) + ' / Monat'], ['Stand', k.cf_m >= zCfB ? 'erreicht' : 'nicht erreicht, es fehlen ' + eur(zCfB - k.cf_m) + ' im Monat']] }));
     return leiste(z, 'b');
   }
   function verhPanel(a, html) {

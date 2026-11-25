@@ -944,23 +944,60 @@ async function tiefe(q) {
   } catch (e) { return { verfuegbar: false, grund: 'dienst' }; }
 }
 
-/* einzelcheck-2 · Lagekarte als data:-Bild (Deckblatt des Berichts). Nur Koordinaten gehen an den mb-Dienst. */
-async function karteHolen(adr) {
+/* einzelcheck-7 · Lagekarte als data:-Bild (Deckblatt des Berichts) aus UNSERER OpenStreetMap-Karte statt Geoapify.
+   Marcel 25.11.2026: „diese OpenStreetMap-Karte, die soll natürlich auch beim Deal Check auf das PDF mit halt so einem
+   Pin, wo die Wohnung ist". Dieselben Kacheln und dieselbe Häuschen-Stecknadel wie frontend/js/lagekarte.js (pin:'haus',
+   v4690), nur serverseitig: das Backend hat keine Bildbibliothek, deshalb ein SVG mit den Kacheln als PNG-Bildern.
+   Der PDF-Dienst (Chromium) druckt es wie jedes andere Bild. Kacheln über services/osmKacheln.js (Ablage, Ratenbremse,
+   eigener User-Agent); an den Kachelserver geht nur die Kachelnummer. Fehlt eine Kachel: null, nie eine halbe Karte.
+   Ohne Straße steht die Nadel am Ort, der Bericht sagt dann „Lage ungefähr". */
+const OSM_VERMERK = '© OpenStreetMap-Mitwirkende';
+function _osmPlan(lat, lon, b, h, z) {
+  const K = 256, n0 = K * Math.pow(2, z);
+  let si = Math.sin(lat * Math.PI / 180); si = Math.min(Math.max(si, -0.9999), 0.9999);
+  const mx = (lon + 180) / 360 * n0, my = (0.5 - Math.log((1 + si) / (1 - si)) / (4 * Math.PI)) * n0;
+  const x0 = mx - b / 2, y0 = my - h / 2, n = Math.pow(2, z), liste = [];
+  for (let ty = Math.floor(y0 / K); ty <= Math.floor((y0 + h - 1) / K); ty++) {
+    for (let tx = Math.floor(x0 / K); tx <= Math.floor((x0 + b - 1) / K); tx++) {
+      if (ty < 0 || ty >= n) continue;
+      liste.push({ z: z, x: ((tx % n) + n) % n, y: ty, dx: tx * K - x0, dy: ty * K - y0 });
+    }
+  }
+  return { liste: liste, mx: b / 2, my: h / 2 };
+}
+function _osmPin(mx, my) {
+  /* Stecknadel mit Häuschen, Spitze auf der Anschrift (Maße wie lagekarte.js, für die 1200-px-Karte x1,6) */
+  const R = 21, cy = my - 40, g = '#C9A84C';
+  const tropfen = 'M' + mx + ' ' + my + ' C' + (mx - 8) + ' ' + (my - 14) + ' ' + (mx - R) + ' ' + (cy + 13) + ' ' + (mx - R) + ' ' + cy
+    + ' A' + R + ' ' + R + ' 0 0 1 ' + (mx + R) + ' ' + cy + ' C' + (mx + R) + ' ' + (cy + 13) + ' ' + (mx + 8) + ' ' + (my - 14) + ' ' + mx + ' ' + my + ' Z';
+  const p = function (dx, dy) { return (mx + dx * 1.6).toFixed(1) + ' ' + (cy + dy * 1.6).toFixed(1); };
+  const haus = 'M' + p(0, -7) + ' L' + p(7.5, -0.5) + ' L' + p(5, -0.5) + ' L' + p(5, 6) + ' L' + p(1.6, 6) + ' L' + p(1.6, 2) + ' L' + p(-1.6, 2)
+    + ' L' + p(-1.6, 6) + ' L' + p(-5, 6) + ' L' + p(-5, -0.5) + ' L' + p(-7.5, -0.5) + ' Z';
+  return '<ellipse cx="' + mx + '" cy="' + (my + 2) + '" rx="11" ry="4" fill="#000" fill-opacity="0.25"/>'
+    + '<path d="' + tropfen + '" fill="' + g + '" stroke="#fff" stroke-width="2.6" filter="url(#sch)"/>'
+    + '<path d="' + haus + '" fill="#fff"/>';
+}
+async function karteHolen(adr, o) {
+  o = o || {};
   const lat = _n(adr && adr.lat), lon = _n(adr && adr.lon);
-  if (lat == null || lon == null || Math.abs(lat) > 90 || Math.abs(lon) > 180) return null;
+  if (lat == null || lon == null || Math.abs(lat) > 85 || Math.abs(lon) > 180 || (lat === 0 && lon === 0)) return null;
   const genau = !!(adr && typeof adr.street === 'string' && adr.street.trim());
+  const B = 1200, H = 560, plan = _osmPlan(lat, lon, B, H, genau ? 16 : 13);
+  if (!plan.liste.length || plan.liste.length > 24) return null;
   try {
-    const u = MB_BASE + '/static-map?lat=' + lat.toFixed(6) + '&lon=' + lon.toFixed(6) + '&zoom=' + (genau ? 16 : 13)
-      /* einzelcheck-4 · Marker immer (Marcel 25.11.2026: „wichtig, dass wir immer zeigen … so eine Stecknadel, wo das
-         Häuschen ist“). Ohne Strasse steht er am Ortsmittelpunkt, der Bericht sagt dann „Lage ungefähr“. */
-      + '&style=dark-matter-yellow-roads&width=1200&height=560&marker=1';
-    const r = await deps().mbFetch(u, { method: 'GET' });
-    if (!r || !r.ok || typeof r.arrayBuffer !== 'function') return null;
-    const typ = String((r.headers && r.headers.get && r.headers.get('content-type')) || 'image/png').split(';')[0];
-    if (!/^image\/(png|jpeg|webp)$/.test(typ)) return null;
-    const buf = Buffer.from(await r.arrayBuffer());
-    if (!buf.length || buf.length > 3 * 1024 * 1024) return null;
-    return { bild: 'data:' + typ + ';base64,' + buf.toString('base64'), genau: genau };
+    const osm = o.osm || require('./osmKacheln');
+    const bilder = await Promise.all(plan.liste.map(function (k) { return osm.kachel(k.z, k.x, k.y).then(function (r) { return r && r.buf; }, function () { return null; }); }));
+    if (bilder.some(function (b) { return !b || !osm.istPng(b); })) return null;   /* nie eine halbe Karte */
+    const kacheln = plan.liste.map(function (k, i) {
+      return '<image x="' + k.dx.toFixed(1) + '" y="' + k.dy.toFixed(1) + '" width="256" height="256" href="data:image/png;base64,' + bilder[i].toString('base64') + '"/>';
+    }).join('');
+    const tw = Math.round(OSM_VERMERK.length * 7.2);
+    const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + B + '" height="' + H + '" viewBox="0 0 ' + B + ' ' + H + '">'
+      + '<defs><filter id="sch" x="-50%" y="-50%" width="200%" height="200%"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.35"/></filter></defs>'
+      + '<rect width="' + B + '" height="' + H + '" fill="#f2efe9"/>' + kacheln + _osmPin(plan.mx, plan.my)
+      + '<rect x="' + (B - tw - 16) + '" y="' + (H - 24) + '" width="' + (tw + 16) + '" height="24" fill="#fff" fill-opacity="0.82"/>'
+      + '<text x="' + (B - 8) + '" y="' + (H - 7) + '" text-anchor="end" font-family="Inter, Helvetica, Arial, sans-serif" font-size="14" fill="#333">' + OSM_VERMERK + '</text></svg>';
+    return { bild: 'data:image/svg+xml;base64,' + Buffer.from(svg, 'utf8').toString('base64'), genau: genau, quelle: 'osm', vermerk: OSM_VERMERK };
   } catch (e) { return null; }
 }
 
