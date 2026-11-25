@@ -79,11 +79,11 @@
     try {
       new MutationObserver(function (ms) {
         var neu = false;
-        for (var i = 0; i < ms.length; i++) { var n = ms[i].target; if (ms[i].type === 'attributes') { var alt = String(ms[i].oldValue || ''); if (ms[i].attributeName === 'class' && !/dp-kt-/.test(alt) && /dp-kt-/.test(String(n.className || ''))) continue; /* unsere eigene Klasse */ if (ms[i].attributeName !== 'class' && /dp-kt-/.test(String(n.className || ''))) continue; /* Stil-Animation an eingestuftem Element: nichts tun */ if (n && n.classList) KL.forEach(function (k) { n.classList.remove(k); }); /* fremder Wechsel (z. B. grün auf rot): neu beurteilen */ try { erledigt.delete(n); } catch (e) {} } neu = true; }   /* eigene Klasse: kein neuer Lauf; Klassen-/Stilwechsel: Element neu beurteilen */
+        for (var i = 0; i < ms.length; i++) { var n = ms[i].target; if (ms[i].type === 'attributes') { var alt = String(ms[i].oldValue || ''); if (ms[i].attributeName === 'class' && !/dp-kt-/.test(alt) && /dp-kt-/.test(String(n.className || ''))) continue; /* unsere eigene Klasse */ if (ms[i].attributeName !== 'class' && /dp-kt-/.test(String(n.className || ''))) continue; /* Stil-Animation an eingestuftem Element: nichts tun */ if (n && n.classList) KL.forEach(function (k) { if (n.classList.contains(k)) n.classList.remove(k); });   /* nur wenn vorhanden: classList.remove setzt das Attribut sonst trotzdem und löst eine Endlosschleife aus */ /* fremder Wechsel (z. B. grün auf rot): neu beurteilen */ try { erledigt.delete(n); } catch (e) {} } neu = true; }   /* eigene Klasse: kein neuer Lauf; Klassen-/Stilwechsel: Element neu beurteilen */
         if (neu) planen();
       }).observe(document.body, { childList: true, subtree: true, characterData: true, attributes: true, attributeOldValue: true, attributeFilter: ['class', 'style', 'hidden'] });   /* Reiterwechsel schalten nur Sichtbarkeit um */
     } catch (e) {}
   }
-  window.DpKontrastText = { pruefe: pruefe, version: 'v4850e' };
+  window.DpKontrastText = { pruefe: pruefe, version: 'v4850f' };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
 })();
