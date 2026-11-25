@@ -71,8 +71,23 @@
       else { s.b3 += r.k1 * r.ek / 100; s.b4 += r.k2 * r.ek / 100; }
     });
     if (!(s.ek > 0)) return null;
-    return { ek: s.ek, k1: s.b1 / s.ek * 100, k2: s.b2 / s.ek * 100, k3: s.b3 / s.ek * 100, k4: s.b4 / s.ek * 100,
-             haupt: s.b4 / s.ek * 100, mit_delta: s.n3 };
+    var out = { ek: s.ek, k1: s.b1 / s.ek * 100, k2: s.b2 / s.ek * 100, k3: s.b3 / s.ek * 100, k4: s.b4 / s.ek * 100,
+             haupt: s.b4 / s.ek * 100, haupt_art: 'k4', mit_delta: s.n3, portfolio: true, anzahl: (liste || []).filter(function (r) { return r && r.ek > 0; }).length };
+    /* v4620 · Hebel des Bestands: Euro-Summen der Objekte, die ihre Hebel-Eingaben tragen */
+    var hs = { gi: 0, z: 0, d: 0, ertrag: 0, ek: 0, m2: 0, n: 0 };
+    (liste || []).forEach(function (r) {
+      if (!r || !(r.ek > 0) || !r.hebel_in || !r.hebel) return;
+      var hi = r.hebel_in; if (!(hi.gi > 0) || !(hi.darlehen > 0) || hi.zins_j == null) return;
+      hs.gi += hi.gi; hs.z += hi.zins_j; hs.d += hi.darlehen; hs.ek += r.ek; hs.n++;
+      hs.ertrag += r.cf_op + hi.zins_j + r.tilg + r.bspar + (r.delta_pa == null ? 0 : r.delta_pa);
+      hs.m2 += (r.hebel.wert_minus2 == null ? (r.k2 || 0) : r.hebel.wert_minus2) * r.ek / 100;
+    });
+    if (hs.n && hs.gi > 0 && hs.d > 0) {
+      var gkr = hs.ertrag / hs.gi * 100, fkz = hs.z / hs.d * 100;
+      out.hebel = { gkr: gkr, fk_zins: fkz, richtung: gkr >= fkz ? 'positiv' : 'negativ', verschuldung: hs.d / hs.ek,
+                    kipp_zins: gkr, wert_minus2: hs.m2 / hs.ek * 100, objekte: hs.n };
+    }
+    return out;
   }
 
   /* v4620 · Hebeleffekt (Marcel 25.11.2026: „auch wenn das in die andere Richtung geht“).

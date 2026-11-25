@@ -562,6 +562,9 @@
     var dl = !zahl(e.delta_pa) ? '' : (e.delta_weg === 'seit_kauf'
       ? sEur(e.delta_pa) + ' im Jahr (' + sEur(e.delta) + ' seit Kauf, ' + de(e.haltejahre, 1) + ' Jahre)'
       : sEur(e.delta_pa) + ' im Jahr (' + de((e.wstg || 0) * 100, 1) + ' % Wertsteigerung auf ' + eur(e.wert) + ')');
+    var _ek4h = zahlKachel('EK-Rendite', p(e.haupt), e.haupt_art === 'k4' ? 'nach Steuer mit Vermögensdelta' : 'nach Steuer', zahl(e.haupt) && e.haupt >= 0 ? C.gut : C.rot, null);
+    /* v4620 · ein Tooltip und Durchschalten der Stufen über ek-rendite-ui.js, die alte Erklärkarte bleibt nur als Rückfall */
+    if (window.DpEkrUi) return DpEkrUi.einbauen(_ek4h.replace('<b>', '<b data-dp-ekr-wert>').replace('<em>', '<em data-dp-ekr-lbl>'), e);
     return zahlKachel('EK-Rendite', p(e.haupt), e.haupt_art === 'k4' ? 'nach Steuer mit Vermögensdelta' : 'nach Steuer', zahl(e.haupt) && e.haupt >= 0 ? C.gut : C.rot,
       { t: 'EK-Rendite in vier Stufen', a: 'Was dein Eigenkapital von ' + eur(e.ek) + ' im Jahr erwirtschaftet. Hauptkennzahl ist Stufe 4: Überschuss nach Steuer, Tilgung und die Wertentwicklung gegenüber Darlehen und Eigenkapital (' + (e.wert_text || 'Bewertung') + ' ' + eur(e.wert) + ').',
         r: [['1 Operativ (Überschuss + Tilgung)', p(e.k1)], ['2 Nach Steuer', p(e.k2)], ['3 Vor Steuer mit Vermögensdelta', p(e.k3)], ['4 Nach Steuer mit Vermögensdelta', p(e.k4)],
