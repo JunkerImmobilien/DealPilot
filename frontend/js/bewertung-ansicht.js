@@ -73,7 +73,18 @@
         h: (domText('cr-st-jahr').replace(/[()]/g, '') || '') + (st > 0 ? '. Die Erstattung kommt vor allem aus Abschreibung und Zinsen.' : st < 0 ? '. Ist das Ergebnis aus Vermietung positiv, zahlst du darauf Steuern.' : '') };
     },
     'kpi-ekr': function () {
-      var k = K(); if (!(k.ek > 100) || k.ekr == null) return null;
+      var k = K();
+      /* v4610 · Marcel 25.11.2026: vier Stufen, Hauptkennzahl Stufe 4 (nach Steuer mit Vermögensdelta). Rechnung ek-rendite.js */
+      var e = k.ekr4;
+      if (e && e.haupt != null) {
+        var dl = e.delta_pa == null ? 'keine Bewertung' : (e.delta_weg === 'seit_kauf' ? eur(e.delta, true) + ' seit Kauf, je Jahr ' + eur(e.delta_pa, true) : eur(e.delta_pa, true) + ' im Jahr aus der Wertsteigerungsannahme');
+        return { t: 'EK-Rendite in vier Stufen',
+          a: 'Was dein Eigenkapital von ' + eur(e.ek) + ' im Jahr erwirtschaftet. Angezeigt wird Stufe 4, nach Steuer mit Vermögensdelta.',
+          r: [['1 Operativ, Überschuss plus Tilgung', pct(e.k1)], ['2 Nach Steuer', pct(e.k2)], ['3 Vor Steuer mit Vermögensdelta', pct(e.k3)], ['4 Nach Steuer mit Vermögensdelta', pct(e.k4), 1],
+            ['Überschuss vor Steuer', eur(e.cf_op, true)], ['Tilgung und Bausparen', eur(e.tilg + e.bspar)], [e.steuer > 0 ? 'Steuernachzahlung' : 'Steuererstattung', eur(Math.abs(e.steuer))], ['Vermögensdelta', dl]],
+          h: 'Vermögensdelta = ' + (e.wert_text || 'Bewertung') + ' ' + eur(e.wert) + ' minus Darlehen bei Kauf ' + eur(e.darlehen0) + ' minus Eigenkapital. Im Ankauf zählt die Wertsteigerung des ersten Jahres, einmalige Effekte nicht. Ab 8 % gilt sie als gut, unter 4 % als niedrig.' };
+      }
+      if (!(k.ek > 100) || k.ekr == null) return null;
       var basis = k.ekr * k.ek / 100;
       return { t: 'Eigenkapitalrendite',
         a: 'Wie sich dein eingesetztes Eigenkapital jedes Jahr laufend verzinst, vor Steuern und ohne Wertsteigerung.',

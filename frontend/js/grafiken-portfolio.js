@@ -46,7 +46,7 @@
         wert: w.wert != null ? w.wert : (zahl(o.kaufpreis_eur) || 0), wertQ: w.quelle || 'kp', rest: zahl(o.restschuld_eur) || 0, darlehen: dar,
         zinsPct: dar ? zinsJ / dar * 100 : null, rateJ: zinsJ + tilgJ, mieteJ: zahl(o.miete_kalt_eur_jahr), cfvs: cfvs, cfns: cfns,
         steuer: cfns != null && cfvs != null ? cfns - cfvs : null, dscr: zahl(o.dscr), bmy: zahl(o.bruttomietrendite_prozent),
-        wfl: zahl(o.wohnflaeche_qm), we: zahl(o.wohneinheiten),
+        wfl: zahl(o.wohnflaeche_qm), we: zahl(o.wohneinheiten), ekr4: (function () { try { return D.ekr4Obj ? D.ekr4Obj(d) : null; } catch (e) { return null; } })(),   /* v4610 */
         score: zahl(o.investor_deal_score) != null ? zahl(o.investor_deal_score) : zahl(o.dealpilot_score),
         bindEnde: d._kpis_bindung_ende || null, rsBind: zahl(d._kpis_rs_bindung), ew: bw.ew != null ? bw.ew : null, mpi: bw.mpi != null ? bw.mpi : null,
         wertstg: zahl(String(d.wertstg == null ? '' : d.wertstg).replace(',', '.')) };
@@ -248,7 +248,13 @@
       + kachel('DSCR', dscr != null ? nf2.format(dscr) : 'keine Angabe', '', dscr == null ? '' : dscr >= 1 ? 'gp-pos' : 'gp-neg', gesamt ? 'Jahresmiete zu Kapitaldienst über alle Objekte, wie bisher in den Kennzahlen.' : 'Für eine Auswahl nur je Objekt.')
       + kachel('Ø-Zins', B.avgZins != null && gesamt ? nf2.format(B.avgZins) + ' %' : (rows.length === 1 && rows[0].zinsPct != null ? nf2.format(rows[0].zinsPct) + ' %' : 'keine Angabe'), '', '', 'Nach Restschuld gewichtet.')
       + kachel('Cashflow vor St.', eurV(CFvs / 12), '', ton(CFvs), 'Im Monat. ' + eurV(CFvs) + ' im Jahr.')
-      + kachel('EK-Rendite', gesamt && S.ek > 100 ? nf1.format(S.cfNsJ / S.ek * 100) + ' %' : 'keine Angabe', '', '', 'Cashflow nach Steuer zu eingesetztem Eigenkapital (' + mio(S.ek) + ').')
+      + (function () {   /* v4610 · Hauptkennzahl nach Steuer mit Vermögensdelta, EK-gewichtet über die gewählten Objekte */
+        var E = window.DpEkRendite ? DpEkRendite.portfolio(rows.map(function (r) { return r.ekr4; })) : null;
+        if (!E) return kachel('EK-Rendite', 'keine Angabe', '', '', 'Kein Eigenkapital oder kein Cashflow gespeichert.');
+        var p = function (x) { return nf1.format(x) + ' %'; };
+        return kachel('EK-Rendite', p(E.haupt), 'nach Steuer mit Vermögensdelta', E.haupt >= 0 ? 'gp-pos' : 'gp-neg',
+          'EK-Rendite in vier Stufen, nach Eigenkapital gewichtet (' + mio(E.ek) + '). 1 Operativ ' + p(E.k1) + '. 2 Nach Steuer ' + p(E.k2) + '. 3 Vor Steuer mit Vermögensdelta ' + p(E.k3) + '. 4 Nach Steuer mit Vermögensdelta ' + p(E.k4) + ', Hauptkennzahl. Vermögensdelta = Bewertung minus Darlehen bei Kauf minus Eigenkapital, je Haltejahr.');
+      })()
       + kachel('Ertragswert', nEw ? (kpEw ? (ewS / kpEw >= 1 ? '+' : '−') + nf1.format(Math.abs(ewS / kpEw * 100 - 100)) + ' %' : '') : 'keine Angabe', nEw ? nEw + ' von ' + rows.length + ' Obj.' : '', nEw && kpEw ? (ewS >= kpEw ? 'gp-pos' : 'gp-neg') : '', 'Gesamtbewertung: Summe Ertragswerte ' + mio(ewS) + ' gegen die Kaufpreise derselben Objekte ' + mio(kpEw) + '.')
       + kachel('Marktpreis', nMpi ? (kpMpi ? (mpiS / kpMpi >= 1 ? '+' : '−') + nf1.format(Math.abs(mpiS / kpMpi * 100 - 100)) + ' %' : '') : 'keine Angabe', nMpi ? nMpi + ' von ' + rows.length + ' Obj.' : '', nMpi && kpMpi ? (mpiS >= kpMpi ? 'gp-pos' : 'gp-neg') : '', 'Gesamtbewertung: Marktpreisindikation ' + mio(mpiS) + ' gegen die Kaufpreise derselben Objekte ' + mio(kpMpi) + '.')
       + '</div>';

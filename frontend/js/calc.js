@@ -3070,6 +3070,23 @@ function _calcImmediate(){
      bleibt als eigene Kennzahl ekr_ns erhalten. */
   var ekr=ekv>0?cf_op/ekv*100:0;
   var ekr_ns=ekv>0?cf_ns/ekv*100:0;
+  /* v4610 · Marcel 25.11.2026: EK-Rendite in vier Stufen, Hauptkennzahl nach Steuer mit Vermögensdelta.
+     Gerechnet nur in js/ek-rendite.js, hier nur die Eingaben. */
+  var ekr4 = null;
+  try {
+    if (window.DpEkRendite) {
+      var _wa4 = State.wert_anker;
+      var _w4 = (_wa4 && _wa4.wert > 0) ? _wa4.wert : (svw > 0 ? svw : kp);
+      ekr4 = DpEkRendite.rechne({
+        cf_op: cf_op, steuer: steuer, tilg: tilg_j, bspar: bspar_y, ek: ekv,
+        wert: _w4, darlehen0: d_total,
+        uebergang: g('wirtschaftlicher_uebergang') || g('kaufdat') || null,
+        stichtag: (_wa4 && _wa4.wert > 0 && _wa4.datum) ? _wa4.datum : null,
+        wstg: wstg
+      });
+      if (ekr4) ekr4.wert_text = (_wa4 && _wa4.wert > 0) ? 'maßgebender Wert' : (svw > 0 ? 'Wertangabe' : 'Kaufpreis');
+    }
+  } catch (_eE4) { ekr4 = null; }
   // EZB = Ende der Zinsbindung — V63.61: Werte AM Ende der Zinsbindung (nach `bindj` vollen
   // Jahren), nicht im letzten Bindungsjahr (bindj-1). Das war ein Off-by-One-Fehler:
   // - Tabelle 'Cashflow-Projektion' zeigt Zeile bindj mit den 'EZB'-Werten
@@ -3254,7 +3271,9 @@ function _calcImmediate(){
      `||` gearbeitet: 0 ist ein gültiger Wert und darf nicht durchfallen. */
   st('kpi-irr', (irr == null) ? '—' : fP(irr, 1));
   /* v3192 · EK-Rendite als eigene Kachel (Marcel: „die Eigenkapitalrendite ist halt ganz wichtig, dass wir die direkt sehen“) - dieselbe Rechnung wie DealKpis (cf_banker_j / ek) und die Kennzahlen-Bewertung */
-  try { var _ekr = (ekv > 100) ? (cf_op / ekv * 100) : null; st('kpi-ekr', (ekv <= 100) ? '∞' : fP(_ekr, 1)); st('kpi-ekr-sub', (ekv <= 100) ? 'kaum Eigenkapital · max. Hebel' : 'vor Steuern auf ' + fE(ekv, 0) + ' EK, volles Jahr nach heutigen Eingaben'); if (_ekr != null) setKpiColor('kpi-ekr', _ekr, 8, 4); } catch (_eEk) {}
+  /* v4610 · Kachel EK-Rendite = Hauptkennzahl (nach Steuer mit Vermögensdelta), alle vier Stufen im Tooltip. _dpEkrZeigen wird im Bestand
+     nach der Jahreszeile noch einmal gerufen. Cash-on-Cash vor Steuer (Score-Eingabe) steht weiter in r-ekr. */
+  try { if (ekv <= 100) { st('kpi-ekr', '∞'); st('kpi-ekr-sub', 'kaum Eigenkapital · max. Hebel'); } else window._dpEkrZeigen(ekr4); } catch (_eEk) {}
   if (irr != null) setKpiColor('kpi-irr', irr, 8, 4);   /* ≥8 % grün, 4–8 gold, <4 rot */
   if (be.cf == null) {
     st('kpi-be', '—');
@@ -3599,7 +3618,7 @@ function _calcImmediate(){
 
        > Wer eine Rechnung abholt, muss wissen, zu wem sie gehoert. */
   State.kpis={_fuer:(window._currentObjKey||null),warm_j:warm_j,nk_vz_j:uf*12,ze_j:ze*12,nkm_netto_j:nkm*12,ze_ezb:ze*12*(_meIncludesZE?_mFac(bindj):1),   /* v2484 */
-    bmy:bmy,bmy_gi:(gi>0?nkm_j/gi*100:0),san_fin:_sanFin,ltc:_ltc,ltv_soll:_ltvSoll,nmy:nmy,fak:fak,em:em,em_pe:em_pe,ekr:ekr,ekr_ns:ekr_ns,
+    bmy:bmy,bmy_gi:(gi>0?nkm_j/gi*100:0),san_fin:_sanFin,ltc:_ltc,ltv_soll:_ltvSoll,nmy:nmy,fak:fak,em:em,em_pe:em_pe,ekr:ekr,ekr_ns:ekr_ns,ekr4:ekr4,
     irr:irr,be_cf:be.cf,be_kum:be.kum,be_kum_ek:be.kumEk,dscr:dscr,dscr_netto:dscr_netto,dscr_brutto:dscr_brutto /* v3031 */,noi_dscr:noi_dscr,kd_dscr:kd_dscr,ltv:ltv,cf_op:cf_op,cf_ns:cf_ns,cf_m:cf_m,cf_ezb:cf_ezb,cf_op_ezb:cf_op_ezb,cf_ns_ezb:cf_ns_ezb,zins_ezb:zins_ezb,tilg_ezb:tilg_ezb,bspar_ezb:bspar_y_ezb,bwk_ezb:bwk_ezb,wm_ezb:wm_ezb,nkm_ezb:nkm_ezb,bwk_cf_ezb:bwk_cf_ezb,ster_ezb:ster_ezb,afa_ezb:afa,cf_op_an:cf_op_an,cf_ns_an:cf_ns_an,zins_an:zins_an,tilg_an:tilg_an,bspar_an:bspar_y_an,wm_an:wm_an,bwk_an:bwk_an,nkm_an:nkm_an,bwk_cf_an:bwk_cf_an,rate_an_m:rate_an_m,ster_an:ster_an,exit_vkp:exit_vkp,wm_j:wm_j,nkm_j:nkm_j,bwk:bwk,bwk_cf:bwk_cf,zins_j:zins_j,tilg_j:tilg_j,bspar_j:bspar_y,steuer:steuer,afa:afa,zve_immo:zve_immo,zaer_m:zaer_m,zaer_pct:zaer_pct,wp_kpi:wp_kpi,d1:d1,ek:ekv,gi:gi,kp:kp,bwk_ul:ul,bwk_nul:nul,bwk_nul_st:nul_st,d1z_pct:d1z*100,d1t_pct:d1t*100,d1IsAussetzung:_d1IsAussetzung,
     /* v2850 · mstg (Prozent) und d_total, damit DealScore.computeFromKpis(State.kpis)
        dasselbe rechnet wie DealScore.compute(): ohne mstg nahm der Kern 1,5 %, und die
@@ -4190,6 +4209,16 @@ function _calcImmediate(){
           State.kpis.cf_op = _hR.cfop_y;
           State.kpis.cf_ns = _hR.cfns_y;
           State.kpis.cf_m  = _hR.cfop_y / 12;
+          /* v4610 · EK-Rendite im Bestand aus derselben Jahreszeile wie Cashflow und Steuer (danach Kachel neu) */
+          try {
+            var _e4 = State.kpis.ekr4;
+            if (_e4 && window.DpEkRendite) {
+              var _e4n = DpEkRendite.rechne({ cf_op: _hR.cfop_y, steuer: _hR.tax_y, tilg: _hR.ty, bspar: _hR.bspar_y || 0, ek: _e4.ek,
+                wert: _e4.wert, darlehen0: _e4.darlehen0, uebergang: g('wirtschaftlicher_uebergang') || g('kaufdat') || null,
+                stichtag: (State.wert_anker && State.wert_anker.wert > 0) ? State.wert_anker.datum : null, wstg: _e4.wstg });
+              if (_e4n) { _e4n.wert_text = _e4.wert_text; _e4n.jahr = _hR.cal; State.kpis.ekr4 = _e4n; try { window._dpEkrZeigen(_e4n); } catch (_eZ) {} }
+            }
+          } catch (_eE4h) {}
           try {
             st('steuer_j', fE(-_hR.tax_y, 0) + (_hR.tax_y < 0 ? ' (Erstattung)' : ' (Belastung)'));
             st('sc-today', fE(_hR.cfns_y, 0, true));
@@ -5832,6 +5861,21 @@ window._dpKpisNachziehen = function () {
     o._kpis_dscr  = State.kpis.dscr;
     o._kpis_dscr_art = 'netto';   /* v3031 */
     o._kpis_ltv   = State.kpis.ltv;
+    o._ekr4 = State.kpis.ekr4 || null;   /* v4610 · EK-Rendite in vier Stufen fürs Portfolio-Cockpit */
     o._wert_anker = (State.wert_anker && State.wert_anker.wert > 0) ? { wert: State.wert_anker.wert, art: State.wert_anker.art || null, datum: State.wert_anker.datum || null } : null;   /* v4420 · maßgebender Objektwert für den Score im Backend (objektRechnung.js) */
   } catch (e) {}
+};
+
+/* v4610 · Anzeige der EK-Rendite (Reiter Kennzahlen): Hauptkennzahl, vier Stufen im Tooltip. Rechnung nur in ek-rendite.js. */
+window._dpEkrZeigen = function (e) {
+  try {
+    var el = document.getElementById('kpi-ekr'), sub = document.getElementById('kpi-ekr-sub'), r4 = document.getElementById('r-ekr4');
+    if (!e || !window.DpEkRendite) return;
+    var p = function (x) { return x == null ? 'k. A.' : x.toLocaleString('de-DE', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + ' %'; };
+    var tip = DpEkRendite.tooltip(e);
+    if (el) { el.textContent = p(e.haupt); el.title = tip; if (typeof setKpiColor === 'function') setKpiColor('kpi-ekr', e.haupt, 8, 4); }
+    if (sub) { sub.textContent = (e.haupt_art === 'k4' ? 'nach Steuer mit Vermögensdelta' : 'nach Steuer') + ', operativ ' + p(e.k1); sub.title = tip; }
+    if (r4) { r4.textContent = p(e.haupt); r4.title = tip; }
+    var kp = el && el.closest ? el.closest('.kpi') : null; if (kp) kp.title = tip;
+  } catch (_e) {}
 };
