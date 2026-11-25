@@ -45557,3 +45557,9 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** staging 7b0c70b2 · main 37b40b70, Version af17ac3a.
 - **Nachweis:** Staging alter Merker gesetzt → Fenster 1×, danach nicht; Prod liefert blackweek-2.
 - **Rest:** keiner.
+
+### Rollout 1.0.206 · einzelcheck-6 / v4720 (25.11.2026)
+- **Was:** Deal-Check bewertet über `js/qc-score-weg.js` genau wie der Quick-Check (kein Investor Deal Score mehr), Urteil Objekt gegen Finanzierung mit Eigenkapitalbedarf, PDF vom PDF-Dienst (`POST /public/einzelcheck/pdf`), Kürzen am Satzende, Wertermittlung auf zwei Seiten, Kopf ImmoWertV nur bei Stufe A.
+- **Commit:** staging f9b14313 · main b0b54d02, Version 8396df9f · Rückführung 1785261c.
+- **Nachweis:** Herford 43 → 66 Solide (Objekt 81, Finanzierung 34). einzelcheck-pruefen U grün mit Gegenproben, score-ketten, rechenkerne, ki-text-zahlen, buster, vorschau grün. Prod-Sicherung haupt/mb-20261125-0810-ec6 (7,0/31 MB, Kopf gelesen), Backend Staging und Prod neu gebaut, healthy, /pdf antwortet 403 ohne Kauf, Dateien mit Bustern ausgeliefert.
+- **Rest:** kein bezahlter Bericht auf Prod gemessen. Quick-Check ohne Marktbericht kennt keine Vergleichsmiete (Potenzial weicht dann ab).
