@@ -82,7 +82,34 @@ async function stand(userId) {
   let frist = null;
   try { const f = await query('SELECT frist_am FROM dateien_fristen WHERE user_id = $1', [userId]); if (f.rowCount) frist = f.rows[0].frist_am; } catch (e) {}
   return { plan, grenze_bytes: grenze, belegt_bytes: belegt, frei_bytes: Math.max(0, grenze - belegt), anzahl: r.rows[0].anzahl, max_datei_bytes: MAX_DATEI, bereit: bereit(),
-    darf_ablegen: grenze > 0, loeschung_am: frist };
+    darf_ablegen: grenze > 0, loeschung_am: frist,
+    belegt_pct: grenze > 0 ? Math.min(100, Math.round(belegt / grenze * 1000) / 10) : 0, warnung: grenze > 0 && belegt / grenze >= 0.8 };
+}
+
+/* v4910 · Einsortieren (Marcel 25.11.2026: „passend nach Ordnern ablegen und auch für die Jahre“). Ordner aus der
+   erkannten Dokumentart, wenn keiner angegeben ist; das Jahr steht in meta.jahr (aus Belegdatum, sonst Ablagejahr). */
+const ORDNER = ['Belege', 'Mietverträge', 'Protokolle', 'Energieausweis', 'Exposé', 'Kauf & Objekt', 'Bewertung', 'Finanzierung', 'Steuer', 'Sonstiges'];
+function ordnerAus(art) {
+  const l = String(art || '').toLowerCase();
+  if (!l) return 'Sonstiges';
+  if (/rechnung|beleg|quittung/.test(l)) return 'Belege';
+  if (/expos/.test(l)) return 'Exposé';
+  if (/energieausweis/.test(l)) return 'Energieausweis';
+  if (/mietvertrag|mieterliste|mietaufstellung/.test(l)) return 'Mietverträge';
+  if (/protokoll|eigentümerversammlung|wirtschaftsplan|hausgeld|abrechnung|weg/.test(l)) return 'Protokolle';
+  if (/market|marktbericht|gutachten|wertermittlung|restnutzungsdauer/.test(l)) return 'Bewertung';
+  if (/grundbuch|teilung|flurkarte|liegenschaft|baulast|kaufvertrag|auflassung/.test(l)) return 'Kauf & Objekt';
+  if (/darlehen|finanzierung|bank|grundschuld/.test(l)) return 'Finanzierung';
+  if (/steuer|bescheid/.test(l)) return 'Steuer';
+  return 'Sonstiges';
+}
+function jahrAusMeta(meta) {
+  const m = meta || {};
+  const j = Number(m.jahr); if (j >= 1900 && j <= 2200) return j;
+  for (const k of ['belegdatum', 'rechnungsdatum', 'datum', 'stichtag']) {
+    const t = String(m[k] || ''); const x = t.match(/(19|20|21)[0-9]{2}/); if (x) return Number(x[0]);
+  }
+  return null;
 }
 
 async function _objektGehoert(userId, objectId) {
@@ -101,7 +128,9 @@ async function ablegen(userId, opts) {
   if (!(await _objektGehoert(userId, opts.objectId))) throw fehler(403, 'Objekt gehört nicht zu diesem Konto.');
   const sha = crypto.createHash('sha256').update(puffer).digest('hex');
   /* dieselbe Datei im selben Ordner desselben Objekts nicht doppelt ablegen */
-  const ordner = ordnerSauber(opts.ordner);
+  const meta0 = Object.assign({}, opts.meta || {});
+  const jm = jahrAusMeta(meta0); if (jm) meta0.jahr = jm;
+  const ordner = ordnerSauber(opts.ordner) || (module.exports.ordnerAus || ordnerAus)(meta0.art || opts.art);
   const dup = await query('SELECT id, user_id, object_id, ordner, name, mime, groesse, sha256, quelle, meta, created_at FROM dateien WHERE user_id = $1 AND sha256 = $2 AND ordner = $3 AND object_id IS NOT DISTINCT FROM $4 AND deleted_at IS NULL LIMIT 1',
     [userId, sha, ordner, opts.objectId || null]);
   if (dup.rowCount) return Object.assign({ doppelt: true }, dup.rows[0]);
@@ -115,7 +144,7 @@ async function ablegen(userId, opts) {
       'INSERT INTO dateien (user_id, object_id, ordner, name, mime, groesse, sha256, ablage_schluessel, quelle, meta) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) '
       + 'RETURNING id, user_id, object_id, ordner, name, mime, groesse, sha256, quelle, meta, created_at',
       [userId, opts.objectId || null, ordner, nameSauber(opts.name), String(opts.mime || 'application/octet-stream').slice(0, 120), puffer.length, sha, schluessel,
-        String(opts.quelle || 'upload').slice(0, 20), JSON.stringify(opts.meta || {})]);
+        String(opts.quelle || 'upload').slice(0, 20), JSON.stringify(meta0)]);
     return r.rows[0];
   } catch (e) { await _entfernen(userId, schluessel); throw e; }
 }
@@ -125,7 +154,7 @@ async function liste(userId, objectId) {
   let w = "user_id = $1 AND deleted_at IS NULL AND quelle IS DISTINCT FROM 'objektfoto'";   /* v3310: Objektfotos nicht in der Liste */
   if (objectId === null) w += ' AND object_id IS NULL';
   else if (objectId) { args.push(objectId); w += ' AND object_id = $2'; }
-  const r = await query('SELECT id, object_id, ordner, name, mime, groesse, sha256, quelle, meta, created_at, updated_at FROM dateien WHERE ' + w + ' ORDER BY ordner, name', args);
+  const r = await query('SELECT d.id, d.object_id, d.ordner, d.name, d.mime, d.groesse, d.sha256, d.quelle, d.meta, d.created_at, d.updated_at, o.name AS objekt_name FROM dateien d LEFT JOIN objects o ON o.id = d.object_id WHERE ' + w.replace(/(^|AND )(user_id|deleted_at|quelle|object_id)/g, '$1d.$2') + ' ORDER BY d.ordner, d.name', args);
   return r.rows.map((z) => Object.assign(z, { jahr: jahrVon(z) }));
 }
 
@@ -166,6 +195,21 @@ function jahrVon(z) {
 }
 
 /** v4860 · alle Dateien eines Jahres (je Objekt) löschen. Gibt die Zahl zurück. */
+/** v4910 · Gruppe löschen: alle Dateien eines Objekts in einem Ordner und/oder Jahr. Ohne Ordner und Jahr: nichts. */
+async function loeschenGruppe(userId, objectId, opt) {
+  opt = opt || {};
+  const j = opt.jahr != null ? Number(opt.jahr) : null;
+  const ord = opt.ordner != null ? ordnerSauber(opt.ordner) : null;
+  if ((j == null || !(j >= 1900 && j <= 2200)) && !ord) return 0;
+  const alle = await liste(userId, objectId);
+  let n = 0;
+  for (const d of alle) {
+    if (j != null && d.jahr !== j) continue;
+    if (ord && String(d.ordner || '').split('/')[0] !== ord.split('/')[0]) continue;
+    if (await loeschen(userId, d.id)) n++;
+  }
+  return n;
+}
 async function loeschenJahr(userId, objectId, jahr) {
   const j = Number(jahr); if (!(j >= 1900 && j <= 2200)) return 0;
   const alle = await liste(userId, objectId);
@@ -254,4 +298,4 @@ async function kontoLeeren(userId) {
   try { await fs.promises.rm(path.join(BASIS, String(userId)), { recursive: true, force: true }); return true; } catch (e) { return false; }
 }
 
-module.exports = { ablegen, liste, holen, aendern, loeschen, loeschenJahr, fristLauf, fristMail, plattenStand, plattenWarnung, jahrVon, FRIST_TAGE, stand, kontoLeeren, bereit, ordnerSauber, nameSauber, GRENZE_JE_PLAN, MAX_DATEI, _lesen, _schreiben, _entfernen };
+module.exports = { ordnerAus, jahrAusMeta, ORDNER, loeschenGruppe, ablegen, liste, holen, aendern, loeschen, loeschenJahr, fristLauf, fristMail, plattenStand, plattenWarnung, jahrVon, FRIST_TAGE, stand, kontoLeeren, bereit, ordnerSauber, nameSauber, GRENZE_JE_PLAN, MAX_DATEI, _lesen, _schreiben, _entfernen };

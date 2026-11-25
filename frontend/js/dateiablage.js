@@ -16,7 +16,8 @@
   'use strict';
   if (window.DpAblage) return;
 
-  var STANDARD = ['Kauf & Objekt', 'Finanzierung', 'Mietverträge', 'WEG', 'Steuer', 'Rechnungen', 'Bewertung', 'Sonstiges'];
+  /* v4910 · Ordner wie in der Verwaltung (Einstellungen › Dokumente); das Jahr steht in meta.jahr, nicht im Ordnernamen */
+  var STANDARD = ['Belege', 'Mietverträge', 'Protokolle', 'Energieausweis', 'Exposé', 'Kauf & Objekt', 'Bewertung', 'Finanzierung', 'Steuer', 'Sonstiges'];
   var _offen = {}, _ziel = '', _standP = null;
 
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
@@ -27,19 +28,51 @@
   function datum(d) { try { return new Date(d).toLocaleDateString('de-DE'); } catch (e) { return ''; } }
 
   /** Standardordner je Dokumentart (Eingang): typ = rechnung | expose | market | dokument; label = erkannte Art */
-  function ordnerFuer(typ, label, jahr) {
-    var l = String(label || '').toLowerCase(), j = jahr ? '/' + jahr : '';
-    if (typ === 'rechnung') return 'Rechnungen' + (jahr ? '/' + jahr : '');
-    if (typ === 'expose') return 'Kauf & Objekt/Exposé';
-    if (typ === 'market') return 'Bewertung';
+  /** Standardordner je Dokumentart (v4910 · ohne Jahr im Namen, das Jahr steht in meta.jahr) */
+  function ordnerFuer(typ, label) {
+    var l = String(label || '').toLowerCase();
+    if (typ === 'rechnung' || /rechnung|beleg|quittung/.test(l)) return 'Belege';
+    if (/energieausweis/.test(l)) return 'Energieausweis';
     if (/mietvertrag|mieterliste|mietaufstellung/.test(l)) return 'Mietverträge';
-    if (/wirtschaftsplan|hausgeld|abrechnung|protokoll|eigentümerversammlung|weg/.test(l)) return 'WEG' + j;
-    if (/grundbuch|teilung|flurkarte|liegenschaft|baulast|energieausweis|kaufvertrag|auflassung/.test(l)) return 'Kauf & Objekt';
-    if (/gutachten|wertermittlung|restnutzungsdauer/.test(l)) return 'Bewertung';
+    if (/protokoll|eigentümerversammlung|wirtschaftsplan|hausgeld|abrechnung|weg/.test(l)) return 'Protokolle';
+    if (typ === 'market' || /gutachten|wertermittlung|restnutzungsdauer|marktbericht/.test(l)) return 'Bewertung';
+    if (/grundbuch|teilung|flurkarte|liegenschaft|baulast|kaufvertrag|auflassung/.test(l)) return 'Kauf & Objekt';
     if (/darlehen|finanzierung|bank|grundschuld/.test(l)) return 'Finanzierung';
-    if (/steuer|bescheid/.test(l)) return 'Steuer' + j;
+    if (/steuer|bescheid/.test(l)) return 'Steuer';
+    if (typ === 'expose' || /expos/.test(l)) return 'Exposé';
     return 'Sonstiges';
   }
+  /** v4910 · Belegjahr aus den gelesenen Daten einer Unterlage (Jahr, Rechnungsdatum, Belegdatum …), sonst null */
+  function jahrAus(o) {
+    var gefunden = null;
+    (function such(x, tiefe) {
+      if (gefunden || !x || typeof x !== 'object' || tiefe > 3) return;
+      ['jahr', 'abrechnungsjahr', 'rechnungsdatum', 'belegdatum', 'datum', 'stichtag'].some(function (k) {
+        var v = x[k]; if (v == null || typeof v === 'object') return false;
+        var m = String(v).match(/(19|20|21)[0-9]{2}/); if (m) { gefunden = Number(m[0]); return true; } return false;
+      });
+      if (!gefunden) Object.keys(x).forEach(function (k) { if (x[k] && typeof x[k] === 'object' && !(x[k] instanceof Blob)) such(x[k], tiefe + 1); });
+    })(o, 0);
+    return gefunden;
+  }
+  /** v4910 · Belegung als kleine Zeile mit Balken (Marcel 25.11.2026: „wie viel ihre Ablage schon voll ist“).
+      Ab 80 % rot, „verwalten“ öffnet Einstellungen › Dokumente. opt.zeile = schmal in einer Zeile, opt.ohneLink */
+  function belegungHtml(s, opt) {
+    opt = opt || {};
+    if (!s || !s.grenze_bytes) return '';
+    var pct = s.belegt_pct != null ? Number(s.belegt_pct) : Math.min(100, Math.round(s.belegt_bytes / s.grenze_bytes * 100));
+    var warn = pct >= 80, farbe = warn ? '#B8625C' : 'var(--wl-c9a84c,#C9A84C)';
+    var p = String(Math.round(pct));
+    return '<div class="dp-ab-belegung" style="font-size:12px;' + (opt.zeile ? 'display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap;' : 'margin-bottom:10px;') + '">'
+      + '<span' + (warn ? ' style="color:#9E4943;font-weight:600"' : ' style="opacity:.8"') + '>Ablage ' + p + ' % · ' + mb(s.belegt_bytes) + ' von ' + mb(s.grenze_bytes) + (warn ? ', bald voll' : '') + '</span>'
+      + '<span style="display:' + (opt.zeile ? 'inline-block;width:70px' : 'block;width:100%;margin:4px 0') + ';height:5px;background:rgba(0,0,0,.08);border-radius:3px"><span style="display:block;height:5px;width:' + Math.max(2, Math.min(100, pct)) + '%;background:' + farbe + ';border-radius:3px"></span></span>'
+      + (opt.ohneLink ? '' : '<a href="#" data-ab-verwalten style="color:inherit;text-decoration:underline;font-size:12px">verwalten</a>') + '</div>';
+  }
+  document.addEventListener('click', function (ev) {
+    var a = ev.target && ev.target.closest ? ev.target.closest('[data-ab-verwalten]') : null; if (!a) return;
+    ev.preventDefault();
+    try { if (typeof window.showSettings === 'function') window.showSettings('dokumente'); } catch (e) {}
+  });
 
   /** Speicherstand, einmal je Sitzung geholt (neu = true holt frisch) */
   function stand(neu) {
@@ -172,10 +205,7 @@
         + knopf('Dateien hochladen', 'data-ab-dateien', 'gold')
         + '<input type="file" multiple data-ab-input-dateien style="display:none"></div>';
     }
-    if (s && s.grenze_bytes) {
-      h += '<div style="font-size:12px;opacity:.8;margin-bottom:4px">Belegt ' + mb(s.belegt_bytes) + ' von ' + mb(s.grenze_bytes) + ' (' + pct + ' %) · je Datei höchstens ' + mb(s.max_datei_bytes) + ' · verschlüsselt auf unserem Server in Deutschland</div>'
-        + '<div style="height:5px;background:rgba(0,0,0,.08);border-radius:3px;margin-bottom:10px"><div style="height:5px;width:' + pct + '%;background:' + (pct > 90 ? '#B8625C' : 'var(--wl-c9a84c,#C9A84C)') + ';border-radius:3px"></div></div>';
-    }
+    if (s && s.grenze_bytes) h += belegungHtml(s) + '<div style="font-size:11.5px;opacity:.65;margin:-4px 0 10px">Je Datei höchstens ' + mb(s.max_datei_bytes) + ' · verschlüsselt auf unserem Server in Deutschland</div>';
     h += '<div data-ab-meldung style="font-size:12.5px;margin-bottom:6px"></div>';
     if (!_liste.length) {
       h += '<p class="dp-pa-p" style="opacity:.75">' + (darf ? 'Noch keine Unterlagen abgelegt. Beim Einlesen bleibt das Original mit dem Häkchen „Original aufbewahren“ hier liegen.' : 'Keine Dateien abgelegt.') + '</p>';
@@ -196,7 +226,7 @@
 
   function hochladenListe(files) {
     var ziel = String(_ziel || '').trim() || 'Sonstiges';
-    var liste = [].slice.call(files).map(function (f) { return { file: f, ordner: ziel }; });
+    var liste = [].slice.call(files).map(function (f) { return { file: f, ordner: ziel, meta: { jahr: new Date().getFullYear() } }; });
     if (!liste.length) return;
     meldung('Lade ' + liste.length + (liste.length === 1 ? ' Datei' : ' Dateien') + ' hoch …');
     ablegenAlle(liste, { quelle: 'upload' }).then(function (e) {
@@ -256,6 +286,96 @@
     return '<div id="dp-ablage"><p class="dp-pa-p" style="opacity:.7">Ablage wird geladen …</p></div>';
   }
 
-  window.DpAblage = { VERSION: 'v4860', html: html, fuellen: fuellen, ablegen: ablegen, ablegenAlle: ablegenAlle, ordnerFuer: ordnerFuer, stand: stand,
+  /* ── v4910 · Einstellungen › Dokumente: Objekt › Ordner › Jahr (Marcel 25.11.2026) ── */
+  var _vHost = null, _vListe = [], _vStand = null, _vOffen = {};
+  function verwaltung(host) {
+    _vHost = host || _vHost; if (!_vHost) return;
+    _vHost.innerHTML = '<p class="dp-pa-p" style="opacity:.7">Ablage wird geladen …</p>';
+    if (!window.Auth || typeof Auth.apiCall !== 'function') return;
+    Promise.all([Auth.apiCall('/dateien'), stand(true)]).then(function (r) {
+      _vListe = (r[0] && r[0].dateien) || []; _vStand = r[1] || null; vZeichnen();
+    }, function () { _vHost.innerHTML = '<p class="dp-pa-p" style="color:#9E4943">Ablage nicht erreichbar.</p>'; });
+  }
+  function basisOrdner(o) { return String(o || 'Sonstiges').split('/')[0] || 'Sonstiges'; }
+  function summe(l) { return l.reduce(function (a, d) { return a + (Number(d.groesse) || 0); }, 0); }
+  function vZeichnen() {
+    if (!_vHost) return;
+    var s = _vStand, h = '<div id="dp-ablage-verw">';
+    if (s && s.grenze_bytes) h += belegungHtml(s, { ohneLink: true });
+    else if (s && !s.darf_ablegen) h += '<p class="dp-pa-p" style="font-size:13px">Die Dokumentenablage gibt es ab dem Plan Starter.' + (s.loeschung_am ? ' Vorhandene Dateien bleiben bis zum ' + esc(datum(s.loeschung_am)) + ' lesbar.' : '') + '</p>';
+    h += '<div data-ab-meldung style="font-size:12.5px;margin-bottom:6px"></div>';
+    if (!_vListe.length) { _vHost.innerHTML = h + '<p class="dp-pa-p" style="opacity:.75">Noch keine Dokumente abgelegt. Beim Einlesen von Unterlagen bleibt das Original mit dem Häkchen „Original aufbewahren“ hier liegen.</p></div>'; return; }
+    var obj = {};
+    _vListe.forEach(function (d) {
+      var k = d.object_id || '-';
+      var o = obj[k] = obj[k] || { name: d.objekt_name || (d.object_id ? 'Objekt' : 'Ohne Objekt'), id: d.object_id || '', ordner: {} };
+      var b = basisOrdner(d.ordner), j = d.jahr || 'ohne Jahr';
+      o.ordner[b] = o.ordner[b] || {};
+      (o.ordner[b][j] = o.ordner[b][j] || []).push(d);
+    });
+    Object.keys(obj).sort(function (a, b) { return obj[a].name.localeCompare(obj[b].name, 'de'); }).forEach(function (k) {
+      var o = obj[k], alle = [];
+      Object.keys(o.ordner).forEach(function (b) { Object.keys(o.ordner[b]).forEach(function (j) { alle = alle.concat(o.ordner[b][j]); }); });
+      var schl = 'o:' + k;
+      h += '<details data-v-key="' + esc(schl) + '"' + (_vOffen[schl] ? ' open' : '') + ' style="border:1px solid rgba(42,39,39,.14);border-radius:10px;padding:6px 10px;margin-bottom:8px">'
+        + '<summary style="cursor:pointer;font-weight:600;padding:4px 0">' + esc(o.name) + ' <span style="font-weight:400;opacity:.65">· ' + alle.length + (alle.length === 1 ? ' Datei' : ' Dateien') + ' · ' + mb(summe(alle)) + '</span></summary>';
+      STANDARD.concat(Object.keys(o.ordner).filter(function (b) { return STANDARD.indexOf(b) < 0; })).forEach(function (b) {
+        var jm = o.ordner[b]; if (!jm) return;
+        var inOrd = []; Object.keys(jm).forEach(function (j) { inOrd = inOrd.concat(jm[j]); });
+        var sk = schl + '|' + b;
+        h += '<details data-v-key="' + esc(sk) + '"' + (_vOffen[sk] ? ' open' : '') + ' style="margin:4px 0 4px 8px">'
+          + '<summary style="cursor:pointer;padding:3px 0">' + esc(b) + ' <span style="opacity:.65">· ' + inOrd.length + ' · ' + mb(summe(inOrd)) + '</span>'
+          + (o.id ? knopf('Ordner löschen', 'data-v-gruppe="1" data-v-objekt="' + esc(o.id) + '" data-v-ordner="' + esc(b) + '" data-v-anzahl="' + inOrd.length + '"', 'rot') : '') + '</summary>';
+        Object.keys(jm).sort(function (x, y) { return String(y).localeCompare(String(x), 'de', { numeric: true }); }).forEach(function (j) {
+          var l = jm[j];
+          h += '<div style="margin:2px 0 6px 10px"><div style="display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;padding:3px 0"><span style="flex:1">' + esc(j) + ' <span style="font-weight:400;opacity:.65">· ' + l.length + '</span></span>'
+            + (o.id && j !== 'ohne Jahr' ? knopf('Jahr löschen', 'data-v-gruppe="1" data-v-objekt="' + esc(o.id) + '" data-v-ordner="' + esc(b) + '" data-v-jahr="' + esc(j) + '" data-v-anzahl="' + l.length + '"', 'rot') : '') + '</div>'
+            + l.map(zeileHtml).join('') + '</div>';
+        });
+        h += '</details>';
+      });
+      h += '</details>';
+    });
+    _vHost.innerHTML = h + '<datalist id="dp-ablage-ordner-v">' + STANDARD.map(function (x) { return '<option value="' + esc(x) + '">'; }).join('') + '</datalist></div>';
+  }
+  document.addEventListener('toggle', function (ev) {
+    var d = ev.target; if (!d || !d.matches || !d.matches('#dp-ablage-verw details[data-v-key]')) return;
+    _vOffen[d.getAttribute('data-v-key')] = d.open;
+  }, true);
+  function vMeldung(t, rot) { var m = document.querySelector('#dp-ablage-verw [data-ab-meldung]'); if (m) { m.textContent = t; m.style.color = rot ? '#9E4943' : ''; } }
+  document.addEventListener('click', function (ev) {
+    var t = ev.target && ev.target.closest ? ev.target.closest('#dp-ablage-verw button') : null; if (!t) return;
+    ev.preventDefault(); ev.stopPropagation();
+    if (t.hasAttribute('data-ab-oeffnen')) { oeffnen(t.getAttribute('data-ab-oeffnen'), t.getAttribute('data-ab-name')); return; }
+    if (t.hasAttribute('data-ab-schieben')) {
+      var zeile = t.parentNode, id2 = t.getAttribute('data-ab-schieben'); if (zeile.querySelector('[data-ab-neuordner]')) return;
+      var w = document.createElement('span');
+      w.innerHTML = '<input list="dp-ablage-ordner-v" data-ab-neuordner placeholder="Ordner" style="padding:4px 6px;border:1px solid #ddd;border-radius:6px;margin-left:6px">' + knopf('OK', 'data-v-schieben-ok="' + esc(id2) + '"');
+      zeile.appendChild(w); w.querySelector('input').focus(); return;
+    }
+    if (t.hasAttribute('data-v-schieben-ok')) {
+      var inp = t.parentNode.querySelector('[data-ab-neuordner]');
+      Auth.apiCall('/dateien/' + t.getAttribute('data-v-schieben-ok'), { method: 'PATCH', body: { ordner: inp ? inp.value : '' } }).then(function () { verwaltung(); }, function () { vMeldung('Verschieben hat nicht geklappt.', true); });
+      return;
+    }
+    if (t.hasAttribute('data-ab-loeschen')) {
+      var id4 = t.getAttribute('data-ab-loeschen');
+      bestaetigen('Datei löschen?', '„' + esc(t.getAttribute('data-ab-name')) + '“ wird endgültig aus der Ablage gelöscht. Werte, die aus der Datei übernommen wurden, bleiben im Objekt stehen.')
+        .then(function (ja) { if (ja) loeschenDatei(id4).then(function (ok) { if (!ok) vMeldung('Löschen hat nicht geklappt.', true); verwaltung(); }); });
+      return;
+    }
+    if (t.hasAttribute('data-v-gruppe')) {
+      var o = t.getAttribute('data-v-objekt'), ord = t.getAttribute('data-v-ordner'), j = t.getAttribute('data-v-jahr'), n = t.getAttribute('data-v-anzahl');
+      var was = j ? 'Ordner „' + ord + '“, Jahr ' + j : 'Ordner „' + ord + '“';
+      bestaetigen(esc(was) + ' löschen?', n + (n === '1' ? ' Datei wird' : ' Dateien werden') + ' endgültig aus der Ablage dieses Objekts gelöscht. Übernommene Werte bleiben im Objekt stehen.', [{ wert: true, text: 'Löschen', rot: true }, { wert: false, text: 'Abbrechen' }])
+        .then(function (ja) {
+          if (!ja) return;
+          var q = '/dateien?objekt=' + encodeURIComponent(o) + '&ordner=' + encodeURIComponent(ord) + (j ? '&jahr=' + encodeURIComponent(j) : '');
+          Auth.apiCall(q, { method: 'DELETE' }).then(function (r) { _standP = null; vMeldung((r && r.geloescht) + ' gelöscht.'); verwaltung(); }, function () { vMeldung('Löschen hat nicht geklappt.', true); });
+        });
+    }
+  }, true);
+
+  window.DpAblage = { VERSION: 'v4910', html: html, verwaltung: verwaltung, belegungHtml: belegungHtml, jahrAus: jahrAus, fuellen: fuellen, ablegen: ablegen, ablegenAlle: ablegenAlle, ordnerFuer: ordnerFuer, stand: stand,
     oeffnen: oeffnen, loeschenDatei: loeschenDatei, bestaetigen: bestaetigen, STANDARD: STANDARD };
 })();
