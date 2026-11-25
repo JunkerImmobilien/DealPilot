@@ -154,6 +154,9 @@
     '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-zahlen.l5{grid-template-columns:repeat(5,minmax(0,1fr))}',   /* v4410 · führend + Marktpreis */
     /* v4490 · führend, stützend und Marktpreis: sechs Kacheln, darunter drei je Zeile, am Handy zwei */
     '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-zahlen.l6{grid-template-columns:repeat(6,minmax(0,1fr))}',
+    '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-zahlen.l7{grid-template-columns:repeat(7,minmax(0,1fr))}',   /* v4610 · EK-Rendite */
+    '@media (max-width:1380px){.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-zahlen.l7{grid-template-columns:repeat(4,minmax(0,1fr))}}',
+    '@media (max-width:640px){.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-zahlen.l7{grid-template-columns:repeat(2,minmax(0,1fr))}}',
     '@media (max-width:1180px){.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-zahlen.l6{grid-template-columns:repeat(3,minmax(0,1fr))}}',
     '@media (max-width:640px){.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-zahlen.l6{grid-template-columns:repeat(2,minmax(0,1fr))}}',
     '.dp-pa5-haken{display:flex;align-items:center;gap:6px;margin-top:4px;font:400 11.5px/1.3 Inter,sans-serif;color:#6B645A;cursor:pointer;white-space:normal;text-transform:none;letter-spacing:0}',
@@ -551,6 +554,20 @@
     var ta = tip ? ' data-dp-pa4-tip="' + esc(JSON.stringify(tip)) + '" tabindex="0"' : '';
     return '<div class="dp-pa4-z' + (tip ? ' dp-pa4-ztip' : '') + '" style="--c:' + (farbe || '#E6DCC2') + '"' + ta + '><span>' + esc(lbl) + '</span><b>' + wert + '</b>' + (unter ? '<em>' + unter + '</em>' : '') + '</div>';
   }
+  /* v4610 · Marcel 25.11.2026: EK-Rendite als Hauptkennzahl (nach Steuer mit Vermögensdelta), alle vier Stufen in der Erklärkarte.
+     Gerechnet nur in ek-rendite.js (State.kpis.ekr4). */
+  function ekKachel(k) {
+    var e = k && k.ekr4; if (!e || !zahl(e.haupt)) return null;
+    var p = function (x) { return zahl(x) ? de(x, 1) + ' %' : 'k. A.'; };
+    var dl = !zahl(e.delta_pa) ? '' : (e.delta_weg === 'seit_kauf'
+      ? sEur(e.delta_pa) + ' im Jahr (' + sEur(e.delta) + ' seit Kauf, ' + de(e.haltejahre, 1) + ' Jahre)'
+      : sEur(e.delta_pa) + ' im Jahr (' + de((e.wstg || 0) * 100, 1) + ' % Wertsteigerung auf ' + eur(e.wert) + ')');
+    return zahlKachel('EK-Rendite', p(e.haupt), e.haupt_art === 'k4' ? 'nach Steuer mit Vermögensdelta' : 'nach Steuer', zahl(e.haupt) && e.haupt >= 0 ? C.gut : C.rot,
+      { t: 'EK-Rendite in vier Stufen', a: 'Was dein Eigenkapital von ' + eur(e.ek) + ' im Jahr erwirtschaftet. Hauptkennzahl ist Stufe 4: Überschuss nach Steuer, Tilgung und die Wertentwicklung gegenüber Darlehen und Eigenkapital (' + (e.wert_text || 'Bewertung') + ' ' + eur(e.wert) + ').',
+        r: [['1 Operativ (Überschuss + Tilgung)', p(e.k1)], ['2 Nach Steuer', p(e.k2)], ['3 Vor Steuer mit Vermögensdelta', p(e.k3)], ['4 Nach Steuer mit Vermögensdelta', p(e.k4)],
+          ['Überschuss vor Steuer', sEur(e.cf_op)], ['Tilgung und Bausparen', eur(e.tilg + e.bspar)], [e.steuer > 0 ? 'Steuernachzahlung' : 'Steuererstattung', eur(Math.abs(e.steuer))],
+          ['Vermögensdelta', dl], ['Darlehen bei Kauf', eur(e.darlehen0)]] });
+  }
   /* v4410 · Erklärkarte wie im Reiter Bewertung (bewertung-ansicht.js .bwa-pop), eine für die ganze Seite */
   var _tipPop = null, _tipAn = null;
   function tipZeige(el) {
@@ -662,12 +679,13 @@
     if (zahl(k.dscr) && k.dscr > 0) z.push(zahlKachel('DSCR', de(k.dscr, 2), k.dscr >= 1.2 ? 'Bank: trägt sich' : k.dscr >= 1 ? 'knapp über 1' : 'unter 1: Zuschuss nötig', k.dscr >= 1 ? C.gut : C.rot,
       zDs == null ? null : { t: 'DSCR (Kapitaldienstdeckung)', a: 'Wie oft der Reinertrag aus der Miete die Jahresrate aus Zins und Tilgung deckt. Ab 1,0 trägt sich das Objekt selbst, Banken erwarten meist 1,2 oder mehr. Gerechnet für ein volles Jahr mit den heutigen Eingaben.',
         r: [['dein Mindest-DSCR', de(zDs, 2)], ['Stand', k.dscr >= zDs ? 'erreicht' : 'nicht erreicht']] }));
+    var EKK = ekKachel(k); if (EKK) z.push(EKK);   /* v4610 */
     var WK = wertKacheln(w); z = z.concat(WK.kacheln);   /* v4410 · führend + Marktpreis mit Erklärung */
-    var nVier = Math.max(4, Math.min(6, 3 + WK.kacheln.length));   /* v4490 · das stützende Verfahren kommt aus wertKacheln */
+    var nVier = Math.max(4, Math.min(7, (EKK ? 4 : 3) + WK.kacheln.length));   /* v4490 · das stützende Verfahren kommt aus wertKacheln */
     var sc = vier ? null : sichtbarerScore();
     if (sc) z.push(zahlKachel(sc.name, String(sc.wert), (window.ScoreTier && window.ScoreTier.stufe ? window.ScoreTier.stufe(sc.wert).wort : ''), '#2A2727'));
     if (vier) z = z.slice(0, nVier);
-    return '<div class="dp-pa4-zahlen' + (vier && z.length === 4 ? ' l4' : '') + (vier && z.length === 5 ? ' l5' : '') + (vier && z.length === 6 ? ' l6' : '') + '" data-dp-pa4-kz="' + (bestand ? 'b' : 'a') + (vier ? '4' : '') + '"' + (z.length ? '' : ' style="display:none"') + '>' + z.join('') + '</div>';
+    return '<div class="dp-pa4-zahlen' + (vier && z.length === 4 ? ' l4' : '') + (vier && z.length === 5 ? ' l5' : '') + (vier && z.length === 6 ? ' l6' : '') + (vier && z.length === 7 ? ' l7' : '') + '" data-dp-pa4-kz="' + (bestand ? 'b' : 'a') + (vier ? '4' : '') + '"' + (z.length ? '' : ' style="display:none"') + '>' + z.join('') + '</div>';
   }
   /* Der Marktbericht (DpWertZielbild) lädt oft erst nach dem Zeichnen - dann die Kacheln neu */
   function kzNeu() {
@@ -1553,6 +1571,7 @@
       { t: 'DSCR (Kapitaldienstdeckung)', a: 'Wie oft der Reinertrag aus der Miete die Jahresrate aus Zins und Tilgung deckt. Banken erwarten meist 1,2 oder mehr. Volles Jahr, heutige Eingaben.' }));
     if (zahl(k.ek) && k.ek > 0) z.push(zahlKachel('Eigenkapital', eur(k.ek), zahl(k.kp) && k.kp > 0 ? de(k.ek / k.kp * 100, 1) + ' % vom Kaufpreis' : '', '#2A2727',
       { t: 'Eigenkapital', a: 'Was du selbst einbringst, mit den Nebenkosten des Kaufs. Mehr Eigenkapital senkt LTV und Zins.' }));
+    var EKB = ekKachel(k); if (EKB) z.push(EKB);   /* v4610 */
     if (zahl(k.cf_m)) z.push(zahlKachel('Cashflow vor Steuer', sEur(k.cf_m) + ' / Monat', 'volles Jahr', k.cf_m >= 0 ? C.gut : C.rot,
       { t: 'Cashflow vor Steuer', a: 'Was im Monat nach Bewirtschaftungskosten, Zins und Tilgung übrig bleibt. Banken sehen gern einen positiven Wert.' }));
     return leiste(z, 'b');

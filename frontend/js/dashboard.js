@@ -605,6 +605,22 @@
      Bestand kapitalgewichtet: Summe Cashflow / Summe EK.
      Heutiger Wert (Marcel): letzter Marktbericht des Objekts
      (Marktpreisindikation), sonst Kaufpreis - je Objekt mit Quelle. */
+  /* v4610 · Marcel 25.11.2026: EK-Rendite in vier Stufen, Hauptkennzahl nach Steuer mit Vermögensdelta.
+     Rechnung nur in ek-rendite.js. Je Objekt der beim Speichern abgelegte Wert (o._ekr4), sonst aus den
+     gespeicherten Kernwerten (Cashflow v./n. St., Darlehen, Tilgung, maßgebender Wert). */
+  function _ekr4Obj(o){
+    if (!o || !window.DpEkRendite) return null;
+    if (o._ekr4 && o._ekr4.k1 != null) return o._ekr4;
+    var cfv = o._kpis_cf_vs != null ? num(o._kpis_cf_vs) : null, cfn = o._kpis_cf_ns != null ? num(o._kpis_cf_ns) : null;
+    if (cfv == null) return null;
+    var wa = o._wert_anker, kp = _kpEuro(o);
+    return DpEkRendite.rechne({ cf_op: cfv, steuer: cfn != null ? cfv - cfn : 0,
+      tilg: num(o.d1)*_pct(o.d1t)/100 + num(o.d2)*_pct(o.d2t)/100 + _dwO(o).tilg_j, bspar: 0, ek: num(o.ek),
+      wert: wa && wa.wert > 0 ? wa.wert : (num(o.svwert) > 0 ? num(o.svwert) : kp),
+      darlehen0: num(o.d1) + num(o.d2) + _dwO(o).betrag, uebergang: o.wirtschaftlicher_uebergang || o.kaufdat || null,
+      stichtag: wa && wa.wert > 0 ? wa.datum : null, wstg: _pct(o.wertstg) / 100 });
+  }
+  function _ekr4Portfolio(arr){ try { return window.DpEkRendite ? DpEkRendite.portfolio((arr || []).map(_ekr4Obj)) : null; } catch (e) { return null; } }
   function _renditeTip(){
     var sw = { bruttorendite:25, nettorendite:30, cashflow:25, cashOnCash:20 }, gw = 35;
     try {
@@ -682,8 +698,14 @@
       + k('Darlehen ↔ Wert heute', sg(delta), ton(delta),
           'Abstand = Wert heute − ursprüngliches Darlehen; Prozent = Abstand ÷ Wert heute. Wert heute je Objekt: letzter Marktbericht (Marktpreisindikation), sonst Kaufpreis.',
           (deltaP != null ? _fPr(deltaP, 1) + ' des Werts · ' : '') + 'Wert ' + fE(wSum));
-    var g3 = k('EK-Rendite v. St.', pr(ekrVs), ton(ekrVs), tipEkr + ' Cashflow vor Steuer.' + EKt,
-          'n. St. ' + pr(ekrNs) + ' · inkl. Tilgung ' + pr(ekrTg))
+    var E4 = _ekr4Portfolio(arr);   /* v4610 */
+    var p4 = function(v){ return v == null ? 'k. A.' : _fPr(v, 1); };
+    var tip4 = E4 ? 'EK-Rendite in vier Stufen, über den Bestand nach Eigenkapital gewichtet (' + fE(E4.ek) + ').\n1 Operativ (Überschuss + Tilgung) ' + p4(E4.k1)
+      + '\n2 Nach Steuer ' + p4(E4.k2) + '\n3 Vor Steuer mit Vermögensdelta ' + p4(E4.k3) + '\n4 Nach Steuer mit Vermögensdelta ' + p4(E4.k4) + ' (Hauptkennzahl)'
+      + '\nVermögensdelta = Bewertung minus Darlehen bei Kauf minus Eigenkapital, je Haltejahr, im Ankauf aus der Wertsteigerungsannahme. '
+      + E4.mit_delta + ' von ' + arr.length + ' Objekten mit Bewertung.' : '';
+    var g3 = (E4 ? k('EK-Rendite', p4(E4.haupt), ton(E4.haupt), tip4 + EKt, 'nach Steuer mit Vermögensdelta · operativ ' + p4(E4.k1))
+               : k('EK-Rendite v. St.', pr(ekrVs), ton(ekrVs), tipEkr + ' Cashflow vor Steuer.' + EKt, 'n. St. ' + pr(ekrNs) + ' · inkl. Tilgung ' + pr(ekrTg)))
       + k('Tilgung p. a.', fE(S.tilgJ), '', 'Summe Darlehen × anfängliche Tilgung, je Jahr – Vermögensaufbau, der im Cashflow schon abgezogen ist.', 'Vermögensaufbau');
     var HK = null; try { HK = _healthKacheln(); } catch (e) { HK = null; }
     if (HK && HK.lock) {
@@ -4213,6 +4235,7 @@
   window.DealPilotDashboard = {
     /* v1704: der Portfolio-Pilot liest hier - er rechnet nichts nach. */
     portfolioPayload: portfolioPayload,
+    ekr4Obj: _ekr4Obj,   /* v4610 · EK-Rendite vier Stufen je Objekt (grafiken-portfolio.js) */
     /* v4140 · gleiche Reihenfolge wie portfolioPayload().objekte, nur lesen (grafiken-neu.js) */
     grafikDaten: function () { return detailArr(true).slice(0, PP_MAX_OBJEKTE); },
     /* v4180 · Portfolio auf einen Blick (grafiken-portfolio.js): dieselben Summen wie Kennzahlen p. a. und Gesamtbewertung,

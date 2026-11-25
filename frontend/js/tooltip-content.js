@@ -583,7 +583,7 @@
     },
     'tab8.ek_rendite': {
       title: 'EK-Rendite (Eigenkapital-Rendite)',
-      body: 'Cashflow vor Steuern (nach Zins und Tilgung) ÷ eingesetztes Eigenkapital — so vergleichbar zwischen Anlegern mit verschiedenem Steuersatz. Bei 100%-Finanzierung mit nur Kaufnebenkosten als EK: oft 20%+ (Leverage-Effekt). Bei viel EK: niedriger, dafür sicherer. ∞ bei 0 € EK = maximaler Hebel.',
+      body: 'Vier Stufen, jeweils im Jahr auf das eingesetzte Eigenkapital. 1 Operativ: Überschuss nach Zins und Tilgung plus Tilgung. 2 Nach Steuer: dazu Steuererstattung oder Nachzahlung. 3 und 4: wie 1 und 2 plus Vermögensdelta, also Bewertung minus Darlehen bei Kauf minus Eigenkapital, je Haltejahr oder im Ankauf aus der Wertsteigerungsannahme. Angezeigt wird Stufe 4, nach Steuer mit Vermögensdelta. Beim Überfahren der Zahl siehst du alle vier mit Rechnung.',   /* v4610 */
       severity: 'pro'
     },
     'tab8.equity_multiple': {
