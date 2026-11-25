@@ -203,7 +203,8 @@ const K = c.DpMietpotenzial, E = c.DpErhoehungen, JA = c.DpJahresabgleich, HV = 
   ok((s.match(/data-jbg-jahr=/g) || []).length === 4, 'G Trefferflächen je Jahr (Kästchen, Klick wählt das Jahr)');
   ok(/Plan/.test(GR.legendeHtml(spec)) && /Ist/.test(GR.legendeHtml(spec)), 'G Legende ab zwei Reihen');
   const roh = lies('frontend/js/jahresbuch-grafik.js') + lies('frontend/js/jahresabgleich.js') + lies('frontend/js/hausverlauf.js');
-  ok(!/#C9A84C|#E8CC7A|#b8932f/i.test(roh.replace(/var\(--wl-c9a84c, ?#C9A84C\)/gi, '').replace(/var\(--wl-b8932f, ?#b8932f\)/gi, '')), 'G Gold nur über var(--wl-c9a84c) (gold-audit)');
+  /* v4840: jedes Gold als Whitelabel-Token var(--wl-<hex>, #<hex>) ist erlaubt (gleiche Regel wie gold-audit), nicht nur c9a84c/b8932f */
+  ok(!/#C9A84C|#E8CC7A|#b8932f/i.test(roh.replace(/var\(--wl-([0-9a-f]{6}), ?#\1\)/gi, '')), 'G Gold nur über Whitelabel-Token var(--wl-<hex>, #<hex>) (gold-audit)');
   ok(!/fill="var\(|stroke="var\(/.test(roh), 'G var() nie in SVG-Präsentationsattributen');
 }
 
