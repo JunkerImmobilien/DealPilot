@@ -566,7 +566,8 @@
       { t: 'EK-Rendite in vier Stufen', a: 'Was dein Eigenkapital von ' + eur(e.ek) + ' im Jahr erwirtschaftet. Hauptkennzahl ist Stufe 4: Überschuss nach Steuer, Tilgung und die Wertentwicklung gegenüber Darlehen und Eigenkapital (' + (e.wert_text || 'Bewertung') + ' ' + eur(e.wert) + ').',
         r: [['1 Operativ (Überschuss + Tilgung)', p(e.k1)], ['2 Nach Steuer', p(e.k2)], ['3 Vor Steuer mit Vermögensdelta', p(e.k3)], ['4 Nach Steuer mit Vermögensdelta', p(e.k4)],
           ['Überschuss vor Steuer', sEur(e.cf_op)], ['Tilgung und Bausparen', eur(e.tilg + e.bspar)], [e.steuer > 0 ? 'Steuernachzahlung' : 'Steuererstattung', eur(Math.abs(e.steuer))],
-          ['Vermögensdelta', dl], ['Darlehen bei Kauf', eur(e.darlehen0)]] });
+          ['Vermögensdelta', dl], ['Darlehen bei Kauf', eur(e.darlehen0)]],
+        h: e.hebel && window.DpEkRendite && DpEkRendite.hebelZeilen ? DpEkRendite.hebelZeilen(e.hebel) : null });
   }
   /* v4410 · Erklärkarte wie im Reiter Bewertung (bewertung-ansicht.js .bwa-pop), eine für die ganze Seite */
   var _tipPop = null, _tipAn = null;
@@ -579,11 +580,13 @@
       s.textContent = '.dp-pa4-pop{position:fixed;z-index:9000;max-width:340px;background:#FFFFFF;color:#2A2727;border:1px solid #E6E0D3;border-radius:12px;box-shadow:0 12px 32px rgba(20,16,8,.16);padding:12px 14px;font:400 12.5px/1.45 Inter,sans-serif;pointer-events:none;opacity:0;transition:opacity .12s}'
         + '.dp-pa4-pop.an{opacity:1}.dp-pa4-pop b.t{display:block;font:600 13px/1.3 "Space Grotesk",Inter,sans-serif;margin-bottom:4px}.dp-pa4-pop p{margin:0 0 6px}'
         + '.dp-pa4-pop table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}.dp-pa4-pop td{padding:2px 0;border-bottom:1px solid #F0EBDF}.dp-pa4-pop td:last-child{text-align:right;padding-left:10px}'
+        + '.dp-pa4-pop ul.h{margin:8px 0 0;padding:6px 0 0 16px;border-top:1px solid #F0EBDF}.dp-pa4-pop ul.h li{margin:0 0 3px}'   /* v4620 */
         + '.dp-pa4-ztip{cursor:help}.dp-pa4-ztip:hover,.dp-pa4-ztip:focus{background:#FBF8F1;outline:none}';
       document.head.appendChild(s);
     }
     _tipPop.innerHTML = '<b class="t">' + esc(d.t || '') + '</b>' + (d.a ? '<p>' + esc(d.a) + '</p>' : '')
-      + (d.r && d.r.length ? '<table>' + d.r.filter(function (z) { return z && z[1]; }).map(function (z) { return '<tr><td>' + esc(z[0]) + '</td><td>' + esc(z[1]) + '</td></tr>'; }).join('') + '</table>' : '');
+      + (d.r && d.r.length ? '<table>' + d.r.filter(function (z) { return z && z[1]; }).map(function (z) { return '<tr><td>' + esc(z[0]) + '</td><td>' + esc(z[1]) + '</td></tr>'; }).join('') + '</table>' : '')
+      + (d.h && d.h.length ? '<ul class="h">' + [].concat(d.h).map(function (z) { return '<li>' + esc(z) + '</li>'; }).join('') + '</ul>' : '');   /* v4620 · Hebel-Punkte */
     var r = el.getBoundingClientRect(); _tipPop.style.maxWidth = Math.min(340, window.innerWidth - 24) + 'px';
     _tipPop.style.left = '0px'; _tipPop.style.top = '0px'; _tipPop.classList.add('an');
     var ph = _tipPop.offsetHeight, pw = _tipPop.offsetWidth, top = r.bottom + 8;

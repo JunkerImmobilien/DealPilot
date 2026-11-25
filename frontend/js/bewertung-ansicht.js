@@ -81,8 +81,8 @@
         return { t: 'EK-Rendite in vier Stufen',
           a: 'Was dein Eigenkapital von ' + eur(e.ek) + ' im Jahr erwirtschaftet. Angezeigt wird Stufe 4, nach Steuer mit Vermögensdelta.',
           r: [['1 Operativ, Überschuss plus Tilgung', pct(e.k1)], ['2 Nach Steuer', pct(e.k2)], ['3 Vor Steuer mit Vermögensdelta', pct(e.k3)], ['4 Nach Steuer mit Vermögensdelta', pct(e.k4), 1],
-            ['Überschuss vor Steuer', eur(e.cf_op, true)], ['Tilgung und Bausparen', eur(e.tilg + e.bspar)], [e.steuer > 0 ? 'Steuernachzahlung' : 'Steuererstattung', eur(Math.abs(e.steuer))], ['Vermögensdelta', dl]],
-          h: 'Vermögensdelta = ' + (e.wert_text || 'Bewertung') + ' ' + eur(e.wert) + ' minus Darlehen bei Kauf ' + eur(e.darlehen0) + ' minus Eigenkapital. Im Ankauf zählt die Wertsteigerung des ersten Jahres, einmalige Effekte nicht. Ab 8 % gilt sie als gut, unter 4 % als niedrig.' };
+            ['Überschuss vor Steuer', eur(e.cf_op, true)], ['Tilgung und Bausparen', eur(e.tilg + e.bspar)], [e.steuer > 0 ? 'Steuernachzahlung' : 'Steuererstattung', eur(Math.abs(e.steuer))], ['Vermögensdelta', dl]].concat(e.hebel ? [['Gesamtkapitalrendite (ohne Darlehen)', pct(e.hebel.gkr)], ['Darlehenszins', pct(e.hebel.fk_zins)], ['Hebel', e.hebel.richtung === 'positiv' ? 'positiv, hebt die EK-Rendite' : 'negativ, drückt die EK-Rendite'], ['Wert fällt 2 % im Jahr', e.hebel.wert_minus2 == null ? 'k. A.' : pct(e.hebel.wert_minus2)]].concat(e.hebel.ekr_anschluss != null ? [['Mit Anschlusszins ' + pct(e.hebel.zins_anschluss), pct(e.hebel.ekr_anschluss)]] : []) : []),
+          h: (e.hebel && window.DpEkRendite && DpEkRendite.hebelZeilen ? DpEkRendite.hebelZeilen(e.hebel).join(' ') + ' ' : '') + 'Vermögensdelta = ' + (e.wert_text || 'Bewertung') + ' ' + eur(e.wert) + ' minus Darlehen bei Kauf ' + eur(e.darlehen0) + ' minus Eigenkapital. Im Ankauf zählt die Wertsteigerung des ersten Jahres, einmalige Effekte nicht. Ab 8 % gilt sie als gut, unter 4 % als niedrig.' };
       }
       if (!(k.ek > 100) || k.ekr == null) return null;
       var basis = k.ekr * k.ek / 100;

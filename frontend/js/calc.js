@@ -3085,6 +3085,11 @@ function _calcImmediate(){
         wstg: wstg
       });
       if (ekr4) ekr4.wert_text = (_wa4 && _wa4.wert > 0) ? 'maßgebender Wert' : (svw > 0 ? 'Wertangabe' : 'Kaufpreis');
+      /* v4620 · Hebeleffekt, Eingaben nur hier, Rechnung in ek-rendite.js */
+      if (ekr4 && DpEkRendite.hebel) {
+        ekr4.hebel_in = { gi: gi, zins_j: zins_j, darlehen: d_total, zins_anschluss: (d1_anschl_enable && az > 0) ? az * 100 : null };
+        ekr4.hebel = DpEkRendite.hebel(ekr4, ekr4.hebel_in);
+      }
     }
   } catch (_eE4) { ekr4 = null; }
   // EZB = Ende der Zinsbindung — V63.61: Werte AM Ende der Zinsbindung (nach `bindj` vollen
@@ -4216,7 +4221,7 @@ function _calcImmediate(){
               var _e4n = DpEkRendite.rechne({ cf_op: _hR.cfop_y, steuer: _hR.tax_y, tilg: _hR.ty, bspar: _hR.bspar_y || 0, ek: _e4.ek,
                 wert: _e4.wert, darlehen0: _e4.darlehen0, uebergang: g('wirtschaftlicher_uebergang') || g('kaufdat') || null,
                 stichtag: (State.wert_anker && State.wert_anker.wert > 0) ? State.wert_anker.datum : null, wstg: _e4.wstg });
-              if (_e4n) { _e4n.wert_text = _e4.wert_text; _e4n.jahr = _hR.cal; State.kpis.ekr4 = _e4n; try { window._dpEkrZeigen(_e4n); } catch (_eZ) {} }
+              if (_e4n) { _e4n.wert_text = _e4.wert_text; _e4n.jahr = _hR.cal; if (_e4.hebel_in && DpEkRendite.hebel) { _e4n.hebel_in = _e4.hebel_in; _e4n.hebel = DpEkRendite.hebel(_e4n, _e4.hebel_in); } State.kpis.ekr4 = _e4n; try { window._dpEkrZeigen(_e4n); } catch (_eZ) {} }
             }
           } catch (_eE4h) {}
           try {
