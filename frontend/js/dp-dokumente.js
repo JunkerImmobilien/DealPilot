@@ -835,12 +835,12 @@
   function inhaltSeite(c, B, teile) {
     /* v4790e · Marcel 25.11.2026: „Bitte bei den PDFs das Inhaltsverzeichnis auf eine Seite.“ Ab 12 Einträgen ohne Unterzeile und mit engem
        Zeilenabstand, dann passen bis 26 Einträge auf eine Seite. Die Seitenzahlen setzt weiter der PDF-Dienst (data-dp-toc). */
-    var eng = teile.length > 11, pad = eng ? 'padding-top:1.6mm;padding-bottom:1.6mm' : '';
+    var eng = teile.length > 11, pad = eng ? 'padding-top:1.1mm;padding-bottom:1.1mm' : '';   /* v4870 · Kombi wie Kurzfassung: Unterzeile bleibt, nur enger */
     return B.seite(c, 'Inhalt', B.abschnitt('Investment Case', 'Inhalt')
       + '<table class="inhalt"><tbody>' + teile.map(function (t, i) {
         /* v4580g · Marcel: „die PDFs brauchen auch Seitenzahlen im Inhaltsverzeichnis.“ Der PDF-Dienst (pdf-dienst/server.js) zählt je
            Abschnitt (data-dp-abschnitt) die gedruckten Seiten und setzt die Startseite in data-dp-toc. Ohne Dienst bleibt die Spalte leer. */
-        return '<tr><td class="num" style="width:12mm;color:var(--gold-d);font-weight:700;' + pad + '">' + (t[2] || (i + 1)) + '</td><td style="' + pad + '"><b>' + B.esc(t[0]) + '</b>' + (eng || !t[1] ? '' : '<div class="det">' + B.esc(t[1]) + '</div>') + '</td>'
+        return '<tr><td class="num" style="width:12mm;color:var(--gold-d);font-weight:700;' + pad + '">' + (t[2] || (i + 1)) + '</td><td style="' + pad + '"><b>' + B.esc(t[0]) + '</b>' + (!t[1] ? '' : '<div class="det"' + (eng ? ' style="font-size:7pt;line-height:1.25;margin:.3mm 0 0"' : '') + '>' + B.esc(t[1]) + '</div>') + '</td>'
           + '<td class="r num" style="width:16mm;vertical-align:top;' + pad + '"><span data-dp-toc="' + B.esc(t[3] || '') + '"></span></td></tr>';
       }).join('') + '</tbody></table>');
   }
@@ -1044,6 +1044,33 @@
       + (hz.length ? '<h3>Hebel</h3><ul>' + hz.map(function (x) { return '<li>' + B.esc(x) + '</li>'; }).join('') + '</ul>' : '')
       + '<p class="det">Alle vier Stufen geteilt durch das Eigenkapital. Der Wertzuwachs ist eine Annahme und geht in keinen Score ein.</p>';
   }
+  /* v4870 · Marcel 25.11.2026: bei den Gruppen des Investor Deal Score die zugrunde liegenden Kennzahlen mit Wert und Punkten.
+     Quelle ist der Score-Kern selbst (dealscore2: investment/finanzierung.gruppen[].kpis, categories[].breakdown), hier wird nichts gerechnet. */
+  function idsGruppen(B, ds2) {
+    if (!ds2 || !ds2.investment || !ds2.finanzierung || !ds2.categories) return '';
+    var bd = {};
+    Object.keys(ds2.categories).forEach(function (k) { (ds2.categories[k].breakdown || []).forEach(function (b) { bd[b.name] = b; }); });
+    function wert(b) {
+      if (!b || b.applied === false || b.value == null || typeof b.value === 'object') return 'keine Angabe';
+      if (typeof b.value === 'string') return b.value.charAt(0).toUpperCase() + b.value.slice(1);
+      var u = String(b.unit || '').trim();
+      if (u === '%') return B.pct(b.value, Math.abs(b.value) < 10 ? 2 : 1);
+      if (u === '€') return B.eurS(b.value);
+      return B.zahl(b.value, Math.abs(b.value) < 10 ? 2 : 0) + (u ? ' ' + u : '');
+    }
+    function gruppe(g) {
+      var zeilen = (g.kpis || []).map(function (n) {
+        var b = bd[n], ok = b && b.applied !== false && typeof b.value !== 'object', p = ok ? Math.max(0, Math.min(100, Math.round(b.points))) : null;
+        var balken = p === null ? '' : '<div style="height:1.6mm;background:rgba(42,39,39,.08);border-radius:1mm;margin-top:.6mm"><div style="height:100%;width:' + p + '%;background:var(--wl-c9a84c,#C9A84C);border-radius:1mm"></div></div>';
+        return '<tr><td style="padding:1mm 1.5mm 1mm 0">' + B.esc(n) + balken + '</td><td class="r num" style="padding:1mm 1.5mm;white-space:nowrap">' + B.esc(wert(b)) + '</td><td class="r num" style="padding:1mm 0;white-space:nowrap;' + (p === null ? 'color:rgba(42,39,39,.5)' : '') + '">' + (p === null ? '–' : p) + '</td></tr>';
+      }).join('');
+      return '<div style="break-inside:avoid;margin:0 0 3mm"><div style="display:flex;justify-content:space-between;align-items:baseline;border-bottom:.3mm solid var(--wl-c9a84c,#C9A84C);padding-bottom:.8mm;margin-bottom:.6mm"><b>' + B.esc(g.name) + '</b><span class="num"><b>' + B.zahl(g.score, 0) + '</b> / 100</span></div>'
+        + '<table class="dicht" style="width:100%"><thead><tr><th>Kennzahl</th><th class="r">Wert</th><th class="r">Punkte</th></tr></thead><tbody>' + zeilen + '</tbody></table></div>';
+    }
+    var sp = function (titel, t) { return '<div><h3>' + titel + ' ' + B.zahl(t.score, 0) + ' / 100</h3>' + t.gruppen.map(gruppe).join('') + '</div>'; };
+    return '<div class="zwei">' + sp('Investment-Score', ds2.investment) + sp('Finanzierungs-Score', ds2.finanzierung) + '</div>'
+      + '<p class="det">Punkte von 0 bis 100 je Kennzahl aus dem Score-Kern der App, je Gruppe gewichtet. „keine Angabe“: die Kennzahl fehlt am Objekt und zählt nicht mit.</p>';
+  }
   function investorScoreSeite(B, SC) {
     var r = null; try { r = typeof window._dpComputeDS2Cached === 'function' ? window._dpComputeDS2Cached() : window._dpLastDS2Result; } catch (e) { r = null; }
     var kat = r && (r.categories || r.kategorien);
@@ -1146,7 +1173,8 @@
     /* 1 · Auf einen Blick, mit Deal Score und den Teilscores des Investor Deal Score */
     var GN = { rendite: 'Rendite', finanzierung: 'Finanzierung', risiko: 'Risiko und Zustand', lage: 'Lage und Markt', upside: 'Potenzial' };
     var kat = ds2 && (ds2.categories || ds2.kategorien), teil = [];
-    if (kat && typeof kat === 'object') teil = (Array.isArray(kat) ? kat : Object.keys(kat).map(function (k) { var x = kat[k] || {}; return { name: x.label || x.name || k, score: x.score }; }))
+    if (ds2 && ds2.investment && ds2.finanzierung && ds2.investment.gruppen) teil = ds2.investment.gruppen.concat(ds2.finanzierung.gruppen || []).map(function (g) { return { l: g.name, v: B.zahl(g.score, 0), s: 'von 100' }; });   /* v4870 */
+    else if (kat && typeof kat === 'object') teil = (Array.isArray(kat) ? kat : Object.keys(kat).map(function (k) { var x = kat[k] || {}; return { name: x.label || x.name || k, score: x.score }; }))
       .map(function (x) { var n = String(x.name || x.label || ''); return { l: GN[n] || n, v: da(x.score) === null ? '–' : B.zahl(x.score, 0), s: 'von 100' }; });
     var scoreBlock = IG ? '<div class="zwei"><div>' + B.scoreRing(IG.score, igWort(IG), 'Investor Deal Score von 100') + '<p class="det">Investor Deal Score: das Objekt aus Sicht des Investmentprofils, in zwei Scores. Rendite mit der EK-Rendite nach Steuer.</p></div><div>'
       + B.kacheln([{ l: 'Investment-Score', v: B.zahl(II.score, 0) + ' / 100', s: (II.stufe || '') + (II.anteil != null ? ' · Anteil ' + B.pct(II.anteil, 1) : '') },
@@ -1165,6 +1193,8 @@
         (!bankF && K.ekr4 && K.ekr4.haupt != null) ? { l: 'EK-Rendite', v: B.pct(K.ekr4.haupt, 1), s: 'nach Steuer mit Vermögensdelta' } : { l: 'LTV', v: B.pct(K.ltv, 1), s: S0.ltv_basis_label ? 'auf ' + S0.ltv_basis_label : '' }
       ].filter(Boolean), true) + '<h3>Investor Deal Score</h3>' + scoreBlock, 1);
 
+    /* v4870 · Investor Deal Score im Detail: Kennzahlen je Gruppe mit Wert und Punkten (alle Fassungen) */
+    if (IG) add('Investor Deal Score im Detail', 'Kennzahlen je Gruppe mit Wert und Punkten', idsGruppen(B, ds2), 1);
     /* 2 · Objekt */
     var steck = '<div class="kv">' + [['Objektart', o.art], ['Baujahr', B.jahr(o.bj)], ['Wohnfläche', o.wfl ? B.zahl(o.wfl, 0) + ' m²' : '–'], ['Grundstück', o.gs ? B.zahl(o.gs, 0) + ' m²' : '–'],
       ['Kaufdatum', B.datum(feld('kaufdat')) || '–'], ['Energieklasse', feld('ds2_energie') || '–']].map(function (k) { return '<div><span>' + k[0] + '</span><span>' + B.esc(k[1]) + '</span></div>'; }).join('') + '</div>';
@@ -1223,10 +1253,10 @@
     if (kombi) { var ord = T.map(function (t, i) { return i; }).sort(function (a, b) { return ((T[a][2] || 1) - (T[b][2] || 1)) || (a - b); }); T = ord.map(function (i) { return T[i]; }); P = ord.map(function (i) { return P[i]; }); }
     var mark = function (html, k) { return html.replace('<section class="seite', '<section data-dp-abschnitt="' + k + '" class="seite'); };
     var nA = 0, nB = 0;
-    var TT = T.map(function (t, i) { var nr = !kombi ? String(i + 1) : (t[2] === 2 ? 'B' + (++nB) : 'A' + (++nA)); return [t[0], kombi ? '' : t[1], nr, 'a' + (i + 1)]; });
-    Sx.push(inhaltSeite(c, B, TT.concat([['Quellen, Methodik und Annahmen', kombi ? '' : 'Quellen, Methodik, Annahmen, Hinweise', 'Q', 'anh']])));
+    var TT = T.map(function (t, i) { return [t[0], t[1], String(i + 1), 'a' + (i + 1)]; });   /* v4870 · Marcel: Kombi wie Kurzfassung, 1, 2, 3 statt A1/B1 */
+    Sx.push(inhaltSeite(c, B, TT.concat([['Quellen, Methodik und Annahmen', 'Quellen, Methodik, Annahmen, Hinweise', 'Q', 'anh']])));
     P.forEach(function (p, i) {
-      var eb = kombi ? (p[2] === 2 ? 'Teil B · Vertiefung' : 'Teil A · Überblick') : 'Abschnitt ' + (i + 1);
+      var eb = 'Abschnitt ' + (i + 1);
       Sx.push(mark(B.seite(c, p[0], B.abschnitt(eb, p[0]) + p[1]), 'a' + (i + 1)));
     });
     /* Quellen und Methodik immer am Schluss (Marcel 25.11.) */
