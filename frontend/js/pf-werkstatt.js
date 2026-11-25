@@ -270,7 +270,7 @@
     pl.innerHTML = palette(); pl.scrollTop = st;
     p.querySelector('.pw-ptabs').innerHTML = reiterHtml(); reiterAktiv();
     var s = scoreHtml();
-    p.querySelector('.pw-score').innerHTML = '<div class="pw-mini pw-scorebild" data-maxh="150" aria-hidden="true" inert><div class="pw-mini-in" data-ew="' + s.w + '" style="width:' + s.w + 'px">' + huelle(s.h) + '</div></div>'
+    p.querySelector('.pw-score').innerHTML = '<div class="pw-mini pw-scorebild" data-maxh="320" aria-hidden="true" inert><div class="pw-mini-in" data-ew="' + s.w + '" style="width:' + s.w + 'px">' + huelle(s.h) + '</div></div>'
       + '<span class="pw-fest" title="Der Score-Kopf steht immer oben">fest' + (s.echt ? '' : ' · Beispielwerte') + '</span>';
     var K = kzAktiv();
     /* v4890 · Kennzahlen erscheinen so, wie sie oben im Cockpit stehen: Karte mit Bezeichnung, Wert und Zusatz */
@@ -309,7 +309,7 @@
   function reiterSprung(g) {
     var p = document.getElementById('dp-pw'); if (!p) return;
     var pl = p.querySelector('.pw-pliste'), z = pl.querySelector('.pw-pg[data-g="' + g + '"]'); if (!z) return;
-    pl.scrollTo({ top: z.offsetTop - pl.offsetTop - 4, behavior: 'smooth' });
+    pl.scrollTo({ top: Math.max(0, z.getBoundingClientRect().top - pl.getBoundingClientRect().top + pl.scrollTop - 4), behavior: 'smooth' });
     [].forEach.call(p.querySelectorAll('.pw-tab'), function (t) { t.classList.toggle('an', t.getAttribute('data-k') === g); });
   }
   /* Große Live-Vorschau beim Überfahren eines Bausteins in der Palette */
@@ -449,7 +449,7 @@
     ziehenEinrichten(p);
     document.addEventListener('keydown', taste, true); window.addEventListener('resize', zeichnen);
     zeichnen();
-    var f = p.querySelector('.pw-b') || p.querySelector('.pw-x'); if (f) f.focus();
+    var f = p.querySelector('.pw-x'); if (f) f.focus({ preventScroll: true });   /* nicht in den Arbeitsbereich springen */
   }
 
   function stil() {
