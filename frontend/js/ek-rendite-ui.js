@@ -190,5 +190,5 @@
   } catch (e) {}
   stil();
 
-  window.DpEkrUi = { einbauen: einbauen, einrichten: einrichten, anwenden: alleAnwenden, stufe: gewaehlt, version: 'v4620' };
+  window.DpEkrUi = { einbauen: einbauen, einrichten: einrichten, anwenden: alleAnwenden, stufe: gewaehlt, version: 'v4620c' };
 })();
