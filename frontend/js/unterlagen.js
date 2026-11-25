@@ -347,6 +347,12 @@
       + (x.kosten_eur ? ' <span style="font-size:12px;color:#2A2727">· ' + esc(eur(x.kosten_eur)) + '</span>' : '') + (x.jahr ? ' <span style="font-size:12px;color:#7A7370">· ' + esc(x.jahr) + '</span>' : '')
       + '<p>' + esc(x.beschreibung || '') + '</p>' + ((x.quelle || x.fundstelle) ? '<div class="dpu-quelle">Quelle: ' + esc(x.quelle || x.fundstelle) + '</div>' : '') + '</div>';
   }
+  /* v4780 · Risiken entfernter Unterlagen (Verlauf: Zurücknehmen/Löschen) fallen weg, Regel in hausverlauf.js */
+  function rAktiv(a) {
+    var L = (a && a.risiken) || [];
+    try { var d = laden(), H = window.DpHausverlauf; if (d && H && H.risikenAktiv && Array.isArray(d.dokumente)) return H.risikenAktiv({ auswertung: a, dokumente: d.dokumente }); } catch (e) {}
+    return L;
+  }
   /** Ein gelesenes Dokument lesbar (Reiter im Import-Fenster) */
   function dokHtml(ext) {
     stil();
@@ -380,8 +386,8 @@
     if (!a) return '';
     var h = '';
     if (a.investitionsthese) h += '<div class="dpu-h">Investitionsthese aus den Unterlagen</div><div class="dpu-these">' + esc(a.investitionsthese) + '</div>';
-    var r = (a.risiken || []).slice().sort(function (x, y) { var o = { hoch: 0, mittel: 1, niedrig: 2 }; return (o[x.schwere] == null ? 1 : o[x.schwere]) - (o[y.schwere] == null ? 1 : o[y.schwere]); });
-    if (r.length) h += '<div class="dpu-h">Risiken (' + r.length + ')</div>' + r.map(risikoHtml).join('');
+    var r = rAktiv(a).slice().sort(function (x, y) { var o = { hoch: 0, mittel: 1, niedrig: 2 }; return (o[x.schwere] == null ? 1 : o[x.schwere]) - (o[y.schwere] == null ? 1 : o[y.schwere]); });
+    if (r.length) h += '<div class="dpu-risk"><div class="dpu-h">Risiken (' + r.length + ')</div>' + r.map(risikoHtml).join('') + '</div>';
     var w = a.weg;
     if (w) {
       /* v3016x · Marcel 28.10.2026: „den Tab ab WEG Eigentümergemeinschaft besser angeben, Übergang zu
@@ -433,7 +439,7 @@
     return s.length > n ? s.slice(0, n).replace(/\s+\S*$/, '') + ' …' : s;
   }
   function einfachHtml(a) {
-    var r = (a.risiken || []).slice();
+    var r = rAktiv(a).slice();
     var n = { hoch: 0, mittel: 0, niedrig: 0 };
     r.forEach(function (x) { var s = String(x.schwere || 'mittel').toLowerCase(); if (n[s] != null) n[s]++; });
     var ord = { hoch: 0, mittel: 1, niedrig: 2 };
@@ -452,7 +458,7 @@
     /* v3017 · Gemeinschaftskosten fest auf den Anteil gerechnet, wo die Auswertung sie gesamt führt */
     kosten.forEach(function (x) { var a = zahl(x.kosten_gesamt_eur) > 0 ? anteil(x.kosten_gesamt_eur) : null; x._betrag = a ? a.eur : zahl(x.kosten_eur); });
     var summe = kosten.reduce(function (s, x) { return s + (x._betrag || 0); }, 0);
-    var h = '<div class="dpu-ampel"><div class="hoch"><b>' + n.hoch + '</b><span>hoch</span></div><div class="mittel"><b>' + n.mittel + '</b><span>mittel</span></div><div class="niedrig"><b>' + n.niedrig + '</b><span>niedrig</span></div></div>';
+    var h = '<div class="dpu-ampel dpu-risk"><div class="hoch"><b>' + n.hoch + '</b><span>hoch</span></div><div class="mittel"><b>' + n.mittel + '</b><span>mittel</span></div><div class="niedrig"><b>' + n.niedrig + '</b><span>niedrig</span></div></div>';
     h += '<div class="dpu-karten">';
     h += '<div class="dpu-karte' + (summe ? '' : ' niedrig') + '"><h4>Was absehbar Geld kostet</h4>'
       + (summe ? '<div class="dpu-gross">' + esc(eur(summe)) + '</div><p>' + kosten.slice(0, 3).map(function (x) { return esc(x.titel) + (x.jahr ? ' (' + esc(x.jahr) + ')' : ''); }).join(' · ') + '</p>'
@@ -466,13 +472,13 @@
     if (a.investitionsthese) h += '<div class="dpu-karte neutral" style="border-top-color:' + GOLD + '"><h4>Investitionsthese</h4><p>' + esc(kurzSatz(a.investitionsthese, 230)) + '</p></div>';
     h += '</div>';
     if (r.length) {
-      h += '<div class="dpu-h">Die wichtigsten Risiken</div><div class="dpu-karten">' + r.slice(0, 3).map(function (x) {
+      h += '<div class="dpu-risk"><div class="dpu-h">Die wichtigsten Risiken</div><div class="dpu-karten">' + r.slice(0, 3).map(function (x) {
         var s = String(x.schwere || 'mittel').toLowerCase();
         return '<div class="dpu-karte ' + esc(s) + '"><h4>' + esc(x.titel) + '</h4>'
           + (x.kosten_eur ? '<div class="dpu-gross" style="font-size:18px">' + esc(eur(x.kosten_eur)) + '</div>' : '')
           + '<p>' + esc(kurzSatz(x.beschreibung, 150)) + '</p>' + ((x.quelle || x.fundstelle) ? '<div class="dpu-quelle">Quelle: ' + esc(x.quelle || x.fundstelle) + '</div>' : '') + '</div>';
       }).join('') + '</div>'
-        + (r.length > 3 ? '<p class="dpu-hinweis">' + (r.length - 3) + ' weitere Risiken und alle Einzelheiten unter <b>Genau</b>.</p>' : '');
+        + (r.length > 3 ? '<p class="dpu-hinweis">' + (r.length - 3) + ' weitere Risiken und alle Einzelheiten unter <b>Genau</b>.</p>' : '') + '</div>';
     }
     if ((a.offene_fragen || []).length) h += '<p class="dpu-hinweis"><b>' + a.offene_fragen.length + ' Fragen</b> an Verwalter oder Verkäufer stehen unter <b>Genau</b>.</p>';
     return h;
@@ -496,8 +502,8 @@
     return '<div class="dp-pa-card dpu-wrap">'
       + '<div class="dpu-umschalter"><button type="button" data-art="einfach" class="' + (art === 'einfach' ? 'on' : '') + '" onclick="DpUnterlagen.ansicht(this,\'einfach\')">Einfach</button>'
       + '<button type="button" data-art="genau" class="' + (art === 'genau' ? 'on' : '') + '" onclick="DpUnterlagen.ansicht(this,\'genau\')">Genau</button></div>'
-      + '<div class="dpu-hinweis">Ausgewertet am ' + esc(datum) + ' aus ' + (d.dokumente || []).length + ' Unterlagen: '
-      + (d.dokumente || []).map(function (x) { return esc(x.label) + (x.datum ? ' ' + esc(x.datum) : ''); }).join(' · ') + '. '
+      + '<div class="dpu-hinweis">Ausgewertet am ' + esc(datum) + ' aus ' + (d.dokumente || []).filter(function (x) { return x && !x.entfernt; }).length + ' Unterlagen: '
+      + (d.dokumente || []).filter(function (x) { return x && !x.entfernt; }).map(function (x) { return esc(x.label) + (x.datum ? ' ' + esc(x.datum) : ''); }).join(' · ') + '. '
       + '</div>'
       /* v3017 · Marcel 28.10.2026: Unterlagen nachreichen - fließen in Risiken, These, Hausgeld und Steuer */
       + '<div class="dpu-nach"><button type="button" class="dpu-nach-btn" onclick="DpUnterlagen.nachreichen()">+ Unterlagen nachreichen</button>'

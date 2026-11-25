@@ -347,6 +347,21 @@
   function gleich(a, b) { return JSON.stringify(a) === JSON.stringify(b); }
   function nahe(a, b) { return (a == null && b == null) || (a != null && b != null && Math.abs(Number(a) - Number(b)) < 0.005); }
 
+  /* v4780 · Marcel 25.11.2026: „wenn ich gewisse Unterlagen lösche, dann sollen diese Risiken natürlich auch verschwinden“.
+     Zurücknehmen und Löschen eines Eintrags markieren seine Dateien in #_dok_auswertung als entfernt. Damit fallen ihre
+     Risiken, Protokolle und Jahreswerte in Haus & Unterlagen weg (hausverlauf.js risikenAktiv, lesen). Die Werte, die
+     schon ins Objekt übernommen sind, regelt weiter Zurücknehmen. Gibt die Zahl der entfernten Dateien zurück. */
+  function dokumenteEntfernen(x) {
+    var U = window.DpUnterlagen; if (!x || !U || !U.laden || !U.merken) return 0;
+    var namen = (x.dokumente || []).map(function (d) { return String((d && (d.name || d.datei)) || '').toLowerCase().trim(); })
+      .filter(function (n) { return n.length > 4 && n !== 'alle unterlagen zusammen'; });
+    if (!namen.length) return 0;
+    var d = U.laden(); if (!d || !Array.isArray(d.dokumente)) return 0;
+    var n = 0, jetzt = new Date().toISOString();
+    d.dokumente.forEach(function (q) { var dn = String((q && q.datei) || '').toLowerCase().trim(); if (dn && !q.entfernt && namen.indexOf(dn) >= 0) { q.entfernt = jetzt; n++; } });
+    if (n) U.merken(d);
+    return n;
+  }
   /** v3154 · Einen Import zurücknehmen: jede gemerkte Änderung rückwärts, nur wo der Wert noch der übernommene ist. */
   function zuruecknehmen(id) {
     var o = lesen(), x = o.verlauf.filter(function (v) { return v.id === id; })[0];
@@ -395,18 +410,21 @@
       return b.eid !== id || konflikt.indexOf(b.feld + ' ' + b.jahr) >= 0;
     });
     schreiben(o);
+    var dokWeg = 0; try { dokWeg = dokumenteEntfernen(x); } catch (y) {}   /* v4780 */
     setTimeout(neuZeichnen, 120);
-    var msg = ok + ' Wert(e) zurückgenommen.' + (konflikt.length ? ' Seitdem von Hand geändert, deshalb belassen: ' + konflikt.join(', ') + '.' : '')
+    var msg = ok + ' Wert(e) zurückgenommen.' + (dokWeg ? ' Die Risiken dieser Unterlage stehen nicht mehr in der Auswertung.' : '') + (konflikt.length ? ' Seitdem von Hand geändert, deshalb belassen: ' + konflikt.join(', ') + '.' : '')
       + (nicht.length ? ' Nicht automatisch zurücknehmbar: ' + nicht.join(', ') + '.' : '');
     try { if (window.toast) window.toast(msg); } catch (y) {}
     return { anzahl: ok, konflikt: konflikt, nicht: nicht };
   }
   /** v3154 · Eintrag aus dem Verlauf löschen - die übernommenen Werte bleiben stehen. */
   function eintragLoeschen(id) {
-    var o = lesen(), n = o.verlauf.length;
+    var o = lesen(), n = o.verlauf.length, x = o.verlauf.filter(function (v) { return v.id === id; })[0];
     o.verlauf = o.verlauf.filter(function (v) { return v.id !== id; });
     if (o.verlauf.length === n) return false;
-    schreiben(o); setTimeout(neuZeichnen, 120);
+    schreiben(o);
+    try { dokumenteEntfernen(x); } catch (y) {}   /* v4780 · mit dem Eintrag fallen die Risiken seiner Unterlagen */
+    setTimeout(neuZeichnen, 120);
     return true;
   }
   /* Zwei Klicks statt Bestätigungsfenster: der erste fragt im Knopf selbst nach.
@@ -615,7 +633,7 @@
             }).join('') + '</ul></div>' : '';
         var kannZurueck = !x.zurueck && (x.aenderungen || []).some(function (a) { return a.t !== 'nicht'; });
         var aktion = (kannZurueck ? '<button type="button" class="dp-eg-k" data-eg-knopf="zurueck:' + esc(x.id) + '" onclick="DpEingang.knopf(\'zurueck\',\'' + esc(x.id) + '\',this)" title="Die übernommenen Werte auf den Stand davor setzen">' + knopfText('zurueck', x.id) + '</button>' : '')
-          + '<button type="button" class="dp-eg-k rot" data-eg-knopf="loeschen:' + esc(x.id) + '" onclick="DpEingang.knopf(\'loeschen\',\'' + esc(x.id) + '\',this)" title="Nur den Eintrag entfernen, übernommene Werte bleiben">' + knopfText('loeschen', x.id) + '</button>';
+          + '<button type="button" class="dp-eg-k rot" data-eg-knopf="loeschen:' + esc(x.id) + '" onclick="DpEingang.knopf(\'loeschen\',\'' + esc(x.id) + '\',this)" title="Eintrag und die Risiken seiner Unterlagen entfernen, übernommene Werte bleiben">' + knopfText('loeschen', x.id) + '</button>';
         return '<div class="dp-eg-z' + (x.zurueck ? ' zurueck' : '') + '" role="row" data-stand="' + r.stand + '">'
           + '<span class="dp-eg-dat">' + esc(datum(x.am)) + '<small class="dp-eg-st s-' + r.stand + '">' + STAND_NAME[r.stand] + '</small></span>'
           + '<span class="dp-eg-doks">' + (marken || '<span class="dp-eg-nichts">keine Datei</span>') + zr + '</span>'
@@ -623,7 +641,7 @@
           + '<span class="dp-eg-uw">' + werte + '</span>'
           + '<span class="dp-eg-akt">' + aktion + '</span>' + liste + '</div>';
       }).join('') + '</div>'
-      + '<p class="dp-eg-fuss">Klick auf eine Zuordnung springt dorthin. Zurücknehmen setzt die Werte auf den Stand davor. Löschen entfernt nur den Eintrag.</p>';
+      + '<p class="dp-eg-fuss">Klick auf eine Zuordnung springt dorthin. Zurücknehmen setzt die Werte auf den Stand davor. Löschen entfernt den Eintrag und die Risiken seiner Unterlagen, übernommene Werte bleiben stehen.</p>';
     if (ae.length) h += '<p class="dp-eg-fuss"><b>Mietverträge den Einheiten zugeordnet:</b> ' + ae.map(function (a) { return esc(a.einheit) + ' (' + esc(datum(a.am)) + (a.vorher.ist ? ', vorher ' + esc(a.vorher.ist) + ' €' : '') + ')'; }).join(' · ') + '</p>';
     return h + '</div>';
   }
@@ -950,5 +968,5 @@
     einheiten: einheiten, mvVorschlag: mvVorschlag, mvOptionen: mvOptionen, mvText: mvText, mvUebernehmen: mvUebernehmen, mvFelder: mvFelder,
     jahrStand: jahrStand, protokoll: protokoll, verlaufHtml: verlaufHtml, lesen: lesen, filtern: filtern, hin: hin, werteAuf: werteAuf, zieleVon: zieleVon /* v4680 */,
     /* v3154 */ txStart: txStart, txEnde: txEnde, feldStand: feldStand, feldGeaendert: feldGeaendert,
-    zuruecknehmen: zuruecknehmen, eintragLoeschen: eintragLoeschen, knopf: knopf, vorschau: vorschau };
+    zuruecknehmen: zuruecknehmen, eintragLoeschen: eintragLoeschen, dokumenteEntfernen: dokumenteEntfernen, knopf: knopf, vorschau: vorschau };
 })();
