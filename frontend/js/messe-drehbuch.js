@@ -10786,6 +10786,8 @@
     }
     return false;
   }
+  /* vom Treffer nach oben, solange der Kasten niedriger als maxH bleibt: so trifft der Kegel die Karte, nicht die Seite */
+  function k5Eng(e, maxH) { if (!e) return null; var x = e; while (x.parentElement && x.parentElement.getBoundingClientRect().height < (maxH || 320) && x.parentElement.id !== 'dp-stage') x = x.parentElement; return x; }
   function k5EkrZurueck() { try { sessionStorage.removeItem('dp_ekr_stufe'); } catch (e) {} }
 
   DREHBUECHER['neu-objekt-cockpit'] = {
@@ -10868,11 +10870,12 @@
         await b2oZeile(s, 'Das Portfolio-Cockpit', 'Oben der Investor Deal Score, geteilt in Investment und Finanzierung.');
       },
       async function (s) {   /* 2 · Kennzahlen */
-        await zeige(function () { var e = rhIm(q('#dp-stage') || document.body, /Vermögen netto/); return e && (e.closest('div[class]') && e.closest('div[class]').parentNode || e); }, 8);
+        await zeige(function () { return k5Eng(rhIm(q('#dp-stage') || document.body, /Vermögen netto/), 220); }, 8);
         await b2oZeile(s, 'Deine Kennzahlen', 'Wertansatz, Vermögen netto, Miete, Cashflow, DSCR, Zinsbindung und EK-Rendite. Welche, bestimmst du.');
       },
       async function (s) {   /* 3 · Objektmatrix */
-        await zeige(function () { var e = rhIm(q('#dp-stage') || document.body, /EK im Objekt/); return e && (e.closest('[class*="karte"],[class*="card"],div[class]') || e); }, 8);
+        var om = rhIm(q('#dp-stage') || document.body, /EK im Objekt/);   /* nur in der Vorlage Objektmatrix (Standard); im Aufnahmekonto gesetzt */
+        if (om) await zeige(function () { return k5Eng(rhIm(q('#dp-stage') || document.body, /EK im Objekt/), 420); }, 8);
         await b2oZeile(s, 'Jedes Objekt als Karte', 'Foto oder Lagekarte, Score und die wichtigsten Zahlen. Ein Klick dreht die Karte um.');
       },
       async function (s) {   /* 4 · Ansicht anpassen */
