@@ -33,6 +33,7 @@ const ROT_MAILEN = ['platte', 'sicherung', 'tls', 'probe', 'messung'];
 
 function _tage(a, b) { return (b - a) / 86400000; }
 function _ms(t) { const x = Date.parse(t); return isFinite(x) ? x : null; }
+function _de(x) { return x == null ? '–' : String(x).replace('.', ','); }
 function _gb(b) { return b == null ? '–' : (b / 1e9).toFixed(1).replace('.', ',') + ' GB'; }
 function _mb(b) { return b == null ? '–' : Math.round(b / 1e6) + ' MB'; }
 
@@ -69,16 +70,16 @@ function bewerten(o) {
   if (m) {
     const pl = m.platte || {};
     k.platte_pct = pl.pct;
-    if (pl.pct >= S.platteRot) add('platte', 'rot', 'Platte zu ' + pl.pct + ' % belegt', 'Sofort Platz schaffen (Build-Cache, alte Handsicherungen) oder Speicher erweitern.');
-    else if (pl.pct >= S.platteGelb) add('platte', 'gelb', 'Platte zu ' + pl.pct + ' % belegt', 'Aufräumen planen, Storage Box oder größeren Server vorbereiten.');
-    else add('platte', 'gruen', 'Platte zu ' + pl.pct + ' % belegt, ' + _gb(pl.frei) + ' frei');
+    if (pl.pct >= S.platteRot) add('platte', 'rot', 'Platte zu ' + _de(pl.pct) + ' % belegt', 'Sofort Platz schaffen (Build-Cache, alte Handsicherungen) oder Speicher erweitern.');
+    else if (pl.pct >= S.platteGelb) add('platte', 'gelb', 'Platte zu ' + _de(pl.pct) + ' % belegt', 'Aufräumen planen, Storage Box oder größeren Server vorbereiten.');
+    else add('platte', 'gruen', 'Platte zu ' + _de(pl.pct) + ' % belegt, ' + _gb(pl.frei) + ' frei');
 
     const h = hochrechnung((o.verlauf || []).map((v) => ({ zeit: v.erfasst_am, belegt: v.daten && v.daten.platte && v.daten.platte.belegt })), pl.gesamt, jetzt);
     k.hochrechnung = h;
     if (h.monate_85 != null) {
-      if (h.monate_85 <= S.vollMonateRot) add('wachstum', 'rot', '85 % Platte in etwa ' + h.monate_85 + ' Monaten', 'Größeren Server oder Storage Box jetzt bestellen.');
-      else if (h.monate_85 <= S.vollMonateGelb) add('wachstum', 'gelb', '85 % Platte in etwa ' + h.monate_85 + ' Monaten', 'Speichererweiterung einplanen.');
-      else add('wachstum', 'gruen', '85 % Platte frühestens in ' + h.monate_85 + ' Monaten');
+      if (h.monate_85 <= S.vollMonateRot) add('wachstum', 'rot', '85 % Platte in etwa ' + _de(h.monate_85) + ' Monaten', 'Größeren Server oder Storage Box jetzt bestellen.');
+      else if (h.monate_85 <= S.vollMonateGelb) add('wachstum', 'gelb', '85 % Platte in etwa ' + _de(h.monate_85) + ' Monaten', 'Speichererweiterung einplanen.');
+      else add('wachstum', 'gruen', '85 % Platte frühestens in ' + _de(h.monate_85) + ' Monaten');
     } else add('wachstum', 'gruen', 'Hochrechnung: ' + (h.grund || 'kein Wachstum'));
 
     const v7 = (o.verlauf || []).filter((v) => _ms(v.erfasst_am) != null && jetzt - _ms(v.erfasst_am) <= 7 * 86400000);
@@ -87,14 +88,14 @@ function bewerten(o) {
       .concat([m.last && m.last.kerne ? m.last.l1 / m.last.kerne : null]));
     k.ram_7 = ram7 == null ? null : +ram7.toFixed(1); k.last_7 = last7 == null ? null : +last7.toFixed(2);
     if (ram7 != null) {
-      if (ram7 >= S.ramRot) add('speicher', 'rot', 'Arbeitsspeicher im Schnitt ' + k.ram_7 + ' % belegt', 'Größeren Server einplanen.');
-      else if (ram7 >= S.ramGelb) add('speicher', 'gelb', 'Arbeitsspeicher im Schnitt ' + k.ram_7 + ' % belegt', 'Beobachten, größeren Server vorbereiten.');
-      else add('speicher', 'gruen', 'Arbeitsspeicher im Schnitt ' + k.ram_7 + ' % belegt');
+      if (ram7 >= S.ramRot) add('speicher', 'rot', 'Arbeitsspeicher im Schnitt ' + _de(k.ram_7) + ' % belegt', 'Größeren Server einplanen.');
+      else if (ram7 >= S.ramGelb) add('speicher', 'gelb', 'Arbeitsspeicher im Schnitt ' + _de(k.ram_7) + ' % belegt', 'Beobachten, größeren Server vorbereiten.');
+      else add('speicher', 'gruen', 'Arbeitsspeicher im Schnitt ' + _de(k.ram_7) + ' % belegt');
     }
     if (last7 != null) {
-      if (last7 >= S.lastRot) add('last', 'rot', 'Last je Kern im Schnitt ' + k.last_7, 'Mehr CPU-Kerne nötig.');
-      else if (last7 >= S.lastGelb) add('last', 'gelb', 'Last je Kern im Schnitt ' + k.last_7, 'Beobachten.');
-      else add('last', 'gruen', 'Last je Kern im Schnitt ' + k.last_7);
+      if (last7 >= S.lastRot) add('last', 'rot', 'Last je Kern im Schnitt ' + _de(k.last_7), 'Mehr CPU-Kerne nötig.');
+      else if (last7 >= S.lastGelb) add('last', 'gelb', 'Last je Kern im Schnitt ' + _de(k.last_7), 'Beobachten.');
+      else add('last', 'gruen', 'Last je Kern im Schnitt ' + _de(k.last_7));
     }
 
     const u = m.updates || {};
