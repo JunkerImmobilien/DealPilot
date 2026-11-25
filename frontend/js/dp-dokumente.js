@@ -1028,7 +1028,7 @@
     var gb = ai.gesamtbewertung || ai.fazit_kurz || '';
     gb = String(gb).split(/(?<=[.!?])\s+/).filter(function (x) { return !(/(halten|gehalten|verkauf|kaufen|gekauft|einstieg)/i.test(x) && /(sollte|empfehl|geeignet|lohnt|ratsam)/i.test(x)); }).join(' ');
     var lm = [ai.mikrolage_recherche ? 'Mikrolage: ' + kuerzen(ai.mikrolage_recherche, 260) : '', ai.makrolage_recherche ? 'Makrolage: ' + kuerzen(ai.makrolage_recherche, 260) : '', ai.kaufpreisniveau ? 'Kaufpreisniveau: ' + kuerzen(ai.kaufpreisniveau, 220) : ''].filter(Boolean);
-    return (gb ? '<p>' + B.esc(kuerzen(gb, 900)) + '</p>' : '') + pilotAnalyse(B, true, bank)
+    var pa = pilotAnalyse(B, true, bank); if (!bank) pa = pa.replace(/<div class="fliess"><h3>Was für die Finanzierung spricht<\/h3>[\s\S]*?<\/ul><\/div>/, '');   /* steht in der Bankfassung */
       + (lm.length ? '<h3>Lage und Markt</h3><ul>' + lm.map(function (x) { return '<li>' + B.esc(x) + '</li>'; }).join('') + '</ul>' : '');
   }
   /* Kundentext ohne Gedankenstriche und Semikolons (Marcel 08.11.): nur im Text zwischen Tags, nie in Stil oder Attributen.
@@ -1106,8 +1106,10 @@
       + (feld('ds2_energie') ? '<h3>Energieeffizienz</h3>' + B.energieSkala(feld('ds2_energie')) : '') + gal, 1);
 
     /* 3 · Miete: Mieterliste und Obergrenze zusammen, damit die Seite trägt */
-    var mp = mietpotenzial(B, PD);
-    add('Miete und Obergrenze', 'Mieterliste, Ist gegen Soll, was rechtlich höchstens drin ist', mieterliste(K, B) + (mp ? '<h3 style="margin-top:6mm">Mietpotenzial und Obergrenze</h3>' + mp : ''), 1);
+    var mp = mietpotenzial(B, PD), ml = mieterliste(K, B), iS = ml.indexOf('<div class="block"><h3>Ist gegen Soll');
+    /* Mieterliste und Obergrenzen-Tabelle doppeln Wohnung, Fläche und Ist: im Überblick nur Ist gegen Soll plus Obergrenze, die volle Mieterliste in der Vertiefung */
+    add('Miete und Obergrenze', 'Ist gegen Soll, was rechtlich höchstens drin ist', mp ? (iS >= 0 ? ml.slice(iS) : '') + '<h3 style="margin-top:6mm">Mietpotenzial und Obergrenze</h3>' + mp : ml, 1);
+    if (kombi && mp && iS > 0) add('Einheiten und Zustand', 'Mieterliste mit Status und Modernisierungspunkten', ml.slice(0, iS), 2);
 
     /* 4 · Finanzierung */
     var dl = darlehen();
