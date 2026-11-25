@@ -1052,7 +1052,7 @@
     Object.keys(ds2.categories).forEach(function (k) { (ds2.categories[k].breakdown || []).forEach(function (b) { bd[b.name] = b; }); });
     function wert(b) {
       if (!b || b.applied === false || b.value == null || typeof b.value === 'object') return 'keine Angabe';
-      if (typeof b.value === 'string') return b.value.charAt(0).toUpperCase() + b.value.slice(1);
+      if (typeof b.value === 'string') { var w = b.value.replace(/_/g, ' '); return w.charAt(0).toUpperCase() + w.slice(1); }
       var u = String(b.unit || '').trim();
       if (u === '%') return B.pct(b.value, Math.abs(b.value) < 10 ? 2 : 1);
       if (u === '€') return B.eurS(b.value);
