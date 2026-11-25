@@ -665,10 +665,12 @@
     var k = o && o._key, kp = _kpEuro(o), wa = o && o._wert_anker;
     if (wa && num(wa.wert) > 0) return { wert: num(wa.wert), quelle: 'anker', art: wa.art || null, datum: wa.datum || null };
     var h = (k && _mbHist[k]) || null;
+    var zz = null; try { zz = window.DpWertZielbild && DpWertZielbild.zielbildFuer ? DpWertZielbild.zielbildFuer(o) : null; } catch (e) { zz = null; }
+    if (!h && zz && (num(zz.ewB) > 0 || num(zz.mpiB) > 0)) h = { created_at: zz.stand || null, market_value: zz.mpiB, ertragswert_eur: null };   /* Zielbild-Lauf ohne geladene Berichtsliste */
     if (h) {
       var art = String(o.objart || o.objektart || '').toLowerCase(), etw = /etw|wohnung|eigentumsw/.test(art);
       var vw = num(h.irw_vergleichswert_eur) > 0 ? num(h.irw_vergleichswert_eur) : (h.vergleichsfaktor_amtlich && num(h.vergleichswert_eur) > 0 ? num(h.vergleichswert_eur) : null);
-      var zbe = null; try { var zz = window.DpWertZielbild && DpWertZielbild.zielbildFuer ? DpWertZielbild.zielbildFuer(o) : null; zbe = zz && zz.ewB != null ? num(zz.ewB) : null; } catch (e) { zbe = null; }
+      var zbe = zz && zz.ewB != null ? num(zz.ewB) : null;
       var ew = zbe > 0 ? zbe : (num(h.ertragswert_eur) > 0 ? num(h.ertragswert_eur) : null);
       var d = h.created_at ? String(h.created_at).slice(0, 10) : null;
       if (etw && vw) return { wert: vw, quelle: 'mb', art: 'vergleichswert', datum: d };

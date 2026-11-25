@@ -168,7 +168,7 @@ window.DpPfKit = (function () {
   /* 3 · Zeitleiste Zinsbindung (Laufbalken bis zum Ende, Punktgrösse = Restschuld) */
   function zeitleiste(o) {
     var W = o.w, rows = o.rows, rh = o.rh || 20, L = W < 480 ? 112 : 150, R = 14, T = 16, B = 20, H = T + rows.length * rh + B;
-    var j0 = 2026, j1 = o.bis || 2040, pw = W - L - R, xv = function (j) { return L + (j - j0) / (j1 - j0) * pw; };
+    var j0 = new Date().getFullYear(), j1 = o.bis || (j0 + 14), pw = W - L - R, xv = function (j) { return L + (j - j0) / (j1 - j0) * pw; };
     var rMax = Math.max.apply(null, rows.map(function (r) { return r.rest; }));
     var s = ['<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Zinsbindung je Objekt">'];
     for (var j = j0; j <= j1; j += (W < 480 ? 4 : 2)) s.push('<line class="gx-netz" x1="' + f1(xv(j)) + '" x2="' + f1(xv(j)) + '" y1="' + (T - 4) + '" y2="' + (H - B) + '"/><text class="gx-ax" x="' + f1(xv(j)) + '" y="' + (H - 6) + '" text-anchor="middle">' + j + '</text>');
@@ -348,7 +348,7 @@ window.DpPfKit = (function () {
 
   /* ── Flugplan: Ereignisse je Objekt über die Jahre ───────────────────── */
   function flugplan(o) {
-    var W = o.w, rows = o.rows, rh = o.rh || 26, L = W < 480 ? 104 : 168, R = 12, T = 26, B = 22, H = T + rows.length * rh + B, j0 = o.von || 2026, j1 = o.bis || 2037;
+    var W = o.w, rows = o.rows, rh = o.rh || 26, L = W < 480 ? 104 : 168, R = 12, T = 26, B = 22, H = T + rows.length * rh + B, j0 = o.von || new Date().getFullYear(), j1 = o.bis || (new Date().getFullYear() + 11);
     var pw = W - L - R, xv = function (j) { return L + (j - j0) / (j1 - j0) * pw; };
     var s = ['<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Flugplan">'];
     for (var j = j0; j <= j1; j++) { s.push('<line class="gx-netz" x1="' + f1(xv(j)) + '" x2="' + f1(xv(j)) + '" y1="' + (T - 6) + '" y2="' + (H - B) + '"/>'); if (W > 480 || j % 2 === 0) s.push('<text class="gx-ax" x="' + f1(xv(j)) + '" y="' + (H - 6) + '" text-anchor="middle">' + j + '</text>'); }
