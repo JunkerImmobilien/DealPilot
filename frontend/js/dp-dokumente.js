@@ -910,6 +910,210 @@
     return B.dokument(name + ' · ' + o.adresse, Sx);
   }
 
+  /* ── v4790 · MUSTER: Investment-PDF im Deal-Check-Stil (Marcel 25.11.2026) ─────────────────────────────────────────────
+     „Ich finde das PDF super gut gemacht für diesen Einzelcheck … genau so für unser Investment-PDF … Kurzfassung … mit
+     Inhaltsverzeichnis und Seitenzahlen … Gesamtbewertung … Finanzierung … mit der Langfassung kombinieren.“ Zusatz: bei
+     Ertrags- und Sachwert fehlt der Rechenweg. Drei Fassungen, nur über DpDokumente.dokument('iv_a_muster'|'iv_b_muster'|
+     'iv_c_muster'), kein Knopf, bis Marcel wählt. Alle Zahlen aus State.kpis, den Kernen (DpEkRendite, DealScore2, DpPotenzial)
+     und dem letzten Stufe-3-Bericht (cross_check.*.staffel), nichts neu gerechnet. */
+  function stufe3Bericht() {
+    var key = window._currentObjKey; if (!key) return Promise.resolve(null);
+    var hol = function (q) { return api('/marktbericht/objects/history?' + q).then(function (h) { return (h && h.history) || []; }).catch(function () { return []; }); };
+    return Promise.all([hol('key=' + encodeURIComponent('dp:' + key)), hol('ref=' + encodeURIComponent(key))]).then(function (z) {
+      var l = z[0].concat(z[1]).filter(function (x) { return x && x.report_id; });
+      l.sort(function (a, b) { return new Date(b.created_at) - new Date(a.created_at); });
+      var x = l.filter(function (h) { return String(h.wert_stufe || '') === '3'; })[0] || l[0];
+      if (!x) return null;
+      return api('/marktbericht/reports/one?id=' + encodeURIComponent(x.report_id)).then(function (r) {
+        var p = r && (r.data || r.payload); if (typeof p === 'string') { try { p = JSON.parse(p); } catch (e) { p = null; } }
+        if (p && x.created_at && !p.created_at) p._erstellt = x.created_at;
+        return p && p.cross_check && p.cross_check.available ? p : null;
+      }).catch(function () { return null; });
+    });
+  }
+  /* Rechenweg je gerechnetem Verfahren: Zeilen des Kerns, Herkunft je Parameter, fehlende Zeilen fallen weg.
+     kurz: ohne Erläuterungszeilen (Kurzfassung eine Seite), sonst mit Erläuterung je Zeile (Kombi). */
+  function rechenweg(B, p, kurz) {
+    if (!p) return '';
+    var c = p.cross_check || {}, ew = c.ertragswert || {}, sw = c.sachwert || {}, bw = c.bodenwert || {}, lv = p.land_value || {};
+    var z = function (v, d) { return da(v) === null ? '' : B.zahl(v, d); };
+    var ohneDetail = function (rows) { return rows.map(function (x) { return { pos: x.pos, wert: x.wert, faktor: x.faktor, summe: x.summe }; }); };
+    var h = '';
+    var bwRows = (bw.schritte || []).map(function (x) { return { pos: x.pos, detail: kurz ? '' : x.detail, wert: x.wert }; });
+    if (bwRows.length && da(bw.wert) !== null) bwRows.push({ pos: '= Bodenwert', wert: bw.wert, summe: true });
+    if (bwRows.length) h += '<div class="block"><h3>Bodenwert</h3>' + B.staffel(bwRows, bwRows.map(function (x, i) {
+      return i === 0 ? 'Bodenrichtwert ' + z(lv.value_sqm, 0) + ' €/m², amtlich' + (lv.stichtag ? ', Stichtag ' + B.datum(lv.stichtag) : '') : (i === bwRows.length - 1 ? '§ 40 ImmoWertV' : '');
+    })) + '</div>';
+    if (Array.isArray(ew.staffel) && ew.staffel.length && da(ew.value_eur) !== null) {
+      var ewQ = ew.staffel.map(function (x) {
+        var t = String(x.pos || '');
+        if (/^Rohertrag/.test(t)) return 'marktüblich erzielbar' + (da(ew.miete_qm) !== null ? ', ' + z(ew.miete_qm, 2) + ' €/m²' : '');
+        if (/Bewirtschaftungskosten/.test(t)) return 'Anlage 3 ImmoWertV bzw. Modell des Ausschusses';
+        if (/Bodenwertverzinsung/.test(t)) return 'Liegenschaftszins ' + z(ew.liegenschaftszins_pct, 2) + ' %' + (ew.liegenschaftszins_stufe ? ', Stufe ' + ew.liegenschaftszins_stufe : '');
+        if (/Barwertfaktor/.test(t)) return '§ 34 ImmoWertV, Restnutzungsdauer ' + z(ew.restnutzungsdauer_jahre, 1) + ' Jahre';
+        if (/Ertragswert/.test(t)) return '§ 28 ImmoWertV';
+        return '';
+      });
+      h += '<div class="block"><h3>Ertragswert</h3>' + B.staffel(kurz ? ohneDetail(ew.staffel) : ew.staffel, ewQ) + '</div>';
+    }
+    if (Array.isArray(sw.staffel) && sw.staffel.length && da(sw.value_eur) !== null) {
+      var swQ = sw.staffel.map(function (x) {
+        var t = String(x.pos || '');
+        if (/Normalherstellungskosten/.test(t)) return 'NHK 2010, Anlage 4 ImmoWertV';
+        if (/Baupreisindex/.test(t)) return 'Baupreisindex zum Stichtag';
+        if (/Alterswertminderung/.test(t)) return '§ 38 ImmoWertV, Restnutzungsdauer ' + z(sw.restnutzungsdauer_jahre, 0) + ' von ' + z(sw.gesamtnutzungsdauer_jahre, 0) + ' Jahren';
+        if (/Sachwertfaktor/.test(t)) return sw.sachwertfaktor ? 'amtlicher Sachwertfaktor' + (sw.sachwertfaktor.stufe ? ', Stufe ' + sw.sachwertfaktor.stufe : '') : '';
+        if (/marktangepasst/.test(t)) return '§ 39 ImmoWertV';
+        return '';
+      });
+      h += '<div class="block"><h3>Sachwert</h3>' + B.staffel(kurz ? ohneDetail(sw.staffel) : sw.staffel, swQ)
+        + (sw.sachwertfaktor ? '' : '<p class="det">Für diesen Ort liegt kein Sachwertfaktor vor. Ausgewiesen ist der vorläufige Sachwert ohne Marktanpassung.</p>') + '</div>';
+    }
+    if (!h) return '';
+    var erst = p.created_at || p._erstellt;
+    return h + '<p class="det">Zeilen und Werte aus dem DealPilot-Marktbericht der Stufe 3' + (erst ? ' vom ' + B.datum(erst) : '') + '. Stufe A ist ein amtlicher Wert des zuständigen Gutachterausschusses, Stufen darunter sind im Marktbericht einzeln begründet. Indikativ, kein Verkehrswertgutachten nach § 194 BauGB.</p>';
+  }
+  /* Mietpotenzial nach der App-Regel (DpPotenzial: Bestand über den Kappungspfad bis zum Oberwert, Neuvermietung Oberwert × 1,10 bei Bremse) */
+  function mietpotenzial(B, PD) {
+    if (!PD || !PD.wohnungen || !PD.wohnungen.length) return '';
+    var t = '<table class="dicht"><thead><tr><th>Wohnung</th><th class="r">Fläche</th><th class="r">Ist</th><th class="r">Obergrenze im Bestand</th><th class="r">Zielbild</th></tr></thead><tbody>'
+      + PD.wohnungen.map(function (w) { return '<tr><td>' + B.esc(w.we || '') + '</td><td class="r num">' + (w.wfl ? B.zahl(w.wfl, 0) + ' m²' : '–') + '</td><td class="r num">' + B.esc(w.ist) + '</td><td class="r num">' + B.esc(String(w.soll || '').replace(/ ·.*$/, '')) + '</td><td class="r num">' + B.esc(w.ziel) + '</td></tr>'; }).join('')
+      + '</tbody></table>';
+    var kz = (PD.kennzahlen || []).slice(0, 3).map(function (k) { return '<tr><td>' + B.esc(k[0]) + '</td>' + PD.spalten.map(function (s) { var v = ''; try { v = k[1](s); } catch (e) { v = '–'; } return '<td class="r num">' + B.esc(v) + '</td>'; }).join('') + '</tr>'; }).join('');
+    var kzT = kz ? '<h3>Je Stufe</h3><table class="dicht"><thead><tr><th></th>' + PD.spalten.map(function (s) { return '<th class="r">' + B.esc((PD.titel && PD.titel[s]) || s) + '</th>'; }).join('') + '</tr></thead><tbody>' + kz + '</tbody></table>' : '';
+    var li = [];
+    if (PD.satz_bank) li.push(klar(PD.satz_bank));
+    if (PD.kappung) li.push(klar(PD.kappung));
+    li.push('Orientierung, keine Rechtsberatung.');
+    return '<p class="sub">Was rechtlich höchstens drin ist, aus Investorensicht: im Bestand bis zum Oberwert der Mietspiegelspanne über die Kappungsgrenze, bei Neuvermietung bis 10 % über dem Oberwert, wo die Mietpreisbremse gilt.</p>'
+      + t + kzT + '<ul>' + li.map(function (x) { return '<li>' + B.esc(x) + '</li>'; }).join('') + '</ul>';
+  }
+  function ekRenditeSeite(B, K) {
+    var r = K.ekr4; if (!r || r.k1 == null) return '';
+    var hz = (window.DpEkRendite && DpEkRendite.hebelZeilen) ? DpEkRendite.hebelZeilen(r.hebel) : [];
+    return B.kacheln([
+      { l: 'Nach Steuer mit Vermögensdelta', v: B.pct(r.k4 != null ? r.k4 : r.k2, 1), s: 'Hauptkennzahl', art: 'hi' },
+      { l: 'Operativ', v: B.pct(r.k1, 1), s: 'Überschuss plus Tilgung' },
+      { l: 'Nach Steuer', v: B.pct(r.k2, 1), s: 'mit Steuerwirkung' },
+      { l: 'Vor Steuer mit Delta', v: r.k3 != null ? B.pct(r.k3, 1) : '–', s: 'mit Wertzuwachs im Jahr' }
+    ], true)
+      + B.liste([['Eigenkapital', B.eur(r.ek)], ['Überschuss nach Kapitaldienst im Jahr', B.eurS(r.cf_op)], ['Tilgung im Jahr', B.eur((r.tilg || 0) + (r.bspar || 0))],
+        ['Steuerwirkung im Jahr', B.eurS(-(r.steuer || 0))], ['Vermögensdelta im Jahr', r.delta_pa == null ? 'ohne Bewertung' : B.eurS(r.delta_pa), { art: 'ende' }]])
+      + (hz.length ? '<h3>Hebel</h3><ul>' + hz.map(function (x) { return '<li>' + B.esc(x) + '</li>'; }).join('') + '</ul>' : '')
+      + '<p class="det">Alle vier Stufen geteilt durch das Eigenkapital. Der Wertzuwachs ist eine Annahme und geht in keinen Score ein.</p>';
+  }
+  function investorScoreSeite(B, SC) {
+    var r = null; try { r = typeof window._dpComputeDS2Cached === 'function' ? window._dpComputeDS2Cached() : window._dpLastDS2Result; } catch (e) { r = null; }
+    var kat = r && (r.categories || r.kategorien);
+    var arr = Array.isArray(kat) ? kat : (kat && typeof kat === 'object' ? Object.keys(kat).map(function (k) { var x = kat[k] || {}; return { name: x.label || x.name || k, score: x.score }; }) : []);
+    var dsT = '<div class="zwei"><div><h3>Deal Score</h3>' + B.scoreRing(SC.score, SC.label) + '<p class="det">Bewertet das Objekt: Cashflow, Rendite, Beleihung, Schuldendienst und Potenzial, wie im Quick-Check.</p></div>'
+      + '<div><h3>Investor Deal Score</h3>' + (r && r.score != null ? B.scoreRing(r.score, r.label) : '<p>–</p>') + '<p class="det">Bewertet das Objekt für das Investmentprofil, mit der EK-Rendite nach Steuer.</p></div></div>';
+    var kt = arr.length ? '<h3>Investor Deal Score je Gruppe</h3><table class="dicht"><thead><tr><th>Gruppe</th><th class="r">Punkte</th></tr></thead><tbody>' + arr.map(function (x) { return '<tr><td>' + B.esc(x.name || x.label || '') + '</td><td class="r num">' + (da(x.score) === null ? '–' : B.zahl(x.score, 0) + ' / 100') + '</td></tr>'; }).join('') + '</tbody></table>' : '';
+    return dsT + kt;
+  }
+  /* Lagekarte mit Haus-Pin (lagekarte.js pin:haus, wie Portfolio-Cockpit und Deal-Check), unabhängig vom Foto */
+  function pinKarte(adresse) {
+    if (!adresse || !window.DpLagekarte) return Promise.resolve(null);
+    return api('/marktbericht/geocode?address=' + encodeURIComponent(adresse)).then(function (g) {
+      return DpLagekarte.bild(g && g.lat, g && g.lon, { breite: 760, hoehe: 427, pin: 'haus' }).then(function (lk) { return lk ? lk.src : null; });
+    }).catch(function () { return null; });
+  }
+  async function investmentNeu(fassung) {
+    var bankF = fassung === 'c', kombi = fassung === 'b';
+    var PZ0 = window.DpPotenzial;
+    try { if (PZ0 && PZ0.modell && PZ0.modell().aktiv) { await Promise.race([PZ0.rechnen(), new Promise(function (f) { setTimeout(f, 40000); })]); if (typeof window.calcNow === 'function') window.calcNow(); } } catch (e0) {}
+    var B = D(), K = (window.State && State.kpis) || {}, o = objektKopf(), key = window._currentObjKey, S0 = St();
+    var name = bankF ? 'Investment Case · Bankfassung' : kombi ? 'Investment Case' : 'Investment Case · Kurzfassung';
+    var SC = scoreDaten(K);
+    var z = await Promise.all([basis(name), objektInfo(key, o.adresse), stufe3Bericht(), pinKarte(o.adresse)]);
+    var c = z[0], info = z[1], fotos = info.fotos, P3 = z[2]; if (z[3]) info.karte = z[3]; c.zeile = o.adresse; o.seq = info.seq || o.seq;
+    var PD = null, WZ = null, PZ = window.DpPotenzial;
+    try { if (PZ && PZ.modell && PZ.modell().aktiv) PD = PZ.pdfDaten(); } catch (e) { PD = null; }
+    try { if (window.DpPdfWertZielbild) WZ = await DpPdfWertZielbild.daten({ potenzial: PD }); } catch (e) { WZ = null; }
+    var mw = massgebend(B);
+    var mpiV = (WZ && WZ.verfahren || []).filter(function (v) { return v.art === 'mpi' && da(v.mitte) !== null; })[0] || null;
+    var sw0 = window.DealPilotSchwellen ? DealPilotSchwellen.get() : {}, dg = Number(sw0.dscrGruen) > 0 ? Number(sw0.dscrGruen) : 1.2;
+    var Sx = [B.deckblatt(c, { bild: fotos[0] || info.karte || null, eyebrow: name, titel: o.adresse, unter: [o.art, o.wfl ? B.zahl(o.wfl, 0) + ' m² Wohnfläche' : '', o.bj ? 'Baujahr ' + B.jahr(o.bj) : '', K.kp ? 'Kaufpreis ' + B.eur(K.kp) : ''].filter(Boolean).join(' · '),
+      kz: [mw ? { l: mw.name + ', führend', v: B.eur(mw.wert) } : { l: 'Gesamtinvestition', v: B.eur(K.gi) }, { l: 'Deal Score', v: SC.score ? B.zahl(SC.score, 0) + ' / 100' : '–', s: SC.label || '' }, { l: 'Cashflow vor Steuern', v: B.eurS(K.cf_m), s: 'im Monat nach Finanzierung', art: (K.cf_m || 0) >= 0 ? 'gut' : 'schlecht' }, { l: 'DSCR', v: B.zahl(K.dscr, 2), s: 'volles Jahr, heutige Eingaben' }],
+      meta: [['Objekt-Nr.', o.seq || '–'], ['Stand', c.stand], ['Bewertungsstichtag', S0.wert_anker && S0.wert_anker.datum ? B.datum(S0.wert_anker.datum) : '–']],
+      hinweisRechts: bankF ? 'Finanzierungsunterlage' : 'Investment Case' })];
+    var T = [], P = [];
+    var add = function (titel, unter, html, teil) { if (!html) return; T.push([titel, unter, teil]); P.push([titel, html, teil]); };
+    /* Kurz gesagt: aus den gerechneten Zahlen, nicht aus dem KI-Text (der kann älter sein als die Zahlen) */
+    var pk = [], rk = [];
+    if (mw && K.kp && mw.wert > K.kp) pk.push('Der Kaufpreis liegt ' + B.eur(mw.wert - K.kp) + ' (' + B.pct((mw.wert - K.kp) / mw.wert * 100, 1) + ') unter dem ' + mw.name + '.');
+    if (mw && K.kp > mw.wert) rk.push('Der Kaufpreis liegt ' + B.pct((K.kp - mw.wert) / mw.wert * 100, 1) + ' über dem ' + mw.name + '.');
+    if (da(K.bmy) !== null) pk.push('Bruttomietrendite ' + B.pct(K.bmy, 2) + ', Kaufpreisfaktor ' + B.zahl(K.fak, 1) + '.');
+    if ((K.cf_m || 0) >= 0) pk.push('Nach Zins und Tilgung bleiben im Monat ' + B.eurS(K.cf_m) + ' vor Steuern.'); else rk.push('Nach Zins und Tilgung fehlen im Monat ' + B.eur(-K.cf_m) + ' vor Steuern.');
+    if (da(K.dscr) !== null) (K.dscr >= dg ? pk : rk).push('DSCR ' + B.zahl(K.dscr, 2) + (K.dscr >= dg ? ', über' : ', unter') + ' der üblichen Schwelle von ' + B.zahl(dg, 2) + '.');
+    if (da(K.rate_an_m) !== null && da(K.cf_op_an) !== null) rk.push('Nach der Zinsbindung (Annahme ' + B.pct(zahlAus('anschl_z'), 2) + ') Rate ' + B.eur(K.rate_an_m) + ' im Monat, Cashflow vor Steuern ' + B.eurS(K.cf_op_an / 12) + ' im Monat.');
+    if (!bankF && K.ekr4 && K.ekr4.k4 != null) pk.push('EK-Rendite nach Steuer mit Vermögensdelta ' + B.pct(K.ekr4.k4, 1) + ', operativ ' + B.pct(K.ekr4.k1, 1) + '.');
+    var punkte = function (titel, arr) { return arr.length ? '<h3>' + titel + '</h3><ul>' + arr.map(function (x) { return '<li>' + B.esc(x) + '</li>'; }).join('') + '</ul>' : ''; };
+    add('Auf einen Blick', 'Die wichtigsten Zahlen und das Urteil in Kürze',
+      B.kacheln([
+        { l: 'Kaufpreis', v: B.eur(K.kp), s: K.gi ? 'Gesamtinvestition ' + B.eur(K.gi) : '' },
+        mw ? { l: mw.name + ', führend', v: B.eur(mw.wert), s: mw.det } : null,
+        mpiV ? { l: 'Marktpreisindikation', v: B.eur(mpiV.mitte), s: 'aus Angebotspreisen, kein Verkehrswert' } : null,
+        aufWert(WZ) ? { l: 'Wert nach Aufteilung', v: B.eur(aufWert(WZ).mitte), s: 'zusätzlich, rechnet nicht mit' } : null,
+        { l: 'Bruttomietrendite', v: B.pct(K.bmy, 2), s: 'Faktor ' + B.zahl(K.fak, 1) },
+        { l: 'Nettomietrendite', v: B.pct(K.nmy, 2), s: 'auf Gesamtinvestition' },
+        { l: 'Cashflow vor Steuern', v: B.eurS(K.cf_m), s: 'im Monat nach Finanzierung', art: (K.cf_m || 0) >= 0 ? 'gut' : 'schlecht' },
+        { l: 'DSCR', v: B.zahl(K.dscr, 2), s: 'volles Jahr', art: K.dscr >= dg ? 'gut' : 'schlecht' }
+      ].filter(Boolean), true)
+      + '<div class="zwei"><div>' + B.scoreRing(SC.score, SC.label) + '</div><div>' + punkte('Kurz gesagt', pk.slice(0, 4)) + '</div></div>'
+      + punkte('Worauf zu achten ist', rk) + '<div class="hinweis">Orientierung für die Entscheidung, keine Rechts-, Steuer- oder Finanzierungsberatung. Alle Werte sind indikativ.</div>', 1);
+    var steck = '<div class="kv">' + [['Objektart', o.art], ['Baujahr', B.jahr(o.bj)], ['Wohnfläche', o.wfl ? B.zahl(o.wfl, 0) + ' m²' : '–'], ['Grundstück', o.gs ? B.zahl(o.gs, 0) + ' m²' : '–'],
+      ['Kaufdatum', B.datum(feld('kaufdat')) || '–'], ['Energieklasse', feld('ds2_energie') || '–']].map(function (k) { return '<div><span>' + k[0] + '</span><span>' + B.esc(k[1]) + '</span></div>'; }).join('') + '</div>';
+    var ansicht = info.karte || fotos[0] || null;
+    add('Objekt und Miete', 'Steckbrief, Lage, Mieterliste', '<div class="zwei"><div>' + steck + (feld('ds2_energie') ? B.energieSkala(feld('ds2_energie')) : '') + '</div><div>'
+      + (ansicht ? '<img class="karte" src="' + ansicht + '" alt="" style="height:58mm;width:100%;object-fit:cover">' : '') + '</div></div>' + mieterliste(K, B), 1);
+    var dl = darlehen();
+    var dlT = dl.length ? '<table class="dicht"><thead><tr><th>Darlehen</th><th class="r">Betrag</th><th class="r">Zins</th><th class="r">Tilgung</th><th class="r">Bindung</th><th class="r">Rate / Monat</th></tr></thead><tbody>'
+      + dl.map(function (d) { return '<tr><td>' + B.esc(d.name) + '</td><td class="r num">' + B.eur(d.betrag) + '</td><td class="r num">' + B.pct(d.zins, 2) + '</td><td class="r num">' + B.pct(d.tilg, 2) + '</td><td class="r num">' + (d.bind ? B.zahl(d.bind, 0) + ' J.' : '–') + '</td><td class="r num">' + B.eur(d.rate, 0) + '</td></tr>'; }).join('') + '</tbody></table>' : '';
+    add('Finanzierung und Anschluss', 'Darlehen, Rate und Cashflow je Phase', dlT + dreiPhasen(K, B), 1);
+    _knapp = true;
+    try { add('Wert und Verfahren', 'Werte je Verfahren, führend und stützend', wertZielbild(K, B, WZ, PD, true, bankF), 1); } finally { _knapp = false; }
+    add('Rechenweg', kombi ? 'Bodenwert, Ertrags- und Sachwert mit Erläuterung je Zeile' : 'Bodenwert, Ertrags- und Sachwert Zeile für Zeile', rechenweg(B, P3, !kombi), 1);
+    add('Mietpotenzial und Obergrenze', 'Ist, Obergrenze im Bestand, Zielbild', mietpotenzial(B, PD), 1);
+    if (!bankF) add('EK-Rendite und Hebel', 'Vier Stufen, Hebel in beide Richtungen', ekRenditeSeite(B, K), 1);
+    if (!bankF) add('Steuer im Überblick', 'Cashflow vor und nach Steuern, Steuerwirkung', '<div class="block"><h3>Cashflow vor und nach Steuern</h3>' + cfDiagramm(B) + '</div>' + steuerWirkung(K, B), 1);
+    if (bankF) {
+      var bc = bankCockpit(B, false), sm = stressMatrix(B);
+      add('Kapitaldienst und Belastungsprobe', 'DSCR und LTV im Verlauf, Zins- und Mietstress', (bc || '') + (sm || ''), 1);
+      var d1 = zahlAus('d1') || K.d_total || 0;
+      add('Sicherheiten', 'Objektwert, Darlehen, Beleihung', B.liste([['Objektwert, maßgebend', mw ? B.eur(mw.wert) : '–', { det: mw ? mw.det : 'kein Marktbericht, Kaufpreis als Bezug' }], ['Kaufpreis', B.eur(K.kp)], ['Darlehen', B.eur(d1)],
+        ['Beleihung auf den Objektwert', mw && mw.wert > 0 && d1 ? B.pct(d1 / mw.wert * 100, 1) : '–'], ['Beleihung laut Kalkulation', B.pct(K.ltv, 1), { det: S0.ltv_basis_label ? 'auf ' + S0.ltv_basis_label : '', art: 'ende' }]]), 1);
+    }
+    add('Deal Score', 'Objekt und Investorensicht', investorScoreSeite(B, SC), 1);
+    add('Gesamtbewertung', 'Stärken, Schwächen, Lage und Markt', pilotAnalyse(B, false, bankF), 1);
+    if (kombi) {
+      _knapp = true;
+      try {
+        add('Investition und Finanzierung im Detail', 'Investition, Darlehen, Phasen im Einzelnen', finanzierungVoll(K, B, false) + '<h3 style="break-before:page;page-break-before:always">Phasen im Einzelnen</h3>' + phasenVoll(K, B), 2);
+        add('Ertrag und Kennzahlen', 'Von der Warmmiete zum Cashflow, Bewirtschaftung, alle Kennzahlen', ertragKette(K, B) + '<div class="zwei"><div>' + bewirtschaftungDetail(K, B) + '</div><div>' + kennzahlen12(K, B, SC) + '</div></div>', 2);
+        add('Cashflow je Jahr', (St().cfRows || []).length + ' Jahre als Tabelle', cfJahre(B), 2);
+        add('Projektion und Vermögen', 'Wert, Restschuld, Eigenkapital, Zuwachs, Exit', vermoegenVoll(K, B), 2);
+        var bc2 = bankCockpit(B, false), sm2 = stressMatrix(B);
+        add('Bank-Cockpit und Belastungsprobe', 'DSCR und LTV im Verlauf, Zins- und Mietstress', (bc2 || '') + (sm2 || ''), 2);
+        add('Wert und Zielbild im Detail', 'Wert je Wohnung, Wertüberleitung, Kennzahlen je Stufe', wertZielbild(K, B, WZ, PD, false, false), 2);
+      } finally { _knapp = false; }
+    }
+    var mark = function (html, k) { return html.replace('<section class="seite', '<section data-dp-abschnitt="' + k + '" class="seite'); };
+    var nA = 0, nB = 0;
+    var TT = T.map(function (t, i) { var nr = !kombi ? String(i + 1) : (t[2] === 2 ? 'B' + (++nB) : 'A' + (++nA)); return [t[0], t[1], nr, 'a' + (i + 1)]; });
+    Sx.push(inhaltSeite(c, B, TT.concat([['Annahmen, Quellen und Hinweise', 'Annahmen, Grundlagen, Methodik', kombi ? 'C' : 'A', 'anh']])));
+    P.forEach(function (p, i) {
+      var eb = kombi ? (p[2] === 2 ? 'Teil B · Vertiefung' : 'Teil A · Überblick') : 'Abschnitt ' + (i + 1);
+      Sx.push(mark(B.seite(c, p[0], B.abschnitt(eb, p[0]) + p[1]), 'a' + (i + 1)));
+    });
+    Sx.push(mark(B.seite(c, 'Annahmen', B.abschnitt('Anhang', 'Annahmen, Quellen und Hinweise') + annahmenVoll(K, B, false)
+      + '<div class="block"><h3>Quellen und Methodik</h3><ul><li>Rendite, Cashflow, DSCR und Finanzierung rechnen die Rechenkerne der DealPilot-App, Monat für Monat wie ein Tilgungsplan.</li>'
+      + '<li>Die Wertermittlung folgt der ImmoWertV mit den Daten des zuständigen Gutachterausschusses, wo sie vorliegen. Werte aus Angebotspreisen sind als indikativ gekennzeichnet.</li>'
+      + '<li>Mietpotenzial und Obergrenze nach §§ 556d, 558 BGB mit der ortsüblichen Vergleichsmiete und der Kappungsgrenze der Gemeinde.</li>'
+      + (info.karte ? '<li>Kartengrundlage: © OpenStreetMap-Mitwirkende.</li>' : '') + '</ul></div>'), 'anh'));
+    return B.dokument(name + ' · ' + o.adresse, Sx);
+  }
+
   /* ── 4 · Kaufpreisaufteilung ─────────────────────────────────────── */
   /* v3184 · der Rechenlauf liegt in bmf-ausgabe.js (dieselbe Stelle wie Arbeitshilfe und XLSX). Die feste
      Wartezeit von 3,5 s vor dem Lauf entfällt, wenn für DIESES Objekt schon gerechnet ist. */
@@ -1750,7 +1954,7 @@
 
   /* ── Einstieg ────────────────────────────────────────────────────── */
   var TYPEN = {
-    investment: function () { return investment('voll'); }, investment_muster: function () { return investmentMuster('voll'); }, kurz_muster: function () { return investmentMuster('kurz'); },   /* v4580 · Muster, kein Knopf */
+    investment: function () { return investment('voll'); }, investment_muster: function () { return investmentMuster('voll'); }, kurz_muster: function () { return investmentMuster('kurz'); }, iv_a_muster: function () { return investmentNeu('a'); }, iv_b_muster: function () { return investmentNeu('b'); }, iv_c_muster: function () { return investmentNeu('c'); },   /* v4790 · Muster, kein Knopf */   /* v4580 · Muster, kein Knopf */
     bank: function () { return investment('bank'); }, kurz: function () { return investment('kurz'); },
     kaufpreisaufteilung: kaufpreisaufteilung, finanzamt: function (o) { return finanzamt(3, false, o); }, finanzamt_anlagev: function (o) { return finanzamt(3, true, o); }, trackrecord: trackRecord, bankexport: bankexport, selbstauskunft: selbstauskunft,
     steuermappe: steuermappe,   /* v3471 · Steuer-Mappe im einheitlichen Design */
