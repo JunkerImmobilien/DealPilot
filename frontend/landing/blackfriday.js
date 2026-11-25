@@ -1,5 +1,8 @@
 /* ═══════════════════════════════════════════════════════════════════════
-   blackfriday.js · landing-blackfriday-1 (24.11.2026)
+   blackfriday.js · landing-blackfriday-1 (24.11.2026), landing-blackweek-1 (25.11.2026)
+   Marcel 25.11.2026: Aktion heisst Black Week und laeuft bis 06.12.2026 23:59:59 MEZ.
+   Stripe live: Promotion-Code BLACKFRIDAY26 neu promo_1UfaqzGefFev8arzdA5HFh3y
+   (expires_at 1796597999) auf Coupon 8dyzOqc2, alter promo_1UfDsfGefFev8arz0gnfuns4 inaktiv.
    ───────────────────────────────────────────────────────────────────────
    Marcel 24.11.2026: "ein kleines Popup wie das letzte zum Erstflug auf der
    Landingpage zu Black Friday und unten die Preise dann reduzieren, so
@@ -33,7 +36,7 @@
   'use strict';
 
   var CODE = 'BLACKFRIDAY26';
-  var ENDE = Date.UTC(2026, 11, 1, 22, 59, 59);      /* 01.12.2026 23:59:59 MEZ */
+  var ENDE = Date.UTC(2026, 11, 6, 22, 59, 59);      /* 06.12.2026 23:59:59 MEZ (Black Week, landing-blackweek-1) */
   var FAKTOR = 0.8;
   var PLAENE = { investor: 1, pro: 1 };
   var GESEHEN = 'dp_bf26_popup_gesehen';
@@ -148,7 +151,7 @@
       if (body && !body.querySelector('.dpbf-etk')) {
         var etk = document.createElement('span');
         etk.className = 'dpbf-etk';
-        etk.textContent = 'BLACK FRIDAY − 20 %';
+        etk.textContent = 'BLACK WEEK − 20 %';
         var code = document.createElement('span');
         code.className = 'dpbf-code';
         code.innerHTML = 'Code <b>' + CODE + '</b> im Checkout eingeben';
@@ -198,13 +201,13 @@
     d.id = ID;
     d.setAttribute('role', 'dialog');
     d.setAttribute('aria-modal', 'true');
-    d.setAttribute('aria-label', 'Black Friday Angebot');
+    d.setAttribute('aria-label', 'Black Week Angebot');
     d.innerHTML =
       '<div class="k">' +
         '<button type="button" class="x" aria-label="Schließen">×</button>' +
-        '<div class="b">BLACK FRIDAY</div>' +
+        '<div class="b">BLACK WEEK</div>' +
         '<h2>20 % auf Investor und Pro<br><em>das ganze erste Jahr.</em></h2>' +
-        '<p>Für neue Abos bis 01.12.2026. Gib den Code im Checkout ein.</p>' +
+        '<p>Für neue Abos bis 06.12.2026. Gib den Code im Checkout ein.</p>' +
         '<div class="c" role="button" tabindex="0" title="Code kopieren"><b>' + CODE + '</b><span>kopieren</span></div>' +
         '<div class="z">' +
           '<button type="button" class="ja">Zu den Paketen →</button>' +
