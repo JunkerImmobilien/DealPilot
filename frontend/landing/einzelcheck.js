@@ -63,7 +63,7 @@
 (function () {
   'use strict';
   if (window.DpEinzelCheck) return;
-  var VERSION = 'einzelcheck-8a';
+  var VERSION = 'einzelcheck-8b';
   var ANSCHLUSS_ZINS = 5.0;     /* v3946 · Marcel 22.11.2026: „Anschlussfinanzierung, die wir einfach auf fünf Prozent rechnen mit derselben Tilgung“ */
   var ABLAGE_STUNDEN = 2;       /* v3946 · Unterlagen im Browser höchstens so lange (die Stripe-Kasse läuft nach 60 Minuten ab) */
   var SPEICHER = 'dp_ec_kauf';
@@ -438,8 +438,18 @@
         lab.classList.toggle('fehlt', /fehlt/.test(html));
         if (alt) alt.remove();
         if (html) lab.insertAdjacentHTML('beforeend', html);
+        standFehlt();
       });
     });
+    /* hh4 · Kopfzeile „Es fehlt noch“ folgt den Feldern (vorher blieb die volle Liste stehen, obwohl alles eingetragen war) */
+    function standFehlt() {
+      var li = $('.ec-stand li.fehlt, .ec-stand li.ok', inhalt); if (!li || li.classList.contains('wahl')) return;
+      var wert = function (k) { var e = document.getElementById(IDS[k]); return e ? String(e.value).trim() : ''; };
+      var liste = GRUND_PFLICHT.filter(function (k) { return k !== 'bindung_j' && wert(k) === ''; });
+      if (!wert('plz') && !wert('ort')) liste.push('plz');
+      if (liste.length) { li.className = 'fehlt'; li.innerHTML = '<b>Es fehlt noch:</b> ' + esc(liste.map(function (k) { return NAMEN[k]; }).join(', ')); }
+      else { li.className = 'ok'; li.innerHTML = '<b>Alle Pflichtangaben sind da.</b>'; }
+    }
     /* Zeile oben nachziehen, sobald gewählt ist */
     function standWahl() {
       var li = $('.ec-stand li.wahl', inhalt); if (!li) return;
