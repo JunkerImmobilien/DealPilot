@@ -499,8 +499,9 @@
     document.body.appendChild(p); document.documentElement.classList.add('pw-offen');
     try {   /* Helligkeit der Akzentfarbe (Partner) messen: dunkel => heller Kopftext */
       var m = (getComputedStyle(p.querySelector('.pw-sym') || p).color || '').match(/\d+(\.\d+)?/g);
-      var hel = getComputedStyle(document.documentElement).getPropertyValue('--wl-c9a84c').trim();
-      var c = hel.charAt(0) === '#' ? [parseInt(hel.substr(1, 2), 16), parseInt(hel.substr(3, 2), 16), parseInt(hel.substr(5, 2), 16)] : (m ? m.slice(0, 3).map(Number) : [201, 168, 76]);
+      /* v4985 · der Kopf malt mit --gold (dp-mtb-hero), also entscheidet --gold; --wl-c9a84c ist ohne Partner leer */
+      var hel = (getComputedStyle(document.documentElement).getPropertyValue('--gold') || '').trim() || '#C9A84C';
+      var c = hel.charAt(0) === '#' ? [parseInt(hel.substr(1, 2), 16), parseInt(hel.substr(3, 2), 16), parseInt(hel.substr(5, 2), 16)] : ((hel.match(/\d+(\.\d+)?/g) || m || [201, 168, 76]).slice(0, 3).map(Number));
       var lum = (0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]) / 255; p.classList.toggle('pw-dunkel', lum < 0.45);
     } catch (e) {}
     p.addEventListener('click', function (ev) {
