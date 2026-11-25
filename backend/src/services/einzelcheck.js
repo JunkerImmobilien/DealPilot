@@ -927,7 +927,7 @@ async function tiefe(q) {
     if (!j || !j.verfuegbar) return { verfuegbar: false, grund: (j && j.grund) || 'dienst' };
     return { verfuegbar: true, stufe3_voll: !!j.stufe3_voll, kurz: _kunde(j.kurz, 200), hinweis: _kunde(j.hinweis, 200),
       punkte: (Array.isArray(j.punkte) ? j.punkte : []).slice(0, 6).map(function (p) {
-        return { id: String(p.id || '').slice(0, 20), name: _kunde(p.name, 40), ok: /^(ja|teils|nein)$/.test(p.ok) ? p.ok : 'nein', text: _kunde(p.text, 260) };
+        return { id: String(p.id || '').slice(0, 20), name: _kunde(p.name, 40), ok: /^(ja|teils|nein|info)$/.test(p.ok) ? p.ok : 'nein', text: _kunde(p.text, 260) };
       }) };
   } catch (e) { return { verfuegbar: false, grund: 'dienst' }; }
 }

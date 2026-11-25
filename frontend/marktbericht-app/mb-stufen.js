@@ -660,7 +660,7 @@
         .then(function (x) { return x.ok ? x.json() : null; })
         .then(function (t) {
           if (schl !== _tiefeSchl) return;
-          var Z = { ja: '✓', teils: '◐', nein: '✕' }, F = { ja: '#3FA56C', teils: '#b8932f', nein: '#B8625C' };
+          var Z = { ja: '✓', teils: '◐', nein: '✕', info: '·' }, F = { ja: '#3FA56C', teils: '#b8932f', nein: '#B8625C', info: 'inherit' };
           var e = function (s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
           _tiefe = { html: (!t || !t.verfuegbar || !Array.isArray(t.punkte))
             ? '<div class="mbst-tiefe-k">' + e((t && t.text) || 'Die Vorabprüfung der amtlichen Daten ist gerade nicht erreichbar. Der Bericht zeigt je Verfahren, womit er rechnet.') + '</div>'
