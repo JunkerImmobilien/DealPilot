@@ -45723,3 +45723,10 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** staging 31c2ce92 · main 0e965506, 718504ea (1.0.223).
 - **Nachweis:** dokumentenablage-pruefen 31/31, Live-Probe Staging 6/6, buster-ebenen, vorschau sauber. Prod-Sicherung haupt/mb-20261125-1141-v4910 (7,1/31 MB, Kopf gelesen), `.env` gesichert.
 - **Rest:** `ADMIN_EMAIL` Prod ist Platzhalter (Betriebs-Mails kommen nicht an); Staging sendet täglich Plattenwarnung an info@, bis die Platte unter 70 % ist; nicht angemeldet im Browser geprüft.
+
+### v4900 · Maßgebender Wert und KI-Begriffe (Prod 1.0.224)
+
+- **Was:** Wertangabe ohne Herkunft nie maßgebend, Marktpreisindikation als gekennzeichneter Rückfall, Hinweis und Knopf Stufe 3 am Wertanker; KI-Begriffsregel und Nachprüfung `_wertBegriffePruefen`.
+- **Commit:** staging 0733cb84 · main dad5ffad, Version 98e82305 (1.0.224). Sicherung haupt-/mb-20261125-1140-v4900 (7,1/31 MB, Kopf gelesen). Prod-Backend zweimal gebaut (paralleler Build hatte den Tag überschrieben), läuft mit dem neuen Code, healthy.
+- **Nachweis:** Staging Hauptstr. 51 Anker MPI 1.035.000, Westerfeldstr. 146 unverändert 740.000. Prüfer: wertvergleich 22/22, flow-berechnen RC 0 (Basislinie 19 mit Ursache), score-ketten 216, prompt-lecks, ki-text-zahlen 50/50, ki-deckel, buster-ebenen.
+- **Rest:** Hauptstr. 51 braucht Objektart MFH/Wohn- und Geschäftshaus und Ist-Miete je Einheit für ein Verfahren (Entscheidung am Objekt).
