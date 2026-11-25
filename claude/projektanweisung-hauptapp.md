@@ -45507,3 +45507,10 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** staging 3f403371, aaa42264, Rückführung f6e20d65 · main 2c13e08c, e3b4777f, Version 445c88db.
 - **Nachweis:** Schrift je Reiter gemessen, 390 px im iframe, Partnerfarbe, gold-audit RC 0 (Staging, Prod), buster-ebenen sauber. Prod-Sicherung haupt-/mb-20261125-0739-v4660 (7,0/31 MB, Kopf gelesen). Prod nur Auslieferung geprüft (curl), nicht eingeloggt.
 - **Rest:** Inhalt der Pilot-Analyse ist in beiden Chrome-Skins weiß, daher nur im Standard gemessen. Jahresabgleich-Struktur (T3) und Haus-Tabelle (U3) bewusst nicht angefasst.
+
+### Rollout 1.0.198 · v4680 Eingelesen und übernommen: Zuordnung und Filter (Fork U3)
+
+- **Was:** Haus & Unterlagen › „Eingelesen und übernommen“ mit Spalte „Zugeordnet“ (Sprung zu Anlage V je Jahr, Feld im Reiter, Wohnungen, Protokolle), Werteliste in voller Breite mit Ziel je Wert, Filter Art/Jahr/Zugeordnet/Stand. Vorlage zur Dokumentenablage (`design/Vorschläge/dokumentenablage-2026-11-25.md`).
+- **Commit:** staging b905bed0, d9487c61, a5e87cf4, ad005319, Vorlage e3bfb670 · main 56d52e83, f94e4c42, 2c5af73c, a5076382, Version 21285579.
+- **Nachweis:** Staging an Westerfeldstr. 146 (Verlauf von Musterweg 7 nur im Browser), drei Sprünge, Filter einzeln und kombiniert, 390 px im iframe. Prüfer: buster-ebenen SAUBER, vorschau SAUBER, unterlagen-steuer 53/53, gold-audit RC 0. Prod-Sicherung haupt-/mb-20261125-0741-v4680 (7,0/31 MB, Kopf gelesen). Prod liefert `unterlagen-eingang.js?v=v4680c`, version.json 198.
+- **Rest:** Prod nicht eingeloggt im Objekt gemessen. Quick-Check-Objekte (2026-1190) haben keinen Verlauf. Westerfeldstr. 146 trägt updated_at 07:37:27 aus meinem Messlauf (loadSaved), `_dok_eingang` unverändert (1.269 Zeichen).
