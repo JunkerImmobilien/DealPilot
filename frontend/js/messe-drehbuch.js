@@ -10946,6 +10946,279 @@
     ]
   };
 
+
+  /* ═══ L6 · NEUE FASSUNGEN 25.11.2026 (v4960, Plan Dateien/Messe/Videos/plan-2026-11-25.md)
+     Ersatz für M11 Pilot-Analyse, M12 Bewertung, M13 Deal-Aktion, M15 Steuer im Bestand, M26 Zielbild,
+     M28 Unterlagen, dazu ViVi. Gleiche Bauweise wie K5: Kopien der Demo-Objekte (nichts am Original),
+     Ziele über den sichtbaren Text, Unterreiter wählen bis offen. Alte Drehbücher bleiben unverändert,
+     damit vorhandene Tonspuren und Storybook-Seiten gültig bleiben. Texte ohne Gedankenstriche. */
+  async function l6Ankauf() {   /* Ankauf-Kopie der Parkstr. 9, Pilot-Analyse offen */
+    await r6KopieStart(R11_PARK, { ohneAnkauf: true });
+    reiter('s5'); await warte(1200);
+    await warteAuf(function () { return q('#ai-content .dp-pa-tab'); }, 10000);
+    await warte(800);
+  }
+  function l6Modus(re) {   /* Einfach / Detail (bzw. Genau) über den sichtbaren Knopf */
+    var k = [].filter.call(document.querySelectorAll('#s5 button, #s5 [role="tab"], #s5 .seg button'), function (b) { return b.offsetWidth && re.test(r6Text(b)); })[0];
+    if (k) k.click();
+    return !!k;
+  }
+  async function l6Cockpit(id) {   /* Bestand-Kopie eines Objekts, Objekt-Cockpit offen */
+    await r6KopieStart(id, { behalte: true });
+    await warteAuf(function () { return q('nav.tabs .tab[data-target-sec="s5"]'); }, 8000);
+    if (!q('#s5.active')) { reiter('s5'); await warte(900); }
+    await warteAuf(function () { return q('#ai-content .dp-pa-tab'); }, 10000);
+    await warte(800);
+  }
+  async function l6ObjektSuchen(re) {   /* Objekt im Konto über die Anschrift finden (nicht verloren, jüngstes zuerst) */
+    try {
+      var r = await Auth.apiCall('/objects');
+      var arr = (r && (r.data || r.objects)) || (Array.isArray(r) ? r : []);
+      var t = arr.filter(function (o) { var d = o.data || o; var s = String((d.str || '') + ' ' + (d.hnr || '') + ' ' + (o.name || o.title || '')); return re.test(s) && !(d._deal_lost); });
+      t.sort(function (a, b) { return String(b.updated_at || '').localeCompare(String(a.updated_at || '')); });
+      return t[0] ? (t[0].id || (t[0].data && t[0].data.id)) : null;
+    } catch (e) { return null; }
+  }
+
+  DREHBUECHER['neu-pilot-analyse'] = {
+    titel: 'Die Pilot-Analyse', unterzeile: 'Im Ankauf, Reiter für Reiter, einfach oder im Detail', objekt: null,
+    abspann: [{ ms: 6200, html: ABSPANN_LOGO }],
+    aufraeumen: function () { k5EkrZurueck(); rhAufraeumen(); },
+    szenen: [
+      async function (s) {   /* 1 · Übersicht */
+        await l6Ankauf();
+        await k5Tab(/^Übersicht/);
+        await zeige(function () { var e = qs('#s5 [data-dp-ekr]'); return (e && k5Eng(e, 260)) || k5Karte(/führend|Kaufpreis/)(); }, 8);
+        await b2oZeile(s, 'Die Übersicht', 'Kaufpreis, maßgebender Wert mit führendem Verfahren, DSCR, Cashflow und EK-Rendite. Dazu der Investor Deal Score in zwei Teilen.');
+      },
+      async function (s) {   /* 2 · Ankauf · Soll · Zielbild */
+        await k5Tab(/Ankauf · Soll|Ankauf · Bestand/);
+        await zeige(function () { var e = rhIm(k5Panel(), /Nettokaltmiete/); return e && (e.closest('table') || e); }, 8);
+        await b2oZeile(s, 'Ankauf, Soll, Zielbild', 'Eine Tabelle: der Kauf, nach Mieterhöhung und das Zielbild. Gerechnet mit dem, was rechtlich höchstens geht.');
+      },
+      async function (s) {   /* 3 · Wert & Lage */
+        await k5Tab(/^Wert/);
+        await zeige(k5Karte(/führend|Ertragswert|Marktpreisindikation/), 8);
+        await b2oZeile(s, 'Wert und Lage', 'Führendes und stützendes Verfahren als Kacheln. Die Marktpreisindikation kommt aus Angeboten und ist kein Verkehrswert.');
+      },
+      async function (s) {   /* 4 · Steuer */
+        await k5Tab(/^Steuer/);
+        await zeige(k5Karte(/Ergebnis aus Vermietung|Verlauf mit Steuern|AfA/), 8);
+        await b2oZeile(s, 'Steuer', 'AfA, Gebäudeanteil und Grenzsteuersatz als Kacheln, darunter das Ergebnis aus Vermietung Jahr für Jahr.');
+      },
+      async function (s) {   /* 5 · Haus & Unterlagen */
+        await k5Tab(/^Haus/);
+        await zeige(k5Karte(/Risiken aus den Unterlagen|Unterlagen/), 8);
+        await b2oZeile(s, 'Haus und Unterlagen', 'Mietverträge, Protokolle und Wirtschaftsplan einlesen. Die Risiken stehen oben.');
+      },
+      async function (s) {   /* 6 · Potenzial & Risiken */
+        await k5Tab(/^Potenzial/);
+        await zeige(k5Karte(/Hebel|rechtlich/), 8);
+        await b2oZeile(s, 'Potenzial und Risiken', 'Deine Hebel und was rechtlich gilt, als kurze Karten.');
+      },
+      async function (s) {   /* 7 · Einfach und Detail */
+        var an = l6Modus(/^(Detail|Genau)$/);
+        await warte(1100);
+        await zeige(function () { return k5Panel(); }, 8);
+        await b2oZeile(s, 'Einfach oder im Detail', 'Einfach zeigt das Wichtigste in Stichpunkten. Detail zeigt den ganzen Rechenweg.');
+        if (an) { l6Modus(/^Einfach$/); await warte(700); }
+      }
+    ]
+  };
+
+  DREHBUECHER['neu-bewertung'] = {
+    titel: 'Bewertung und KPIs', unterzeile: 'Investor Deal Score in zwei Teilen, EK-Rendite in vier Stufen', objekt: null,
+    abspann: [{ ms: 6200, html: ABSPANN_LOGO }],
+    aufraeumen: function () { k5EkrZurueck(); try { r12Zu(); } catch (e) {} rhAufraeumen(); },
+    szenen: [
+      async function (s) {   /* 1 · Kopf */
+        await r6KopieStart(R11_PARK, { ohneAnkauf: true });
+        reiter('s6'); await warte(1400);
+        await warteAuf(function () { return q('#s6 .dpz-kopf'); }, 6000);
+        await zeige(function () { return q('#s6 .dpz-kopf'); }, 8);
+        var K = d3Kopf();
+        await b2oZeile(s, 'Investor Deal Score', 'Oben das Gesamturteil: <b>' + (K.score || '–') + ' · ' + (K.wort || '–') + '</b>. Es setzt sich immer aus zwei Teilen zusammen.');
+      },
+      async function (s) {   /* 2 · Investment */
+        await zeige(r12ZKarte(0), 8);
+        await b2oZeile(s, 'Investment', 'Objektrendite, Risiko und Zustand, Lage und Markt, Potenzial und Preis. Jede Gruppe mit ihren Kennzahlen.');
+      },
+      async function (s) {   /* 3 · Finanzierung */
+        await zeige(r12ZKarte(1), 8);
+        await b2oZeile(s, 'Finanzierung', 'Kapitaldienst und Beleihung, Cashflow und EK-Rendite nach Steuer.');
+      },
+      async function (s) {   /* 4 · EK-Rendite */
+        var k = function () { return qs('#s6 [data-dp-ekr]') || k5Eng(rhIm(q('#s6'), /EK-Rendite/), 260); };
+        if (k()) {
+          await zeige(k, 8);
+          await b2oZeile(s, 'EK-Rendite in vier Stufen', 'Operativ, nach Steuer, mit Wert und die Hauptkennzahl. Der Tooltip zeigt alle vier und den Hebel.');
+        }
+      },
+      async function (s) {   /* 5 · Einstellungen */
+        await b2oZeile(s, 'Deine Schwellen', 'Gewichtung und Schwellen stellst du in den Einstellungen ein. Die Aufteilung in zwei Scores bleibt immer.');
+      }
+    ]
+  };
+
+  DREHBUECHER['neu-dealaktion'] = {
+    titel: 'Deal-Aktion', unterzeile: 'Status, ViVi, Dokumente', objekt: null,
+    abspann: [{ ms: 6200, html: ABSPANN_LOGO }], aufraeumen: rhAufraeumen,
+    szenen: [
+      async function (s) {   /* 1 · Status */
+        await r6KopieStart(R11_WESTERFELD, { ohneAnkauf: true });
+        reiter('s8'); await warte(1400);
+        await warteAuf(function () { return q('#s8 .da-status-tile'); }, 6000);
+        await zeige(function () { var t = q('#s8 .da-status-tile'); return t && t.parentElement; }, 8);
+        await b2oZeile(s, 'Der Deal-Status', 'Offen, gewonnen oder verloren, als drei Karten. Gewonnen friert den Ankauf-Stand ein und öffnet das Objekt-Cockpit.');
+      },
+      async function (s) {   /* 2 · Bereit für die Bank */
+        await zeige(function () { var r = q('#dab-cockpit .dab-rowflex'); return r && r.parentElement; }, 8);
+        await b2oZeile(s, 'Bereit für die Bank', 'Der Vorflug-Check zeigt, welche Grundfelder eine Bank noch braucht. Ein Klick springt ins Feld.');
+      },
+      async function (s) {   /* 3 · ViVi */
+        var v = function () { return k5Eng(rhIm(q('#s8'), /ViVi/), 260); };
+        if (v()) { await zeige(v, 8); }
+        await b2oZeile(s, 'ViVi', 'Mit ViVi verbunden? Dann stehen hier Abgleich, Jetzt abgleichen und Verknüpfung lösen.');
+      },
+      async function (s) {   /* 4 · Dokumente */
+        await r13Zeige(/^Dokumente/);
+        await b2oZeile(s, 'Dokumente und Exporte', 'Investment-PDF in Kurzfassung, Kombi oder für die Bank, dazu Bankexport und Marktberichte.');
+      }
+    ]
+  };
+
+  DREHBUECHER['neu-steuer-bestand'] = {
+    titel: 'Steuer im Bestand', unterzeile: 'Anlage V, Belege je Jahr, Verlauf mit Steuern', objekt: null,
+    abspann: [{ ms: 6200, html: ABSPANN_LOGO }],
+    aufraeumen: function () { rhAufraeumen(); },
+    szenen: [
+      async function (s) {   /* 1 · Cockpit Steuer */
+        await k5Cockpit();
+        await k5Tab(/^Steuer/);
+        await zeige(k5Karte(/Ergebnis aus Vermietung/), 8);
+        await b2oZeile(s, 'Ergebnis aus Vermietung', 'Die Anlage V Jahr für Jahr. Grün heißt Verlust, die Steuer sinkt. Rot heißt Überschuss.');
+      },
+      async function (s) {   /* 2 · Kacheln */
+        await zeige(k5Karte(/AfA|Grenzsteuersatz/), 8);
+        await b2oZeile(s, 'Die Eckdaten', 'AfA, Gebäudeanteil, Zehnjahresfrist und Grenzsteuersatz. Die Erklärung steht im Tooltip.');
+      },
+      async function (s) {   /* 3 · Verlauf mit Steuern im Tab Steuern */
+        reiter('s3-tax'); await warte(1400);
+        await zeige(function () { return k5Eng(rhIm(q('#s3-tax') || document.body, /Verlauf mit Steuern/), 420); }, 8);
+        await b2oZeile(s, 'Verlauf mit Steuern', 'Dieselbe Grafik auch im Reiter Steuern, mit denselben Zahlen.');
+      },
+      async function (s) {   /* 4 · Belege je Jahr */
+        var b = function () { return k5Eng(rhIm(q('#s3-tax') || document.body, /Belege/), 160); };
+        if (b()) await zeige(b, 8);
+        await b2oZeile(s, 'Belege je Jahr', 'Belege einlesen, die Zuordnung zur Anlage V schlägt DealPilot vor. Umbuchen geht jederzeit.');
+      }
+    ]
+  };
+
+  DREHBUECHER['neu-zielbild'] = {
+    titel: 'Mieterhöhung und Zielbild', unterzeile: 'Was rechtlich höchstens geht, in einer Tabelle', objekt: null,
+    abspann: [{ ms: 6200, html: ABSPANN_LOGO }],
+    aufraeumen: function () { rhAufraeumen(); },
+    szenen: [
+      async function (s) {   /* 1 · Tabelle (Westerfeldstr. 146, aufgeteilt) */
+        await l6Cockpit(R11_WESTERFELD);
+        await k5Tab(/Ankauf · Bestand/);
+        await zeige(function () { var e = rhIm(k5Panel(), /Nettokaltmiete/); return e && (e.closest('table') || e); }, 8);
+        await b2oZeile(s, 'Eine Tabelle', 'Ankauf, heute, nach Mieterhöhung und Zielbild. Abweichungen sind markiert, Texte darunter gibt es nicht mehr.');
+      },
+      async function (s) {   /* 2 · Investorenlogik */
+        await b2oZeile(s, 'Gerechnet als Investor', 'Im Bestand bis zum Oberwert des Mietspiegels über die Kappungsgrenze. Bei Neuvermietung Oberwert plus zehn Prozent mit Mietpreisbremse.');
+      },
+      async function (s) {   /* 3 · Aufteilung */
+        var a = function () { var e = rhIm(k5Panel(), /Wert nach Aufteilung/); return e && (e.closest('tr') || e); };
+        if (a()) {
+          await zeige(a, 8);
+          await b2oZeile(s, 'Wert nach Aufteilung', 'Bei aufgeteilten Häusern steht der Wert je Wohnung als eigene Zeile daneben. Gerechnet wird mit dem Haus als Ganzes.');
+        }
+      },
+      async function (s) {   /* 4 · Potenzial & Exit */
+        await k5Tab(/^Potenzial/);
+        await zeige(k5Karte(/rechtlich|Hebel/), 8);
+        await b2oZeile(s, 'Was rechtlich gilt', 'Kappungsgrenze, Sperrfrist und Mietpreisbremse als kurze Karten. Der Rechenweg steht im Detail.');
+      },
+      async function (s) {   /* 5 · Jahresabgleich */
+        await k5Tab(/^Jahresabgleich/);
+        await zeige(k5Karte(/zulässig/), 8);
+        await b2oZeile(s, 'Im Jahresabgleich', 'Eingetragen, zulässig, Luft und ab wann. Jede Erhöhung wird an ihrem eigenen Tag geprüft.');
+      }
+    ]
+  };
+
+  DREHBUECHER['neu-unterlagen'] = {
+    titel: 'Alle Unterlagen reinladen', unterzeile: 'Einlesen, prüfen, Risiken sehen', objekt: null,
+    abspann: [{ ms: 6200, html: ABSPANN_LOGO }],
+    aufraeumen: function () { rhAufraeumen(); },
+    szenen: [
+      async function (s) {   /* 1 · Objekt mit Unterlagen (Lindenallee, sonst Parkstr.-Kopie) */
+        var id = await l6ObjektSuchen(/Lindenallee\s*14/);
+        await r6KopieStart(id || R11_PARK, { behalte: true });
+        await warteAuf(function () { return q('nav.tabs .tab[data-target-sec="s5"]'); }, 8000);
+        if (!q('#s5.active')) { reiter('s5'); await warte(900); }
+        await warteAuf(function () { return q('#ai-content .dp-pa-tab'); }, 10000);
+        await k5Tab(/^Haus/);
+        await zeige(k5Karte(/Risiken aus den Unterlagen/), 8);
+        await b2oZeile(s, 'Risiken zuerst', 'Was die Unterlagen an Risiken zeigen, steht oben. Je Jahr filterbar, im Detail mit Quelle.');
+      },
+      async function (s) {   /* 2 · Protokolle */
+        var p = function () { var e = rhIm(k5Panel(), /Protokolle im Einzelnen/); return e && k5Eng(e, 420); };
+        if (p()) {
+          await zeige(p, 8);
+          await b2oZeile(s, 'Protokolle im Einzelnen', 'Je Versammlung Rücklage, Hausgeld, Sonderumlagen, Beschlüsse und Streitpunkte.');
+        }
+      },
+      async function (s) {   /* 3 · Eingelesen und übernommen */
+        var t = function () { var e = rhIm(k5Panel(), /Eingelesen und übernommen/); return e && k5Eng(e, 460); };
+        if (t()) await zeige(t, 8);
+        await b2oZeile(s, 'Eingelesen und übernommen', 'Jede Unterlage mit Zuordnung, ein Klick springt dorthin. Dazu ein Filter nach Art, Jahr und Stand.');
+      },
+      async function (s) {   /* 4 · Adressprüfung */
+        await b2oZeile(s, 'Falsche Adresse, kein Eintrag', 'Gehört eine Unterlage zu einer anderen Adresse, lehnt DealPilot sie ab. Vorhandene Werte werden nie still überschrieben.');
+      }
+    ]
+  };
+
+  /* ViVi: nur am echten, verknüpften Testobjekt Musterhof 8. Laden kann speichern, deshalb ist saveObj im Lauf
+     stumm (Gedächtnis „loadData speichert sofort“). Vor der Aufnahme die DB-Zeile sichern, danach vergleichen. */
+  DREHBUECHER['neu-vivi'] = {
+    titel: 'ViVi verbinden und abgleichen', unterzeile: 'Deine Buchhaltung und DealPilot in einem Bild', objekt: null,
+    abspann: [{ ms: 6200, html: ABSPANN_LOGO }],
+    aufraeumen: function () {
+      try { if (window.__l6Save) { window.saveObj = window.__l6Save; window.__l6Save = null; } } catch (e) {}
+      rhAufraeumen();
+    },
+    szenen: [
+      async function (s) {   /* 1 · Cockpit › ViVi */
+        await rhNurStart();
+        var id = await l6ObjektSuchen(/Musterhof\s*8/);
+        if (typeof window.saveObj === 'function' && !window.__l6Save) { window.__l6Save = window.saveObj; window.saveObj = async function () { return null; }; }
+        if (id && typeof window.loadSaved === 'function') await window.loadSaved(id);
+        await warteAuf(function () { return q('nav.tabs .tab[data-target-sec="s5"]'); }, 9000);
+        if (!q('#s5.active')) { reiter('s5'); await warte(900); }
+        await warteAuf(function () { return q('#ai-content .dp-pa-tab'); }, 10000);
+        await k5Tab(/^ViVi/);
+        await zeige(function () { return k5Panel(); }, 8);
+        await b2oZeile(s, 'ViVi im Objekt-Cockpit', 'Oben der Stand des Abgleichs, die Felder aus ViVi und die Restschuld. Abweichungen sind markiert.');
+      },
+      async function (s) {   /* 2 · Deal-Aktion */
+        reiter('s8'); await warte(1400);
+        var v = function () { return k5Eng(rhIm(q('#s8'), /Jetzt abgleichen|Abgleich mit ViVi/), 220); };
+        if (v()) await zeige(v, 8);
+        await b2oZeile(s, 'Abgleichen', 'Unter Deal-Aktion gleichst du jederzeit neu ab. Was ViVi liefert, ist im Objekt gesperrt und mit Schloss markiert.');
+      },
+      async function (s) {   /* 3 · Fragen an ViVi */
+        await b2oZeile(s, 'Fragen an ViVi', 'Im Co-Pilot gibt es eigene Fragen an ViVi, zum Beispiel nach offenen Mieten oder der Restschuld.');
+      },
+      async function (s) {   /* 4 · verbinden */
+        await b2oZeile(s, 'Verbinden', 'Verknüpft wird einmal in den Einstellungen. ViVi gibt es ab dem Investor-Plan.');
+      }
+    ]
+  };
+
   /* v3502 · Marcel 16.11.2026: die Videoreihe läuft nicht mehr in info@, sondern in einem Konto mit Kopien der
      Demo-Objekte (tools/videoreihe-konto-anlegen.js). Die festen Kennungen der Drehbücher zeigen auf die Originale;
      liegt die Zuordnung Original → Kopie in localStorage dpm_kennungen (setzt nur das Aufnahmewerkzeug), werden sie
