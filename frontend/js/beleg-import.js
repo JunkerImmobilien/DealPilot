@@ -23,6 +23,17 @@
   var _bilder      = {};
   var _leer        = [];   // [{name, grund}]
   var _betrag      = {};   // v3154e · Rechnungsbetrag laut Beleg je Datei (Gegenprobe)
+  /* v4930 · Marcel 25.11.2026: ein Beleg eines ANDEREN Objekts (Leistungsort/Objekt laut KI) wird abgelehnt.
+     Firmen- oder Rechnungsadressen zählen nie, nur objekt_anschrift. Ohne Objektbezug: nicht blocken, Hinweis. */
+  var _ohneBezug = {};
+  function _belegAdrPruefen(r) {
+    var AP = window.DpAdressPruefung; if (!AP || !r) return null;
+    var oa = AP.objekt(); if (!oa) return null;
+    if (!r.objekt_anschrift) { _ohneBezug[r.name] = 1; return null; }
+    var x = AP.pruefen(r.objekt_anschrift, oa);
+    if (x.urteil === 'anders') return 'andere Adresse ' + x.dokText + ', das Objekt ist ' + x.objText + ', nicht übernommen';
+    return null;
+  }
   /* v3156 · VIER-AUGEN-PRINZIP (Marcel: „das muss passen, das ist Buchhaltung"): der Server liest jeden Beleg zweimal.
      _sicher[name] = 'doppelt_gleich' | 'eine_passt' | 'unsicher'; _zweit[name] = Summe der anderen Lesung.
      _geprueft[name] = der Nutzer hat bestätigt, die Positionen mit dem Bild verglichen zu haben. */
@@ -480,7 +491,7 @@
     if (scan) scan.classList.add('on');
     var setT = function (s) { var e = document.getElementById('bi-scan-t'); if (e) e.textContent = s; };
 
-    _rows = []; _bilder = {}; _leer = []; _betrag = {}; _sicher = {}; _zweit = {}; _geprueft = {}; _roh = {}; var docCount = 0; var leer = []; var skipped = [];
+    _rows = []; _bilder = {}; _leer = []; _betrag = {}; _ohneBezug = {}; _sicher = {}; _zweit = {}; _geprueft = {}; _roh = {}; var docCount = 0; var leer = []; var skipped = [];
 
     // 1) CSV/Excel lokal parsen — KEINE KI, KEIN Kerosin
     for (var i = 0; i < tableFiles.length; i++) {
@@ -521,6 +532,7 @@
             var nochmal = [];
             (res && res.results || []).forEach(function (r) {
               var poss = Array.isArray(r.positionen) ? r.positionen : (r.data ? [r.data] : []);
+              var _fr = _belegAdrPruefen(r); if (_fr) { leer.push(r.name + ' (' + _fr + ')'); return; }   /* v4930 */
               if (r.rechnungsbetrag > 0) _betrag[r.name] = r.rechnungsbetrag;   /* v3154e */
               if (r.sicherheit) _sicher[r.name] = r.sicherheit;   /* v3156 */
               if (r.zweitlesung) _zweit[r.name] = r.zweitlesung;
@@ -539,6 +551,7 @@
                   if (resp2.ok) {
                     var res2 = await resp2.json(), x2 = res2 && res2.results && res2.results[0];
                     if (x2) poss2 = Array.isArray(x2.positionen) ? x2.positionen : (x2.data ? [x2.data] : []);
+                    var _fr2 = x2 ? _belegAdrPruefen(x2) : null; if (_fr2) { poss2 = []; r0 = { name: r0.name, error: _fr2 }; }   /* v4930 */
                     if (x2 && x2.rechnungsbetrag > 0) _betrag[r0.name] = x2.rechnungsbetrag;   /* v3154e */
                     if (x2 && x2.sicherheit) { _sicher[r0.name] = x2.sicherheit; _zweit[r0.name] = x2.zweitlesung || null; }   /* v3156 */
                     if (!poss2.length && x2) r0 = x2;
@@ -565,7 +578,9 @@
     if (note) {
       var t = docCount + ' Datei(en) gelesen · ' + _rows.length + ' Position(en) erkannt. Prüfe jede Zeile, bevor du übernimmst.';
       if (nDup || nJunk) t += ' ' + nDup + ' doppelt und ' + nJunk + ' ohne Wert automatisch abgewählt.';
-      if (ohne.length) t += ' ' + ohne.length + ' Datei(en) ohne Ergebnis, rot markiert, sie werden NICHT übernommen.';
+      if (ohne.length) t += ' ' + ohne.length + ' Datei(en) ohne Ergebnis oder abgelehnt, rot markiert, sie werden NICHT übernommen.';
+      var _ob = Object.keys(_ohneBezug).filter(function (n) { return !ohne.some(function (o) { return o.indexOf(n) === 0; }); });
+      if (_ob.length) t += ' Objektbezug nicht erkennbar, bitte prüfen: ' + _ob.join(', ') + '.';
       var nPr = _rows.filter(function (r) { return r.pruefen && r.pruefen.length; }).length;
       if (nPr) t += ' ' + nPr + ' Zeile(n) mit „prüfen", Bild und Werte über das Vorschaubild vergleichen.';
       note.textContent = t;

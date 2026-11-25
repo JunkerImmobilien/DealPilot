@@ -2079,17 +2079,41 @@
     var a = _fileAddr(f); if (!a) return true;
     return (_norm(a.str) + '|' + _norm(a.plz) + '|' + _norm(a.ort)) === _addrChoice;
   }
+  /* v4930 · Marcel 25.11.2026: Unterlage mit fremder Objektanschrift wird abgelehnt und geblockt (kein „trotzdem“),
+     im Bestand werden aus Exposé, Marktbericht oder Gutachten keine Objektdaten übernommen. Gilt für jede Datei. */
+  var _sperrHinweise = [];
+  function _dateiSperren() {
+    _sperrHinweise = [];
+    var AP = window.DpAdressPruefung; if (!AP) return;
+    var obj = _qcMode ? null : AP.objekt(), bestand = !_qcMode && AP.istBestand();
+    _files.forEach(function (f) {
+      f.fremd = null; f.bestandSperre = false;
+      var d = f.cache && f.cache[f.type]; if (!d) return;
+      var dokAdr = null, typ = f.type;
+      if (typ === 'expose' || typ === 'market') { var fa = _fileAddr(f); dokAdr = fa ? { str: fa.str, hnr: fa.hnr, plz: fa.plz, ort: fa.ort } : null; }
+      else if (typ === 'dokument' && d.success) { dokAdr = AP.ausAuslese(d.extracted); }   /* ein Gutachten bleibt im Bestand erlaubt: es liefert den maßgebenden Wert */
+      if (obj && dokAdr) { var r = AP.pruefen(dokAdr, obj); if (r.urteil === 'anders') { f.fremd = r; _sperrHinweise.push({ name: f.name, text: AP.meldung(r), art: 'fremd' }); try { if (f.row) setStatus(f, 'andere Adresse · abgelehnt'); } catch (e) {} return; } }
+      if (bestand && (typ === 'expose' || typ === 'market')) {
+        f.bestandSperre = true;
+        var w = typ === 'expose' ? 'ein Exposé' : 'ein Marktbericht';
+        _sperrHinweise.push({ name: f.name, text: 'Das ist ' + w + '. Im Bestand werden daraus keine Objektdaten übernommen.', art: 'bestand' });
+        try { if (f.row) setStatus(f, w.replace(/^ein /, '') + ' · im Bestand nicht übernommen'); } catch (e) {}
+      }
+    });
+  }
+  function _gesperrt(f) { return !!(f && (f.fremd || f.bestandSperre)); }
   function recompute() {
     _merged = {};
-    _files.filter(function (f) { return f.type === 'expose' && f.cache.expose && _giltFuerWahl(f); }).forEach(function (f) { mergeExpose(f.cache.expose); });
-    _files.filter(function (f) { return f.type === 'market' && f.cache.market && _giltFuerWahl(f); }).forEach(function (f) { mergeMarket(f.cache.market); });
+    _dateiSperren();
+    _files.filter(function (f) { return f.type === 'expose' && f.cache.expose && !_gesperrt(f) && _giltFuerWahl(f); }).forEach(function (f) { mergeExpose(f.cache.expose); });
+    _files.filter(function (f) { return f.type === 'market' && f.cache.market && !_gesperrt(f) && _giltFuerWahl(f); }).forEach(function (f) { mergeMarket(f.cache.market); });
     /* v2218h · amtliche Dokumente zuletzt: Grundbuch und Vertrag gehen vor dem Exposé */
     _vergleich = []; _importHinweise = []; _mvImport = [];   /* v3198 */
     /* v3029-import · Wirtschaftsplan/Abrechnung ZULETZT: sie brauchen Objektart und MEA, und
        die kommen oft aus demselben Paket (Exposé, Grundbuch). Bis v3028 las _hausgeldBasis das
        Formular - bei einem neuen Objekt war die Objektart leer, und der Gesamtplan der ganzen
        Gemeinschaft (z. B. 38.000 € umlagefähig) ging vorgehakt in EINE Wohnung. */
-    var _dokFiles = _files.filter(function (f) { return f.type === 'dokument' && f.cache.dokument && f.cache.dokument.success; });
+    var _dokFiles = _files.filter(function (f) { return f.type === 'dokument' && f.cache.dokument && f.cache.dokument.success && !_gesperrt(f); });
     _dokFiles.forEach(function (f) { mergeDokument(f.cache.dokument, false); });
     /* v3993 · F22 Marcel 23.11.2026: mehrere Hausgeld-Unterlagen. Maßgeblich ist die jüngste Abrechnung, der
        Wirtschaftsplan nur zur Plausibilität (DokumentImport.hausgeldWahl). Bis hier gewann die zuletzt gelesene Datei. */
@@ -2310,7 +2334,9 @@
   /* v3016 · alle erfolgreich gelesenen Unterlagen (ohne Exposé/Marktbericht) als Liste */
   function _unterlagenListe() {
     var aus = [];
+    _dateiSperren();   /* v4930 · abgelehnte Unterlagen gehen nicht in die Auswertung (Risiken, Protokolle, Einheiten) */
     _files.forEach(function (f) {
+      if (_gesperrt(f)) return;
       if (f.cache && f.cache.mietliste && f.cache.mietliste.success && f.type === 'expose') aus.push({ typ: 'mietaufstellung', label: 'Mieterliste (aus dem Exposé)', ausExpose: true, dateiname: f.name, extracted: f.cache.mietliste.extracted || {}, datum: (f.cache.mietliste.extracted || {}).stichtag || '' });
       var a = f.cache && f.cache.dokument; if (!a || !a.success) return;
       [a].concat(a.weitere || []).forEach(function (t) {
@@ -2506,7 +2532,7 @@
   }
   function addressOptions() {
     var seen = {}, out = [];
-    _files.forEach(function (f) { var a = _fileAddr(f); if (!a) return; var key = _norm(a.str) + '|' + _norm(a.plz) + '|' + _norm(a.ort); if (seen[key]) return; seen[key] = 1; a.key = key; a.label = (a.str + (a.hnr ? ' ' + a.hnr : '') + ', ' + a.plz + ' ' + a.ort).replace(/^,\s*|,\s*$/g, '').trim(); out.push(a); });
+    _files.forEach(function (f) { if (_gesperrt(f)) return; var a = _fileAddr(f); if (!a) return; var key = _norm(a.str) + '|' + _norm(a.plz) + '|' + _norm(a.ort); if (seen[key]) return; seen[key] = 1; a.key = key; a.label = (a.str + (a.hnr ? ' ' + a.hnr : '') + ', ' + a.plz + ' ' + a.ort).replace(/^,\s*|,\s*$/g, '').trim(); out.push(a); });
     return out;
   }
   /* v2217 · was steht im Objekt, und weicht es vom gelesenen Wert ab? */
@@ -2574,14 +2600,15 @@
      gewählten Adresse passt. Ohne Fotoliste je Datei (Mitschnitt, alter Weg)
      eine Gruppe aus _importPhotos wie bisher. */
   function _fotoGruppen(konflikt) {
-    var g = [];
+    var g = [], _gesp = false;
     _files.forEach(function (f) {
+      if (_gesperrt(f)) { if (f.photos && f.photos.length) _gesp = true; return; }   /* v4930 · Fotos einer abgelehnten Unterlage nie anbieten */
       if (!f.photos || !f.photos.length) return;
       var a = _fileAddr(f), key = a ? _norm(a.str) + '|' + _norm(a.plz) + '|' + _norm(a.ort) : '';
       var wo = f.name + (a && a.str ? ' (' + a.str + (a.hnr ? ' ' + a.hnr : '') + ')' : '');
       g.push({ fotos: f.photos, wo: wo, an: !konflikt || !key || key === _addrChoice });
     });
-    if (!g.length && _importPhotos && _importPhotos.length) g.push({ fotos: _importPhotos.slice(0, 6), wo: 'PDF', an: true });
+    if (!g.length && !_gesp && _importPhotos && _importPhotos.length) g.push({ fotos: _importPhotos.slice(0, 6), wo: 'PDF', an: true });
     return g;
   }
   function _gewaehlteFotos(ov) {
@@ -2687,7 +2714,7 @@
     });
     var _dg = _detailgradFiltern(keys); keys = _dg.keys;   /* v3236 */
     var hasPhotos = !!(_importPhotos && _importPhotos.length);
-    if (!keys.length && !hasPhotos) { host.innerHTML = '<p style="color:var(--muted,#7A7370);font-style:italic;margin-top:10px">Noch keine Werte erkannt.</p>' + _dg.html + (_importHinweise.length ? '<div class="oabi-hinw" style="font-size:12.5px;margin-top:6px">' + _importHinweise.map(escH).join('<br>') + '</div>' : ''); if (ab) ab.disabled = true; return; }
+    if (!keys.length && !hasPhotos) { host.innerHTML = (_sperrHinweise.length ? _sperrHinweise.map(function (h) { return '<div class="oabi-sperre" style="margin:8px 0;padding:10px 12px;border-radius:8px;border:1px solid ' + (h.art === 'fremd' ? '#B8625C' : '#d9a441') + ';background:' + (h.art === 'fremd' ? 'rgba(184,98,92,.10)' : 'rgba(217,164,65,.12)') + ';font-size:13px"><b>' + (h.art === 'fremd' ? '⛔ Abgelehnt: ' : '⚠ ') + escH(h.name || '') + '</b><div style="margin-top:3px">' + escH(h.text) + '</div></div>'; }).join('') : '') + '<p style="color:var(--muted,#7A7370);font-style:italic;margin-top:10px">Noch keine Werte erkannt.</p>' + _dg.html + (_importHinweise.length ? '<div class="oabi-hinw" style="font-size:12.5px;margin-top:6px">' + _importHinweise.map(escH).join('<br>') + '</div>' : ''); if (ab) ab.disabled = true; return; }
     var photoRow = '';
     if (hasPhotos) {
       /* v2223 · eine Zeile je PDF. Bei einem Adresskonflikt ist nur die Zeile
@@ -2718,11 +2745,14 @@
        Übernehmen gesperrt. Die Antwort gilt für genau diese Dokument-Adresse. */
     var _ADR = ['str', 'hnr', 'plz', 'ort'];
     var _adrAbw = _qcMode ? [] : _ADR.filter(function (id) { return abw[id] !== undefined; });
+    /* v4930 · Schreibweisen wie „Str.“/„Straße“ sind keine Abweichung; was wirklich widerspricht, ist oben schon geblockt */
+    if (_adrAbw.length && window.DpAdressPruefung) { var _ap = {}, _ao = {}; _ADR.forEach(function (id) { _ap[id] = _merged[id] ? String(_merged[id].value) : _istText(id); _ao[id] = _istText(id); });
+      if (window.DpAdressPruefung.pruefen(_ap, _ao).urteil !== 'anders') _adrAbw = []; }
     var _adrSig = _ADR.map(function (id) { return _merged[id] ? String(_merged[id].value) : ''; }).join('|');
     /* Dokumente (Kaufvertrag, Gutachten, Mietvertrag …) tragen ihre Anschrift im Ergebnis der
        Auslese, nicht als Zeile str/plz - dieselbe Rückfrage über DokumentImport.adresseAbweichung */
     var _dokAdr = [];
-    if (!_qcMode && window.DokumentImport && typeof window.DokumentImport.adresseAbweichung === 'function') {
+    if (!_qcMode && !window.DpAdressPruefung && window.DokumentImport && typeof window.DokumentImport.adresseAbweichung === 'function') {
       _files.forEach(function (f) {
         var d = f.cache && f.cache.dokument; if (!d || !d.success) return;
         var x = window.DokumentImport.adresseAbweichung(d.extracted); if (x) _dokAdr.push({ name: f.name, dok: x.dok });
@@ -2739,10 +2769,11 @@
         + '<div style="margin-top:4px">Im Objekt: <b>' + escH(_adrText(_adrObj)) + '</b>'
         + (_adrAbw.length ? '<br>Im Dokument: <b>' + escH(_adrText(_adrDok)) + '</b>' : '')
         + _dokAdr.map(function (x) { return '<br>In ' + escH(x.name) + ': <b>' + escH(x.dok) + '</b>'; }).join('') + '</div>'
-        + '<div style="margin-top:6px">Gehört das Dokument zu diesem Objekt? Bis du antwortest, ist nichts angehakt.</div>'
-        + '<div style="margin-top:8px"><button type="button" class="oabi-btn" id="oabi-adr-nein">Nein, abbrechen</button> '
-        + '<button type="button" class="oabi-btn primary" id="oabi-adr-ja">Ja, trotzdem übernehmen</button></div></div>'
+        + '<div style="margin-top:6px">Die Unterlage gehört nicht zu diesem Objekt. Nicht übernommen. Lies sie im passenden Objekt ein.</div></div>'
       : ((_adrAbw.length || _dokAdr.length) ? '<div class="oabi-abw-kopf" style="margin:8px 0;padding:8px 10px;border-radius:8px;border:1px solid rgba(42,39,39,.2);font-size:12.5px">Du hast bestätigt, dass das Dokument zu diesem Objekt gehört. Die Adresszeilen übernimmst du nur, wenn du sie anhakst.</div>' : '');
+    /* v4930 · geblockte Dateien rot und vor allem anderen */
+    var sperrKopf = _sperrHinweise.length ? _sperrHinweise.map(function (h) { var rot = h.art === 'fremd';
+      return '<div class="oabi-sperre" style="margin:8px 0;padding:10px 12px;border-radius:8px;border:1px solid ' + (rot ? '#B8625C' : '#d9a441') + ';background:' + (rot ? 'rgba(184,98,92,.10)' : 'rgba(217,164,65,.12)') + ';font-size:13px"><b>' + (rot ? '⛔ Abgelehnt: ' : '⚠ ') + escH(h.name || '') + '</b><div style="margin-top:3px">' + escH(h.text) + '</div></div>'; }).join('') : '';
     var abwKopf = nAbw ? '<div class="oabi-abw-kopf" style="margin:8px 0;padding:8px 10px;border-radius:8px;border:1px solid #d9a441;background:rgba(217,164,65,.12);font-size:12.5px">'
       + '<b>' + nAbw + (nAbw === 1 ? ' Wert weicht' : ' Werte weichen') + ' vom Objekt ab.</b> Diese Zeilen sind nicht vorgehakt. Hak sie an, wenn das Dokument recht hat.</div>' : '';
     /* v3088a · Hinweis, wenn Zeilen aus Wirtschaftsplan/Abrechnung bewusst nicht vorgehakt sind */
@@ -2763,7 +2794,7 @@
       + '<b>Dieses Exposé bietet ' + window.DpPaket.erkennen(_pkF.text) + ' Objekte einzeln an.</b> Statt eines Objekts kannst du das Paket anlegen: jedes Haus als eigenes Objekt mit seinen Einheiten, verbunden über den Paketnamen. '
       + '<button type="button" id="oabi-paket" class="oabi-btn primary" style="margin-left:6px">Als Paket anlegen</button></div>' : '';
     var _viviKopfZeile = _hatVivi ? '<tr class="oabi-vivi-thead" style="font-size:11.5px;color:#7A7370"><td></td><td>Feld</td><td>laut Unterlage</td><td>laut ViVi</td><td>Quelle</td></tr>' : '';
-    host.innerHTML = _pkHtml + addrHtml + adrFrage + abwKopf + '<table class="oabi-tbl"><tbody>' + _viviKopfZeile + photoRow + keys.map(function (id) {
+    host.innerHTML = _pkHtml + sperrKopf + addrHtml + adrFrage + abwKopf + '<table class="oabi-tbl"><tbody>' + _viviKopfZeile + photoRow + keys.map(function (id) {
       var it = _merged[id];
       var valCell = it.range ? ('<b class="oabi-vnum">' + escH(it.value) + '</b>' + spanToggle(id, it.range.cur)) : ('<b>' + escH(it.value) + '</b>');
       if (abw[id] !== undefined) valCell += '<div class="oabi-bisher" style="font-size:11.5px;color:#b5651d;margin-top:2px">' + escH(_bisherKopf(it)) + escH(_bisherText(it, abw[id])) + '</div>';
@@ -3639,13 +3670,13 @@
     try {
       var _aend = _E ? _E.txEnde() : [];
       /* v3154 · Dateien, aus denen nichts kam (Fehler, gesperrt, kein Wert): im Verlauf als Warnung */
-      var _ohne = _files.filter(function (f) { return f.status !== 'ok' || (f.type !== 'rechnung' && !_hatWerte(f)); }).map(function (f) { return f.name; });
+      var _ohne = _files.filter(function (f) { return f.status !== 'ok' || f.fremd || (f.type !== 'rechnung' && !_hatWerte(f)); }).map(function (f) { return f.name + (f.fremd ? ' (andere Adresse, abgelehnt)' : ''); });   /* v4930 */
       /* v3163 · Marcel 03.11.2026: „lesen wir die nur aus und verwerfen die später … dann haben wir die Mietverträge
          nicht auf unserem Server“ - die Originale werden NICHT abgelegt (v3162 rückgebaut), nur die gelesenen Werte. */
-      var _orig = _ablageHaken() ? _files.filter(function (f) { return f.status === 'ok' && f.file; }) : [];   /* v4860 */
+      var _orig = _ablageHaken() ? _files.filter(function (f) { return f.status === 'ok' && f.file && !f.fremd; }) : [];   /* v4930 · fremde Unterlage nie ablegen */   /* v4860 */
       if (window.DpEingang) window.DpEingang.protokoll({
         aenderungen: _aend, nicht_gelesen: _ohne, quelle: 'Eingang',
-        dokumente: _files.filter(function (f) { return f.status === 'ok'; }).map(function (f) { return { name: f.name, typ: f.type === 'dokument' ? (f.dokLabel || 'Dokument') : f.type === 'rechnung' ? 'Rechnung' : f.type === 'market' ? 'Marktbericht' : 'Exposé' }; }),
+        dokumente: _files.filter(function (f) { return f.status === 'ok' && !f.fremd; }).map(function (f) { return { name: f.name, typ: f.type === 'dokument' ? (f.dokLabel || 'Dokument') : f.type === 'rechnung' ? 'Rechnung' : f.type === 'market' ? 'Marktbericht' : 'Exposé' }; }),
         uebernommen: _applied.map(function (id) { var x = _merged[id]; return x ? (x.label + ': ' + String(x.value).slice(0, 120)) : id; })
       });
       if (_orig.length) _originaleAblegen(_orig.map(function (f) { return { file: f.file, name: f.name, type: f.type, dokLabel: f.dokLabel }; }), 'eingang');   /* v4860 */

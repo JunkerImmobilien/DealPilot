@@ -4435,8 +4435,9 @@ const _BELEG_PROMPT =
   'Rechnungen, Quittungen, Notar-, Grundbuch-, Makler-, Handwerkerbelege, Sammelrechnungen ' +
   'UND Buchhaltungs-/Kontenlisten (OPOS-Konto / Rechnungswesen / Kontoauszug). Das Bild kann gedreht sein - lies es trotzdem. ' +
   'Gib AUSSCHLIESSLICH ein JSON-Objekt zurueck, ohne Vorrede, ohne Markdown:\n' +
-  '{"positionen":[{"datum":"TT.MM.JJJJ oder null","aussteller":"string oder null","betrag_netto":Zahl oder null,"ust_betrag":Zahl oder null,"ust_satz":19 oder 7 oder 0 oder null,"betrag_brutto":Zahl oder null,"kategorie":"eine aus der Liste","konfidenz":"hoch oder mittel oder niedrig","beschreibung":"kurzer Hinweis"}]}\n' +
+  '{"positionen":[{"datum":"TT.MM.JJJJ oder null","aussteller":"string oder null","betrag_netto":Zahl oder null,"ust_betrag":Zahl oder null,"ust_satz":19 oder 7 oder 0 oder null,"betrag_brutto":Zahl oder null,"kategorie":"eine aus der Liste","konfidenz":"hoch oder mittel oder niedrig","beschreibung":"kurzer Hinweis"}],"objekt_anschrift":"string oder null"}\n' +
   'Regeln:\n' +
+  '- "objekt_anschrift": Anschrift des OBJEKTS bzw. LEISTUNGSORTS, auf das sich der Beleg bezieht (z. B. "Leistungsort", "Objekt", "Bauvorhaben", "Liegenschaft", "Mietobjekt"), als "Strasse Hausnummer, PLZ Ort". NIE die Anschrift des Ausstellers oder der Firma, NIE die Rechnungs- oder Empfaengeranschrift, wenn sie nicht ausdruecklich das Objekt ist. Nicht erkennbar: null.\n' +
   '- ZUERST PRUEFEN - Buchhaltungs-/OPOS-/Kontenliste? Merkmale: Kopf wie "OPOS-Konto"/"Rechnungswesen"/"Kontenanzeige", ' +
   'Spalten "Betrag Soll"/"Betrag Haben", und eine FUSSZEILE mit "JVZ Soll" und "JVZ Haben" (oft daneben "Summe offene Posten"/"EB-Wert"). ' +
   'Wenn ja: IGNORIERE alle Einzelzeilen und gib GENAU EINE Position fuer die Seite zurueck: ' +
@@ -4502,8 +4503,9 @@ const _WK_PROMPT =
   '{"positionen":[{"datum":"TT.MM.JJJJ oder null","jahr":JJJJ oder null,"aussteller":"string oder null",' +
   '"betrag_netto":Zahl oder null,"ust_betrag":Zahl oder null,"ust_satz":19 oder 7 oder 0 oder null,' +
   '"betrag_brutto":Zahl oder null,"kategorie":"eine aus der Liste",' +
-  '"konfidenz":"hoch oder mittel oder niedrig","beschreibung":"kurzer Hinweis"}],"rechnungsbetrag":Zahl oder null}\n' +
+  '"konfidenz":"hoch oder mittel oder niedrig","beschreibung":"kurzer Hinweis"}],"rechnungsbetrag":Zahl oder null,"objekt_anschrift":"string oder null"}\n' +
   'Regeln:\n' +
+  '- "objekt_anschrift": Anschrift des OBJEKTS bzw. LEISTUNGSORTS, auf das sich der Beleg bezieht (z. B. "Leistungsort", "Objekt", "Bauvorhaben", "Liegenschaft", "Mietobjekt"), als "Strasse Hausnummer, PLZ Ort". NIE die Anschrift des Ausstellers oder der Firma, NIE die Rechnungs- oder Empfaengeranschrift, wenn sie nicht ausdruecklich das Objekt ist. Nicht erkennbar: null.\n' +
   /* v3154e · Gegenprobe im Browser: Summe der Positionen gegen den ausgewiesenen Rechnungsbetrag */
   '- "rechnungsbetrag" ist der auf der Seite ausgewiesene Gesamt-/End-/Rechnungsbetrag BRUTTO des Belegs ' +
   '(nicht der bereits gezahlte Teilbetrag), sonst null. Er ist KEINE eigene Position.\n' +
@@ -4589,6 +4591,8 @@ async function _extractBelegPage(image, opts, textEbene) {
   pos.forEach(function (x) { if (x && typeof x === 'object') x.quelle = quelle; });   /* v3154e */
   const rb = parsed && !Array.isArray(parsed) ? Number(parsed.rechnungsbetrag) : NaN;
   pos.rechnungsbetrag = Number.isFinite(rb) && rb > 0 ? rb : null;
+  /* v4930 · Objekt- bzw. Leistungsort fuer die Adresspruefung im Browser */
+  pos.objekt_anschrift = parsed && !Array.isArray(parsed) && typeof parsed.objekt_anschrift === 'string' && parsed.objekt_anschrift.trim().length > 3 ? parsed.objekt_anschrift.trim().slice(0, 160) : null;
   return pos;
 }
 
@@ -4631,13 +4635,14 @@ async function _belegLesung(imgs, opts) {
   const runners = [];
   for (let w = 0; w < Math.min(4, imgs.length); w++) runners.push(worker());
   await Promise.all(runners);
-  let pos = [], errN = 0, firstErr = '', rb = null;
+  let pos = [], errN = 0, firstErr = '', rb = null, oa = null;
   out.forEach(function (r, i) {
+    if (r && !oa && r.objekt_anschrift) oa = r.objekt_anschrift;   /* v4930 */
     if (Array.isArray(r) && r.length) pos = pos.concat(r);
     else if (err[i]) { errN++; if (!firstErr) firstErr = err[i]; }
     if (r && r.rechnungsbetrag > 0 && (rb == null || r.rechnungsbetrag > rb)) rb = r.rechnungsbetrag;   /* v3154e */
   });
-  return { pos: pos, rb: rb, errN: errN, firstErr: firstErr };
+  return { pos: pos, rb: rb, oa: oa, errN: errN, firstErr: firstErr };
 }
 async function extractBeleg(images, opts) {
   opts = opts || {};
@@ -4655,6 +4660,7 @@ async function extractBeleg(images, opts) {
   if (!wahl.pos.length) { diag += ', 0 Treffer'; if (wahl.errN) diag += ' - ' + wahl.errN + ' Seite(n) mit Fehler: ' + wahl.firstErr; }
   const andere = wahl === A ? B : A;
   return { positionen: wahl.pos, pages: imgs.length, diag: diag, rechnungsbetrag: wahl.rb,
+    objekt_anschrift: wahl.oa || andere.oa || null,   /* v4930 */
     sicherheit: sicherheit,
     zweitlesung: { summe: _belegSumme(andere.pos, andere.rb), rechnungsbetrag: andere.rb, anzahl: andere.pos.length },
     summe: _belegSumme(wahl.pos, wahl.rb) };

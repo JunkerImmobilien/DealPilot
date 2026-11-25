@@ -2237,6 +2237,7 @@ router.post('/extract-beleg', authenticate, extractLimiter, async (req, res, nex
         const positionen = (out && Array.isArray(out.positionen)) ? out.positionen : [];
         results.push({ name: nm, ok: positionen.length > 0, positionen: positionen, pages: (out && out.pages) || imgs.length, diag: (out && out.diag) || '',
           rechnungsbetrag: (out && out.rechnungsbetrag) || null,
+          objekt_anschrift: (out && out.objekt_anschrift) || null,   /* v4930 */
           sicherheit: (out && out.sicherheit) || null, zweitlesung: (out && out.zweitlesung) || null, summe: (out && out.summe) != null ? out.summe : null });   /* v3156 */
         if (positionen.length > 0) okCount++;
       } catch (e) {
