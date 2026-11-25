@@ -1060,8 +1060,12 @@
     var mw = massgebend(B);
     var mpiV = (WZ && WZ.verfahren || []).filter(function (v) { return v.art === 'mpi' && da(v.mitte) !== null; })[0] || null;
     var sw0 = window.DealPilotSchwellen ? DealPilotSchwellen.get() : {}, dg = Number(sw0.dscrGruen) > 0 ? Number(sw0.dscrGruen) : 1.2;
+    /* Marcel 25.11.2026: der Investor Deal Score steht immer mit zwei Scores (Investment und Finanzierung), der Deal Score nicht zusätzlich */
+    var ds2 = null; try { ds2 = typeof window._dpComputeDS2Cached === 'function' ? window._dpComputeDS2Cached() : window._dpLastDS2Result; } catch (e) { ds2 = null; }
+    var IG = ds2 && ds2.gesamt ? ds2.gesamt : null, II = ds2 && ds2.investment, IF = ds2 && ds2.finanzierung;
+    var idsKz = IG ? { l: 'Investor Deal Score', v: B.zahl(IG.score, 0) + ' / 100', s: (IG.empfehlung && IG.empfehlung.text) || IG.stufe || '' } : { l: 'Deal Score', v: SC.score ? B.zahl(SC.score, 0) + ' / 100' : '–', s: SC.label || '' };
     var Sx = [B.deckblatt(c, { bild: fotos[0] || info.karte || null, eyebrow: name, titel: o.adresse, unter: [o.art, o.wfl ? B.zahl(o.wfl, 0) + ' m² Wohnfläche' : '', o.bj ? 'Baujahr ' + B.jahr(o.bj) : '', K.kp ? 'Kaufpreis ' + B.eur(K.kp) : ''].filter(Boolean).join(' · '),
-      kz: [mw ? { l: mw.name + ', führend', v: B.eur(mw.wert) } : { l: 'Gesamtinvestition', v: B.eur(K.gi) }, { l: 'Deal Score', v: SC.score ? B.zahl(SC.score, 0) + ' / 100' : '–', s: SC.label || '' }, { l: 'Cashflow vor Steuern', v: B.eurS(K.cf_m), s: 'im Monat nach Finanzierung', art: (K.cf_m || 0) >= 0 ? 'gut' : 'schlecht' }, { l: 'DSCR', v: B.zahl(K.dscr, 2), s: 'volles Jahr, heutige Eingaben' }],
+      kz: [mw ? { l: mw.name + ', führend', v: B.eur(mw.wert) } : { l: 'Gesamtinvestition', v: B.eur(K.gi) }, idsKz, { l: 'Cashflow vor Steuern', v: B.eurS(K.cf_m), s: 'im Monat nach Finanzierung', art: (K.cf_m || 0) >= 0 ? 'gut' : 'schlecht' }, { l: 'DSCR', v: B.zahl(K.dscr, 2), s: 'volles Jahr, heutige Eingaben' }],
       meta: [['Objekt-Nr.', o.seq || '–'], ['Stand', c.stand], ['Bewertungsstichtag', S0.wert_anker && S0.wert_anker.datum ? B.datum(S0.wert_anker.datum) : '–']],
       hinweisRechts: bankF ? 'Finanzierungsunterlage' : 'Investment Case' })];
     var T = [], P = [];
@@ -1079,15 +1083,15 @@
     if (PD && PD.satz_bank) pk.push(klar(PD.satz_bank));
 
     /* 1 · Auf einen Blick, mit Deal Score und den Teilscores des Investor Deal Score */
-    var ds2 = null; try { ds2 = typeof window._dpComputeDS2Cached === 'function' ? window._dpComputeDS2Cached() : window._dpLastDS2Result; } catch (e) { ds2 = null; }
     var GN = { rendite: 'Rendite', finanzierung: 'Finanzierung', risiko: 'Risiko und Zustand', lage: 'Lage und Markt', upside: 'Potenzial' };
     var kat = ds2 && (ds2.categories || ds2.kategorien), teil = [];
     if (kat && typeof kat === 'object') teil = (Array.isArray(kat) ? kat : Object.keys(kat).map(function (k) { var x = kat[k] || {}; return { name: x.label || x.name || k, score: x.score }; }))
       .map(function (x) { var n = String(x.name || x.label || ''); return { l: GN[n] || n, v: da(x.score) === null ? '–' : B.zahl(x.score, 0), s: 'von 100' }; });
-    var scoreBlock = '<div class="zwei"><div>' + B.scoreRing(SC.score, SC.label) + '<p class="det">Deal Score: bewertet das Objekt über Cashflow, Rendite, Beleihung, Schuldendienst und Potenzial, wie im Quick-Check.</p></div><div>'
-      + (ds2 && ds2.score != null ? B.scoreRing(ds2.score, 'Investor Deal Score · ' + (ds2.label || '')) + '<p class="det">Investor Deal Score: dasselbe Objekt aus Sicht des Investmentprofils, mit der EK-Rendite nach Steuer.</p>' : '') + '</div></div>'
-      + (teil.length ? B.kacheln(teil, true) : '');
-    add('Auf einen Blick', 'Die wichtigsten Zahlen, Deal Score und Teilscores',
+    var scoreBlock = IG ? '<div class="zwei"><div>' + B.scoreRing(IG.score, (IG.empfehlung && IG.empfehlung.text) || IG.stufe) + '<p class="det">Investor Deal Score: das Objekt aus Sicht des Investmentprofils, in zwei Scores. Rendite mit der EK-Rendite nach Steuer.</p></div><div>'
+      + B.kacheln([{ l: 'Investment-Score', v: B.zahl(II.score, 0) + ' / 100', s: (II.stufe || '') + (II.anteil != null ? ' · Anteil ' + B.pct(II.anteil, 1) : '') },
+        { l: 'Finanzierungs-Score', v: B.zahl(IF.score, 0) + ' / 100', s: (IF.stufe || '') + (IF.gedeckelt && IF.deckel ? ' · gedeckelt: ' + IF.deckel : '') }]).replace('class="kz"', 'class="kz" style="grid-template-columns:1fr 1fr"')
+      + '</div></div>' + (teil.length ? '<h3>Gruppen des Investor Deal Score</h3>' + B.kacheln(teil, true) : '') : B.scoreRing(SC.score, SC.label);
+    add('Auf einen Blick', 'Die wichtigsten Zahlen, Investor Deal Score mit Investment- und Finanzierungs-Score',
       B.kacheln([
         { l: 'Kaufpreis', v: B.eur(K.kp), s: K.gi ? 'Gesamtinvestition ' + B.eur(K.gi) : '' },
         mw ? { l: mw.name + ', führend', v: B.eur(mw.wert), s: mw.det } : null,
@@ -1098,7 +1102,7 @@
         { l: 'Cashflow vor Steuern', v: B.eurS(K.cf_m), s: 'im Monat nach Finanzierung', art: (K.cf_m || 0) >= 0 ? 'gut' : 'schlecht' },
         { l: 'DSCR', v: B.zahl(K.dscr, 2), s: 'volles Jahr', art: K.dscr >= dg ? 'gut' : 'schlecht' },
         (!bankF && K.ekr4 && K.ekr4.haupt != null) ? { l: 'EK-Rendite', v: B.pct(K.ekr4.haupt, 1), s: 'nach Steuer mit Vermögensdelta' } : { l: 'LTV', v: B.pct(K.ltv, 1), s: S0.ltv_basis_label ? 'auf ' + S0.ltv_basis_label : '' }
-      ].filter(Boolean), true) + '<h3>Deal Score</h3>' + scoreBlock, 1);
+      ].filter(Boolean), true) + '<h3>Investor Deal Score</h3>' + scoreBlock, 1);
 
     /* 2 · Objekt */
     var steck = '<div class="kv">' + [['Objektart', o.art], ['Baujahr', B.jahr(o.bj)], ['Wohnfläche', o.wfl ? B.zahl(o.wfl, 0) + ' m²' : '–'], ['Grundstück', o.gs ? B.zahl(o.gs, 0) + ' m²' : '–'],
