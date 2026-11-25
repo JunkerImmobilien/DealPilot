@@ -122,6 +122,14 @@
         return '<tr class="' + (z.art || '') + '">' + w.map(function (x, i) { return i ? '<td class="r num">' + B.esc(x == null ? '–' : x) + '</td>' : '<td>' + B.esc(x) + '</td>'; }).join('') + '</tr>';
       }).join('') + '</tbody></table>';
   }
+  /* v4860 · Ohne gewählte Herkunft nannte das Dokument die Wertangabe „Marktwert (eigene Schätzung)“. Bei Hauptstr. 51 (Staging)
+     ist es der Wert aus dem Marktbericht, nur ohne Herkunftsangabe. Eine Schätzung zu behaupten, die niemand gemacht hat,
+     ist falsch (Marcel 24.11.2026). Ohne Herkunft heißt sie deshalb neutral „Wertangabe im Reiter Objekt, Herkunft nicht angegeben“. */
+  function svwText(t) {
+    if (!t) return t;
+    var hk = document.getElementById('svw_herkunft');
+    return (!hk || !hk.value) ? String(t).replace(/Marktwert \(eigene Schätzung\)/,'Wertangabe im Reiter Objekt (Herkunft nicht angegeben)') : t;
+  }
   function scoreDaten(K) {
     var SC = null, SCK = null;
     try { if (window.DealScore && typeof DealScore.computeFromKpis === 'function') SC = DealScore.computeFromKpis(K); } catch (e) {}
@@ -239,7 +247,7 @@
       fin.push([_mw.titel, B.eur(_mw.wert), { det: _mw.det }]);
       if (da(K.wp_kpi)) fin.push(['Sofortiger Wertpuffer gegenüber dem Kaufpreis', B.eurS(K.wp_kpi), { art: 'ende', farbe: 1 }]);
     } else if (svw) {
-      fin.push([S.svw_label || 'Wertangabe (Reiter Objekt)', B.eur(svw)]);
+      fin.push([svwText(S.svw_label) || 'Wertangabe (Reiter Objekt)', B.eur(svw)]);
       if (da(K.wp_kpi)) fin.push(['Sofortiger Wertpuffer gegenüber dem Kaufpreis', B.eurS(K.wp_kpi), { art: 'ende', farbe: 1 }]);
     }
     /* v3223: wird die Finanzierung trotzdem länger als der Rest der Seite, darf sie umbrechen statt ganz zu springen */
@@ -741,7 +749,7 @@
     z.push(['Anschlusszins · Anschlusstilgung (Annahme)', B.pct(zahlAus('anschl_z'), 2) + ' · ' + B.pct(zahlAus('anschl_t'), 2)], ['Persönlicher Grenzsteuersatz', B.pct(zahlAus('grenz'), 2)],
       ['Gebäudeanteil am Kaufpreis', B.pct(zahlAus('geb_ant'), 0)], ['AfA-Satz Gebäude', zahlAus('afa_satz') != null ? B.pct(zahlAus('afa_satz'), 2) : (feld('afa_satz') || '–')], ['Grunderwerbsteuer (Land)', B.pct(zahlAus('gest_p'), 2)]);
     if (zahlAus('exit_bmy') != null) z.push(['Exit-Rendite (Verkaufsszenario)', B.pct(zahlAus('exit_bmy'), 1)]);
-    if (da(S.wert_basis) !== null && S.wert_basis !== K.kp) z.push(['Wert-Anker der Wertsteigerung', (S.wert_basis_text || (zahlAus('svwert') ? 'Verkehrswert' : 'Bankbewertung')) + ' · ' + B.eur(S.wert_basis)]);
+    if (da(S.wert_basis) !== null && S.wert_basis !== K.kp) z.push(['Wert-Anker der Wertsteigerung', (svwText(S.wert_basis_text) || (zahlAus('svwert') ? 'Verkehrswert' : 'Bankbewertung')) + ' · ' + B.eur(S.wert_basis)]);
     if (K.d1IsAussetzung) z.push(['Darlehenstyp', 'Tilgungsaussetzung mit Bausparvertrag']);
     var h = '<div class="block"><h3>Annahmen</h3>' + B.liste(z) + '</div>';
     if (dg && dg.stufe < 3 && (dg.zeilen.length || dg.neutral || dg.weitere)) {
@@ -1100,6 +1108,8 @@
     var B = D(), K = (window.State && State.kpis) || {}, o = objektKopf(), key = window._currentObjKey, S0 = St();
     var name = bankF ? 'Investment Case · Bankfassung' : kombi ? 'Investment Case' : 'Investment Case · Kurzfassung';
     var SC = scoreDaten(K);
+    /* v4860 · am Score steht die Stufe wie in der App („69 Solide“), nicht die Empfehlung des Investor-Profils („Verhandeln“) */
+    try { if (SC && SC.score != null && window.ScoreTier && ScoreTier.stufe) SC.label = ScoreTier.stufe(SC.score).wort; } catch (eT) {}
     var z = await Promise.all([basis(name), objektInfo(key, o.adresse), stufe3Bericht(), pinKarte(o.adresse)]);
     var c = z[0], info = z[1], fotos = info.fotos, P3 = z[2]; if (z[3]) info.karte = z[3]; c.zeile = o.adresse; o.seq = info.seq || o.seq;
     var PD = null, WZ = null, PZ = window.DpPotenzial;
