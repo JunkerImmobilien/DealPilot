@@ -652,12 +652,12 @@
       + '@media (max-width:700px){.dp-eg-filter .dp-eg-f{flex:1 1 140px}.dp-eg-fz{margin-left:0;flex-basis:100%}}'
       /* v4680b · gemessen in der Pilot-Analyse: deren Knopfregel (padding 10px 16px, Radius 8) und Blocksatz mit Silbentrennung
          griffen auf Marken und Liste. Darum hier mit der ID als Anker. */
-      + '#dp-eg-verlauf{text-align:left;hyphens:manual}#dp-eg-verlauf *{text-align:inherit}'
+      + '#dp-eg-verlauf{text-align:left}#dp-eg-verlauf *{text-align:inherit;hyphens:manual!important;-webkit-hyphens:manual!important}'
       + '#dp-eg-verlauf button.dp-eg-zu{padding:3px 9px!important;min-height:0!important;height:auto!important;border-radius:999px!important;font:500 11.5px/1.3 Inter,system-ui,sans-serif!important;box-shadow:none!important;text-transform:none!important;letter-spacing:0!important;background:color-mix(in srgb,' + g + ' 7%,#fff)!important}'
       + '#dp-eg-verlauf button.dp-eg-ziel,#dp-eg-verlauf button.dp-eg-wt,#dp-eg-verlauf button.dp-eg-fx{padding:0!important;min-height:0!important;height:auto!important;border:0!important;background:none!important;box-shadow:none!important;border-radius:0!important;text-transform:none!important;letter-spacing:0!important}'
       + '#dp-eg-verlauf button.dp-eg-wt{font:500 12.5px/1.6 Inter,system-ui,sans-serif!important;color:inherit!important;cursor:pointer}#dp-eg-verlauf button.dp-eg-wt b{font-variant-numeric:tabular-nums}#dp-eg-verlauf button.dp-eg-wt::after{content:"";display:inline-block;width:5px;height:5px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(45deg);margin:0 0 3px 8px;opacity:.55}#dp-eg-verlauf button.dp-eg-wt[aria-expanded=true]::after{transform:rotate(-135deg);margin-bottom:-1px}'
-      + '#dp-eg-verlauf button.dp-eg-ziel{font:500 11.5px/1.4 Inter,system-ui,sans-serif!important;color:var(--wl-9a7f33,#9a7f33)!important;white-space:nowrap}'
-      + '#dp-eg-verlauf .dp-eg-wl{grid-column:1/-1;margin:2px 0 0;border-top:1px dashed rgba(42,39,39,.1);padding-top:6px}#dp-eg-verlauf .dp-eg-wl ul{list-style:none;margin:0;padding:0;columns:2 360px;column-gap:24px}#dp-eg-verlauf .dp-eg-wl li{display:flex;justify-content:space-between;gap:12px;break-inside:avoid;padding:3px 0;font-size:12px;line-height:1.4;border-bottom:1px solid rgba(42,39,39,.05)}#dp-eg-verlauf .dp-eg-wl li span{min-width:0}'
+      + '#dp-eg-verlauf button.dp-eg-ziel{font:500 11.5px/1.4 Inter,system-ui,sans-serif!important;color:var(--wl-9a7f33,#9a7f33)!important;white-space:normal;text-align:right!important;flex:0 1 auto;max-width:48%}'
+      + '#dp-eg-verlauf .dp-eg-wl{grid-column:1/-1;margin:2px 0 0;border-top:1px dashed rgba(42,39,39,.1);padding-top:6px}#dp-eg-verlauf .dp-eg-wl ul{list-style:none;margin:0;padding:0;columns:2 360px;column-gap:24px}#dp-eg-verlauf .dp-eg-wl li{display:flex;justify-content:space-between;gap:12px;break-inside:avoid;padding:3px 0;font-size:12px;line-height:1.4;border-bottom:1px solid rgba(42,39,39,.05)}#dp-eg-verlauf .dp-eg-wl li span{min-width:0;flex:1 1 auto}'
       + '.dp-eg-schon{margin-top:12px;border:1px solid color-mix(in srgb,' + g + ' 22%,transparent);border-radius:10px;padding:10px 12px;background:#fff}'
       + '.dp-eg-schon-t{font:600 10.5px/1.2 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--muted,#7A7370);margin-bottom:6px}'
       + '.dp-eg-schon-t b{color:var(--wl-9a7f33,#9a7f33);margin-left:4px}'
@@ -917,7 +917,7 @@
   }
 
   try { _grundCss(); } catch (e) {}
-  window.DpEingang = { VERSION: 'v4680b', schonHtml: schonHtml, start: start, jahresAnsicht: jahresAnsicht, jahresInRahmen: jahresInRahmen, oeffnen: oeffnen, istRechnung: istRechnung, belegeAuslesen: belegeAuslesen,
+  window.DpEingang = { VERSION: 'v4680c', schonHtml: schonHtml, start: start, jahresAnsicht: jahresAnsicht, jahresInRahmen: jahresInRahmen, oeffnen: oeffnen, istRechnung: istRechnung, belegeAuslesen: belegeAuslesen,
     einheiten: einheiten, mvVorschlag: mvVorschlag, mvOptionen: mvOptionen, mvText: mvText, mvUebernehmen: mvUebernehmen, mvFelder: mvFelder,
     jahrStand: jahrStand, protokoll: protokoll, verlaufHtml: verlaufHtml, lesen: lesen, filtern: filtern, hin: hin, werteAuf: werteAuf, zieleVon: zieleVon /* v4680 */,
     /* v3154 */ txStart: txStart, txEnde: txEnde, feldStand: feldStand, feldGeaendert: feldGeaendert,
