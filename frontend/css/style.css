@@ -42043,11 +42043,11 @@ html body #sb-actions-accordion .sb-act-item.sb-act-pilot { display: none !impor
 .bc-kpi-trend-bench-val, .bc-kpi-track-marker::after { font-family: "Space Grotesk", Inter, sans-serif; font-variant-numeric: lining-nums tabular-nums; }
 .bc-kpi-track-scale, .bc-kpi-trend-bench-label, .bc-kpi-trend-label, .bc-kpi-label { font-family: Inter, system-ui, sans-serif; font-variant-numeric: lining-nums tabular-nums; }
 
-/* v4850 · Kontrast kleiner Schrift (js/kontrast-text.js setzt die Klassen): feste Textvarianten der Statusfarben,
+/* v4850 · Kontrast kleiner Schrift (js/kontrast-text.js setzt die Klassen): feste Textvarianten der Statusfarben (Selektor mit ID-Gewicht, weil u. a. bmf-modal-v292.css #s6 ... !important setzt),
    keine Whitelabel-Tokens. Hell: >= 4,85 : 1 auf Weiss, Creme, Karte, Hellgrau. Dunkel: >= 6,5 : 1 auf Obsidian/#2A2727. */
-.dp-kt-gruen { color: #27704A !important; }
-.dp-kt-rot   { color: #9E4943 !important; }
-.dp-kt-grau  { color: #6B655C !important; }
-.dp-kt-gruen-d { color: #6FCF97 !important; }
-.dp-kt-rot-d   { color: #EE9A93 !important; }
-.dp-kt-grau-d  { color: #B3ACA2 !important; }
+:is(#dpkt#dpkt#dpkt, html) .dp-kt-gruen.dp-kt-gruen { color: #27704A !important; }
+:is(#dpkt#dpkt#dpkt, html) .dp-kt-rot.dp-kt-rot   { color: #9E4943 !important; }
+:is(#dpkt#dpkt#dpkt, html) .dp-kt-grau.dp-kt-grau  { color: #6B655C !important; }
+:is(#dpkt#dpkt#dpkt, html) .dp-kt-gruen-d.dp-kt-gruen-d { color: #6FCF97 !important; }
+:is(#dpkt#dpkt#dpkt, html) .dp-kt-rot-d.dp-kt-rot-d   { color: #EE9A93 !important; }
+:is(#dpkt#dpkt#dpkt, html) .dp-kt-grau-d.dp-kt-grau-d  { color: #B3ACA2 !important; }
