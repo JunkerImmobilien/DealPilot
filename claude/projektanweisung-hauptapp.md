@@ -45772,3 +45772,9 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** staging 5ce99f3c · main 0f2ca05e, Version 7dcd73cb.
 - **Nachweis:** Staging Hauptstr. 51 Anker 1.265.000 € vor boG, Westerfeldstr. 146 740.000 € unverändert; Prüfer grün. Prod-Sicherung -1227-v4940, healthy.
 - **Rest:** Anker anderer Objekte mit vorläufigem Ertragswert ändern sich erst beim nächsten Speichern.
+
+### Rollout 1.0.228 · v5000–v5000c Handy: Menüband, Feldtipps, Portfolio-Cockpit (25.11.2026)
+- **Was:** Umschalter Aktionen·Ankauf·Bestand am Handy als schlankes Band (32 statt 56 px, Zahl in Space Grotesk statt Mono, die 0 las sich wie 8). `js/feld-tipps.js`: 15 lange Erklärtexte unter Feldern (Miete, Steuer, Sanierung, Sonderumlage, Eigene Werte) wandern per `data-als-tip` ins ⓘ, bei ausgeschalteten Tooltips bleibt der Text. Portfolio-Cockpit bei 390 und 822 px: Filter als Raster, Unterzeilen zweizeilig, Objektmatrix bis 480 px zweispaltig (Seite 12.300 → 9.132 px), Zielbild-Tabelle ohne weiße Namenszelle, Score-Teilnoten am Tablet einspaltig. **Ursache waagerecht scrollender Modul-Tabellen:** `table.tab` erbte die App-Reiter-Regeln (`.tab` inline-flex !important, Polster 14/16 px) → Klasse `pf-tab`. Nach Vorlagenwechsel ruft `ansichtAnwenden()` `DealPilotTabellenKarten.alle(app)`.
+- **Commit:** staging 0ba16f76, 6d5716e6, 4977d183, 014a7814 · main c2f5094d, 7ed08e9a, 5b495f09, f82d5c4c, afeb7765 (Buster v5000m), b9b6dc0b (Version).
+- **Nachweis:** Messkabine Staging, alle neun Vorlagen bei 390 und 822 px: kein Überlauf, keine Scrollleiste, keine Schrift unter 8,5 px; buster-ebenen, vorschau-pruefen, gold-audit (beide Server) grün. Prod liefert v5000m, version 228, 15 Feldtipps aktiv; Portfolio auf Prod nicht angemeldet nachgemessen.
+- **Rest:** Kartenbeschriftungen der Tabellen (tabellen-karten.js) bleiben JetBrains Mono, app-weit einheitlich.
