@@ -45563,3 +45563,10 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** staging f9b14313 · main b0b54d02, Version 8396df9f · Rückführung 1785261c.
 - **Nachweis:** Herford 43 → 66 Solide (Objekt 81, Finanzierung 34). einzelcheck-pruefen U grün mit Gegenproben, score-ketten, rechenkerne, ki-text-zahlen, buster, vorschau grün. Prod-Sicherung haupt/mb-20261125-0810-ec6 (7,0/31 MB, Kopf gelesen), Backend Staging und Prod neu gebaut, healthy, /pdf antwortet 403 ohne Kauf, Dateien mit Bustern ausgeliefert.
 - **Rest:** kein bezahlter Bericht auf Prod gemessen. Quick-Check ohne Marktbericht kennt keine Vergleichsmiete (Potenzial weicht dann ab).
+
+### Rollout 1.0.208 · v4740 Restfehler (Fork DD4)
+
+- **Was:** Unterlagen-Auswertung aus dem Quick-Check immer übernommen und Pilot-Analyse startet danach; Sprung „WEG und Protokolle“ in Haus & Unterlagen; Marken in „Verlauf mit Steuern“ kollisionsfrei.
+- **Commit:** staging a0b04166, 9d85f891 · main 72713aaa, d5e4ecdb, Version 8ae68a26.
+- **Nachweis:** Staging-Lauf mit Testunterlagen (Auswertung 14.294 Zeichen, Pilot lief), Sprung gemessen, Marken 0 Überdeckungen bei 340–1100 px. buster-ebenen, vorschau SAUBER, gold-audit Prod RC 0. Sicherung haupt-/mb-20261125-0903-v4740 (7,0/31 MB, Kopf gelesen).
+- **Rest:** 2026-1192 (Lindenallee) hat weiter keine Auswertung, nur durch erneutes Einlesen.
