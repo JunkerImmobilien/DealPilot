@@ -45699,3 +45699,10 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** staging f64ec255, 5507a1a7, 0cea8ad7, dad17b92 · main 389b2833, Version e8c7e1a2.
 - **Nachweis:** Staging gemessen (Karten, Tabelle, Modal-Bedienung), Prod Auslieferung per curl (Buster v4870, patch 221). buster-ebenen und vorschau sauber.
 - **Rest:** gold-audit auf Prod rot durch js/dateiablage.js (nicht v4870, Fork UU4). 390 px der Einfach-Karten nicht eigens gemessen. Modal auf Prod erst nach Freigabe (Commit 5507a1a7 + v4870a/b per Cherry-Pick).
+
+### v4880 · Betrieb: Überwachung, Sicherheit, Wiederherstellung (Fork WW4) · Prod 1.0.220
+- **Was:** Admin › Betrieb (Ampeln Platte/Wachstum/Speicher/Last/Updates/Neustart/Ports/TLS/Images/npm audit/Nachtsicherung/Probe/Konfiguration), Host-Takt `tools/server/betrieb-sammeln.py` (stündlich, Audit montags), Wiederherstellungsprobe `tools/server/wiederherstellungsprobe.sh` (monatlich), Rot-Mail sofort + Wochenmail montags (BETRIEB_MAIL=1, ADMIN_EMAIL), Runbook `claude/notfall-wiederherstellung.md`, Migration 133, Takt-Schlüssel 13, Prüfer `tools/betrieb-pruefen.mjs` 47/47.
+- **Commit:** staging 4cc295c3, 5edfbe57, 3ea42aef, Merge 3a49de8a · main db0416a0, 229d622d, 248e478e (1.0.220), 72ce57ee.
+- **Nachweis:** Prod-Sicherung haupt-/mb-20261125-1105-v4880 (7,0 / 31 MB, Kopf gelesen); Migration 133 eingespielt, backend healthy, `version.json` 220; Messung + Audit geschrieben; Probe bestanden (109/43 Tabellen, 0,62 % / 0,0 % Zeilenabweichung, 53 s, keine Probe-Container übrig).
+- **Host:** crontab Prod +3, Staging +2 Zeilen (alte crontab gesichert unter /root/backups/crontab-vor-v4880-*), `.env` Prod `BETRIEB_MAIL=1` (gesichert env-vor-v4880-*).
+- **Rest:** eine irrtümliche Rot-Mail (erste Probe vor v4880b); Admin-Ansicht nicht im echten Browser angemeldet geprüft (Passwort/TOTP), nur DOM-Probe und Backend-Auswertung im Container; Staging ohne Nachtsicherung; Vorschläge in wissen/2026-11-25.md.
