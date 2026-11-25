@@ -110,8 +110,14 @@
     [].forEach.call(c.querySelectorAll('[id]'), function (n) { n.removeAttribute('id'); }); c.removeAttribute('id');
     [].forEach.call(c.querySelectorAll('button,a,input,select,textarea,[tabindex]'), function (n) { n.setAttribute('tabindex', '-1'); });
     c.classList.remove('gp-aus'); c.style.order = ''; c.style.margin = '0';
-    var w = Math.max(320, el.offsetWidth || 900);
-    return '<div class="pw-live" aria-hidden="true"><div class="pw-live-in" style="width:' + w + 'px" data-w="' + w + '">' + c.outerHTML + '</div></div>';
+    /* Die Cockpit-Regeln hängen an #dashboard-main #dp-stage .app: die Vorschau bekommt dieselbe Hülle (nur Klassen,
+       die IDs bleiben, die echten Elemente stehen im Dokument davor und gewinnen bei getElementById) */
+    var app = el.parentNode, st = document.getElementById('dp-stage'), dm = document.getElementById('dashboard-main');
+    var huelle = function (inner) {
+      if (!st || !dm || !app) return inner;
+      return '<div id="dashboard-main" class="' + esc(dm.className) + '" style="all:unset;display:block"><div id="dp-stage" class="' + esc(st.className) + '"><div class="' + esc(app.className) + '">' + inner + '</div></div></div>';
+    };
+    return '<div class="pw-live" aria-hidden="true" inert><div class="pw-live-in" data-ew="' + (el.offsetWidth || 900) + '">' + huelle(c.outerHTML) + '</div></div>';
   }
   function block(k) {
     var a = modul(k), A = API.stand(), halb = (A.br[k] || a.b) === 'halb';
@@ -125,9 +131,10 @@
   function palette() {
     var A = API.stand(), an = {}; aktiv().forEach(function (k) { an[k] = 1; });
     var kzan = {}; kzAktiv().forEach(function (k) { kzan[k] = 1; });
-    var h = '<div class="pw-pg"><div class="pw-pt">Kennzahlen oben</div><div class="pw-pl">' + API.kzdef.filter(function (d) { return !kzan[d.k]; }).map(function (d) {
+    var kzH = '<div class="pw-pg"><div class="pw-pt">Kennzahlen oben</div><div class="pw-pl">' + API.kzdef.filter(function (d) { return !kzan[d.k]; }).map(function (d) {
       return '<button type="button" class="pw-pi pw-pkz" draggable="true" data-pw="kzhinzu" data-k="' + d.k + '" title="Ziehen oder klicken zum Hinzufügen"><span class="pw-kzmini" aria-hidden="true">123</span><b>' + esc(d.t) + '</b><i aria-hidden="true">+</i></button>';
     }).join('') + '</div></div>';
+    var h = '';
     var gesehen = {};
     GRUPPEN.forEach(function (g) { g.m.forEach(function (k) { gesehen[k] = 1; }); });
     var rest = API.ansicht.filter(function (a) { return !a.fest && !a.vb && !gesehen[a.k]; }).map(function (a) { return a.k; });
@@ -140,7 +147,7 @@
         return '<button type="button" class="pw-pi" draggable="true" data-pw="hinzu" data-k="' + k + '" title="' + esc(a.w || '') + '">' + piktogramm(k) + '<b>' + esc(a.t) + (a.vb ? '<small>in Projektion und Verlauf</small>' : '') + '</b><i aria-hidden="true">+</i></button>';
       }).join('') + '</div></div>';
     });
-    return h;
+    return h + kzH;   /* Module zuerst, Kennzahlen am Ende der Palette */
   }
   function zeichnen() {
     var p = document.getElementById('dp-pw'); if (!p) return;
@@ -167,8 +174,10 @@
   function skalieren() {
     var p = document.getElementById('dp-pw'); if (!p) return;
     [].forEach.call(p.querySelectorAll('.pw-live-in'), function (x) {
-      var w = Number(x.getAttribute('data-w')) || 900, box = x.parentNode.clientWidth || 300, f = Math.min(1, box / w);
-      x.style.transform = 'scale(' + f.toFixed(3) + ')'; x.parentNode.style.height = Math.min(200, Math.round((x.scrollHeight || 300) * f)) + 'px';
+      /* verkleinert: die Vorschau rechnet mit gut doppelter Breite und wird auf die Blockbreite gestaucht */
+      var box = x.parentNode.clientWidth || 300, w = Math.max(Number(x.getAttribute('data-ew')) || 900, Math.round(box * 2.2)), f = Math.min(1, box / w);
+      x.style.width = w + 'px'; x.style.transform = 'scale(' + f.toFixed(3) + ')';
+      x.parentNode.style.height = Math.min(170, Math.max(60, Math.round((x.scrollHeight || 300) * f))) + 'px';
     });
   }
   function melden(t) { var m = document.getElementById('pw-live-msg'); if (m) { m.textContent = ''; setTimeout(function () { m.textContent = t; }, 30); } }
