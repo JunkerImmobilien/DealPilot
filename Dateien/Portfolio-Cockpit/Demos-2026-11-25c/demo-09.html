@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Portfolio-Cockpit · Demo 09 · Mieten-Hebel</title>
+<link rel="stylesheet" href="kit.css">
+
+</head>
+<body>
+<div class="seite">
+ <div class="kopf">
+  <div><div class="marke"><i></i>Portfolio-Cockpit · Demo 09 von 10 · Runde 3</div><h1>Mieten-Hebel</h1><div class="unter">Wo Miete liegen bleibt: Potenzial, Leerstand und Mietniveau je Objekt. Echte Werte des Demokontos, Stand 25.11.2026.</div></div>
+  <div class="leiste"><span id="ziel"></span><div class="schalter" id="thema"><button aria-pressed="true" data-t="light">Hell</button><button aria-pressed="false" data-t="dark">Dunkel</button></div></div>
+ </div>
+<div id="sk"></div>
+<div id="kz"></div>
+<div class="raster">
+ <div class="karte" style="--s:7" id="mh"></div>
+ <div class="karte" style="--s:5" id="zs"></div>
+ <div class="karte" style="--s:12" id="bsz"></div>
+ <div class="karte" style="--s:6" id="qm"></div>
+ <div class="karte" style="--s:6" id="todo"></div>
+</div>
+ <div class="fuss">Wertansatz: Ertragswert im Bestand, wo gerechnet, sonst Kaufpreis. Projektion aus dem Portfolio-Modell (Stützjahre 1, 5 und 10). Restschuld zum Ende der Zinsbindung vereinfacht mit heutiger Tilgung fortgeschrieben.</div>
+</div>
+<script src="ek-rendite.js"></script>
+<script src="daten.js"></script>
+<script src="kit.js"></script>
+<script src="bausteine.js"></script>
+<script src="baukasten.js"></script>
+<script>
+
+var k = K.kennzahlen(), S = K.D.summe, Z = K.D.ziele, O = K.D.objekte;
+function kzStd(){ var z=K.ziele(); return [
+ {l:'Wertansatz', v:K.mio(k.wert), s:'18 Objekte · '+k.we+' Einheiten', tip:'<div class="t-k">Wertansatz</div>Ertragswert im Bestand, wo gerechnet, sonst Kaufpreis.'},
+ {l:'Eigenkapital im Bestand', v:K.mio(k.ekHeute), s:'eingesetzt '+K.mio(k.ekEin), hero:1},
+ {l:'Kaltmiete', v:K.eur(S.mieteJ/12), s:'im Monat · '+K.pct(S.brutto)+' brutto'},
+ {l:'Cashflow vor Steuer', v:K.eurV(S.cfVsJ/12), s:'im Monat', c:S.cfVsJ>=0?'ok':'nok', tip:z?K.tz('dein Ziel je Objekt', 'mind. '+K.eur(z.minCfVs))+K.tz('erreicht', O.filter(function(o){return o.cfVs>=z.minCfVs}).length+' von 18'):''},
+ {l:'Cashflow nach Steuer', v:K.eurV(S.cfNsJ/12), s:'im Monat', c:S.cfNsJ>=0?'ok':'nok'},
+ {l:'DSCR', v:K.d2(S.dscr), s:z?'Ziel '+K.d2(z.minDscr)+' · '+k.unterZiel.length+' Objekte darunter':'Kapitaldienstdeckung', c:z?(S.dscr>=z.minDscr?'ok':'nok'):''},
+ {l:'Nächste Zinsbindung', v:(function(){var x=O.slice().sort(function(a,b){return a.zbJahr-b.zbJahr})[0];return x.zb.slice(5,7)+'/'+x.zb.slice(0,4)})(), s:(function(){var x=O.slice().sort(function(a,b){return a.zbJahr-b.zbJahr})[0];return x.name})(), c:k.bald.length?'nok':'warn'}
+];}
+function zeichneKz(sel, fs, n){ K.modul(sel, function(){ return K.kz(fs(), n); }); }
+
+K.modul("#sk", function(){ return K.scoreKopf(); });
+var zb=K.D.zielbild, qm=K.summe(O,function(o){return o.mieteJ})/12/k.wfl;
+zeichneKz('#kz', function(){ return [
+ {l:'Kaltmiete heute', v:K.eur(zb.mieteB/12), s:'im Monat, nur Wohnungen'},
+ {l:'Ohne Mieterwechsel', v:K.eurV((zb.mieteMh-zb.mieteB)/12), s:'Mieterhöhung im Monat', c:'ok'},
+ {l:'Mit Umbau und Neuvermietung', v:K.eurV((zb.mieteZ-zb.mieteMh)/12), s:'zusätzlich im Monat', c:'ok'},
+ {l:'Zielbild', v:K.eur(zb.mieteZ/12), s:K.pctV((zb.mieteZ/zb.mieteB-1)*100)+' auf heute', hero:1},
+ {l:'Leerstand', v:K.eur(k.leerEur/12), s:'entgangen im Monat', c:'warn'},
+ {l:'Mietniveau', v:K.d2(qm)+' €/m²', s:'Durchschnitt Bestand'}
+]; }, 6);
+B.mietHebel('#mh'); B.zusammensetzung('#zs','ort');
+K.modul('#bsz', function(){ return K.karte('Bestand und Zielbild je Objekt','Sortiert nach Wertzuwachs nach Kosten. Fahr über ein Objekt für die Details.', K.bszTabelle()); });
+K.modul('#qm', function(w){ var os=O.filter(function(o){return o.qmMiete}).sort(function(a,b){return a.qmMiete-b.qmMiete});
+ var rows=os.map(function(o){ var z=o.wfl?o.mieteZ/12/o.wfl:o.qmMiete; return {label:K.kurzName(o,w), a:o.qmMiete, b:Math.max(z,o.qmMiete), tip:K.objTip(o)}; });
+ return K.karte('Miete je Quadratmeter','Heute gegen Zielbild. Unten die günstigsten Objekte, dort liegt meist der Hebel.', K.hantel({w:w, rows:rows, rh:19, farbe:function(){return 'var(--gold)'}, fmtWert:function(v){return K.d2(v)+' €'}, fmtAx:function(v){return K.d2(v)}, aria:'Miete je Quadratmeter'})); });
+K.modul('#todo', function(){ return K.karte('Was jetzt zu tun ist','Aus deinen Zahlen abgeleitet.', K.hinweise(6)); });
+K.zielSchalter('#ziel');
+document.getElementById('thema').addEventListener('click',function(e){var b=e.target.closest('button'); if(!b)return; document.documentElement.setAttribute('data-theme',b.getAttribute('data-t')); this.querySelectorAll('button').forEach(function(x){x.setAttribute('aria-pressed',x===b?'true':'false')});});
+(function(){ var t=new URLSearchParams(location.search).get('thema')||document.documentElement.getAttribute('data-theme'); if(t){ document.documentElement.setAttribute('data-theme',t); document.querySelectorAll('#thema button').forEach(function(x){x.setAttribute('aria-pressed',x.getAttribute('data-t')===t?'true':'false')}); } })();
+K.ausbau(); BK.start();
+if(/mass=1/.test(location.search)) setTimeout(function(){ var t=document.createElement('meta'); t.id='hoehe'; t.content=String(document.documentElement.scrollHeight); document.head.appendChild(t); }, 600);
+</script>
+</body>
+</html>
