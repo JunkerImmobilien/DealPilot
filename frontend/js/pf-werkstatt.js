@@ -178,6 +178,15 @@
         if (c.offsetHeight > 20) r = { h: c.outerHTML, w: c.offsetWidth || W };
         z2.removeChild(c);
       }
+      if (!r && API.modulHtml) {   /* v4900 · ausgeblendete Cockpit-Bausteine (Objektmatrix, Gesamtbewertung …) aus dem letzten Zeichnen */
+        var hh = API.modulHtml(k);
+        if (hh) {
+          var z3 = offscreen(), h3 = document.createElement('div'), w3 = halb ? Math.round(W / 2 - 8) : W;
+          h3.setAttribute('data-dp-gp', k); h3.className = 'dp-gp'; h3.style.width = w3 + 'px'; h3.innerHTML = hh; z3.appendChild(h3);
+          if (h3.offsetHeight > 20) r = { h: saeubern(h3.cloneNode(true)).outerHTML, w: w3 };
+          z3.removeChild(h3);
+        }
+      }
     } catch (e) { r = null; }
     _mini[k] = r; return r;
   }

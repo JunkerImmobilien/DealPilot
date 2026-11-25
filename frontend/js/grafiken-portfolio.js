@@ -361,6 +361,7 @@
       var zDsOm = zielWert('min_dscr');
       T.om = omAn ? DpObjektmatrix.html(rows, { ziel: zDsOm != null ? { dscr: zDsOm } : null }) : '';
     }
+    _T_LETZT = T; _ROWS_LETZT = rows;   /* v4900 · Arbeitsbereich zeigt auch ausgeblendete Bausteine als Bild (GP_API.modulHtml) */
     if (hosts) Object.keys(T).forEach(function (k) { if (hosts[k]) hosts[k].innerHTML = T[k]; });
     if (omAn) {
       DpObjektmatrix.einrichten(hosts.om, function () { var h = document.querySelector('[data-dp-gp="kopf"]'); if (h) h.removeAttribute('data-gp-sig'); lauf(); });
@@ -490,7 +491,7 @@
     br.projektion = 'ganz';
     return { v: 2, an: an, ord: ord, ordVb: ordVb, br: br, vorlage: v.k, kz: (_ans && _ans.kz) || kzStandard() };
   }
-  var _ans = null, _ansServer = false, _bkOffen = false, _bkVorher = null, _bkPut = null, _KZH_LETZT = null;
+  var _ans = null, _ansServer = false, _bkOffen = false, _bkVorher = null, _bkPut = null, _KZH_LETZT = null, _T_LETZT = null, _ROWS_LETZT = null;
   /* v1 (v4260) kannte nur an/aus: die Häkchen bleiben, Reihenfolge und Breite kommen aus Standard */
   function normal(s) {
     var basis = ausVorlage(VORLAGEN[0]);
@@ -645,6 +646,13 @@
     ziel: function (k) { var hero = document.getElementById('dp-pscore-hero'), app = hero && hero.parentNode; return app ? (ansichtZiele(app)[k] || null) : null; },
     kopf: function () { return document.querySelector('[data-dp-gp="kopf"]'); },
     /* v4890 · eine Kennzahl als Karte mit ihrem echten Wert (aus dem letzten Zeichnen), null wenn noch nicht gezeichnet */
+    /* v4900 · HTML eines Bausteins aus dem letzten Zeichnen, auch wenn er im Cockpit gerade ausgeblendet ist (nur zum Ansehen) */
+    modulHtml: function (k) {
+      try {
+        if (k === 'om' && window.DpObjektmatrix && _ROWS_LETZT) { var z = zielWert('min_dscr'); return DpObjektmatrix.html(_ROWS_LETZT, { ziel: z != null ? { dscr: z } : null }); }
+        return _T_LETZT && _T_LETZT[k] ? _T_LETZT[k] : null;
+      } catch (e) { return null; }
+    },
     kzKachel: function (k) { try { return _KZH_LETZT && _KZH_LETZT[k] ? _KZH_LETZT[k]() : null; } catch (e) { return null; } },
     speichern: function (mitKz) { if (mitKz) kzGeaendert(); else { ansSpeichern(); ansichtAnwenden(); } },
     seitenleiste: function () { ansichtOeffnenLeiste(); }
