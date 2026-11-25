@@ -110,8 +110,17 @@ export async function tiefeVorab({ plz, ort, objektart, wfl = null, baujahr = nu
         : 'Im Land nicht frei abrufbar. Ohne Bodenrichtwert rechnen Ertrags- und Sachwert nicht.' });
   }
 
-  const ja = aus.punkte.filter((x) => x.ok === 'ja').length;
-  aus.stufe3_voll = aus.punkte.every((x) => x.ok === 'ja');
+  /* Nur die Verfahren zaehlen, die fuer DIESE Objektart fuehren oder stuetzen (§ 6 Abs. 1 ImmoWertV):
+     Mehrfamilienhaus Ertragswert, Ein- und Zweifamilienhaus Sachwert, Wohnung Vergleichs- und Ertragswert.
+     Der Bodenrichtwert zaehlt immer. Ein fehlender Faktor fuer ein Verfahren, das hier nicht fuehrt, ist kein Mangel. */
+  const noetig = a.mfh ? ['ertragswert', 'boden'] : a.haus ? ['sachwert', 'boden'] : a.objart === 'GEW' ? ['ertragswert', 'boden'] : ['vergleichswert', 'ertragswert', 'boden'];
+  aus.punkte.forEach((x) => {
+    if (noetig.indexOf(x.id) < 0 && x.ok !== 'ja') { x.ok = 'info'; x.text = 'Führt bei dieser Objektart nicht. ' + x.text; }
+    x.noetig = noetig.indexOf(x.id) >= 0;
+  });
+  const zaehlt = aus.punkte.filter((x) => x.noetig);
+  const ja = zaehlt.filter((x) => x.ok === 'ja').length;
+  aus.stufe3_voll = zaehlt.every((x) => x.ok === 'ja');
   aus.kurz = aus.stufe3_voll ? 'Für diesen Ort liegen alle amtlichen Daten vor.'
     : ja === 0 ? 'Für diesen Ort liegen kaum amtliche Daten vor. Die Wertermittlung bleibt weitgehend indikativ.'
     : 'Für diesen Ort liegen nicht alle amtlichen Daten vor. Was fehlt, rechnet indikativ oder gar nicht.';

@@ -664,7 +664,7 @@
     holeJson(api('/tiefe' + qs)).then(function (t) {
       if (nr !== schritt || !box.isConnected) return;
       if (!t || !t.verfuegbar || !Array.isArray(t.punkte)) { box.innerHTML = '<p class="ec-fein">Die Vorabprüfung der amtlichen Daten ist gerade nicht erreichbar. Der Bericht zeigt je Verfahren, womit er rechnet.</p>'; return; }
-      var ZEICHEN = { ja: '✓', teils: '◐', nein: '✕' };
+      var ZEICHEN = { ja: '✓', teils: '◐', nein: '✕', info: '·' };
       box.innerHTML = '<span class="ec-l">Was es für diesen Ort amtlich gibt</span><p class="ec-tiefe-kurz">' + esc(t.kurz || '') + '</p><ul>'
         + t.punkte.map(function (p) { return '<li class="' + esc(p.ok) + '"><i aria-hidden="true">' + (ZEICHEN[p.ok] || '') + '</i><b>' + esc(p.name) + '</b><span>' + esc(p.text) + '</span></li>'; }).join('')
         + '</ul>' + (t.hinweis ? '<p class="ec-fein">' + esc(t.hinweis) + '</p>' : '');
