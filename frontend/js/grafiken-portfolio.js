@@ -38,6 +38,7 @@
     if (!B || !p || !Array.isArray(p.objekte) || !p.objekte.length) return null;
     var Wk = {}; (B.W || []).forEach(function (x) { if (x.key) Wk[x.key] = x; });
     var Bk = {}; (B.BW || []).forEach(function (x) { if (x.key) Bk[x.key] = x; });
+    var zbK = {}; (((B.A || {}).mit) || []).forEach(function (x) { if (x && x.key) zbK[x.key] = x; });   /* v4690 · Zielbild je Objekt */
     var rows = p.objekte.map(function (o, i) {
       var d = det[i] || {}, w = Wk[o.id] || {}, bw = Bk[o.id] || {};
       var dar = zahl(o.darlehen_eur) || 0, zinsJ = zahl(o.zins_eur_jahr) || 0, tilgJ = zahl(o.tilgung_eur_jahr) || 0;
@@ -49,7 +50,11 @@
         wfl: zahl(o.wohnflaeche_qm), we: zahl(o.wohneinheiten), ekr4: (function () { try { return D.ekr4Obj ? D.ekr4Obj(d) : null; } catch (e) { return null; } })(),   /* v4610 */
         score: zahl(o.investor_deal_score) != null ? zahl(o.investor_deal_score) : zahl(o.dealpilot_score),
         bindEnde: d._kpis_bindung_ende || null, rsBind: zahl(d._kpis_rs_bindung), ew: bw.ew != null ? bw.ew : null, mpi: bw.mpi != null ? bw.mpi : null,
-        wertstg: zahl(String(d.wertstg == null ? '' : d.wertstg).replace(',', '.')) };
+        wertstg: zahl(String(d.wertstg == null ? '' : d.wertstg).replace(',', '.')),
+        /* v4690 · für die Objektmatrix (portfolio-objektmatrix.js): Bild, Anschrift, Kapitaldienst, Substanz, Zielbild */
+        thumb: typeof d._thumb === 'string' ? d._thumb : null, str: d.str || '', hnr: d.hnr || '', plz: d.plz || '', ort: o.ort || d.ort || '',
+        zinsJ: zinsJ || null, tilgJ: tilgJ || null, leer: zahl(o.leerstand_pct), energie: o.energieklasse || null,
+        zb: (zbK[o.id] || null) };
     });
     return { B: B, rows: rows };
   }
@@ -101,7 +106,7 @@
       A + '{display:flex;flex-direction:column}',
       A + ' > *{order:50}',
       A + ' > .sl-head{order:0}' + A + ' > #dp-pscore-hero{order:1}' + A + ' > .cp-ansicht{order:2}' + A + ' > [data-dp-gp="kopf"]{order:3}' + A + ' > #dp-einfach{order:4}',
-      A + ' > [data-dp-gp="gb"]{order:5}' + A + ' > .cp-sek[data-sek="projektion"]{order:6}' + A + ' > [data-dp-gp="ob"]{order:7}' + A + ' > .cp-sek[data-sek="steuer"]{order:8}',
+      A + ' > [data-dp-gp="om"]{order:5}' + A + ' > [data-dp-gp="gb"]{order:5}' + A + ' > .cp-sek[data-sek="projektion"]{order:6}' + A + ' > [data-dp-gp="ob"]{order:7}' + A + ' > .cp-sek[data-sek="steuer"]{order:8}',
       A + ' > [data-dp-gp="bk"]{order:9}' + A + ' > .cp-sek[data-sek="zielbild"]{order:10}' + A + ' > #dp-pp-slot{order:11}' + A + ' > .cp-sek[data-sek="gesamtproj"]{order:12}' + A + ' > [data-dp-gp="det"]{order:13}',
       A + ' .sl > .e{display:none}',   /* die alten Nummern 02 bis 06 passen nach dem Umstellen nicht mehr */
       /* Einfach: Leiste, die Karten (ohne „Heute", das steht in der Leiste), je Objekt und Finanzierung. Genau: alles. */
@@ -336,7 +341,18 @@
       bk: sl('Finanzierung', 'Zinsbindung und Anschluss') + '<div class="gp-karte dp-gx dp-gx-frei" data-gp-k="bk"><div class="gx-kopf"><div class="gx-eye">Finanzierung · Anschluss</div></div><div class="gx-t gp-t">' + bkT + '</div><div class="gx-s gp-u">' + bkU + '</div>' + bk + bkOhne + '</div>',
       det: sl('Details', 'je Objekt und Rechenprüfung') + '<div class="gp-karte dp-gx dp-gx-frei"><div class="gx-kopf"><div class="gx-eye">Details · je Objekt</div></div>' + tab + pruef + '</div>'
     };
+    /* v4690 · Objektmatrix (Demo 07): jedes Objekt als Karte zum Umdrehen */
+    var omAn = !!(hosts && hosts.om && window.DpObjektmatrix && sichtbar('om'));   /* ausgeblendet: nicht bauen, keine Karten laden */
+    if (hosts && hosts.om) {
+      var zDsOm = zielWert('min_dscr');
+      T.om = omAn ? DpObjektmatrix.html(rows, { ziel: zDsOm != null ? { dscr: zDsOm } : null }) : '';
+    }
     if (hosts) Object.keys(T).forEach(function (k) { if (hosts[k]) hosts[k].innerHTML = T[k]; });
+    if (omAn) {
+      DpObjektmatrix.einrichten(hosts.om, function () { var h = document.querySelector('[data-dp-gp="kopf"]'); if (h) h.removeAttribute('data-gp-sig'); lauf(); });
+      DpObjektmatrix.nachladen(hosts.om);
+      try { if (window.DpEkrUi && DpEkrUi.anwenden) DpEkrUi.anwenden(); } catch (e) {}
+    }
     else host.innerHTML = T.kopf + T.ob + T.bk + T.det;
     (hosts ? hosts.kopf : host).setAttribute('data-gp-pruef', nOk + '/' + P.length);
     return true;
@@ -359,6 +375,7 @@
      die Gruppe als Ganzes steht im Hauptraster. */
   var ANSICHT = [
     { k: 'kopf', t: 'Kennzahlen auf einen Blick', fest: true, w: 'Die wichtigsten Zahlen des Portfolios in einer Leiste.' },
+    { k: 'om', t: 'Objektkarten zum Umdrehen', b: 'ganz', w: 'Jedes Objekt als Karte mit Foto oder Lage. Klick dreht sie um: EK-Rendite, Finanzierung, Miete, Risiken.' },   /* v4690 */
     { k: 'gb', t: 'Vermögen und Gesamtbewertung', b: 'ganz', w: 'Was investiert ist, was dir heute gehört und was es nach Bewertung wert ist.' },
     { k: 'zielbild', t: 'Bestand und Zielbild je Objekt', b: 'ganz', w: 'Die Tabelle wie in der Pilot-Analyse, für alle Objekte. Fahr über ein Objekt für die Details.' },
     { k: 'ob', t: 'Cashflow und Steuer je Objekt', b: 'halb', w: 'Welches Objekt Geld bringt und welches kostet.' },
@@ -378,8 +395,12 @@
   var TOP = ANSICHT.filter(function (a) { return !a.fest && !a.vb; }).map(function (a) { return a.k; });
   var VBK = ANSICHT.filter(function (a) { return a.vb; }).map(function (a) { return a.k; });
   /* Vorlagen nach den Demos (Dateien/Portfolio-Cockpit/Demos-2026-11-25c/baukasten.js). m: [Schlüssel, Breite] in Reihenfolge. */
+  /* v4690 · Marcel 25.11.2026: „Cockpit mit Demo 07“ → die Objektmatrix ist der Standard (VORLAGEN[0] = neue Nutzer und Zurücksetzen).
+     Das Asset-Manager-Cockpit behält seinen Schlüssel 'standard', damit gespeicherte Stände ihre Vorlage wiederfinden. */
   var VORLAGEN = [
-    { k: 'standard', t: 'Asset-Manager-Cockpit', u: 'Standard · was ein Bestandshalter am Montagmorgen sehen will',
+    { k: 'matrix', t: 'Objektmatrix', u: 'Standard · jedes Objekt als Karte, per Klick umzudrehen',
+      m: [['om', 'ganz'], ['zielbild', 'ganz']], kommt: [], kz: ['wert', 'netto', 'miete', 'cfvs', 'dscr', 'zinsb', 'ekr'] },
+    { k: 'standard', t: 'Asset-Manager-Cockpit', u: 'Was ein Bestandshalter am Montagmorgen sehen will',
       m: [['zielbild', 'ganz'], ['ob', 'halb'], ['bk', 'halb'], ['vb-eq', 'ganz'], ['gb', 'ganz']], kommt: ['Was jetzt zu tun ist', 'Wohin die Miete geht'] },   /* gb: Gesamtbewertung zeigt sich in Genau (Demo Detail-Modus) */
     { k: 'risiko', t: 'Risiko-Radar', u: 'Wo der Bestand verwundbar ist',
       m: [['bk', 'ganz'], ['zielbild', 'ganz']], kommt: ['Risikomatrix', 'Rendite gegen Tragfähigkeit', 'Zinsstress beim Anschluss'] },
@@ -389,8 +410,6 @@
       m: [['bk', 'ganz'], ['zielbild', 'ganz']], kommt: ['Sicherheiten je Objekt', 'Was für die Finanzierung spricht', 'Zinsstress beim Anschluss'] },
     { k: 'rendite', t: 'Renditequellen', u: 'Was dein Eigenkapital verdient und woher',
       m: [['zielbild', 'ganz']], kommt: ['Woher die Rendite kommt', 'EK-Rendite je Objekt', 'Wo dein Kapital arbeitet', 'Kapital umschichten?'] },
-    { k: 'matrix', t: 'Objektmatrix', u: 'Jedes Objekt als kleine Karte',
-      m: [['zielbild', 'ganz']], kommt: ['Objektkarten zum Umdrehen'] },
     { k: 'wert', t: 'Wert und Zielbild', u: 'Was der Bestand heute wert ist und was der Plan daraus macht',
       m: [['zielbild', 'ganz'], ['vb-eq', 'ganz']], kommt: ['Wert heute und im Zielbild', 'Miethebel', 'Wo die Miete herkommt'] },
     { k: 'miete', t: 'Mieten-Hebel', u: 'Wo Miete liegen bleibt',
@@ -405,7 +424,8 @@
     { k: 'proj', t: 'Vermögen netto in der Projektion' }, { k: 'rest', t: 'Restschuld' }, { k: 'ltv', t: 'LTV' }, { k: 'zins', t: 'Ø-Zins' },
     { k: 'ew', t: 'Ertragswert gegen Kaufpreis' }, { k: 'mp', t: 'Marktpreis gegen Kaufpreis' }
   ];
-  function kzStandard() { return KZDEF.map(function (x, i) { return { k: x.k, an: i < 8 }; }); }
+  var KZ_STD = ['wert', 'netto', 'miete', 'cfvs', 'dscr', 'zinsb', 'ekr'];   /* v4690 · Kennzahlen der Demo 07 */
+  function kzStandard() { var a = KZ_STD.map(function (k) { return { k: k, an: true }; }); KZDEF.forEach(function (x) { if (KZ_STD.indexOf(x.k) < 0) a.push({ k: x.k, an: false }); }); return a; }
   function kzReihe() { return (ansLaden().kz || kzStandard()).filter(function (x) { return x.an; }).map(function (x) { return x.k; }); }
   function vorlageVon(k) { return VORLAGEN.filter(function (v) { return v.k === k; })[0] || null; }
   /* Stand aus einer Vorlage: nur ihre Module an, in ihrer Reihenfolge und Breite, der Rest dahinter und aus */
@@ -427,15 +447,25 @@
   function normal(s) {
     var basis = ausVorlage(VORLAGEN[0]);
     if (!s || typeof s !== 'object') return basis;
+    /* v4690 · Der bisherige Standard (Asset-Manager, seit 1.0.193), nie selbst gewählt und nicht verändert: er war die
+       Voreinstellung, keine Auswahl. Er wechselt auf den neuen Standard (Objektmatrix). Wer eine Vorlage per Knopf
+       wählt, bekommt gewaehlt: true und behält sie. Kennzahlen bleiben, wenn sie vom alten Standard abweichen. */
+    if (s.v === 2 && s.vorlage === 'standard' && !s.gewaehlt) {
+      var alt = ['wert', 'netto', 'miete', 'cfvs', 'cfns', 'dscr', 'zinsb', 'ekr'];
+      var kzAlt = Array.isArray(s.kz) && s.kz.filter(function (x) { return x && x.an; }).map(function (x) { return x.k; }).join() === alt.join();
+      basis.kz = kzAlt || !Array.isArray(s.kz) ? kzStandard() : s.kz.map(function (x) { return { k: x.k, an: !!x.an }; });
+      return basis;
+    }
     var an = s.an && typeof s.an === 'object' ? s.an : (s.v ? {} : s);
-    var out = { v: 2, an: {}, ord: [], ordVb: [], br: {}, vorlage: s.v === 2 ? (s.vorlage || null) : (Object.keys(an).length ? null : 'standard') };
-    Object.keys(basis.an).forEach(function (k) { out.an[k] = Object.prototype.hasOwnProperty.call(an, k) ? !!an[k] : basis.an[k]; });
+    var out = { v: 2, an: {}, ord: [], ordVb: [], br: {}, vorlage: s.v === 2 ? (s.vorlage || null) : (Object.keys(an).length ? null : VORLAGEN[0].k), gewaehlt: !!s.gewaehlt };
+    /* v4690 · ein Modul, das ein gespeicherter v2-Stand noch nicht kennt, bleibt aus (die eigene Auswahl gilt) */
+    Object.keys(basis.an).forEach(function (k) { out.an[k] = Object.prototype.hasOwnProperty.call(an, k) ? !!an[k] : (s.v === 2 ? false : basis.an[k]); });
     var o = Array.isArray(s.ord) ? s.ord.filter(function (k) { return TOP.indexOf(k) >= 0; }) : [];
     basis.ord.forEach(function (k) { if (o.indexOf(k) < 0) o.push(k); }); out.ord = o;
     var ov = Array.isArray(s.ordVb) ? s.ordVb.filter(function (k) { return VBK.indexOf(k) >= 0; }) : [];
     basis.ordVb.forEach(function (k) { if (ov.indexOf(k) < 0) ov.push(k); }); out.ordVb = ov;
     var kz = Array.isArray(s.kz) ? s.kz.filter(function (x) { return x && KZDEF.some(function (d) { return d.k === x.k; }); }).map(function (x) { return { k: x.k, an: !!x.an }; }) : [];
-    KZDEF.forEach(function (d, i) { if (!kz.some(function (x) { return x.k === d.k; })) kz.push({ k: d.k, an: Array.isArray(s.kz) ? false : i < 8 }); }); out.kz = kz;
+    if (!Array.isArray(s.kz)) kz = kzStandard(); else KZDEF.forEach(function (d) { if (!kz.some(function (x) { return x.k === d.k; })) kz.push({ k: d.k, an: false }); }); out.kz = kz;   /* v4690 */
     ANSICHT.forEach(function (a) { if (a.fest) return; var b = s.br && s.br[a.k]; out.br[a.k] = b === 'halb' || b === 'ganz' ? b : (basis.br[a.k] || a.b || 'ganz'); });
     return out;
   }
@@ -472,7 +502,7 @@
     var q = function (s) { return app ? app.querySelector(s) : null; };
     return {
       'vb-eq': q('[data-gp-k="vb-eq"]'), 'vb-bilanz': q('[data-gp-k="vb-bilanz"]'), 'vb-objekte': q('[data-gp-k="vb-objekte"]'), 'vb-quellen': q('[data-gp-k="vb-quellen"]'), 'vb-cf': q('[data-gp-k="vb-cf"]'),
-      gb: q(':scope > [data-dp-gp="gb"]'), ob: q(':scope > [data-dp-gp="ob"]'), bk: q(':scope > [data-dp-gp="bk"]'), det: q(':scope > [data-dp-gp="det"]'),
+      om: q(':scope > [data-dp-gp="om"]'), gb: q(':scope > [data-dp-gp="gb"]'), ob: q(':scope > [data-dp-gp="ob"]'), bk: q(':scope > [data-dp-gp="bk"]'), det: q(':scope > [data-dp-gp="det"]'),
       zielbild: q(':scope > .cp-sek[data-sek="zielbild"]'), steuer: q(':scope > .cp-sek[data-sek="steuer"]'),
       gesamtproj: q(':scope > .cp-sek[data-sek="gesamtproj"]'), pp: q(':scope > #dp-pp-slot'),
       projektion: q(':scope > .cp-sek[data-sek="projektion"]')
@@ -486,7 +516,10 @@
     A.ord.forEach(function (k, i) { var el = Z[k]; if (!el) return; el.style.order = String(10 + i); el.classList.toggle('gp-halb', breite(k) === 'halb'); });
     A.ordVb.forEach(function (k, i) { var el = Z[k]; if (!el) return; el.style.order = String(i); el.classList.toggle('gp-breit', breite(k) !== 'halb'); });
     var gb = Z.gb; if (gb) gb.removeAttribute('data-gp-fest');
+    /* v4690 · Objektmatrix eben eingeschaltet: einmal neu zeichnen (aus gezeichnet wird sie nicht gebaut) */
+    if (Z.om && sichtbar('om') && !Z.om.querySelector('.om-raster') && !_omNeu) { _omNeu = setTimeout(function () { _omNeu = null; var h = document.querySelector('[data-dp-gp="kopf"]'); if (h) h.removeAttribute('data-gp-sig'); try { lauf(); } catch (e) {} }, 0); }
   }
+  var _omNeu = null;
 
   /* ── Seitenleiste ── */
   function bkZeile(k, i, n, inGruppe) {
@@ -569,7 +602,9 @@
       var a = b.getAttribute('data-bk'), k = b.getAttribute('data-k'), A = ansLaden();
       if (a === 'zu') bkZu();
       else if (a === 'reset') { _ans = ausVorlage(VORLAGEN[0]); _ans.kz = kzStandard(); kzGeaendert(); ansichtAnwenden(); bkListe(); }
-      else if (a === 'vorlage') { var v = vorlageVon(k); if (v) { _ans = ausVorlage(v); ansSpeichern(); ansichtAnwenden(); bkListe(); } }
+      else if (a === 'vorlage') { var v = vorlageVon(k); if (v) { _ans = ausVorlage(v); _ans.gewaehlt = true;   /* v4690 */
+        if (v.kz) { _ans.kz = v.kz.map(function (x) { return { k: x, an: true }; }); KZDEF.forEach(function (d) { if (v.kz.indexOf(d.k) < 0) _ans.kz.push({ k: d.k, an: false }); }); kzGeaendert(); }
+        ansSpeichern(); ansichtAnwenden(); bkListe(); } }
       else if (a === 'hoch' || a === 'runter') bkVerschieben(k, a === 'hoch' ? -1 : 1);
       else if (a === 'kzhoch' || a === 'kzrunter') { var KZ = A.kz, i = KZ.findIndex(function (x) { return x.k === k; }), j = i + (a === 'kzhoch' ? -1 : 1); if (i >= 0 && j >= 0 && j < KZ.length) { var x = KZ.splice(i, 1)[0]; KZ.splice(j, 0, x); kzGeaendert(); } }
       else if (a === 'br') { A.br[k] = b.getAttribute('data-w') === 'halb' ? 'halb' : 'ganz'; bkGeaendert(); }
@@ -975,7 +1010,7 @@
     var app = hero.parentNode;
     var alt = app.querySelector(':scope > [data-dp-gp="1"]'); if (alt) alt.parentNode.removeChild(alt);   /* v4180-Host */
     var hosts = {};
-    ['kopf', 'gb', 'ob', 'bk', 'det'].forEach(function (k) {
+    ['kopf', 'om', 'gb', 'ob', 'bk', 'det'].forEach(function (k) {   /* v4690 · om = Objektmatrix */
       var h = app.querySelector(':scope > [data-dp-gp="' + k + '"]');
       if (!h) { h = document.createElement('div'); h.setAttribute('data-dp-gp', k); h.className = 'dp-gp dp-gp-' + k; app.appendChild(h); }
       hosts[k] = h;
