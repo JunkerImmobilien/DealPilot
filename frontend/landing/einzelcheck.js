@@ -63,7 +63,7 @@
 (function () {
   'use strict';
   if (window.DpEinzelCheck) return;
-  var VERSION = 'einzelcheck-9d';
+  var VERSION = 'einzelcheck-9e';
   var ANSCHLUSS_ZINS = 5.0;     /* v3946 · Marcel 22.11.2026: „Anschlussfinanzierung, die wir einfach auf fünf Prozent rechnen mit derselben Tilgung“ */
   var ABLAGE_STUNDEN = 2;       /* v3946 · Unterlagen im Browser höchstens so lange (die Stripe-Kasse läuft nach 60 Minuten ab) */
   var SPEICHER = 'dp_ec_kauf';
@@ -1602,7 +1602,7 @@
     var uF = d.urteil || {};
     var fazitHtml = D.abschnitt('Fazit', 'Was dieser Bericht sagt', 'Die Kernaussagen in wenigen Punkten.')
       + (uF.satz ? '<p><b>' + D.esc(uF.satz) + '</b></p>' : '')
-      + (blick.length ? '<ul>' + blick.map(function (x) { return '<li>' + D.esc(x) + '</li>'; }).join('') + '</ul>' : '')
+      + (blick.length ? '<ul>' + blick.filter(function (x) { return x !== uF.satz; }).map(function (x) { return '<li>' + D.esc(x) + '</li>'; }).join('') + '</ul>' : '')
       + (uF.braucht && uF.braucht.length ? '<h3>Was es bräuchte</h3><ul>' + uF.braucht.map(function (x) { return '<li>' + D.esc(x) + '</li>'; }).join('') + '</ul>' : '');
     seiten.push(D.seite(c, 'Fazit und nächster Schritt', fazitHtml + '<div class="block">' + D.abschnitt('Der nächste Schritt', 'Weiter in DealPilot', 'Steuer, Finanzierung, Restnutzungsdauer und Wertermittlung im Detail.')
       + '<ul><li>Objekt anlegen: Die Zahlen dieses Berichts übernimmt DealPilot beim Start über die Pakete der Startseite.</li>'
@@ -1612,7 +1612,7 @@
     seiten.push(D.seite(c, 'Quellen und Methodik', quellenHtml));
     /* einzelcheck-2 (Marcel 24.11.2026: „immer ganze Seiten … relativ abgehackt“): Überschrift nie allein am Seitenende,
        Tabellen, Kacheln und Blöcke nicht zerreißen, Zeilen etwas dichter, damit ein Kapitel auf seine Seite passt */
-    var doc = D.dokument('DealPilot Einzel-Check · ' + titel, seiten, { css: 'h2,h3{break-after:avoid;page-break-after:avoid}.block,.kz,.zwei,table,.hinweis,ul{break-inside:avoid;page-break-inside:avoid}td{padding-top:1.35mm;padding-bottom:1.35mm}h3{margin-top:5mm}table+ul,table+p{margin-top:5mm}' });   /* hh4 · Abstand nach Tabellen (Mietpotenzial) */
+    var doc = D.dokument('DealPilot Einzel-Check · ' + titel, seiten, { css: 'h2,h3{break-after:avoid;page-break-after:avoid}.block,.kz,.zwei,table,.hinweis,ul{break-inside:avoid;page-break-inside:avoid}td{padding-top:1.35mm;padding-bottom:1.35mm}h3{margin-top:5mm}section.seite table+ul,section.seite table+p{margin-top:6mm!important}' });   /* hh4 · Abstand nach Tabellen (Mietpotenzial) */
     if (nurHtml) return { html: doc, titel: titel };   /* einzelcheck-2 · Mail: dasselbe Dokument, ohne Vorschau */
     D.vorschau(doc, 'Einzel-Check · ' + titel);
     return doc;
