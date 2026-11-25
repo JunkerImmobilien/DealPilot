@@ -447,7 +447,8 @@
   var SEC_NAME = { s0: 'Objekt', s1: 'Investition', s2: 'Miete', s3: 'Finanzierung', s4: 'Bewirtschaftung', 's3-tax': 'Steuer', s5: 'Pilot-Analyse', s6: 'Bewertung', s8: 'Deal-Aktion' };
   var ZU_NAME = { av: 'Anlage V', feld: 'Reiter und Felder', we: 'Wohnungen', weg: 'WEG und Protokolle', sonst: 'Sonstiges' };
   var STAND_NAME = { ueb: 'Übernommen', offen: 'Offen', zurueck: 'Zurückgenommen' };
-  var _filt = { art: '', jahr: '', zu: '', stand: '' };
+  var _filt = { art: '', jahr: '', zu: '', stand: '' }, _auf = {};
+  function werteAuf(id) { _auf[id] = !_auf[id]; filtern(); }
   function postenName(f) { for (var i = 0; i < POSTEN.length; i++) if (POSTEN[i][0] === f) return POSTEN[i][1]; return f; }
   function feldSec(id) { var e = el(id), s = e && e.closest ? e.closest('.sec') : null; return s ? s.id : ''; }
   /** Ziel einer Wertzeile: Anlage V (Jahr, Posten), ein Formularfeld, Wohnungen, WEG/Protokolle oder Sonstiges */
@@ -522,7 +523,7 @@
     setTimeout(function () { e.style.boxShadow = alt; }, 2600);
   }
   function filtern(k, v) {
-    if (k === 'alle') _filt = { art: '', jahr: '', zu: '', stand: '' }; else _filt[k] = v || '';
+    if (k === 'alle') _filt = { art: '', jahr: '', zu: '', stand: '' }; else if (k) _filt[k] = v || '';
     var c = el('dp-eg-verlauf'); if (c) { var neu = document.createElement('div'); neu.innerHTML = verlaufHtml(); var n = neu.firstElementChild; if (n) c.replaceWith(n); }
   }
   function verlaufHtml() {
@@ -573,12 +574,16 @@
         var zu = Object.keys(grp).map(function (k) { var g = grp[k]; return g.hin
           ? '<button type="button" class="dp-eg-zu z-' + g.g + '" onclick="DpEingang.hin(\'' + esc(g.hin) + '\')" title="Dorthin springen">' + esc(g.k) + ' <b>' + g.n + '</b></button>'
           : '<span class="dp-eg-zu z-' + g.g + '">' + esc(g.k) + ' <b>' + g.n + '</b></span>'; }).join('');
+        /* v4680b · gemessen: die Werte in der schmalen Spalte brachen Wort für Wort. Die Liste steht jetzt in voller
+           Breite unter der Zeile, je Wert links der Wert, rechts sein Ziel. Auf/zu überlebt das Neuzeichnen. */
+        var auf = !!_auf[x.id];
         var werte = nu
-          ? '<details class="dp-eg-werte"><summary><b>' + nu + '</b> ' + (nu === 1 ? 'Wert' : 'Werte') + '</summary><ul>' + x.uebernommen.map(function (w) {
+          ? '<button type="button" class="dp-eg-wt" aria-expanded="' + auf + '" onclick="DpEingang.werteAuf(\'' + esc(x.id) + '\')"><b>' + nu + '</b> ' + (nu === 1 ? 'Wert' : 'Werte') + '</button>'
+          : '<span class="dp-eg-nichts">nichts</span>';
+        var liste = nu && auf ? '<div class="dp-eg-wl"><ul>' + x.uebernommen.map(function (w) {
               var z = zielVon(w, x);
               return '<li><span>' + esc(w) + '</span>' + (z.hin ? '<button type="button" class="dp-eg-ziel" onclick="DpEingang.hin(\'' + esc(z.hin) + '\')">' + esc(z.text) + '</button>' : '<em class="dp-eg-ziel">' + esc(z.text) + '</em>') + '</li>';
-            }).join('') + '</ul></details>'
-          : '<span class="dp-eg-nichts">nichts</span>';
+            }).join('') + '</ul></div>' : '';
         var kannZurueck = !x.zurueck && (x.aenderungen || []).some(function (a) { return a.t !== 'nicht'; });
         var aktion = (kannZurueck ? '<button type="button" class="dp-eg-k" data-eg-knopf="zurueck:' + esc(x.id) + '" onclick="DpEingang.knopf(\'zurueck\',\'' + esc(x.id) + '\',this)" title="Die übernommenen Werte auf den Stand davor setzen">' + knopfText('zurueck', x.id) + '</button>' : '')
           + '<button type="button" class="dp-eg-k rot" data-eg-knopf="loeschen:' + esc(x.id) + '" onclick="DpEingang.knopf(\'loeschen\',\'' + esc(x.id) + '\',this)" title="Nur den Eintrag entfernen, übernommene Werte bleiben">' + knopfText('loeschen', x.id) + '</button>';
@@ -587,7 +592,7 @@
           + '<span class="dp-eg-doks">' + (marken || '<span class="dp-eg-nichts">keine Datei</span>') + zr + '</span>'
           + '<span class="dp-eg-zus">' + (zu || '<span class="dp-eg-nichts">nichts</span>') + '</span>'
           + '<span class="dp-eg-uw">' + werte + '</span>'
-          + '<span class="dp-eg-akt">' + aktion + '</span></div>';
+          + '<span class="dp-eg-akt">' + aktion + '</span>' + liste + '</div>';
       }).join('') + '</div>'
       + '<p class="dp-eg-fuss">Klick auf eine Zuordnung springt dorthin. Zurücknehmen setzt die Werte auf den Stand davor. Löschen entfernt nur den Eintrag.</p>';
     if (ae.length) h += '<p class="dp-eg-fuss"><b>Mietverträge den Einheiten zugeordnet:</b> ' + ae.map(function (a) { return esc(a.einheit) + ' (' + esc(datum(a.am)) + (a.vorher.ist ? ', vorher ' + esc(a.vorher.ist) + ' €' : '') + ')'; }).join(' · ') + '</p>';
@@ -645,6 +650,14 @@
       + '.dp-eg-uw li{display:flex;flex-wrap:wrap;gap:2px 8px;align-items:baseline}.dp-eg-ziel{border:0;background:none;padding:0;font:500 11px/1.4 Inter,system-ui,sans-serif;color:var(--wl-9a7f33,#9a7f33);cursor:pointer;font-style:normal}button.dp-eg-ziel:hover{text-decoration:underline}.dp-eg-ziel::before{content:"\\2192  "}'
       + '.dp-eg-st{display:block;margin-top:3px;font:600 9px/1 "JetBrains Mono",monospace;letter-spacing:.06em;text-transform:uppercase}.dp-eg-st.s-ueb{color:#3FA56C}.dp-eg-st.s-offen{color:#B8625C}.dp-eg-st.s-zurueck{color:var(--muted,#7A7370)}'
       + '@media (max-width:700px){.dp-eg-filter .dp-eg-f{flex:1 1 140px}.dp-eg-fz{margin-left:0;flex-basis:100%}}'
+      /* v4680b · gemessen in der Pilot-Analyse: deren Knopfregel (padding 10px 16px, Radius 8) und Blocksatz mit Silbentrennung
+         griffen auf Marken und Liste. Darum hier mit der ID als Anker. */
+      + '#dp-eg-verlauf{text-align:left;hyphens:manual}#dp-eg-verlauf *{text-align:inherit}'
+      + '#dp-eg-verlauf button.dp-eg-zu{padding:3px 9px!important;min-height:0!important;height:auto!important;border-radius:999px!important;font:500 11.5px/1.3 Inter,system-ui,sans-serif!important;box-shadow:none!important;text-transform:none!important;letter-spacing:0!important;background:color-mix(in srgb,' + g + ' 7%,#fff)!important}'
+      + '#dp-eg-verlauf button.dp-eg-ziel,#dp-eg-verlauf button.dp-eg-wt,#dp-eg-verlauf button.dp-eg-fx{padding:0!important;min-height:0!important;height:auto!important;border:0!important;background:none!important;box-shadow:none!important;border-radius:0!important;text-transform:none!important;letter-spacing:0!important}'
+      + '#dp-eg-verlauf button.dp-eg-wt{font:500 12.5px/1.6 Inter,system-ui,sans-serif!important;color:inherit!important;cursor:pointer}#dp-eg-verlauf button.dp-eg-wt b{font-variant-numeric:tabular-nums}#dp-eg-verlauf button.dp-eg-wt::after{content:"";display:inline-block;width:5px;height:5px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(45deg);margin:0 0 3px 8px;opacity:.55}#dp-eg-verlauf button.dp-eg-wt[aria-expanded=true]::after{transform:rotate(-135deg);margin-bottom:-1px}'
+      + '#dp-eg-verlauf button.dp-eg-ziel{font:500 11.5px/1.4 Inter,system-ui,sans-serif!important;color:var(--wl-9a7f33,#9a7f33)!important;white-space:nowrap}'
+      + '#dp-eg-verlauf .dp-eg-wl{grid-column:1/-1;margin:2px 0 0;border-top:1px dashed rgba(42,39,39,.1);padding-top:6px}#dp-eg-verlauf .dp-eg-wl ul{list-style:none;margin:0;padding:0;columns:2 360px;column-gap:24px}#dp-eg-verlauf .dp-eg-wl li{display:flex;justify-content:space-between;gap:12px;break-inside:avoid;padding:3px 0;font-size:12px;line-height:1.4;border-bottom:1px solid rgba(42,39,39,.05)}#dp-eg-verlauf .dp-eg-wl li span{min-width:0}'
       + '.dp-eg-schon{margin-top:12px;border:1px solid color-mix(in srgb,' + g + ' 22%,transparent);border-radius:10px;padding:10px 12px;background:#fff}'
       + '.dp-eg-schon-t{font:600 10.5px/1.2 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--muted,#7A7370);margin-bottom:6px}'
       + '.dp-eg-schon-t b{color:var(--wl-9a7f33,#9a7f33);margin-left:4px}'
@@ -904,9 +917,9 @@
   }
 
   try { _grundCss(); } catch (e) {}
-  window.DpEingang = { VERSION: 'v4680a', schonHtml: schonHtml, start: start, jahresAnsicht: jahresAnsicht, jahresInRahmen: jahresInRahmen, oeffnen: oeffnen, istRechnung: istRechnung, belegeAuslesen: belegeAuslesen,
+  window.DpEingang = { VERSION: 'v4680b', schonHtml: schonHtml, start: start, jahresAnsicht: jahresAnsicht, jahresInRahmen: jahresInRahmen, oeffnen: oeffnen, istRechnung: istRechnung, belegeAuslesen: belegeAuslesen,
     einheiten: einheiten, mvVorschlag: mvVorschlag, mvOptionen: mvOptionen, mvText: mvText, mvUebernehmen: mvUebernehmen, mvFelder: mvFelder,
-    jahrStand: jahrStand, protokoll: protokoll, verlaufHtml: verlaufHtml, lesen: lesen, filtern: filtern, hin: hin, zieleVon: zieleVon /* v4680 */,
+    jahrStand: jahrStand, protokoll: protokoll, verlaufHtml: verlaufHtml, lesen: lesen, filtern: filtern, hin: hin, werteAuf: werteAuf, zieleVon: zieleVon /* v4680 */,
     /* v3154 */ txStart: txStart, txEnde: txEnde, feldStand: feldStand, feldGeaendert: feldGeaendert,
     zuruecknehmen: zuruecknehmen, eintragLoeschen: eintragLoeschen, knopf: knopf, vorschau: vorschau };
 })();
