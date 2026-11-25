@@ -240,6 +240,7 @@
   }
 
   function oeffnen(api) {
+    if (window.DpVorschau && !api.__frei) { window.DpVorschau.frei('grafiken_neu').then(function (an) { if (an) { api.__frei = true; oeffnen(api); } }); return; }
     API = api; if (_offen) { zeichnen(); return; }
     _offen = true; _vorher = document.activeElement; _rueck = []; stil();
     var hg = document.createElement('div'); hg.id = 'dp-pw-hg'; hg.className = 'pw-hg'; hg.setAttribute('aria-hidden', 'true'); document.body.appendChild(hg);
