@@ -391,7 +391,10 @@
     popWeg();
     if (_klein) schublade(true);
     var pl = p.querySelector('.pw-pliste'), z = pl.querySelector('.pw-pg[data-g="' + g + '"]'); if (!z) return;
-    _sprungZiel = g; clearTimeout(_sprungUhr); _sprungUhr = setTimeout(function () { _sprungZiel = null; reiterAktiv(); }, 700);
+    _sprungZiel = g; clearTimeout(_sprungUhr); _sprungUhr = setTimeout(function () {   /* Bilder laden nach und verschieben die Gruppe: Ziel nachkorrigieren */
+      var d0 = z.getBoundingClientRect().top - pl.getBoundingClientRect().top - 6; if (Math.abs(d0) > 12) pl.scrollTop += d0;
+      _sprungZiel = null; reiterAktiv();
+    }, 750);
     pl.scrollTo({ top: Math.max(0, z.getBoundingClientRect().top - pl.getBoundingClientRect().top + pl.scrollTop - 6), behavior: 'smooth' });
     reiterAktiv();
   }
