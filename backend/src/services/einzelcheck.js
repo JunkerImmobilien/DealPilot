@@ -808,6 +808,19 @@ function _kunde(t, n, streng) {
 }
 function _stufe(x) { const s = String(x || '').trim().toUpperCase(); return /^[A-EMN]$/.test(s) ? s : null; }
 function _jahr(x) { const n = _n(x); return n > 0 ? Math.round(n * 10) / 10 : null; }
+/* hh4 (Marcel 25.11.2026: „Die Rechnung fehlt noch im PDF, wenn es Ertragswert oder Sachwert ist.“) · Rechenweg wie im
+   Marktbericht: die Staffel des Kerns (ErtragswertService / nhk2010) unverändert durchgereicht, nichts neu gerechnet.
+   Eine Zeile ohne Betrag und ohne Faktor fällt weg, statt etwas zu erfinden. */
+function _rechenweg(staffel) {
+  if (!Array.isArray(staffel)) return null;
+  const z = staffel.map(function (x) {
+    if (!x || typeof x.pos !== 'string') return null;
+    const wert = _n(x.wert), faktor = _n(x.faktor);
+    if (wert == null && faktor == null) return null;
+    return { pos: _kunde(x.pos, 140), detail: _kunde(x.detail, 140), wert: wert == null ? null : Math.round(wert), faktor: faktor, summe: !!x.summe };
+  }).filter(function (x) { return x && x.pos; });
+  return z.length >= 3 ? z.slice(0, 28) : null;
+}
 function wertAus(out) {
   const p = (out && out.data) || {}, cc = p.cross_check || {}, lv = p.land_value || {}, ref = p.ref || {};
   if (!(Number(ref.wert_stufe) >= 3) || cc.nicht_im_umfang) return { verfuegbar: false, grund: 'nicht_im_umfang' };
@@ -838,7 +851,7 @@ function wertAus(out) {
       herkunft: _kunde(wh.kurz || wh.klartext, 160) || (st ? STUFE_TEXT[st] : null),
       indikativ: !!(wh.indikativ || ew.indikativ_wegen_zins || (st && st !== 'A')),
       rnd_j: _jahr(ew.restnutzungsdauer_jahre), gnd_j: _jahr(ew.gesamtnutzungsdauer_jahre), miete_qm: _n(ew.miete_qm),
-      weg: wh.unter_a && wh.weg && wh.weg.text ? _kunde(wh.weg.text, 300) : null });
+      weg: wh.unter_a && wh.weg && wh.weg.text ? _kunde(wh.weg.text, 300) : null, rechenweg: _rechenweg(ew.staffel) });
   } else {
     aus.verfahren.push({ art: 'ertragswert', name: VERFAHREN_NAME.ertragswert, verfuegbar: false, grund: _kunde(ew.grund, 320) || 'Nicht ausgewiesen.' });
   }
@@ -849,7 +862,7 @@ function wertAus(out) {
       marktangepasst: !!sw.marktangepasst, swf: _n(sw.sachwertfaktor),
       bezeichnung: _kunde(sw.bezeichnung, 120),
       herkunft: sw.marktangepasst ? 'Sachwertfaktor des Gutachterausschusses' : 'ohne Sachwertfaktor, vorläufiger Sachwert, kein Marktwert',
-      indikativ: true, rnd_j: _jahr(sw.restnutzungsdauer_jahre), gnd_j: _jahr(sw.gnd_jahre) });
+      indikativ: true, rnd_j: _jahr(sw.restnutzungsdauer_jahre), gnd_j: _jahr(sw.gnd_jahre), rechenweg: _rechenweg(sw.staffel) });
   } else {
     aus.verfahren.push({ art: 'sachwert', name: VERFAHREN_NAME.sachwert, verfuegbar: false, nicht_massgeblich: !!sw.nicht_massgeblich,
       grund: _kunde(sw.grund, 320) || 'Nicht ausgewiesen.' });
