@@ -45730,3 +45730,10 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** staging 0733cb84 · main dad5ffad, Version 98e82305 (1.0.224). Sicherung haupt-/mb-20261125-1140-v4900 (7,1/31 MB, Kopf gelesen). Prod-Backend zweimal gebaut (paralleler Build hatte den Tag überschrieben), läuft mit dem neuen Code, healthy.
 - **Nachweis:** Staging Hauptstr. 51 Anker MPI 1.035.000, Westerfeldstr. 146 unverändert 740.000. Prüfer: wertvergleich 22/22, flow-berechnen RC 0 (Basislinie 19 mit Ursache), score-ketten 216, prompt-lecks, ki-text-zahlen 50/50, ki-deckel, buster-ebenen.
 - **Rest:** Hauptstr. 51 braucht Objektart MFH/Wohn- und Geschäftshaus und Ist-Miete je Einheit für ein Verfahren (Entscheidung am Objekt).
+
+### v4930 · Betriebs-Mails an support@ (Fork F5, 25.11.2026)
+
+- **Was:** `backend/src/services/betrieb.js` Empfänger `BETRIEB_MAIL_TO` (Rückfall `ADMIN_EMAIL`, das weiter den Admin-Bootstrap steuert). `.env` Prod und Staging: `BETRIEB_MAIL_TO`, `ABLAGE_WARN_TO`, `CREDIT_ALERT_TO` = support@dealpilot.immo.
+- **Commit:** staging `1a110185`, main `0a834f58`. Keine neue Version gestempelt (nur Backend).
+- **Nachweis:** betrieb-pruefen 47/47, printenv im Container, Backend healthy auf beiden, Test-Mail Prod an support@ versendet. Sicherungen `env-vor-v4930-*`, `haupt-/mb-20261125-1257-v4930`.
+- **Rest:** Hauptstr. 51 (Staging) jetzt MFH mit Stufe-3-Bericht 618, Ertragswert 1.265.000 € führend, aber „vorläufig vor BoG“ → Anker bleibt Marktpreisindikation 955.000 € (Entscheidung offen), siehe wissen/2026-11-25.md.
