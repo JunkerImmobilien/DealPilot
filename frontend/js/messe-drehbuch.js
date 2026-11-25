@@ -10793,10 +10793,10 @@
   DREHBUECHER['neu-objekt-cockpit'] = {
     titel: 'Das Objekt-Cockpit', unterzeile: 'Dein Objekt im Bestand, Reiter für Reiter', objekt: null,
     abspann: [{ ms: 6200, html: ABSPANN_LOGO }],
-    aufraeumen: function () { k5EkrZurueck(); rhAufraeumen(); },
+    aufraeumen: function () { k5EkrZurueck(); rhAufraeumen(); try { l6OriginalZu(); } catch (e) {} },
     szenen: [
       async function (s) {   /* 1 · gewonnen öffnet im Cockpit */
-        await k5Cockpit();
+        await l6Original(R11_WESTERFELD);   /* L6: echte Westerfeldstr. 140 (Stufe-3-Bericht) statt Kopie */
         await zeige(function () { return q('nav.tabs .tab[data-target-sec="s5"]'); }, 8);
         await b2oZeile(s, 'Gewonnen heißt Bestand', 'Ein gewonnenes Objekt öffnet direkt im <b>Objekt-Cockpit</b>, ganz vorne und in Gold.');
       },
@@ -10954,6 +10954,23 @@
      damit vorhandene Tonspuren und Storybook-Seiten gültig bleiben. Texte ohne Gedankenstriche. */
   /* Karte statt einzelner Zeile: erst .dp-pa-card, sonst nach oben bis 420 px Höhe */
   function l6Karte(re) { return function () { var e = rhIm(k5Panel(), re); return e && (e.closest('.dp-pa-card') || k5Eng(e, 420)); }; }
+  /* Marcel 25.11.: Aufnahmen mit Stufe-3-Bericht an der ECHTEN Westerfeldstr. 140 (Bericht hängt an der Objekt-ID,
+     Kopien haben keinen). Speichern im Lauf stumm, Stand vorher gemerkt, nach dem Lauf verglichen (Konsole). */
+  async function l6Original(id) {
+    await rhNurStart();
+    if (typeof window.saveObj === 'function' && !window.__l6Save) { window.__l6Save = window.saveObj; window.saveObj = async function () { return null; }; }
+    try { var l = await Auth.apiCall('/objects'); var o = ((l && l.items) || []).filter(function (x) { return x.id === id; })[0]; window.__l6Vorher = o ? { id: id, upd: o.updated_at } : null; } catch (e) { window.__l6Vorher = null; }
+    if (typeof window.loadSaved === 'function') await window.loadSaved(id);
+    await warteAuf(function () { return window._currentObjKey === id && q('nav.tabs .tab[data-target-sec="s5"]'); }, 9000);
+    if (!q('#s5.active')) { reiter('s5'); await warte(900); }
+    await warteAuf(function () { return q('#ai-content .dp-pa-tab'); }, 10000);
+    await warte(800);
+  }
+  function l6OriginalZu() {
+    try { if (window.__l6Save) { window.saveObj = window.__l6Save; window.__l6Save = null; } } catch (e) {}
+    var v = window.__l6Vorher; window.__l6Vorher = null;
+    if (v) setTimeout(function () { Auth.apiCall('/objects').then(function (l) { var o = ((l && l.items) || []).filter(function (x) { return x.id === v.id; })[0]; console.log('[L6] Datensatz ' + v.id + (o && o.updated_at === v.upd ? ' unverändert' : ' GEÄNDERT ' + v.upd + ' -> ' + (o && o.updated_at))); }); }, 1500);
+  }
   async function l6Ankauf() {   /* Ankauf-Kopie der Parkstr. 9, Pilot-Analyse offen */
     await r6KopieStart(R11_PARK, { ohneAnkauf: true });
     reiter('s5'); await warte(1200);
@@ -10983,12 +11000,12 @@
   }
 
   DREHBUECHER['neu-pilot-analyse'] = {
-    titel: 'Die Pilot-Analyse', unterzeile: 'Im Ankauf, Reiter für Reiter, einfach oder im Detail', objekt: null,
+    titel: 'Die Pilot-Analyse', unterzeile: 'Reiter für Reiter, einfach oder im Detail', objekt: null,
     abspann: [{ ms: 6200, html: ABSPANN_LOGO }],
-    aufraeumen: function () { k5EkrZurueck(); rhAufraeumen(); },
+    aufraeumen: function () { k5EkrZurueck(); rhAufraeumen(); l6OriginalZu(); },
     szenen: [
       async function (s) {   /* 1 · Übersicht */
-        await l6Ankauf();
+        await l6Original(R11_WESTERFELD);   /* echte Westerfeldstr. 140 mit Stufe-3-Bericht */
         await k5Tab(/^Übersicht/);
         await zeige(function () { var e = qs('#s5 [data-dp-ekr]'); return (e && k5Eng(e, 260)) || l6Karte(/führend|Kaufpreis/)(); }, 8);
         await b2oZeile(s, 'Die Übersicht', 'Kaufpreis, maßgebender Wert mit führendem Verfahren, DSCR, Cashflow und EK-Rendite. Dazu der Investor Deal Score in zwei Teilen.');
@@ -11120,10 +11137,10 @@
   DREHBUECHER['neu-zielbild'] = {
     titel: 'Mieterhöhung und Zielbild', unterzeile: 'Was rechtlich höchstens geht, in einer Tabelle', objekt: null,
     abspann: [{ ms: 6200, html: ABSPANN_LOGO }],
-    aufraeumen: function () { rhAufraeumen(); },
+    aufraeumen: function () { rhAufraeumen(); l6OriginalZu(); },
     szenen: [
       async function (s) {   /* 1 · Tabelle (Westerfeldstr., Bestand) */
-        await l6Cockpit(R11_WESTERFELD);
+        await l6Original(R11_WESTERFELD);
         await k5Tab(/Ankauf · Bestand/);
         await zeige(function () { var p = k5Panel(); return p && p.querySelector('table'); }, 8);
         await b2oZeile(s, 'Eine Tabelle', 'Ankauf, heute, nach Mieterhöhung und Zielbild. Abweichungen sind markiert, Texte darunter gibt es nicht mehr.');
