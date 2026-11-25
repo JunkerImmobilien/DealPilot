@@ -11151,10 +11151,10 @@
         await l6Original(R11_WESTERFELD);
         await l6Tab(/Ankauf · Bestand/);
         await zeige(function () { var p = k5Panel(); return p && p.querySelector('table'); }, 8);
-        await b2oZeile(s, 'Eine Tabelle', 'Ankauf, heute, nach Mieterhöhung und Zielbild. Abweichungen sind markiert, Texte darunter gibt es nicht mehr.');
+        await b2oZeile(s, 'Eine Tabelle', 'Ankauf, heute, nach Mieterhöhung und Zielbild. Abweichungen sind markiert.');
       },
       async function (s) {   /* 2 · Investorenlogik */
-        await b2oZeile(s, 'Gerechnet als Investor', 'Im Bestand bis zum Oberwert des Mietspiegels über die Kappungsgrenze. Bei Neuvermietung Oberwert plus zehn Prozent mit Mietpreisbremse.');
+        await b2oZeile(s, 'Gerechnet als Investor', 'Im Bestand bis zum Oberwert des Mietspiegels, gedeckelt durch die Kappungsgrenze. Bei Neuvermietung Oberwert plus zehn Prozent mit Mietpreisbremse.');
       },
       async function (s) {   /* 3 · Aufteilung */
         var a = function () { var e = rhIm(k5Panel(), /Wert nach Aufteilung/); return e && (e.closest('tr') || e); };
