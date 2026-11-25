@@ -1045,7 +1045,7 @@
      Ein einzelnes „–“ als Platzhalter für „kein Wert“ bleibt. */
   function ohneStriche(html) {
     return String(html).replace(/>([^<]+)</g, function (m, t) {
-      return '>' + t.replace(/\s[–—]\s/g, ', ').replace(/^\s*[–—]\s+(?=\S)/, '').replace(/;\s/g, ', ') + '<';
+      return '>' + t.replace(/\s[–—]\s/g, ', ').replace(/^\s*[–—]\s+(?=\S)/, '').replace(/(&[#a-zA-Z0-9]+;)|;\s/g, function (x, ent) { return ent || ', '; }) + '<';   /* v4790l · Entitäten wie &amp; bleiben */
     });
   }
   async function investmentNeu(fassung) {
@@ -1138,7 +1138,7 @@
 
     /* 5 · Wert und Rechenweg */
     _knapp = true;
-    try { var rw = rechenweg(B, P3, !kombi); add('Wert, Verfahren und Rechenweg', 'Werte je Verfahren, Wert je Stufe, Ertrags- und Sachwert Zeile für Zeile', wertZielbild(K, B, WZo, PD, true, bankF) + (rw ? '<h3 style="break-before:page;page-break-before:always">Rechenweg</h3>' + rw : ''), 1); } finally { _knapp = false; }
+    try { var rw = rechenweg(B, P3, !kombi); add(rw ? 'Wert, Verfahren und Rechenweg' : 'Wert und Verfahren', rw ? 'Werte je Verfahren, Wert je Stufe, Ertrags- und Sachwert Zeile für Zeile' : 'Werte je Verfahren und Wert je Stufe', wertZielbild(K, B, WZo, PD, true, bankF) + (rw ? '<h3 style="break-before:page;page-break-before:always">Rechenweg</h3>' + rw : ''), 1); } finally { _knapp = false; }
 
     /* 6 · Rendite und Steuer (nicht in der Bankfassung) */
     if (!bankF) add('EK-Rendite und Hebel', 'Vier Stufen, Hebel in beide Richtungen', ekRenditeSeite(B, K), 1);
