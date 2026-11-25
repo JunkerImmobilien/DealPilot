@@ -420,7 +420,7 @@
         'font-size:11.5px;line-height:1.5}',
       '.mbst-info b{color:var(--wl-e8cc7a,#E8CC7A)}',
       /* v4630 · Vorabprüfung der amtlichen Daten */
-      '.mbst-tiefe{margin-top:9px;padding:8px 10px;border-radius:6px;border:1px solid rgba(201,168,76,.22);font-size:11.5px;line-height:1.5}',
+      '.mbst-tiefe{margin-top:9px;padding:8px 10px;border-radius:6px;border:1px solid rgba(127,127,127,.3);font-size:11.5px;line-height:1.5}',
       '.mbst-tiefe-t{font:600 9.5px/1.3 var(--mono,monospace);letter-spacing:.08em;text-transform:uppercase;opacity:.75;margin-bottom:3px}',
       '.mbst-tiefe-z{display:grid;grid-template-columns:14px 1fr;gap:6px;margin-top:4px}',
       '.mbst-tiefe-z span:first-child{font-weight:700;text-align:center}',
