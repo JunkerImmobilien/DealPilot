@@ -423,7 +423,7 @@
           || (zahl(_sb.mpiOhne) != null && d.berichtOhne != null && Math.abs(zahl(_sb.mpiOhne) - d.berichtOhne) >= 500))) {
         doc.setFont('helvetica', 'italic'); doc.setFontSize(6.8); setT(f.grau);
         var _hz = doc.splitTextToSize(sauber('Die Stufen sind mit den Angebotspreisen vom ' + new Date().toLocaleDateString('de-DE')
-          + ' neu gerechnet; die Werte je Verfahren oben stammen aus dem Marktbericht' + (d.berichtDatum ? ' vom ' + d.berichtDatum : '')
+          + ' neu gerechnet, die Werte je Verfahren oben stammen aus dem Marktbericht' + (d.berichtDatum ? ' vom ' + d.berichtDatum : '')
           + '. Kaufpreis- und Angebotsniveau können deshalb leicht abweichen.'), B);
         platz(_hz.length * 3 + 2);
         doc.text(_hz, x, y + 3.2); y += _hz.length * 3 + 1;

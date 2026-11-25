@@ -383,7 +383,7 @@
         '<div class="bi-bar"><span class="bi-t">📎 ' + (_modus === 'wk' ? 'Belege prüfen und übernehmen' : 'Belege importieren') + '</span>' +
           '<span class="bi-obj" title="Für dieses Objekt wird übernommen">Objekt: ' + _esc(_objektName()) + '</span>' +   /* v3155 */
           '<button class="bi-x" type="button" onclick="DealPilotBelegImport.close()" aria-label="Schließen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>' + /* v1116-x */
-        '<div class="bi-hero">KI liest Datum · Betrag · USt · Aussteller · Kategorie — du bestätigst jede Zeile, bevor sie in die ' + (_modus === 'wk' ? 'Werbungskosten' : 'Anschaffungskosten') + ' fließt.</div>' +   /* v2273: im WK-Modus stand hier „Anschaffungskosten“ */
+        '<div class="bi-hero">KI liest Datum · Betrag · USt · Aussteller · Kategorie, du bestätigst jede Zeile, bevor sie in die ' + (_modus === 'wk' ? 'Werbungskosten' : 'Anschaffungskosten') + ' fließt.</div>' +   /* v2273: im WK-Modus stand hier „Anschaffungskosten“ */
         '<div class="bi-body">' +
           '<div class="bi-drop" id="bi-drop">' +
             '<div class="bi-big">Ordner mit Belegen wählen</div>' +
@@ -565,9 +565,9 @@
     if (note) {
       var t = docCount + ' Datei(en) gelesen · ' + _rows.length + ' Position(en) erkannt. Prüfe jede Zeile, bevor du übernimmst.';
       if (nDup || nJunk) t += ' ' + nDup + ' doppelt und ' + nJunk + ' ohne Wert automatisch abgewählt.';
-      if (ohne.length) t += ' ' + ohne.length + ' Datei(en) ohne Ergebnis – rot markiert, sie werden NICHT übernommen.';
+      if (ohne.length) t += ' ' + ohne.length + ' Datei(en) ohne Ergebnis, rot markiert, sie werden NICHT übernommen.';
       var nPr = _rows.filter(function (r) { return r.pruefen && r.pruefen.length; }).length;
-      if (nPr) t += ' ' + nPr + ' Zeile(n) mit „prüfen" – Bild und Werte über das Vorschaubild vergleichen.';
+      if (nPr) t += ' ' + nPr + ' Zeile(n) mit „prüfen", Bild und Werte über das Vorschaubild vergleichen.';
       note.textContent = t;
     }
     if (!_rows.length && scan) { setT('Nichts erkannt.'); }
@@ -701,15 +701,15 @@
     if (_sa) return '<div class="bi-gruen" style="font-weight:500"><div style="font-weight:700;margin-bottom:4px">Schon übernommen am ' + _sa + ' – wird nicht noch einmal gebucht</div>Alle Positionen dieses Belegs stehen bereits im Reiter Steuer (Knopf „Belege je Jahr"). Ist es wirklich ein zweiter Beleg, die Positionen unten anhaken.</div>';
     var gp = _gegenprobe(nm), z = _zweit[nm], s = _sicher[nm], h = '';
     var zeile = function (ok, t) { return '<div style="margin:2px 0">' + (ok ? '✓ ' : '✗ ') + t + '</div>'; };
-    h += zeile(s === 'doppelt_gleich', s === 'doppelt_gleich' ? 'Zweimal unabhängig gelesen – gleiches Ergebnis'
-      : 'Zweimal gelesen – die Lesungen weichen ab' + (z && z.summe != null ? ' (andere Lesung: ' + _fmtEur(z.summe) + ' €)' : ''));
-    h += zeile(!!gp && gp.ok, gp ? 'Rechnungsbetrag laut Beleg ' + _fmtEur(gp.rechnungsbetrag) + ' € · ausgewählte Positionen ' + _fmtEur(gp.summe) + ' €' + (gp.ok ? '' : ' – passt nicht') : 'Kein Rechnungsbetrag erkannt – Summe nicht gegenprüfbar');
+    h += zeile(s === 'doppelt_gleich', s === 'doppelt_gleich' ? 'Zweimal unabhängig gelesen, gleiches Ergebnis'
+      : 'Zweimal gelesen, die Lesungen weichen ab' + (z && z.summe != null ? ' (andere Lesung: ' + _fmtEur(z.summe) + ' €)' : ''));
+    h += zeile(!!gp && gp.ok, gp ? 'Rechnungsbetrag laut Beleg ' + _fmtEur(gp.rechnungsbetrag) + ' € · ausgewählte Positionen ' + _fmtEur(gp.summe) + ' €' + (gp.ok ? '' : ' – passt nicht') : 'Kein Rechnungsbetrag erkannt, Summe nicht gegenprüfbar');
     if (_rows.some(function (r) { return r.name === nm && r.hand != null; })) h += zeile(false, 'Betrag von Hand geändert');
     var sicher = _dateiSicher(nm);
     var box = '<div class="' + (sicher || _geprueft[nm] ? 'bi-gruen' : 'bi-gelb') + '" style="font-weight:500">'
-      + '<div style="font-weight:700;margin-bottom:4px">' + (sicher ? 'Sicher – wird übernommen' : (_geprueft[nm] ? 'Von dir bestätigt – wird übernommen' : 'Nicht sicher – wird erst nach deiner Bestätigung übernommen')) + '</div>' + h;
+      + '<div style="font-weight:700;margin-bottom:4px">' + (sicher ? 'Sicher, wird übernommen' : (_geprueft[nm] ? 'Von dir bestätigt, wird übernommen' : 'Nicht sicher, wird erst nach deiner Bestätigung übernommen')) + '</div>' + h;
     if (!sicher) box += '<label style="display:flex;gap:8px;align-items:flex-start;margin-top:8px;font-weight:700;cursor:pointer"><input type="checkbox"' + (_geprueft[nm] ? ' checked' : '')
-      + ' onchange="DealPilotBelegImport._pruefung(this.checked)" style="margin-top:2px"> Ich habe die Positionen mit dem Bild links verglichen – Beträge und Kategorien stimmen.</label>';
+      + ' onchange="DealPilotBelegImport._pruefung(this.checked)" style="margin-top:2px"> Ich habe die Positionen mit dem Bild links verglichen, Beträge und Kategorien stimmen.</label>';
     return box + '</div>';
   }
   function _planWk() {
@@ -746,8 +746,8 @@
       h = '<table><thead><tr><th>Wohin</th><th class="num">bisher</th><th class="num">aus den Belegen</th><th class="num">neu</th></tr></thead><tbody>'
         + (p.zeilen.map(function (z) {
             if (z.zins) return '<tr><td><b>Steuer ' + z.jahr + '</b> · ' + _esc(z.label) + '</td><td class="num">' + eur(z.neu) + '<div class="bi-k">' + (z.override != null ? 'eingetragen' : 'aus dem Tilgungsplan') + '</div></td><td class="num">' + eur(z.betrag) + '<div class="bi-k">wird geprüft, nicht addiert</div></td><td class="num"><b>' + eur(z.neu) + '</b><div class="bi-k">bleibt angesetzt</div></td></tr>';   /* v4340b */
-            var bisher = z.override != null ? eur(z.override) + '<div class="bi-k">eingetragen – wird addiert</div>'
-              : (z.auto > 0 ? eur(z.auto) + '<div class="bi-k">Schätzung der App – der Beleg ersetzt sie</div>' : '–');
+            var bisher = z.override != null ? eur(z.override) + '<div class="bi-k">eingetragen, wird addiert</div>'
+              : (z.auto > 0 ? eur(z.auto) + '<div class="bi-k">Schätzung der App, der Beleg ersetzt sie</div>' : '–');
             return '<tr><td><b>Steuer ' + z.jahr + '</b> · ' + _esc(z.label) + '</td><td class="num">' + bisher + '</td><td class="num">' + (z.betrag < 0 ? '− ' : '+ ') + eur(Math.abs(z.betrag)) + '</td><td class="num"><b>' + eur(z.neu) + '</b></td></tr>';
           }).join('') || '<tr><td colspan="4" class="bi-k">Noch nichts ausgewählt.</td></tr>') + '</tbody></table>';
       var nicht = [];
@@ -756,8 +756,8 @@
       if (_leer.length) nicht.push('nicht gelesen: ' + _leer.map(function (x) { return x.name; }).join(', '));
       if (p.offen.length) nicht.unshift('noch nicht bestätigt: ' + p.offen.join(', '));   /* v3156 */
       if (nicht.length) h += '<div class="bi-nicht"><b>Wird nicht übernommen:</b> ' + nicht.map(_esc).join(' · ') + '</div>';
-      h += '<div class="bi-nicht">Die Belege selbst werden nicht gespeichert – nur die übernommenen Werte.</div>';   /* v3163 */
-      if (p.fremd.length) h += '<div class="bi-nicht">Für ' + p.fremd.join(', ') + ' führt der Reiter Steuer noch kein Jahr – der Wert wird hinterlegt und erscheint, sobald der Zeitraum so weit reicht.</div>';
+      h += '<div class="bi-nicht">Die Belege selbst werden nicht gespeichert, nur die übernommenen Werte.</div>';   /* v3163 */
+      if (p.fremd.length) h += '<div class="bi-nicht">Für ' + p.fremd.join(', ') + ' führt der Reiter Steuer noch kein Jahr, der Wert wird hinterlegt und erscheint, sobald der Zeitraum so weit reicht.</div>';
     } else {
       var a = _aggregate(), f = Object.keys(a.byField); n = f.length;
       h = '<table><thead><tr><th>Wohin</th><th class="num">bisher</th><th class="num">aus den Belegen</th><th class="num">neu (addiert)</th></tr></thead><tbody>'
@@ -795,11 +795,11 @@
     var bild = bilder.length ? bilder.slice(0, 12).map(function (src, k) { return '<img src="' + src + '" alt="Seite ' + (k + 1) + '">'; }).join('') : '<div class="bi-k" style="padding:30px;text-align:center">Keine Bildansicht (Tabelle).</div>';
     var rechts;
     if (st0.cls === 'rot') {
-      rechts = '<div class="bi-rot">⚠ Aus dieser Datei konnte nichts gelesen werden' + (st0.grund ? ' (' + _esc(st0.grund) + ')' : '') + '. Auch der zweite Leseversuch ergab keinen Betrag.<br>Sie wird nicht übernommen – bitte links ansehen und die Beträge von Hand im Reiter Steuer eintragen.</div>'
+      rechts = '<div class="bi-rot">⚠ Aus dieser Datei konnte nichts gelesen werden' + (st0.grund ? ' (' + _esc(st0.grund) + ')' : '') + '. Auch der zweite Leseversuch ergab keinen Betrag.<br>Sie wird nicht übernommen, bitte links ansehen und die Beträge von Hand im Reiter Steuer eintragen.</div>'
         /* v3166 · Marcel 04.11.2026 („ja auf jeden Fall"): auf Klick das Bild dieses einen Belegs an die KI */
         + ((_bilder[_sel] || []).length ? '<div style="margin-top:12px;padding:12px;border:1px solid #e6e0d2;border-radius:8px;background:#fff;font-size:12.5px;line-height:1.45">'
           + '<b>Die Texterkennung hat auf dem Bild nichts gefunden</b> (oft bei zerknitterten oder schräg fotografierten Kassenbons). '
-          + 'Du kannst das Bild dieses einen Belegs direkt von der KI lesen lassen. Dabei wird nichts geschwärzt – nur verwenden, wenn auf dem Beleg keine Daten von Mietern stehen.'
+          + 'Du kannst das Bild dieses einen Belegs direkt von der KI lesen lassen. Dabei wird nichts geschwärzt, nur verwenden, wenn auf dem Beleg keine Daten von Mietern stehen.'
           + '<div style="margin-top:10px"><button type="button" class="btn btn-gold btn-sm" id="bi-bild-knopf" onclick="DealPilotBelegImport._bildLesen(' + _liste.indexOf(_sel) + ',this)">Bild von der KI lesen lassen</button></div></div>' : '');
     } else {
       var idx = []; _rows.forEach(function (r, i) { if (r.name === _sel) idx.push(i); });
@@ -822,7 +822,7 @@
     var z = _zielHtml();
     box.innerHTML = '<div class="bi-leiste">' + leiste + '</div>'
       + '<div class="bi-detail"><div class="bi-bild">' + bild + '</div><div class="bi-werte">' + rechts + '</div></div>'
-      + '<div class="bi-ziel-box"><div class="bi-h">Was übernommen wird – und wohin</div>' + z.html + '</div>'
+      + '<div class="bi-ziel-box"><div class="bi-h">Was übernommen wird, und wohin</div>' + z.html + '</div>'
       + '<div class="bi-sums" id="bi-sums"></div><div id="bi-ampel"></div>';
     var take = document.getElementById('bi-take');
     if (take) { take.disabled = !z.anzahl; if (_modus === 'wk') take.textContent = z.anzahl ? z.anzahl + (z.anzahl === 1 ? ' Wert übernehmen' : ' Werte übernehmen') : 'Nichts zu übernehmen'; }
@@ -843,7 +843,7 @@
     } catch (e) {}
     if (!poss.length) {
       if (btn) { btn.disabled = false; btn.textContent = 'Bild von der KI lesen lassen'; }
-      try { if (window.toast) window.toast('Auch aus dem Bild ließ sich nichts sicher lesen – bitte die Beträge von Hand eintragen.'); } catch (e) {}
+      try { if (window.toast) window.toast('Auch aus dem Bild ließ sich nichts sicher lesen, bitte die Beträge von Hand eintragen.'); } catch (e) {}
       return;
     }
     if (x.rechnungsbetrag > 0) _betrag[nm] = x.rechnungsbetrag;
@@ -852,7 +852,7 @@
     for (var z = vorher; z < _rows.length; z++) _rows[z].bild = true;
     _leer = _leer.filter(function (l) { return l.name !== nm; });
     _flagRows(); _pruefen();
-    _rows.forEach(function (r) { if (r.bild) r.pruefen.push('direkt aus dem Bild gelesen (Kassenbon) – bitte mit dem Bild links vergleichen'); });
+    _rows.forEach(function (r) { if (r.bild) r.pruefen.push('direkt aus dem Bild gelesen (Kassenbon), bitte mit dem Bild links vergleichen'); });
     _sel = nm; _render();
   }
   function _keep(i, v) { if (_rows[i]) { _rows[i].keep = !!v; _render(); } }   /* v3155: Leiste, Gegenprobe und Ziel ziehen mit */
@@ -878,7 +878,7 @@
       if (r.netto > 0 && r.ust >= 0 && r.brutto > 0 && Math.abs(r.netto + r.ust - r.brutto) > Math.max(1, r.brutto * 0.01)) g.push('Netto + USt ergibt nicht den Bruttobetrag');
       var d = String(r.datum || '').trim();
       if (!d || d === '—' || !/\d/.test(d)) g.push('kein Rechnungsdatum erkannt');
-      if (!r.jahr) g.push('kein Jahr erkannt – bitte Datum prüfen');
+      if (!r.jahr) g.push('kein Jahr erkannt, bitte Datum prüfen');
       if (!r.aussteller || r.aussteller === '—') g.push('kein Aussteller erkannt');
       if (/nied|low/i.test(String(r.konfidenz || ''))) g.push('die Lesung war unsicher');
       if (r.brutto > 25000) g.push('ungewöhnlich hoher Betrag');
@@ -887,7 +887,7 @@
          Verpflegungspauschale abgegolten. Üblich ist ein Abzug von 20 % des vollen Tagessatzes (Inland 5,60 €) je
          Frühstück. Wie viele Nächte es waren, steht nicht sicher auf jeder Rechnung - deshalb benannt, nicht gerechnet. */
       if (r.kategorie === 'Übernachtung / Hotel' && /fr(ü|ue)hst|breakfast|\binkl\b.*fr|b\s*&\s*b|\bbb\b/i.test(String(r.beschreibung || '')))
-        g.push('Übernachtung inklusive Frühstück: der Frühstücksanteil gehört nicht zu den Übernachtungskosten – üblich 5,60 € je Frühstück abziehen (Betrag anklicken und ändern)');
+        g.push('Übernachtung inklusive Frühstück: der Frühstücksanteil gehört nicht zu den Übernachtungskosten, üblich 5,60 € je Frühstück abziehen (Betrag anklicken und ändern)');
       r.pruefen = g;
       if (!r.jahr && _modus === 'wk') r.keep = false;
     });
@@ -903,10 +903,10 @@
         var andere = g.filter(function (x) { return x !== r && !x.summe; });
         var summe = andere.reduce(function (a, x) { return a + (x.brutto || 0); }, 0);
         if (andere.length >= 2 && r.brutto > 0 && Math.abs(r.brutto - summe) <= Math.max(0.5, r.brutto * 0.01)) {
-          r.summe = true; r.keep = false; r.pruefen.push('ist die Summe der übrigen Positionen – nicht zusätzlich übernommen'); return;
+          r.summe = true; r.keep = false; r.pruefen.push('ist die Summe der übrigen Positionen, nicht zusätzlich übernommen'); return;
         }
         if (/gesamtrechnung|gesamtbetrag|rechnungsbetrag|endbetrag|\btotal\b|^\s*summe/i.test(String(r.beschreibung || ''))) {
-          r.keep = false; r.pruefen.push('sieht nach dem Gesamtbetrag aus – nicht zusätzlich zu den Einzelpositionen übernehmen');
+          r.keep = false; r.pruefen.push('sieht nach dem Gesamtbetrag aus, nicht zusätzlich zu den Einzelpositionen übernehmen');
         }
         var vorher = g.slice(0, k).filter(function (x) { return x.kategorie === r.kategorie && Math.abs((x.brutto || 0) - (r.brutto || 0)) < 0.01; });
         if (vorher.length) { r.keep = false; r.pruefen.push('möglicherweise doppelt (gleicher Betrag und gleiche Kategorie, oft von Seite 2)'); }
@@ -918,7 +918,7 @@
       var rb = _betrag[nm], g = _rows.filter(function (r) { return r.name === nm && !r.junk; });
       if (!(rb > 0) || !g.length) return;
       if (g.length > 1) g.forEach(function (r) {
-        if (r.keep && Math.abs(r.brutto - rb) < 0.01) { r.summe = true; r.keep = false; r.pruefen.push('trägt genau den Rechnungsbetrag – das ist die Gesamtzeile, nicht zusätzlich übernommen'); }
+        if (r.keep && Math.abs(r.brutto - rb) < 0.01) { r.summe = true; r.keep = false; r.pruefen.push('trägt genau den Rechnungsbetrag, das ist die Gesamtzeile, nicht zusätzlich übernommen'); }
       });
       var sum = g.filter(function (r) { return r.keep || /Verpflegung|Rücklage/.test(r.kategorie); }).reduce(function (a, r) { return a + (r.brutto || 0); }, 0);
       var ok = Math.abs(sum - rb) <= Math.max(1, rb * 0.01);
@@ -943,7 +943,7 @@
           buch.splice(i, 1);
           r.schon = String(b.am || '').split('-').reverse().join('.');
           r.keep = false;
-          r.pruefen.push('schon am ' + r.schon + ' übernommen – wird nicht noch einmal gebucht (anhaken, falls es wirklich ein zweiter Beleg ist)');
+          r.pruefen.push('schon am ' + r.schon + ' übernommen, wird nicht noch einmal gebucht (anhaken, falls es wirklich ein zweiter Beleg ist)');
           break;
         }
       });
@@ -967,13 +967,13 @@
     var h = []; alle.forEach(function (x) { (x.pruefen || []).forEach(function (g) { if (h.indexOf(g) < 0) h.push(g); }); });
     var gew = alle.filter(function (x) { return x.keep; }).reduce(function (a, x) { return a + (x.brutto || 0); }, 0);
     if (_betrag[r.name] > 0) h.unshift('Rechnungsbetrag laut Beleg: ' + _fmtEur(_betrag[r.name]) + ' € · Summe der Positionen: ' + _fmtEur(r.gegenprobe ? r.gegenprobe.summe : gew) + ' € – ' + (r.gegenprobe && r.gegenprobe.ok ? 'passt ✓' : 'passt NICHT'));
-    h.push('Ausgewählt aus dieser Datei: ' + _fmtEur(gew) + ' € brutto – bitte mit dem Rechnungsbetrag auf dem Bild vergleichen.');   /* v3154c */
+    h.push('Ausgewählt aus dieser Datei: ' + _fmtEur(gew) + ' € brutto, bitte mit dem Rechnungsbetrag auf dem Bild vergleichen.');   /* v3154c */
     window.DpEingang.vorschau({ titel: r.name, bilder: _bilder[r.name] || null, werte: werte, hinweise: h });
   }
   function _ansehenLeer(k) {
     var x = _leer[k]; if (!x || !window.DpEingang || !window.DpEingang.vorschau) return;
     window.DpEingang.vorschau({ titel: x.name, bilder: _bilder[x.name] || null, werte: [],
-      warnung: 'Aus dieser Datei konnte auch im zweiten Versuch nichts gelesen werden' + (x.grund ? ' (' + x.grund + ')' : '') + '. Sie wird nicht übernommen – bitte die Beträge von Hand im Reiter Steuer eintragen.' });
+      warnung: 'Aus dieser Datei konnte auch im zweiten Versuch nichts gelesen werden' + (x.grund ? ' (' + x.grund + ')' : '') + '. Sie wird nicht übernommen, bitte die Beträge von Hand im Reiter Steuer eintragen.' });
   }
   function _mini(name, onclick) {
     var b = _bilder[name];
@@ -1044,15 +1044,15 @@
       ampel.text = '15-Prozent-Pruefung: Gebaeude-Anschaffungskosten noch nicht berechnet';
     } else {
       if (sanierung <= 0) {
-        ampel.html = 'Keine Instandsetzungs-/Modernisierungsbelege — 15-%-Grenze nicht berührt. Grenze: ' + _fmtEur(grenze) + ' € netto (15 % der Gebäude-Anschaffungskosten ' + _fmtEur(gebAk) + ' €).';
+        ampel.html = 'Keine Instandsetzungs-/Modernisierungsbelege, 15-%-Grenze nicht berührt. Grenze: ' + _fmtEur(grenze) + ' € netto (15 % der Gebäude-Anschaffungskosten ' + _fmtEur(gebAk) + ' €).';
         ampel.text = 'keine Sanierung; Grenze ' + _fmtEur(grenze) + ' EUR netto';
       } else if (sanNetto <= grenze) {
         ampel.cls = 'g';
-        ampel.html = '<strong>Grün:</strong> Instandsetzung ' + _fmtEur(sanNetto) + ' €' + _nt + ' liegt unter der Grenze von ' + _fmtEur(grenze) + ' € netto (15 % der Gebäude-Anschaffungskosten). Fällt i.d.R. als Erhaltungsaufwand sofort abziehbar an — Erweiterungen und Standardhebungen ausgenommen.';
+        ampel.html = '<strong>Grün:</strong> Instandsetzung ' + _fmtEur(sanNetto) + ' €' + _nt + ' liegt unter der Grenze von ' + _fmtEur(grenze) + ' € netto (15 % der Gebäude-Anschaffungskosten). Fällt i.d.R. als Erhaltungsaufwand sofort abziehbar an, Erweiterungen und Standardhebungen ausgenommen.';
         ampel.text = 'GRUEN: Erhaltungsaufwand (' + _fmtEur(sanNetto) + ' netto <= Grenze ' + _fmtEur(grenze) + ' EUR)';
       } else {
         ampel.cls = 'r';
-        ampel.html = '<strong>Rot:</strong> Instandsetzung ' + _fmtEur(sanNetto) + ' €' + _nt + ' überschreitet die Grenze von ' + _fmtEur(grenze) + ' € netto (15 % der Gebäude-Anschaffungskosten) — dann sind ALLE diese Aufwendungen anschaffungsnahe Herstellungskosten (§ 6 Abs. 1 Nr. 1a EStG) → über die AfA statt Sofortabzug. Bitte steuerlich prüfen.';
+        ampel.html = '<strong>Rot:</strong> Instandsetzung ' + _fmtEur(sanNetto) + ' €' + _nt + ' überschreitet die Grenze von ' + _fmtEur(grenze) + ' € netto (15 % der Gebäude-Anschaffungskosten), dann sind ALLE diese Aufwendungen anschaffungsnahe Herstellungskosten (§ 6 Abs. 1 Nr. 1a EStG) → über die AfA statt Sofortabzug. Bitte steuerlich prüfen.';
         ampel.text = 'ROT: anschaffungsnahe HK (' + _fmtEur(sanNetto) + ' netto > Grenze ' + _fmtEur(grenze) + ' EUR)';
       }
     }
@@ -1140,7 +1140,7 @@
     var p = _planWk();
     if (!p.zeilen.length) { try { if (window.toast) window.toast('Nichts zu übernehmen.'); } catch (e) {} return; }
     if (typeof window.dpWkUebernehmen !== 'function') {
-      try { if (window.toast) window.toast('✗ Steuer-Modul nicht geladen — Seite neu laden.'); } catch (e) {}
+      try { if (window.toast) window.toast('✗ Steuer-Modul nicht geladen, Seite neu laden.'); } catch (e) {}
       return;
     }
     /* v3155 · kein window.confirm mehr: „Was übernommen wird – und wohin" steht vorher sichtbar im Fenster */

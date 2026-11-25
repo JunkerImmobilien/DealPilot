@@ -1223,7 +1223,7 @@
     zeile('davon Anteil an der Kaltmiete', (da(K.nkm_j) && K.nkm_j > 0) ? pct(K.bwk / K.nkm_j * 100, 1) : '-', { klein: true });
     if (_gs1895.length) {
       einleitung('Die mit (geschätzt) bezeichneten Posten hat DealPilot angesetzt, weil dazu keine '
-        + 'Angabe vorlag — als Anteil der Jahresmiete nach den hinterlegten Standardwerten. '
+        + 'Angabe vorlag, als Anteil der Jahresmiete nach den hinterlegten Standardwerten. '
         + 'Das kalkulatorische Mietausfallwagnis steckt in keiner Hausgeldabrechnung und wird '
         + 'deshalb immer angesetzt. Alle übrigen Zahlen dieses Abschnitts sind vorgelegte Werte.');
     }
@@ -1457,7 +1457,7 @@
       if (MFH.rndGew > 0) zeile('Restnutzungsdauer des Gebäudes (Anlage 2, indikativ)', Math.round(MFH.rndGew) + ' Jahre'
         + (MFH.rndInfo && MFH.rndInfo.gnd ? ' (GND ' + MFH.rndInfo.gnd + ')' : ''), { summe: true });
       var hin = MFH.sollAbJahr
-        ? 'Die Cashflow-Rechnung setzt die Soll-Miete ab Jahr ' + MFH.sollAbJahr + ' an; davor und danach gilt die hinterlegte Mietentwicklung.'
+        ? 'Die Cashflow-Rechnung setzt die Soll-Miete ab Jahr ' + MFH.sollAbJahr + ' an, davor und danach gilt die hinterlegte Mietentwicklung.'
         : 'Die Cashflow-Rechnung rechnet durchgehend mit der Ist-Miete - die Soll-Miete ist hier nur nachrichtlich.';
       absatz(hin, { groesse: 7.6, farbe: 130, zeile: 4.2 });
       y += 6;

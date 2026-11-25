@@ -23,9 +23,9 @@
 
   var AP = [
     ['AP 1', 'Zielfunktion', 'Barwert nach Steuer über alle Objekte, progressiv gekoppelt (§ 32a)'],
-    ['AP 2', 'Steuer-Rechenkern', 'AfA-Methodenwechsel, § 7b, V+V, Verlustverrechnung — im Objekt-Rechner vorhanden (calc.js, afa-engine.js)'],
+    ['AP 2', 'Steuer-Rechenkern', 'AfA-Methodenwechsel, § 7b, V+V, Verlustverrechnung, im Objekt-Rechner vorhanden (calc.js, afa-engine.js)'],
     ['AP 3', 'Normableitung', 'Normtext zu Rechengröße; Wahlrechte als Exklusionsrelation'],
-    ['AP 4', 'Datenfusion', 'Bewertungsquellen, Register der Zinssätze und Sachwertfaktoren — im Marktbericht vorhanden'],
+    ['AP 4', 'Datenfusion', 'Bewertungsquellen, Register der Zinssätze und Sachwertfaktoren, im Marktbericht vorhanden'],
     ['AP 5', 'Szenario-Engine', 'Vergleich fester Varianten über 10-Jahres-Barwert, Cashflow, Steuerlast'],
     ['AP 6', 'Heuristische Suche', 'Startheuristik, lokale Suche über Zuordnung und Zeitpunkt; Schwelle: unter 2 % zum Referenzoptimum kleiner Bestände'],
     ['AP 7', 'Restriktions- und Fristenmodell', 'Fristen und Freibeträge als verbrauchbare Budgets in gleitenden Fenstern'],

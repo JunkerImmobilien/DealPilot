@@ -581,7 +581,7 @@ function handleManualUpgrade(planId, interval) {
     'Bitte einmal manuell aktivieren.\n\nDanke!'
   );
   window.location.href = 'mailto:' + to + '?subject=' + subject + '&body=' + body;
-  if (typeof toast === 'function') toast('✓ Email-Anfrage geöffnet — der Admin schaltet deinen Plan frei');
+  if (typeof toast === 'function') toast('✓ Email-Anfrage geöffnet, der Admin schaltet deinen Plan frei');
 }
 
 /**
@@ -616,7 +616,7 @@ function handleManualUpgradeSafe(planId, interval) {
       '<div style="position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px" onclick="if(event.target===this)this.remove()">' +
         '<div style="background:#fff;border-radius:12px;max-width:560px;width:100%;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,0.4)">' +
           '<h3 style="margin:0 0 16px;color:#2A2727;font-size:18px">Plan-Wechsel zu ' + _escAttr(planLabel) + '</h3>' +
-          '<p style="margin:0 0 14px;color:#7A7370;font-size:13.5px;line-height:1.5">Plan-Wechsel läuft aktuell manuell per Email. Bitte sende uns folgende Nachricht — wir schalten dich umgehend frei.</p>' +
+          '<p style="margin:0 0 14px;color:#7A7370;font-size:13.5px;line-height:1.5">Plan-Wechsel läuft aktuell manuell per Email. Bitte sende uns folgende Nachricht, wir schalten dich umgehend frei.</p>' +
           '<div style="background:#F8F6F1;border-radius:8px;padding:12px;font-family:monospace;font-size:12px;color:#2A2727;line-height:1.5;margin-bottom:14px;white-space:pre-wrap;max-height:200px;overflow-y:auto">' +
             'An: <strong>' + _escAttr(to) + '</strong>\nBetreff: <strong>' + _escAttr(subject) + '</strong>\n\n' + _escAttr(body) +
           '</div>' +
@@ -679,7 +679,7 @@ function handleDowngradeToFree() {
     'ich möchte gerne meinen Plan zurück auf Free downgraden.\n\n' +
     'Mein Account:  ' + (user.email || '–') + '\n' +
     'Account-Name: ' + (user.name || '–') + '\n\n' +
-    'Bitte einmal manuell umstellen — Premium-Features sollen zum Ende des aktuellen Abrechnungszeitraums enden.\n\nDanke!';
+    'Bitte einmal manuell umstellen, Premium-Features sollen zum Ende des aktuellen Abrechnungszeitraums enden.\n\nDanke!';
 
   var mailto = 'mailto:' + to + '?subject=' + encodeURIComponent(subject) +
                '&body=' + encodeURIComponent(body);
@@ -692,7 +692,7 @@ function handleDowngradeToFree() {
     '<div style="position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px" onclick="if(event.target===this)this.remove()">' +
       '<div style="background:#fff;border-radius:12px;max-width:560px;width:100%;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,0.4)">' +
         '<h3 style="margin:0 0 16px;color:#2A2727;font-size:18px">Downgrade auf Free-Plan</h3>' +
-        '<p style="margin:0 0 14px;color:#7A7370;font-size:13.5px;line-height:1.5">Schade dass du downgraden möchtest. Bitte sende uns kurz die Nachricht — wir stellen dich zum Ende des Abrechnungszeitraums um.</p>' +
+        '<p style="margin:0 0 14px;color:#7A7370;font-size:13.5px;line-height:1.5">Schade dass du downgraden möchtest. Bitte sende uns kurz die Nachricht, wir stellen dich zum Ende des Abrechnungszeitraums um.</p>' +
         '<div style="background:#F8F6F1;border-radius:8px;padding:12px;font-family:monospace;font-size:12px;color:#2A2727;line-height:1.5;margin-bottom:14px;white-space:pre-wrap;max-height:200px;overflow-y:auto">' +
           'An: <strong>' + _escAttr(to) + '</strong>\nBetreff: <strong>' + _escAttr(subject) + '</strong>\n\n' + _escAttr(body) +
         '</div>' +
@@ -794,7 +794,7 @@ async function renderSubscriptionBadge() {
     var pill = document.createElement('span');
     pill.className = 'sb-user-plan-pill plan-' + sub.plan_id;
     pill.setAttribute('onclick', clickHandler);
-    pill.title = 'Aktueller Plan — Klick für Details';
+    pill.title = 'Aktueller Plan, Klick für Details';
     pill.textContent = label;
     userText.appendChild(pill);
   } catch (e) {
@@ -1004,7 +1004,7 @@ async function applyFeatureGates() {
   var kiButtons = document.querySelectorAll('.btn-gold[onclick*="qcAi"], #qc-ai-fill-all, .ai-btn');
   kiButtons.forEach(function(btn) {
     if (aiCreditsLeft === 0 || aiCreditsLeft === null) {
-      btn.setAttribute('title', 'KI nicht im aktuellen Plan verfügbar — Credit-Paket dazubuchen');
+      btn.setAttribute('title', 'KI nicht im aktuellen Plan verfügbar, Credit-Paket dazubuchen');
     } else if (aiCreditsLeft > 0 && aiCreditsLeft !== -1) {
       btn.setAttribute('title', aiCreditsLeft + ' KI-Credits verfügbar');
     }

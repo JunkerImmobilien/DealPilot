@@ -131,7 +131,7 @@
       })
       .then(function (r) {
         if (r === false) return false;   /* v3491 · Kundenstand */
-        if (typeof toast === 'function') toast('✓ Ankauf-Stand gespeichert — Korrektur mit Nachweis. Das Ist ist unverändert.');
+        if (typeof toast === 'function') toast('✓ Ankauf-Stand gespeichert, Korrektur mit Nachweis. Das Ist ist unverändert.');
         return true;
       })
       .catch(function (e) {
@@ -248,7 +248,7 @@
       + '</div>';
     var frei = _aktiv
       ? '<label class="ank-frei"><input type="checkbox" id="ank-freigabe"' + (_frei ? ' checked' : '')
-        + '> ' + (_frei ? 'Freigegeben — Speichern überschreibt den Ankauf-Stand (mit Nachweis)'
+        + '> ' + (_frei ? 'Freigegeben, Speichern überschreibt den Ankauf-Stand (mit Nachweis)'
                         : 'Gesperrt · zum nachträglichen Bearbeiten freigeben') + '</label>'
       : '';
     return '<div class="ank-ansicht-kopf ank-schlank ank-mit-wahl' + (_aktiv ? ' ank-soll' : '') + '" title="' + esc(erklaerung) + '">'
@@ -280,7 +280,7 @@
       bannerZeichnen();
       if (typeof toast === 'function') {
         toast(_frei
-          ? '⚠ Der Ankauf-Stand ist zum Bearbeiten frei. Beim Speichern wird er überschrieben — mit Nachweis.'
+          ? '⚠ Der Ankauf-Stand ist zum Bearbeiten frei. Beim Speichern wird er überschrieben, mit Nachweis.'
           : '✓ Ankauf-Stand wieder gesperrt.');
       }
     });

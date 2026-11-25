@@ -107,7 +107,7 @@
           '<div class="mf-r">' + badge + '<button class="mf-btn red" data-revoke="' + s.id + '">Widerrufen</button></div></div>';
       }).join('');
 
-      w.innerHTML = '<p class="mf-intro">Freigegebene Objekte kann ' + esc(brand) + ' einsehen und prüfen — du behältst die Kontrolle und kannst jederzeit widerrufen.</p>' +
+      w.innerHTML = '<p class="mf-intro">Freigegebene Objekte kann ' + esc(brand) + ' einsehen und prüfen, du behältst die Kontrolle und kannst jederzeit widerrufen.</p>' +
         '<p class="mf-label">Meine Objekte</p>' + objRows +
         (shRows ? '<p class="mf-label" style="margin-top:20px">Bereits freigegeben</p>' + shRows : '');
       w.querySelectorAll('[data-share]').forEach(function (b) { b.addEventListener('click', function () { share(b.getAttribute('data-share')); }); });

@@ -88,10 +88,10 @@
     /* ── Fall 1: noch kein eigener Bot hinterlegt ─────────────────────── */
     if (!s.bot_bereit) {
       h += '<div style="color:var(--muted);font-size:13px;line-height:1.6">'
-        + 'DealPilot per Telegram bedienen — Objekte abfragen, Felder ändern, '
+        + 'DealPilot per Telegram bedienen, Objekte abfragen, Felder ändern, '
         + 'neue Objekte per Sprachnachricht anlegen und Portfolio-Zahlen abrufen.'
         + '<br><br><b>Dein eigener Bot, dein Name.</b> Du legst ihn in Telegram '
-        + 'selbst an und trägst ihn hier ein — niemand sonst hat Zugriff darauf.'
+        + 'selbst an und trägst ihn hier ein, niemand sonst hat Zugriff darauf.'
         + '</div>';
 
       h += '<ol style="color:var(--muted);font-size:13px;line-height:1.7;'
@@ -121,8 +121,8 @@
         + 'font-size:13px;line-height:1.6;cursor:pointer">'
         + '<input type="checkbox" id="dp-tg-einwilligung" style="margin-top:3px;flex:0 0 auto"'
         + ' onchange="DealPilotTelegram.einwilligungGeprueft()">'
-        + '<span>Ich willige ein, dass meine Objektdaten — Adressen, Kaufpreise, Mieten '
-        + 'und Kennzahlen — über Telegram übertragen werden, und dass sie dabei '
+        + '<span>Ich willige ein, dass meine Objektdaten, Adressen, Kaufpreise, Mieten '
+        + 'und Kennzahlen, über Telegram übertragen werden, und dass sie dabei '
         + '<b>in die Vereinigten Arabischen Emirate</b> gelangen, für die kein '
         + 'Angemessenheitsbeschluss der EU besteht. Bot-Chats sind '
         + '<b>nicht Ende-zu-Ende-verschlüsselt</b>. '
@@ -174,7 +174,7 @@
                     + 'seitdem geändert</span>'
                   : '')
             : '<span style="color:var(--warn, #D8954C)">Einwilligung nicht '
-              + 'dokumentiert</span> — beim nächsten Verbinden wird sie erfragt')
+              + 'dokumentiert</span>, beim nächsten Verbinden wird sie erfragt')
         + '</div></div>'
         + '<button type="button" class="btn btn-ghost" style="font-size:12px"'
         + ' onclick="DealPilotTelegram.botEntfernen()">Bot entfernen</button>'
@@ -210,7 +210,7 @@
     var bot = (s.bot && s.bot.username) ? '@' + s.bot.username : 'deinen Bot';
     h += '<div style="color:var(--muted);font-size:13px;line-height:1.6;margin-top:10px">'
       + 'Noch ist kein Chat verbunden. Der Code sagt dem Bot, <b>wessen</b> Daten er '
-      + 'zeigen darf — ohne ihn antwortet er niemandem.</div>';
+      + 'zeigen darf, ohne ihn antwortet er niemandem.</div>';
 
     if (s.offener_code) {
       h += '<div style="margin-top:12px;padding:14px;border:1px solid var(--border);'
@@ -329,7 +329,7 @@
         + 'border:1px solid var(--wl-b8625c,#B8625C);background:rgba(184,98,92,.08);'
         + 'font-size:13px;line-height:1.5';
       box.innerHTML = '<b>Verbindung wirklich trennen?</b><br>'
-        + 'Dabei wird auch der <b>Chatverlauf</b> im Bot gelöscht — Adressen, '
+        + 'Dabei wird auch der <b>Chatverlauf</b> im Bot gelöscht, Adressen, '
         + 'Kaufpreise und ein angefangenes Objekt. Deine Objekte in DealPilot '
         + 'bleiben unberührt, der Bot-Token bleibt hinterlegt.'
         + '<div style="margin-top:10px;display:flex;gap:8px">'

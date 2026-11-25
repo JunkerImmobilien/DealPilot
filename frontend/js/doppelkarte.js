@@ -659,7 +659,7 @@
        saehe aus wie „keine Objekte". */
     var leer = liste.querySelector('.dk-leer');
     if (!sichtbar && ks.length) {
-      var txt = alle ? 'Keine Objekte im Ankauf — alle sind gewonnen. Unter „Bestand“ stehen sie.'
+      var txt = alle ? 'Keine Objekte im Ankauf, alle sind gewonnen. Unter „Bestand“ stehen sie.'
                      : 'Noch keine Objekte im Bestand. Ein Objekt kommt hierher, sobald es auf „gewonnen“ steht.';
       if (!leer) { leer = document.createElement('div'); leer.className = 'dk-leer'; liste.appendChild(leer); }
       if (leer.textContent !== txt) leer.textContent = txt;

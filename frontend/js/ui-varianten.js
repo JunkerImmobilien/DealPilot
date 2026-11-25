@@ -859,7 +859,7 @@
     p.setAttribute('aria-label', 'Darstellung');
     p.innerHTML =
       '<div id="dpuv-h"><div style="flex:1"><h2>Darstellung</h2>' +
-        '<p>Jede Änderung wirkt sofort — dahinter siehst du das Ergebnis.</p></div>' +
+        '<p>Jede Änderung wirkt sofort, dahinter siehst du das Ergebnis.</p></div>' +
         '<button type="button" id="dpuv-x" aria-label="Schließen">✕</button></div>' +
       '<div id="dpuv-b">' +
         /* ── v1380 · Hell und Dunkel, wieder bedienbar ────────────────────
@@ -893,7 +893,7 @@
            > ob er es nur nicht gefunden hat. */
         '<div class="dpuv-g"><h3>Modus</h3>' +
           '<p class="dpuv-hint">Grundhelligkeit der Oberfläche. Wählt die passende Vorlage ' +
-            'darunter mit aus — eine, die schon passt, bleibt stehen.</p>' +
+            'darunter mit aus, eine, die schon passt, bleibt stehen.</p>' +
           '<div class="dp-tt-mode-toggle" id="dpuv-modus">' +
             '<button type="button" class="dp-tt-mode-btn" data-v="obsidian">Dunkel' +
               '<span class="dp-tt-mode-btn-label">Obsidian &amp; Gold</span></button>' +
@@ -920,7 +920,7 @@
            Vorlage und Kartenmodus. */
         '<div class="dpuv-g"><h3>Form</h3>' +
           '<p class="dpuv-hint">Wie weich Karten, Felder und Knöpfe an den Ecken sind. ' +
-            'Wirkt zusammen mit einer Vorlage — „DealPilot" behält seine eigenen Ecken.</p>' +
+            'Wirkt zusammen mit einer Vorlage, „DealPilot" behält seine eigenen Ecken.</p>' +
           segHtml('dpuv-form', FORMEN, get('ui_form', FORMEN)) + '</div>' +
         '<div class="dpuv-g"><h3>Schrift</h3>' +
           '<p class="dpuv-hint">Schriftfamilie und Textgröße der gesamten Oberfläche.</p>' +
@@ -996,12 +996,12 @@
               '<b>Die Vorlage bestimmt die Flächen</b>' +
               '<span>Solange eine Vorlage aktiv ist, kommen Kopfleiste, ' +
               'Reiterleiste und Objektleiste aus ihr. Die Grundfarbe gilt für ' +
-              'die Fassung <b>DealPilot</b> — wähle sie oben, dann ist die ' +
+              'die Fassung <b>DealPilot</b>, wähle sie oben, dann ist die ' +
               'Grundfarbe wieder frei. Der <b>Akzent</b> wirkt in jeder ' +
               'Vorlage.</span></div></div>' +
             '<div class="dp-tb-sec" id="dpuv-bereiche"><b>Einzelne Bereiche</b>' +
               '<p class="dpuv-hint" style="margin:0 0 6px">Übersteuert die Vorlage. ' +
-              'Wirkt zusammen mit einer Vorlage — „DealPilot" behält seine eigenen Flächen.</p>' +
+              'Wirkt zusammen mit einer Vorlage, „DealPilot" behält seine eigenen Flächen.</p>' +
               BEREICHE.map(farbzeile).join('') + '</div>' +
             '<div id="dpuv-logo">' + fremdBlock('_dpLogoBlock') + '</div>' +
             /* v1122 · Weg B: die drei Freiheitsstufen, direkt ueber dem
@@ -1316,7 +1316,7 @@
       var txt;
       if (markeFrei) {
         txt = '<div><b>Von deinem Partner freigegeben</b><span>Farben und Logo deines ' +
-          'Partners sind nur die Voreinstellung — du kannst alles selbst ändern.</span></div>';
+          'Partners sind nur die Voreinstellung, du kannst alles selbst ändern.</span></div>';
       } else if (mandant && frei === 'keine') {
         txt = '<div><b>Von deinem Partner vorgegeben</b><span>Farben, Logo <b>und</b> die ' +
           'Darstellung kommen aus dem Branding deines Partners und gelten unverändert.</span></div>';

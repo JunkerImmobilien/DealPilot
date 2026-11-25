@@ -734,7 +734,7 @@ function _steuerRegime(halterId) {
       art: 'GbR / Personengesellschaft',
       kurz: 'Feststellung',
       hinweis: 'Bei einer vermögensverwaltenden Personengesellschaft wird die Anlage V '
-        + 'zur gesonderten und einheitlichen Feststellung eingereicht; der festgestellte '
+        + 'zur gesonderten und einheitlichen Feststellung eingereicht, der festgestellte '
         + 'Anteil geht danach in die Erklärung der Beteiligten ein.'
     };
   }
@@ -1017,7 +1017,7 @@ function _renderMappeSummaryPage(doc, jahr, saetze, stamm, ohneStamm, W, H, M, C
             + 'Zeilenzuordnung hinterlegt. Die Nummern ändern sich je Veranlagungsjahr und werden '
             + 'nicht geraten.'
           : 'Die Zuordnung zu den Zeilennummern der amtlichen Anlage V ist in dieser Mappe nicht '
-            + 'enthalten — sie lässt sich beim Erstellen zuschalten.')
+            + 'enthalten, sie lässt sich beim Erstellen zuschalten.')
   ];
   /* v1224 · WAS NICHT DABEI IST, WIRD BENANNT. Eine fehlende Anlage-V-Seite
      kann zwei ganz verschiedene Gruende haben — keine Abschrift des Formulars,
@@ -1026,14 +1026,14 @@ function _renderMappeSummaryPage(doc, jahr, saetze, stamm, ohneStamm, W, H, M, C
   if (av && av.ohneAnlageV && av.ohneAnlageV.length) {
     hin.push('Für ' + av.ohneAnlageV.length + ' Objekt'
       + (av.ohneAnlageV.length === 1 ? '' : 'e') + ' liegt bewusst KEINE Anlage-V-Seite bei: '
-      + av.ohneAnlageV.join(', ') + '. Sie gehören einer Kapitalgesellschaft; nach '
+      + av.ohneAnlageV.join(', ') + '. Sie gehören einer Kapitalgesellschaft, nach '
       + '§ 8 Abs. 2 KStG gibt es dort nur Einkünfte aus Gewerbebetrieb und damit keine '
       + 'Anlage V. Die Zahlen dieser Objektblätter gehören in die Gewinnermittlung.');
   }
   if (av && av.wechseljahre && av.wechseljahre.length) {
     hin.push(av.wechseljahre.length === 1 ? 'Ein Objekt wechselt in ' + jahr
       + ' den Halter (' + av.wechseljahre[0] + '). Sein Blatt deckt nur den Teil des Jahres ab, '
-      + 'in dem es hier gehalten wurde — der andere Teil steht auf dem Blatt des anderen Halters. '
+      + 'in dem es hier gehalten wurde, der andere Teil steht auf dem Blatt des anderen Halters. '
       + 'Die Summe unten ist deshalb keine Jahressumme eines einzelnen Steuerpflichtigen.'
       : av.wechseljahre.length + ' Objekte wechseln in ' + jahr + ' den Halter ('
       + av.wechseljahre.join(', ') + '). Ihre Blätter decken nur den Teil des Jahres ab, in dem '
@@ -1063,7 +1063,7 @@ function _renderMappeSummaryPage(doc, jahr, saetze, stamm, ohneStamm, W, H, M, C
   } catch (_eF) {}
   if (ohneStamm.length) {
     hin.push('Zu ' + ohneStamm.length + ' Objekt' + (ohneStamm.length === 1 ? '' : 'en')
-      + ' liegen keine Stammdaten vor (Adresse, Fläche, Art) — die Seiten tragen nur den Namen: '
+      + ' liegen keine Stammdaten vor (Adresse, Fläche, Art), die Seiten tragen nur den Namen: '
       + ohneStamm.join(', ') + '.');
   }
   hin.forEach(function (t) {
@@ -1270,8 +1270,8 @@ function _renderAnlageVPage(doc, jahr, totals, q, W, H, M, CW) {
 
   /* ── Fuss ── */
   klein('Zuordnung abgeschrieben aus dem amtlichen Formular Anlage V ' + R.jahr + ' (' + (R.formular || '') + (R.stand ? ', Stand ' + R.stand : '') + '). '
-    + 'Keine Steuererklärung und keine Steuerberatung — die Zahlen sind zum Übertragen gedacht, die Verantwortung für den Eintrag bleibt beim Erklärenden. '
-    + 'Bei verbilligter Vermietung sind die Aufwendungen laut Formular in voller Höhe einzutragen; die Kürzung nimmt das Finanzamt aus den dafür vorgesehenen Zeilen vor.');
+    + 'Keine Steuererklärung und keine Steuerberatung, die Zahlen sind zum Übertragen gedacht, die Verantwortung für den Eintrag bleibt beim Erklärenden. '
+    + 'Bei verbilligter Vermietung sind die Aufwendungen laut Formular in voller Höhe einzutragen, die Kürzung nimmt das Finanzamt aus den dafür vorgesehenen Zeilen vor.');
   return true;
 }
 
@@ -1392,9 +1392,9 @@ function _renderMappeDeckblatt(doc, jahr, h, saetze, stamm, W, H, M, CW) {
     doc.setFont('helvetica', 'italic'); doc.setFontSize(9);
     doc.setTextColor(176, 140, 90);
     var mt = doc.splitTextToSize('Die Objekte dieses Jahres gehören ' + h.anzahlHalter
-      + ' verschiedenen Steuerpflichtigen. Erklärt wird je Steuerpflichtigem — diese Mappe '
+      + ' verschiedenen Steuerpflichtigen. Erklärt wird je Steuerpflichtigem, diese Mappe '
       + 'fasst sie zusammen und ist deshalb eine Übersicht, keine Erklärung. Die Objektliste '
-      + 'unten und die Blätter dahinter sind nach Steuerpflichtigem gegliedert; die Angaben '
+      + 'unten und die Blätter dahinter sind nach Steuerpflichtigem gegliedert, die Angaben '
       + 'in diesem Kopf gelten nur für den ersten. Bei einer Überführung ist das der '
       + 'Regelfall: dasselbe Objekt steht im Jahr des Wechsels auf beiden Seiten.', CW);
     doc.text(mt, M, cy);

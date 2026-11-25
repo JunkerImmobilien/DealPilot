@@ -59,12 +59,12 @@
      Bedeutung kommt aus WertParameterService (A/B/C/N/D/E), hier als Tooltip
      an jeder Pille und als Legende unter der Leiste. v2401: N zwischen C und D. */
   var STUFEN = {
-    A: 'Stufe A — amtlich: vom zuständigen Gutachterausschuss für dieses Gebiet und diese Objektart abgeleitet.',
-    B: 'Stufe B — amtlich, aber übergeordnet (Kreis- oder Landesebene) oder Modellansatz des Ausschusses; indikativ.',
-    C: 'Stufe C — amtlicher Wert einer anderen Gemeinde desselben Ausschusses; indikativ.',
-    N: 'Stufe N — abgeleitet aus der DealPilot-Formel (aus den amtlichen Werten der Gutachterausschüsse), nicht amtlich; indikativ. Genauer: den Wert des Ausschusses eintragen.',
-    D: 'Stufe D — gesetzlicher Auffangwert nach § 256 BewG, nicht marktabgeleitet.',
-    E: 'Stufe E — eigene Angabe des Nutzers.'
+    A: 'Stufe A, amtlich: vom zuständigen Gutachterausschuss für dieses Gebiet und diese Objektart abgeleitet.',
+    B: 'Stufe B, amtlich, aber übergeordnet (Kreis- oder Landesebene) oder Modellansatz des Ausschusses; indikativ.',
+    C: 'Stufe C, amtlicher Wert einer anderen Gemeinde desselben Ausschusses; indikativ.',
+    N: 'Stufe N, abgeleitet aus der DealPilot-Formel (aus den amtlichen Werten der Gutachterausschüsse), nicht amtlich; indikativ. Genauer: den Wert des Ausschusses eintragen.',
+    D: 'Stufe D, gesetzlicher Auffangwert nach § 256 BewG, nicht marktabgeleitet.',
+    E: 'Stufe E, eigene Angabe des Nutzers.'
   };
   function st(cls, txt) {
     var m = String(txt || '').match(/^Stufe ([A-EN])$/);
@@ -90,7 +90,7 @@
      Dieselbe Formel, zwei Zwecke. Deshalb steht es jetzt dran, statt
      dass der Leser es sich zusammenreimt. */
   var RND_HINWEIS = '<div class="oe-legende"><b>Restnutzungsdauer:</b> die hier '
-    + 'gezeigte Zahl gilt für die <b>Verkehrswertermittlung</b> — Alterswertminderung '
+    + 'gezeigte Zahl gilt für die <b>Verkehrswertermittlung</b>, Alterswertminderung '
     + 'im Sachwertverfahren (§ 38 ImmoWertV) und Vervielfältiger im Ertragswertverfahren '
     + '(§ 34). Ein <b>Restnutzungsdauergutachten</b> für die Abschreibung '
     + '(§ 7 Abs. 4 Satz 2 EStG) ist etwas anderes und entsteht nicht hier.</div>';
@@ -104,7 +104,7 @@
     var brw = _v('brw'), stich = _v('brw_stichtag');
     var status = $('brw-ai-status') ? String($('brw-ai-status').textContent || '').trim() : '';
     var manuell = _v('brw_manuell');
-    var q = status ? esc(status) : (brw ? 'gespeicherter Wert — Herkunft nicht vermerkt (Abruf oder Eingabe)' : 'noch nicht abgerufen — Knopf „Bodenrichtwert abrufen" oben');
+    var q = status ? esc(status) : (brw ? 'gespeicherter Wert, Herkunft nicht vermerkt (Abruf oder Eingabe)' : 'noch nicht abgerufen, Knopf „Bodenrichtwert abrufen" oben');
     if (stich) q += ' · Stichtag ' + esc(stich);
     if (manuell) q = st('b', 'abweichend') + 'eigener Ansatz ' + deEin(manuell) + ' €/m² — ' + q;
     return zeile('Bodenrichtwert', brw ? deEin(brw) + ' €/m²' : '—', q, knopf(manuell ? 'ändern' : 'eintragen', 'brw_manuell'));   /* v3247 · Tausenderpunkt */
@@ -481,7 +481,7 @@
     }
     var mpZeile = zeile('Modernisierungspunkte', mp ? mp.total + ' von 20' : (_mb && _mb.herkunft !== 'eigene' ? _mb.punkte + ' von 20' : '—'), mpQ, '');
     if (!o.plz) {
-      kachelnSetzen(box, brwZeile() + zeile('Liegenschaftszins', '—', 'PLZ eintragen — dann holt DealPilot den amtlichen Satz', '')
+      kachelnSetzen(box, brwZeile() + zeile('Liegenschaftszins', '—', 'PLZ eintragen, dann holt DealPilot den amtlichen Satz', '')
         + zeile('Sachwertfaktor', '—', 'PLZ eintragen', '') + zeile('GND / RND', '—', 'Baujahr und Objektart eintragen', '') + mpZeile);   /* v3237 */
       return;
     }
@@ -504,7 +504,7 @@
        der Endpunkt den Rückfall, sagt das jetzt auch die Punkte-Zeile. */
     if (r && r.rnd_quelle === 'geschaetzt' && mp && mp.total > 0) {
       mpZeile = zeile('Modernisierungspunkte', mp.total + ' von 20', st('x', 'Anlage 2 greift hier nicht')
-        + 'Die Restnutzungsdauer ist geschätzt — den Grund nennt die Zeile GND / RND. Die Punkte entstehen aus der Spalte „modernisiert" der Gewerke-Tabelle. Klick springt zum Feld:'
+        + 'Die Restnutzungsdauer ist geschätzt, den Grund nennt die Zeile GND / RND. Die Punkte entstehen aus der Spalte „modernisiert" der Gewerke-Tabelle. Klick springt zum Feld:'
         + '<br>' + mpChips, '');
     }
     var html = brwZeile();
@@ -513,7 +513,7 @@
       var aus = r && r.ausschuss ? ' · ' + esc(r.ausschuss) : '';
       html += zeile('Liegenschaftszins', '—', st('x', 'kein Wert') + esc(grund) + aus, knopf('eintragen', 'lzs_pct'));
       html += zeile('Sachwertfaktor', '—', st('x', 'kein Wert') + 'ohne Zuordnung zum Ausschuss keine Tabelle', knopf('eintragen', 'sachwertfaktor'));
-      html += zeile('GND / RND', '—', 'Anlage 1/2 ImmoWertV — wird im Bericht aus Baujahr und Modernisierungspunkten abgeleitet', '');
+      html += zeile('GND / RND', '—', 'Anlage 1/2 ImmoWertV, wird im Bericht aus Baujahr und Modernisierungspunkten abgeleitet', '');
     } else {
       var stufe = r.stufe || '?';
       var cls = stufe === 'A' ? 'a' : (stufe === 'B' || stufe === 'C') ? 'b' : stufe === 'N' ? 'n' : 'x';
@@ -525,11 +525,11 @@
       /* v2401 · Stufe N: sagen, was es ist und wie es genauer geht (Rechenweg als Tooltip) */
       if (stufe === 'N') {
         var _zw = r.zins_herkunft && r.zins_herkunft.weg;
-        q += ' · <span title="' + esc(r.hinweis || '') + '">abgeleitet, nicht amtlich</span> — genauer: den Satz des Gutachterausschusses eintragen'
+        q += ' · <span title="' + esc(r.hinweis || '') + '">abgeleitet, nicht amtlich</span>, genauer: den Satz des Gutachterausschusses eintragen'
           + (_zw && _zw.url ? ' (<a href="' + esc(_zw.url) + '" target="_blank" rel="noopener">' + esc(String(_zw.ausschuss || 'Ausschuss').split(',')[0]) + '</a>)' : '');
       }
       var eigen = _v('lzs_pct');
-      if (eigen) q = st('b', 'abweichend') + 'eigener Ansatz ' + deEin(eigen, 2, 2) + ' % — amtlich ' + q;
+      if (eigen) q = st('b', 'abweichend') + 'eigener Ansatz ' + deEin(eigen, 2, 2) + ' %, amtlich ' + q;
       html += zeile('Liegenschaftszins', r.wert_pct == null || !isFinite(Number(r.wert_pct)) ? '—' : deNum(r.wert_pct, 2) + ' %', q,   /* v3247 · kein „NaN %" */ knopf(eigen ? 'ändern' : 'eintragen', 'lzs_pct'));
       var sq = r.sachwertfaktor_quelle;
       var swfEigen = _v('sachwertfaktor');
@@ -547,7 +547,7 @@
         html += _swF != null
           ? zeile('Sachwertfaktor', _de(_swF, 2), _swA + ' — im Marktbericht vom ' + _berDatum(_swB) + ' aus der Tabelle abgelesen (§ 21 Abs. 3, am vorläufigen Sachwert)'
               + (_swB.swf_stufe ? ' · Stufe ' + esc(_swB.swf_stufe) : '') + '. Ändern sich Fläche, Baujahr oder Ausstattung, liest ein neuer Bericht neu ab.', knopf('eintragen', 'sachwertfaktor'))
-          : zeile('Sachwertfaktor', 'folgt im Bericht', _swA + ' — der Ausschuss führt eine Tabelle; der Faktor wird im Marktbericht am vorläufigen Sachwert abgelesen (§ 21 Abs. 3), vorher gibt es keine Zahl', knopf('eintragen', 'sachwertfaktor'));
+          : zeile('Sachwertfaktor', 'folgt im Bericht', _swA + ' — der Ausschuss führt eine Tabelle, der Faktor wird im Marktbericht am vorläufigen Sachwert abgelesen (§ 21 Abs. 3), vorher gibt es keine Zahl', knopf('eintragen', 'sachwertfaktor'));
       }
       else {
         /* v1867 · Marcel: „dass der fehlt, aber auch warum und dass man den nicht
@@ -556,7 +556,7 @@
         var _artS = _v('objart').toUpperCase(), _mfh = /MFH|GESCH|BUERO/.test(_artS) || parseInt(_v('einheiten'), 10) >= 3;
         html += zeile('Sachwertfaktor', '1,00', st('b', 'Standard') + 'ohne Marktanpassung — ' + esc((sq && sq.hinweis) || 'Für diesen Ausschuss sind keine Sachwertfaktoren hinterlegt.')
           + (sq && sq.ausschuss ? ' <span class="oe-q" title="' + esc(sq.ausschuss) + '">(' + esc(String(sq.ausschuss).split(',')[0]) + ')</span>' : '')
-          + (_mfh ? ' Für Mehrfamilienhäuser ist der Ertragswert das Verfahren, der Sachwert dient nur der Plausibilität — der Faktor wird nicht gebraucht.'
+          + (_mfh ? ' Für Mehrfamilienhäuser ist der Ertragswert das Verfahren, der Sachwert dient nur der Plausibilität, der Faktor wird nicht gebraucht.'
                   : ' Der vorläufige Sachwert ist damit eine Herstellungskostenrechnung, kein Marktwert.')
           + ' Eigener Ansatz möglich:', knopf('eintragen', 'sachwertfaktor'));
       }
@@ -596,7 +596,7 @@
             : 'Der Wert entsteht im Marktbericht: er braucht die Bezugsgröße der Bodenrichtwertzone. ';
           html += zeile('Umrechnung Grundstücksgröße', _ukWert, st('b', 'Näherung') + _ukText + esc(uq.naeherung_text || '') + (uq.hinweis ? ' ' + esc(uq.hinweis) : '') + _ukQ + ' Eigener Ansatz möglich:', knopf('eintragen', 'uk_flaeche'));
         }
-        else html += zeile('Umrechnung Grundstücksgröße', '—', st('x', 'kein Wert') + esc(uq.hinweis || 'Für diesen Ort ist kein Umrechnungskoeffizient hinterlegt — der Bodenwert wird nicht an die Grundstücksgröße angepasst.') + _ukQ + ' Eigener Ansatz möglich:', knopf('eintragen', 'uk_flaeche'));
+        else html += zeile('Umrechnung Grundstücksgröße', '—', st('x', 'kein Wert') + esc(uq.hinweis || 'Für diesen Ort ist kein Umrechnungskoeffizient hinterlegt, der Bodenwert wird nicht an die Grundstücksgröße angepasst.') + _ukQ + ' Eigener Ansatz möglich:', knopf('eintragen', 'uk_flaeche'));
       }
       /* v2361 · Umrechnung nach der WGFZ (§ 16 Abs. 4 ImmoWertV): nur wo der Ausschuss
          sie fuer diese Objektart fuehrt. Ob sie greift, entscheidet die Zone (GFZ im
@@ -633,8 +633,8 @@
           }
           _wText += esc(_wAbl.hinweis || _wAbl.kennung || '') + ' Eigene Angabe möglich:';
         } else if (!wEigen) {
-          _wWert = 'WGFZ fehlt — eintragen';
-          _wText = ' Der Ausschuss führt eine Umrechnung nach der WGFZ. Trag die WGFZ des Objekts ein (oberirdische Geschossfläche / Grundstück) — sonst bleibt der Bodenwert insoweit unangepasst.'
+          _wWert = 'WGFZ fehlt, eintragen';
+          _wText = ' Der Ausschuss führt eine Umrechnung nach der WGFZ. Trag die WGFZ des Objekts ein (oberirdische Geschossfläche / Grundstück), sonst bleibt der Bodenwert insoweit unangepasst.'
             + (r.wgfz_abgeleitet && r.wgfz_abgeleitet.hinweis ? ' ' + esc(r.wgfz_abgeleitet.hinweis) : '');
         } else if (_wA && _wA.verfuegbar && _wPasst && _wA.faktor != null) {
           _wWert = '× ' + _de(_wA.faktor) + ' WGFZ ' + _de(_wA.wgfz_zone, 2) + ' → ' + _de(_wA.wgfz_objekt, 2);
@@ -654,7 +654,7 @@
           _wWert = 'WGFZ ' + deEin(wEigen, 1, 2);
           _wText = _wA && !_wPasst && _wA.wgfz_objekt != null
             ? ' — der Marktbericht vom ' + _berDatum(_wB) + ' rechnete mit WGFZ ' + _de(_wA.wgfz_objekt, 2) + '; ein neuer Bericht rechnet mit der eingetragenen.'
-            : ' Greift, wenn die Bodenrichtwertzone eine GFZ nennt — der Faktor entsteht im Marktbericht.';
+            : ' Greift, wenn die Bodenrichtwertzone eine GFZ nennt, der Faktor entsteht im Marktbericht.';
         }
         html += zeile('Umrechnung WGFZ', _wWert, _wKopf + _wText, knopf(wEigen ? 'ändern' : 'eintragen', 'wgfz_objekt'));
       }
@@ -775,14 +775,14 @@
     fehlt.forEach(function (e) {
       var _eSwf = /sachwert|swf/i.test(String(e.kennzahl) + String(e.name)), _eZins = /liegenschaft|lzs/i.test(String(e.kennzahl) + String(e.name));
       if ((_eSwf && eigenSwf != null) || (_eZins && zinsEigen)) {
-        zeilen.push('<div class="oe-qz"><b>' + esc(NAME[e.kennzahl] || e.name || e.kennzahl) + '</b><span>nicht im Register — deine eigene Angabe'
+        zeilen.push('<div class="oe-qz"><b>' + esc(NAME[e.kennzahl] || e.name || e.kennzahl) + '</b><span>nicht im Register, deine eigene Angabe'
           + (_eSwf ? ' ' + _de(eigenSwf, 2) : (eigenLzs != null ? ' ' + _de(eigenLzs, 2) + ' %' : '')) + ' gilt (Stufe E)</span></div>');
         return;
       }
       zeilen.push('<div class="oe-qz fehlt"><b>' + esc(NAME[e.kennzahl] || e.name || e.kennzahl) + '</b><span>nicht im Register — ' + esc(kurz(q && q.ausschuss) || 'Gutachterausschuss') + ' anfragen oder dem Grundstücksmarktbericht entnehmen</span><button type="button" class="oe-btn" data-oe-amt="gutachterausschuss">anfragen</button></div>');
     });
     if (swfOhneArt && eigenSwf != null) {
-      zeilen.push('<div class="oe-qz"><b>Sachwertfaktor</b><span title="' + esc(_leiste.swfHinweis || '') + '">für diese Objektart nicht abgeleitet — deine eigene Angabe ' + _de(eigenSwf, 2) + ' gilt (Stufe E)</span></div>');
+      zeilen.push('<div class="oe-qz"><b>Sachwertfaktor</b><span title="' + esc(_leiste.swfHinweis || '') + '">für diese Objektart nicht abgeleitet, deine eigene Angabe ' + _de(eigenSwf, 2) + ' gilt (Stufe E)</span></div>');
     } else if (swfOhneArt) {
       zeilen.push('<div class="oe-qz fehlt"><b>Sachwertfaktor</b><span title="' + esc(_leiste.swfHinweis || '') + '">für diese Objektart nicht abgeleitet — ' + esc(kurz(_leiste.ausschuss || (q && q.ausschuss)) || 'Gutachterausschuss') + ' anfragen</span><button type="button" class="oe-btn" data-oe-amt="gutachterausschuss">anfragen</button></div>');
     }
@@ -791,8 +791,8 @@
     var brauchtAnfrage = _fehltOhneEigen.length > 0 || (_leiste && ((!_leiste.zins && !zinsEigen) || (swfRelevant && !_leiste.swf && eigenSwf == null)));
     var mitEigen = zinsEigen || (swfRelevant && eigenSwf != null && !(_leiste && _leiste.swf));
     if (hint) hint.innerHTML = brauchtAnfrage
-      ? st('x', 'nötig') + 'Für dieses Objekt fehlt eine amtliche Kennzahl — Quelle unten, Anfrage mit einem Klick.'
-      : (mitEigen ? st('a', 'vollständig') + 'Alle Kennzahlen liegen vor — teils aus dem Register' + (q && q.ausschuss ? ' (' + esc(q.ausschuss) + ')' : '') + ', teils als deine eigene Angabe (Stufe E).'
+      ? st('x', 'nötig') + 'Für dieses Objekt fehlt eine amtliche Kennzahl, Quelle unten, Anfrage mit einem Klick.'
+      : (mitEigen ? st('a', 'vollständig') + 'Alle Kennzahlen liegen vor, teils aus dem Register' + (q && q.ausschuss ? ' (' + esc(q.ausschuss) + ')' : '') + ', teils als deine eigene Angabe (Stufe E).'
       : (q && q.ausschuss ? st('a', 'vollständig') + 'Alle Kennzahlen liegen im Register (' + esc(q.ausschuss) + ').' : ''));
     box.innerHTML = zeilen.join('');
     box.style.display = zeilen.length ? '' : 'none';
@@ -887,7 +887,7 @@
       var el = f.querySelector('input,select'); if (!el || !el.id) return;
       var lab = f.querySelector('label'); if (!lab) return;
       var alt = lab.querySelector('.oe-opt'); if (alt) alt.remove();
-      if (pflicht.indexOf(el.id) < 0) { var s = document.createElement('span'); s.className = 'oe-opt'; s.textContent = 'optional'; s.title = 'Verfeinert den Bericht — ohne Angabe gilt der Ansatz der Anlage 3 ImmoWertV bzw. kein Zuschlag.'; lab.appendChild(s); }
+      if (pflicht.indexOf(el.id) < 0) { var s = document.createElement('span'); s.className = 'oe-opt'; s.textContent = 'optional'; s.title = 'Verfeinert den Bericht, ohne Angabe gilt der Ansatz der Anlage 3 ImmoWertV bzw. kein Zuschlag.'; lab.appendChild(s); }
     });
   }
   function fehltFuer(stufe) { return pflichtFuer(stufe).filter(function (id) { return !_v(id); }); }
@@ -897,7 +897,7 @@
     if (!liste.length) { box.style.display = 'none'; box.innerHTML = ''; return; }
     box.innerHTML = '<b>Für Stufe ' + stufe + ' fehlt noch:</b> '
       + liste.map(function (id) { return '<span class="oe-chip" data-oe-feld="' + id + '">' + esc(FELDNAMEN[id] || id) + '</span>'; }).join('')
-      + '<div class="hint" style="margin:6px 0 0">Klick auf einen Eintrag springt zum Feld. Die Stufe lässt sich erst abrufen, wenn alles da ist — der Bericht rechnet nie halb.</div>';
+      + '<div class="hint" style="margin:6px 0 0">Klick auf einen Eintrag springt zum Feld. Die Stufe lässt sich erst abrufen, wenn alles da ist, der Bericht rechnet nie halb.</div>';
     box.style.display = '';
   }
 
@@ -1051,8 +1051,8 @@
     /* v1855 · drei Kacheln unten in der Karte „Marktbericht abrufen" */
     var kacheln = {
       /* v3213 · W-13: „kurz" steht sichtbar unter der Kachel (bis v3212 nur im title) */
-      1: { name: 'Einsteiger · Stufe 1', kurz: 'Marktwert, Spanne und Lage aus Adresse, Fläche und Baujahr', sub: 'Marktpreisindikation aus Adresse, Objektart, Fläche und Baujahr — Marktwert, Spanne, Lage-Scores.', art: 'Marktpreisindikation' },
-      2: { name: 'Fortgeschritten · Stufe 2', kurz: 'Dazu Rendite und Abschlag zum Markt aus Kaufpreis, Miete und Zustand', sub: 'Erweiterte Indikation: dazu Kaufpreis, Miete, Zustand, Energie und Ausstattung — mit Rendite und Abschlag zum Markt.', art: 'erweiterte Indikation' },
+      1: { name: 'Einsteiger · Stufe 1', kurz: 'Marktwert, Spanne und Lage aus Adresse, Fläche und Baujahr', sub: 'Marktpreisindikation aus Adresse, Objektart, Fläche und Baujahr, Marktwert, Spanne, Lage-Scores.', art: 'Marktpreisindikation' },
+      2: { name: 'Fortgeschritten · Stufe 2', kurz: 'Dazu Rendite und Abschlag zum Markt aus Kaufpreis, Miete und Zustand', sub: 'Erweiterte Indikation: dazu Kaufpreis, Miete, Zustand, Energie und Ausstattung, mit Rendite und Abschlag zum Markt.', art: 'erweiterte Indikation' },
       3: { name: 'Experte · Stufe 3', kurz: 'Boden-, Ertrags- und Sachwert nach ImmoWertV mit amtlichen Werten', sub: 'Wertermittlung nach ImmoWertV: Boden-, Ertrags- und Sachwert mit amtlichem Zins und Sachwertfaktor, Quellennachweis.', art: 'Wertermittlung' }
     };
     var ab = { 2: 'ab Investor', 3: 'ab Pro' };
@@ -1362,17 +1362,17 @@
      Sachwert: Stufe des Sachwertfaktors, ohne Faktor „vorläufig"; Marktwert und
      Vergleichswert aus Angeboten: „Indikation". Statusfarben bleiben hart (Grün/Rot). */
   var TRAUEN = {
-    A: { buchst: 'A', kurz: 'amtlich', farbe: '#3FA56C', lang: 'Amtlicher Wert des zuständigen Gutachterausschusses — belastbar.' },
-    B: { buchst: 'B', kurz: 'amtlich, regional', farbe: '#3FA56C', lang: 'Amtlich, aber aus dem Landesbericht — für den Kreis liegt kein eigener Wert vor. Genauer: den örtlichen Wert eintragen.' },
-    C: { buchst: 'C', kurz: 'abgeleitet', farbe: 'var(--wl-b8932f, #b8932f)', lang: 'Abgeleitet — schmale Datenbasis, Nachbarwert desselben Ausschusses oder übertragene Tabelle. Mit dem örtlichen Wert wird es genauer.' },
+    A: { buchst: 'A', kurz: 'amtlich', farbe: '#3FA56C', lang: 'Amtlicher Wert des zuständigen Gutachterausschusses, belastbar.' },
+    B: { buchst: 'B', kurz: 'amtlich, regional', farbe: '#3FA56C', lang: 'Amtlich, aber aus dem Landesbericht, für den Kreis liegt kein eigener Wert vor. Genauer: den örtlichen Wert eintragen.' },
+    C: { buchst: 'C', kurz: 'abgeleitet', farbe: 'var(--wl-b8932f, #b8932f)', lang: 'Abgeleitet, schmale Datenbasis, Nachbarwert desselben Ausschusses oder übertragene Tabelle. Mit dem örtlichen Wert wird es genauer.' },
     /* v2401 · N zwischen C (Gold) und D (Rot): Statusfarbe, bewusst nicht tokenisiert */
-    N: { buchst: 'N', kurz: 'DealPilot-Formel', farbe: '#B87A46', lang: 'Abgeleitet aus der DealPilot-Formel — aus den amtlichen Werten der Gutachterausschüsse gerechnet, nicht amtlich und nicht für diesen Ort ermittelt. Genauer: den Liegenschaftszinssatz des Ausschusses eintragen.' },
-    D: { buchst: 'D', kurz: 'Auffangwert', farbe: '#B8625C', lang: 'Gesetzlicher Auffangwert (§ 256 BewG) — kein örtlicher Zins. Nur eine grobe Einordnung: trag den Liegenschaftszinssatz des Ausschusses ein.' },
+    N: { buchst: 'N', kurz: 'DealPilot-Formel', farbe: '#B87A46', lang: 'Abgeleitet aus der DealPilot-Formel, aus den amtlichen Werten der Gutachterausschüsse gerechnet, nicht amtlich und nicht für diesen Ort ermittelt. Genauer: den Liegenschaftszinssatz des Ausschusses eintragen.' },
+    D: { buchst: 'D', kurz: 'Auffangwert', farbe: '#B8625C', lang: 'Gesetzlicher Auffangwert (§ 256 BewG), kein örtlicher Zins. Nur eine grobe Einordnung: trag den Liegenschaftszinssatz des Ausschusses ein.' },
     /* v3242 · M zwischen N und D: aus Angebotspreisen, keine amtliche Zahl (Statusfarbe wie N, nicht tokenisiert) */
-    M: { buchst: 'M', kurz: 'aus Angebotspreisen', farbe: '#B87A46', lang: 'Vergleichswert indikativ aus Angebotspreisen vergleichbarer Wohnungen abgeleitet, abzüglich des Abschlags zwischen Angebots- und Kaufpreisen — kein amtlicher Wert. Genauer: mit einem amtlichen Vergleichsfaktor des Gutachterausschusses.' },
+    M: { buchst: 'M', kurz: 'aus Angebotspreisen', farbe: '#B87A46', lang: 'Vergleichswert indikativ aus Angebotspreisen vergleichbarer Wohnungen abgeleitet, abzüglich des Abschlags zwischen Angebots- und Kaufpreisen, kein amtlicher Wert. Genauer: mit einem amtlichen Vergleichsfaktor des Gutachterausschusses.' },
     E: { buchst: 'E', kurz: 'eigene Angabe', farbe: '#8a8378', lang: 'Mit deiner eigenen Angabe gerechnet.' },
-    V: { buchst: '', kurz: 'vorläufig', farbe: '#B8625C', lang: 'Vorläufig — ohne Sachwertfaktor des Ausschusses (keine Marktanpassung). Trag den Sachwertfaktor ein, wenn du ihn hast.' },
-    I: { buchst: '', kurz: 'Indikation', farbe: '#8a8378', lang: 'Indikation aus Angebotspreisen — kein Verfahren nach ImmoWertV.' }
+    V: { buchst: '', kurz: 'vorläufig', farbe: '#B8625C', lang: 'Vorläufig, ohne Sachwertfaktor des Ausschusses (keine Marktanpassung). Trag den Sachwertfaktor ein, wenn du ihn hast.' },
+    I: { buchst: '', kurz: 'Indikation', farbe: '#8a8378', lang: 'Indikation aus Angebotspreisen, kein Verfahren nach ImmoWertV.' }
   };
   function _trauen(code) { return code && TRAUEN[String(code).toUpperCase()] ? TRAUEN[String(code).toUpperCase()] : null; }
   function _trauZeigen(h) {
@@ -1451,7 +1451,7 @@
         bgfEl.value = String(bgf);
         bgfEl.dispatchEvent(new Event('input', { bubbles: true })); bgfEl.dispatchEvent(new Event('change', { bubbles: true }));
         try { var hk = $('_dp_herkunft'); if (hk) { var o = {}; try { o = JSON.parse(hk.value || '{}'); } catch (e2) {} o.bgf = 'geschätzt (Wohnfläche × 1,35, EFH-Faustwert)'; hk.value = JSON.stringify(o); hk.dispatchEvent(new Event('change', { bubbles: true })); } } catch (e3) {}
-        if (bh) bh.textContent = 'Schätzung: ' + deNum(wfl, 0) + ' m² × 1,35 = ' + deNum(bgf, 0) + ' m² BGF — grobe Näherung (DIN 277 misst außen, alle Grundrissebenen). Die Bauzeichnung ist genauer.';
+        if (bh) bh.textContent = 'Schätzung: ' + deNum(wfl, 0) + ' m² × 1,35 = ' + deNum(bgf, 0) + ' m² BGF, grobe Näherung (DIN 277 misst außen, alle Grundrissebenen). Die Bauzeichnung ist genauer.';
         return;
       }
       /* v2540 · Quelle der Modernisierungspunkte beim MFH umschalten */

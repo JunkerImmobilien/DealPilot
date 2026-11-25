@@ -312,14 +312,14 @@
       ['marktbericht', 'Marktbericht & Bewertung'], ['unterlagen', 'Unterlagen & Import'], ['admin', 'Admin & Konten'], ['design', 'Optik & Bedienung'], ['sonstiges', 'Sonstiges']];
     var hg = document.createElement('div'); hg.className = 'bb-hg';
     hg.innerHTML = '<div class="bb" role="dialog" aria-modal="true" aria-labelledby="bb-titel">'
-      + '<div class="bb-kopf"><div><h3 id="bb-titel">Bordbuch</h3><p>Was ist dir aufgefallen? Markiere die Stelle, beschreibe oder diktiere es — es landet im Backlog.</p></div>'
+      + '<div class="bb-kopf"><div><h3 id="bb-titel">Bordbuch</h3><p>Was ist dir aufgefallen? Markiere die Stelle, beschreibe oder diktiere es, es landet im Backlog.</p></div>'
       + '<button class="bb-zu" type="button" aria-label="Schließen">×</button></div>'
       + '<div class="bb-rumpf"><div class="bb-bild">'
       + '<div class="bb-werkzeug"><button type="button" data-w="rahmen" class="an" title="Rahmen um eine Stelle ziehen">▭ Rahmen</button><button type="button" data-w="stift" title="Frei zeichnen">✎ Stift</button>'
       + '<button type="button" data-w="schnitt" title="Bereich aufziehen, dann Zuschneiden">⛶ Ausschnitt</button><button type="button" data-a="schneiden" class="bb-schneiden" disabled>✂ Zuschneiden</button>'
       + '<button type="button" data-a="zurueck">↶ Rückgängig</button><button type="button" data-a="leeren">Alles weg</button>'
       + '<span class="bb-zoom"><button type="button" data-a="zoom-" aria-label="Verkleinern">−</button><span class="bb-zoomwert">100 %</span><button type="button" data-a="zoom+" aria-label="Vergrößern">+</button><button type="button" data-a="zoom0">Einpassen</button></span></div>'
-      + '<div class="bb-leinwand">' + (basis ? '<canvas></canvas>' : '<div class="bb-leer">Noch kein Bild.<br><button type="button" class="bb-knopf" data-a="aufnahme" style="margin:10px 0 6px">📷 Tab aufnehmen</button><br>Der Browser fragt kurz „Diesen Tab teilen?“ — auf „Teilen“ klicken.<br>Oder ein Bild mit Strg+V einfügen bzw. unten aus einer Datei wählen.</div>') + '</div>'
+      + '<div class="bb-leinwand">' + (basis ? '<canvas></canvas>' : '<div class="bb-leer">Noch kein Bild.<br><button type="button" class="bb-knopf" data-a="aufnahme" style="margin:10px 0 6px">📷 Tab aufnehmen</button><br>Der Browser fragt kurz „Diesen Tab teilen?“, auf „Teilen“ klicken.<br>Oder ein Bild mit Strg+V einfügen bzw. unten aus einer Datei wählen.</div>') + '</div>'
       + '<div class="bb-weitere"></div>'
       + '<div><button type="button" class="bb-link" data-a="datei">+ weiteres Bild aus Datei</button><input type="file" accept="image/*" hidden></div>'
       + '</div><div class="bb-form">'
@@ -415,7 +415,7 @@
         hg.style.visibility = 'hidden';
         tabAufnahme().then(function (c) {
           hg.style.visibility = '';
-          if (!c) { meldung('Keine Aufnahme — Bild mit Strg+V einfügen geht immer.', true); return; }
+          if (!c) { meldung('Keine Aufnahme, Bild mit Strg+V einfügen geht immer.', true); return; }
           bildSetzen(c);
         });
       }
@@ -458,9 +458,9 @@
     var b = document.createElement('button');
     b.id = 'dp-bb-fab'; b.type = 'button';
     b.setAttribute('aria-label', 'Bordbuch: Fehler oder Wunsch mit Screenshot eintragen (Alt+B)');
-    b.innerHTML = figur() + '<span class="bb-schild">Bordbuch · Alt+B</span><span class="bb-weg" role="button" tabindex="0" title="Mechaniker ausblenden (Alt+B geht weiter; einblenden unter System › Umsetzungswünsche)" aria-label="Mechaniker ausblenden">×</span>';
+    b.innerHTML = figur() + '<span class="bb-schild">Bordbuch · Alt+B</span><span class="bb-weg" role="button" tabindex="0" title="Mechaniker ausblenden (Alt+B geht weiter, einblenden unter System › Umsetzungswünsche)" aria-label="Mechaniker ausblenden">×</span>';
     b.addEventListener('click', function (e) {
-      if (e.target.closest('.bb-weg')) { e.stopPropagation(); ausblenden(true); meld('Mechaniker ausgeblendet — Alt+B öffnet das Bordbuch weiter, einblenden unter System › Umsetzungswünsche'); return; }
+      if (e.target.closest('.bb-weg')) { e.stopPropagation(); ausblenden(true); meld('Mechaniker ausgeblendet, Alt+B öffnet das Bordbuch weiter, einblenden unter System › Umsetzungswünsche'); return; }
       start();
     });
     document.body.appendChild(b);

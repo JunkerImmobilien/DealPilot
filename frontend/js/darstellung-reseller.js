@@ -212,7 +212,7 @@
         'onclick="_dpResCommit()">F\u00fcr meine Mandanten speichern</button>' +
       '<div style="font-size:10.5px;color:#8a8473;margin-top:6px;line-height:1.5">' +
         'Gilt danach f\u00fcr <b>alle</b> deine Mandanten. Zur\u00fcck auf „Mich" stellt deine ' +
-        'pers\u00f6nliche Ansicht wieder her — ohne zu speichern.</div></div>';
+        'pers\u00f6nliche Ansicht wieder her, ohne zu speichern.</div></div>';
   };
   function _hint() {
     return TARGET === 'me'

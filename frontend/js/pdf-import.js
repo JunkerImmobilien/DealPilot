@@ -86,7 +86,7 @@
           '<div class="pdfi-icon">📄</div>' +
           '<div class="pdfi-title-block">' +
             '<h3>PDF-Exposé importieren</h3>' +
-            '<div class="pdfi-sub">ImmoScout, Kleinanzeigen, Maklerexposés — die KI extrahiert die wichtigen Werte automatisch.</div>' +
+            '<div class="pdfi-sub">ImmoScout, Kleinanzeigen, Maklerexposés, die KI extrahiert die wichtigen Werte automatisch.</div>' +
           '</div>' +
           '<button class="bmf-close" type="button" onclick="closePdfImport()">×</button>' +
         '</div>' +
@@ -157,12 +157,12 @@
       // selectable Text — pdf.js gibt nur Whitespace / Layout-Garbage.
       // tesseract.js (Frontend-OCR, ~3 MB Library) liest die Seiten als Bild.
       if (!text || text.replace(/\s/g, '').length < 50) {
-        _showLoading('PDF enthält keinen lesbaren Text — starte OCR (kann ~30 Sek dauern)…');
+        _showLoading('PDF enthält keinen lesbaren Text, starte OCR (kann ~30 Sek dauern)…');
         try {
           text = await _extractPdfTextViaOCR(file, _showLoading);
         } catch (ocrErr) {
           console.error('[pdf-import] OCR fail:', ocrErr);
-          throw new Error('Weder Text-Extraktion noch OCR erfolgreich. Bitte das PDF prüfen — eventuell verschlüsselt oder leer.');
+          throw new Error('Weder Text-Extraktion noch OCR erfolgreich. Bitte das PDF prüfen, eventuell verschlüsselt oder leer.');
         }
         if (!text || text.replace(/\s/g, '').length < 50) {
           throw new Error('OCR konnte keinen Text aus dem PDF lesen. Eventuell ein leeres oder verschlüsseltes PDF.');
@@ -914,7 +914,7 @@
       photosHtml = '<div class="pdfi-photos-section">' +
         '<div class="pdfi-photos-head">' +
           '<input type="checkbox" id="pdfi-photos-cb" checked> ' +
-          '<label for="pdfi-photos-cb"><strong>📷 ' + photos.length + ' Bild' + (photos.length === 1 ? '' : 'er') + '</strong> aus PDF — werden mit übernommen</label>' +
+          '<label for="pdfi-photos-cb"><strong>📷 ' + photos.length + ' Bild' + (photos.length === 1 ? '' : 'er') + '</strong> aus PDF, werden mit übernommen</label>' +
         '</div>' +
         '<div class="pdfi-photos-grid">' +
           photos.map(function(src, i) {
@@ -926,7 +926,7 @@
       // V62: Auch bei 0 Bildern eine Sektion zeigen — als Status-Info für den User
       photosHtml = '<div class="pdfi-photos-section">' +
         '<div class="pdfi-photos-head" style="opacity:0.6">' +
-          '<span>📷 Keine Bilder im PDF gefunden — du kannst sie nach dem Übernehmen direkt im Quick-Check hochladen.</span>' +
+          '<span>📷 Keine Bilder im PDF gefunden, du kannst sie nach dem Übernehmen direkt im Quick-Check hochladen.</span>' +
         '</div>' +
       '</div>';
     }
@@ -1170,7 +1170,7 @@
           var vh = document.getElementById('verkehrswert-hint');
           if (vh) {
             if (!vh._origText) vh._origText = vh.textContent;
-            vh.textContent = '(Marktpreisindikation · AVM-Bericht — kein Verkehrswert n. §194 BauGB)';
+            vh.textContent = '(Marktpreisindikation · AVM-Bericht, kein Verkehrswert n. §194 BauGB)';
             var svEl = document.getElementById('svwert');
             if (svEl && !svEl._v356HintReset) {
               svEl._v356HintReset = true;
@@ -1304,7 +1304,7 @@
       var iconEl = document.querySelector('#pdfimport-modal .pdfi-icon');
       if (iconEl) { iconEl.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>'; iconEl.style.fontSize = '0'; }  /*v359-modal-neutral-icon*/
       if (titleEl) titleEl.textContent = 'Marktbericht-PDF importieren';
-      if (subEl) subEl.textContent = 'Marktbericht- oder Gutachten-PDF — die KI extrahiert Verkehrswert, Lage-Scores und Wertentwicklung.' /*v359-modal-neutral*/;
+      if (subEl) subEl.textContent = 'Marktbericht- oder Gutachten-PDF, die KI extrahiert Verkehrswert, Lage-Scores und Wertentwicklung.' /*v359-modal-neutral*/;
       if (iconEl) iconEl.textContent = '📊';
     }, 50);
   }
@@ -1443,7 +1443,7 @@ function _dpLageLuecken() {
   box.innerHTML =
     '<b>Aus dem Bericht kam hier nichts:</b> ' +
     leer.map(function (f) { return f[1]; }).join(' · ') + '.<br>' +
-    '<span style="color:var(--muted)">Das heißt nicht, dass die Lage schlecht ist — die Angaben standen nicht ' +
+    '<span style="color:var(--muted)">Das heißt nicht, dass die Lage schlecht ist, die Angaben standen nicht ' +
     'im Dokument. Trag sie selbst ein oder lass sie über <i>Pilot-Lagebewertung</i> recherchieren; ' +
     'ohne sie rechnet der Investor Deal Score diese Punkte nicht mit.</span>';
 }

@@ -160,7 +160,7 @@
     s.className = 'dpbv-sum';
     s.setAttribute('data-dpbv', MARKE);
     s.textContent = 'Darin ' + (anz === 1 ? 'ist ein Posten' : 'sind ' + anz + ' Posten') +
-      ' von DealPilot geschätzt — die Summe ändert sich, sobald du deine eigenen Zahlen einträgst.';
+      ' von DealPilot geschätzt, die Summe ändert sich, sobald du deine eigenen Zahlen einträgst.';
     b.appendChild(s);
   }
 

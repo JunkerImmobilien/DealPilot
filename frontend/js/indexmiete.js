@@ -126,7 +126,7 @@
     out.schritte = schritte;
     out.naechste = schritte[0] || null;
     out.in_jahren = schritte.length ? { jahre: schritte.length, miete: schritte[schritte.length - 1].miete_neu, plus_monat: r2(schritte[schritte.length - 1].miete_neu - miete) } : null;
-    out.annahme_text = 'Annahme ' + String(a).replace('.', ',') + ' % Preisanstieg p. a. – kein amtlicher Wert';
+    out.annahme_text = 'Annahme ' + String(a).replace('.', ',') + ' % Preisanstieg p. a., kein amtlicher Wert';
     return out;
   }
 
@@ -168,7 +168,7 @@
     return '<div class="dp-idx">' + kopf
       + '<table class="dp-idx-tab"><thead><tr><th>Jahr</th><th>Index</th><th>mögliche Miete</th><th>Erhöhung €/Monat</th><th>wirksam ab</th></tr></thead><tbody>' + zeilen + '</tbody></table>'
       + '<div class="dp-idx-fuss">Basis: VPI ' + zahlDe(r.basis.wert, 1) + ' (' + monatText(r.basis.monat) + ', ' + esc(r.basis.herkunft) + '), Miete heute ' + eur(r.miete) + '. '
-      + 'Erklärung in Textform, wirksam ab dem übernächsten Monat; frühestens ein Jahr nach der letzten Änderung (§ 557b Abs. 2 und 3 BGB). '
+      + 'Erklärung in Textform, wirksam ab dem übernächsten Monat, frühestens ein Jahr nach der letzten Änderung (§ 557b Abs. 2 und 3 BGB). '
       + 'Echte Werte bis ' + monatText(r.letzter_vpi.monat) + (r.schritte.some(function (s) { return s.annahme; }) ? '; * = Szenario: ' + esc(r.annahme_text) : '') + '.</div></div>';
   }
 

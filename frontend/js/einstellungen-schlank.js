@@ -165,7 +165,7 @@
     var api = pane('api');
     if (api) {
       var hint = api.querySelector(':scope > p.hint');
-      if (hint) hint.textContent = 'So schreiben deine Pilot-Analysen. Die Zahlen kommen immer aus dem Objekt — diese Auswahl ändert nur die Form, nicht das Ergebnis.';
+      if (hint) hint.textContent = 'So schreiben deine Pilot-Analysen. Die Zahlen kommen immer aus dem Objekt, diese Auswahl ändert nur die Form, nicht das Ergebnis.';
       var h3s = api.querySelectorAll(':scope > h3.set-section-h');
       if (h3s[0]) h3s[0].textContent = 'So antwortet der Co-Pilot';
       var dl = api.querySelector('#set_ai_detail_level'), to = api.querySelector('#set_ai_tonality');
@@ -186,7 +186,7 @@
       var det = document.createElement('details');
       det.className = 'dp-es-profis';
       det.style.cssText = 'margin-top:18px;border-top:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 30%, transparent);padding-top:10px';
-      det.innerHTML = '<summary style="cursor:pointer;font-weight:600;font-size:13px;padding:6px 0">Für Profis — Fokus, eigene Anweisungen, eigenes Wissen</summary>';
+      det.innerHTML = '<summary style="cursor:pointer;font-weight:600;font-size:13px;padding:6px 0">Für Profis, Fokus, eigene Anweisungen, eigenes Wissen</summary>';
       var focus = api.querySelector('.ai-focus-checks'), ci = api.querySelector('#set_ai_custom_instructions'),
           sugg = api.querySelector('.ai-suggestions'), wissen = api.querySelector('#set_eigenes_wissen');
       var wissenF = wissen && wissen.closest('.f');
@@ -203,7 +203,7 @@
         var box = document.createElement('div');
         box.className = 'dp-es-haltung';
         box.innerHTML = '<h3 class="ip-section">Deine Haltung</h3>' +
-          '<p class="hint">Strategie und Risikoneigung gehen in die Pilot-Analyse ein und färben ihre Empfehlung — die Zahlen ändern sie nicht. Änderungen gelten sofort.</p>' +
+          '<p class="hint">Strategie und Risikoneigung gehen in die Pilot-Analyse ein und färben ihre Empfehlung, die Zahlen ändern sie nicht. Änderungen gelten sofort.</p>' +
           '<div class="g2 dp-es-haltung-grid"></div>';
         /* v3077 · Marcel 02.11.2026: die Zeile „Gewichtung anpassen ›" ist raus — der
            Reiter Deal Score steht direkt daneben. Dafür steht hier der Detailgrad
@@ -212,9 +212,9 @@
         dg.className = 'dp-es-detailgrad';
         dg.style.marginBottom = '18px';   /* v3077a · Luft vor „Deine Haltung“ */
         dg.innerHTML = '<h3 class="ip-section">Detailgrad der Eingabe</h3>' +
-          '<p class="hint">Wie viele Felder du in den Reitern siehst — gilt für alle Objekte. Einsteiger: die wichtigsten Felder, Marktbericht Stufe 1. ' +
+          '<p class="hint">Wie viele Felder du in den Reitern siehst, gilt für alle Objekte. Einsteiger: die wichtigsten Felder, Marktbericht Stufe 1. ' +
           'Fortgeschritten: dazu Gewerke, Sanierung, Mietvertrag, Darlehen II, wirtschaftlicher Übergang und Erbbaurecht, Stufe 2. Experte: alle Felder mit Mieterhöhung und Zielbild und die Wertermittlung nach ImmoWertV, Stufe 3. ' +
-          'Gesellschaften (GmbH, UG, GbR) gibt es ab Experte — Mandanten, Halter, Überführung und die Steuer-Mappe der Gesellschaft; Objekte einer Gesellschaft rechnen in jeder Stufe mit ihrer Steuer. ' +   /* v3270 */
+          'Gesellschaften (GmbH, UG, GbR) gibt es ab Experte, Mandanten, Halter, Überführung und die Steuer-Mappe der Gesellschaft; Objekte einer Gesellschaft rechnen in jeder Stufe mit ihrer Steuer. ' +   /* v3270 */
           'Ausgeblendete Felder behalten ihre Werte und rechnen weiter.</p>' +
           '<div class="dp-dg-host" data-dp-detailgrad="einstellungen"></div>';
         sw.insertBefore(dg, host);
@@ -256,7 +256,7 @@
 
   /* Bandtitel beim Reiterwechsel nachziehen */
   var BAND = {
-    standardwerte: ['Mein Profil', 'Was in jede Rechnung einfließt — und deine Haltung für die Pilot-Analyse.'],
+    standardwerte: ['Mein Profil', 'Was in jede Rechnung einfließt, und deine Haltung für die Pilot-Analyse.'],
     api: ['Co-Pilot (KI)', 'Länge und Ton deiner Pilot-Analysen.']
   };
 

@@ -90,7 +90,7 @@ function openBMFFromMode(mode){
 
   if(mode === 'simple'){
     // In der echten App: bestehender JS-BMF-Rechner (bmf-ui.js openBMFRechner)
-    toast('Einfacher Modus — öffnet in der App den bestehenden BMF-Rechner');
+    toast('Einfacher Modus, öffnet in der App den bestehenden BMF-Rechner');
     return;
   }
 
@@ -274,7 +274,7 @@ var BMF_PFLICHT = [
   { id: 'bmf_bj',    alt: 'baujahr', name: 'Baujahr',              wo: 'Tab Objekt' },
   { id: 'bmf_wfl',   alt: 'wfl',     name: 'Wohn-/Nutzfläche',     wo: 'Tab Objekt' },
   { id: 'bmf_gsfl',  alt: 'gsfl',    name: 'Grundstücksfläche',    wo: 'Tab Objekt',
-    warum: 'Ohne sie ist der Bodenwert null — der Rechner käme auf 100 % Gebäudeanteil.' },
+    warum: 'Ohne sie ist der Bodenwert null, der Rechner käme auf 100 % Gebäudeanteil.' },
   { id: 'bmf_brw',   alt: 'brw',     name: 'Bodenrichtwert',       wo: 'Tab Objekt',
     warum: 'Steht auch im Gutachterausschuss-Block dieses Fensters zum Übernehmen bereit.' },
   /* Nur bei Wohnungseigentum — die Pruefung haengt an der Grundstuecksart. */
@@ -348,7 +348,7 @@ function _bmfPflichtZeichnen(){
     '<div class="bmfpf-kopf">Es fehlen ' + fehlt.length + ' Pflichtangabe'
       + (fehlt.length === 1 ? '' : 'n') + ' — solange wird nicht gerechnet.</div>'
     + '<ul class="bmfpf-liste">' + zeilen + '</ul>'
-    + '<div class="bmfpf-fuss">Die BMF-Arbeitshilfe rechnet auch mit Lücken — sie setzt '
+    + '<div class="bmfpf-fuss">Die BMF-Arbeitshilfe rechnet auch mit Lücken, sie setzt '
     + 'das Fehlende dann auf null. Dabei kommt eine Aufteilung heraus, die '
     + 'plausibel aussieht und vor dem Finanzamt nicht hält. Deshalb hält der '
     + 'Rechner hier an, statt eine Zahl zu liefern.</div>';
@@ -530,10 +530,10 @@ function calcFahrt(){
    Verfahrens-Toggle
    ────────────────────────────────────────────────────── */
 var VERF_INFOS = {
-  auto: '<strong>Automatik</strong> — BMF-Logik wählt das passende Verfahren: bekannter Vergleichsfaktor → Vergleichswert, sonst bekannte Miete → Ertragswert, sonst Sachwert.',
-  ertrag: '<strong>Ertragswertverfahren</strong> — Standard für Renditeobjekte mit bekannter Miete. Wird vom Finanzamt anerkannt, wenn ein lokaler Liegenschaftszinssatz vorliegt.',
-  sach: '<strong>Sachwertverfahren</strong> — Fallback für Eigennutzung (EFH/ZFH ohne Vermietung). Basiert auf Bodenwert + Gebäudesachwert nach BGF-Kostenkennwerten.',
-  vergl: '<strong>Vergleichswertverfahren</strong> — Nur wenn lokaler Vergleichsfaktor des Gutachterausschusses vorliegt. Bei ETW oft am genauesten.'
+  auto: '<strong>Automatik</strong>, BMF-Logik wählt das passende Verfahren: bekannter Vergleichsfaktor → Vergleichswert, sonst bekannte Miete → Ertragswert, sonst Sachwert.',
+  ertrag: '<strong>Ertragswertverfahren</strong>, Standard für Renditeobjekte mit bekannter Miete. Wird vom Finanzamt anerkannt, wenn ein lokaler Liegenschaftszinssatz vorliegt.',
+  sach: '<strong>Sachwertverfahren</strong>, Fallback für Eigennutzung (EFH/ZFH ohne Vermietung). Basiert auf Bodenwert + Gebäudesachwert nach BGF-Kostenkennwerten.',
+  vergl: '<strong>Vergleichswertverfahren</strong>, Nur wenn lokaler Vergleichsfaktor des Gutachterausschusses vorliegt. Bei ETW oft am genauesten.'
 };
 function setVerf(v){
   document.querySelectorAll('.verf-btn').forEach(function(b){
@@ -612,7 +612,7 @@ function runBmf(){
   var _fehlt = (typeof _bmfPflichtZeichnen === 'function') ? _bmfPflichtZeichnen() : [];
   if (_fehlt.length) {
     var _h0 = $('bmfAutoHint');
-    if (_h0) _h0.textContent = 'Angehalten — es fehlt: '
+    if (_h0) _h0.textContent = 'Angehalten, es fehlt: '
       + _fehlt.map(function(e){ return e.name; }).join(', ') + '.';
     var _r0 = $('bmfResult');
     if (_r0) _r0.style.display = 'none';
@@ -846,7 +846,7 @@ function _mockupRenderBmfResult(r, demoLabel){
 
   var sb = $('bmfStatus');
   sb.className = 'banner ok';
-  sb.innerHTML = '<strong>✓ Berechnung abgeschlossen.</strong> Quelle: BMF-Vorlage Stand März 2026 — Ertragswertverfahren als maßgebend. ' +
+  sb.innerHTML = '<strong>✓ Berechnung abgeschlossen.</strong> Quelle: BMF-Vorlage Stand März 2026, Ertragswertverfahren als maßgebend. ' +
     '<br><span style="font-size:11.5px;color:var(--muted);font-style:italic">Gebäudeanteil ' + fmtPct(r.geb_pct) + ', AfA-Basis ' + fmtEur(kpGeb,2) + '</span>';
 
   toast('BMF-Ergebnis: ' + fmtPct(r.geb_pct) + ' Gebäudeanteil');
@@ -1405,7 +1405,7 @@ function updateInv(){
       warnEl.style.fontSize = '11.5px';
     }
     if (warnText) {
-      warnText.innerHTML = 'Inventaranteil <strong>' + fmtPct(invQuote,1) + '</strong> — erklärungsbedürftig, aber belegbar. Belege/Wertnachweise empfohlen.';
+      warnText.innerHTML = 'Inventaranteil <strong>' + fmtPct(invQuote,1) + '</strong>, erklärungsbedürftig, aber belegbar. Belege/Wertnachweise empfohlen.';
     }
   } else {
     if (warnEl) warnEl.style.display = 'none';
@@ -1464,7 +1464,7 @@ function _varianten(){
       bodenEur: bmfBodenEur,
       gebEur: bmfGebEur,
       risk:'green',
-      riskLabel:'Anerkannt — keine Begründung nötig'
+      riskLabel:'Anerkannt, keine Begründung nötig'
     },
     {
       key:'moderat',
@@ -1793,19 +1793,19 @@ function renderEmpfehlung(){
   if(chosen.key === 'konservativ'){
     mainHtml = '<p><strong>Konservative Variante:</strong> Aufteilung nach BMF übernehmen. Diese Variante ist vom Finanzamt anerkennungsfähig ohne weitere Begründung.</p>';
     listItems = [
-      'Notarvertrag-Klausel siehe unten — direkt einfügbar.',
+      'Notarvertrag-Klausel siehe unten, direkt einfügbar.',
       'Keine zusätzlichen Nachweise erforderlich.',
       'Standardvariante für Erstkäufer und konservatives Reporting.'
     ];
   } else if(chosen.key === 'moderat'){
-    mainHtml = '<p><strong>Moderate Variante:</strong> Bodenanteil reduziert um 10 % gegenüber BMF. Geringfügige Abweichung — vom Finanzamt nach BFH IX R 12/14 anerkennungsfähig ohne aufwändige Begründung.</p>';
+    mainHtml = '<p><strong>Moderate Variante:</strong> Bodenanteil reduziert um 10 % gegenüber BMF. Geringfügige Abweichung, vom Finanzamt nach BFH IX R 12/14 anerkennungsfähig ohne aufwändige Begründung.</p>';
     listItems = [
       'Notarvertrag-Klausel mit kurzem Begründungs-Zusatz einfügen.',
       'Modernisierungsstand kurz dokumentieren (Heizung, Fenster, Dach).',
-      'Keine Gutachten zwingend — Belege als Vorsorge empfohlen.'
+      'Keine Gutachten zwingend, Belege als Vorsorge empfohlen.'
     ];
   } else if(chosen.key === 'optimiert'){
-    mainHtml = '<p><strong>Optimierte Variante:</strong> Bodenanteil reduziert um 25 % gegenüber BMF. Plausibilitätsgrenze der Rechtsprechung — Begründung notwendig, aber vertretbar (BFH IX R 26/19).</p>';
+    mainHtml = '<p><strong>Optimierte Variante:</strong> Bodenanteil reduziert um 25 % gegenüber BMF. Plausibilitätsgrenze der Rechtsprechung, Begründung notwendig, aber vertretbar (BFH IX R 26/19).</p>';
     listItems = [
       'Notarvertrag-Klausel mit ausführlichem Begründungs-Zusatz einfügen.',
       'Modernisierungsstand detailliert dokumentieren (mit Belegen).',
@@ -1817,9 +1817,9 @@ function renderEmpfehlung(){
 
   // Inventar-Empfehlungen ergänzen
   if(invQuote > 15){
-    listItems.push('Inventaranteil ' + fmtPct(invQuote,1) + ' ist hoch — Wertgutachten + Einzelrechnungen vorbereiten.');
+    listItems.push('Inventaranteil ' + fmtPct(invQuote,1) + ' ist hoch, Wertgutachten + Einzelrechnungen vorbereiten.');
   } else if(invQuote > 8){
-    listItems.push('Inventaranteil ' + fmtPct(invQuote,1) + ' ist erklärungsbedürftig — Kaufbelege beifügen.');
+    listItems.push('Inventaranteil ' + fmtPct(invQuote,1) + ' ist erklärungsbedürftig, Kaufbelege beifügen.');
   }
 
   // 15-%-Grenze
@@ -1830,9 +1830,9 @@ function renderEmpfehlung(){
   var max15 = gebAk * 0.15;
   var geplant = _g15e.geplantNetto;
   if(geplant > max15){
-    listItems.push('15-%-Grenze überschritten — geplante Renovierung wird zu AHK (keine sofortige Werbungskosten-Wirksamkeit).');
+    listItems.push('15-%-Grenze überschritten, geplante Renovierung wird zu AHK (keine sofortige Werbungskosten-Wirksamkeit).');
   } else if(geplant > max15 * 0.80 && geplant > 0){
-    listItems.push('15-%-Grenze knapp — Renovierungen ggf. auf Jahr 4 verschieben.');
+    listItems.push('15-%-Grenze knapp, Renovierungen ggf. auf Jahr 4 verschieben.');
   }
 
   $('empfText').innerHTML = mainHtml;
@@ -1859,7 +1859,7 @@ function renderKlausel(){
   if(chosen.key === 'moderat'){
     begruendung = '\n\nDie Aufteilung berücksichtigt den modernisierungsbedingt höheren Gebäudewert (insbesondere Heizung, Fenster, Sanitär) und liegt im Rahmen der geringfügigen Abweichung von der BMF-Arbeitshilfe, die nach BFH-Urteil vom 16.09.2015 (IX R 12/14) anzuerkennen ist.';
   } else if(chosen.key === 'optimiert'){
-    begruendung = '\n\nDie vertragliche Aufteilung folgt der wirtschaftlichen Werterelation der baulichen Anlagen unter Berücksichtigung wesentlicher Modernisierungen, der konkreten Lage sowie der erwartbaren Restnutzungsdauer. Die BMF-Arbeitshilfe stellt nach BFH-Urteil vom 21.07.2020 (IX R 26/19) keine bindende Rechtsnorm dar; sie ist lediglich Hilfsmittel der Finanzverwaltung.';
+    begruendung = '\n\nDie vertragliche Aufteilung folgt der wirtschaftlichen Werterelation der baulichen Anlagen unter Berücksichtigung wesentlicher Modernisierungen, der konkreten Lage sowie der erwartbaren Restnutzungsdauer. Die BMF-Arbeitshilfe stellt nach BFH-Urteil vom 21.07.2020 (IX R 26/19) keine bindende Rechtsnorm dar, sie ist lediglich Hilfsmittel der Finanzverwaltung.';
   }
 
   // Klausel-Aufbau gemäß Spec
@@ -1869,7 +1869,7 @@ function renderKlausel(){
       '<strong>§ X &nbsp; Kaufpreisaufteilung</strong>\n\n' +
       'Die Vertragsparteien sind sich einig, dass sich der vereinbarte Gesamtkaufpreis in Höhe von ' +
       '<span class="num">' + fmtEur(bruttoKp,2) + '</span> wie folgt aufteilt:\n\n' +
-      '<strong>(1)</strong> Auf das mit veräußerte <em>Inventar</em> (bewegliche Wirtschaftsgüter — insbesondere Einbauküche, Möblierung und Geräte) entfällt ein Anteil in Höhe von ' +
+      '<strong>(1)</strong> Auf das mit veräußerte <em>Inventar</em> (bewegliche Wirtschaftsgüter, insbesondere Einbauküche, Möblierung und Geräte) entfällt ein Anteil in Höhe von ' +
       '<span class="num">' + fmtEur(inv,2) + '</span>.\n\n' +
       '<strong>(2)</strong> Auf den verbleibenden Immobilien-Kaufpreis in Höhe von ' +
       '<span class="num">' + fmtEur(immoKp,2) + '</span> entfallen:\n\n' +
@@ -1929,7 +1929,7 @@ function copyKlausel(){
     }, 2200);
     toast('✓ Notarvertrag-Klausel in Zwischenablage kopiert');
   } catch(e){
-    toast('⚠ Kopieren fehlgeschlagen — bitte manuell markieren');
+    toast('⚠ Kopieren fehlgeschlagen, bitte manuell markieren');
   }
 }
 
@@ -2100,7 +2100,7 @@ function suggestGaaBmf(){
 
   // Vorab-Validierung: ohne PLZ + Ort macht's keinen Sinn
   if(!payload.plz || !payload.ort){
-    toast('KI-Vorschlag braucht PLZ und Ort — bitte erst im Tab Objekt eintragen');
+    toast('KI-Vorschlag braucht PLZ und Ort, bitte erst im Tab Objekt eintragen');
     if(btn){ btn.disabled = false; btn.textContent = 'KI-Vorschlag'; }
     return;
   }
@@ -2175,7 +2175,7 @@ function suggestGaaBmf(){
       toast('⚠ KI fand keine ausreichenden Daten für ' + ((document.getElementById('plz') || {}).value || 'diese Lage') + '. ' +
             'Bitte BRW manuell aus BORIS-NRW (boris.nrw.de) eintragen.');
     } else {
-      toast('GAA-Werte von KI vorgeschlagen — Confidence: ' + confidenceLabel);
+      toast('GAA-Werte von KI vorgeschlagen, Confidence: ' + confidenceLabel);
     }
     _persistBmfState();
   })
@@ -2299,7 +2299,7 @@ function openBMFModal(){
   //               'BMF-Rechner & Export' verspricht. Jetzt bmf_calc_export.
   if(!_hasBmfCalc()){
     toast('🔒 BMF-Rechner ist Teil des Investor-Plans oder höher');
-    console.warn('[bmf-modal] bmf_calc_export nicht verfügbar — Plan unter Investor?');
+    console.warn('[bmf-modal] bmf_calc_export nicht verfügbar, Plan unter Investor?');
     return;
   }
 
@@ -2416,7 +2416,7 @@ function applyToTax(){
   if(typeof window.calc === 'function') window.calc();
 
   if(bmfApplied){
-    toast('✓ BMF-Werte übernommen — Gebäudeanteil ' + (window._lastBmfResults.gebaeudeanteil_prozent.value.toFixed(1) + ' %').replace('.', ',') + ' im Steuermodul');
+    toast('✓ BMF-Werte übernommen, Gebäudeanteil ' + (window._lastBmfResults.gebaeudeanteil_prozent.value.toFixed(1) + ' %').replace('.', ',') + ' im Steuermodul');
   } else {
     toast('Bitte erst Berechnung in Pane 2 durchführen');
     return;  // nicht schließen wenn nichts zu übernehmen
@@ -2447,7 +2447,7 @@ function _initBmfAdvancedButton(){
   //  - Investor-User sehen den Pro-Button als Upgrade-Anreiz (Konversion)
   //  - Click-Handler zeigt klaren Toast wenn nicht berechtigt
   btn.style.display = '';
-  console.log('[bmf-modal] Button initialisiert — Plan-Check beim Klick');
+  console.log('[bmf-modal] Button initialisiert, Plan-Check beim Klick');
 }
 document.addEventListener('DOMContentLoaded', _initBmfAdvancedButton);
 if(document.readyState === 'complete' || document.readyState === 'interactive'){
@@ -2504,11 +2504,11 @@ function _updateFooterNav(paneId){
   var hint = document.getElementById('bmfmoFooterHint');
   if(hint){
     var hints = {
-      'p-ak':    '<b>Schritt 1 / 5:</b> Anschaffungskosten — Brutto-KP, Inventar, Nebenkosten ergeben die Prognose-AK (V292-Pipeline).',
+      'p-ak':    '<b>Schritt 1 / 5:</b> Anschaffungskosten, Brutto-KP, Inventar, Nebenkosten ergeben die Prognose-AK (V292-Pipeline).',
       'p-bmf':   '<b>Schritt 2 / 5:</b> BMF-Eckdaten + KI-GAA. Änderungen lösen automatisch eine neue Berechnung aus (500ms debounced).',
-      'p-afa':   '<b>Schritt 3 / 5:</b> Vergleich: Amtlich, Konservativ, Optimiert und die umgekehrte Ertragswertmethode nach Jacoby — gewählt wird in Schritt 4.',
-      'p-hebel': '<b>Schritt 4 / 5:</b> Welche Aufteilung soll gelten? Eine Zeile wählen — übernommen wird in Schritt 5 (Übersicht und Ausgabe).',   /* v3184 */
-      'p-boden': '<b>Schritt 5 / 5:</b> Übersicht der Auswahl, Begründung und alle Ausgaben — Kaufpreisaufteilung, BMF-Arbeitshilfe, BMF-Original, Texte für Vertrag und Berater.'
+      'p-afa':   '<b>Schritt 3 / 5:</b> Vergleich: Amtlich, Konservativ, Optimiert und die umgekehrte Ertragswertmethode nach Jacoby, gewählt wird in Schritt 4.',
+      'p-hebel': '<b>Schritt 4 / 5:</b> Welche Aufteilung soll gelten? Eine Zeile wählen, übernommen wird in Schritt 5 (Übersicht und Ausgabe).',   /* v3184 */
+      'p-boden': '<b>Schritt 5 / 5:</b> Übersicht der Auswahl, Begründung und alle Ausgaben, Kaufpreisaufteilung, BMF-Arbeitshilfe, BMF-Original, Texte für Vertrag und Berater.'
     }; /* V292-footer-hints */
     hint.innerHTML = hints[paneId] || hints['p-ak'];
   }
@@ -2524,7 +2524,7 @@ function bmfPaneNext(){
     var _mm = parseDe((document.getElementById('ds2_marktmiete') || {}).value);
     if (!(_m > 0) && !(_mm > 0)) {
       if (typeof toast === 'function') {
-        toast('Bitte erst die Nettokaltmiete eintragen — sie wird für das Ertragswertverfahren benötigt (bei Leerstand: Marktmiete im Tab Miete).');
+        toast('Bitte erst die Nettokaltmiete eintragen, sie wird für das Ertragswertverfahren benötigt (bei Leerstand: Marktmiete im Tab Miete).');
       }
       var _mEl = $('bmf_miete');
       if (_mEl) { _mEl.classList.add('dp-required-bmf'); _mEl.focus(); }
@@ -2659,7 +2659,7 @@ function _renderVergleich(){
   if(diffEur > 200){
     rec = '<strong style="color:var(--green,#3FA56C)">✓ Empfehlung: BMF-Berechnung anwenden.</strong> Die BMF-Aufteilung bringt dir ~' + Math.round(diffEur) + ' € mehr Steuerersparnis pro Jahr (' + Math.round(diffEur * 50) + ' € über 50 J).';
   } else if(diffEur < -200){
-    rec = '<strong style="color:var(--muted)">Hinweis: Standard 80/20 wäre günstiger.</strong> BMF rechnet ~' + Math.abs(Math.round(diffEur)) + ' € weniger AfA pro Jahr — selten der Fall, prüfe deine Eingaben.';
+    rec = '<strong style="color:var(--muted)">Hinweis: Standard 80/20 wäre günstiger.</strong> BMF rechnet ~' + Math.abs(Math.round(diffEur)) + ' € weniger AfA pro Jahr, selten der Fall, prüfe deine Eingaben.';
   } else {
     rec = '<strong style="color:var(--muted)">Hinweis:</strong> Beide Methoden liegen sehr nah beieinander (~' + Math.round(Math.abs(diffEur)) + ' € Diff). Standard 80/20 ist FA-freundlicher und einfacher.';
   }
@@ -2773,10 +2773,10 @@ function _renderKlauselText(){ /* V293-E-klausel-no-pct: Prozente entfernt, nur 
 
   /* v2260 · Ueberschrift der abweichenden Varianten aus ihrer Definition */
   var _kv = _KLAUSEL_VARIANTEN.filter(function(v){ return v.key === _selVar; })[0];
-  var _kopfAbw = _kv ? (_kv.name + ' — ' + _kv.zusatz) : 'Moderat — empfohlen';
+  var _kopfAbw = _kv ? (_kv.name + ' — ' + _kv.zusatz) : 'Moderat, empfohlen';
   var texts = {
     amtlich:
-      '<p><strong>Kaufpreisaufteilung (Amtlich — nach BMF-Arbeitshilfe)</strong></p>' +
+      '<p><strong>Kaufpreisaufteilung (Amtlich, nach BMF-Arbeitshilfe)</strong></p>' +
       '<p>Die Vertragsparteien teilen den Gesamtkaufpreis in Höhe von <strong>' + _eur(kp) + '</strong> ' +
       'für das Objekt <em>' + (addr || '[Objektadresse]') + '</em> wie folgt auf:</p>' +
       '<ul style="margin:8px 0;padding-left:22px"><li>Auf den Grund und Boden entfallen <strong>' + _eur(basisGrund) + '</strong>.</li>' +
@@ -2790,7 +2790,7 @@ function _renderKlauselText(){ /* V293-E-klausel-no-pct: Prozente entfernt, nur 
       '<ul style="margin:8px 0;padding-left:22px"><li>Grund und Boden: <strong>' + _eur(basisGrund) + '</strong></li>' +
       '<li>Gebäudesubstanz (abnutzbares Wirtschaftsgut): <strong>' + _eur(basisGeb) + '</strong></li></ul>' +
       '<p>Die Aufteilung berücksichtigt den nach BMF-Arbeitshilfe (Stand März 2026) ermittelten Sachwertanteil unter Beachtung von Baujahr, Wohnfläche, Bodenrichtwert und Lage. ' +
-      'Die Vertragsparteien sind übereingekommen, dass diese Aufteilung der wirtschaftlichen Wertverteilung entspricht und der steuerlichen Behandlung — insbesondere der AfA-Berechnung — zugrunde gelegt wird. ' +
+      'Die Vertragsparteien sind übereingekommen, dass diese Aufteilung der wirtschaftlichen Wertverteilung entspricht und der steuerlichen Behandlung, insbesondere der AfA-Berechnung, zugrunde gelegt wird. ' +
       'Stand: ' + datum + '.</p>'
     /* v3686 · Pruefbericht 18.11.2026 P-11: die Klausel „Aggressiv“ („rechtsverbindlich“, „verbindlicher Charakter“,
        BFH-Zitat als Anerkennungsversprechen) gehoert in keinen Kaufvertrag. Die Variante ist seit v3184
@@ -2819,7 +2819,7 @@ function _renderKlauselText(){ /* V293-E-klausel-no-pct: Prozente entfernt, nur 
       '<p>Die Aufteilung folgt der umgekehrten Ertragswertmethode (BFH, Urteil vom 20.09.2022, IX R 12/21): ausgehend vom Kaufpreis und dem Bodenwert ' +
       'mit einem Liegenschaftszinssatz von ' + String(_jac.lzs_pct).replace('.', ',') + ' %' + (_jac.ausschuss ? ' (' + _jac.ausschuss + ')' : '') +
       ' und einer Restnutzungsdauer von ' + _jac.rnd_jahre + ' Jahren. Die Herleitung liegt bei. ' +
-      'Die Vertragsparteien sind übereingekommen, dass diese Aufteilung der wirtschaftlichen Wertverteilung entspricht und der steuerlichen Behandlung — insbesondere der AfA-Berechnung — zugrunde gelegt wird. ' +
+      'Die Vertragsparteien sind übereingekommen, dass diese Aufteilung der wirtschaftlichen Wertverteilung entspricht und der steuerlichen Behandlung, insbesondere der AfA-Berechnung, zugrunde gelegt wird. ' +
       'Stand: ' + datum + '.</p>';
   }
   if(el) el.innerHTML = texts[_textKey] || texts.amtlich;
@@ -2827,7 +2827,7 @@ function _renderKlauselText(){ /* V293-E-klausel-no-pct: Prozente entfernt, nur 
 
 function copyKlausel_unused_v292(){
   // V289.2.5: hier durch Mockup-Original (Z.1051) ersetzt — bessere Animation
-  console.warn('Call to copyKlausel_unused — using Mockup-Original');
+  console.warn('Call to copyKlausel_unused, using Mockup-Original');
 }
 
 // Issue #10: Übernehmen schreibt Gebäudeanteil + AfA-Satz in AfA-Konfig-Card
@@ -2939,7 +2939,7 @@ if (typeof window.fmtForInput !== 'function') {
       };
     };
     window.__v292_6_2_dollar_patched = true;
-    console.log('[v292.6.2] $ defensive wrapper installed — null-checks no longer crash');
+    console.log('[v292.6.2] $ defensive wrapper installed, null-checks no longer crash');
   }
 })();
 

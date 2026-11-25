@@ -265,7 +265,7 @@ window.ImmoKalkImport = (function() {
                             (_toNum(R('N33')) * 100).toFixed(2).replace('.', ',') + ' %');
       if (d4 > 0) rest.push('IV: ' + Math.round(d4).toLocaleString('de-DE') + ' € zu ' +
                             (_toNum(R('N40')) * 100).toFixed(2).replace('.', ',') + ' %');
-      issues.push('NICHT übernommen — DealPilot rechnet mit zwei Darlehen: ' + rest.join(' · ') +
+      issues.push('NICHT übernommen, DealPilot rechnet mit zwei Darlehen: ' + rest.join(' · ') +
                   '. Bitte von Hand ergänzen oder mit Darlehen II zusammenlegen; ' +
                   'automatisch zusammengefasst wird nichts, weil die Zinssätze verschieden sind.');
     }
@@ -623,7 +623,7 @@ window.importImmoKalkExcel = function(input) {
       // dessen Felder überschreiben. Stattdessen: ein neues Objekt anlegen.
       var hasLoadedObject = !!window._currentObjKey;
       var contextHint = hasLoadedObject
-        ? '\n\nℹ Aktuell ist ein Objekt geladen. Der Import wird ein NEUES Objekt anlegen — das geladene Objekt bleibt unverändert.'
+        ? '\n\nℹ Aktuell ist ein Objekt geladen. Der Import wird ein NEUES Objekt anlegen, das geladene Objekt bleibt unverändert.'
         : '\n\nDie Werte werden in das aktuelle (leere) Formular übernommen.';
 
       var summary =

@@ -300,7 +300,7 @@
     var s = typeof l.satz === 'string' ? { text: l.satz } : l.satz;
     var t = [s.text, s.warum_kein_wert, s.kosten].filter(Boolean).join(' ');
     if (!t) return '';
-    return '<div class="hinweis"><b>Sachwertfaktor – Quelle:</b> ' + esc(t) + (l.url ? ' <span class="det">' + esc(l.url) + '</span>' : '')
+    return '<div class="hinweis"><b>Sachwertfaktor, Quelle:</b> ' + esc(t) + (l.url ? ' <span class="det">' + esc(l.url) + '</span>' : '')
       + (s.hinweis ? '<br><span class="det">' + esc(s.hinweis) + '</span>' : '') + '</div>';
   }
 
@@ -487,7 +487,7 @@
         return '<tr' + (x.objekt ? ' class="ende"' : '') + '><td>' + (x.objekt ? 'Lage des Objekts' : 'Zone ' + esc(x.nr)) + (x.ort && !x.objekt ? ' · ' + esc(x.ort) : '') + '</td><td>' + esc(x.nutzung) + (x.gfz ? ', GFZ ' + esc(x.gfz) : '') + '</td>'
           + '<td class="r num">' + zahl(x.wert, 0) + '</td><td class="r num">' + esc(datum(x.stichtag)) + '</td><td class="r num">' + (x.objekt ? '–' : 'ca. ' + zahl(Math.round(x.dist / 10) * 10, 0) + ' m') + '</td></tr>';
       }).join('') + '</tbody></table>'
-      + '<p class="det">Abgefragt an ' + z.punkte + ' Punkten der Nahkarte; sehr kleine Zonen dazwischen können fehlen. Entfernung bis zum nächsten abgefragten Punkt der Zone. '
+      + '<p class="det">Abgefragt an ' + z.punkte + ' Punkten der Nahkarte, sehr kleine Zonen dazwischen können fehlen. Entfernung bis zum nächsten abgefragten Punkt der Zone. '
       + (z.liste.length > l.length ? 'Gezeigt die ' + l.length + ' nächsten von ' + z.liste.length + ' Zonen. ' : '') + esc(BRW_VERMERK.replace(/^Bodenrichtwertzonen /, 'Quelle: ')) + '.</p></div>';
   }
   /* v3219 · Seiten einpassen (Marcel 08.11.2026: "zwei oder drei Zeilen auf ein neues Blatt und der Rest ist
@@ -836,7 +836,7 @@
       + '</tbody></table>';
     var mv = (p.valuation && p.valuation.market_value) || {};
     teile.push(seite(d, 'Markt', ab('Markt') + '<h2>Markt</h2>'
-      + '<p class="sub">Aktueller Marktdurchschnitt vergleichbarer Angebote im Umkreis von ' + zahl((s.used_radius_m || 0) / 1000, 0) + ' km. Angebotspreise sind keine Kaufpreise; sie werden um den Angebotsabschlag bereinigt.</p>'
+      + '<p class="sub">Aktueller Marktdurchschnitt vergleichbarer Angebote im Umkreis von ' + zahl((s.used_radius_m || 0) / 1000, 0) + ' km. Angebotspreise sind keine Kaufpreise, sie werden um den Angebotsabschlag bereinigt.</p>'
       + markt
       + '<div class="kv" style="margin-top:4mm">'
       + '<div><span>Preisentwicklung</span><span class="num">' + (istZahl(p.price_trend_pct) ? (p.price_trend_pct > 0 ? '+' : '') + zahl(p.price_trend_pct, 1) + ' %' : '–') + '</span></div>'
@@ -874,7 +874,7 @@
         + (istZahl(sw.value_eur) ? '<h3>Sachwert</h3>' + staffelTabelle(sw.staffel, swQ)
           + (sw.restnutzungsdauer_herkunft && sw.restnutzungsdauer_herkunft.hinweis ? '<p class="det">' + esc(sw.restnutzungsdauer_herkunft.hinweis) + '</p>' : '')
           + (sw.sachwertfaktor ? '<div class="hinweis">Sachwertfaktor: ' + esc(sw.sachwertfaktor_ausschuss || 'zuständiger Gutachterausschuss') + '. Er ist nach demselben Modell abgeleitet, in dem hier gerechnet wird (NHK 2010, lineare Alterswertminderung, § 10 ImmoWertV).</div>'
-            : '<div class="hinweis">Für diesen Ort liegt kein Sachwertfaktor vor. Ausgewiesen ist der vorläufige Sachwert ohne Marktanpassung; er ist eine Herstellungskostenrechnung, kein Marktwert.</div>') : '')
+            : '<div class="hinweis">Für diesen Ort liegt kein Sachwertfaktor vor. Ausgewiesen ist der vorläufige Sachwert ohne Marktanpassung, er ist eine Herstellungskostenrechnung, kein Marktwert.</div>') : '')
         + swfWeg(sw)));
     }
 
@@ -949,7 +949,7 @@
     teile.push(seite(d, 'Quellen', ab('Quellen und Grundlagen') + '<h2>Quellen und Grundlagen</h2>'
       + '<ol class="quellen">' + uniq.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ol>'
       + ((c.notes || []).length ? '<h3>Hinweise zur Rechnung</h3>' + c.notes.map(function (n) { return '<p class="det" style="font-size:7.8pt">' + esc(n) + '</p>'; }).join('') : '')
-      + '<h3>Zu diesem Bericht</h3><p>Die Wertermittlung folgt der Immobilienwertermittlungsverordnung 2021. Sie ist indikativ und ersetzt kein Verkehrswertgutachten nach § 194 BauGB. Grundlage sind die Angaben zum Objekt; eine Besichtigung hat nicht stattgefunden. Jede Zahl stammt aus einer genannten Quelle oder ist als Annahme gekennzeichnet.</p>'
+      + '<h3>Zu diesem Bericht</h3><p>Die Wertermittlung folgt der Immobilienwertermittlungsverordnung 2021. Sie ist indikativ und ersetzt kein Verkehrswertgutachten nach § 194 BauGB. Grundlage sind die Angaben zum Objekt, eine Besichtigung hat nicht stattgefunden. Jede Zahl stammt aus einer genannten Quelle oder ist als Annahme gekennzeichnet.</p>'
       + '<p class="det">Erstellt am ' + esc(datum(d.erstellt || new Date())) + ' mit DealPilot · Fassung ' + VERSION + '</p>'));
 
     /* v3219 · Marcel 08.11.2026: "keine Semikolons oder Bindestriche, normale Werte, normale Saetze mit Punkt

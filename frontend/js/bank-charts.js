@@ -615,13 +615,13 @@ if (!window._wlc) {
     var ltvQuoteText;
     // v2240: ≤60 sehr sicher, ≤ max_ltv solide, ≤100 erhöht, >100 kritisch (max_ltv aus den Einstellungen)
     if (ltvToday > _s.ltvRot) {
-      ltvQuoteText = '<strong>Übersichert (' + _fmtPct(ltvToday, 0) + '):</strong> Restschuld höher als Wert — kritisch. Sinkt durch Tilgung &amp; Wertsteigerung in ' + bindj + ' Jahren auf ' + _fmtPct(ltvEzb, 0) + '.';
+      ltvQuoteText = '<strong>Übersichert (' + _fmtPct(ltvToday, 0) + '):</strong> Restschuld höher als Wert, kritisch. Sinkt durch Tilgung &amp; Wertsteigerung in ' + bindj + ' Jahren auf ' + _fmtPct(ltvEzb, 0) + '.';
     } else if (ltvToday > _s.ltvGruen) {
-      ltvQuoteText = '<strong>Erhöhter Start-LTV (' + _fmtPct(ltvToday, 0) + '):</strong> Über ' + _lG + '% Beleihung — Zinsaufschläge wahrscheinlich. Sinkt in ' + bindj + ' Jahren auf ' + _fmtPct(ltvEzb, 0) + '.';
+      ltvQuoteText = '<strong>Erhöhter Start-LTV (' + _fmtPct(ltvToday, 0) + '):</strong> Über ' + _lG + '% Beleihung, Zinsaufschläge wahrscheinlich. Sinkt in ' + bindj + ' Jahren auf ' + _fmtPct(ltvEzb, 0) + '.';
     } else if (ltvToday > Math.min(60, _s.ltvGruen)) {
-      ltvQuoteText = '<strong>Solider Start-LTV (' + _fmtPct(ltvToday, 0) + '):</strong> Klassische Bank-Finanzierung — verhandelbare Konditionen.';
+      ltvQuoteText = '<strong>Solider Start-LTV (' + _fmtPct(ltvToday, 0) + '):</strong> Klassische Bank-Finanzierung, verhandelbare Konditionen.';
     } else {
-      ltvQuoteText = '<strong>Sehr sicher (' + _fmtPct(ltvToday, 0) + '):</strong> Hoher EK-Anteil — beste Konditionen, niedriges Risiko.';
+      ltvQuoteText = '<strong>Sehr sicher (' + _fmtPct(ltvToday, 0) + '):</strong> Hoher EK-Anteil, beste Konditionen, niedriges Risiko.';
     }
     var ltvQuoteCls = ltvToday > _s.ltvGruen ? 'bc-bank-tag-warn' : '';
 
@@ -798,7 +798,7 @@ if (!window._wlc) {
     var hasBsparW = bsparKumEnd > 0;
 
     if (total <= 0) {
-      host.innerHTML = '<div class="bc-empty">Vermögenszuwachs ist nicht positiv — kein Waterfall darstellbar.</div>';
+      host.innerHTML = '<div class="bc-empty">Vermögenszuwachs ist nicht positiv, kein Waterfall darstellbar.</div>';
       return;
     }
     var ek0 = (state.kpis && state.kpis.ek) || 0;
@@ -965,8 +965,8 @@ if (!window._wlc) {
             '<span class="bc-footer-sub">' + (hasBsparW
               ? ('Brutto ' + _fmtEUR(tilgEffektivBrutto) + ' (Tilgung + BSV-Guthaben), abzüglich Eigenanteil ' + _fmtEUR(eigenanteil) + ' = echter Schuldenabbau aus Mietüberschuss.')
               : (eigenanteil > 0
-                  ? ('Tilgung ' + _fmtEUR(tilgEffektivBrutto) + ' brutto, abzüglich ' + _fmtEUR(eigenanteil) + ' Eigenanteil — netto ' + _fmtEUR(tilgEffektiv) + ' aus Miete.')
-                  : 'Tilgungsanteil — durch Mieten abbezahlt.')) + '</span>' +
+                  ? ('Tilgung ' + _fmtEUR(tilgEffektivBrutto) + ' brutto, abzüglich ' + _fmtEUR(eigenanteil) + ' Eigenanteil, netto ' + _fmtEUR(tilgEffektiv) + ' aus Miete.')
+                  : 'Tilgungsanteil, durch Mieten abbezahlt.')) + '</span>' +
           '</div>' +
           '<div class="bc-footer-cell bc-footer-cell-highlight">' +
             (eigenanteil > 0
@@ -1074,13 +1074,13 @@ if (!window._wlc) {
     var dscrBoth        = matrix[2][1];         // -10% Miete + 1pp Zins
 
     if (dscrBoth >= 1.0) {
-      assessment = '<strong>Sehr widerstandsfähig:</strong> Auch bei 10% Mietausfall UND 1pp Zinssteigerung bleibt DSCR über 1,0 — Bank-tauglicher Stress-Test bestanden.';
+      assessment = '<strong>Sehr widerstandsfähig:</strong> Auch bei 10% Mietausfall UND 1pp Zinssteigerung bleibt DSCR über 1,0, Bank-tauglicher Stress-Test bestanden.';
     } else if (dscrMietMinus10 >= 1.0 && dscrZinsPlus1 >= 1.0) {
-      assessment = '<strong>Robust gegen einzelne Stressfaktoren:</strong> 10% Mietausfall ODER 1pp Zinssteigerung wird verkraftet. Bei beidem gleichzeitig wird es eng — 3-Mon. Liquiditätsreserve einplanen.';
+      assessment = '<strong>Robust gegen einzelne Stressfaktoren:</strong> 10% Mietausfall ODER 1pp Zinssteigerung wird verkraftet. Bei beidem gleichzeitig wird es eng, 3-Mon. Liquiditätsreserve einplanen.';
     } else if (dscrBase_check >= 1.0) {
-      assessment = '<strong>Stress-Anfällig:</strong> Schon kleine Verschlechterungen drücken DSCR unter 1,0 — Liquiditätsreserve oder höherer Eigenanteil empfohlen.';
+      assessment = '<strong>Stress-Anfällig:</strong> Schon kleine Verschlechterungen drücken DSCR unter 1,0, Liquiditätsreserve oder höherer Eigenanteil empfohlen.';
     } else {
-      assessment = '<strong>Hohe Sensitivität:</strong> Bereits im Base-Case ist die Schuldendeckung knapp — strukturelle Anpassungen empfohlen (mehr EK, längere Tilgung, höhere Miete).';
+      assessment = '<strong>Hohe Sensitivität:</strong> Bereits im Base-Case ist die Schuldendeckung knapp, strukturelle Anpassungen empfohlen (mehr EK, längere Tilgung, höhere Miete).';
     }
 
     var matrixHtml = '';

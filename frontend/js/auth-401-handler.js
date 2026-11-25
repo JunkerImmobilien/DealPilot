@@ -23,7 +23,7 @@
   'use strict';
 
   if (!window.Auth || typeof window.Auth.apiCall !== 'function') {
-    console.warn('[401-handler] Auth.apiCall nicht gefunden — Handler nicht installiert');
+    console.warn('[401-handler] Auth.apiCall nicht gefunden, Handler nicht installiert');
     return;
   }
 
@@ -67,7 +67,7 @@
       } catch (e) {}
 
       if (typeof window.showAuthModal !== 'function') {
-        reject(new Error('Re-Login nicht möglich — showAuthModal fehlt. Bitte Seite neu laden.'));
+        reject(new Error('Re-Login nicht möglich, showAuthModal fehlt. Bitte Seite neu laden.'));
         return;
       }
 
@@ -115,7 +115,7 @@
           // Prüfen ob Login erfolgreich war
           var token = localStorage.getItem('ji_token');
           if (token) {
-            console.log('[401-handler] ✓ Re-Login erfolgreich — Request wird wiederholt');
+            console.log('[401-handler] ✓ Re-Login erfolgreich, Request wird wiederholt');
             resolve();
           } else {
             console.warn('[401-handler] Re-Login abgebrochen oder fehlgeschlagen');
@@ -180,7 +180,7 @@
       }
       // Anti-Doppel-Retry: einmal ist genug
       if (options._v156_retried) {
-        console.warn('[401-handler] Auch nach Re-Login wieder 401 — gebe auf');
+        console.warn('[401-handler] Auch nach Re-Login wieder 401, gebe auf');
         throw err;
       }
 
@@ -207,5 +207,5 @@
     }
   };
 
-  console.log('[401-handler] V156 installiert — Auto-Re-Login bei abgelaufenem Token aktiv');
+  console.log('[401-handler] V156 installiert, Auto-Re-Login bei abgelaufenem Token aktiv');
 })();

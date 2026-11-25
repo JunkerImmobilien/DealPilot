@@ -228,7 +228,7 @@
     var sz = String(Math.round(10000 / j) / 100).replace('.', ',');   /* v3064a: den Satz mitnennen (eigener Satz aus Gutachten z. B. 6,25 % = 16 J.) */
     var stil = 'margin:10px 0 0;padding:9px 12px;border-radius:8px;font-size:12.5px;line-height:1.5;';
     if (!r.hebung) return '<div class="dp-fesh dp-fesh-2" style="' + stil + 'background:color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 10%,#fff);border:1px solid color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 35%,transparent)">'
-      + '<b>Steuer · 2 von 4 zentralen Bereichen</b> (' + esc(r.bereiche.join(', ')) + '). Kommt ein dritter dazu — Fenster, Elektro, Sanitär oder Heizung — '
+      + '<b>Steuer · 2 von 4 zentralen Bereichen</b> (' + esc(r.bereiche.join(', ')) + '). Kommt ein dritter dazu, Fenster, Elektro, Sanitär oder Heizung — '
       + 'und wird der Standard dabei deutlich gehoben, sind die Kosten Herstellungskosten (AfA über ' + jt + ' Jahre), kein Erhaltungsaufwand (BMF-Schreiben vom 26.01.2026).</div>';
     return '<div class="dp-fesh dp-fesh-3" style="' + stil + 'background:color-mix(in srgb,#B8625C 8%,#fff);border:1px solid color-mix(in srgb,#B8625C 35%,transparent)">'
       + '<b style="color:#B8625C">Steuer · Standardhebung: ' + r.anzahl + ' von 4 zentralen Bereichen</b> (' + esc(r.bereiche.join(', ')) + '). '
@@ -451,7 +451,7 @@
     var zb = w.ziel_bremse || {}, zq = zahl(w.ziel_qm), bad = !!(og && br && br.gilt === true && zq > og + 0.004 && !zb.ausnahme);
     z.push({ c: 'ziel', t: 'Zielbild', v: zq > 0 ? eur2(zq) + '/m²' + (wfl ? ' · ' + eur(zq * wfl) + '/Monat' : '') : 'noch keine Zielmiete', bad: bad,
       tag: zb.gekappt ? (zb.grenze === 'wistg' ? 'auf die Höchstmiete bei Neuvermietung begrenzt' : 'auf die Mietpreisbremse begrenzt') : zb.ueber ? 'Ausnahme § ' + zb.ausnahme + ' BGB' : '', warn: !!zb.gekappt,
-      u: bad ? 'über der Mietpreisbremse — nur mit höherer Vormiete (§ 556e) oder nach umfassender Modernisierung (§ 556f)'
+      u: bad ? 'über der Mietpreisbremse, nur mit höherer Vormiete (§ 556e) oder nach umfassender Modernisierung (§ 556f)'
         : zb.text ? zb.text + (f.ziel_wann ? ' · ' + String(f.ziel_wann) : '')
         : (f.ziel_wann ? String(f.ziel_wann) : 'Zielmiete und Maßnahmen darunter eintragen') });
     z._kapp = d.kapp && d.kapp.text;
@@ -543,7 +543,7 @@
      neuvermietung). Eine eigene „marktübliche Miete nach Modernisierung" (zb_markt_qm)
      geht vor. Ohne Marktmiete: kein Vorschlag, sondern der Weg zur Marktbewertung.
      Nach außen keine Quellennamen - „aktueller Marktdurchschnitt". */
-  var VORSCHLAG_FEHLT = 'Marktbewertung abrufen (Reiter Objekt, „Marktbericht abrufen“ – Stufe 1 genügt), dann schlägt DealPilot je Wohnung eine Zielmiete vor.';
+  var VORSCHLAG_FEHLT = 'Marktbewertung abrufen (Reiter Objekt, „Marktbericht abrufen“, Stufe 1 genügt), dann schlägt DealPilot je Wohnung eine Zielmiete vor.';
   function qmDe(x) { return x.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
   function marktSaniert(m) {
     var eig = zahl(wert('zb_markt_qm'));
@@ -563,7 +563,7 @@
     var qm = Math.round((oben > mitte ? oben : mitte) * 100) / 100;
     return { qm: qm, mitte: Math.round(mitte * 100) / 100, art: oben > mitte ? 'oben' : 'mitte', wfl_schnitt: ds || null, datum: c.bericht_datum || null,
       herkunft: 'aktueller Marktdurchschnitt' + (ds > 0 ? ' für Wohnungen um ' + Math.round(ds) + ' m²' : '')
-        + (oben > mitte ? ', obere Spanne als Ansatz für den sanierten Zustand (Mitte ' + qmDe(mitte) + ' €/m²)' : ' (Mitte; keine Spanne in der Marktbewertung)')
+        + (oben > mitte ? ', obere Spanne als Ansatz für den sanierten Zustand (Mitte ' + qmDe(mitte) + ' €/m²)' : ' (Mitte, keine Spanne in der Marktbewertung)')
         + (c.bericht_datum ? ' · Marktbewertung vom ' + c.bericht_datum : '') };
   }
   function vorschlagFuer(m, idx) {
@@ -578,7 +578,7 @@
     if (zm && zm.vergleich) r.vergleich = zm.vergleich;
     if (zm && zm.prognose) r.prognose = zm.prognose;
     /* die Marktmiete gilt für die mittlere Wohnungsgröße - weicht diese Wohnung deutlich ab, sagt es der Vorschlag */
-    if (b && b.wfl_schnitt > 0 && Math.abs(w.wfl / b.wfl_schnitt - 1) > 0.35) r.groesse = 'Wohnung deutlich ' + (w.wfl > b.wfl_schnitt ? 'größer' : 'kleiner') + ' als der Durchschnitt — Marktmiete je m² weicht dann meist ab';
+    if (b && b.wfl_schnitt > 0 && Math.abs(w.wfl / b.wfl_schnitt - 1) > 0.35) r.groesse = 'Wohnung deutlich ' + (w.wfl > b.wfl_schnitt ? 'größer' : 'kleiner') + ' als der Durchschnitt, Marktmiete je m² weicht dann meist ab';
     return r;
   }
   /** v3130 · alle Wohnungen des Arbeitsstands: { markt, zeilen:[{ i, nr, lage, wfl, ist, ziel_qm, v }] } */
@@ -758,7 +758,7 @@
         ? 'gerechnet: Marktmiete ' + eur2(vAng.markt_qm) + '/m² (aktueller Marktdurchschnitt der Angebotsmieten, Feld Marktmiete im Tab Miete) − ' + dez(vAng.pct, vAng.pct % 1 ? 1 : 0) + ' % = ' + eur2(vAng.qm) + '/m²'
           + ' · Abschlag ' + dez(vAng.pct, vAng.pct % 1 ? 1 : 0) + ' %' + (vAb && vAb.grund ? ', weil ' + vAb.grund + (STUFE_W[vAb.stufe] ? ' (Marktlage ' + STUFE_W[vAb.stufe] + ')' : '') : '')
           + ': Angebotsmieten liegen über der ortsüblichen Vergleichsmiete, denn in diese gehen auch die Bestandsmieten der letzten sechs Jahre ein (§ 558 Abs. 2 BGB)'
-        : 'gerechnet mit der Marktmiete ' + eur2(vAng.markt_qm) + '/m² ohne Abschlag (Marktlage nicht bekannt) — die ortsübliche Vergleichsmiete liegt meist darunter';
+        : 'gerechnet mit der Marktmiete ' + eur2(vAng.markt_qm) + '/m² ohne Abschlag (Marktlage nicht bekannt), die ortsübliche Vergleichsmiete liegt meist darunter';
     } else if (vQa === 'dealpilot_naeherung' && vgO.naeherung && vgO.naeherung.rechnung && Math.abs(zahl(vgO.naeherung.qm) - vglQm) < 0.005) {
       vBegr = 'gerechnet: ' + vgO.naeherung.rechnung;
     }
@@ -804,8 +804,8 @@
             + (vglHer ? ', ' + vglHer : '') + ')' : 'Trag die Vergleichsmiete ein. Dann rechnet DealPilot die Obergrenze')
         : br.gilt === false ? (br.neubau ? br.text + '. ' : '') + 'Neuvermietung frei vereinbar' + (vglQm > 0 ? '. ' + (window.DpMieteRegel ? DpMieteRegel.satz() : '') + ' Das sind ca. ' + eur2(vglQm * (window.DpMieteRegel ? DpMieteRegel.faktorOhne() : 1.2)) + '/m² (§ 5 WiStG)' : '') : '',   /* v3356 · B3 */
       warn: br.gilt === null || !!br.pruefen || (br.gilt === true && markt), lang: br.text
-        + (br.gilt === true && naeh ? ' Die Obergrenze ist auf der DealPilot-Näherung der ortsüblichen Vergleichsmiete gerechnet: sie leitet die Vergleichsmiete aus der amtlichen Zensus-Bestandsmiete ab und ist an den freien Mietspiegeln kalibriert (mittlere Abweichung rund 7,5 %). Maßgeblich bleibt die Vergleichsmiete laut Mietspiegel — liegt sie niedriger, ist auch die zulässige Miete niedriger; vor der Neuvermietung mit dem Mietspiegel prüfen.' : '')
-        + (br.gilt === true && markt && !naeh ? ' Die Obergrenze ist auf einer Schätzung aus Angebotsmieten gerechnet, nicht auf der ortsüblichen Vergleichsmiete (Mietspiegel) — die kann niedriger liegen.' : '')
+        + (br.gilt === true && naeh ? ' Die Obergrenze ist auf der DealPilot-Näherung der ortsüblichen Vergleichsmiete gerechnet: sie leitet die Vergleichsmiete aus der amtlichen Zensus-Bestandsmiete ab und ist an den freien Mietspiegeln kalibriert (mittlere Abweichung rund 7,5 %). Maßgeblich bleibt die Vergleichsmiete laut Mietspiegel, liegt sie niedriger, ist auch die zulässige Miete niedriger, vor der Neuvermietung mit dem Mietspiegel prüfen.' : '')
+        + (br.gilt === true && markt && !naeh ? ' Die Obergrenze ist auf einer Schätzung aus Angebotsmieten gerechnet, nicht auf der ortsüblichen Vergleichsmiete (Mietspiegel), die kann niedriger liegen.' : '')
         + (br.gilt === true ? ' Ausnahmen: höhere Vormiete (§ 556e BGB), erste Vermietung nach umfassender Modernisierung oder Neubau (§ 556f BGB).' : '') });
     /* v3286 · 3b · RECHENWEG der Höchstmiete mit den Zahlen des Objekts (Marcel 11.11.2026: „woher der
        Wert kommt und wie die Maximalmiete berechnet wird"). Gerechnet wird hier nichts Neues: die Regel
@@ -1210,8 +1210,8 @@
     var g = agsJetzt(), reg = msRegister();
     if (!g || !reg || !(reg.werte_verfuegbar || reg.naeherung_verfuegbar)) return null;   /* v3266: auch für die Näherung */
     var bj = parseInt(wert('baujahr'), 10), fl = Math.round(zahl(wflW) * 100) / 100;
-    if (!(bj > 1000)) return { unten: null, mittel: null, oben: null, hinweise: ['Baujahr fehlt — der Mietspiegel ordnet nach Baualter'] };
-    if (!(fl > 0)) return { unten: null, mittel: null, oben: null, hinweise: ['Wohnfläche fehlt — der Mietspiegel ordnet nach Wohnungsgröße'] };
+    if (!(bj > 1000)) return { unten: null, mittel: null, oben: null, hinweise: ['Baujahr fehlt, der Mietspiegel ordnet nach Baualter'] };
+    if (!(fl > 0)) return { unten: null, mittel: null, oben: null, hinweise: ['Wohnfläche fehlt, der Mietspiegel ordnet nach Wohnungsgröße'] };
     var k = g + '|' + bj + '|' + fl + '|' + msMerkmalQuery();
     if (k in _msWerte) { var c = _msWerte[k]; return c && typeof c.then !== 'function' ? c : null; }
     if (!window.Auth || typeof Auth.apiCall !== 'function') return null;
@@ -1422,7 +1422,7 @@
       var ak = opts.aufteilungskosten != null ? opts.aufteilungskosten : D.aufteilungskosten;
       out.aufteilungskosten = (ak != null && String(ak).trim() !== '') ? zahl(ak) : nWohnen * AUFTEILUNG_JE_WE;
       out.aufteilungskosten_herkunft = (ak != null && String(ak).trim() !== '') ? 'eigene Angabe'
-        : 'Vorbelegung ' + AUFTEILUNG_JE_WE.toLocaleString('de-DE') + ' € je Wohnung (Notar, Grundbuch, Teilungserklärung, Abgeschlossenheit) — bitte prüfen';
+        : 'Vorbelegung ' + AUFTEILUNG_JE_WE.toLocaleString('de-DE') + ' € je Wohnung (Notar, Grundbuch, Teilungserklärung, Abgeschlossenheit), bitte prüfen';
     } else {
       var wflO = zahl(wert('wfl')), istO = zahl(wert('nkm'));
       var eO = { ist: istO, wfl: wflO, status: istO > 0 ? 'vermietet' : 'leer',
@@ -1720,7 +1720,7 @@
     var abs = (m.wohnungen || []).map(function (w) { return w.soll && w.soll.miete > w.ist && w.soll.ab ? w.soll.ab : null; }).filter(Boolean).sort();
     var mh = m.stufen.mieterhoehung ? (abs.length ? +String(abs[0] <= heuteYm() ? heuteYm() : abs[0]).slice(0, 4) : new Date().getFullYear()) : null;
     var zf = parseInt(String(wert('zb_fertig_jahr') || '').trim(), 10);
-    return { ankauf: ankauf, mieterhoehung: mh, mieterhoehung_herkunft: abs.length ? 'frühestes Wirksamwerden der Soll-Mieten, § 558b/§ 559b BGB' : 'ohne Termin – laufendes Jahr',   /* v3028: Jahr = WIRKSAM, nicht verlangbar */
+    return { ankauf: ankauf, mieterhoehung: mh, mieterhoehung_herkunft: abs.length ? 'frühestes Wirksamwerden der Soll-Mieten, § 558b/§ 559b BGB' : 'ohne Termin, laufendes Jahr',   /* v3028: Jahr = WIRKSAM, nicht verlangbar */
              zielbild: m.stufen.zielbild && zf >= 1990 && zf <= 2100 ? zf : null };
   }
   /* ── v3213 · W-6 · Ziel-Bruttomietrendite in Stufen (Entwicklungspartner) ──
@@ -1762,14 +1762,14 @@
       + (M.angebote.abschlag_pct != null ? String(Math.round(Number(M.angebote.abschlag_pct) * 10) / 10).replace('.', ',') + ' % ' : '') + 'Abschlag auf Angebotspreise; Mieterhöhung wie Bestand (Angebotspreise hängen nicht an der Miete), Zielbild mit Zustand „modernisiert".');
     if (M.rohertragsfaktor && M.rohertragsfaktor.verfuegbar) t.push('Rohertragsfaktor ' + dez(M.rohertragsfaktor.faktor, 1).replace(',0', '') + ' des '
       + String(M.rohertragsfaktor.ausschuss || 'Gutachterausschusses').replace(/^Der\s+/, '') + (M.rohertragsfaktor.berichtsjahr ? ' (' + M.rohertragsfaktor.berichtsjahr + ')' : '')
-      + ' × Jahresnettokaltmiete der Stufe — Durchschnitt aus Kauffällen, eine Gegenprobe.');
+      + ' × Jahresnettokaltmiete der Stufe, Durchschnitt aus Kauffällen, eine Gegenprobe.');
     else if (M.rohertragsfaktor) t.push('Rohertragsfaktor: ' + (M.rohertragsfaktor.grund || 'nicht veröffentlicht') + '');
     return t.join(' ');
   }
   function jahreFuss(J) {
     return 'Jahre: Bestand ab Kaufdatum' + (J.ankauf ? ' (' + J.ankauf + ')' : ' (nicht eingetragen)')
       + (J.mieterhoehung ? ', Mieterhöhung ' + J.mieterhoehung + ' (' + J.mieterhoehung_herkunft + ')' : '')
-      + ', Zielbild ' + (J.zielbild ? J.zielbild + ' (eigene Angabe)' : 'offen — Feld „Zielbild fertig (Jahr)"') + '.';
+      + ', Zielbild ' + (J.zielbild ? J.zielbild + ' (eigene Angabe)' : 'offen, Feld „Zielbild fertig (Jahr)"') + '.';
   }
   function ankaufKurz() {
     var AK = window.DealPilotAnkauf, st = null;
@@ -2209,7 +2209,7 @@
   /* ── v2842 · ABRUFLEISTE (Marcel 22.10.2026: „die Abrufe müssen schlüssiger sein") ──
      Ein Bereich oben: je Abruf Stand/Datum, was er kostet, ein Knopf. Die Rückfrage
      und der Lauf des Marktpreis-Abrufs stehen in derselben Zeile. */
-  var KURZ_AUSBLICK = 'Mieterhöhung: Wert zum heutigen Stichtag, Erhöhungen erst ab Wirksamkeit und abgezinst. Zielbild: Ausblick mit umgesetzten Maßnahmen – kein heutiger Verkehrswert.';   /* v3151 */
+  var KURZ_AUSBLICK = 'Mieterhöhung: Wert zum heutigen Stichtag, Erhöhungen erst ab Wirksamkeit und abgezinst. Zielbild: Ausblick mit umgesetzten Maßnahmen, kein heutiger Verkehrswert.';   /* v3151 */
   function abrufLeiste(r, zu, W) {
     var z1, b1;
     if (zu) { z1 = 'Gehört zu Stufe 3 (Wertermittlung nach ImmoWertV).'; b1 = '<button type="button" class="dp-pot-knopf" data-dp-pot-stufe3="1">Stufe 3 im Tab Objekt</button>'; }
@@ -2341,7 +2341,7 @@
     if (r && r.verfuegbar && r.basis) li.push('Liegenschaftszins ' + esc(pct(r.basis.lzs_pct)) + (r.basis.lzs_stufe ? ' (Stufe ' + esc(r.basis.lzs_stufe) + ')' : '')
       + ', Bewirtschaftung, Gesamtnutzungsdauer und Bodenwert wie im Marktbericht Stufe 3; je Stufe wechseln Miete und Restnutzungsdauer (Anlage 2 ImmoWertV).');
     if (r && r.verfuegbar && r.basis && r.basis.bestandsbasis && r.basis.bestandsbasis.hinweis) li.push(esc(r.basis.bestandsbasis.hinweis));
-    if (W && W.leer) li.push('Leere Wohnungen gehen mit der marktüblichen Miete in den Rohertrag ein (§ 31 Abs. 2 ImmoWertV). Mietausfall bis zur Wiedervermietung und Kosten der Herrichtung sind nicht abgezogen — sie sind als besonderes objektspezifisches Grundstücksmerkmal (§ 8 Abs. 3 ImmoWertV) zu würdigen.');
+    if (W && W.leer) li.push('Leere Wohnungen gehen mit der marktüblichen Miete in den Rohertrag ein (§ 31 Abs. 2 ImmoWertV). Mietausfall bis zur Wiedervermietung und Kosten der Herrichtung sind nicht abgezogen, sie sind als besonderes objektspezifisches Grundstücksmerkmal (§ 8 Abs. 3 ImmoWertV) zu würdigen.');
     if (W && W.quelle === 'abruf') li.push('Die Wertzeilen stammen aus dem Abruf „Marktpreise" vom ' + esc(W.datum) + ' und sind mit den damaligen Angaben gerechnet; „Ertragswerte rechnen" rechnet sie mit den heutigen.');
     li.push('Cashflow und DSCR bei gleicher Finanzierung und gleichen Kosten.');
     if (m.kappung && m.kappung.text) li.push(esc(m.kappung.text));
@@ -2409,8 +2409,8 @@
     var key = marktKey();
     if (_markt.key !== key) { _markt.daten = null; _markt.abrufe = []; _markt.einordnung = null; _markt.zustand = 'ruhe'; marktVerlaufLaden(); }
     var knopf = '';   /* v2842 · Knopf, Rückfrage und Lauf stehen in der Abrufleiste oben (abrufLeiste) */
-    var kopf = '<div class="dp-markt-kopf"><b>Marktpreise</b><span>Kaufpreise und Angebotsmieten am Ort, Marktpreisindikation je Stufe und je Wohnung — mit Spannen.</span></div>';
-    if (!_markt.daten) return '<div class="dp-markt">' + kopf + '<p class="dp-pot-hin">Für dieses Objekt liegt noch kein Abruf vor — oben unter „Abrufe" abrufen.</p></div>';
+    var kopf = '<div class="dp-markt-kopf"><b>Marktpreise</b><span>Kaufpreise und Angebotsmieten am Ort, Marktpreisindikation je Stufe und je Wohnung, mit Spannen.</span></div>';
+    if (!_markt.daten) return '<div class="dp-markt">' + kopf + '<p class="dp-pot-hin">Für dieses Objekt liegt noch kein Abruf vor, oben unter „Abrufe" abrufen.</p></div>';
     var D = _markt.daten.daten || {}, M = D.markt || {}, S = D.stufen || {};
     /* v2842 · Abschlag des Abrufs an jeder Marktpreisindikation */
     var abP = M.abschlag_pct != null ? M.abschlag_pct : (D.mpi && D.mpi.angebote ? D.mpi.angebote.abschlag_pct : null);
@@ -2461,7 +2461,7 @@
             + qm0(m.kauf_etw && m.kauf_etw.median_qm) + '</td><td>' + qm2(m.miete && m.miete.median_qm) + '</td><td>' + (b && b.mpi_angebote != null ? eur(b.mpi_angebote) : '—') + '</td></tr>'; }).join('')
       + '</tbody></table></div>'
       + (E && E.text ? '<p class="dp-pot-hin" style="color:#4a4436">' + esc(E.text) + '</p>' : ''));
-    html += '<p class="dp-pot-hin" style="font-size:10.5px">Angebotspreise und -mieten, keine Kaufpreise; die Marktpreisindikation zieht den Abschlag auf Angebotspreise ab. Zielbild mit Zustand „modernisiert".</p>'
+    html += '<p class="dp-pot-hin" style="font-size:10.5px">Angebotspreise und -mieten, keine Kaufpreise, die Marktpreisindikation zieht den Abschlag auf Angebotspreise ab. Zielbild mit Zustand „modernisiert".</p>'
       + '</div>';
     return html;
   }
@@ -2587,7 +2587,7 @@
         }).join('')
       + '<tr class="dp-pot-sum"><td>Summe</td><td></td><td>' + eur(T.summe) + (T.vollstaendig ? '' : '*') + '</td><td>' + esc(T.bezeichnung || 'Vergleichswert') + '</td><td></td></tr>'
       + '</tbody></table></div>'
-      + (T.vollstaendig ? '' : '<p class="dp-pot-hin">* nicht jede Wohnung hat einen Wert – es wird nichts ergänzt.</p>') + '</details>';
+      + (T.vollstaendig ? '' : '<p class="dp-pot-hin">* nicht jede Wohnung hat einen Wert, es wird nichts ergänzt.</p>') + '</details>';
   }
   function verfahrenText(z) {
     if (!z) return '';
@@ -3011,7 +3011,7 @@
       var lauf = !!_bwLauf;
       var grund = grundGespeichert();
       html += '<p class="dp-pot-hin">' + (lauf ? 'Die Ertragswerte werden gerechnet (bis 40 Sekunden) …'
-          : (ergebnisVeraltet() ? 'Die Angaben haben sich geändert — die Ertragswerte sind neu zu rechnen. ' : (grund ? esc(grund) + ' ' : ''))
+          : (ergebnisVeraltet() ? 'Die Angaben haben sich geändert, die Ertragswerte sind neu zu rechnen. ' : (grund ? esc(grund) + ' ' : ''))
             + ' <button type="button" class="dp-pot-knopf" data-dp-wp-rechnen="1">Ertragswerte rechnen</button>') + '</p>';
     }
     /* Die Aufteilungs-Erklärung steht oben schon hervorgehoben - im Fuss nicht noch einmal. */
@@ -3112,7 +3112,7 @@
       var m = (liste || []).filter(function (x) { return x.id === k.id; })[0];
       var p = k.gewerk ? Math.max(0, (k.max != null ? Math.min(maxP(k.gewerk), k.max) : maxP(k.gewerk)) - punkteJetzt(k.gewerk, e, geb)) : 0;   /* v3001a: Teilmassnahme (Elektrik 1 von 2) zeigt ihren Teil, wie punkteGewinn rechnet */
       return '<button type="button" class="dp-zb-chip' + (m ? ' on' : '') + '" data-zb-chip="' + k.id + '" aria-pressed="' + (m ? 'true' : 'false') + '"'
-        + ' title="' + esc(k.gewerk ? (p ? '+' + p + ' Modernisierungspunkte (Anlage 2)' : 'Gewerk schon voll modernisiert — keine weiteren Punkte') : (k.hinweis || 'ohne Modernisierungspunkte')) + '">'
+        + ' title="' + esc(k.gewerk ? (p ? '+' + p + ' Modernisierungspunkte (Anlage 2)' : 'Gewerk schon voll modernisiert, keine weiteren Punkte') : (k.hinweis || 'ohne Modernisierungspunkte')) + '">'
         + esc(k.t) + (mitPunkte && k.gewerk && p ? ' <em>+' + p + ' P.</em>' : '') + '</button>';
     }).join('') + '</div>';
   }
@@ -3123,14 +3123,14 @@
         + '<label><span>Kosten €</span><input data-zb-k="' + i + '" inputmode="decimal" value="' + esc(m.k ? String(Math.round(zahl(m.k))) : '') + '" placeholder="0"></label>'
         /* v3001 · Marcel 27.10.2026: „bewohnen und irgendein Paragraph, wo keiner weiss, was gemeint ist“ -
            das Kaestchen sagt jetzt, was es tut: die Kosten als Modernisierungsumlage auf die laufende Miete. */
-        + (m.id === 'renovierung' ? '<span class="dp-zb-bew-nein">Renovierung ist Erhaltung — nicht auf die Miete umlegbar</span>'
+        + (m.id === 'renovierung' ? '<span class="dp-zb-bew-nein">Renovierung ist Erhaltung, nicht auf die Miete umlegbar</span>'
           : !vg.s559 ? '<span class="dp-zb-bew-nein"><b>Nicht auf die Miete umlegbar.</b> ' + esc(vg.text) + ' Die Maßnahme zählt zum Zielbild (nach Auszug, Neuvermietung).</span>'
-          : '<label class="dp-zb-bew"><input type="checkbox" data-zb-b="' + i + '"' + (m.bewohnt ? ' checked' : '') + '> Mieter bleibt drin — Kosten auf die Miete umlegen</label>'
+          : '<label class="dp-zb-bew"><input type="checkbox" data-zb-b="' + i + '"' + (m.bewohnt ? ' checked' : '') + '> Mieter bleibt drin, Kosten auf die Miete umlegen</label>'
           + (m.bewohnt ? '<label><span>davon Erhaltung %</span><input data-zb-e="' + i + '" inputmode="decimal" value="' + esc(m.erh ? String(zahl(m.erh)) : '') + '" placeholder="0" style="width:70px"></label>'
-            + '<span class="dp-zb-bew-info">Modernisierungsumlage (§ 559 BGB): 8 % der Kosten pro Jahr auf die Miete, ohne den Anteil für Erhaltung (z. B. ohnehin fällige Reparatur), höchstens 3 €/m² — bei Miete unter 7 €/m² 2 €/m² — in 6 Jahren. Geht in die Soll-Miete ein.</span>'
+            + '<span class="dp-zb-bew-info">Modernisierungsumlage (§ 559 BGB): 8 % der Kosten pro Jahr auf die Miete, ohne den Anteil für Erhaltung (z. B. ohnehin fällige Reparatur), höchstens 3 €/m², bei Miete unter 7 €/m² 2 €/m², in 6 Jahren. Geht in die Soll-Miete ein.</span>'
             /* v3016s · Marcel 28.10.2026: „was soll das heißen? Mieter bleibt drin — Kosten auf die Miete
                umlegen, was passiert, wenn ich das auswähle?" Jetzt steht auch OHNE Haken, was gilt. */
-            : '<span class="dp-zb-bew-info"><b>Ohne Haken</b> gehört die Maßnahme zum <b>Zielbild</b>: Die Wohnung wird nach einem Auszug saniert und zur Zielmiete neu vermietet – die laufende Miete ändert sich bis dahin nicht. <b>Mit Haken</b> bleibt der Mieter wohnen, und 8 % der Kosten pro Jahr kommen als Modernisierungsumlage (§ 559 BGB) auf seine Miete.</span>'))
+            : '<span class="dp-zb-bew-info"><b>Ohne Haken</b> gehört die Maßnahme zum <b>Zielbild</b>: Die Wohnung wird nach einem Auszug saniert und zur Zielmiete neu vermietet, die laufende Miete ändert sich bis dahin nicht. <b>Mit Haken</b> bleibt der Mieter wohnen, und 8 % der Kosten pro Jahr kommen als Modernisierungsumlage (§ 559 BGB) auf seine Miete.</span>'))
         + (m.id === 'sonst' ? '<label><span>Bezeichnung</span><input data-zb-t="' + i + '" value="' + esc(m.t) + '"></label>' : '')
         + '</div>';
     }).join('');
@@ -3551,12 +3551,12 @@
       var b = ev.target && ev.target.closest ? ev.target.closest('[data-dp-pot-rechnen]') : null;
       if (!b) return;
       b.disabled = true; b.textContent = 'wird gerechnet …';
-      laufAnzeige(true, 'Ertragswerte werden gerechnet', 'Bestand, Mieterhöhung und Zielbild nach ImmoWertV — mit den Werten des Gutachterausschusses. Das dauert meist 5 bis 30 Sekunden.');
+      laufAnzeige(true, 'Ertragswerte werden gerechnet', 'Bestand, Mieterhöhung und Zielbild nach ImmoWertV, mit den Werten des Gutachterausschusses. Das dauert meist 5 bis 30 Sekunden.');
       rechnen({ erzwingen: true }).then(function (r) {
         laufAnzeige(false);
         var host = b.closest('[data-dp-pot-wirt]');
         if (host) host.innerHTML = tafelHtml();
-        else { b.disabled = false; b.textContent = (r && r.verfuegbar) ? 'gerechnet — Ansicht neu öffnen' : 'nicht verfügbar'; }
+        else { b.disabled = false; b.textContent = (r && r.verfuegbar) ? 'gerechnet, Ansicht neu öffnen' : 'nicht verfügbar'; }
         if (r && !r.verfuegbar && !gesperrt(r) && typeof window.toast === 'function') window.toast('Ertragswert: ' + (r.grund || 'nicht verfügbar'));
       }, function () { laufAnzeige(false); b.disabled = false; b.textContent = 'Ertragswerte rechnen'; });   /* v2556c */
     });

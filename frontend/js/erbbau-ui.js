@@ -163,8 +163,8 @@
   }
 
   var FEHLT_TEXT = {
-    volleigentum: 'ein Wert zum Rechnen — Verkehrswert, Bankbewertung oder wenigstens der Kaufpreis',
-    bodenwert: 'der Bodenwert — Grundstücksfläche und Bodenrichtwert (BORIS abrufen geht direkt darüber)',
+    volleigentum: 'ein Wert zum Rechnen, Verkehrswert, Bankbewertung oder wenigstens der Kaufpreis',
+    bodenwert: 'der Bodenwert, Grundstücksfläche und Bodenrichtwert (BORIS abrufen geht direkt darüber)',
     restlaufzeit: 'die Restlaufzeit des Erbbaurechts in Jahren (steht im Erbbaurechtsvertrag)'
   };
 

@@ -471,10 +471,10 @@ window.DealPilotDatenraum = (function() {
     html.push('  <div class="dr-intro">');
     html.push('    <h3 style="margin:0 0 6px 0">Datenraum verknüpfen</h3>');
     html.push('    <p style="margin:0 0 12px 0;font-size:13px;color:var(--muted);line-height:1.5">');
-    html.push('      Verknüpfe deinen <strong>persönlichen Cloud-Ordner</strong> (für SCHUFA, Steuerbescheide, Gehaltsabrechnungen etc.) und für jedes Objekt einen <strong>eigenen Cloud-Ordner</strong>. DealPilot speichert nur die URLs — keine Datei-Inhalte werden gelesen oder hochgeladen.');
+    html.push('      Verknüpfe deinen <strong>persönlichen Cloud-Ordner</strong> (für SCHUFA, Steuerbescheide, Gehaltsabrechnungen etc.) und für jedes Objekt einen <strong>eigenen Cloud-Ordner</strong>. DealPilot speichert nur die URLs, keine Datei-Inhalte werden gelesen oder hochgeladen.');
     html.push('    </p>');
     html.push('    <div class="dr-privacy">');
-    html.push('      <strong>Hinweis zur Datensicherheit:</strong> Gespeichert werden nur die Links, nicht die Dateien. Sie liegen in deinem Browser und zusätzlich in deinem DealPilot-Konto, damit sie einen Gerätewechsel überstehen. Bei Bank-Anfragen wird der entsprechende Link in die E-Mail eingefügt — der Empfänger sieht den Ordner mit deinen Freigabe-Einstellungen.');
+    html.push('      <strong>Hinweis zur Datensicherheit:</strong> Gespeichert werden nur die Links, nicht die Dateien. Sie liegen in deinem Browser und zusätzlich in deinem DealPilot-Konto, damit sie einen Gerätewechsel überstehen. Bei Bank-Anfragen wird der entsprechende Link in die E-Mail eingefügt, der Empfänger sieht den Ordner mit deinen Freigabe-Einstellungen.');
     html.push('    </div>');
     html.push('  </div>');
 
@@ -526,7 +526,7 @@ window.DealPilotDatenraum = (function() {
 
     html.push('  <div class="dr-section">');
     html.push('    <h3 class="dr-section-h">Objekt-Datenräume</h3>');
-    html.push('    <p class="dr-section-desc">Pro Objekt ein eigener Cloud-Ordner. Strukturiere intern wie du möchtest — DealPilot prüft nur, ob die Pflicht-Dokumente bestätigt sind.</p>');
+    html.push('    <p class="dr-section-desc">Pro Objekt ein eigener Cloud-Ordner. Strukturiere intern wie du möchtest, DealPilot prüft nur, ob die Pflicht-Dokumente bestätigt sind.</p>');
 
     if (objekteList.length === 0) {
       if (!loadedAsync) {
@@ -675,7 +675,7 @@ window.DealPilotDatenraum = (function() {
         detectEl.innerHTML = providerIcon(p) + ' Erkannt: <strong>' + esc(providerLabel(p)) + '</strong>';
         detectEl.style.color = 'var(--ch)';
       } else {
-        detectEl.textContent = '⚠ Kein gültiger URL — bitte mit https:// beginnen';
+        detectEl.textContent = '⚠ Kein gültiger URL, bitte mit https:// beginnen';
         detectEl.style.color = 'var(--red, #B8625C)';
       }
     };
@@ -684,7 +684,7 @@ window.DealPilotDatenraum = (function() {
       var url = urlField.value.trim();
       if (!url) { alert('Bitte einen Freigabe-Link einfügen.'); return; }
       var ok = opts.onSave(url, labelField.value);
-      if (!ok) { alert('Speichern fehlgeschlagen — bitte URL prüfen.'); return; }
+      if (!ok) { alert('Speichern fehlgeschlagen, bitte URL prüfen.'); return; }
       _closeEditModal();
       var container = document.getElementById('dr-settings-host');
       if (container) container.innerHTML = renderSettingsTab();
@@ -761,7 +761,7 @@ window.DealPilotDatenraum = (function() {
     html.push('  <div class="dr-da-body"' + (_open ? '' : ' style="display:none"') + '>');
 
     if (!currentObjId || !status) {
-      html.push('  <div class="dr-da-warn">⚠ Kein aktives Objekt — bitte zuerst Objekt im Tab "Objekt" laden.</div>');
+      html.push('  <div class="dr-da-warn">⚠ Kein aktives Objekt, bitte zuerst Objekt im Tab "Objekt" laden.</div>');
       html.push('</div>');
       return html.join('');
     }
@@ -845,7 +845,7 @@ window.DealPilotDatenraum = (function() {
     html.push('  </div>');
 
     if (status.complete && status.hatBeideOrdner) {
-      html.push('  <div class="dr-da-complete">✓ Alle Pflicht-Dokumente bestätigt — beide Ordner-Links werden der Anfrage automatisch beigefügt.</div>');
+      html.push('  <div class="dr-da-complete">✓ Alle Pflicht-Dokumente bestätigt, beide Ordner-Links werden der Anfrage automatisch beigefügt.</div>');
     } else if (!status.hatBeideOrdner) {
       var fehlt = [];
       if (!pers.hatOrdner) fehlt.push('Persönlicher Datenraum');

@@ -63,7 +63,7 @@ function duplicateObj() {
   }
   if (typeof saveObj === 'function') {
     saveObj({ silent: false });
-    if (typeof toast === 'function') toast('✓ Objekt dupliziert — neue Nummer: ' + (window._currentObjSeq || ''));
+    if (typeof toast === 'function') toast('✓ Objekt dupliziert, neue Nummer: ' + (window._currentObjSeq || ''));
   }
 }
 
@@ -103,7 +103,7 @@ function updateTabWorkflowBar(tabIndex) {
   var pctEl = document.getElementById('wf-progress-pct');
   var fillEl = document.getElementById('wf-progress-fill');
   if (pctEl) {
-    var lblTxt = pct >= 100 ? 'Grunddaten vollständig — einfache Bewertung möglich' :
+    var lblTxt = pct >= 100 ? 'Grunddaten vollständig, einfache Bewertung möglich' :
                  pct >=  60 ? pct + ' % Grunddaten · weitere Felder erhöhen Genauigkeit' :
                  pct + ' % Grunddaten ausgefüllt';
     pctEl.textContent = lblTxt;
@@ -669,7 +669,7 @@ function setTitleImg(i) {
   window._dpImgPop = -1;   /* v3257: Menü zu, der Index hat sich verschoben */
   renderImgs();
   // Wenn der User Titel ändert, ist das Objekt "dirty" — wir signalisieren das mit einem dezenten Toast
-  if (typeof toast === 'function') toast('★ Titelbild gesetzt — beim nächsten Speichern auch in der Sidebar sichtbar');
+  if (typeof toast === 'function') toast('★ Titelbild gesetzt, beim nächsten Speichern auch in der Sidebar sichtbar');
 }
 window.setTitleImg = setTitleImg;
 
@@ -774,7 +774,7 @@ async function runAI() {
    * Ursache ist eine Kruecke — ein Riegel gegen die ganze Klasse ist eine Regel.
    */
   if (window._aiRunning) {
-    try { console.warn('[v950] Pilot-Analyse läuft bereits — zweiter Aufruf verworfen (hätte 1 L gekostet).'); } catch (e) {}
+    try { console.warn('[v950] Pilot-Analyse läuft bereits, zweiter Aufruf verworfen (hätte 1 L gekostet).'); } catch (e) {}
     return;
   }
   window._aiRunning = true;
@@ -1765,7 +1765,7 @@ async function _runAIServer(btn) {
         '<div class="ai-error-msg">' +
           'Das KI-Modell hat eine Antwort geliefert, die nicht im erwarteten Format war ' +
           '(typisch bei zu langen Antworten oder Modell-Hänger). ' +
-          'Versuche es bitte erneut — meistens klappt es im zweiten Anlauf.' +
+          'Versuche es bitte erneut, meistens klappt es im zweiten Anlauf.' +
         '</div>' +
         '<button class="ai-btn" onclick="runAI()" style="margin-top:14px">Analyse neu starten</button>' +
         '<details class="ai-error-details">' +
@@ -1782,7 +1782,7 @@ async function _runAIServer(btn) {
        stand der Fehlerkasten da UND die Erfolgsmeldung - und wer den Kasten
        uebersah, hielt die alte Analyse fuer die neue. */
     if (data && data.analysis) toast('✓ Pilot-Analyse mit Web-Recherche abgeschlossen');
-    else toast('⚠ Die KI hat keine Analyse geliefert — Details im Feld darunter');
+    else toast('⚠ Die KI hat keine Analyse geliefert, Details im Feld darunter');
     // V63.86: Pill aktualisieren nach Credit-Verbrauch
     if (window.AiCredits) window.AiCredits.refresh(true);
   } catch (e) {

@@ -133,13 +133,13 @@
 
   /* ── Wissen: vier Quellen, eine Liste ─────────────────────────────── */
   var AKTIONEN = [
-    { t: 'Quick-Check starten', b: 'Ein Objekt in einer Minute einordnen: Adresse, Preis, Miete — Ampel, Score und Verhandlungs-Empfehlung.', ziel: { aktion: 'quickcheck' }, w: 'schnell pruefen inserat bewerten' },
+    { t: 'Quick-Check starten', b: 'Ein Objekt in einer Minute einordnen: Adresse, Preis, Miete, Ampel, Score und Verhandlungs-Empfehlung.', ziel: { aktion: 'quickcheck' }, w: 'schnell pruefen inserat bewerten' },
     { t: 'Neues Objekt anlegen', b: 'Startet die Datenaufnahme für ein neues Objekt.', ziel: { aktion: 'new' }, w: 'anlegen hinzufuegen objekt neu' },
     { t: 'Marktbericht abrufen', b: 'Marktpreisindikation (Stufe 1/2) oder Wertermittlung nach ImmoWertV (Stufe 3) für das geöffnete Objekt.', ziel: { aktion: 'marktbericht' }, w: 'marktwert verkehrswert bewertung gutachten' },
     { t: 'Portfolio-Cockpit öffnen', b: 'Alle Objekte zusammen: Cashflow, Vermögen, Kennzahlen.', ziel: { aktion: 'cockpit' }, w: 'portfolio uebersicht bestand alle' },
     { t: 'Bankexport', b: 'Die Unterlagen für die Finanzierungsanfrage zusammenstellen.', ziel: { aktion: 'bankexport' }, w: 'bank finanzierung pdf kredit' },
     { t: 'Einstellungen', b: 'Investment-Profil, Standardwerte, Bewirtschaftung je Objektart, Score-Gewichte, Darstellung.', ziel: { aktion: 'settings' }, w: 'profil standardwerte einstellen' },
-    { t: 'Prozess-Atlas öffnen', b: 'Alle Abläufe als Netzplan — vom Quick-Check bis zum Steuerjahr.', ziel: { atlas: '' }, w: 'ablauf prozess netzplan schritt' },
+    { t: 'Prozess-Atlas öffnen', b: 'Alle Abläufe als Netzplan, vom Quick-Check bis zum Steuerjahr.', ziel: { atlas: '' }, w: 'ablauf prozess netzplan schritt' },
     { t: 'App-Tour starten', b: 'Schritt für Schritt durch alle Reiter.', ziel: { fn: 'helpStartTour' }, w: 'tour einfuehrung rundgang' },
     { t: 'Ganze Hilfe öffnen', b: 'Kennzahlen, Finanzierung, Steuer, Glossar, Häufige Fragen.', ziel: { fn: 'showHelp' }, w: 'hilfe handbuch glossar faq' }
   ];
@@ -212,14 +212,14 @@
     if (pilot) return;
     css();
     pilot = document.createElement('div'); pilot.id = 'dp-pilot'; pilot.className = 'ruht';
-    pilot.title = 'Pilot rufen — F1 oder ?'; pilot.setAttribute('role', 'button'); pilot.setAttribute('aria-label', 'Pilot rufen (F1)');
+    pilot.title = 'Pilot rufen, F1 oder ?'; pilot.setAttribute('role', 'button'); pilot.setAttribute('aria-label', 'Pilot rufen (F1)');
     pilot.innerHTML = '<span class="pf-wrap">' + (window.DealPilotFigur ? DealPilotFigur.svg({}) : '') + '</span>';
     if (window.DealPilotFigur) DealPilotFigur.css();
     pilot.addEventListener('click', function () { tower && tower.classList.contains('an') ? schliessen() : rufen(); });
     tower = document.createElement('div'); tower.id = 'dp-tower'; tower.setAttribute('role', 'dialog'); tower.setAttribute('aria-label', 'Tower');
     tower.innerHTML = '<div class="k"><span class="u">Tower · Pilot hört</span><kbd>Esc</kbd><button class="zu" type="button" aria-label="Schließen">×</button></div>'
       + '<div class="rumpf"><div class="feldbox"></div>'
-      + '<input class="frage" type="text" autocomplete="off" placeholder="Was liegt an? — z. B. „Ankauf einfrieren“, „DSCR“, „Anlage V“">'
+      + '<input class="frage" type="text" autocomplete="off" placeholder="Was liegt an?, z. B. „Ankauf einfrieren“, „DSCR“, „Anlage V“">'
       + '<div class="antwbox"></div><ul class="tr"></ul>'
       + '<button class="frag" type="button">Den Piloten fragen (KI)</button></div>'
       + '<div class="fuss"><span class="h">Sofort-Antworten kommen aus Hilfe, Feld-Erklärungen und Abläufen. F1 oder ? ruft mich überall.</span>'
@@ -345,7 +345,7 @@
     var a = ort();
     /* v3218 · W-4: mit der Pilot-Blase gibt es keinen Ruheort mehr zu waehlen */
     if (window.DealPilotBlase) return '<hr class="dvd"><h3 class="set-section-h">Pilot</h3>'
-      + '<p class="hint" style="margin-bottom:10px">Der Pilot steht unten rechts, in jeder Ansicht: Fragen, Änderungen per Chat („Miete auf 9 €/m² erhöhen“ – du bestätigst) und Unterlagen über die Klammer. Im Fenster erklärt „Feld erklären“ das Feld, auf dem du gerade bist (auch mit F1), „Hilfe“ öffnet die ganze Hilfe.</p>'
+      + '<p class="hint" style="margin-bottom:10px">Der Pilot steht unten rechts, in jeder Ansicht: Fragen, Änderungen per Chat („Miete auf 9 €/m² erhöhen“, du bestätigst) und Unterlagen über die Klammer. Im Fenster erklärt „Feld erklären“ das Feld, auf dem du gerade bist (auch mit F1), „Hilfe“ öffnet die ganze Hilfe.</p>'
       /* v3223 · Marcel 08.11.2026: ein- und ausschaltbar; aus = oben über das Fragezeichen */
       + '<label style="display:flex;gap:9px;align-items:flex-start;margin-top:12px;cursor:pointer;font-size:13px;line-height:1.4">'
       + '<input type="checkbox" id="dp-pilot-blase-an" style="margin-top:2px" ' + (DealPilotBlase.istAn && !DealPilotBlase.istAn() ? '' : 'checked ')
@@ -356,7 +356,7 @@
       + 'onchange="window.DpHinweise && DpHinweise.setze(\'erklaer\', !this.checked)">'
       + '<span><b>Geführte Eingabe: „Erklär mir das“ anbieten</b><br><span class="hint" style="color:var(--muted)">Der Knopf unter jeder Frage. Ausgeschaltet kannst du trotzdem jederzeit „Erklär mir das“ sagen oder tippen. Gilt für dein Konto, auf allen Geräten.</span></span></label>';
     return '<hr class="dvd"><h3 class="set-section-h">Pilot · Hilfe auf F1</h3>'
-      + '<p class="hint" style="margin-bottom:10px">Drück F1 oder ? — der Pilot erklärt das Feld, auf dem du gerade bist, und beantwortet Fragen. Hier stellst du ein, wo er wartet.</p>'
+      + '<p class="hint" style="margin-bottom:10px">Drück F1 oder ?, der Pilot erklärt das Feld, auf dem du gerade bist, und beantwortet Fragen. Hier stellst du ein, wo er wartet.</p>'
       + '<div class="dp-tt-mode-toggle" style="flex-wrap:wrap">' + ORTE.map(function (o) {
         return '<button type="button" style="flex:1 1 140px;min-width:0" class="dp-tt-mode-btn' + (o.id === a ? ' active' : '') + '" data-pilot-ort="' + o.id + '" onclick="DealPilotPilot.setOrt(\'' + o.id + '\')">'
           + esc(o.t) + (o.id === 'aus' ? ' · Standard' : '') + '<span class="dp-tt-mode-btn-label">' + esc(o.d) + '</span></button>';
@@ -489,7 +489,7 @@
     if (f) {
       var w = (f.wofuer || []).map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('');
       box.innerHTML = '<div class="feld"><div class="t">' + esc(f.titel) + (f.zusatz ? '<small>' + esc(f.zusatz) + '</small>' : '') + (f.quelle ? '<small>' + esc(f.quelle) + '</small>' : '') + '</div>'
-        + (f.body ? '<p>' + esc(f.body) + '</p>' : '<p style="color:#b9ad8f">Zu diesem Feld gibt es noch keinen gepflegten Text — frag mich unten, ich schaue in Hilfe und Abläufen nach.</p>')
+        + (f.body ? '<p>' + esc(f.body) + '</p>' : '<p style="color:#b9ad8f">Zu diesem Feld gibt es noch keinen gepflegten Text, frag mich unten, ich schaue in Hilfe und Abläufen nach.</p>')
         + (w ? '<ul>' + w + '</ul>' : '') + '</div>';
       if (f.el) f.el.classList.add('dp-pilot-spot');
     } else box.innerHTML = '';
@@ -524,7 +524,7 @@
     sofort(q);
     ul.innerHTML = _treffer.map(function (e, i) {
       return '<li data-i="' + i + '"><span class="art ' + e.art + '">' + ART[e.art] + '</span><span class="tx"><b>' + esc(e.t) + '</b><span>' + esc(kurz(e.b, 110)) + '</span></span></li>';
-    }).join('') || '<li class="leer" style="cursor:default">Nichts Passendes in Hilfe, Feldern und Abläufen — frag den Piloten (KI) unten.</li>';
+    }).join('') || '<li class="leer" style="cursor:default">Nichts Passendes in Hilfe, Feldern und Abläufen, frag den Piloten (KI) unten.</li>';
   }
   /* Marcel, 13.10.2026: „die Hilfe muss direkt, wenn ich was eingebe …
      die Antwort zeigen." Der beste Treffer steht als Antwort OBEN, ohne
@@ -550,7 +550,7 @@
     if (norm(q).length < 3) { box.innerHTML = ''; return; }
     _sofortT = setTimeout(function () {
       var e = _treffer.filter(function (x) { return x.art !== 'aktion'; })[0] || _treffer[0];
-      if (!e) { box.innerHTML = '<div class="antw"><div class="q">Keine Sofort-Antwort</div>In Hilfe, Feldern und Abläufen steht dazu nichts. Drück Enter — dann fragt der Pilot die KI.</div>'; return; }
+      if (!e) { box.innerHTML = '<div class="antw"><div class="q">Keine Sofort-Antwort</div>In Hilfe, Feldern und Abläufen steht dazu nichts. Drück Enter, dann fragt der Pilot die KI.</div>'; return; }
       antworte(e, true);
     }, 140);
     clearTimeout(_autoT);
@@ -610,7 +610,7 @@
         box.innerHTML = '<div class="antw"><div class="q">Pilot · ' + esc(kurz(q, 60)) + '</div><div>' + kiText(a) + '</div>' + (k ? '<div class="knoepfe">' + k + '</div>' : '') + '</div>';
       })
       .catch(function (e) {
-        var m = e && e.status === 429 ? 'Das Tageslimit für KI-Fragen ist erreicht — morgen geht es weiter. Die Sofort-Antworten oben funktionieren weiter.'
+        var m = e && e.status === 429 ? 'Das Tageslimit für KI-Fragen ist erreicht, morgen geht es weiter. Die Sofort-Antworten oben funktionieren weiter.'
           : 'Die KI konnte gerade nicht antworten (' + esc((e && e.message) || 'Fehler') + '). Die Sofort-Antworten oben funktionieren ohne KI.';
         box.innerHTML = '<div class="antw">' + m + '</div>';
       })

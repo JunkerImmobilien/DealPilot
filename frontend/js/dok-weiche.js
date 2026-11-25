@@ -74,7 +74,7 @@
     var r = await fetch(basis() + '/rechenkerne/html-pdf', { method: 'POST',
       headers: Object.assign({ 'Content-Type': 'application/json' }, t ? { Authorization: 'Bearer ' + t } : {}),
       body: JSON.stringify({ html: html.replace('</style>', '.fuss{display:none}</style>'), titel: d.title || NAMEN[art], fuss: fuss }) });
-    if (r.status === 401) { hinweis('Sitzung abgelaufen – bitte neu anmelden.'); return true; }
+    if (r.status === 401) { hinweis('Sitzung abgelaufen, bitte neu anmelden.'); return true; }
     if (!r.ok || !/pdf/.test(r.headers.get('content-type') || '')) return false;
     herunterladen(await r.blob(), dateiname(r, art));
     return true;
@@ -96,7 +96,7 @@
         var r = await fetch(basis() + '/rechenkerne/dok-pdf', { method: 'POST',
           headers: Object.assign({ 'Content-Type': 'application/json' }, t ? { Authorization: 'Bearer ' + t } : {}),
           body: JSON.stringify({ art: art, objekt_id: objekt ? key : null, optionen: opt || {} }) });
-        if (r.status === 401) { hinweis('Sitzung abgelaufen – bitte neu anmelden.'); return; }
+        if (r.status === 401) { hinweis('Sitzung abgelaufen, bitte neu anmelden.'); return; }
         if (r.ok && /pdf/.test(r.headers.get('content-type') || '')) {
           herunterladen(await r.blob(), dateiname(r, art));
           hinweis('✓ ' + name + ' erstellt');
@@ -105,7 +105,7 @@
       } catch (e) {}
     }
     /* Rückfall: dieselbe Fassung als Vorschau mit „Drucken / als PDF speichern" */
-    hinweis(name + ': Vorschau – über „Drucken / als PDF speichern" sichern.');
+    hinweis(name + ': Vorschau, über „Drucken / als PDF speichern" sichern.');
     return window.DpDokumente.oeffnen(art, opt || {});
   }
 

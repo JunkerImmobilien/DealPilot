@@ -192,7 +192,7 @@
       ? (aus ? 'Tilgung ausgesetzt: du zahlst je Monat nur die Zinsen, die Restschuld bleibt bis zum Ende stehen und wird über einen Tilgungsträger (Bausparvertrag, Versicherung) abgelöst.'
              : 'Monatliche Raten aus deinen Angaben, gerechnet wie in der Projektion.')
       : (aus ? 'Tilgung ausgesetzt: je Monat Zinsen aufs Darlehen plus Sparrate in den Bausparvertrag. Du kannst einzelne Werte überschreiben.'
-             : 'Übersicht und Bearbeitung der monatlichen Raten. Du kannst einzelne Werte überschreiben — z.B. wenn deine Bank Sondertilgungen oder abweichende Raten vereinbart hat.');
+             : 'Übersicht und Bearbeitung der monatlichen Raten. Du kannst einzelne Werte überschreiben, z.B. wenn deine Bank Sondertilgungen oder abweichende Raten vereinbart hat.');
 
     var ov = document.createElement('div');
     ov.id = 'tilgplan-modal';
@@ -213,7 +213,7 @@
         '<div class="iexp-body" id="tilgplan-body" style="padding:0">' +
           '<div id="tilgplan-statusbar" style="padding:14px 24px; background:rgba(63,165,108,0.08); border-bottom:1px solid rgba(42,39,39,0.06); display:flex; align-items:center; justify-content:space-between; gap:14px">' +
             '<div id="tilgplan-status-text" style="font-size:13px; color:#2A2727; flex:1">' +
-              '✓ Plan zeigt die Standard-Berechnung deiner Bank — keine manuellen Änderungen.' +
+              '✓ Plan zeigt die Standard-Berechnung deiner Bank, keine manuellen Änderungen.' +
             '</div>' +
             '<div style="display:flex; gap:8px">' +
               '<button type="button" class="btn-ghost btn-sm" onclick="resetTilgplanOverrides()">↺ Zurücksetzen</button>' +
@@ -412,7 +412,7 @@
     }
     html += '</tbody></table>';
     if (maxMonths >= 480) {
-      html += '<div class="hint" style="padding:10px 0">… (Anzeige auf 480 Monate begrenzt — der gesamte Tilgungsverlauf wird intern weitergeführt.)</div>';
+      html += '<div class="hint" style="padding:10px 0">… (Anzeige auf 480 Monate begrenzt, der gesamte Tilgungsverlauf wird intern weitergeführt.)</div>';
     }
     box.innerHTML = html;
 
@@ -421,12 +421,12 @@
     if (statusEl) {
       if (anyOverride) {
         var count = Object.keys(window._tilgPlanOverrides).length;
-        statusEl.innerHTML = '⚡ <b>' + count + ' Zeile' + (count !== 1 ? 'n' : '') + ' manuell überschrieben</b> — abweichend von der Standard-Berechnung. ' +
+        statusEl.innerHTML = '⚡ <b>' + count + ' Zeile' + (count !== 1 ? 'n' : '') + ' manuell überschrieben</b>, abweichend von der Standard-Berechnung. ' +
           'Goldene Markierung in der Tabelle. Mit "Zurücksetzen" wieder auf den Bank-Plan.';
         var bar = document.getElementById('tilgplan-statusbar');
         if (bar) bar.style.background = 'rgba(201,168,76,0.10)';
       } else {
-        statusEl.innerHTML = '✓ Plan zeigt die Standard-Berechnung deiner Bank — keine manuellen Änderungen.';
+        statusEl.innerHTML = '✓ Plan zeigt die Standard-Berechnung deiner Bank, keine manuellen Änderungen.';
         var bar2 = document.getElementById('tilgplan-statusbar');
         if (bar2) bar2.style.background = 'rgba(63,165,108,0.08)';
       }
@@ -525,7 +525,7 @@
     var _dG = String(_sw.dscrGruen).replace('.', ','), _dY = String(_sw.dscrGelb).replace('.', ',');
     // LTV
     if (ltv > _sw.ltvRot) {
-      recs.push({ type: 'warn', icon: '⚠', title: 'LTV über ' + _sw.ltvRot + ' % — kritisch',
+      recs.push({ type: 'warn', icon: '⚠', title: 'LTV über ' + _sw.ltvRot + ' %, kritisch',
         text: 'Dein LTV liegt bei <b>' + ltv.toFixed(1) + ' %</b>. Deine Grenze liegt bei ' + _sw.ltvGruen + ' %. ' +
               'Prüfe, ob du mehr Eigenkapital einbringen kannst oder den Kaufpreis reduzieren kannst.' });
     } else if (ltv > _sw.ltvGruen) {
@@ -544,7 +544,7 @@
     } else if (dscr < _sw.dscrGruen) {
       recs.push({ type: 'gold', icon: '⚡', title: 'DSCR knapp (' + dscr.toFixed(2) + ')',
         text: 'Deine Mindest-Schwelle liegt bei DSCR ≥ ' + _dG + '. Bei Mietausfall wird es eng. ' +
-              'Erhöhung der Tilgung verschlechtert DSCR weiter — über Anschluss-Tilgung von 1,0 % nachdenken.' });
+              'Erhöhung der Tilgung verschlechtert DSCR weiter, über Anschluss-Tilgung von 1,0 % nachdenken.' });
     }
 
     // Tilgung
@@ -554,18 +554,18 @@
               'Bei steigenden Zinsen kann die Anschlussfinanzierung teuer werden.' });
     }
     if (!isAussetzung && tilg >= 2.5) {
-      recs.push({ type: 'ok', icon: '✓', title: 'Hohe Tilgung — schneller schuldenfrei',
+      recs.push({ type: 'ok', icon: '✓', title: 'Hohe Tilgung, schneller schuldenfrei',
         text: 'Mit ' + tilg.toFixed(2) + ' % Anfangstilgung baust du schnell Eigenkapital auf. Der Cashflow bleibt aber gedrückt.' });
     }
 
     // Zinsbindung
     if (bindj <= 5 && zins < 4.0) {
-      recs.push({ type: 'gold', icon: '💡', title: 'Kurze Zinsbindung — hohes Anschlussrisiko',
+      recs.push({ type: 'gold', icon: '💡', title: 'Kurze Zinsbindung, hohes Anschlussrisiko',
         text: 'Bei nur ' + bindj + ' Jahren Zinsbindung trägst du das volle Anschlussrisiko. ' +
               'Eine längere Bindung (15+ Jahre) sichert dir die aktuellen Konditionen.' });
     }
     if (bindj >= 20) {
-      recs.push({ type: 'ok', icon: '✓', title: 'Lange Zinsbindung — Planungssicherheit',
+      recs.push({ type: 'ok', icon: '✓', title: 'Lange Zinsbindung, Planungssicherheit',
         text: bindj + ' Jahre Zinsbindung gibt dir maximale Planungssicherheit. § 489 BGB erlaubt nach 10 J. eine Sondertilgung.' });
     }
 
@@ -591,7 +591,7 @@
 
     // Render
     if (!recs.length) {
-      listEl.innerHTML = '<div class="hint" style="padding:10px">✓ Deine Finanzierung sieht solide aus — keine kritischen Hinweise.</div>';
+      listEl.innerHTML = '<div class="hint" style="padding:10px">✓ Deine Finanzierung sieht solide aus, keine kritischen Hinweise.</div>';
       return;
     }
     listEl.innerHTML = recs.map(function(r) {
@@ -636,7 +636,7 @@
 
     if (lc.zuteilStatus === 'never') {
       if (statusEl) {
-        statusEl.innerHTML = '<span style="color:#B8625C">⚠ Sparrate zu niedrig — Zuteilung in 50 Jahren nicht erreichbar</span>';
+        statusEl.innerHTML = '<span style="color:#B8625C">⚠ Sparrate zu niedrig, Zuteilung in 50 Jahren nicht erreichbar</span>';
       }
       if (detailEl) {
         detailEl.innerHTML = 'Mindestguthaben: <b>' + fmtE(lc.zielGuthaben) + '</b> ' +
@@ -648,15 +648,15 @@
       var statusIcon, statusText, statusColor;
       if (lc.zuteilStatus === 'before_ezb') {
         statusIcon = '✓';
-        statusText = 'Zuteilung vor Bindungsende — optimal';
+        statusText = 'Zuteilung vor Bindungsende, optimal';
         statusColor = '#3FA56C';
       } else if (lc.zuteilStatus === 'at_ezb') {
         statusIcon = '✓';
-        statusText = 'Zuteilung exakt zum Bindungsende — passt';
+        statusText = 'Zuteilung exakt zum Bindungsende, passt';
         statusColor = '#3FA56C';
       } else {
         statusIcon = '⚡';
-        statusText = 'Zuteilung erst nach Bindungsende — Anschlussfinanzierung der Lücke nötig';
+        statusText = 'Zuteilung erst nach Bindungsende, Anschlussfinanzierung der Lücke nötig';
         statusColor = '#C9A84C';
       }
 
@@ -845,7 +845,7 @@
     var neu = Math.max(0, gi.wert - d.summe);
     _setzen('ek', neu);
     if (typeof window.toast === 'function') {
-      window.toast('✓ Eigenkapital auf ' + _eur(neu) + ' gesetzt — Gesamtinvestition minus Darlehen');
+      window.toast('✓ Eigenkapital auf ' + _eur(neu) + ' gesetzt, Gesamtinvestition minus Darlehen');
     }
   };
 
@@ -856,7 +856,7 @@
     _d1Modus = 'auto';   /* v1433: ab jetzt laeuft das Darlehen wieder mit */
     _setzen('d1', neu);
     if (typeof window.toast === 'function') {
-      window.toast('✓ Darlehen I auf ' + _eur(neu) + ' gesetzt — Gesamtinvestition minus Eigenkapital' + (d.d2 ? ' und Darlehen II' : '') + (d.dw ? ' und weitere Darlehen' : ''));
+      window.toast('✓ Darlehen I auf ' + _eur(neu) + ' gesetzt, Gesamtinvestition minus Eigenkapital' + (d.d2 ? ' und Darlehen II' : '') + (d.dw ? ' und weitere Darlehen' : ''));
     }
   };
 
@@ -893,7 +893,7 @@
       + (d.dw ? ' + ' + _eur(d.dw) + ' weitere Darlehen' : '')   /* v3215 */
       + ' = ' + _eur(deckung)
       + '  ·  Gesamtinvestition ' + _eur(gi.wert)
-      + (gi.sicher ? '' : ' (nur Kaufpreis — noch nicht gerechnet)');
+      + (gi.sicher ? '' : ' (nur Kaufpreis, noch nicht gerechnet)');
 
     if (Math.abs(diff) <= toleranz) {
       box.style.background = 'color-mix(in srgb, var(--green, #3FA56C) 8%, transparent)';

@@ -177,7 +177,7 @@
     if (a === 'etw') {
       var e = p.etw, hg = e.hg_qm * wfl * 12, nul = hg * e.nul_pct / 100;
       return { art: a, hg_ul: Math.round(hg - nul), hg_nul: Math.round(nul), eigen_r: Math.round(e.ruecklage_qm * wfl * 12),
-        text: 'Hausgeld ' + de(e.hg_qm, 2) + ' €/m² × ' + de(wfl) + ' m² × 12, davon ' + de(e.nul_pct) + ' % nicht umlagefähig; eigene Rücklage ' + de(e.ruecklage_qm, 2) + ' €/m²' };
+        text: 'Hausgeld ' + de(e.hg_qm, 2) + ' €/m² × ' + de(wfl) + ' m² × 12, davon ' + de(e.nul_pct) + ' % nicht umlagefähig, eigene Rücklage ' + de(e.ruecklage_qm, 2) + ' €/m²' };
     }
     var h = p[a], einheiten = a === 'mfh' ? we : 1;
     var verw = (h.verw * einheiten + (h.stp_verw || 0) * (a === 'mfh' ? stp : 0)) * f;
@@ -240,15 +240,15 @@
     var v = vorschlag(ausFormular());
     var a = artVon((el('objart') || {}).value);
     if (!a) {
-      host.innerHTML = '<div class="bwk-std"><b>Standardwerte je Objektart</b> — sobald im Reiter Objekt Objektart und Wohnfläche stehen, schlägt DealPilot die Bewirtschaftung vor. Anpassen in den Einstellungen unter „Investment-Profil“.</div>';
+      host.innerHTML = '<div class="bwk-std"><b>Standardwerte je Objektart</b>, sobald im Reiter Objekt Objektart und Wohnfläche stehen, schlägt DealPilot die Bewirtschaftung vor. Anpassen in den Einstellungen unter „Investment-Profil“.</div>';
       return;
     }
     var auto = ZIELE.filter(function (id) { var f = el(id); return f && f.getAttribute('data-bwk-auto') === '1'; }).length;
     host.innerHTML = '<div class="bwk-std"><div><b>Standardwerte · ' + NAME[a] + '</b>'
       + (v ? '<div class="bwk-std-t">' + v.text + '</div>' : '<div class="bwk-std-t">Für den Vorschlag fehlt die Wohnfläche im Reiter Objekt.</div>')
       + (a !== 'etw' ? '<div class="bwk-std-t">Bei Häusern ohne WEG steht unten: umlagefähig = Betriebskosten, nicht umlagefähig = Verwaltung, eigene Rücklage = Instandhaltung.</div>' : '')
-      + (auto ? '<div class="bwk-std-t">' + auto + ' Feld' + (auto > 1 ? 'er' : '') + ' aus den Standardwerten — eigene Eingaben gehen immer vor.</div>' : '')
-      + '</div>' + (v ? '<button type="button" class="btn btn-sm" onclick="DealPilotBwkProfil.einsetzen(true)" title="Setzt Hausgeld/Betriebskosten, nicht umlagefähige Kosten und Rücklage neu aus den Standardwerten — überschreibt die drei Felder.">Standardwerte einsetzen</button>' : '')
+      + (auto ? '<div class="bwk-std-t">' + auto + ' Feld' + (auto > 1 ? 'er' : '') + ' aus den Standardwerten, eigene Eingaben gehen immer vor.</div>' : '')
+      + '</div>' + (v ? '<button type="button" class="btn btn-sm" onclick="DealPilotBwkProfil.einsetzen(true)" title="Setzt Hausgeld/Betriebskosten, nicht umlagefähige Kosten und Rücklage neu aus den Standardwerten, überschreibt die drei Felder.">Standardwerte einsetzen</button>' : '')
       + '</div>';
   }
 

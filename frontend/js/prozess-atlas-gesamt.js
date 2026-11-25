@@ -36,21 +36,21 @@
 
   /* Was du davon hast — je Ablauf ein Satz, nur was der Code hält */
   var NUTZEN = {
-    reise: 'Ein Objekt, ein Datensatz vom Inserat bis zur Steuer — nichts wird zweimal eingegeben.',
-    quickcheck: 'In einer Minute weißt du, ob sich der zweite Blick lohnt — und zu welchem Preis.',
-    sprache: 'Objekt erzählen statt tippen. Du bestätigst, was übernommen wird; nichts wird still überschrieben.',
-    dokumente: 'Exposé, Grundbuch, Gutachten lesen statt abtippen — Personendaten werden vor der KI geschwärzt, Abweichungen gemeldet.',
+    reise: 'Ein Objekt, ein Datensatz vom Inserat bis zur Steuer, nichts wird zweimal eingegeben.',
+    quickcheck: 'In einer Minute weißt du, ob sich der zweite Blick lohnt, und zu welchem Preis.',
+    sprache: 'Objekt erzählen statt tippen. Du bestätigst, was übernommen wird, nichts wird still überschrieben.',
+    dokumente: 'Exposé, Grundbuch, Gutachten lesen statt abtippen, Personendaten werden vor der KI geschwärzt, Abweichungen gemeldet.',
     boarding: 'Jede Stufe schaltet frei, was ohne sie nicht rechnen darf: keine Kennzahl auf geschätzter Grundlage.',
     marktbericht: 'Ein Wert mit Herkunft: jede amtliche Zahl mit Ausschuss, Lizenz und Stichtag.',
-    scores: 'Eine Stufenleiter für alles — dasselbe Objekt trägt überall dieselbe Note.',
+    scores: 'Eine Stufenleiter für alles, dasselbe Objekt trägt überall dieselbe Note.',
     deal: 'Der Plan beim Kauf bleibt stehen. Später siehst du schwarz auf weiß, was daraus geworden ist.',
     steuer: 'Anlage V und Werbungskosten aus denselben Zahlen, die schon im Objekt stehen.',
-    zielbild: 'Was im Haus steckt: Soll-Miete und Umbau mit Ertragswert je Stufe — kostenlos gerechnet, im Cockpit über alle Objekte.',   /* v2965b */
-    telegram: 'DealPilot in der Hosentasche: Kennzahlen, Soll/Ist und Anlegen per Sprachnachricht — mit denselben Rechenkernen wie die App.'
+    zielbild: 'Was im Haus steckt: Soll-Miete und Umbau mit Ertragswert je Stufe, kostenlos gerechnet, im Cockpit über alle Objekte.',   /* v2965b */
+    telegram: 'DealPilot in der Hosentasche: Kennzahlen, Soll/Ist und Anlegen per Sprachnachricht, mit denselben Rechenkernen wie die App.'
   };
   /* Unterkarten: welche Station spielt welche Seite ab (frontend/atlas/) */
   var UNTER = {
-    'sprache:*': ['atlas/2-sprechlauf.html', 'Sprechlauf', 'Ein Diktat läuft ab — Wörter fliegen ins Feld'],
+    'sprache:*': ['atlas/2-sprechlauf.html', 'Sprechlauf', 'Ein Diktat läuft ab, Wörter fliegen ins Feld'],
     'dokumente:*': ['atlas/3-dokumentenfluss.html', 'Dokument-Import', 'Lesen, schwärzen, auslesen, vergleichen'],
     'reise:an1': ['atlas/2-sprechlauf.html', 'Sprechlauf', 'Die Datenaufnahme per Stimme'],
     'boarding:e1': ['atlas/3-dokumentenfluss.html', 'Dokument-Import', 'Die Basis aus dem Kaufvertrag lesen'],
@@ -78,7 +78,7 @@
   function spurHtml(d) {
     var s = spur(d), abl = {};
     s.her.concat(s.hin).forEach(function (e) { abl[e[0].id] = 1; });
-    function l(x, c) { return x.length ? x.map(function (e) { return '<button type="button" class="' + c + '" data-spring="' + e[0].id + ':' + e[1].id + '">' + esc(e[1].t) + '<small>' + esc(e[0].name) + '</small></button>'; }).join('') : '<div class="leer">' + (c === 'h' ? 'Eingabe — keine Station erzeugt es.' : 'Endergebnis — geht nicht weiter.') + '</div>'; }
+    function l(x, c) { return x.length ? x.map(function (e) { return '<button type="button" class="' + c + '" data-spring="' + e[0].id + ':' + e[1].id + '">' + esc(e[1].t) + '<small>' + esc(e[0].name) + '</small></button>'; }).join('') : '<div class="leer">' + (c === 'h' ? 'Eingabe, keine Station erzeugt es.' : 'Endergebnis, geht nicht weiter.') + '</div>'; }
     return '<div class="ag-spur"><div class="kp"><b>' + esc(d) + '</b><span>' + (s.her.length + s.hin.length) + ' Stationen · ' + Object.keys(abl).length + ' Abläufe</span></div>'
       + '<div class="sp2"><div><h5>entsteht in</h5>' + l(s.her, 'h') + '</div><div><h5>gebraucht in</h5>' + l(s.hin, 'g') + '</div></div></div>';
   }
@@ -226,9 +226,9 @@
          GEMESSEN: der gemerkte „Sprechlauf" überschrieb danach „Quick-Check". */
       _kopfAlt = null; ag.innerHTML = ''; markiere(); return;
     }
-    var T = { gesamt: ['Alles auf einer Fläche', 'Alle Abläufe nach Phasen — Klick auf eine Linie zoomt hinein, Klick auf eine Station öffnet sie'],
-              zusammen: ['Das Zusammenspiel', 'Ein Objekt, sechs Rechenkerne, alle Abläufe — und was du in der Hand hältst'],
-              flug: ['Beispielflug · Parkstraße 9', 'Ein Objekt aus den Demo-Daten fliegt durch die Abläufe — scroll mit'] }[m];
+    var T = { gesamt: ['Alles auf einer Fläche', 'Alle Abläufe nach Phasen, Klick auf eine Linie zoomt hinein, Klick auf eine Station öffnet sie'],
+              zusammen: ['Das Zusammenspiel', 'Ein Objekt, sechs Rechenkerne, alle Abläufe, und was du in der Hand hältst'],
+              flug: ['Beispielflug · Parkstraße 9', 'Ein Objekt aus den Demo-Daten fliegt durch die Abläufe, scroll mit'] }[m];
     root.querySelector('.nm').textContent = T[0]; root.querySelector('.s').textContent = T[1];
     if (m === 'gesamt') gesamtnetz();
     if (m === 'zusammen') ag.innerHTML = '<iframe src="atlas/5-zusammenspiel.html?eingebettet&v=' + BUSTER + '" title="Zusammenspiel"></iframe>';
@@ -257,13 +257,13 @@
     }
     var alle = Object.keys(d).sort();
     var vor = ['Kaufpreis', 'Wohnfläche', 'Nettokaltmiete', 'Bodenrichtwert', 'DSCR', 'Werbungskosten'].filter(function (x) { return alle.some(function (a) { return passt(a, norm(x)); }); });
-    ag.innerHTML = '<div class="atl-netz">' + h + '</div><div class="atl-panel"><div class="u">Prozess-Atlas · Gesamtnetz</div><h3>Alles, was DealPilot tut — auf einer Fläche</h3>'
+    ag.innerHTML = '<div class="atl-netz">' + h + '</div><div class="atl-panel"><div class="u">Prozess-Atlas · Gesamtnetz</div><h3>Alles, was DealPilot tut, auf einer Fläche</h3>'
       + '<div class="d">Oben die ganze Reise, darunter jeder Ablauf als eigene Linie, geordnet nach Phasen. Die gestrichelte Spur läuft in Flugrichtung.</div>'
       + '<div class="ag-zahl"><div><b>' + PZ.length + '</b><span>ABLÄUFE</span></div><div><b>' + n + '</b><span>STATIONEN</span></div><div><b>' + alle.length + '</b><span>DATEN</span></div></div>'
       + '<div class="bl">Ein Datum verfolgen</div><input class="ag-such" id="ag-such" list="ag-liste" placeholder="z. B. Kaufpreis, DSCR, Wohnfläche …"><datalist id="ag-liste">' + alle.map(function (x) { return '<option value="' + esc(x) + '">'; }).join('') + '</datalist>'
       + '<div class="ag-vor">' + vor.map(function (x) { return '<button type="button" data-such="' + x + '">' + x + '</button>'; }).join('') + '</div>'
       + '<div id="ag-spur"></div>'
-      + '<div class="bl">So geht es weiter</div><div class="d" style="font-size:12.5px">Klick auf einen Ablauf zoomt in seinen Netzplan. Dort klappt jede Station ihre Schritte auf, die Daten fliegen ein — und jedes Datum lässt sich anklicken. Am Ende: <b>Zusammenspiel</b> und der <b>Flug</b> eines Objekts aus den Demo-Daten.</div></div>';
+      + '<div class="bl">So geht es weiter</div><div class="d" style="font-size:12.5px">Klick auf einen Ablauf zoomt in seinen Netzplan. Dort klappt jede Station ihre Schritte auf, die Daten fliegen ein, und jedes Datum lässt sich anklicken. Am Ende: <b>Zusammenspiel</b> und der <b>Flug</b> eines Objekts aus den Demo-Daten.</div></div>';
     if (window.DealPilotFigur) { kap = document.createElement('div'); kap.className = 'ag-kap'; kap.appendChild(DealPilotFigur.bauen({ koffer: true })); ag.querySelector('.ag-fl').appendChild(kap); kapZu('reise'); }
     ag.querySelector('#ag-such').addEventListener('input', function () { suche(this.value); });
   }
@@ -379,7 +379,7 @@
       band('Beispielflug Parkstraße'); setzeModus('flug'); await warte(1500, g);
       var kap6 = []; try { kap6 = ag.querySelector('iframe').contentWindow.document.querySelectorAll('.kap'); } catch (e) {}
       for (var q = 1; q < kap6.length; q++) { kap6[q].scrollIntoView({ behavior: 'smooth', block: 'center' }); await warte(3800, g); }
-      band('Ende — danke fürs Mitfliegen'); await warte(2500, g);
+      band('Ende, danke fürs Mitfliegen'); await warte(2500, g);
     } catch (e) { if (e !== 'stopp') throw e; }
     if (g === flug) stoppFlug();
   }

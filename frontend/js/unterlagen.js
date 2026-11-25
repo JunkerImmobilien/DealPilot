@@ -421,7 +421,7 @@
       h += '<div class="dpu-h">Baulasten</div>' + (bl.keine && !(bl.eintraege || []).length ? '<p style="font-size:12.5px;margin:4px 0">Laut Auskunft aus dem Baulastenverzeichnis sind keine Baulasten eingetragen.</p>'
         : '<ul class="dpu-ul">' + bl.eintraege.map(function (y) { return '<li>' + esc(y) + '</li>'; }).join('') + '</ul>');
     } else if (g && (g.lasten || []).length) {
-      h += '<div class="dpu-h">Baulasten</div><p style="font-size:12.5px;margin:4px 0">Baulasten stehen nicht im Grundbuch, sondern im Baulastenverzeichnis der Bauaufsicht. Eine Auskunft liegt nicht vor – du kannst sie nachreichen.</p>';
+      h += '<div class="dpu-h">Baulasten</div><p style="font-size:12.5px;margin:4px 0">Baulasten stehen nicht im Grundbuch, sondern im Baulastenverzeichnis der Bauaufsicht. Eine Auskunft liegt nicht vor, du kannst sie nachreichen.</p>';
     }
     if ((a.offene_fragen || []).length) h += '<div class="dpu-h">Beim Verwalter oder Verkäufer anfragen</div><ul class="dpu-ul">' + a.offene_fragen.map(function (y) { return '<li>' + esc(y) + '</li>'; }).join('') + '</ul>';
     return h;
@@ -507,11 +507,11 @@
       + '</div>'
       /* v3017 · Marcel 28.10.2026: Unterlagen nachreichen - fließen in Risiken, These, Hausgeld und Steuer */
       + '<div class="dpu-nach"><button type="button" class="dpu-nach-btn" onclick="DpUnterlagen.nachreichen()">+ Unterlagen nachreichen</button>'
-      + '<span>z. B. Wirtschaftsplan, Hausgeldabrechnung, Baulastenauskunft, neues Protokoll – die Auswertung wird ergänzt, nicht ersetzt. Vor der Übernahme siehst du jede Änderung an Risiken, These, Hausgeld und Steuer.</span></div>'
-      + ((d.auswertung.aenderungen || []).length ? '<div class="dpu-aend"><b>Zuletzt nachgereicht – das hat sich geändert:</b><ul>' + d.auswertung.aenderungen.map(function (y) { return '<li>' + esc(y) + '</li>'; }).join('') + '</ul></div>' : '')
+      + '<span>z. B. Wirtschaftsplan, Hausgeldabrechnung, Baulastenauskunft, neues Protokoll, die Auswertung wird ergänzt, nicht ersetzt. Vor der Übernahme siehst du jede Änderung an Risiken, These, Hausgeld und Steuer.</span></div>'
+      + ((d.auswertung.aenderungen || []).length ? '<div class="dpu-aend"><b>Zuletzt nachgereicht, das hat sich geändert:</b><ul>' + d.auswertung.aenderungen.map(function (y) { return '<li>' + esc(y) + '</li>'; }).join('') + '</ul></div>' : '')
       + '<div data-dpu-ansicht="einfach"' + (art === 'einfach' ? '' : ' style="display:none"') + '>' + einfachHtml(d.auswertung) + '</div>'
       + '<div data-dpu-ansicht="genau"' + (art === 'genau' ? '' : ' style="display:none"') + '>' + auswertungHtml(d.auswertung) + '</div>'
-      + '<div class="dpu-hinweis" style="margin-top:10px">Gelesen und zusammengefasst aus den Unterlagen — keine Rechtsberatung. Prüfe Beschlüsse und Lasten im Original.</div>'
+      + '<div class="dpu-hinweis" style="margin-top:10px">Gelesen und zusammengefasst aus den Unterlagen, keine Rechtsberatung. Prüfe Beschlüsse und Lasten im Original.</div>'
       + '</div>';
   }
 

@@ -321,7 +321,7 @@
     var text = 'Das Gebäude ist laut Baujahr ' + bj + ' vor dem 01.01.1925 fertiggestellt. Dafür sieht § 7 Abs. 4 Satz 1 Nr. 2 Buchst. c EStG 2,5 % linear vor (40 Jahre); gewählt sind 2,0 % (50 Jahre).'
       + (mehr ? ' Mit 2,5 % wären es rund ' + mehr.toLocaleString('de-DE') + ' € AfA im Jahr mehr.' : '')
       + (p.gesellschaft ? ' Das gilt auch im Betriebsvermögen der Gesellschaft.' : '')
-      + ' Weist ein Gutachten eine kürzere Restnutzungsdauer nach (§ 7 Abs. 4 Satz 2 EStG), gilt der eigene Satz – dann entfällt dieser Hinweis.';
+      + ' Weist ein Gutachten eine kürzere Restnutzungsdauer nach (§ 7 Abs. 4 Satz 2 EStG), gilt der eigene Satz, dann entfällt dieser Hinweis.';
     return { warnen: true, soll: 2.5, ist: 2.0, mehrJahr: mehr, titel: 'AfA-Satz prüfen: Fertigstellung vor 1925', text: text };
   }
 

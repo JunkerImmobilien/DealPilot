@@ -240,7 +240,7 @@
        Fuß. Zwei Fassungen desselben Satzes sind der Grund, warum er
        einmal übersehen wurde. */
     var fuss = 'Zurücksetzung am ' + _datum(s.period_reset_at) + '. ' +
-               'Was du bis dahin nicht nutzt, verfällt — zugekaufte Bewertungen nie.';
+               'Was du bis dahin nicht nutzt, verfällt, zugekaufte Bewertungen nie.';
     /* v1185: Waehrend der Testphase stimmt der zweite Satz nicht — was aus
        dem Testpaket kommt, verfaellt sehr wohl. Ein Satz, der in einem
        Zustand falsch ist, gehoert ersetzt, nicht ergaenzt. */
@@ -248,7 +248,7 @@
       fuss = 'Testphase: noch ' + s.testphase.tage_rest +
              (s.testphase.tage_rest === 1 ? ' Tag' : ' Tage') +
              ' Pro, bis ' + _datum(s.testphase.bis) + '. ' +
-             'Die Bewertungen aus dem Testpaket verfallen dann — zugekaufte bleiben.';
+             'Die Bewertungen aus dem Testpaket verfallen dann, zugekaufte bleiben.';
     }
 
     return '<div class="dp-kg-panel" role="tooltip">' +
@@ -389,7 +389,7 @@
     /* v1296: der Satz stand hier seit v1183 und sagt ab heute das Gegenteil
        der Regel. Marcels Entscheidung vom 11.09.2026: das Monatskontingent
        verfaellt, nur Gekauftes bleibt. */
-    var hinweis = 'Dein Monatskontingent gilt für den laufenden Monat — was du ' +
+    var hinweis = 'Dein Monatskontingent gilt für den laufenden Monat, was du ' +
       'bis zum Monatsende nicht nutzt, verfällt. Zugekaufte Bewertungen verfallen ' +
       'nie und werden erst verbraucht, wenn dein Monatskontingent leer ist.';
     if (s.testphase && s.testphase.laeuft) {

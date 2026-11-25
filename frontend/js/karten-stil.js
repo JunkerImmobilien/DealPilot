@@ -594,7 +594,7 @@
                + '</button>';
         }).join('')
       + '</div>'
-      + '<div class="dp-okw-fuss">Wirkt in jedem Aussehen — die Quellen und der '
+      + '<div class="dp-okw-fuss">Wirkt in jedem Aussehen, die Quellen und der '
       + 'Abruf sind in allen dieselben, es wechselt nur die Form.</div>'
       + '</div>';
     host.addEventListener('click', function (e) {
@@ -886,7 +886,7 @@
     k.type = 'button';
     k.id = KACHEL_ID;
     k.className = 'dp-pf-tile tool dpk-copilot';
-    k.title = 'Co-Pilot — er fragt dich durch, du antwortest';
+    k.title = 'Co-Pilot, er fragt dich durch, du antwortest';
     k.innerHTML =
       '<span class="dp-pf-ic" aria-hidden="true">'
       + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" '

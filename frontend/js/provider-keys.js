@@ -17,7 +17,7 @@
           '<span style="font-weight:700;font-size:15px"><span style="color:#C9A84C">Immo</span>Metrica</span>' +
           '<span id="pk-imo-badge" style="margin-left:auto;font-size:11px;font-family:JetBrains Mono,ui-monospace,monospace;padding:3px 9px;border-radius:999px;border:1px solid #ddd;color:#888">…</span>' +
         '</div>' +
-        '<p class="hint" style="margin:0 0 12px">Meta-Suche für Off-Market-Deals. Erfordert ein <b>Investor-Pro-Abo</b> bei ImmoMetrica – den API-Token findest du dort im Dashboard.</p>' +
+        '<p class="hint" style="margin:0 0 12px">Meta-Suche für Off-Market-Deals. Erfordert ein <b>Investor-Pro-Abo</b> bei ImmoMetrica, den API-Token findest du dort im Dashboard.</p>' +
         '<div id="pk-imo-body"></div>' +
       '</div>' +
       '<div id="pk-vivi-host"></div>' +   /* v3950 · ViVi-Verbindung (js/vivi.js, nur Vorschau-Funktion vivi) */

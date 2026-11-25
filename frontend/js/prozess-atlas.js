@@ -31,48 +31,48 @@
 
   var PROZESSE = [
     {
-      id: 'reise', name: 'Die ganze Reise', sub: 'Vom ersten Inserat bis zum Portfolio — neun Stationen in drei Phasen',
+      id: 'reise', name: 'Die ganze Reise', sub: 'Vom ersten Inserat bis zum Portfolio, neun Stationen in drei Phasen',
       spalten: ['Pre-Flight · Quick-Check', 'Boarding · Ankauf', 'Reiseflug · Bestand'],
       knoten: [
         { id: 'qc1', s: 0, z: 0, t: 'Inserat erfassen', k: 'Quick-Check',
-          d: 'Adresse, Fläche, Miete, Hausgeld und Finanzierung — mehr braucht der Quick-Check nicht. Der Score rechnet live mit, während du tippst.',
-          unter: [['Adresse', 'Straße, PLZ und Ort sind Pflicht. Die Hausnummer ist frei — fehlt sie, bezieht sich die Lage auf die Straße.'], ['Objektdaten', 'Objektart, Wohnfläche, Baujahr, Lageklasse A/B/C.'], ['Miete und Hausgeld', 'Nettokaltmiete gesamt, Hausgeld und der nicht umlagefähige Anteil.'], ['Finanzierung', 'Beleihung, Kaufpreis, Eigenkapital, Zins, Tilgung.']],
+          d: 'Adresse, Fläche, Miete, Hausgeld und Finanzierung, mehr braucht der Quick-Check nicht. Der Score rechnet live mit, während du tippst.',
+          unter: [['Adresse', 'Straße, PLZ und Ort sind Pflicht. Die Hausnummer ist frei, fehlt sie, bezieht sich die Lage auf die Straße.'], ['Objektdaten', 'Objektart, Wohnfläche, Baujahr, Lageklasse A/B/C.'], ['Miete und Hausgeld', 'Nettokaltmiete gesamt, Hausgeld und der nicht umlagefähige Anteil.'], ['Finanzierung', 'Beleihung, Kaufpreis, Eigenkapital, Zins, Tilgung.']],
           ein: ['PLZ', 'Ort', 'Wohnfläche', 'Nettokaltmiete', 'Hausgeld', 'Kaufpreis', 'Eigenkapital', 'Zins', 'Tilgung'],
           aus: ['Quick Check Score', 'Fünf Teilscores', 'KPI-Leiste mit Zielwerten'],
           ziel: { aktion: 'quickcheck' }, beleg: 'frontend/quickcheck-app.html:QUICK CHECK SCORE' },
         { id: 'qc2', s: 0, z: 1, t: 'Marktpreis einholen', k: 'Marktbewertung · Abruf',
-          d: 'Eine Marktpreisindikation von einem unabhängigen Bewertungspartner — Marktwert mit Spanne. Ausdrücklich kein Gutachten nach § 194 BauGB.',
-          unter: [['Bewertungsquelle wählen', 'In der Aktionsleiste unter „Marktbewertung“.'], ['Abrufen', 'Der Abruf wird vorher bestätigt — er zählt auf dein Kontingent.'], ['Ergebnis prüfen', 'Marktwert, Marktmiete und Lage erscheinen unter der Leiste.']],
+          d: 'Eine Marktpreisindikation von einem unabhängigen Bewertungspartner, Marktwert mit Spanne. Ausdrücklich kein Gutachten nach § 194 BauGB.',
+          unter: [['Bewertungsquelle wählen', 'In der Aktionsleiste unter „Marktbewertung“.'], ['Abrufen', 'Der Abruf wird vorher bestätigt, er zählt auf dein Kontingent.'], ['Ergebnis prüfen', 'Marktwert, Marktmiete und Lage erscheinen unter der Leiste.']],
           ein: ['PLZ', 'Ort', 'Objektart', 'Wohnfläche'], aus: ['Marktwert mit Spanne', 'Marktmiete', 'Lage-Einschätzung'],
           ziel: { aktion: 'quickcheck' }, beleg: 'frontend/quickcheck-app.html:openCreditModal' },
         { id: 'qc3', s: 0, z: 2, t: 'Urteil und speichern', k: 'Entscheidung',
           d: 'Das Urteil mit Pro-Argumenten, Warnungen und einer Verhandlungs-Empfehlung. Der Zielpreis darin kommt aus deiner Ziel-Bruttomietrendite je Lageklasse. Lohnt es sich: „Als Objekt speichern“.',
-          unter: [['Bewertung lesen', 'Urteil, Pro-Argumente, „Achtung“-Punkte.'], ['Verhandlungs-Empfehlung', 'Zielpreis aus Zielrendite und Cashflow-Null — nie über dem Marktwert.'], ['Als Objekt speichern', 'Erst wenn alle Pflichtfelder gefüllt sind. Du wählst, welche Daten übernommen werden.']],
+          unter: [['Bewertung lesen', 'Urteil, Pro-Argumente, „Achtung“-Punkte.'], ['Verhandlungs-Empfehlung', 'Zielpreis aus Zielrendite und Cashflow-Null, nie über dem Marktwert.'], ['Als Objekt speichern', 'Erst wenn alle Pflichtfelder gefüllt sind. Du wählst, welche Daten übernommen werden.']],
           ein: ['Score', 'Lageklasse', 'Ziel-Bruttomietrendite'], aus: ['Verhandlungs-Empfehlung', 'neues Objekt „In Prüfung“'],
           ziel: { aktion: 'quickcheck' }, beleg: 'frontend/js/qc-heuristik.js:zielKaufpreis' },
         { id: 'an1', s: 1, z: 0, t: 'Datenaufnahme', k: 'Etappen 1–8',
-          d: 'Vom Groben zum Feinen. Jede Etappe schaltet Kennzahlen frei — was fehlt, wird nicht geschätzt, sondern genannt.',
+          d: 'Vom Groben zum Feinen. Jede Etappe schaltet Kennzahlen frei, was fehlt, wird nicht geschätzt, sondern genannt.',
           unter: [['Basis', 'Objekt, Preis und Miete.'], ['Geld', 'Finanzierung und Kaufnebenkosten.'], ['Lage & Zustand', 'Wo es steht und wie es dasteht.'], ['Feinschliff', 'Bewirtschaftung, Entwicklung, Steuer.'], ['Deine Sicht', 'These und Risiken in eigenen Worten.'], ['Wertermittlung · Restnutzungsdauer', 'Optional, wenn Stufe 3 gebraucht wird.']],
           ein: ['259 Felder', '11 Objektarten'], aus: ['DSCR', 'Cashflow n. St.', 'LTV', 'DealScore', 'Investor Deal Score'],
           ziel: { tab: 's0' }, beleg: 'backend/src/generated/frontend-konstanten.json:Feinschliff' },
         { id: 'an2', s: 1, z: 1, t: 'Wert ermitteln', k: 'Marktbericht Stufe 3',
-          d: 'Boden-, Ertrags- und Sachwert nach ImmoWertV — mit Liegenschaftszins und Sachwertfaktor des zuständigen Gutachterausschusses und Quellennachweis.',
-          unter: [['Detailgrad Experte', 'Stufe 3 ist ab dem Detailgrad Experte (Einstellungen › Mein Profil) freigegeben; abgerufen wird im Reiter Objekt in der Box „Marktbericht abrufen“.'], ['Läuft im Hintergrund', 'Acht Etappen, du arbeitest weiter.'], ['Übernehmen', 'Jeder Abruf landet im Verlauf und steht am Verkehrswert zur Übernahme.']],
+          d: 'Boden-, Ertrags- und Sachwert nach ImmoWertV, mit Liegenschaftszins und Sachwertfaktor des zuständigen Gutachterausschusses und Quellennachweis.',
+          unter: [['Detailgrad Experte', 'Stufe 3 ist ab dem Detailgrad Experte (Einstellungen › Mein Profil) freigegeben, abgerufen wird im Reiter Objekt in der Box „Marktbericht abrufen“.'], ['Läuft im Hintergrund', 'Acht Etappen, du arbeitest weiter.'], ['Übernehmen', 'Jeder Abruf landet im Verlauf und steht am Verkehrswert zur Übernahme.']],
           ein: ['Grundstück', 'Bodenrichtwert', 'Zustand', 'Standardstufe'], aus: ['Bodenwert', 'Ertragswert', 'Sachwert', 'Quellennachweis'],
           ziel: { tab: 's0' }, beleg: 'frontend/js/objekt-reiter.js:pflichtFuer' },
         { id: 'an3', s: 1, z: 2, t: 'Bereit für die Bank', k: 'Deal-Aktion',
           d: 'Der Vorflug-Check zählt die Grundfelder. Daneben die bankfertigen PDFs und die Unterlagen fürs Bankgespräch.',
-          unter: [['Vorflug-Check', '„X / Y Grundfelder befüllt“ — was fehlt, steht als Chip da.'], ['Investment-PDF', 'Empfohlen, in mehreren Fassungen.'], ['Bordkarte & Unterlagen', 'Persönliche und Objekt-Unterlagen, Anforderung beim Amt.']],
+          unter: [['Vorflug-Check', '„X / Y Grundfelder befüllt“, was fehlt, steht als Chip da.'], ['Investment-PDF', 'Empfohlen, in mehreren Fassungen.'], ['Bordkarte & Unterlagen', 'Persönliche und Objekt-Unterlagen, Anforderung beim Amt.']],
           ein: ['Grundfelder', 'Pilot-Analyse'], aus: ['Investment-PDF', 'Unterlagenliste'],
           ziel: { tab: 's8' }, beleg: 'frontend/js/deal-action-boarding.js:Bereit für die Bank' },
         { id: 'be1', s: 2, z: 0, t: 'Gewonnen: einfrieren', k: 'Ankauf-Stand',
-          d: 'Auf „Gewonnen“ wird der ganze Datensatz zum Nutzen-/Lastenwechsel festgeschrieben — das Soll. Ohne dieses Datum wird nichts eingefroren.',
-          unter: [['Status „Gewonnen“', 'Deal-Aktion → Departures · Deal-Status.'], ['Stichtag prüfen', 'Feld „Wirtsch. Übergang · Nutzen-/Lastenwechsel“ im Reiter Objekt.'], ['Festschreiben', 'Automatisch, wenn das Datum steht — sonst fragt DealPilot nach.']],
+          d: 'Auf „Gewonnen“ wird der ganze Datensatz zum Nutzen-/Lastenwechsel festgeschrieben, das Soll. Ohne dieses Datum wird nichts eingefroren.',
+          unter: [['Status „Gewonnen“', 'Deal-Aktion → Departures · Deal-Status.'], ['Stichtag prüfen', 'Feld „Wirtsch. Übergang · Nutzen-/Lastenwechsel“ im Reiter Objekt.'], ['Festschreiben', 'Automatisch, wenn das Datum steht, sonst fragt DealPilot nach.']],
           ein: ['Nutzen-/Lastenwechsel', 'alle Felder'], aus: ['Soll · Ankauf-Stand', 'Objekt im Bestand'],
           ziel: { tab: 's8' }, beleg: 'frontend/js/ankauf.js:vonSelbst' },
         { id: 'be2', s: 2, z: 1, t: 'Ist pflegen', k: 'Ist · heute',
-          d: 'Im Bestand pflegst du Mieten, Kosten und Verträge weiter. Oben im Objekt schaltest du zwischen Ist und Soll — die Abweichung bleibt sichtbar.',
-          unter: [['Ist · heute', 'Frei zu pflegen.'], ['Soll · Ankauf-Stand', 'Gesperrt — der Haken „zum nachträglichen Bearbeiten freigeben“ öffnet ihn mit Nachweis.'], ['Marktbericht wiederholen', 'Der Wertverlauf wächst mit jedem Abruf.']],
+          d: 'Im Bestand pflegst du Mieten, Kosten und Verträge weiter. Oben im Objekt schaltest du zwischen Ist und Soll, die Abweichung bleibt sichtbar.',
+          unter: [['Ist · heute', 'Frei zu pflegen.'], ['Soll · Ankauf-Stand', 'Gesperrt, der Haken „zum nachträglichen Bearbeiten freigeben“ öffnet ihn mit Nachweis.'], ['Marktbericht wiederholen', 'Der Wertverlauf wächst mit jedem Abruf.']],
           ein: ['Mieten', 'Kosten', 'Marktberichte'], aus: ['Soll/Ist-Abweichung', 'Wertverlauf'],
           ziel: { tab: 's0' }, beleg: 'frontend/js/ankauf-ansicht.js:sollSpeichern' },
         { id: 'be3', s: 2, z: 2, t: 'Portfolio steuern', k: 'Portfolio-Cockpit',
@@ -84,18 +84,18 @@
       kanten: [['qc1', 'qc2'], ['qc2', 'qc3'], ['qc3', 'an1'], ['an1', 'an2'], ['an2', 'an3'], ['an3', 'be1'], ['be1', 'be2'], ['be2', 'be3']]
     },
     {
-      id: 'quickcheck', name: 'Quick-Check', sub: 'Ein Inserat in einer Minute einordnen — und nur übernehmen, was taugt',
+      id: 'quickcheck', name: 'Quick-Check', sub: 'Ein Inserat in einer Minute einordnen, und nur übernehmen, was taugt',
       spalten: ['Eingeben', 'Bewerten', 'Entscheiden'],
       knoten: [
-        { id: 'q1', s: 0, z: 0, t: 'Adresse', k: 'Straße · PLZ · Ort Pflicht', d: 'Die Hausnummer ist freiwillig — viele Inserate nennen keine. Fehlt sie, bezieht sich die Lage auf die Straße.', ein: ['Straße', 'Hausnr.', 'PLZ', 'Ort'], aus: ['Standort'], ziel: { aktion: 'quickcheck' }, beleg: 'frontend/quickcheck-app.html:Adresse' },
-        { id: 'q2', s: 0, z: 1, t: 'Objekt und Miete', k: 'Wohnfläche · Nettokaltmiete', d: 'Objektart, Fläche, Baujahr, Lageklasse — und die Mieteinnahmen je Monat. Die Lageklasse bestimmt deine Zielrendite.', ein: ['Objektart', 'Wohnfläche', 'Baujahr', 'Lageklasse', 'Grundmiete', 'Stellplatz'], aus: ['Nettokaltmiete gesamt'], ziel: { aktion: 'quickcheck' }, beleg: 'frontend/quickcheck-app.html:Mieteinnahmen' },
-        { id: 'q3', s: 0, z: 2, t: 'Kosten und Geld', k: 'Hausgeld · Finanzierung', d: 'Hausgeld je Monat und der nicht umlagefähige Anteil — DealPilot rechnet ihn aus Objektart, Fläche und Hausgeld nach ImmoWertV Anlage 3 vor. Dazu Beleihung, Kaufpreis, Eigenkapital, Zins und Tilgung; Kaufnebenkosten nach Bundesland und Gebührenordnung.', ein: ['Hausgeld', 'nicht umlagefähig %', 'Kaufpreis', 'Eigenkapital', 'Zins', 'Tilgung'], aus: ['Kapitaldienst'], ziel: { aktion: 'quickcheck' }, beleg: 'frontend/quickcheck-app.html:Bewirtschaftungskosten' },
-        { id: 'q4', s: 1, z: 0, t: 'Score live', k: 'fünf Teilscores', d: 'Rendite, Cashflow, LTV, Risiko, Potenzial — je von 100, dazu der Ring mit dem Gesamtscore. Er rechnet bei jeder Eingabe neu.', gew: [['Rendite', 0], ['Cashflow', 0], ['LTV', 0], ['Risiko', 0], ['Potenzial', 0]], aus: ['Quick Check Score'], ziel: { aktion: 'quickcheck' }, beleg: 'frontend/js/quick-check.js:kennzahlenAmpel' },
+        { id: 'q1', s: 0, z: 0, t: 'Adresse', k: 'Straße · PLZ · Ort Pflicht', d: 'Die Hausnummer ist freiwillig, viele Inserate nennen keine. Fehlt sie, bezieht sich die Lage auf die Straße.', ein: ['Straße', 'Hausnr.', 'PLZ', 'Ort'], aus: ['Standort'], ziel: { aktion: 'quickcheck' }, beleg: 'frontend/quickcheck-app.html:Adresse' },
+        { id: 'q2', s: 0, z: 1, t: 'Objekt und Miete', k: 'Wohnfläche · Nettokaltmiete', d: 'Objektart, Fläche, Baujahr, Lageklasse, und die Mieteinnahmen je Monat. Die Lageklasse bestimmt deine Zielrendite.', ein: ['Objektart', 'Wohnfläche', 'Baujahr', 'Lageklasse', 'Grundmiete', 'Stellplatz'], aus: ['Nettokaltmiete gesamt'], ziel: { aktion: 'quickcheck' }, beleg: 'frontend/quickcheck-app.html:Mieteinnahmen' },
+        { id: 'q3', s: 0, z: 2, t: 'Kosten und Geld', k: 'Hausgeld · Finanzierung', d: 'Hausgeld je Monat und der nicht umlagefähige Anteil, DealPilot rechnet ihn aus Objektart, Fläche und Hausgeld nach ImmoWertV Anlage 3 vor. Dazu Beleihung, Kaufpreis, Eigenkapital, Zins und Tilgung; Kaufnebenkosten nach Bundesland und Gebührenordnung.', ein: ['Hausgeld', 'nicht umlagefähig %', 'Kaufpreis', 'Eigenkapital', 'Zins', 'Tilgung'], aus: ['Kapitaldienst'], ziel: { aktion: 'quickcheck' }, beleg: 'frontend/quickcheck-app.html:Bewirtschaftungskosten' },
+        { id: 'q4', s: 1, z: 0, t: 'Score live', k: 'fünf Teilscores', d: 'Rendite, Cashflow, LTV, Risiko, Potenzial, je von 100, dazu der Ring mit dem Gesamtscore. Er rechnet bei jeder Eingabe neu.', gew: [['Rendite', 0], ['Cashflow', 0], ['LTV', 0], ['Risiko', 0], ['Potenzial', 0]], aus: ['Quick Check Score'], ziel: { aktion: 'quickcheck' }, beleg: 'frontend/js/quick-check.js:kennzahlenAmpel' },
         { id: 'q5', s: 1, z: 1, t: 'Ampel je Kennzahl', k: 'gegen Zielwerte', d: 'Jede Kennzahl gegen ihren Zielwert: Bruttomietrendite ≥ 5 %, Nettomietrendite ≥ 3 %, EK-Rendite ≥ 7 %, Cashflow, DSCR und LTV gegen deine Mindest-Schwellen aus den Einstellungen (Vorgabe ≥ 0 €, ≥ 1,2, ≤ 90 %), Bewirtschaftung 18–35 %.', aus: ['grün · gelb · rot'], ziel: { aktion: 'quickcheck' }, beleg: 'frontend/js/qc-heuristik.js:kennzahlenAmpel' },
-        { id: 'q6', s: 1, z: 2, t: 'Marktpreis', k: 'optional · Abruf', opt: true, d: 'Die Marktpreisindikation eines unabhängigen Bewertungspartners — mit Spanne. Sie fließt als Obergrenze in den Zielpreis.', ein: ['PLZ', 'Ort', 'Objektart', 'Wohnfläche'], aus: ['Marktwert mit Spanne', 'Marktmiete'], ziel: { aktion: 'quickcheck' }, beleg: 'frontend/quickcheck-app.html:avm-results-host' },
+        { id: 'q6', s: 1, z: 2, t: 'Marktpreis', k: 'optional · Abruf', opt: true, d: 'Die Marktpreisindikation eines unabhängigen Bewertungspartners, mit Spanne. Sie fließt als Obergrenze in den Zielpreis.', ein: ['PLZ', 'Ort', 'Objektart', 'Wohnfläche'], aus: ['Marktwert mit Spanne', 'Marktmiete'], ziel: { aktion: 'quickcheck' }, beleg: 'frontend/quickcheck-app.html:avm-results-host' },
         { id: 'q7', s: 2, z: 0, t: 'Urteil', k: 'eine Karte', d: 'Eine Karte: Urteil mit Lageklasse A · B · C, drei Prüfsteine (Preis gegen die Marktspanne, Rendite gegen das Lage-Ziel, Finanzierung), Zielkaufpreis, angesetzte Miete mit Mietrecht der Gemeinde, Dafür und Dagegen. Der Score bleibt bei jeder Lageklasse gleich.', aus: ['Urteil', 'Prüfsteine', 'Dafür / Dagegen'], ziel: { aktion: 'quickcheck' }, beleg: 'frontend/quickcheck-app.html:_renderBewertungNeu' },
-        { id: 'q8', s: 2, z: 1, t: 'Verhandlungs-Empfehlung', k: 'Zielpreis', d: 'Der niedrigste aus drei Preisen: Ziel-Bruttomietrendite der Lageklasse, Cashflow null mit deiner Finanzierung und — wenn abgerufen — Marktwert nach Angebotsabschlag. Die Grenze, die greift, ist hervorgehoben.', ein: ['Zielrendite der Lageklasse', 'Marktwert'], aus: ['Zielpreis', 'Verhandlungsspanne'], ziel: { aktion: 'quickcheck' }, beleg: 'frontend/js/qc-heuristik.js:zielKaufpreis' },
-        { id: 'q9', s: 2, z: 2, t: 'Als Objekt speichern', k: 'Speichern & übernehmen', d: 'Erst wenn alle Pflichtfelder gefüllt sind. Du hakst an, welche Daten mitgehen — auch Fotos und Marktwerte. Das neue Objekt startet „In Prüfung“.', unter: [['Welche Daten übernehmen?', '„Alle übernehmen“ oder einzeln.'], ['Neues Objekt', 'Legt ein Objekt an und überträgt die Werte.'], ['Weiter in der Datenaufnahme', 'Ab hier geht es im Objekt weiter.']], aus: ['Objekt · In Prüfung'], ziel: { aktion: 'quickcheck' }, beleg: 'frontend/js/qc-bridge.js:_handleSave' }
+        { id: 'q8', s: 2, z: 1, t: 'Verhandlungs-Empfehlung', k: 'Zielpreis', d: 'Der niedrigste aus drei Preisen: Ziel-Bruttomietrendite der Lageklasse, Cashflow null mit deiner Finanzierung und, wenn abgerufen, Marktwert nach Angebotsabschlag. Die Grenze, die greift, ist hervorgehoben.', ein: ['Zielrendite der Lageklasse', 'Marktwert'], aus: ['Zielpreis', 'Verhandlungsspanne'], ziel: { aktion: 'quickcheck' }, beleg: 'frontend/js/qc-heuristik.js:zielKaufpreis' },
+        { id: 'q9', s: 2, z: 2, t: 'Als Objekt speichern', k: 'Speichern & übernehmen', d: 'Erst wenn alle Pflichtfelder gefüllt sind. Du hakst an, welche Daten mitgehen, auch Fotos und Marktwerte. Das neue Objekt startet „In Prüfung“.', unter: [['Welche Daten übernehmen?', '„Alle übernehmen“ oder einzeln.'], ['Neues Objekt', 'Legt ein Objekt an und überträgt die Werte.'], ['Weiter in der Datenaufnahme', 'Ab hier geht es im Objekt weiter.']], aus: ['Objekt · In Prüfung'], ziel: { aktion: 'quickcheck' }, beleg: 'frontend/js/qc-bridge.js:_handleSave' }
       ],
       kanten: [['q1', 'q2'], ['q2', 'q3'], ['q1', 'q4'], ['q2', 'q4'], ['q3', 'q4'], ['q4', 'q5'], ['q1', 'q6', 'opt'], ['q6', 'q8', 'opt'], ['q5', 'q7'], ['q7', 'q8'], ['q8', 'q9']]
     },
@@ -104,7 +104,7 @@
     {
       "id": "sprache",
       "name": "Sprechlauf",
-      "sub": "Du erzählst das Objekt — DealPilot füllt die Felder",
+      "sub": "Du erzählst das Objekt, DealPilot füllt die Felder",
       "spalten": [
         "Sprechen",
         "Verstehen",
@@ -117,7 +117,7 @@
           "z": 0,
           "t": "Aufnahme",
           "k": "bis 4 Minuten",
-          "d": "Die Aufnahme startet sofort. Während du sprichst, erscheint der Text live als Vorschau; maßgeblich ist die Audio-Aufnahme.",
+          "d": "Die Aufnahme startet sofort. Während du sprichst, erscheint der Text live als Vorschau, maßgeblich ist die Audio-Aufnahme.",
           "ein": [
             "Mikrofon"
           ],
@@ -191,7 +191,7 @@
           "z": 0,
           "t": "Nachfragen",
           "k": "wenn ein Feld belegt ist",
-          "d": "Trägt das Objekt schon Werte, zeigt DealPilot, was sich ändern würde — und fragt, bevor überschrieben wird.",
+          "d": "Trägt das Objekt schon Werte, zeigt DealPilot, was sich ändern würde, und fragt, bevor überschrieben wird.",
           "ein": [
             "bestehende Werte"
           ],
@@ -209,7 +209,7 @@
           "z": 1,
           "t": "Übernehmen",
           "k": "an- und abwählbar",
-          "d": "Dieselbe Tabelle wie beim Exposé-Import. Du wählst, was übernommen wird — danach rechnen alle Kerne neu.",
+          "d": "Dieselbe Tabelle wie beim Exposé-Import. Du wählst, was übernommen wird, danach rechnen alle Kerne neu.",
           "ein": [
             "deine Auswahl"
           ],
@@ -249,7 +249,7 @@
     {
       "id": "dokumente",
       "name": "Dokument-Import",
-      "sub": "Exposé, Grundbuch, Gutachten, Belege — lesen statt abtippen",
+      "sub": "Exposé, Grundbuch, Gutachten, Belege, lesen statt abtippen",
       "spalten": [
         "Einlesen",
         "Schützen",
@@ -282,7 +282,7 @@
           "z": 1,
           "t": "Art erkennen",
           "k": "neun Dokumentarten",
-          "d": "Grundbuch, Kataster, Kaufvertrag, WEG-Protokoll, BORIS, Verkehrswert-, Restnutzungsdauergutachten, Kaufpreisaufteilung, Marktbericht — je mit eigenem Schema.",
+          "d": "Grundbuch, Kataster, Kaufvertrag, WEG-Protokoll, BORIS, Verkehrswert-, Restnutzungsdauergutachten, Kaufpreisaufteilung, Marktbericht, je mit eigenem Schema.",
           "ein": [
             "Seitentext"
           ],
@@ -300,7 +300,7 @@
           "z": 0,
           "t": "Schwärzen",
           "k": "auf dem DealPilot-Server, vor der KI",
-          "d": "Geburtsdaten, Namen nach Anrede, Anschriften nach „wohnhaft\", E-Mail, Telefon, IBAN, Steuer-ID werden ersetzt. Die Objektanschrift und Beträge bleiben — die braucht die Auswertung.",
+          "d": "Geburtsdaten, Namen nach Anrede, Anschriften nach „wohnhaft\", E-Mail, Telefon, IBAN, Steuer-ID werden ersetzt. Die Objektanschrift und Beträge bleiben, die braucht die Auswertung.",
           "ein": [
             "Seitentext"
           ],
@@ -337,7 +337,7 @@
           "z": 1,
           "t": "Vergleich, nicht Ergebnis",
           "k": "fremde Gutachten",
-          "d": "Ein mitgelesener Gutachtenwert (Restnutzungsdauer, Verkehrswert, Gebäudeanteil) erscheint als Vergleich neben der eigenen Rechnung — er wird nicht übernommen.",
+          "d": "Ein mitgelesener Gutachtenwert (Restnutzungsdauer, Verkehrswert, Gebäudeanteil) erscheint als Vergleich neben der eigenen Rechnung, er wird nicht übernommen.",
           "ein": [
             "Gutachtenwert"
           ],
@@ -355,7 +355,7 @@
           "z": 0,
           "t": "Übernehmen",
           "k": "Feld für Feld",
-          "d": "Jedes Feld steht mit „im Dokument“ und „im Objekt“ nebeneinander: leere Felder sind vorgehakt, abweichende nicht — still überschrieben wird nie. Belege bestätigst du Zeile für Zeile, weil sie in die Steuer gehen.",
+          "d": "Jedes Feld steht mit „im Dokument“ und „im Objekt“ nebeneinander: leere Felder sind vorgehakt, abweichende nicht, still überschrieben wird nie. Belege bestätigst du Zeile für Zeile, weil sie in die Steuer gehen.",
           "ein": [
             "deine Auswahl"
           ],
@@ -396,36 +396,36 @@
       id: 'boarding', name: 'Netzplan Datenaufnahme', sub: 'Jede Stufe schaltet frei, was ohne sie nicht rechnen darf',
       spalten: ['Stufe 1 · Einordnen · 6 Pflichtfelder', 'Stufe 2 · Durchrechnen · 13', 'Stufe 3 · Bewerten · bis 20'],
       knoten: [
-        { id: 'e1', s: 0, z: 1, t: 'E1 Basis', k: 'Objekt, Preis und Miete', d: 'Adresse, Objektart, Wohnfläche, Baujahr. Ohne Stufe 1 kein Score — und keine Schätzung an ihrer Stelle.', ein: ['PLZ', 'Ort', 'Straße', 'Objektart', 'Wohnfläche', 'Baujahr'], aus: ['Bruttomietrendite', 'Kaufpreisfaktor', 'Marktpreisindikation Stufe 1'], ziel: { tab: 's0' }, beleg: 'frontend/js/objekt-reiter.js:pflichtFuer' },
+        { id: 'e1', s: 0, z: 1, t: 'E1 Basis', k: 'Objekt, Preis und Miete', d: 'Adresse, Objektart, Wohnfläche, Baujahr. Ohne Stufe 1 kein Score, und keine Schätzung an ihrer Stelle.', ein: ['PLZ', 'Ort', 'Straße', 'Objektart', 'Wohnfläche', 'Baujahr'], aus: ['Bruttomietrendite', 'Kaufpreisfaktor', 'Marktpreisindikation Stufe 1'], ziel: { tab: 's0' }, beleg: 'frontend/js/objekt-reiter.js:pflichtFuer' },
         { id: 'e2', s: 1, z: 0, t: 'E2 Geld', k: 'Finanzierung, Kaufnebenkosten', d: 'Zwei Darlehen, Zins, Tilgung, Zinsbindung, Eigenkapital.', ein: ['Kaufpreis', 'Darlehen', 'Zins', 'Tilgung', 'Zinsbindung', 'Eigenkapital'], aus: ['DSCR', 'Beleihungsauslauf', 'Cashflow', 'DealScore'], ziel: { tab: 's3' }, beleg: 'frontend/js/dscr-engine.js:compute' },
-        { id: 'e3', s: 1, z: 1, t: 'E3 Lage & Zustand', k: 'wo es steht, wie es dasteht', d: 'Zustand, Energieklasse, Standardstufe, Zimmer — bei ETW die Etage, beim MFH die Einheiten.', ein: ['Nettokaltmiete', 'Zustand', 'Energieklasse', 'Standardstufe', 'Zimmer'], aus: ['Lage-Analyse', 'Mietanalyse', 'Risiko im Investor Deal Score'], ziel: { tab: 's0' }, beleg: 'frontend/js/objekt-reiter.js:ds2_zustand' },
+        { id: 'e3', s: 1, z: 1, t: 'E3 Lage & Zustand', k: 'wo es steht, wie es dasteht', d: 'Zustand, Energieklasse, Standardstufe, Zimmer, bei ETW die Etage, beim MFH die Einheiten.', ein: ['Nettokaltmiete', 'Zustand', 'Energieklasse', 'Standardstufe', 'Zimmer'], aus: ['Lage-Analyse', 'Mietanalyse', 'Risiko im Investor Deal Score'], ziel: { tab: 's0' }, beleg: 'frontend/js/objekt-reiter.js:ds2_zustand' },
         { id: 'e4', s: 1, z: 2, t: 'E4 Feinschliff', k: 'Bewirtschaftung, Steuer', d: 'Hausgeld getrennt nach umlagefähig, Rücklagen, Grenzsteuersatz. Ohne Wirtschaftsplan schlägt DealPilot die Standardwerte je Objektart vor.', ein: ['Hausgeld umlagefähig', 'Rücklagen', 'Grenzsteuersatz'], aus: ['Cashflow nach Steuer', 'AfA inkl. § 7b', 'Mietentwicklungsplan', 'Anlage V'], ziel: { tab: 's4' }, beleg: 'frontend/js/bwk-profil.js:jahresFaktor' },
-        { id: 'e5', s: 2, z: 0, t: 'E5 Deine Sicht', k: 'These und Risiken', d: 'Investmentthese und Risiken in eigenen Worten — die Pilot-Analyse bezieht sich dann auf deine These statt auf allgemeines Wissen.', ein: ['Investmentthese', 'Risiken'], aus: ['Pilot-Analyse mit Bezug'], ziel: { tab: 's5' }, beleg: 'backend/src/generated/frontend-konstanten.json:Deine Sicht' },
-        { id: 'e7', s: 2, z: 1, t: 'E7 Wertermittlung', k: 'Sachwert nach ImmoWertV', opt: true, d: 'Nutzungsart, Grundstück, Bodenrichtwert, BGF — bei ETW der Miteigentumsanteil, am Haus Hausform, Geschosse und Dach. ETW ohne Miteigentumsanteil: Sachwert ohne Bodenwert, und das steht dann dran.', ein: ['Nutzungsart', 'Grundstücksfläche', 'Bodenrichtwert', 'BGF', 'MEA (ETW)'], aus: ['Sachwert (NHK 2010)', 'Ertragswert', 'Marktbericht Stufe 3'], ziel: { tab: 's0' }, beleg: 'backend/src/generated/frontend-konstanten.json:Wertermittlung' },
-        { id: 'e8', s: 2, z: 2, t: 'E8 Restnutzungsdauer', k: 'Anlage 2 · 20 Punkte', opt: true, d: 'Modernisierungsgrad nach Anlage 2 ImmoWertV — acht Bauteile, zwanzig Punkte. Daraus die Restnutzungsdauer, abgeglichen gegen die AfA-Dauer.', ein: ['8 Bauteile', 'Modernisierungsjahre'], aus: ['Restnutzungsdauer', 'Abgleich AfA-Dauer'], ziel: { tab: 's0' }, beleg: 'backend/src/generated/frontend-konstanten.json:Restnutzungsdauer' }
+        { id: 'e5', s: 2, z: 0, t: 'E5 Deine Sicht', k: 'These und Risiken', d: 'Investmentthese und Risiken in eigenen Worten, die Pilot-Analyse bezieht sich dann auf deine These statt auf allgemeines Wissen.', ein: ['Investmentthese', 'Risiken'], aus: ['Pilot-Analyse mit Bezug'], ziel: { tab: 's5' }, beleg: 'backend/src/generated/frontend-konstanten.json:Deine Sicht' },
+        { id: 'e7', s: 2, z: 1, t: 'E7 Wertermittlung', k: 'Sachwert nach ImmoWertV', opt: true, d: 'Nutzungsart, Grundstück, Bodenrichtwert, BGF, bei ETW der Miteigentumsanteil, am Haus Hausform, Geschosse und Dach. ETW ohne Miteigentumsanteil: Sachwert ohne Bodenwert, und das steht dann dran.', ein: ['Nutzungsart', 'Grundstücksfläche', 'Bodenrichtwert', 'BGF', 'MEA (ETW)'], aus: ['Sachwert (NHK 2010)', 'Ertragswert', 'Marktbericht Stufe 3'], ziel: { tab: 's0' }, beleg: 'backend/src/generated/frontend-konstanten.json:Wertermittlung' },
+        { id: 'e8', s: 2, z: 2, t: 'E8 Restnutzungsdauer', k: 'Anlage 2 · 20 Punkte', opt: true, d: 'Modernisierungsgrad nach Anlage 2 ImmoWertV, acht Bauteile, zwanzig Punkte. Daraus die Restnutzungsdauer, abgeglichen gegen die AfA-Dauer.', ein: ['8 Bauteile', 'Modernisierungsjahre'], aus: ['Restnutzungsdauer', 'Abgleich AfA-Dauer'], ziel: { tab: 's0' }, beleg: 'backend/src/generated/frontend-konstanten.json:Restnutzungsdauer' }
       ],
       kanten: [['e1', 'e2'], ['e1', 'e3'], ['e1', 'e4'], ['e2', 'e5'], ['e3', 'e5'], ['e4', 'e5'], ['e3', 'e7', 'opt'], ['e7', 'e8', 'opt']]
     },
     {
-      id: 'deal', name: 'Deal bis gewonnen', sub: 'Offen — Gewonnen — Verloren, und was jeder Status auslöst',
+      id: 'deal', name: 'Deal bis gewonnen', sub: 'Offen, Gewonnen, Verloren, und was jeder Status auslöst',
       spalten: ['Akquise', 'Deal-Status', 'Danach'],
       knoten: [
         { id: 'd1', s: 0, z: 0, t: 'Offen', k: 'Deal in Prüfung · BOARDING', d: 'Jedes neue Objekt startet offen und steht in der Liste unter „Ankauf“.', aus: ['Liste: Ankauf'], ziel: { tab: 's8' }, beleg: 'frontend/js/deal-action-boarding.js:Deal in Prüfung' },
-        { id: 'd2', s: 0, z: 1, t: 'Pilot-Analyse', k: 'KI-Einordnung', d: 'Stärken, Risiken, Szenarien, Verhandlungsempfehlung und Bank-Argumente — gespeichert am Objekt.', aus: ['Empfehlung', 'Ziel-Kaufpreis', 'Bank-Argumente'], ziel: { tab: 's5' }, beleg: 'frontend/js/ui.js:_dpVerlaufKiText' },
+        { id: 'd2', s: 0, z: 1, t: 'Pilot-Analyse', k: 'KI-Einordnung', d: 'Stärken, Risiken, Szenarien, Verhandlungsempfehlung und Bank-Argumente, gespeichert am Objekt.', aus: ['Empfehlung', 'Ziel-Kaufpreis', 'Bank-Argumente'], ziel: { tab: 's5' }, beleg: 'frontend/js/ui.js:_dpVerlaufKiText' },
         { id: 'd3', s: 0, z: 2, t: 'Vorflug-Check & PDFs', k: 'Bereit für die Bank', d: 'Grundfelder zählen, Investment-PDF erzeugen, Unterlagen fürs Bankgespräch sammeln.', aus: ['Investment-PDF', 'Unterlagenliste'], ziel: { tab: 's8' }, beleg: 'frontend/js/deal-action-boarding.js:Vorflug-Check' },
-        { id: 'd4', s: 1, z: 0, t: 'Gewonnen', k: 'ABGEFLOGEN', d: 'Deal gewonnen — Objekt im Bestand. Mit dem Nutzen-/Lastenwechsel wird der Ankauf-Stand automatisch festgeschrieben.', unter: [['Datum vorhanden', '„Ankauf-Stand automatisch festgeschrieben zum …“'], ['Datum fehlt', 'Nichts wird eingefroren — DealPilot sagt, dass der Nutzen-/Lastenwechsel fehlt.'], ['rückgängig / Stand neu nehmen', 'Jederzeit in der Zeile darunter.']], ein: ['Nutzen-/Lastenwechsel'], aus: ['Soll · Ankauf-Stand', 'Liste: Bestand'], ziel: { tab: 's8' }, beleg: 'frontend/js/deal-action.js:setDealWon' },
-        { id: 'd5', s: 1, z: 2, t: 'Verloren', k: 'GESTRICHEN', d: 'Deal nicht zustande gekommen. Das Objekt bleibt mit allen Zahlen erhalten — ausgegraut am Ende der Ankauf-Liste.', aus: ['ausgegraut in Ankauf'], ziel: { tab: 's8' }, beleg: 'frontend/js/deal-action.js:_deal_lost' },
+        { id: 'd4', s: 1, z: 0, t: 'Gewonnen', k: 'ABGEFLOGEN', d: 'Deal gewonnen, Objekt im Bestand. Mit dem Nutzen-/Lastenwechsel wird der Ankauf-Stand automatisch festgeschrieben.', unter: [['Datum vorhanden', '„Ankauf-Stand automatisch festgeschrieben zum …“'], ['Datum fehlt', 'Nichts wird eingefroren, DealPilot sagt, dass der Nutzen-/Lastenwechsel fehlt.'], ['rückgängig / Stand neu nehmen', 'Jederzeit in der Zeile darunter.']], ein: ['Nutzen-/Lastenwechsel'], aus: ['Soll · Ankauf-Stand', 'Liste: Bestand'], ziel: { tab: 's8' }, beleg: 'frontend/js/deal-action.js:setDealWon' },
+        { id: 'd5', s: 1, z: 2, t: 'Verloren', k: 'GESTRICHEN', d: 'Deal nicht zustande gekommen. Das Objekt bleibt mit allen Zahlen erhalten, ausgegraut am Ende der Ankauf-Liste.', aus: ['ausgegraut in Ankauf'], ziel: { tab: 's8' }, beleg: 'frontend/js/deal-action.js:_deal_lost' },
         { id: 'd6', s: 2, z: 0, t: 'Bestand', k: 'Ist · Soll', d: 'Das Objekt steht unter „Bestand“. Oben im Objekt: „Ist · heute“ und „Soll · Ankauf-Stand“.', aus: ['Soll/Ist-Abgleich'], ziel: { tab: 's0' }, beleg: 'frontend/js/doppelkarte.js:Bestand' },
-        { id: 'd7', s: 2, z: 1, t: 'In Gesellschaft überführen', k: 'Privat → GmbH', opt: true, d: 'Das Privatobjekt friert ein, ein neues GmbH-Objekt entsteht mit Werten, Fotos und KI-Analyse — beide verlinkt.', unter: [['Stichtag', '„Stichtag · Privat → Gesellschaft“'], ['Gesellschaft', 'Halter, Verkehrswert als AfA-Basis, übernommener Zins — mit Hinweis auf Grunderwerbsteuer und verdeckte Einlage, Prüfung der Zehnjahresfrist § 23 EStG.'], ['Bestätigen', 'Vorschau „Privat · friert ein“ / „GmbH · neu“.']], ein: ['Stichtag', 'Gesellschaft', 'Verkehrswert'], aus: ['GmbH-Objekt', 'Privatobjekt eingefroren'], ziel: { tab: 's8' }, beleg: 'frontend/js/ueberfuehrung-wizard.js:Stichtag der' }
+        { id: 'd7', s: 2, z: 1, t: 'In Gesellschaft überführen', k: 'Privat → GmbH', opt: true, d: 'Das Privatobjekt friert ein, ein neues GmbH-Objekt entsteht mit Werten, Fotos und KI-Analyse, beide verlinkt.', unter: [['Stichtag', '„Stichtag · Privat → Gesellschaft“'], ['Gesellschaft', 'Halter, Verkehrswert als AfA-Basis, übernommener Zins, mit Hinweis auf Grunderwerbsteuer und verdeckte Einlage, Prüfung der Zehnjahresfrist § 23 EStG.'], ['Bestätigen', 'Vorschau „Privat · friert ein“ / „GmbH · neu“.']], ein: ['Stichtag', 'Gesellschaft', 'Verkehrswert'], aus: ['GmbH-Objekt', 'Privatobjekt eingefroren'], ziel: { tab: 's8' }, beleg: 'frontend/js/ueberfuehrung-wizard.js:Stichtag der' }
       ],
       kanten: [['d1', 'd2'], ['d2', 'd3'], ['d3', 'd4'], ['d3', 'd5', 'nein'], ['d4', 'd6'], ['d6', 'd7', 'opt']]
     },
     {
-      id: 'steuer', name: 'Das Steuerjahr', sub: 'Der Plan von damals bleibt stehen — daneben wachsen die Ist-Eintragungen',
+      id: 'steuer', name: 'Das Steuerjahr', sub: 'Der Plan von damals bleibt stehen, daneben wachsen die Ist-Eintragungen',
       spalten: ['beim Kauf · einmal', 'laufendes Jahr', 'zum Jahresende', 'zur Erklärung'],
       knoten: [
-        { id: 's1', s: 0, z: 0, t: 'Ankauf-Stand', k: 'AfA-Basis steht fest', d: 'Zum Nutzen-/Lastenwechsel wird der ganze Datensatz festgeschrieben — Kaufpreisaufteilung Boden/Gebäude und AfA-Basis inklusive.', unter: [['Kaufpreisaufteilung', 'Nach der Arbeitshilfe des BMF, Belege über „Anschaffungskosten einlesen“.'], ['AfA-Konfiguration', 'Satz oder Restnutzungsdauer, § 7b falls zutreffend.']], ein: ['Kaufpreis', 'Bodenrichtwert', 'Grundstück'], aus: ['AfA-Bemessungsgrundlage'], ziel: { tab: 's3-tax' }, beleg: 'frontend/js/werbungskosten-pdf.js:exportWerbungskostenPDF' },
-        { id: 's2', s: 1, z: 0, t: 'Steuerzeitraum anlegen', k: 'Gültig von · bis', d: 'Je Zeitraum dein zu versteuerndes Einkommen. DealPilot prüft auf Überlappung — zwei Zeiträume über denselben Monat wären zwei Wahrheiten über dieselbe Miete.', unter: [['Steuerzeiträume verwalten', 'Link im Reiter Steuer.'], ['Neuen Zeitraum hinzufügen', 'Gültig von, gültig bis (leer = laufend), zvE, Grund.'], ['Konfliktprüfung', '„Konflikt — überschneidende Zeiträume“']], ein: ['zvE / Jahr', 'Gültig von', 'Gültig bis'], aus: ['Grenzsteuersatz je Jahr'], ziel: { fn: '_v842OpenTaxPeriods' }, beleg: 'frontend/js/tax-periods.js:Neuen Zeitraum' },
+        { id: 's1', s: 0, z: 0, t: 'Ankauf-Stand', k: 'AfA-Basis steht fest', d: 'Zum Nutzen-/Lastenwechsel wird der ganze Datensatz festgeschrieben, Kaufpreisaufteilung Boden/Gebäude und AfA-Basis inklusive.', unter: [['Kaufpreisaufteilung', 'Nach der Arbeitshilfe des BMF, Belege über „Anschaffungskosten einlesen“.'], ['AfA-Konfiguration', 'Satz oder Restnutzungsdauer, § 7b falls zutreffend.']], ein: ['Kaufpreis', 'Bodenrichtwert', 'Grundstück'], aus: ['AfA-Bemessungsgrundlage'], ziel: { tab: 's3-tax' }, beleg: 'frontend/js/werbungskosten-pdf.js:exportWerbungskostenPDF' },
+        { id: 's2', s: 1, z: 0, t: 'Steuerzeitraum anlegen', k: 'Gültig von · bis', d: 'Je Zeitraum dein zu versteuerndes Einkommen. DealPilot prüft auf Überlappung, zwei Zeiträume über denselben Monat wären zwei Wahrheiten über dieselbe Miete.', unter: [['Steuerzeiträume verwalten', 'Link im Reiter Steuer.'], ['Neuen Zeitraum hinzufügen', 'Gültig von, gültig bis (leer = laufend), zvE, Grund.'], ['Konfliktprüfung', '„Konflikt, überschneidende Zeiträume“']], ein: ['zvE / Jahr', 'Gültig von', 'Gültig bis'], aus: ['Grenzsteuersatz je Jahr'], ziel: { fn: '_v842OpenTaxPeriods' }, beleg: 'frontend/js/tax-periods.js:Neuen Zeitraum' },
         { id: 's3', s: 2, z: 0, t: 'Werbungskosten eintragen', k: 'Ist je Jahr', d: 'Die tatsächlichen Kosten des Jahres je Objekt. Belege und Abrechnungen lassen sich einlesen statt abtippen.', unter: [['Steuerjahr wählen', 'Karte „Steuerformular pro Jahr“.'], ['Belege, Unterlagen & Rechnungen einlesen (KI)', 'Hausgeld- und Nebenkostenabrechnung, Rechnungen.'], ['Quick- oder Detail-Modus', 'Vorschläge lassen sich wiederherstellen.']], ein: ['Hausgeldabrechnung', 'Rechnungen', 'Zinsbescheinigung'], aus: ['Werbungskosten je Kategorie'], ziel: { tab: 's3-tax' }, beleg: 'backend/src/routes/wkAggregate.js:wk' },
         { id: 's4', s: 3, z: 0, t: 'Anlage V und Steuer der Gesellschaft', k: 'Finanzamt-PDF', d: 'Finanzamt-PDF mit der Anlage V als zweiter Seite. Im Cockpit: Steuer über alle Objekte, Steuer-Mappe, bei Gesellschaften die Steuer-Mappe der Gesellschaft.', ein: ['Werbungskosten', 'Mieteinnahmen', 'AfA'], aus: ['Anlage V', 'Finanzamt-PDF', 'Überschuss V+V'], ziel: { tab: 's3-tax' }, beleg: 'frontend/js/anlage-v-2025.js:Anlage V' }
       ],
@@ -433,26 +433,26 @@
     },
     {
       /* v3094 (N93) · Stufen heißen seit v3073 wie der Detailgrad; die Wahl ist seit v3078 eigen, freigegeben bis zum Detailgrad */
-      id: 'marktbericht', name: 'Marktbericht', sub: 'Drei Stufen, acht Etappen — und jede Zahl mit Herkunft',
+      id: 'marktbericht', name: 'Marktbericht', sub: 'Drei Stufen, acht Etappen, und jede Zahl mit Herkunft',
       spalten: ['Stufe wählen', 'Erstellen · im Hintergrund', 'Ergebnis'],
       knoten: [
-        { id: 'm1', s: 0, z: 0, t: 'Einsteiger · Stufe 1', k: 'Marktpreisindikation', d: 'Aus Adresse, Objektart, Fläche und Baujahr. Gewählt wird die Stufe im Reiter Objekt — angeboten nur bis zum Detailgrad (Einstellungen › Mein Profil).', ein: ['Adresse', 'Objektart', 'Wohnfläche', 'Baujahr'], aus: ['Marktwert mit Spanne'], ziel: { tab: 's0' }, beleg: 'frontend/js/objekt-reiter.js:Einsteiger · Stufe 1' },
+        { id: 'm1', s: 0, z: 0, t: 'Einsteiger · Stufe 1', k: 'Marktpreisindikation', d: 'Aus Adresse, Objektart, Fläche und Baujahr. Gewählt wird die Stufe im Reiter Objekt, angeboten nur bis zum Detailgrad (Einstellungen › Mein Profil).', ein: ['Adresse', 'Objektart', 'Wohnfläche', 'Baujahr'], aus: ['Marktwert mit Spanne'], ziel: { tab: 's0' }, beleg: 'frontend/js/objekt-reiter.js:Einsteiger · Stufe 1' },
         { id: 'm2', s: 0, z: 1, t: 'Fortgeschritten · Stufe 2', k: 'erweiterte Indikation · ab Investor', d: 'Dazu Kaufpreis, Miete, Zustand, Energie, Ausstattung. Freigegeben ab dem Detailgrad Fortgeschritten.', ein: ['Kaufpreis', 'Nettokaltmiete', 'Zustand', 'Energie'], aus: ['Rendite', 'Abstand zum Markt'], ziel: { tab: 's0' }, beleg: 'frontend/js/objekt-reiter.js:Fortgeschritten · Stufe 2' },
         { id: 'm3', s: 0, z: 2, t: 'Experte · Stufe 3', k: 'Wertermittlung · ab Pro', d: 'Nach ImmoWertV, nur im Detailgrad Experte. Fehlt eine Angabe, sagt DealPilot welche: der Bericht rechnet nie halb.', ein: ['Grundstück', 'Bodenrichtwert', 'Zustand', 'Standardstufe'], aus: ['Verkehrswert-Indikation'], ziel: { tab: 's0' }, beleg: 'frontend/js/objekt-reiter.js:Experte · Stufe 3' },
         { id: 'm4', s: 1, z: 1, t: 'Acht Etappen', k: 'du arbeitest weiter', d: 'Der Bericht entsteht im Hintergrund, unten zeigt eine Leiste den Fortschritt. Ist er fertig, meldet sich DealPilot.', unter: [['Standort ermitteln', ''], ['Vergleichspreise', ''], ['Vergleichsmieten', ''], ['Mikrolage', ''], ['Makrolage', 'Aus der eigenen Datenbank, monatlich aktualisiert.'], ['Strukturdaten (Zensus)', ''], ['Bodenrichtwert', ''], ['Bewertung und Bericht', '']], aus: ['„Bericht ist fertig“'], ziel: { tab: 's0' }, beleg: 'frontend/js/mb-auftrag.js:ETAPPEN' },
         { id: 'm5', s: 2, z: 0, t: 'Bericht und Verlauf', k: 'zur Übernahme', d: 'Jeder Abruf landet im Verlauf und steht am Verkehrswert zur Übernahme. Wiederholte Abrufe zeigen den Wertverlauf, die Pilot-Analyse ordnet ihn ein.', aus: ['Verkehrswert', 'Wertverlauf', 'KI-Einordnung'], ziel: { aktion: 'marktbericht' }, beleg: 'frontend/js/dealpilot-mb.js:generate-stream' },
-        { id: 'm6', s: 2, z: 2, t: 'Quellennachweis', k: 'Herkunft jeder Zahl', d: 'Liegenschaftszins und Sachwertfaktor des zuständigen Gutachterausschusses, mit Lizenz und Stichtag. Wo kein amtlicher Wert vorliegt, nennt der Bericht den Ausschuss und den Weg zur Quelle — statt eine Zahl zu erfinden.', aus: ['Quellennachweis', 'Weg zur Quelle'], ziel: { aktion: 'marktbericht' }, beleg: 'marktbericht/backend/src/services/CrossCheckService.js:quellen_nachweis' }
+        { id: 'm6', s: 2, z: 2, t: 'Quellennachweis', k: 'Herkunft jeder Zahl', d: 'Liegenschaftszins und Sachwertfaktor des zuständigen Gutachterausschusses, mit Lizenz und Stichtag. Wo kein amtlicher Wert vorliegt, nennt der Bericht den Ausschuss und den Weg zur Quelle, statt eine Zahl zu erfinden.', aus: ['Quellennachweis', 'Weg zur Quelle'], ziel: { aktion: 'marktbericht' }, beleg: 'marktbericht/backend/src/services/CrossCheckService.js:quellen_nachweis' }
       ],
       kanten: [['m1', 'm4'], ['m2', 'm4'], ['m3', 'm4'], ['m4', 'm5'], ['m4', 'm6']]
     },
     {
-      id: 'scores', name: 'Woraus die Scores bestehen', sub: 'Zwei Scores, bewusst verschieden — und wo du drehst',
+      id: 'scores', name: 'Woraus die Scores bestehen', sub: 'Zwei Scores, bewusst verschieden, und wo du drehst',
       spalten: ['Eingang', 'Scores', 'Urteil'],
       knoten: [
-        { id: 'c1', s: 0, z: 0, t: 'Kennzahlen', k: 'aus der Datenaufnahme', d: 'Cashflow, Renditen, DSCR, LTV, Lage, Zustand — dieselben Rechenkerne wie überall in der App.', aus: ['KPI-Satz'], ziel: { tab: 's6' }, beleg: 'frontend/js/deal-kpis.js:compute' },
-        { id: 'c2', s: 0, z: 2, t: 'Deine Einstellungen', k: 'Vorlagen · Gewichte · Lageklassen', d: 'Sechs Vorlagen für den DealScore (ausgewogen, konservativ, optimistisch, lageorientiert, cashflowstark, sicherheitsorientiert), eigene Gewichte mit Summe 100, Ziel-Bruttomietrendite je Lageklasse (3,5 / 5,0 / 7,0 %), persönliche Mindest-Schwellen.', ein: ['Vorlage', 'Gewichte', 'Lageklasse'], aus: ['andere Rangfolge — dieselben Objekte'], ziel: { aktion: 'settings' }, beleg: 'frontend/js/dealscore.js:PRESET_WEIGHTS' },
+        { id: 'c1', s: 0, z: 0, t: 'Kennzahlen', k: 'aus der Datenaufnahme', d: 'Cashflow, Renditen, DSCR, LTV, Lage, Zustand, dieselben Rechenkerne wie überall in der App.', aus: ['KPI-Satz'], ziel: { tab: 's6' }, beleg: 'frontend/js/deal-kpis.js:compute' },
+        { id: 'c2', s: 0, z: 2, t: 'Deine Einstellungen', k: 'Vorlagen · Gewichte · Lageklassen', d: 'Sechs Vorlagen für den DealScore (ausgewogen, konservativ, optimistisch, lageorientiert, cashflowstark, sicherheitsorientiert), eigene Gewichte mit Summe 100, Ziel-Bruttomietrendite je Lageklasse (3,5 / 5,0 / 7,0 %), persönliche Mindest-Schwellen.', ein: ['Vorlage', 'Gewichte', 'Lageklasse'], aus: ['andere Rangfolge, dieselben Objekte'], ziel: { aktion: 'settings' }, beleg: 'frontend/js/dealscore.js:PRESET_WEIGHTS' },
         { id: 'c3', s: 1, z: 0, t: 'DealScore', k: 'fünf Faktoren · der schnelle Blick', d: 'Barkauf: Beleihungsauslauf und Risiko entfallen und werden nicht schlecht bewertet.', ein: ['Cashflow', 'Rendite', 'LTV', 'DSCR'], gew: [['Cashflow', 30], ['Rendite', 25], ['Beleihungsauslauf', 15], ['Risiko (Kapitaldienst)', 15], ['Potenzial', 15]], aus: ['0–100'], ziel: { tab: 's6' }, beleg: 'frontend/js/dealscore.js:DEFAULT_WEIGHTS' },
-        { id: 'c4', s: 1, z: 2, t: 'Investor Deal Score', k: 'fünf Kategorien mit Unterkennzahlen', d: 'Fehlt eine Unterkennzahl, fällt sie aus der Gewichtung — sie wird nicht mit einem Mittelwert gefüllt.', ein: ['DSCR', 'LTV', 'Cashflow', 'Lage', 'Baujahr', 'Energie'], gew: [['Rendite', 35], ['Finanzierung', 25], ['Risiko', 20], ['Lage', 10], ['Upside', 10]], unter: [['Rendite', 'brutto 25 · netto 30 · Cashflow 25 · Cash-on-Cash 20'], ['Finanzierung', 'DSCR 35 · LTV 30 · Zins 15 · Tilgung 10 · EK-Bedarf 10'], ['Risiko', 'Leerstand 20 · Instandhaltung 20 · Qualität 20 · Baujahr 15 · Energie 15 · Mietausfall 10'], ['Lage', 'Markt vs. Ist 25 · Mietwachstum 25 · Bevölkerung 20 · Nachfrage 15 · Mikrolage 15'], ['Upside', 'Mietsteigerung 35 · Kaufpreisfaktor 30 · Wertsteigerung 20 · Entwicklung 15']], aus: ['0–100 mit Deckung'], ziel: { tab: 's6' }, beleg: 'frontend/js/dealscore2.js:subWeights' },
+        { id: 'c4', s: 1, z: 2, t: 'Investor Deal Score', k: 'fünf Kategorien mit Unterkennzahlen', d: 'Fehlt eine Unterkennzahl, fällt sie aus der Gewichtung, sie wird nicht mit einem Mittelwert gefüllt.', ein: ['DSCR', 'LTV', 'Cashflow', 'Lage', 'Baujahr', 'Energie'], gew: [['Rendite', 35], ['Finanzierung', 25], ['Risiko', 20], ['Lage', 10], ['Upside', 10]], unter: [['Rendite', 'brutto 25 · netto 30 · Cashflow 25 · Cash-on-Cash 20'], ['Finanzierung', 'DSCR 35 · LTV 30 · Zins 15 · Tilgung 10 · EK-Bedarf 10'], ['Risiko', 'Leerstand 20 · Instandhaltung 20 · Qualität 20 · Baujahr 15 · Energie 15 · Mietausfall 10'], ['Lage', 'Markt vs. Ist 25 · Mietwachstum 25 · Bevölkerung 20 · Nachfrage 15 · Mikrolage 15'], ['Upside', 'Mietsteigerung 35 · Kaufpreisfaktor 30 · Wertsteigerung 20 · Entwicklung 15']], aus: ['0–100 mit Deckung'], ziel: { tab: 's6' }, beleg: 'frontend/js/dealscore2.js:subWeights' },
         { id: 'c5', s: 2, z: 1, t: 'Score-Stufen', k: 'überall dieselben', d: 'Sehr gut ab 85 · Gut ab 70 · Solide ab 50 · Schwach ab 35 · Kritisch darunter. Auf der Objektkarte, im Quick-Check, im Marktbericht und im Telegram-Bot.', gew: [['Sehr gut', 85], ['Gut', 70], ['Solide', 50], ['Schwach', 35]], aus: ['Pille auf der Objektkarte'], ziel: { aktion: 'view-all' }, beleg: 'frontend/js/score-tiers.js:stufe' }
       ],
       kanten: [['c1', 'c3'], ['c1', 'c4'], ['c2', 'c3'], ['c2', 'c4'], ['c3', 'c5'], ['c4', 'c5']]
@@ -460,17 +460,17 @@
     /* v2965b · Marcel 26.10.2026: „Können wir auch beschreiben und erklären, wie Zielbilder angelegt werden?"
        Fakten aus potenzial.js, wert-zielbild.js, mfh-einheiten.js und dashboard.js (renderZielbild). */
     {
-      id: 'zielbild', name: 'Mieterhöhung und Zielbild', sub: 'Was im Haus steckt — Soll-Miete, Umbau, Ertragswert je Stufe',
+      id: 'zielbild', name: 'Mieterhöhung und Zielbild', sub: 'Was im Haus steckt, Soll-Miete, Umbau, Ertragswert je Stufe',
       spalten: ['Eintragen · im Reiter Objekt', 'Rechnen · kostenlos', 'Lesen'],
       knoten: [
         { id: 'z1', s: 0, z: 0, t: 'Soll-Miete eintragen', k: 'Mieter bleibt · § 558 BGB',
           d: 'Die Soll-Miete ist, was der jetzige Mieter nach normalen Mieterhöhungen zahlt. Lässt du das Feld leer, rechnet DealPilot sie vor: bis zur Vergleichsmiete, frühestens 15 Monate nach der letzten Erhöhung, höchstens um die Kappungsgrenze (15 % oder 20 % in drei Jahren). Deine eigene Angabe überschreibt immer.',
-          unter: [['Karte öffnen', 'Reiter Miete, Karte „Mieterhöhung und Zielbild (optional)“ (Detailgrad Experte), Haken „Zielbild festlegen“.'], ['Vergleichsmiete (€/m²)', 'Die ortsübliche Vergleichsmiete. Leer: die Marktmiete aus dem Reiter Miete.'], ['Soll-Miete (Mieter bleibt, €/m²)', 'Leer lassen, dann steht darunter der Vorschlag mit Begründung — oder eine eigene Zahl eintragen.'], ['Soll erreichbar ab', 'Leer: 15 Monate nach der letzten Erhöhung aus dem Mietvertrag.']],
+          unter: [['Karte öffnen', 'Reiter Miete, Karte „Mieterhöhung und Zielbild (optional)“ (Detailgrad Experte), Haken „Zielbild festlegen“.'], ['Vergleichsmiete (€/m²)', 'Die ortsübliche Vergleichsmiete. Leer: die Marktmiete aus dem Reiter Miete.'], ['Soll-Miete (Mieter bleibt, €/m²)', 'Leer lassen, dann steht darunter der Vorschlag mit Begründung, oder eine eigene Zahl eintragen.'], ['Soll erreichbar ab', 'Leer: 15 Monate nach der letzten Erhöhung aus dem Mietvertrag.']],
           ein: ['Ist-Miete', 'Vergleichsmiete', 'letzte Mieterhöhung', 'Kappungsgrenze'], aus: ['Soll-Miete', 'Mieterhöhung je Monat'],
           ziel: { tab: 's0' }, beleg: 'frontend/index.html:Soll-Miete (Mieter bleibt, €/m²)' },
         { id: 'z2', s: 0, z: 1, t: 'Zielbild und Maßnahmen', k: 'nach Umbau oder Neuvermietung',
-          d: 'Das Zielbild ist, was nach deinem Umbau oder bei einem Mieterwechsel drin ist. Jede Maßnahme ist ein Chip mit Kosten. Bad, Fenster, Böden/Innenausbau, Grundriss, Elektrik, Dach, Fassade, Heizung und Leitungen tragen Modernisierungspunkte nach Anlage 2 ImmoWertV — das verlängert die Restnutzungsdauer und hebt den Ertragswert.',
-          unter: [['Zielmiete (€/m²)', 'Was nach Umbau oder Neuvermietung erzielbar ist.'], ['Maßnahmen anklicken', 'Der Chip zeigt, wie viele Punkte das Gewerk noch bringt (z. B. „+2 P.“).'], ['Kosten € je Maßnahme', 'Die Summe steht unter der Karte.'], ['Haken „Mieter bleibt drin — Kosten auf die Miete umlegen“', 'Modernisierungsumlage (§ 559 BGB): 8 % der Kosten im Jahr auf die Soll-Miete, ohne Erhaltungsanteil, gedeckelt.'], ['Zielbild fertig (Jahr)', 'Für Pilot-Analyse und PDF; leer heißt offen.']],
+          d: 'Das Zielbild ist, was nach deinem Umbau oder bei einem Mieterwechsel drin ist. Jede Maßnahme ist ein Chip mit Kosten. Bad, Fenster, Böden/Innenausbau, Grundriss, Elektrik, Dach, Fassade, Heizung und Leitungen tragen Modernisierungspunkte nach Anlage 2 ImmoWertV, das verlängert die Restnutzungsdauer und hebt den Ertragswert.',
+          unter: [['Zielmiete (€/m²)', 'Was nach Umbau oder Neuvermietung erzielbar ist.'], ['Maßnahmen anklicken', 'Der Chip zeigt, wie viele Punkte das Gewerk noch bringt (z. B. „+2 P.“).'], ['Kosten € je Maßnahme', 'Die Summe steht unter der Karte.'], ['Haken „Mieter bleibt drin, Kosten auf die Miete umlegen“', 'Modernisierungsumlage (§ 559 BGB): 8 % der Kosten im Jahr auf die Soll-Miete, ohne Erhaltungsanteil, gedeckelt.'], ['Zielbild fertig (Jahr)', 'Für Pilot-Analyse und PDF; leer heißt offen.']],
           ein: ['Zielmiete', 'Maßnahmen', 'Kosten'], aus: ['Zielbild', 'Modernisierungspunkte', 'Maßnahmenkosten'],
           ziel: { tab: 's0' }, beleg: 'frontend/js/potenzial.js:MASSNAHMEN' },
         { id: 'z3', s: 0, z: 2, t: 'Mehrfamilienhaus: je Wohnung', k: 'Einheiten erfassen › Details', opt: true,
@@ -480,17 +480,17 @@
           ziel: { tab: 's0' }, beleg: 'frontend/js/mfh-einheiten.js:Zielbild · Neuvermietung oder nach Sanierung' },
         { id: 'z4', s: 1, z: 1, t: 'Ertragswert je Stufe', k: 'kein Kontingent · mit Stufe 3',
           d: 'Derselbe Rechenkern wie der Marktbericht Stufe 3, mit denselben Ansätzen (Liegenschaftszins, Bewirtschaftung, Bodenwert). Je Stufe wechseln nur die Miete und die Restnutzungsdauer nach den Modernisierungspunkten. Das kostet kein Kontingent. Der Ertragswert erscheint, sobald für das Objekt ein Marktbericht Stufe 3 vorliegt oder dein Tarif Stufe 3 enthält.',
-          unter: [['Von selbst', 'Öffnest du den Reiter Bewertung, rechnet DealPilot fehlende oder veraltete Ertragswerte von selbst nach.'], ['Von Hand', '„Ertragswerte rechnen“ in der Pilot-Analyse, „Jetzt rechnen“ in Wert & Zielbild.'], ['Gespeichert', 'Das Ergebnis reist mit dem Objekt — das Portfolio-Cockpit liest es von dort.']],
+          unter: [['Von selbst', 'Öffnest du den Reiter Bewertung, rechnet DealPilot fehlende oder veraltete Ertragswerte von selbst nach.'], ['Von Hand', '„Ertragswerte rechnen“ in der Pilot-Analyse, „Jetzt rechnen“ in Wert & Zielbild.'], ['Gespeichert', 'Das Ergebnis reist mit dem Objekt, das Portfolio-Cockpit liest es von dort.']],
           ein: ['Soll-Miete', 'Zielbild', 'Modernisierungspunkte', 'Liegenschaftszins', 'Bodenwert'], aus: ['Ertragswert Bestand', 'Ertragswert Mieterhöhung', 'Ertragswert Zielbild'],
           ziel: { tab: 's6' }, beleg: 'frontend/js/potenzial.js:Ertragswert je Stufe mit DealPilot Stufe 3' },
         { id: 'z5', s: 2, z: 0, t: 'Wert & Zielbild lesen', k: 'Bewertung · Pilot-Analyse · PDF',
-          d: 'Im Reiter Bewertung die Karte „Wert & Zielbild“: Kaltmiete, Maßnahmen, Ertragswert je Stufe und der Wertzuwachs nach Kosten (Ertragswert der Stufe minus Bestand minus Maßnahmen). Alles ist ein Ausblick, kein Verkehrswert zum heutigen Stichtag — maßgeblich für heute bleibt der Bestand.',
+          d: 'Im Reiter Bewertung die Karte „Wert & Zielbild“: Kaltmiete, Maßnahmen, Ertragswert je Stufe und der Wertzuwachs nach Kosten (Ertragswert der Stufe minus Bestand minus Maßnahmen). Alles ist ein Ausblick, kein Verkehrswert zum heutigen Stichtag, maßgeblich für heute bleibt der Bestand.',
           unter: [['Kacheln', 'Die Kernaussagen auf einen Blick.'], ['Im Detail', 'Wohnungen, Wertüberleitung, Kennzahlen je Stufe.'], ['Pilot-Analyse', 'Bereich „Ankauf · Bestand · Zielbild“ mit Einfach und Genau.'], ['PDF', 'Seite Wertpotenzial in beiden PDFs.']],
           ein: ['Ertragswert je Stufe', 'Maßnahmenkosten'], aus: ['Wertzuwachs nach Kosten', 'Bruttomietrendite je Stufe'],
           ziel: { tab: 's6' }, beleg: 'frontend/js/wert-zielbild.js:Wertzuwachs nach Kosten' },
         { id: 'z6', s: 2, z: 2, t: 'Im Portfolio-Cockpit', k: '03 Bestand & Zielbild',
-          d: 'Das Cockpit addiert Mieterhöhung und Zielbild aller Objekte, für die sie erfasst und gerechnet sind. Fehlt ein Objekt, steht der Grund daneben — mit einem Knopf ins Objekt und „neu rechnen ↻“ (kostenlos).',
-          unter: [['Kacheln und Brücken', 'Kaltmiete, Rendite, Maßnahmen, Wertzuwachs nach Kosten.'], ['Je Objekt', 'Steigerung der Kaltmiete und Wertzuwachs nach Kosten.'], ['Mit Grund', 'Nicht oder nur teilweise enthalten — z. B. noch nichts eingetragen, Ertragswert nur mit Stufe 3, noch nicht gerechnet.']],
+          d: 'Das Cockpit addiert Mieterhöhung und Zielbild aller Objekte, für die sie erfasst und gerechnet sind. Fehlt ein Objekt, steht der Grund daneben, mit einem Knopf ins Objekt und „neu rechnen ↻“ (kostenlos).',
+          unter: [['Kacheln und Brücken', 'Kaltmiete, Rendite, Maßnahmen, Wertzuwachs nach Kosten.'], ['Je Objekt', 'Steigerung der Kaltmiete und Wertzuwachs nach Kosten.'], ['Mit Grund', 'Nicht oder nur teilweise enthalten, z. B. noch nichts eingetragen, Ertragswert nur mit Stufe 3, noch nicht gerechnet.']],
           ein: ['Ertragswert je Stufe', 'alle Objekte'], aus: ['Wertzuwachs Portfolio', 'Gründe fehlender Objekte'],
           ziel: { aktion: 'cockpit' }, beleg: 'frontend/js/dashboard.js:Nicht oder nur teilweise enthalten · mit Grund' }
       ],
@@ -500,17 +500,17 @@
        passend integriert?" Er war es nicht - kein Ablauf, keine Station.
        Jede Station hier hat ihr Werkzeug in agentWerkzeuge.js als Beleg. */
     {
-      id: 'telegram', name: 'Telegram-Bot', sub: 'DealPilot unterwegs — fragen, sprechen, anlegen, ohne die App zu öffnen',
+      id: 'telegram', name: 'Telegram-Bot', sub: 'DealPilot unterwegs, fragen, sprechen, anlegen, ohne die App zu öffnen',
       spalten: ['Verbinden', 'Fragen', 'Handeln'],
       knoten: [
-        { id: 't1', s: 0, z: 0, t: 'Bot verbinden', k: 'Code aus den Einstellungen', d: 'In den Einstellungen erzeugst du einen Code und schickst ihn deinem Bot. Erst dann gehört der Chat zu deinem Konto — welche Daten der Bot liest, entscheidet nie der Nachrichtentext.', ein: ['Code'], aus: ['verknüpfter Chat'], ziel: { aktion: 'settings' }, beleg: 'backend/src/routes/telegram.js:/code' },
+        { id: 't1', s: 0, z: 0, t: 'Bot verbinden', k: 'Code aus den Einstellungen', d: 'In den Einstellungen erzeugst du einen Code und schickst ihn deinem Bot. Erst dann gehört der Chat zu deinem Konto, welche Daten der Bot liest, entscheidet nie der Nachrichtentext.', ein: ['Code'], aus: ['verknüpfter Chat'], ziel: { aktion: 'settings' }, beleg: 'backend/src/routes/telegram.js:/code' },
         { id: 't2', s: 0, z: 1, t: 'Sprechen, tippen, fotografieren', k: 'ohne Befehle', d: 'Sprachnachrichten werden umgeschrieben, Text versteht er wie gesagt, ein Foto vom Exposé liest er aus. Befehle wie /objekte gehen auch.', ein: ['Sprachnachricht', 'Text', 'Foto'], aus: ['Frage'], beleg: 'backend/src/routes/telegramWebhook.js:voiceExtract' },
-        { id: 't3', s: 1, z: 0, t: 'Objekt und Kennzahlen', k: 'DSCR, Miete, Score …', d: 'Liste, Kerndaten und gerechnete Kennzahlen eines Objekts — aus denselben Rechenkernen wie die App, ins Backend gespiegelt. Er bleibt beim Objekt, bis du ein anderes nennst.', ein: ['Frage'], aus: ['DSCR', 'Cashflow', 'DealScore'], beleg: 'backend/src/services/agentWerkzeuge.js:objekt_kennzahlen' },
-        { id: 't4', s: 1, z: 1, t: 'Portfolio', k: 'Vermögensbilanz · Rangliste · Hebel', d: 'Summen nur aus Zahlen, die DealPilot gerechnet hat — mit Stand. Dazu die Rangliste deiner Objekte und die Hebel für mehr Cashflow.', ein: ['Frage'], aus: ['Vermögensbilanz', 'Rangliste'], beleg: 'backend/src/services/agentWerkzeuge.js:portfolio_lesen' },
+        { id: 't3', s: 1, z: 0, t: 'Objekt und Kennzahlen', k: 'DSCR, Miete, Score …', d: 'Liste, Kerndaten und gerechnete Kennzahlen eines Objekts, aus denselben Rechenkernen wie die App, ins Backend gespiegelt. Er bleibt beim Objekt, bis du ein anderes nennst.', ein: ['Frage'], aus: ['DSCR', 'Cashflow', 'DealScore'], beleg: 'backend/src/services/agentWerkzeuge.js:objekt_kennzahlen' },
+        { id: 't4', s: 1, z: 1, t: 'Portfolio', k: 'Vermögensbilanz · Rangliste · Hebel', d: 'Summen nur aus Zahlen, die DealPilot gerechnet hat, mit Stand. Dazu die Rangliste deiner Objekte und die Hebel für mehr Cashflow.', ein: ['Frage'], aus: ['Vermögensbilanz', 'Rangliste'], beleg: 'backend/src/services/agentWerkzeuge.js:portfolio_lesen' },
         { id: 't5', s: 1, z: 2, t: 'Soll/Ist und Pilot-Analyse', k: 'Plan gegen heute', d: 'Für Objekte im Bestand: der Ankauf-Stand gegen heute, Kennzahl für Kennzahl, und die Pilot-Analyse beim Ankauf neben der heutigen.', ein: ['Ankauf-Stand'], aus: ['Soll/Ist-Abgleich', 'Empfehlung damals und heute'], beleg: 'backend/src/services/agentWerkzeuge.js:soll_ist_lesen' },
-        { id: 't6', s: 2, z: 0, t: 'Objekt anlegen', k: 'Frage für Frage', d: '„Leg mir ein Objekt an" — dann erzählst du, und er fragt nach, was fehlt. Das Objekt steht danach in der App.', ein: ['Adresse', 'Kaufpreis', 'Wohnfläche'], aus: ['Objekt · In Prüfung'], beleg: 'backend/src/services/agentWerkzeuge.js:objekt_anlegen' },
-        { id: 't7', s: 2, z: 1, t: 'Felder ändern', k: 'mit Rückfrage', d: '„Setz die Zimmerzahl auf 5" — er nennt alt und neu und ändert erst nach deinem Ja.', ein: ['Feld', 'neuer Wert'], aus: ['geändertes Objekt'], beleg: 'backend/src/services/agentWerkzeuge.js:felder_aendern' },
-        { id: 't8', s: 2, z: 2, t: 'Marktpreis abrufen', k: 'kostet · erst Preis, dann Frage', opt: true, d: 'Erst sagt er, was der Abruf kostet, dann fragt er — abgerufen wird nur nach deinem Ja.', ein: ['Adresse', 'Objektart', 'Wohnfläche'], aus: ['Marktwert mit Spanne'], beleg: 'backend/src/services/agentWerkzeuge.js:marktbericht_abrufen' }
+        { id: 't6', s: 2, z: 0, t: 'Objekt anlegen', k: 'Frage für Frage', d: '„Leg mir ein Objekt an", dann erzählst du, und er fragt nach, was fehlt. Das Objekt steht danach in der App.', ein: ['Adresse', 'Kaufpreis', 'Wohnfläche'], aus: ['Objekt · In Prüfung'], beleg: 'backend/src/services/agentWerkzeuge.js:objekt_anlegen' },
+        { id: 't7', s: 2, z: 1, t: 'Felder ändern', k: 'mit Rückfrage', d: '„Setz die Zimmerzahl auf 5", er nennt alt und neu und ändert erst nach deinem Ja.', ein: ['Feld', 'neuer Wert'], aus: ['geändertes Objekt'], beleg: 'backend/src/services/agentWerkzeuge.js:felder_aendern' },
+        { id: 't8', s: 2, z: 2, t: 'Marktpreis abrufen', k: 'kostet · erst Preis, dann Frage', opt: true, d: 'Erst sagt er, was der Abruf kostet, dann fragt er, abgerufen wird nur nach deinem Ja.', ein: ['Adresse', 'Objektart', 'Wohnfläche'], aus: ['Marktwert mit Spanne'], beleg: 'backend/src/services/agentWerkzeuge.js:marktbericht_abrufen' }
       ],
       kanten: [['t1', 't2'], ['t2', 't3'], ['t2', 't4'], ['t2', 't5'], ['t3', 't6'], ['t3', 't7'], ['t3', 't8', 'opt']]
     }
@@ -841,7 +841,7 @@
     }).join('') + '</ol>';
     if (k.aus && k.aus.length) h += '<div class="bl">Was herauskommt</div><div class="atl-chips aus"></div>';
     if (weiter) h += '<div class="bl">Wie es weitergeht</div><div class="atl-weiter">' + weiter + '</div>';
-    if (k.ziel) h += '<button type="button" class="atl-hin">✈ Hinfliegen — in der App öffnen</button>';
+    if (k.ziel) h += '<button type="button" class="atl-hin">✈ Hinfliegen, in der App öffnen</button>';
     var hbId = handbuchFuer(P.id, k.id);
     if (hbId) h += '<a class="atl-hb" href="handbuch.html#a-' + esc(hbId) + '" target="_blank" rel="noopener">Schritt für Schritt im Flughandbuch →</a>';
     h += '<div class="atl-beleg">Beleg im Code: ' + esc(k.beleg) + '</div>';

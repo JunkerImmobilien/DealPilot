@@ -23,7 +23,7 @@
   function tryInit() {
     attempts++;
     if (attempts > MAX_ATTEMPTS) {
-      console.warn('[bootstrap V165] DealPilotDealAction.init() nach 5s nicht möglich — gebe auf');
+      console.warn('[bootstrap V165] DealPilotDealAction.init() nach 5s nicht möglich, gebe auf');
       return;
     }
 

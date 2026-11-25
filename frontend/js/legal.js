@@ -36,7 +36,7 @@
            'zur Modell-Berechnung von Immobilien-Investitionen. Es ermöglicht die ' +
            'Berechnung von Cashflows, Renditen, Tilgungsplänen und steuerlichen Effekten ' +
            'auf Basis von Eingaben des Nutzers und liefert KI-gestützte Bewertungen. ' +
-           'Bitte lies die folgenden Hinweise aufmerksam — sie sind wesentliche Grundlage ' +
+           'Bitte lies die folgenden Hinweise aufmerksam, sie sind wesentliche Grundlage ' +
            'für die Nutzung der Plattform.',
 
     sections: [
@@ -45,14 +45,14 @@
         text: 'DealPilot leistet <strong>keine</strong> Steuer-, Rechts-, Finanz- oder Anlageberatung ' +
               'im Sinne des Rechtsdienstleistungsgesetzes (RDG), des Steuerberatungsgesetzes (StBerG) ' +
               'oder des Wertpapierhandelsgesetzes (WpHG). Alle ausgegebenen Werte sind ' +
-              'Modell-Berechnungen — keine verbindlichen Aussagen oder Empfehlungen.'
+              'Modell-Berechnungen, keine verbindlichen Aussagen oder Empfehlungen.'
       },
       {
         titel: '2. Diskussionsanstöße statt Empfehlungen',
         text: 'Die Berechnungen zeigen mögliche Szenarien und Hebel auf. Was als „Empfehlung", ' +
               '„Maßnahme" oder „Handlungsempfehlung" formuliert ist, ist als ' +
               '<strong>Anreiz für ein Gespräch mit Steuerberater, Notar oder Finanzierer</strong> ' +
-              'zu verstehen — nicht als individuelle Beratungs-Empfehlung.'
+              'zu verstehen, nicht als individuelle Beratungs-Empfehlung.'
       },
       {
         titel: '3. KI-generierte Inhalte (OpenAI)',
@@ -266,7 +266,7 @@
     html += '      <span>Ich habe die Hinweise gelesen und verstanden. Mir ist bewusst, dass DealPilot <strong>keine Beratung</strong> ist und ich vor jeder Umsetzung einen Steuerberater oder Notar konsultieren muss.</span>';
     html += '    </label>';
     html += '    <div class="dp-legal-actions">';
-    html += '      <button class="dp-legal-btn dp-legal-btn-primary" id="dp-legal-accept" disabled>Verstanden — DealPilot nutzen</button>';
+    html += '      <button class="dp-legal-btn dp-legal-btn-primary" id="dp-legal-accept" disabled>Verstanden, DealPilot nutzen</button>';
     html += '    </div>';
     html += '  </div>';
     html += '</div>';

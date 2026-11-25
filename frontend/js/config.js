@@ -719,7 +719,7 @@ window.DealPilotConfig = (function() {
             if (!getCurrentPlanKey._ovWarned) {
               getCurrentPlanKey._ovWarned = true;
               console.warn('[Plan] Pruefmodus: ' + apiPlan + ' wird als ' + ovDown
-                + ' angezeigt. Nur das Frontend-Gate — das Backend antwortet nach dem echten Abo.'
+                + ' angezeigt. Nur das Frontend-Gate, das Backend antwortet nach dem echten Abo.'
                 + ' Aufheben: localStorage.removeItem("dp_plan_override")');
             }
             return ovDown;
@@ -743,7 +743,7 @@ window.DealPilotConfig = (function() {
       if (_lk && PRICING[_lk]) {
         if (!getCurrentPlanKey._warned) {
           getCurrentPlanKey._warned = true;
-          console.warn('[Plan] Subscription nicht im Cache — nutze letzten bekannten Plan:', _lk);
+          console.warn('[Plan] Subscription nicht im Cache, nutze letzten bekannten Plan:', _lk);
         }
         return _lk;
       }
@@ -958,7 +958,7 @@ window.DealPilotConfig = (function() {
       // V185: Alle Mail-Empfänger auf info@dealpilot.immo vereinheitlicht.
       // Marcel kann hier später pro Typ unterschiedliche Adressen hinterlegen.
       bankPartner: {
-        name: 'Junker Immobilien — Finanzierung',
+        name: 'Junker Immobilien, Finanzierung',
         email: 'info@dealpilot.immo',
         fbEmail: 'info@dealpilot.immo'
       },
@@ -1049,7 +1049,7 @@ window.DealPilotConfig = (function() {
       stufen: { angespannt: 22, mittel: 10, entspannt: 5 },
       entspannt_unter_einwohner: 20000,
       berlin_ags: '11000000',
-      berlin_warnung: 'Angebotsmieten liegen hier über 40 % über der Vergleichsmiete — Schätzung nicht belastbar, Mietspiegel eintragen',
+      berlin_warnung: 'Angebotsmieten liegen hier über 40 % über der Vergleichsmiete, Schätzung nicht belastbar, Mietspiegel eintragen',
       stand: '2026-11-09',
       quelle_intern: 'BBSR-Hintergrundpapier Mietenentwicklung/ortsübliche Vergleichsmiete (Daten 2012, S. 5-6); Wohngeld- und Mietenbericht 2024, BT-Drs. 21/2170, S. 13/43; München Mietspiegel 2025 gegen BBSR-Angebotsmiete 2025',
       herkunft: 'DealPilot-Ansatz nach Marktlage, nicht amtlich'

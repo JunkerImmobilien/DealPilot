@@ -72,7 +72,7 @@
       s.textContent = '●';           /* wird per CSS zum Schloss-Glyph */
       row.appendChild(s);
     }
-    row.setAttribute('title', 'In deinem Plan nicht enthalten — hier tippen zeigt die Pläne');
+    row.setAttribute('title', 'In deinem Plan nicht enthalten, hier tippen zeigt die Pläne');
   }
 
   function entsperren(row) {

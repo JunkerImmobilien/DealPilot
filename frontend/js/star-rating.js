@@ -182,7 +182,7 @@ window.StarRating = (function() {
     if (!starsEl || !labelEl) return;
 
     if (!avgInfo) {
-      starsEl.innerHTML = '<span class="qz-avg-empty">– – – – –</span>';
+      starsEl.innerHTML = '<span class="qz-avg-empty">–, – – –</span>';
       labelEl.textContent = 'noch keine Bewertung';
       labelEl.classList.add('qz-label-empty');
       return;

@@ -183,7 +183,7 @@
   function schliessen() { var o = el('gp-overlay'); if (o) o.remove(); document.removeEventListener('keydown', escZu); if (st && st.takt) clearTimeout(st.takt); }
 
   var STATUS_TEXT = { draft: 'Entwurf', received: 'eingegangen', initialAssessment: 'Ersteinschätzung liegt vor', ordered: 'beauftragt' };
-  var HERK_TEXT = { objekt: 'aus dem Objekt', abgeleitet: 'aus dem Objekt abgeleitet – bitte prüfen', konto: 'aus deinen Einstellungen' };
+  var HERK_TEXT = { objekt: 'aus dem Objekt', abgeleitet: 'aus dem Objekt abgeleitet, bitte prüfen', konto: 'aus deinen Einstellungen' };
   function datum(d) { try { return new Date(d).toLocaleDateString('de-DE'); } catch (e) { return ''; } }
   function zahl(n, d) { return Number(n).toLocaleString('de-DE', { minimumFractionDigits: d || 0, maximumFractionDigits: d || 0 }); }
   /* Unsere AfA: 100 ÷ RND (Marcel 16.11.2026) — dieselbe Rechnung wie afa-eigen.js setzen() */
@@ -242,7 +242,7 @@
 
   function feldHtml(f, i) {
     var a = A(), p = a.feldPfad(f), opts = a.optionen(f, st.def.schema), id = 'gp-f' + i;
-    var unten = (f.helpText ? '<div class="gp-herk">' + N(f.helpText) + '</div>' : '') + '<div class="gp-herk" data-herk></div><div class="gp-fehlt-t" data-fehlt hidden>fehlt – bitte ergänzen</div><div class="gp-fehler"></div>';
+    var unten = (f.helpText ? '<div class="gp-herk">' + N(f.helpText) + '</div>' : '') + '<div class="gp-herk" data-herk></div><div class="gp-fehlt-t" data-fehlt hidden>fehlt, bitte ergänzen</div><div class="gp-fehler"></div>';
     var ph = f.placeholder ? ' placeholder="' + N(f.placeholder) + '"' : '';
     var breit = /^(multiselect|textarea|array|radio)$/.test(f.inputType) ? ' rnd-wiz-col-2' : '';
     var eing;
@@ -292,13 +292,13 @@
       + '</div></section>'
       + '<section class="rnd-hub-karte"><h3 class="rnd-hub-h">Preis</h3><div id="gp-preis" class="gp-herk">wird berechnet …</div></section>'
       + '<section class="rnd-hub-karte"><h3 class="rnd-hub-h">Deine Angaben für die Rechnung</h3><div class="rnd-wiz-grid rnd-hub-felder">'
-      + KUNDE.map(function (k) { return '<div class="rnd-wiz-field" data-kunde="' + k[0] + '"><label for="gp-k-' + k[0] + '">' + esc(k[1]) + '</label><input type="' + k[2] + '" id="gp-k-' + k[0] + '"><div class="gp-fehlt-t" data-fehlt hidden>fehlt – bitte ergänzen</div><div class="gp-fehler"></div></div>'; }).join('')
+      + KUNDE.map(function (k) { return '<div class="rnd-wiz-field" data-kunde="' + k[0] + '"><label for="gp-k-' + k[0] + '">' + esc(k[1]) + '</label><input type="' + k[2] + '" id="gp-k-' + k[0] + '"><div class="gp-fehlt-t" data-fehlt hidden>fehlt, bitte ergänzen</div><div class="gp-fehler"></div></div>'; }).join('')
       + '</div></section>'
       + '<section class="rnd-hub-karte"><h3 class="rnd-hub-h">Bestätigen</h3>'
       + '<div class="rnd-wiz-field rnd-wiz-col-2" data-zust="daten"><label class="rnd-wiz-checkbox"><input type="checkbox" id="gp-z-daten"> Meine Angaben dürfen zur Beauftragung an Junker Solution und den beauftragten Gutachter übermittelt werden. '
       + '<a href="https://junker-immobilien.io/datenschutz.html" target="_blank" rel="noopener">Datenschutz</a></label><div class="gp-fehler"></div></div>'
       /* PLATZHALTER fuer Marcel: eine eigene Widerrufsbelehrung gibt es auf junker-immobilien.io noch nicht (gemessen 16.11.2026) */
-      + '<div class="rnd-wiz-field rnd-wiz-col-2" data-zust="widerruf"><label class="rnd-wiz-checkbox"><input type="checkbox" id="gp-z-widerruf"> Ich habe die Widerrufsbelehrung zur Kenntnis genommen <i>[Platzhalter – Text von Junker Immobilien folgt]</i>.</label><div class="gp-fehler"></div></div>'
+      + '<div class="rnd-wiz-field rnd-wiz-col-2" data-zust="widerruf"><label class="rnd-wiz-checkbox"><input type="checkbox" id="gp-z-widerruf"> Ich habe die Widerrufsbelehrung zur Kenntnis genommen <i>[Platzhalter, Text von Junker Immobilien folgt]</i>.</label><div class="gp-fehler"></div></div>'
       + '<div class="rnd-wiz-field rnd-wiz-col-2" data-zust="kosten"><label class="rnd-wiz-checkbox"><input type="checkbox" id="gp-z-kosten"> Ich beauftrage das Gutachten <b>kostenpflichtig</b> zum oben genannten Endpreis. ' + esc(pl.zahlung || '') + '</label><div class="gp-fehler"></div></div>'
       + '<p class="gp-herk" style="margin:6px 0 0">' + esc(pl.steuer || '') + ' ' + esc(pl.skonto_vorkasse || '') + '</p>';
   }
@@ -322,7 +322,7 @@
           + ((st.preisliste || {}).vorlaeufig ? '<p class="gp-herk">Preise nach der Preisliste von Junker Immobilien (Stand ' + esc(((st.preisliste || {}).stand || '').split('-').reverse().join('.')) + ').</p>' : '')
           + (p.individuell_moeglich ? '<p class="gp-herk">' + esc((st.preisliste || {}).hinweis_individuell || '') + '</p>' : '')
           + (((st.preisliste || {}).mengenrabatt || []).length ? '<p class="gp-herk">Mengenrabatt bei mehreren Objekten in einem Auftrag: ' + st.preisliste.mengenrabatt.slice().reverse().map(function (m) { return 'ab ' + m.ab + ' → ' + m.pct + ' %'; }).join(', ')
-            + ' (Beauftragung binnen zwei Wochen) – bitte bei ' + esc(st.ueber || 'Junker Immobilien') + ' anfragen.</p>' : '');
+            + ' (Beauftragung binnen zwei Wochen), bitte bei ' + esc(st.ueber || 'Junker Immobilien') + ' anfragen.</p>' : '');
       }).catch(function (e) { var box = el('gp-preis'); if (box) box.textContent = A().neutral(e.message); });
     }, 250);
   }
@@ -344,7 +344,7 @@
       if (r.letzter) {
         html += (st.art === 'lite'
           ? '<section class="rnd-hub-karte"><h3 class="rnd-hub-h">Ersteinschätzung</h3><div class="gp-kosten">Die Ersteinschätzung ist <b>kostenlos</b>. Sie wird über ' + esc(st.ueber || 'Junker Immobilien')
-            + ' bei ' + MARKE + ' angefragt; das Ergebnis erscheint hier in wenigen Sekunden. Eine Ersteinschätzung ist kein Gutachten.</div>'
+            + ' bei ' + MARKE + ' angefragt, das Ergebnis erscheint hier in wenigen Sekunden. Eine Ersteinschätzung ist kein Gutachten.</div>'
           : bestellungHtml())
           + '<div id="gp-allgemein" class="gp-fehler" style="margin-top:8px"></div><div id="gp-ergebnis" style="margin-top:10px"></div></section>';
       }
@@ -474,7 +474,7 @@
       var leer = w === undefined || w === '' || w === false || (Array.isArray(w) && !w.length);
       var muss = !box.hidden && f.inputType !== 'file' && A().pflicht(st.def, p, data) && leer;
       box.classList.toggle('gp-fehlt', muss);
-      var t = box.querySelector('[data-fehlt]'); if (t) { t.hidden = !muss; t.textContent = f.inputType === 'checkbox' ? 'bitte bestätigen' : 'fehlt – bitte ergänzen'; }
+      var t = box.querySelector('[data-fehlt]'); if (t) { t.hidden = !muss; t.textContent = f.inputType === 'checkbox' ? 'bitte bestätigen' : 'fehlt, bitte ergänzen'; }
     });
     /* v3590 · Bestellung: Rechnungsangaben und Zustimmungen zaehlen im letzten Reiter */
     if (st.art === 'voll') {
@@ -556,7 +556,7 @@
     if (beauftragen) {
       var offen = offeneJeReiter(), erster = offen.findIndex(function (n) { return n > 0; });
       if (erster >= 0) { reiterZeigen(erster); fehlerZeigen(null); var al = el('gp-allgemein'); if (al) al.textContent = ''; 
-        var zz = el('gp-zaehler'); if (zz) zz.textContent = 'Bitte zuerst alle Pflichtangaben füllen (' + offen.reduce(function (x, y) { return x + y; }, 0) + ' offen) – „Entwurf speichern“ geht jederzeit.'; return; }
+        var zz = el('gp-zaehler'); if (zz) zz.textContent = 'Bitte zuerst alle Pflichtangaben füllen (' + offen.reduce(function (x, y) { return x + y; }, 0) + ' offen), „Entwurf speichern“ geht jederzeit.'; return; }
     }
     var data = lesen(), kunde = kundeLesen();
     try { localStorage.setItem(MERK_KUNDE, JSON.stringify(kunde)); } catch (e) {}
@@ -655,7 +655,7 @@
             if (n.result && n.result.finalAverageRUL) { ergebnisZeigen(n, true); return; }
             versuch++;
             if (!vonHand && versuch < 3) st.takt = setTimeout(function () { abrufen(false); }, 5000);
-            else if (el('gp-warte')) el('gp-warte').textContent = 'Das Ergebnis ist noch nicht abrufbar (Stand: ' + (STATUS_TEXT[n.status] || n.status || '') + '). Bitte später „Ergebnis abrufen“ – die Anfrage bleibt am Objekt gespeichert.';
+            else if (el('gp-warte')) el('gp-warte').textContent = 'Das Ergebnis ist noch nicht abrufbar (Stand: ' + (STATUS_TEXT[n.status] || n.status || '') + '). Bitte später „Ergebnis abrufen“, die Anfrage bleibt am Objekt gespeichert.';
           }).catch(function (e) { if (el('gp-warte')) el('gp-warte').textContent = A().neutral(e.message); });
         };
         el('gp-abrufen').onclick = function () { abrufen(true); };

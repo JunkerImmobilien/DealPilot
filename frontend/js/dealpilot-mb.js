@@ -392,7 +392,7 @@ if (!window._wlc) {
       if (!global.DealPilotErbbau || !global.DealPilotErbbau.istAn()) return '';
       var r = global.DealPilotErbbau.rechnen();
       var G = 'var(--wl-c9a84c, #C9A84C)';
-      var kopf = '<b>Erbbaurecht:</b> Der Marktwert oben ist <b>Volleigentum</b> — das Grundstück ist nicht dabei. ';
+      var kopf = '<b>Erbbaurecht:</b> Der Marktwert oben ist <b>Volleigentum</b>, das Grundstück ist nicht dabei. ';
       var rest;
       if (r && r.ok) {
         rest = 'Abschlag nach § 50 ImmoWertV: <b>'
@@ -400,7 +400,7 @@ if (!window._wlc) {
           + r.abschlagPct.toFixed(1).replace('.', ',') + ' %</b>. '
           + 'Wertpuffer, Wertsteigerung und Deal Score rechnen bereits damit.';
       } else {
-        rest = 'Für den Abschlag fehlen noch Angaben — siehe Reiter <b>Objekt</b>, Grund &amp; Boden.';
+        rest = 'Für den Abschlag fehlen noch Angaben, siehe Reiter <b>Objekt</b>, Grund &amp; Boden.';
       }
       return '<div class="dpx-erb" style="margin:8px 0 0;padding:8px 10px;border-radius:9px;font-size:11px;line-height:1.5;'
         + 'border:1px solid ' + G + ';background:var(--gold-bg, rgba(201,168,76,.08))">' + kopf + rest + '</div>';
@@ -506,7 +506,7 @@ if (!window._wlc) {
     } else {
       if (tn) tn.nodeValue = 'Marktwertindikation ';
       if (hint) {
-        hint.textContent = '(' + (st.stufe ? 'Stufe ' + st.stufe + ' · ' : '') + 'aus Angebotspreisen mit Abschlag — kein Verkehrswert n. § 194 BauGB)';
+        hint.textContent = '(' + (st.stufe ? 'Stufe ' + st.stufe + ' · ' : '') + 'aus Angebotspreisen mit Abschlag, kein Verkehrswert n. § 194 BauGB)';
         hint.style.color = 'var(--gold-3,#9a7f33)';
       }
       lbl.style.color = 'var(--gold-3,#9a7f33)';
@@ -855,7 +855,7 @@ if (!window._wlc) {
            weiss, WELCHE Bewertung fehlt. */
         if (data && (data.needs_credits || data.error === 'kein_kontingent')) {
           var _artName = { mpi: 'Marktpreisindikation', mpi_plus: 'erweiterte Marktpreisindikation', wev: 'Wertermittlung' };
-          toast('⚠ Keine ' + (_artName[data.art] || 'Bewertung') + ' mehr frei — im Marktbericht nachkaufbar');
+          toast('⚠ Keine ' + (_artName[data.art] || 'Bewertung') + ' mehr frei, im Marktbericht nachkaufbar');
         }
         else toast('⚠ DealPilot-Marktbewertung fehlgeschlagen' + (data && (data.error || data.message) ? ': ' + (data.message || data.error) : ''));
         return;
@@ -884,8 +884,8 @@ if (!window._wlc) {
       var _mv = payload.valuation && payload.valuation.market_value;
       if (!(_mv && _mv.estimated > 0)) {
         /* derselbe Massstab wie der Proxy: ohne Marktwert wird nicht abgebucht */
-        if (M) M.fehler(job, 'Für diese Adresse liegen aktuell keine Marktdaten vor — es wurde nichts abgebucht.');
-        else toast('⚠ Für diese Adresse liegen aktuell keine Marktdaten vor — es wurde nichts abgebucht');
+        if (M) M.fehler(job, 'Für diese Adresse liegen aktuell keine Marktdaten vor, es wurde nichts abgebucht.');
+        else toast('⚠ Für diese Adresse liegen aktuell keine Marktdaten vor, es wurde nichts abgebucht');
         return;
       }
       if ((global._currentObjKey || null) !== key) {

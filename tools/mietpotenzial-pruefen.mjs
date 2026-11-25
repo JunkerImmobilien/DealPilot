@@ -472,7 +472,7 @@ const EINH = [{ nr: '1', wfl: '60', ist: '480', status: 'vermietet' }, { nr: '2'
   gleich('K7 mittel: weder Bremse noch 15 % -> 10 %', K.abschlagStufe(ABS, { bremse_gilt: false, kapp_pct: 20 }).pct, 10);
   gleich('K7 entspannt nur mit bekannter Einwohnerzahl < 20.000 -> 5 %', [K.abschlagStufe(ABS, { bremse_gilt: false, kapp_pct: 20, einwohner: 15000 }).pct, K.abschlagStufe(ABS, { bremse_gilt: false, kapp_pct: 20, einwohner: null }).pct, K.abschlagStufe(ABS, { bremse_gilt: false, kapp_pct: 20, einwohner: 25000 }).pct], [5, 10, 10]);
   gleich('K7 Bremse schlägt kleine Gemeinde', K.abschlagStufe(ABS, { bremse_gilt: true, einwohner: 15000 }).pct, 22);
-  wahr('K7 Berlin: Warnung', /über 40 % über der Vergleichsmiete — Schätzung nicht belastbar, Mietspiegel eintragen/.test(K.abschlagStufe(ABS, { bremse_gilt: true, ags: '11000000' }).warnung || '') && K.abschlagStufe(ABS, { bremse_gilt: true, ags: '09162000' }).warnung === null);
+  wahr('K7 Berlin: Warnung', /über 40 % über der Vergleichsmiete, Schätzung nicht belastbar, Mietspiegel eintragen/.test(K.abschlagStufe(ABS, { bremse_gilt: true, ags: '11000000' }).warnung || '') && K.abschlagStufe(ABS, { bremse_gilt: true, ags: '09162000' }).warnung === null);
   const s22 = K.vglAusAngebot(10, { pct: 22, stufe: 'angespannt' });
   gleich('K8 Schätzung 10,00 − 22 % = 7,80', [s22.qm, s22.pct], [7.8, 22]);
   wahr('K8 Kennzeichnung im Wortlaut, ohne Quellennamen', /^Schätzung aus Angebotsmieten abzüglich 22 % \(DealPilot-Ansatz nach Marktlage, nicht amtlich\) — für das Erhöhungsverlangen mit Mietspiegel, drei Vergleichswohnungen oder Gutachten belegen$/.test(s22.text)

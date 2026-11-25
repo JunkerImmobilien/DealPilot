@@ -34,7 +34,7 @@
     try {
       const token = getToken();
       if (!token) {
-        console.log('[V258-05] Kein Token — keine WK-Aggregation');
+        console.log('[V258-05] Kein Token, keine WK-Aggregation');
         return null;
       }
       if (!_cache) _status = 'laedt';   /* v3314 */

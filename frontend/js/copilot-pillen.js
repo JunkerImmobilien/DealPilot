@@ -52,7 +52,7 @@
      stehen deshalb vorne als Pillen, der Rest nach Thema in der Auswahl. */
   var FRAGEN = [
     { id: 'rechnet', text: 'Rechnet sich das?',
-      frage: 'Rechnet sich dieser Deal — vor Steuern und nach Steuern? Nenne je den Cashflow '
+      frage: 'Rechnet sich dieser Deal, vor Steuern und nach Steuern? Nenne je den Cashflow '
            + 'im ersten Jahr und über zehn Jahre und sag in einem Satz, ob ich kaufen sollte.' },
     { id: 'bank', text: 'Was sage ich der Bank?',
       frage: 'Was sage ich der Bank zu diesem Objekt? Formuliere die drei stärksten Argumente '
@@ -139,11 +139,11 @@
     var t = [];
     t.push(d.filled + ' von ' + d.total + ' Feldern sind gefüllt (' + d.percent + ' %).');
     if (d.stufe) {
-      t.push('Detailgrad ' + ((window.DpDetailgrad && DpDetailgrad.NAMEN[d.stufe]) || d.stufe) + ' (Stufe ' + d.stufe + ') ist gewählt; davon kommen '
+      t.push('Detailgrad ' + ((window.DpDetailgrad && DpDetailgrad.NAMEN[d.stufe]) || d.stufe) + ' (Stufe ' + d.stufe + ') ist gewählt, davon kommen '
         + d.stufe_felder + ' Pflichtfelder der Wertermittlung dazu.');
     }
     if (!d.missing.length) {
-      t.push('Es fehlt nichts — alle Felder dieser Stufe und alle '
+      t.push('Es fehlt nichts, alle Felder dieser Stufe und alle '
         + 'Investor-Deal-Score-Felder sind ausgefüllt.');
     } else {
       t.push('Offen sind noch ' + d.missing.length + '.');

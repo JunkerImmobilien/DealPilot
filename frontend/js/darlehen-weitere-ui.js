@@ -136,7 +136,7 @@
            (financing.js triggerPdfImportTo('dw:i'), Leser financing-pdf.js) */
         var werkzeuge = '<div class="fz-werkzeuge dw-werkzeuge">'
           + '<button type="button" class="btn-ghost btn-sm" data-dw-plan="' + i + '">' + (aus ? 'Zinsplan' : 'Tilgungsplan') + ' ansehen</button>'
-          + '<button type="button" class="btn-ghost btn-sm" data-dw-pdf="' + i + '" title="Darlehensvertrag einlesen — die erkannten Werte prüfst du vor dem Übernehmen">Daten aus Bank-PDF importieren</button>'
+          + '<button type="button" class="btn-ghost btn-sm" data-dw-pdf="' + i + '" title="Darlehensvertrag einlesen, die erkannten Werte prüfst du vor dem Übernehmen">Daten aus Bank-PDF importieren</button>'
           + '<button type="button" class="btn btn-sm dw-btn" data-dw-weg="' + i + '">Entfernen</button>'
           + '</div>';
         return '<div class="dw-eintrag fz-gruppen" data-i="' + i + '">'

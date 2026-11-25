@@ -145,7 +145,7 @@
       + '<div>Kaufpreis ' + eur(w.kp) + ' · Kaltmiete ' + eur(w.nkm) + ' im Monat' + (w.ze > 0 ? ' · Zusatzeinnahmen ' + eur(w.ze) + ' im Monat' : '') + ' · Eigenkapital ' + eur(ekVon(w))
       + ' · Zins ' + dez(zinsVon(w), 2) + ' %' + (w.bind != null ? ' (' + Math.round(w.bind) + ' J)' : '') + ' · Tilgung ' + dez(w.tilg != null ? w.tilg : 1.5, 2) + ' % · Nebenkosten ' + dez(nkVon(w), 0) + ' %</div>'   /* v3932 */
       + '<div style="color:#6b655c;font-size:12.5px;margin-top:6px">Angemeldet als <b>' + String(konto).replace(/[<>&"]/g, '') + '</b> – das Objekt kommt in dieses Konto. DealPilot legt daraus ein neues Objekt als Entwurf an. '
-      + 'Adresse, Wohnfläche und Hausgeld trägst du danach selbst ein — erst dann rechnen Lage, Steuer und Wert mit.</div>',
+      + 'Adresse, Wohnfläche und Hausgeld trägst du danach selbst ein, erst dann rechnen Lage, Steuer und Wert mit.</div>',
       [{ text: 'Als Objekt anlegen', haupt: true, tun: function () { anlegen(w); } },
        { text: 'Später', tun: function () { bandWeg(); } },
        { text: 'Nein, danke', tun: function () { loeschen(); bandWeg(); } }]);
@@ -187,7 +187,7 @@
     if (!l.frei) {
       band('<div style="font:600 16px Space Grotesk,Inter,sans-serif;margin-bottom:6px">Dein Tarif ist voll</div>'
         + '<div>Dein Tarif' + (l.plan ? ' (' + l.plan + ')' : '') + ' hat Platz für ' + l.lim + (l.lim === 1 ? ' Objekt' : ' Objekte')
-        + ', und alle sind belegt. Mit einem größeren Tarif legst du den Deal-Check sofort an — wir merken ihn dir sieben Tage.</div>',
+        + ', und alle sind belegt. Mit einem größeren Tarif legst du den Deal-Check sofort an, wir merken ihn dir sieben Tage.</div>',
         [{ text: 'Tarife ansehen', haupt: true, tun: function () { bandWeg(); if (typeof window.openPricingModal === 'function') window.openPricingModal(); } },
          { text: 'Später', tun: function () { bandWeg(); } },
          { text: 'Verwerfen', tun: function () { loeschen(); bandWeg(); } }]);
@@ -270,10 +270,10 @@
         if (ps && typeof ps.then === 'function') await ps;
       }
       if (typeof window.switchTab === 'function') { try { window.switchTab(0); } catch (e) {} }
-      if (typeof window.toast === 'function') window.toast('✓ Deal-Check als neues Objekt angelegt — trag jetzt Adresse und Wohnfläche ein.');
+      if (typeof window.toast === 'function') window.toast('✓ Deal-Check als neues Objekt angelegt, trag jetzt Adresse und Wohnfläche ein.');
     } catch (e) {
       try { console.error('[dealcheck-uebernahme]', e); } catch (x) {}
-      if (typeof window.toast === 'function') window.toast('Deal-Check konnte nicht angelegt werden — bitte neu laden.');
+      if (typeof window.toast === 'function') window.toast('Deal-Check konnte nicht angelegt werden, bitte neu laden.');
     } finally {
       clearTimeout(frei);
       window._qcTakeover = false;

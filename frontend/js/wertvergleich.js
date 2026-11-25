@@ -94,7 +94,7 @@
       var mitDatum = isFinite(am), gilt = mitDatum ? Date.now() >= am : (isFinite(kd) && Date.now() - kd >= 365 * 864e5);
       if (san > 0 && gilt) f.push('Zustand <b>„' + zw + '“</b>: die Sanierungskosten gelten als ausgeführt'
         + (mitDatum ? ' (laut „Sanierung ausgeführt am“ ' + datum(am) + ')' : ' (der Kauf liegt über ein Jahr zurück, kein Ausführungsdatum eingetragen)')
-        + ' und werden nicht abgezogen. Ist die Sanierung noch offen, trag unter Investition bei <b>„Sanierung ausgeführt am“</b> das geplante Datum ein — dann zählt sie bis dahin als Instandhaltungsrückstau. Ist saniert, stell den Zustand um.');
+        + ' und werden nicht abgezogen. Ist die Sanierung noch offen, trag unter Investition bei <b>„Sanierung ausgeführt am“</b> das geplante Datum ein, dann zählt sie bis dahin als Instandhaltungsrückstau. Ist saniert, stell den Zustand um.');
       else if (!(san > 0)) f.push('Zustand <b>„' + zw + '“</b>, aber keine <b>Sanierungskosten</b> eingetragen (Reiter Investition): ein Instandsetzungsrückstand ist in Sach- und Ertragswert nicht abgezogen, beide liegen dann zu hoch.');
     }
     if (!f.length) return '';

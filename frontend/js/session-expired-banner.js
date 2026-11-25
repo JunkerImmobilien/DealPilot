@@ -49,7 +49,7 @@
       b.id = 'dp-sess-banner';
       b.setAttribute('role', 'alert');
       b.innerHTML =
-        '<span><b>Sitzung abgelaufen</b> — bitte neu anmelden. ' +
+        '<span><b>Sitzung abgelaufen</b>, bitte neu anmelden. ' +
         'Der letzte Vorgang (z.\u202fB. PDF-Import) wurde nicht ausgef\u00fchrt.</span>' +
         '<button id="dp-sess-relogin" type="button">Neu anmelden</button>' +
         '<button id="dp-sess-close" type="button">Schlie\u00dfen</button>';

@@ -158,7 +158,7 @@
     var adr = mailAdresse();
     if (!adr) {
       b.querySelector('.dvb-txt').textContent =
-        'Für das Nachsenden fehlt die Adresse — bitte melde dich einmal neu an.';
+        'Für das Nachsenden fehlt die Adresse, bitte melde dich einmal neu an.';
       return;
     }
     knopf.disabled = true;
@@ -184,7 +184,7 @@
       .catch(function () {
         knopf.disabled = false; knopf.textContent = alt;
         b.querySelector('.dvb-txt').textContent =
-          'Das Senden hat nicht geklappt — bitte später noch einmal versuchen.';
+          'Das Senden hat nicht geklappt, bitte später noch einmal versuchen.';
       });
   }
 

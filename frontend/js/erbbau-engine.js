@@ -193,7 +193,7 @@
          darunter, und genau darin steckt der halbe Wert. */
       zinsVertragEur = zinsAngemessenEur;
       out.hinweise.push('Kein Erbbauzins angegeben - gerechnet wird mit einem marktgerechten Vertrag. ' +
-        'Alte Verträge liegen oft deutlich darunter; dann fällt der Abschlag kleiner aus.');
+        'Alte Verträge liegen oft deutlich darunter, dann fällt der Abschlag kleiner aus.');
     }
     var bwf = barwertfaktor(i, rlz);
     var zinsvorteil = (zinsAngemessenEur - zinsVertragEur) * bwf;

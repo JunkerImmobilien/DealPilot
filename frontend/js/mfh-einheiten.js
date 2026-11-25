@@ -329,7 +329,7 @@
     var zi = el('zimmer');
     if (zi) {
       zi.readOnly = mitEinheiten;
-      zi.title = mitEinheiten ? 'Summe aus den erfassten Einheiten — im Einheiten-Dialog pflegen' : '';
+      zi.title = mitEinheiten ? 'Summe aus den erfassten Einheiten, im Einheiten-Dialog pflegen' : '';
       var box = feldBox('zimmer');
       if (box) {
         var h = box.querySelector('.dp-zimmer-auto');
@@ -388,8 +388,8 @@
     /* v3252 · oben drei Zahlen statt eines Satzes; die Gewerke als zwei Karten:
        links, was JEDE Einheit erbt (eine Wohnung kann es nicht abweichend haben),
        rechts die Vorgabe, von der eine Wohnung in Schritt 3 abweichen darf. */
-    return intro('Was für das ganze Haus gilt. Jede Einheit erbt es — abweichen kann eine Wohnung nur bei Fenstern, Bädern, Innenausbau und Grundriss (Schritt 3).',
-        'Die Kriterien sind die der Anlage 2 ImmoWertV — dieselben wie im Restnutzungsdauer-Assistenten. Dach, Außenwand, Leitungen und Heizung kann eine einzelne Wohnung nicht abweichend haben. '
+    return intro('Was für das ganze Haus gilt. Jede Einheit erbt es, abweichen kann eine Wohnung nur bei Fenstern, Bädern, Innenausbau und Grundriss (Schritt 3).',
+        'Die Kriterien sind die der Anlage 2 ImmoWertV, dieselben wie im Restnutzungsdauer-Assistenten. Dach, Außenwand, Leitungen und Heizung kann eine einzelne Wohnung nicht abweichend haben. '
         + 'Aus den Punkten entstehen Modernisierungsgrad und Restnutzungsdauer des Hauses (Schritt 4).')
       + (_vor ? '<div class="mfh-notiz"><b>' + _vor + ' Angaben' + (_vor === 1 ? ' stammt' : ' stammen') + ' aus dem Tab Objekt</b> und sind unten schon gesetzt. Was du hier änderst, geht zurück dorthin.</div>' : '')
       + '<div class="mfh-fakten">'
@@ -398,7 +398,7 @@
         + '<div><span>Gebäudepunkte</span><b><b id="mfh-geb-p">—</b> von 20</b></div>'
       + '</div>'
       + '<div class="mfh-raster2">'
-      + blatt('Vom Haus — gilt für alle Einheiten', '<table class="mfh-gw-tab"><tbody>' + GEB_IDS.map(function (id) { return zeile(id, false); }).join('') + '</tbody></table>', 'geerbt', 'mfh-blatt-haus')
+      + blatt('Vom Haus, gilt für alle Einheiten', '<table class="mfh-gw-tab"><tbody>' + GEB_IDS.map(function (id) { return zeile(id, false); }).join('') + '</tbody></table>', 'geerbt', 'mfh-blatt-haus')
       + blatt('Vorgabe je Wohnung', '<table class="mfh-gw-tab"><tbody>' + WE_IDS.map(function (id) { return zeile(id, true); }).join('') + '</tbody></table>', 'in Schritt 3 je Einheit änderbar')
       + '</div>'
       /* v2966 · N80 (Marcel 26.10.2026): Massnahmen am GANZEN Haus fuer das Zielbild. Der Zustand oben
@@ -517,7 +517,7 @@
   function historieHtml(e) {
     var h = Array.isArray(e.mv_historie) ? e.mv_historie : [];
     var dat = function (v) { return /^\d{4}-\d{2}-\d{2}$/.test(v || '') ? v.split('-').reverse().join('.') : (v || '–'); };
-    return '<div class="mfh-we-hint" style="margin-top:8px"><button type="button" class="btn btn-outline btn-sm" id="mfh-we-ablegen" title="Den bisherigen Vertrag als früheren Vertrag ablegen und die Felder für den neuen leeren">Neuer Mietvertrag – bisherigen ablegen</button>'
+    return '<div class="mfh-we-hint" style="margin-top:8px"><button type="button" class="btn btn-outline btn-sm" id="mfh-we-ablegen" title="Den bisherigen Vertrag als früheren Vertrag ablegen und die Felder für den neuen leeren">Neuer Mietvertrag, bisherigen ablegen</button>'
       + (h.length ? '<div style="margin-top:8px"><b>Frühere Verträge (' + h.length + '):</b><br>' + h.map(function (v) {
           return esc((v.mv_mieter ? v.mv_mieter + ' · ' : '') + (v.mv_art || 'Vertrag') + ' ab ' + dat(v.mv_beginn) + (v.kaltmiete ? ' · ' + v.kaltmiete + ' €/Monat' : '') + ' · abgelegt ' + dat(v.abgelegt_am) + (v.grund ? ' (' + v.grund + ')' : ''));
         }).join('<br>') + '</div>' : '') + '</div>';
@@ -622,13 +622,13 @@
               f('leer_monate', 'Monate bis zur Vermietung', 'z. B. 4', 'decimal') +
               f('herrichtung_eur', 'Herrichtung (€)', 'z. B. 6.000', 'decimal') +
             '</div></div>' +
-          '<p class="mfh-we-hint">Staffel- und Indexmiete tragen ihre nächste Erhöhung schon im Vertrag — sie sind ein <b>Termin</b>, kein Potenzial. ' +
+          '<p class="mfh-we-hint">Staffel- und Indexmiete tragen ihre nächste Erhöhung schon im Vertrag, sie sind ein <b>Termin</b>, kein Potenzial. ' +
             '<b>Kündigungsverzicht</b> heißt: <i>beide</i> Seiten verzichten bis zu diesem Datum auf die ordentliche Kündigung (bei Staffelmiete höchstens vier Jahre, § 557a Abs. 3 BGB).</p>' +
           /* v2023 - die Erhoehung wird konkret, nur bei Staffel und Index */
           '<div id="mfh-we-erh-box" style="display:none">' +
             '<h4>Geplante Erhöhungen</h4>' +
             '<div id="mfh-we-index-warn" class="mfh-we-warn" style="display:none">' +
-              '<b>Indexmiete — die Höhe ist eine Annahme.</b> Der <i>Termin</i> steht im Vertrag, ' +
+              '<b>Indexmiete, die Höhe ist eine Annahme.</b> Der <i>Termin</i> steht im Vertrag, ' +
               'die Höhe ergibt sich erst aus dem Verbraucherpreisindex. Was du hier einträgst, ' +
               'rechnet DealPilot als <b>Annahme</b> fort und kennzeichnet sie auch in der Mietentwicklung.' +
             '</div>' +
@@ -652,7 +652,7 @@
            Übernehmen." Oben die LEITER (heute → Mieterhöhung → Neuvermietung → nach Sanierung) mit je einem
            Knopf „übernehmen", der das Feld darunter setzt - derselbe Weg wie eine Eingabe von Hand. Die
            eigenen Angaben zur Mieterhöhung stehen zugeklappt darunter. */
-        blk('soll', 'Miete — was geht und wann <span class="mfh-we-kann">kann, nicht muss</span>',
+        blk('soll', 'Miete, was geht und wann <span class="mfh-we-kann">kann, nicht muss</span>',
           '<div id="mfh-we-leiter" class="mfh-we-leiter"></div>' +
           '<details class="mfh-we-eigen"><summary>Eigene Angaben zur Mieterhöhung (Mieter bleibt)</summary>' +
           '<div class="mfh-we-raster">' +
@@ -741,10 +741,10 @@
                   + '<div><span>wirksam ab</span><b>' + esc(P.mmjj(so.termine.wirksam_ab)) + '</b> <small>(' + esc(so.termine.grund) + ')</small></div>'
                 : '<div><span>wirksam ab</span><b>—</b></div>')
               + '<div><span>Herkunft</span><b>' + esc(so.herkunft || '') + (so.grenze ? ' · ' + esc(so.grenze) : '') + '</b></div></div>'
-              + (so.kapp_angerechnet ? '<p class="mfh-we-hint">Kappungsgrenze auf ' + eur(so.kapp_basis) + '/Monat gerechnet — die Miete vor der letzten Erhöhung; die Erhöhung um ' + eur(so.kapp_angerechnet) + ' liegt in den drei Jahren und ist angerechnet (§ 558 Abs. 3 BGB).</p>' : '')
+              + (so.kapp_angerechnet ? '<p class="mfh-we-hint">Kappungsgrenze auf ' + eur(so.kapp_basis) + '/Monat gerechnet, die Miete vor der letzten Erhöhung, die Erhöhung um ' + eur(so.kapp_angerechnet) + ' liegt in den drei Jahren und ist angerechnet (§ 558 Abs. 3 BGB).</p>' : '')
               + (so.umlage559 ? '<p class="mfh-we-hint">Darin Modernisierungsumlage § 559 BGB: ' + eur(so.umlage559.monat) + '/Monat (8 % von ' + eur(so.umlage559.kosten) + (so.umlage559.gedeckelt ? ', gedeckelt auf ' + so.umlage559.kappe_qm + ' €/m²' : '') + ').</p>' : '')
               /* v3244 · Staffel/Index/Gewerbe: die Soll-Miete ist die vertragliche Erhöhung, keine nach § 558 */
-              + (so.vertrag ? '<p class="mfh-we-hint">Nach Vertrag (' + esc(P.sollVertrag({ soll: so, ist: ist }).norm) + ') — keine Erhöhung nach § 558 BGB. Die Soll-Miete zählt als vertragliche Erhöhung, nicht als Mieterhöhung bis zur Vergleichsmiete.</p>' : '')
+              + (so.vertrag ? '<p class="mfh-we-hint">Nach Vertrag (' + esc(P.sollVertrag({ soll: so, ist: ist }).norm) + '), keine Erhöhung nach § 558 BGB. Die Soll-Miete zählt als vertragliche Erhöhung, nicht als Mieterhöhung bis zur Vergleichsmiete.</p>' : '')
               + (so.hinweise && so.hinweise.length ? '<p class="mfh-we-hint" style="color:#B8625C">Hinweis: ' + esc(so.hinweise.join(', ')) + '.</p>' : '')
             : '<p class="mfh-we-hint">' + esc((so && so.grund) || 'Keine Soll-Miete.') + ' Eine Vergleichsmiete hier, der Mietspiegel oder die Marktmiete (beides im Tab Miete) lässt DealPilot vorrechnen.</p>')
           /* v3246 · woher die Vergleichsmiete stammt und was für sie gilt (Mietspiegel-Spanne, Vermutungswirkung, Schätzung) */
@@ -764,7 +764,7 @@
           + '<div><span>Modernisierungspunkte</span><b>' + (pkt ? '+' + pkt : '0') + ' (Anlage 2)</b></div></div>'
           /* v3064 · FESH-Regel: Wohnungs- und Hausmaßnahmen zusammen (potenzial.js standardhebungHtml) */
           + (P.standardhebungHtml ? P.standardhebungHtml((w.massnahmen || []).concat((m.haus && m.haus.massnahmen) || [])) : '')
-          + '<p class="mfh-we-hint">Dach, Fassade, Heizung und Leitungen gehören dem Haus: Maßnahmen dafür trägst du im Schritt Gebäude unter „Maßnahmen am ganzen Haus“ ein — ihr Kostenanteil und ihre Punkte sind hier schon enthalten. Die Zielmiete fließt nicht in die Mietentwicklung — nur in Pilot-Analyse und PDF.</p>';
+          + '<p class="mfh-we-hint">Dach, Fassade, Heizung und Leitungen gehören dem Haus: Maßnahmen dafür trägst du im Schritt Gebäude unter „Maßnahmen am ganzen Haus“ ein, ihr Kostenanteil und ihre Punkte sind hier schon enthalten. Die Zielmiete fließt nicht in die Mietentwicklung, nur in Pilot-Analyse und PDF.</p>';
       }
       ewZeichnen(m);
       faktenZeichnen(m, w);
@@ -801,7 +801,7 @@
       /* dieselbe Menge wie der Dienst: Wohnungen des Modells (Fläche oder Ist-Miete erfasst) ohne Fläche - eine leere Zeile zählt nicht */
       var ohneFl = (m && m.wohnungen ? m.wohnungen : []).filter(function (x) { return x.art !== 'gewerbe' && !(zahl(x.wfl) > 0); });
       if (ohneFl.length) {
-        h.innerHTML = '<p class="mfh-we-hint mfh-we-hint-offen">Der Vergleichswert je Wohnung führt erst, wenn <b>alle Wohnungen eine Wohnfläche</b> haben — offen: '
+        h.innerHTML = '<p class="mfh-we-hint mfh-we-hint-offen">Der Vergleichswert je Wohnung führt erst, wenn <b>alle Wohnungen eine Wohnfläche</b> haben, offen: '
           + esc(ohneFl.map(function (x) { return 'Nr. ' + (x.nr || '?'); }).join(', ')) + '. Bis dahin gilt der Ertragswert.</p>';
         if (rolle) rolle.textContent = 'bis dahin führend';
         return;
@@ -839,7 +839,7 @@
               + '. Angebotspreise sind keine Kaufpreise (§ 25 Abs. 1 ImmoWertV): genauer geht es mit einem amtlichen Vergleichsfaktor des Gutachterausschusses.</p>');
         if (rolle) rolle.textContent = 'stützend';
       } else {
-        html += '<p class="mfh-we-hint mfh-we-hint-offen"><b>Vergleichswert: kein Angebotsniveau für Wohnungen an diesem Ort</b> — die Marktpreise in der Pilot-Analyse unter „Abrufe“ abrufen (Marktbericht-Dienst, 1 × erweiterte Marktpreisindikation), danach „Ertragswerte rechnen“. '
+        html += '<p class="mfh-we-hint mfh-we-hint-offen"><b>Vergleichswert: kein Angebotsniveau für Wohnungen an diesem Ort</b>, die Marktpreise in der Pilot-Analyse unter „Abrufe“ abrufen (Marktbericht-Dienst, 1 × erweiterte Marktpreisindikation), danach „Ertragswerte rechnen“. '
           + (vg && !vg.wert && vg.offen && vg.offen.length ? 'Ein amtlicher Vergleichsfaktor liegt vor, für diese Wohnung fehlt: ' + esc(vg.offen.join(', ')) + '. ' : '')
           + 'Bis dahin steht der Ertragswert <b>ersatzweise</b>.</p>';
         if (rolle) rolle.textContent = 'ersatzweise';
@@ -852,7 +852,7 @@
         b.setAttribute('aria-pressed', b.getAttribute('data-ewart') === _ewArt ? 'true' : 'false');
         if (b.getAttribute('data-ewart') === 'etw') { b.disabled = !_weg; b.title = _weg ? '' : 'Nur mit dem Haken „In Wohnungseigentum aufgeteilt“ unter den Einheiten (Schritt 2)'; }
       });
-      if (!m.aktiv) { h.innerHTML = '<p class="mfh-we-hint">Erst eine Soll-Miete oder ein Zielbild eintragen — dann rechnet DealPilot den Ertragswert' + (_weg ? ' und den Vergleichswert' : '') + ' je Stufe.</p>'; var _v0 = el('mfh-we-vw'); if (_v0) _v0.innerHTML = ''; return; }
+      if (!m.aktiv) { h.innerHTML = '<p class="mfh-we-hint">Erst eine Soll-Miete oder ein Zielbild eintragen, dann rechnet DealPilot den Ertragswert' + (_weg ? ' und den Vergleichswert' : '') + ' je Stufe.</p>'; var _v0 = el('mfh-we-vw'); if (_v0) _v0.innerHTML = ''; return; }
       var r = P.ergebnis(opts()), we = r ? P.wohnungErgebnis(r, m, i) : null;
       var feld = _ewArt === 'etw' ? 'als_etw' : 'anteil_am_haus';
       var werte = we && we[feld] ? we[feld] : null;
@@ -1047,7 +1047,7 @@
             + '<span><b>In Wohnungseigentum aufgeteilt</b> (Teilungserklärung nach WEG)'
             + '<span class="mfh-info" tabindex="0" role="img" aria-label="' + esc(tipp) + '" title="' + esc(tipp) + '">i</span>'
             + '<div id="mfh-weg-text" class="mfh-leise"' + (_weg ? '' : ' style="display:none"') + '>'
-            + 'Dann ist jede Einheit einzeln verkäuflich — für Bank und Exit ein Unterschied. Score und Cashflow bleiben unberührt. Je Wohnung führt dann der Vergleichswert (Ertragswert stützend); Reiter Ergebnis, Pilot-Analyse und PDF zeigen die Summe nach Aufteilung.</div></span></label>'
+            + 'Dann ist jede Einheit einzeln verkäuflich, für Bank und Exit ein Unterschied. Score und Cashflow bleiben unberührt. Je Wohnung führt dann der Vergleichswert (Ertragswert stützend); Reiter Ergebnis, Pilot-Analyse und PDF zeigen die Summe nach Aufteilung.</div></span></label>'
             /* v2430 · Kosten der Aufteilung, eigene Angabe mit Vorbelegung */
             + '<div id="mfh-weg-kosten" class="mfh-feldzeile" style="margin:8px 0 0 21px;display:' + (_weg ? 'flex' : 'none') + '"><label for="mfh-auftk">Kosten der Aufteilung</label>'
             + '<input class="mfh-in mfh-md mfh-in-gross" id="mfh-auftk" inputmode="decimal" style="width:150px" value="' + esc(_auftK == null ? '' : String(_auftK)) + '" placeholder="' + (((window.DpPotenzial && window.DpPotenzial.AUFTEILUNG_JE_WE) || 1800) * Math.max(1, _arbeit.filter(function (x) { return x.art !== 'gewerbe'; }).length)).toLocaleString('de-DE') + ' (Vorbelegung)"> €'
@@ -1060,7 +1060,7 @@
   }
   var WEG_TIPP = 'Haken setzen, wenn für das Haus eine Teilungserklärung nach WEG besteht (oder du mit Aufteilung rechnen willst). '
     + 'Dann: 1) erscheint das Feld „Kosten der Aufteilung“ (leer = 1.800 € je Wohnung, schon aufgeteilt: 0); '
-    + '2) führt im Wohnungsfenster je Wohnung das Vergleichswertverfahren — amtlicher Vergleichsfaktor, sonst Angebotspreise für Wohnungen am Ort minus Abschlag (indikativ), sobald alle Wohnungen eine Wohnfläche haben; der Ertragswert „als Eigentumswohnung“ steht stützend daneben; '
+    + '2) führt im Wohnungsfenster je Wohnung das Vergleichswertverfahren, amtlicher Vergleichsfaktor, sonst Angebotspreise für Wohnungen am Ort minus Abschlag (indikativ), sobald alle Wohnungen eine Wohnfläche haben, der Ertragswert „als Eigentumswohnung“ steht stützend daneben; '
     + '3) zeigen Reiter Ergebnis, Pilot-Analyse und PDF die Summe nach Aufteilung mit ihrem führenden Verfahren, abzüglich der Aufteilungskosten; '
     + '4) nennen PDF und Bankunterlagen „in Wohnungseigentum aufgeteilt (WEG)“. '
     + 'Score und Cashflow bleiben unberührt.';
@@ -1255,9 +1255,9 @@
       + '</tr></thead><tbody><tr>'
       + GEB_IDS.map(function (id) { return '<td>' + esc(stufeText(_geb[id])) + '</td>'; }).join('')
       + WE_IDS.map(function (id) { return '<td class="mfh-erbe-v">' + esc(stufeText(_geb[id])) + '</td>'; }).join('')
-      + '</tr></tbody></table></div><p class="mfh-leise" style="margin:6px 0 0">Ändern im Reiter <b>Gebäude</b>. Dach, Außenwand, Leitungen und Heizung gelten immer für alle Einheiten; die Vorgabe je Wohnung gilt, bis du sie unten änderst.</p></details>';
-    return intro('Nur Wohnungen anfassen, die vom Haus abweichen — grau und kursiv steht, was vom Haus kommt.',
-        'Dach, Außenwand, Leitungen und Heizung kommen immer vom Haus. Fenster, Bäder, Innenausbau und Grundriss stehen auf der Vorgabe des Hauses, bis du sie für eine Einheit änderst; die Punkte je Einheit rechnen sofort mit.')
+      + '</tr></tbody></table></div><p class="mfh-leise" style="margin:6px 0 0">Ändern im Reiter <b>Gebäude</b>. Dach, Außenwand, Leitungen und Heizung gelten immer für alle Einheiten, die Vorgabe je Wohnung gilt, bis du sie unten änderst.</p></details>';
+    return intro('Nur Wohnungen anfassen, die vom Haus abweichen, grau und kursiv steht, was vom Haus kommt.',
+        'Dach, Außenwand, Leitungen und Heizung kommen immer vom Haus. Fenster, Bäder, Innenausbau und Grundriss stehen auf der Vorgabe des Hauses, bis du sie für eine Einheit änderst, die Punkte je Einheit rechnen sofort mit.')
       + erbe
       + blatt('Je Einheit ausfüllen', '<div class="mfh-scroll"><table class="mfh-tab mfh-tab-zustand" style="font-size:12.5px"><thead>' + kopf + '</thead><tbody>' + zeilen + '</tbody></table></div>', 'nur Abweichungen');
   }
@@ -1377,9 +1377,9 @@
     /* v2483 · eine RND fuer das Haus (siehe auswerten) - die Spalte je Einheit ist weg */
     var opt = d.hausPunkte, r = Math.round(d.rndGew);
     /* v3252 · zwei Karten: je Einheit, dann das Haus mit dem, was ins Objekt geht */
-    return intro('Punkte je Einheit und für das ganze Haus — mit <b>Übernehmen</b> gehen sie ins Objekt.',
-        'Gerechnet mit dem Punktraster der Anlage 2 aus dem RND-Kern (DealPilotRND ' + ((window.DealPilotRND && window.DealPilotRND.VERSION) || '') + '). Die Zahl ist indikativ — den Nachweis fürs Finanzamt liefert ein Gutachten. '
-        + 'Die Punkte des Hauses sind flächengewichtet aus den Einheiten; daraus folgt eine Restnutzungsdauer für das ganze Gebäude.')
+    return intro('Punkte je Einheit und für das ganze Haus, mit <b>Übernehmen</b> gehen sie ins Objekt.',
+        'Gerechnet mit dem Punktraster der Anlage 2 aus dem RND-Kern (DealPilotRND ' + ((window.DealPilotRND && window.DealPilotRND.VERSION) || '') + '). Die Zahl ist indikativ, den Nachweis fürs Finanzamt liefert ein Gutachten. '
+        + 'Die Punkte des Hauses sind flächengewichtet aus den Einheiten, daraus folgt eine Restnutzungsdauer für das ganze Gebäude.')
       + blatt('Je Einheit', '<table class="mfh-erg-tab" style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr style="text-align:left;color:#8A8272;font-size:11px"><th>Einheit</th><th style="text-align:right">Fläche</th><th style="text-align:right">Anlage 2</th></tr></thead><tbody>' + rows + '</tbody></table>')
       + blatt('Haus gesamt', '<div class="mfh-erg-haus">'
       + '<b>Gebäude gesamt:</b> ' + d.punkteGew.toFixed(1).replace('.', ',') + ' Punkte flächengewichtet, angesetzt <b>' + opt + ' Punkte</b>'
@@ -1392,7 +1392,7 @@
            Soll-Miete nie. */
         + '<span style="font-size:12px;color:#6B6356">(Kalenderjahr wie 2028 oder Jahr der Mietentwicklung wie 3; leer = kein Sprung)</span></div>' : '')
       + '<div style="margin-top:8px;display:grid;gap:6px">'
-      + '<label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="mfh-uep" checked> Modernisierungsgrad ins Objekt übernehmen (<b>' + opt + ' Punkte</b> — gilt dann für Marktbericht, Ertragswert und Wertpotenzial)</label>'
+      + '<label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="mfh-uep" checked> Modernisierungsgrad ins Objekt übernehmen (<b>' + opt + ' Punkte</b>, gilt dann für Marktbericht, Ertragswert und Wertpotenzial)</label>'
       + (r > 0 ? '<label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="mfh-uer"> Restnutzungsdauer <b>' + r + ' Jahre</b> in die AfA übernehmen (eigener Satz ' + (100 / r).toFixed(2).replace('.', ',') + ' %)</label>' : '')
       + '</div></div>'   /* Ende Haken-Raster und .mfh-erg-haus */
       /* ── v2095a · DIE ZAHL TRÄGT IHREN STICHTAG ──────────────────────
@@ -1433,7 +1433,7 @@
     if (!A || !A.je_stufe || !A.je_stufe.bestand) {
       return blatt('Wert nach Aufteilung', '<p class="mfh-leise" style="margin:0 0 8px">'
         + (P.ergebnisVeraltet && P.ergebnisVeraltet() ? 'Die Angaben haben sich geändert. ' : '')
-        + 'Je Wohnung der Vergleichswert (führend) und der Ertragswert als Eigentumswohnung (stützend), summiert gegen das Haus als Ganzes — gerechnet vom Marktbericht-Dienst wie Bericht Stufe 3 (kein Kontingent). Braucht eine Soll-Miete oder ein Zielbild an mindestens einer Wohnung.</p>' + knopf, 'Bestand');
+        + 'Je Wohnung der Vergleichswert (führend) und der Ertragswert als Eigentumswohnung (stützend), summiert gegen das Haus als Ganzes, gerechnet vom Marktbericht-Dienst wie Bericht Stufe 3 (kein Kontingent). Braucht eine Soll-Miete oder ein Zielbild an mindestens einer Wohnung.</p>' + knopf, 'Bestand');
     }
     var T = A.aufteiler && A.aufteiler.bestand, S = A.je_stufe.bestand, H = r.haus && r.haus.bestand;
     var e0 = function (v) { return v != null && isFinite(v) ? eur(v) : '—'; };
@@ -1472,7 +1472,7 @@
   function hausSumme() {
     var h = el('mfh-haus-sum'); if (!h) return;
     var k = _hausM.reduce(function (a, m) { return a + zahl(m.k); }, 0);
-    h.textContent = _hausM.length ? 'Am Haus: ' + _hausM.length + ' Maßnahme' + (_hausM.length === 1 ? '' : 'n') + ' · ' + Math.round(k).toLocaleString('de-DE') + ' € — in den Kosten der Wohnungen nach Fläche enthalten.' : 'Keine Maßnahme am ganzen Haus.';
+    h.textContent = _hausM.length ? 'Am Haus: ' + _hausM.length + ' Maßnahme' + (_hausM.length === 1 ? '' : 'n') + ' · ' + Math.round(k).toLocaleString('de-DE') + ' €, in den Kosten der Wohnungen nach Fläche enthalten.' : 'Keine Maßnahme am ganzen Haus.';
   }
   function hausBinden() {
     var host = el('mfh-haus-mass'), P = window.DpPotenzial;
@@ -1876,7 +1876,7 @@
         '</div>' +
         '<div class="dp-mtb-hero dp-mtb-hero-titled">' +
           '<div class="dp-mtb-h-title">Einheiten und Zustand erfassen</div>' +
-          '<div class="dp-mtb-h-sub">Fläche, Miete und Zustand je Einheit — daraus Restnutzungsdauer und Soll-Miete.</div>' +
+          '<div class="dp-mtb-h-sub">Fläche, Miete und Zustand je Einheit, daraus Restnutzungsdauer und Soll-Miete.</div>' +
         '</div>' +
       '</div>' +
       '<div class="mfh-kopf">' +
@@ -1965,7 +1965,7 @@
         + 'Ist ' + eur(s.ist) + '/Monat · Soll ' + eur(s.soll) + '/Monat'
         + (s.leer ? ' · <span style="color:#B8625C">Leerstand ' + s.leer + ' WE / ' + Math.round(s.leerFl) + ' m²</span>' : '')
         + (s.kosten ? ' · Maßnahmen ' + eur(s.kosten) : '')
-      : 'Noch keine Einheit — „+ Einheit" legt die erste an.';
+      : 'Noch keine Einheit, „+ Einheit" legt die erste an.';
     sanZeile();
   }
   /* Massnahmenkosten -> Sanierung nur auf ausdruecklichen Haken.
@@ -2210,7 +2210,7 @@
       z('Leerstand', s.leer ? s.leer + ' WE' : '—', '—') +
       /* v3750 · die Zeile „Maßnahmen" ist raus: Maßnahmen und ihre Umlage gehören ins Zielbild, nicht in diese Spalte */
       '</table><div class="cf-hint" style="margin-top:4px">Soll = Mieterhöhung nach § 558 BGB und vertragliche Erhöhungen, die Mieter bleiben, Leerstand bleibt leer (dieselbe Stufe wie in der Pilot-Analyse). Gleiche Finanzierung und Kosten. Zielmiete und Maßnahmen stehen im Zielbild. '
-      + (d.sollAbJahr > 0 ? 'Ab Jahr ' + d.sollAbJahr + ' rechnet die Mietentwicklung mit der Soll-Miete.' : 'Die Rechnung oben bleibt beim Ist — ein Jahr für den Sprung steht im Konfigurator, Schritt 4.') + '</div>';
+      + (d.sollAbJahr > 0 ? 'Ab Jahr ' + d.sollAbJahr + ' rechnet die Mietentwicklung mit der Soll-Miete.' : 'Die Rechnung oben bleibt beim Ist, ein Jahr für den Sprung steht im Konfigurator, Schritt 4.') + '</div>';
   }
   function anhaengen() {
     if (typeof window.calc !== 'function') return false;
@@ -2242,7 +2242,7 @@
     var list = (artMitEinheiten() && window._dpMfh && Array.isArray(window._dpMfh.einheiten)) ? window._dpMfh.einheiten.filter(function (e) { return zahl(e.wfl) > 0 || zahl(e.ist) > 0 || String(e.lage || '').trim(); }) : [];
     if (list.length) {
       var s = summe(list), soll = vermstandAus(s);
-      if (soll && v !== soll) h.push('Laut Einheiten ' + soll.toLowerCase() + ' (' + s.leer + ' von ' + s.anzahl + ' leer) — die Auswahl sagt „' + v + '“.');
+      if (soll && v !== soll) h.push('Laut Einheiten ' + soll.toLowerCase() + ' (' + s.leer + ' von ' + s.anzahl + ' leer), die Auswahl sagt „' + v + '“.');
       list.forEach(function (e, i) {
         var n = String(e.nr || (i + 1)) + (e.lage ? ' (' + e.lage + ')' : '');
         if (e.status === 'leer' && zahl(e.ist) > 0) h.push('Einheit ' + n + ' steht auf leer, trägt aber eine Ist-Miete von ' + eur(zahl(e.ist)) + ' — sie zählt nicht mit.');

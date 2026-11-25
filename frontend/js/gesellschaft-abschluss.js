@@ -677,13 +677,13 @@ function _gaSteuerHinweis(rech) {
           /* v3268 · Hinzurechnung § 8 Nr. 1 GewStG */
           + (!(rech.erwStatus && rech.erwStatus.aktiv)
               ? (rech.steuerDetail.hinzurechnung > 0
-                  ? '; Hinzurechnung § 8 Nr. 1 GewStG ' + _gaEur(rech.steuerDetail.hinzurechnung) + ' (25 % der Zinsen ' + _gaEur(rech.steuerDetail.entgelte) + ' über dem Freibetrag; nur Zinsen erfasst, Mieten/Pachten nicht)'
+                  ? '; Hinzurechnung § 8 Nr. 1 GewStG ' + _gaEur(rech.steuerDetail.hinzurechnung) + ' (25 % der Zinsen ' + _gaEur(rech.steuerDetail.entgelte) + ' über dem Freibetrag, nur Zinsen erfasst, Mieten/Pachten nicht)'
                   : (rech.steuerDetail.entgelte > 0 ? '; Zinsen ' + _gaEur(rech.steuerDetail.entgelte) + ' unter dem Freibetrag des § 8 Nr. 1 GewStG, keine Hinzurechnung' : ''))
               : '')
           + (rech.steuerDetail.genutzt > 0 ? '; Verlustvortrag verrechnet ' + _gaEur(rech.steuerDetail.genutzt) : '')
           + (rech.steuerDetail.vortragNach > 0 ? '; verbleibender Verlustvortrag ' + _gaEur(rech.steuerDetail.vortragNach) : '')
           + (rech.ugRuecklage > 0 ? '. UG: gesetzliche Rücklage 25 % des um einen Verlustvortrag geminderten Jahresüberschusses = ' + _gaEur(rech.ugRuecklage) + ' (§ 5a Abs. 3 GmbHG)' : '') + '.'
-        : 'Satz ' + (rech.steuersatz * 100).toFixed(3).replace('.', ',') + ' % — Körperschaftsteuer und Soli'
+        : 'Satz ' + (rech.steuersatz * 100).toFixed(3).replace('.', ',') + ' %, Körperschaftsteuer und Soli'
           + (rech.erwStatus && rech.erwStatus.aktiv ? ', Gewerbesteuer wegen erweiterter Kürzung mit 0 angesetzt' : ', einschließlich Gewerbesteuer') + '.');
 }
 function _gaAusgleichText(b) {
@@ -693,7 +693,7 @@ function _gaAusgleichText(b) {
   if (!(b.gesdar > 0)) _fehlt.push('ein etwaiges Gesellschafterdarlehen');
   var _basis = 'Die Bilanz geht auf, weil die Differenz zwischen dem, was '
     + 'DealPilot kennt, und dem, was tatsächlich über das Konto der Gesellschaft lief, '
-    + 'als eigene Zeile ausgewiesen wird — nicht, weil sie null wäre. In diesem Posten '
+    + 'als eigene Zeile ausgewiesen wird, nicht, weil sie null wäre. In diesem Posten '
     + 'stecken alle Vorgänge, die DealPilot nicht führt: Einlagen und Entnahmen, private '
     + 'Zahlungen für die Gesellschaft, Mietkautionen, der Zeitpunkt von Steuerzahlungen, '
     + 'sowie die laufenden Bankbewegungen des Jahres. Bei kleinen Immobiliengesellschaften '
@@ -701,7 +701,7 @@ function _gaAusgleichText(b) {
   if (_fehlt.length) {
     _basis += '  IN DIESEM ABSCHLUSS FEHLT: ' + _fehlt.join(', ') + '. '
       + 'Solange diese Angaben in den Stammdaten der Gesellschaft auf null stehen, '
-      + 'trägt der Ausgleichsposten sie mit — er ist dann zwangsläufig zu hoch. '
+      + 'trägt der Ausgleichsposten sie mit, er ist dann zwangsläufig zu hoch. '
       + 'Nachzutragen unter Einstellungen / Mandanten.';
   } else {
     _basis += '  Die Stammdaten der Gesellschaft sind vollständig hinterlegt. '
@@ -866,7 +866,7 @@ function _gaDeckblatt(doc, jahr, name, rech, daten, W, H, M, CW) {
     + 'Sie ist KEIN aufgestellter Jahresabschluss im Sinne der §§ 242 ff. HGB und ersetzt weder '
     + 'die Buchführung noch die Beratung: sie kennt nur die Geschäftsvorfälle, die in DealPilot '
     + 'erfasst sind. Was darüber hinaus über das Konto der Gesellschaft läuft, steht als '
-    + '„Verrechnungskonto Gesellschafter" in der Bilanz — siehe die Erläuterung dort.', CW);
+    + '„Verrechnungskonto Gesellschafter" in der Bilanz, siehe die Erläuterung dort.', CW);
   doc.text(ft, M, fy);
 }
 
@@ -968,7 +968,7 @@ function _gaGuvSeite(doc, jahr, name, rech, W, H, M, CW) {
       + (rech.befunde.ohneSatz.length === 1 ? '' : 'e') + ' liegt für ' + jahr
       + ' kein Steuersatz vor: ' + rech.befunde.ohneSatz.join(', ')
       + '. Diese Objekte sind in der GuV mit null enthalten, stehen in der Bilanz aber mit '
-      + 'ihrem Buchwert — die Rechnung ist deshalb unvollständig.', CW);
+      + 'ihrem Buchwert, die Rechnung ist deshalb unvollständig.', CW);
     doc.text(os, M, cy);
     cy += os.length * 3.4 + 3;
     doc.setTextColor(42, 39, 39);
@@ -1027,12 +1027,12 @@ function _gaBilanzSeite(doc, jahr, name, rech, W, H, M, CW) {
   ly += 2;
   ly = zeile(lx, ly, 'B. Umlaufvermögen', null, { fett: true });
   ly = zeile(lx, ly, 'Guthaben bei Kreditinstituten', b.bank);
-  ly = unter(lx, ly, 'Eröffnungsbestand aus den Stammdaten — die laufenden '
+  ly = unter(lx, ly, 'Eröffnungsbestand aus den Stammdaten, die laufenden '
     + 'Zahlungen des Jahres sind DealPilot nicht bekannt');
   if (b.ausgleich < 0) {
     ly += 2;
     ly = zeile(lx, ly, 'Forderungen gegen Gesellschafter', -b.ausgleich, { aus: true });
-    ly = unter(lx, ly, 'Ausgleichsposten — siehe Erläuterung unten');
+    ly = unter(lx, ly, 'Ausgleichsposten, siehe Erläuterung unten');
   }
 
   /* ── Passiva ── */
@@ -1049,7 +1049,7 @@ function _gaBilanzSeite(doc, jahr, name, rech, W, H, M, CW) {
     var n = (vd && vd.jahre) ? vd.jahre.length : 0;
     var txt;
     if (!n) {
-      txt = 'Anfangsbestand aus den Stammdaten — kein Vorjahr erfasst';
+      txt = 'Anfangsbestand aus den Stammdaten, kein Vorjahr erfasst';
     } else {
       var von = vd.jahre[0].jahr, bis = vd.jahre[n - 1].jahr;
       txt = 'Anfangsbestand aus den Stammdaten + Ergebnisse ' + von + (bis !== von ? '–' + bis : '')
@@ -1064,7 +1064,7 @@ function _gaBilanzSeite(doc, jahr, name, rech, W, H, M, CW) {
   ry = zeile(rx, ry, 'B. Rückstellungen', null, { fett: true });
   ry = zeile(rx, ry, 'Steuerrückstellung', b.steuerrueckstellung);
   ry = unter(rx, ry, 'Körperschaftsteuer des Jahres, hier in voller Höhe als noch '
-    + 'nicht gezahlt angesetzt — Vorauszahlungen sind nicht bekannt');
+    + 'nicht gezahlt angesetzt, Vorauszahlungen sind nicht bekannt');
   ry += 2;
   ry = zeile(rx, ry, 'C. Verbindlichkeiten', null, { fett: true });
   ry = zeile(rx, ry, 'gegenüber Kreditinstituten', b.darlehen);
@@ -1072,7 +1072,7 @@ function _gaBilanzSeite(doc, jahr, name, rech, W, H, M, CW) {
   ry = zeile(rx, ry, 'Gesellschafterdarlehen', b.gesdar);
   if (b.ausgleich > 0) {
     ry = zeile(rx, ry, 'Verrechnungskonto Gesellschafter', b.ausgleich, { aus: true });
-    ry = unter(rx, ry, 'Ausgleichsposten — siehe Erläuterung unten');
+    ry = unter(rx, ry, 'Ausgleichsposten, siehe Erläuterung unten');
   }
 
   /* ── Summen ── */
@@ -1190,14 +1190,14 @@ function _gaSpiegelSeite(doc, jahr, name, rech, daten, W, H, M, CW) {
   doc.line(M, cy, M + CW, cy); cy += 5.5;
   doc.setFont('helvetica', 'normal'); doc.setFontSize(7.2);
   doc.setTextColor(122, 115, 112);
-  var pt = 'Der gespeicherte Steuersatz eines Objekts führt die Restschuld nicht — geprüft am '
+  var pt = 'Der gespeicherte Steuersatz eines Objekts führt die Restschuld nicht, geprüft am '
     + '03.09.2026 an allen 45 Feldern. Sie wird deshalb hier aus den Darlehensangaben des '
     + 'Objekts gerechnet: Annuitätendarlehen mit monatlicher Zahlung, Beginn laut '
     + 'Darlehensvertrag. Nicht enthalten sind Sondertilgungen, tilgungsfreie Anlaufzeiten und '
     + 'eine Anschlussfinanzierung zu anderen Konditionen.';
   if (p) {
     pt += '  Gegenprobe am geöffneten Objekt gegen den Rechenkern der App: '
-      + _gaEur(p.eigen) + ' hier, ' + _gaEur(p.kern) + ' dort — Abweichung '
+      + _gaEur(p.eigen) + ' hier, ' + _gaEur(p.kern) + ' dort, Abweichung '
       + (p.abweichung * 100).toFixed(2).replace('.', ',') + ' %'
       + (p.ok ? '. Die Rechnung stimmt mit dem Rechenkern überein.'
               : '. DAS IST ZU VIEL: die Restschuld in dieser Bilanz ist nicht belegt.');

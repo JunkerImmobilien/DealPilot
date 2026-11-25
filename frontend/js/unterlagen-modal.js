@@ -140,7 +140,7 @@
       + '<div style="color:#f3ead0;opacity:.78;font-size:12.5px;margin-top:2px">'
       + (o.strasse || o.ort
           ? _esc([o.strasse, [o.plz, o.ort].filter(Boolean).join(' ')].filter(Boolean).join(', '))
-          : '<span style="color:var(--wl-e8cc7a, #E8CC7A)">Kein Objekt geladen — Adresse fehlt</span>')
+          : '<span style="color:var(--wl-e8cc7a, #E8CC7A)">Kein Objekt geladen, Adresse fehlt</span>')
       + '</div></div>'
       + '<button type="button" style="' + _KNOPF_DUNKEL + '"'
       + ' onclick="DealPilotUnterlagen.schliessen()">Schließen</button>'
@@ -211,7 +211,7 @@
       h += '<div style="color:#6f6960;font-size:12.5px;line-height:1.6;'
         + 'margin-bottom:14px"><b style="color:#2A2727">Optional:</b> '
         + fehlendFlur.join(', ') + '. Ohne diese Angaben sucht das Amt das '
-        + 'Flurstück selbst heraus — das geht, dauert nur länger. Du findest '
+        + 'Flurstück selbst heraus, das geht, dauert nur länger. Du findest '
         + 'sie im Grundbuchauszug oder auf der Flurkarte.</div>';
     }
 
@@ -259,7 +259,7 @@
     h += '<div style="color:#6f6960;font-size:12px;line-height:1.6;margin-top:16px;'
       + 'padding-top:12px;border-top:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 35%, transparent)">'
       + 'DealPilot <b>verschickt nichts</b>. Es erzeugt das Anschreiben und legt es '
-      + 'in die Zwischenablage — gesendet wird aus deinem eigenen Mailprogramm.'
+      + 'in die Zwischenablage, gesendet wird aus deinem eigenen Mailprogramm.'
       + '</div>';
 
     body.innerHTML = h;
@@ -319,7 +319,7 @@
        er der einzige Weg ist. */
     if (a.antrag_url) {
       t += '<br><a href="' + _esc(a.antrag_url) + '" target="_blank" rel="noopener">'
-        + (a.email ? 'Online-Antrag / Portal' : 'nur über das Portal — hier öffnen')
+        + (a.email ? 'Online-Antrag / Portal' : 'nur über das Portal, hier öffnen')
         + '</a>';
     }
     /* Der Belegstand gehört an die Adresse, nicht in eine Fußnote. */
@@ -406,7 +406,7 @@
         } else {
           /* Ein Häkchen an einem Namen ohne Postfach wäre ein
              Versprechen, das der Versand nicht halten kann. */
-          t += '<div style="' + _S_KLEIN + ';opacity:.8;margin-top:4px">ohne Adresse — nicht in Kopie</div>';
+          t += '<div style="' + _S_KLEIN + ';opacity:.8;margin-top:4px">ohne Adresse, nicht in Kopie</div>';
         }
         t += '</div>';
       });
@@ -449,12 +449,12 @@
           + '</div>';
       } else if (a.antrag_url) {
         t += '<div style="margin-top:7px;font-size:12px;color:#6f6960">'
-          + 'Keine Adresse und keine Ansprechperson belegt — dieses Amt '
+          + 'Keine Adresse und keine Ansprechperson belegt, dieses Amt '
           + 'nimmt die Anfrage über das Portal.</div>';
       } else {
         t += '<div style="margin-top:7px;font-size:12px;'
           + 'color:var(--warn,#D8954C)">Weder Adresse noch Ansprechperson '
-          + 'belegt. Bitte den Weg selbst prüfen — die Quelle ist oben '
+          + 'belegt. Bitte den Weg selbst prüfen, die Quelle ist oben '
           + 'verlinkt.</div>';
       }
     }
@@ -487,7 +487,7 @@
           if (Date.now() - t0 > 240000) {
             if (ziel) ziel.innerHTML = '<span style="color:var(--warn,#D8954C)">'
               + 'Die Recherche dauert ungewöhnlich lange. Sie läuft auf dem Server '
-              + 'weiter — öffne die Unterlagen in ein paar Minuten noch einmal, '
+              + 'weiter, öffne die Unterlagen in ein paar Minuten noch einmal, '
               + 'dann steht das Ergebnis hier.</span>';
             return;
           }
@@ -521,7 +521,7 @@
       var msg = String((e && e.message) || e || '');
       if (/Anfrage-Timeout|nicht erreichbar/i.test(msg)) {
         msg = 'Die Verbindung zum Server ist abgerissen. Die Recherche läuft dort '
-          + 'gegebenenfalls weiter — öffne die Unterlagen gleich noch einmal.';
+          + 'gegebenenfalls weiter, öffne die Unterlagen gleich noch einmal.';
       }
       if (ziel) ziel.innerHTML = '<span style="color:var(--bad,#D8564C)">'
         + _esc(msg) + '</span>';
@@ -557,7 +557,7 @@
       + '<div style="color:#6f6960;font-size:12.5px;margin-bottom:8px">'
       + 'An: <b id="dp-ul-an">' + _esc(_empfaenger(amt) || '— keine Adresse —') + '</b>'
       + (amt && !amt.beleg_ok && _empfaenger(amt) === amt.email
-          ? ' <span style="color:var(--warn,#D8954C)">(nicht belegt — bitte prüfen)</span>'
+          ? ' <span style="color:var(--warn,#D8954C)">(nicht belegt, bitte prüfen)</span>'
           : '')
       + _empfaengerWahl(amt)
       /* v2152 · Der CC steht im Briefkopf, nicht nur im mailto-Link.

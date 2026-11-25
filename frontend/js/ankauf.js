@@ -393,7 +393,7 @@
       return '<div class="ank-zeile ank-frage ank-fehlt">'
         + '<div class="ank-txt"><b>Ankauf-Stand festschreiben?</b> Dafür fehlt der '
         + '<i>Nutzen-/Lastenwechsel</i> im Reiter Objekt. Ohne Stichtag wird nichts '
-        + 'eingefroren — ein Stand mit falschem Datum sieht richtig aus und ist es nicht.</div>'
+        + 'eingefroren, ein Stand mit falschem Datum sieht richtig aus und ist es nicht.</div>'
         + '</div>';
     }
     return '<div class="ank-zeile ank-frage">'

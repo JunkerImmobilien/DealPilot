@@ -47,8 +47,8 @@
   var TEXTE = {
     dealpilot:   { t: 'DealPilot Marktbewertung', u: 'Markteinschätzung aus unseren Daten' },
     dpmb:        { t: 'DealPilot Marktbewertung', u: 'Markteinschätzung aus unseren Daten' },
-    import:      { t: 'Exposé oder Marktbericht', u: 'PDF oder Foto einlesen — Adresse, Fläche, Preis' },
-    expose:      { t: 'Exposé oder Marktbericht', u: 'PDF oder Foto einlesen — Adresse, Fläche, Preis' },
+    import:      { t: 'Exposé oder Marktbericht', u: 'PDF oder Foto einlesen, Adresse, Fläche, Preis' },
+    expose:      { t: 'Exposé oder Marktbericht', u: 'PDF oder Foto einlesen, Adresse, Fläche, Preis' },
     voice:       { t: 'Sprache',                  u: 'Das Objekt frei einsprechen' },
     immometrica: { t: 'ImmoMetrica',              u: 'Aus dem Bestand übernehmen' },
     spr:         { t: 'Bewertungspartner',        u: 'Externe Marktbewertung' },
@@ -124,7 +124,7 @@
       /* v2078: hier stand „dann erst wird Kerosin verbraucht". Den Begriff
          gibt es seit v1176 nicht mehr (config.js:238 „Kontingente statt
          Kerosin"), und die Einheit Liter ist mit ihm gefallen. */
-      + '<b>Abgerufen wird erst, wenn du auf „Abrufen" drückst</b> — dann erst wird dein Kontingent belastet.</p>'
+      + '<b>Abgerufen wird erst, wenn du auf „Abrufen" drückst</b>, dann erst wird dein Kontingent belastet.</p>'
       + '<div class="dpnq-knoepfe">'
       + '<label class="dpnq-merk"><input type="checkbox" id="dpnq-merken"> Auswahl merken</label>'
       + '<button type="button" class="dpnq-b" id="dpnq-ohne">Nur anlegen</button>'
@@ -233,7 +233,7 @@
           r = null;
           try { console.error('[neues-objekt] Anlegen fehlgeschlagen:', e); } catch (e2) {}
           if (typeof window.toast === 'function') {
-            window.toast('Objekt konnte nicht angelegt werden — bitte neu laden.');
+            window.toast('Objekt konnte nicht angelegt werden, bitte neu laden.');
           }
         } finally {
           laeuft = false;

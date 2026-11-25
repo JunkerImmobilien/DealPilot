@@ -59,7 +59,7 @@
         );
       });
       if (!data.length) {
-        console.warn('  ⚠ Keine Treffer — eventuell Tippfehler oder Nominatim-Rate-Limit (1 req/s)');
+        console.warn('  ⚠ Keine Treffer, eventuell Tippfehler oder Nominatim-Rate-Limit (1 req/s)');
       }
     } catch (e) {
       console.error('  ✗ Fehler:', e.message);
@@ -67,5 +67,5 @@
   }
 
   window.DealPilotAutocompleteDebug = { check: check, testQuery: testQuery };
-  console.log('[autocomplete-debug V174] geladen — DealPilotAutocompleteDebug.check() / .testQuery("...")');
+  console.log('[autocomplete-debug V174] geladen, DealPilotAutocompleteDebug.check() / .testQuery("...")');
 })();

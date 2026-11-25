@@ -152,7 +152,7 @@ if (!window._pdfGold) {
     mand: ['Mandanten', 'Kunden verwalten und Seats zuweisen.'],
     frei: ['Freigaben', 'Eingereichte Objekte prüfen und bestätigen.'],
     ueberg: ['Objekte übergeben', 'Durchgerechnete Objekte per E-Mail an Kunden übergeben.'],   /* v3317 */
-    brand: ['Branding', 'Whitelabel — Farben, Logo, Subdomain.'],
+    brand: ['Branding', 'Whitelabel, Farben, Logo, Subdomain.'],
     abr: ['Abrechnung', 'Dein Partner-Abo und die Seat-Abrechnung.']
   };
 
@@ -256,7 +256,7 @@ if (!window._pdfGold) {
     else if (s === 'frei') loadFreigaben();
     else if (s === 'ueberg') loadUebergaben();   /* v3317 */
     else if (s === 'brand') loadBranding();
-    else if (s === 'abr') $('rp-work').innerHTML = '<p class="rp-intro">Dein Partner-Abo und die Seat-Abrechnung.</p><p class="rp-label">Abo &amp; Rechnungen</p><p class="rp-ph">Partner-Basis · Seat-Pool · Stripe-Rechnungen — kommt im Abrechnungs-Paket.</p>';
+    else if (s === 'abr') $('rp-work').innerHTML = '<p class="rp-intro">Dein Partner-Abo und die Seat-Abrechnung.</p><p class="rp-label">Abo &amp; Rechnungen</p><p class="rp-ph">Partner-Basis · Seat-Pool · Stripe-Rechnungen, kommt im Abrechnungs-Paket.</p>';
   }
 
   // ── Übersicht ──────────────────────────────────────────────
@@ -357,7 +357,7 @@ if (!window._pdfGold) {
         return '<div class="rp-mrow"><div class="rp-av" style="background:#f0ece2;color:#9a9284">' + esc(ini) + '</div><div><div class="rp-nm">' + esc(i.display_name) + '</div><div class="rp-mt">' + esc(i.email) + '</div></div>' +
           '<div class="rp-mr"><span class="rp-seat off">Einladung ausstehend</span><button class="rp-act remove" data-rev="' + i.id + '">zurückziehen</button></div></div>';
       }).join('');
-      w.innerHTML = '<p class="rp-intro">Lade Mandanten per E-Mail ein — sie legen über den Link selbst ein Konto an und bekommen automatisch einen freien Seat.</p>' +
+      w.innerHTML = '<p class="rp-intro">Lade Mandanten per E-Mail ein, sie legen über den Link selbst ein Konto an und bekommen automatisch einen freien Seat.</p>' +
         '<p class="rp-label">Mandanten <button class="rp-add" id="rp-addc">+ Mandant einladen</button></p>' +
         '<div id="rp-inviteform"></div>' +
         (rows || (invRows ? '' : '<p class="rp-ph">Noch keine Mandanten.</p>')) +
@@ -392,7 +392,7 @@ if (!window._pdfGold) {
     if (!n || !em) { toast('Name + E-Mail nötig'); return; }
     try {
       var r = await api('/clients', { method: 'POST', body: { email: em, displayName: n } });
-      toast(r && r.mail_sent ? ('✓ Einladung an ' + em + ' gesendet') : 'Mandant angelegt — Mail nicht versendet (SMTP prüfen)');
+      toast(r && r.mail_sent ? ('✓ Einladung an ' + em + ' gesendet') : 'Mandant angelegt, Mail nicht versendet (SMTP prüfen)');
       loadMandanten();
     } catch (e) { toast('Einladen fehlgeschlagen: ' + (e && e.message ? e.message : '')); }
   }
@@ -407,7 +407,7 @@ if (!window._pdfGold) {
   }
   async function seat(id, kind) {
     try { await api('/clients/' + id + '/' + kind, { method: 'POST', body: {} }); loadMandanten(); toast(kind === 'assign' ? 'Seat zugewiesen' : 'Seat entzogen'); }
-    catch (e) { toast(e && e.status === 409 ? 'Kein freier Seat — erst welche kaufen.' : 'Aktion fehlgeschlagen'); }
+    catch (e) { toast(e && e.status === 409 ? 'Kein freier Seat, erst welche kaufen.' : 'Aktion fehlgeschlagen'); }
   }
 
   // ── Freigaben ──────────────────────────────────────────────
@@ -433,7 +433,7 @@ if (!window._pdfGold) {
         var openBtn = s.status === 'bestaetigt' ? '<button class="rp-act" data-open="' + s.id + '">Öffnen</button>' : '';
         return row(s, b + openBtn);
       }).join('');
-      w.innerHTML = '<p class="rp-intro">Von deinen Mandanten zur Prüfung eingereichte Objekte — einzeln bestätigen oder zurückgeben.</p>' +
+      w.innerHTML = '<p class="rp-intro">Von deinen Mandanten zur Prüfung eingereichte Objekte, einzeln bestätigen oder zurückgeben.</p>' +
         '<p class="rp-label">Wartet auf Prüfung (' + pend.length + ')</p>' + (pendHtml || '<p class="rp-ph">Keine offenen Prüfungen.</p>') +
         (doneHtml ? '<p class="rp-label" style="margin-top:22px">Erledigt</p>' + doneHtml : '');
       w.querySelectorAll('[data-ok]').forEach(function (b) { b.addEventListener('click', function () { reviewShare(b.getAttribute('data-ok'), 'bestaetigt'); }); });
@@ -501,7 +501,7 @@ if (!window._pdfGold) {
           '<div class="rp-mt">' + mt + (u.platz_reserviert ? ' · 1 Platz reserviert für ' + esc(u.email) : '') + '</div></div>' +
           '<div style="margin-left:auto;display:flex;gap:8px;align-items:center">' + platz + '<span class="rp-bg" style="' + s[1] + '">' + s[0] + '</span>' + weg + '</div></div>';
       }).join('');
-      w.innerHTML = '<p class="rp-intro">Ein durchgerechnetes Objekt per E-Mail an einen Kunden übergeben. Die Mail kommt in deiner Marke; der Kunde bekommt eine Kopie des Objekts in sein Konto. Ein neuer Kunde legt dabei ein Konto an und erhält einen freien Platz.</p>' +
+      w.innerHTML = '<p class="rp-intro">Ein durchgerechnetes Objekt per E-Mail an einen Kunden übergeben. Die Mail kommt in deiner Marke, der Kunde bekommt eine Kopie des Objekts in sein Konto. Ein neuer Kunde legt dabei ein Konto an und erhält einen freien Platz.</p>' +
         '<p class="rp-label">Objekt übergeben</p>' +
         (objs.length ? (
         '<div class="rp-panel" style="margin-top:0">' +

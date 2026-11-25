@@ -813,10 +813,10 @@
       if (selbstbezug) gmbhKey = '';
 
       var frage = selbstbezug
-        ? 'Die Verknüpfung dieses Objekts ist beschädigt (sie zeigt auf sich selbst).\n\nDas Objekt wird nur AUFGETAUT — es wird nichts gelöscht. Fortfahren?'
+        ? 'Die Verknüpfung dieses Objekts ist beschädigt (sie zeigt auf sich selbst).\n\nDas Objekt wird nur AUFGETAUT, es wird nichts gelöscht. Fortfahren?'
         : (gmbhKey
             ? 'Überführung aufheben?\n\nDas GESELLSCHAFTS-Objekt wird GELOESCHT und dieses Privat-Objekt wieder aufgetaut.'
-            : 'Es ist kein Gesellschafts-Objekt verknüpft.\n\nDas Objekt wird nur AUFGETAUT — es wird nichts gelöscht. Fortfahren?');
+            : 'Es ist kein Gesellschafts-Objekt verknüpft.\n\nDas Objekt wird nur AUFGETAUT, es wird nichts gelöscht. Fortfahren?');
       if (!window.confirm(frage)) return;
 
       if (!window.Auth || !Auth.apiCall) { if (typeof toast === 'function') toast('Nicht eingeloggt.'); return; }
@@ -831,8 +831,8 @@
       try { uewPlanZurueck(privatKey); } catch (e) {}   /* v3470 */
       if (typeof toast === 'function') {
         toast(geloescht
-          ? '✓ Überführung aufgehoben — Gesellschafts-Objekt gelöscht, Privat-Objekt aufgetaut.'
-          : '✓ Privat-Objekt aufgetaut — es war kein Gesellschafts-Objekt (mehr) verknüpft.');
+          ? '✓ Überführung aufgehoben, Gesellschafts-Objekt gelöscht, Privat-Objekt aufgetaut.'
+          : '✓ Privat-Objekt aufgetaut, es war kein Gesellschafts-Objekt (mehr) verknüpft.');
       }
       try { _renderUeberfBadge(); } catch (e) {}
       try { if (typeof renderSaved === 'function') renderSaved({ _immediate: true }); } catch (e) {}
@@ -882,7 +882,7 @@
       var _nGes = (_state.list || []).filter(function (m) { return m && m.id !== 'privat'; }).length;
       if (_expSperre) return ''
         + '<h2 class="set-section-h2">Mandanten</h2>'
-        + '<p class="hint">Dein privater Halter — inklusive <b>Steuerzeiträumen</b> — ist in jedem Detailgrad da. <b>Gesellschaften (GmbH, UG, GbR) gibt es ab Detailgrad Experte.</b></p>'
+        + '<p class="hint">Dein privater Halter, inklusive <b>Steuerzeiträumen</b>, ist in jedem Detailgrad da. <b>Gesellschaften (GmbH, UG, GbR) gibt es ab Detailgrad Experte.</b></p>'
         + '<div style="border:1px solid #ece7df;border-radius:12px;padding:13px 15px;display:flex;flex-wrap:wrap;align-items:center;gap:10px 12px;background:#fff;margin:14px 0">'
         +   '<div style="flex:1 1 220px;min-width:0">'
         +   '<div style="display:flex;align-items:center;gap:9px;margin-bottom:3px"><strong style="font:600 15px/1.2 \'Space Grotesk\',sans-serif">' + esc(_priv.name || 'Privat') + '</strong>' + _badge('privat') + '</div>'
@@ -892,14 +892,14 @@
         + '</div>'
         + '<div class="dp-ges-sperre" style="margin-top:14px;padding:20px 22px;border:1px solid var(--wl-c9a84c, #C9A84C);border-radius:14px;background:#FAF9F4">'
         +   '<div style="font:700 13px/1 \'Inter\',sans-serif;letter-spacing:1.4px;text-transform:uppercase;color:var(--wl-b8932f,#b8932f);margin-bottom:8px">Ab Detailgrad Experte</div>'
-        +   '<p style="margin:0 0 14px;color:#2A2727;font-size:14px;line-height:1.55">Mit <b>Mandanten</b> hältst du Objekte privat <i>oder</i> in einer Gesellschaft (GmbH, UG, GbR) — mit eigener Steuerrechnung, Kosten der Gesellschaft, Jahresabschluss und Überführung. '
-        +     (_nGes ? 'Du hast ' + (_nGes === 1 ? 'eine Gesellschaft' : _nGes + ' Gesellschaften') + ' angelegt; ihre Objekte rechnen in jedem Detailgrad weiter mit ihrer Steuer.' : 'Der Detailgrad gilt für alle Objekte und ist nur Anzeige — nichts wird gelöscht.')
+        +   '<p style="margin:0 0 14px;color:#2A2727;font-size:14px;line-height:1.55">Mit <b>Mandanten</b> hältst du Objekte privat <i>oder</i> in einer Gesellschaft (GmbH, UG, GbR), mit eigener Steuerrechnung, Kosten der Gesellschaft, Jahresabschluss und Überführung. '
+        +     (_nGes ? 'Du hast ' + (_nGes === 1 ? 'eine Gesellschaft' : _nGes + ' Gesellschaften') + ' angelegt, ihre Objekte rechnen in jedem Detailgrad weiter mit ihrer Steuer.' : 'Der Detailgrad gilt für alle Objekte und ist nur Anzeige, nichts wird gelöscht.')
         +   '</p>'
         +   '<button type="button" class="btn btn-gold" data-dp-dg-setzen="3">Auf Experte umstellen</button>'
         + '</div>';
       return ''
         + '<h2 class="set-section-h2">Mandanten</h2>'
-        + '<p class="hint">Dein privater Halter — inklusive <b>Steuerzeitr\u00e4umen</b> — ist in allen Pl\u00e4nen verf\u00fcgbar. Weitere Gesellschaften (GmbH/UG) mit eigenem Steuerregime sind Teil des <b>Pro</b>-Plans.</p>'
+        + '<p class="hint">Dein privater Halter, inklusive <b>Steuerzeitr\u00e4umen</b>, ist in allen Pl\u00e4nen verf\u00fcgbar. Weitere Gesellschaften (GmbH/UG) mit eigenem Steuerregime sind Teil des <b>Pro</b>-Plans.</p>'
         + '<div style="border:1px solid #ece7df;border-radius:12px;padding:13px 15px;display:flex;align-items:center;gap:12px;background:#fff;margin:14px 0">'
         +   '<div style="flex:1;min-width:0">'
         +   '<div style="display:flex;align-items:center;gap:9px;margin-bottom:3px"><strong style="font:600 15px/1.2 \'Space Grotesk\',sans-serif">' + esc(_priv.name || 'Privat') + '</strong>' + _badge('privat') + '</div>'
@@ -1052,7 +1052,7 @@
      Transparenzregister); alte Saetze mit allem in `steuerber` bleiben gueltig. */
   var KOSTENARTEN = [
     { f: 'steuerber', t: 'Buchführung / Steuerberatung',
-      h: 'Honorar für Buchführung, Lohnabrechnung und die Steuererklärungen der Gesellschaft (KSt, GewSt). Nicht die Steuerberatung, die ein einzelnes Objekt betrifft — die steht im Objekt.' },
+      h: 'Honorar für Buchführung, Lohnabrechnung und die Steuererklärungen der Gesellschaft (KSt, GewSt). Nicht die Steuerberatung, die ein einzelnes Objekt betrifft, die steht im Objekt.' },
     { f: 'abschluss', t: 'Jahresabschluss / Offenlegung',
       h: 'Erstellung des Jahresabschlusses, Offenlegung im Unternehmensregister (§ 325 HGB), Transparenzregister.' },
     { f: 'kammer', t: 'IHK-Beitrag, Handelsregister, Notar',
@@ -1060,9 +1060,9 @@
     { f: 'bank', t: 'Kontoführung der Gesellschaft',
       h: 'Gebühren des Geschäftskontos. Kontoführung, die zu einem Objektdarlehen gehört, steht beim Objekt.' },
     { f: 'gf', t: 'Geschäftsführergehalt',
-      h: 'Bruttogehalt einschließlich Arbeitgeberanteil. Bei 0 wird unentgeltlich geführt — dann bitte mit dem Steuerberater klären, ob das so gewollt ist.' },
+      h: 'Bruttogehalt einschließlich Arbeitgeberanteil. Bei 0 wird unentgeltlich geführt, dann bitte mit dem Steuerberater klären, ob das so gewollt ist.' },
     { f: 'sonst', t: 'Sonstige Gesellschaftskosten',
-      h: 'Versicherungen der Gesellschaft (D&O, Haftpflicht), Software, Porto, Beiträge — alles ohne Objektbezug.' }
+      h: 'Versicherungen der Gesellschaft (D&O, Haftpflicht), Software, Porto, Beiträge, alles ohne Objektbezug.' }
   ];
 
   var _kDraft = {};    /* Jahr -> { steuerber, kammer, bank, gf, sonst } */
@@ -1346,7 +1346,7 @@
         '<hr class="dvd" style="margin:18px 0 6px">'
       + '<h3 class="set-section-h">Identifikation <span style="font-weight:400;color:#7A7370;font-size:12px">· erscheint auf der Steuer-Mappe</span></h3>'
       + '<div style="' + _fGrid() + '">'
-      +   fldH('Steuernummer', inp('mand-f-stnr', ident.steuernummer, 'z.B. 123/456/78901'), 'Die Steuernummer dieses Halters — bei einer Gesellschaft ihre eigene, nicht die persönliche.')
+      +   fldH('Steuernummer', inp('mand-f-stnr', ident.steuernummer, 'z.B. 123/456/78901'), 'Die Steuernummer dieses Halters, bei einer Gesellschaft ihre eigene, nicht die persönliche.')
       +   fldH('Zuständiges Finanzamt', inp('mand-f-fa', ident.finanzamt, 'z.B. Finanzamt Minden'), 'Steht im Kopf der Anlage V und auf jedem Steuerbescheid.')
       + '</div>'
       + '<div style="' + _fGrid() + '">'
@@ -1391,7 +1391,7 @@
          der Rueckweg aus der Buchhaltung der Kanzlei (ADDISON/DATEV). */
       +   '<h3 class="set-section-h">Stammdaten der Gesellschaft</h3>'
       +   '<div style="' + _fGrid() + '">'
-      +     fldH('Stammkapital (€)', inp('mand-f-sk', bh.stammkapital || 0), 'Gezeichnetes Kapital laut Gesellschaftsvertrag — GmbH mind. 25.000 €, UG ab 1 €. Bei der UG rechnet DealPilot damit die gesetzliche Rücklage.')
+      +     fldH('Stammkapital (€)', inp('mand-f-sk', bh.stammkapital || 0), 'Gezeichnetes Kapital laut Gesellschaftsvertrag, GmbH mind. 25.000 €, UG ab 1 €. Bei der UG rechnet DealPilot damit die gesetzliche Rücklage.')
       +     '<input type="hidden" id="mand-f-wj" value="' + esc(bh.wj_start || '01-01') + '">'
       +     '<input type="hidden" id="mand-f-bank" value="' + esc(bh.eb_bank || 0) + '">'
       +     '<input type="hidden" id="mand-f-gesdar" value="' + esc(bh.eb_gesdar || 0) + '">'
@@ -1424,7 +1424,7 @@
          ═══════════════════════════════════════════════════════════════════ */
       +   '<hr class="dvd" style="margin:18px 0 6px">'
       +   '<h3 class="set-section-h">Kosten der Gesellschaft <span style="font-weight:400;color:#7A7370;font-size:12px">· je Jahr, ohne Objektbezug</span></h3>'
-      +   '<div class="mand-fhint" style="margin:2px 0 12px;font-size:12px;color:#7A7370;line-height:1.5">Aufwand, der <b>keinem einzelnen Objekt</b> zuzuordnen ist. Die Kosten der Objekte stehen im jeweiligen Objekt unter Steuer — hier steht nur, was die Gesellschaft als solche kostet. <b>Ohne diese Beträge ist der Jahresüberschuss zu hoch und die Bilanz geht nicht auf.</b></div>'
+      +   '<div class="mand-fhint" style="margin:2px 0 12px;font-size:12px;color:#7A7370;line-height:1.5">Aufwand, der <b>keinem einzelnen Objekt</b> zuzuordnen ist. Die Kosten der Objekte stehen im jeweiligen Objekt unter Steuer, hier steht nur, was die Gesellschaft als solche kostet. <b>Ohne diese Beträge ist der Jahresüberschuss zu hoch und die Bilanz geht nicht auf.</b></div>'
       +   '<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:14px 0 2px">'
       +     '<label style="font-size:12px;color:#7A7370;font-weight:600">Jahr</label>'
       +     '<select id="mand-f-kjahr" onchange="DealPilotMandanten.kostenJahr(this.value)" style="padding:7px 10px;border:1px solid #e6e0d3;border-radius:8px;font-family:inherit;font-size:13px">' + _kjOpts() + '</select>'
@@ -1437,7 +1437,7 @@
     var transHint =
         '<div id="mand-transparent-hint" style="display:' + (corp ? 'none' : 'block') + '">'
       +   '<div style="margin-top:16px;padding:13px 15px;background:#FAF9F4;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 25%, transparent);border-radius:10px;font-size:12.5px;color:#2A2727;line-height:1.5;margin-bottom:14px">'
-      +     '<b>Privatvermögen</b> wird über dein <b>zu versteuerndes Einkommen (zvE)</b> besteuert — gilt für alle privaten Objekte. Pflege die Zeiträume hier:'
+      +     '<b>Privatvermögen</b> wird über dein <b>zu versteuerndes Einkommen (zvE)</b> besteuert, gilt für alle privaten Objekte. Pflege die Zeiträume hier:'
       +   '</div>'
       +   '<div id="mand-tax-periods-host"></div>'
       + '</div>'
@@ -1453,7 +1453,7 @@
       +   '<div style="margin-top:16px;padding:13px 15px;background:#FAF9F4;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 25%, transparent);border-radius:10px;font-size:12.5px;color:#2A2727;line-height:1.55;margin-bottom:12px">'
       +     '<b>Warum diese Angabe nötig ist:</b> Eine GbR zahlt selbst keine Einkommensteuer. '
       +     'Ihr Ergebnis wird den Gesellschaftern zugerechnet und fließt in <b>deren</b> '
-      +     'Steuererklärung — bei dir also in <b>dasselbe zvE</b> wie deine privaten Objekte. '
+      +     'Steuererklärung, bei dir also in <b>dasselbe zvE</b> wie deine privaten Objekte. '
       +     'DealPilot rechnet die GbR-Objekte deshalb <b>zusammen mit dem Privatvermögen</b> '
       +     'in einer Progression, nicht getrennt daneben.'
       +   '</div>'
@@ -1461,12 +1461,12 @@
              '<input id="mand-f-quote" type="text" inputmode="decimal" class="tr" value="'
              + esc(m.quote != null ? String(m.quote).replace('.', ',') : '100') + '" placeholder="100">',
              'Dein <b>Anteil am Gewinn und Verlust</b> dieser Gesellschaft, nicht zwingend der '
-             + 'Kapitalanteil — maßgeblich ist der Gewinnverteilungsschlüssel aus dem '
+             + 'Kapitalanteil, maßgeblich ist der Gewinnverteilungsschlüssel aus dem '
              + 'Gesellschaftsvertrag. Nur dieser Anteil geht in deine Steuerrechnung ein: bei '
              + '50 % zählt ein Verlust von 20.000 € bei dir mit 10.000 €. '
              + 'Bist du alleiniger Gesellschafter, bleibt es bei 100 %. '
              + '<b>Was hier nicht abgebildet ist:</b> Sonderbetriebsausgaben und '
-             + 'Ergänzungsbilanzen — die kennt nur die einheitliche und gesonderte '
+             + 'Ergänzungsbilanzen, die kennt nur die einheitliche und gesonderte '
              + 'Feststellung deines Steuerberaters.')
       /* v3268 · die anderen Gesellschafter — fuer die Uebersicht
          „Gesonderte und einheitliche Feststellung (§ 180 AO)" */
@@ -1650,7 +1650,7 @@
      die Plan-Sperre (Investor). */
   function _expertePflicht(was) {
     if (gesellschaftenSichtbar()) return false;
-    if (typeof toast === 'function') toast(was + ' gibt es ab Detailgrad Experte — umstellen unter Einstellungen › Mein Profil.');
+    if (typeof toast === 'function') toast(was + ' gibt es ab Detailgrad Experte, umstellen unter Einstellungen › Mein Profil.');
     return true;
   }
   function openJahresabschluss(id) {
@@ -1694,7 +1694,7 @@
     if (btnSt) btnSt.onclick = function () {
       var jahr = jSel.value ? parseInt(jSel.value, 10) : 0;
       if (!jahr) { if (typeof toast === 'function') toast('Bitte ein Geschäftsjahr wählen.'); return; }
-      if (!window.DpDokWeiche || typeof DpDokWeiche.erzeugen !== 'function') { if (typeof toast === 'function') toast('✗ Dokument-Modul nicht geladen — Seite neu laden.'); return; }
+      if (!window.DpDokWeiche || typeof DpDokWeiche.erzeugen !== 'function') { if (typeof toast === 'function') toast('✗ Dokument-Modul nicht geladen, Seite neu laden.'); return; }
       var t2 = btnSt.textContent; btnSt.disabled = true; btnSt.textContent = 'erstelle …';
       Promise.resolve().then(function () { return DpDokWeiche.erzeugen('steuermappe', { jahr: jahr, halter: m.id, anlageV: false }, false); })
         .catch(function (e) { if (typeof toast === 'function') toast('✗ ' + ((e && e.message) || e)); })
@@ -1704,7 +1704,7 @@
       var jahr = jSel.value ? parseInt(jSel.value, 10) : 0;
       if (!jahr) { if (typeof toast === 'function') toast('Bitte ein Geschäftsjahr wählen.'); return; }
       if (typeof window.exportAbschlussPDF !== 'function') {
-        if (typeof toast === 'function') toast('✗ Abschluss-Modul nicht geladen — Seite neu laden.');
+        if (typeof toast === 'function') toast('✗ Abschluss-Modul nicht geladen, Seite neu laden.');
         return;
       }
       var txt = btn.textContent;
@@ -1852,7 +1852,7 @@
           + '<div id="mand-uew-liste" style="padding:10px 18px 8px;overflow:auto;display:grid;grid-template-columns:minmax(0,1fr);gap:8px;flex:1 1 auto"><div style="color:#6B6356;font-size:13px">Objekte laden …</div></div>'
           + '<div style="padding:10px 18px 14px;border-top:1px solid #E6E0D3;display:flex;gap:10px;align-items:center;flex-wrap:wrap"><span id="mand-uew-wahl" style="flex:1;font-size:12px;color:#6B6356">Mehrere Objekte anhaken, Stichtag je Objekt setzen, dann zur Gruppe hinzufügen.</span>'
           + '<button type="button" id="mand-uew-hinzu" class="btn btn-gold btn-sm" disabled>Zur Gruppe hinzufügen</button></div>'
-        : '<div style="padding:18px;font-size:13.5px;color:#3a352b;line-height:1.55">Es gibt noch keine Gesellschaft. Lege zuerst unter „Neuer Mandant" eine GmbH oder UG an – dann lassen sich Privatobjekte dorthin überführen.</div>')
+        : '<div style="padding:18px;font-size:13.5px;color:#3a352b;line-height:1.55">Es gibt noch keine Gesellschaft. Lege zuerst unter „Neuer Mandant" eine GmbH oder UG an, dann lassen sich Privatobjekte dorthin überführen.</div>')
       + '</div>';
     document.body.appendChild(ov);
     /* v3196 · Messkabine: bei 390 px standen die Zeilen 393 px breit im 358-px-Fenster - die implizite
@@ -1964,7 +1964,7 @@
       function wahlAnzeigen() {
         var n = Object.keys(gewaehlt).length;
         hinzuBtn.disabled = !n;
-        wahlEl.textContent = n ? n + ' Objekt' + (n === 1 ? '' : 'e') + ' gewählt — jedes wird mit seinem Stichtag einzeln übertragen, das erste startet danach.' : 'Mehrere Objekte anhaken, Stichtag je Objekt setzen, dann zur Gruppe hinzufügen.';
+        wahlEl.textContent = n ? n + ' Objekt' + (n === 1 ? '' : 'e') + ' gewählt, jedes wird mit seinem Stichtag einzeln übertragen, das erste startet danach.' : 'Mehrere Objekte anhaken, Stichtag je Objekt setzen, dann zur Gruppe hinzufügen.';
       }
       hinzuBtn.addEventListener('click', function () {
         var ein = Object.keys(gewaehlt).map(function (id) {

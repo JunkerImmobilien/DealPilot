@@ -241,10 +241,10 @@
 
       addMsg('assistant',
         'Marktpreis-Indikation (unabhängiger Bewertungspartner'
-        + (r.demo ? ', Demo-Modus — kostenlos' : '') + '):\n\n'
+        + (r.demo ? ', Demo-Modus, kostenlos' : '') + '):\n\n'
         + zeilen.join('\n')
         + '\n\nDas ist eine Indikation, kein Verkehrswert. Sie liegt jetzt in meinen '
-        + 'Daten — frag mich, was sie für deinen Kaufpreis, die Miete oder die '
+        + 'Daten, frag mich, was sie für deinen Kaufpreis, die Miete oder die '
         + 'Verhandlung bedeutet.');
 
       /* Damit das Modell sie auch wirklich kennt, wandert sie zusaetzlich
@@ -326,7 +326,7 @@
     if (!msg) return;
     if (cpRest() <= 0) {
       addMsg('assistant', 'Deine ' + CP_FREI + ' Co-Pilot-Fragen für diesen Monat sind aufgebraucht. '
-        + 'Ab dem Investor-Plan fragst du so oft du willst — am 1. des nächsten Monats sind '
+        + 'Ab dem Investor-Plan fragst du so oft du willst, am 1. des nächsten Monats sind '
         + 'wieder ' + CP_FREI + ' frei.');
       try { if (typeof openPricingModal === 'function') setTimeout(openPricingModal, 900); } catch (e) {}
       return;

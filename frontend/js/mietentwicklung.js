@@ -477,7 +477,7 @@ window.MietEntwicklung = (function() {
       var _st = nutzbar ? einheitenStand() : null;   /* v2410 */
       btnE.title = nutzbar
         ? ('Aus den Mietverträgen der einzelnen Wohnungen (' + _st.mit + ' mit Staffel, ' + _st.soll + ' mit Soll-Miete)')
-        : 'Noch keine vermietete Wohnung mit Ist-Miete — im MFH-Konfigurator je Wohnung eintragen.';
+        : 'Noch keine vermietete Wohnung mit Ist-Miete, im MFH-Konfigurator je Wohnung eintragen.';
     }
     if (blkP && blkD) {
       blkP.style.display = mode === 'prog' ? '' : 'none';
@@ -618,7 +618,7 @@ window.MietEntwicklung = (function() {
               + ' wird <b>keine</b> Steigerung angenommen' + (st.soll && (st.soll_ab || st.soll_termin) ? ', bis ihre Soll-Miete greift' : '') + '.'
             : '')
         + (st.soll && st.soll_ab ? (st.soll_roh >= 1900 ? ' Ab ' + st.soll_roh : ' Ab Jahr ' + st.soll_ab) + ' gilt je Wohnung die <b>Soll-Miete</b> (' + st.soll + ' Wohnungen).' : '')
-        + (st.soll && !st.soll_ab && st.soll_termin ? ' Je Wohnung gilt ab ihrem Termin die <b>Soll-Miete</b> (' + st.soll_termin + ' Wohnungen: ab dem Wirksamwerden – Verlangen frühestens ein Jahr nach der letzten Erhöhung, wirksam ab dem dritten Kalendermonat nach Zugang, § 558b Abs. 1 BGB – oder eigene Angabe).' : '')   /* v2481 */
+        + (st.soll && !st.soll_ab && st.soll_termin ? ' Je Wohnung gilt ab ihrem Termin die <b>Soll-Miete</b> (' + st.soll_termin + ' Wohnungen: ab dem Wirksamwerden, Verlangen frühestens ein Jahr nach der letzten Erhöhung, wirksam ab dem dritten Kalendermonat nach Zugang, § 558b Abs. 1 BGB, oder eigene Angabe).' : '')   /* v2481 */
         + (st.soll && !st.soll_ab && !st.soll_termin ? ' Soll-Mieten sind erfasst, aber ohne Jahr \u2014 sie gehen noch nicht ein (Konfigurator, Schritt 4).' : '')
         + '</div>';
       if (st.index > 0) {
@@ -732,7 +732,7 @@ window.MietEntwicklung = (function() {
         + '<small style="margin-left:8px;font-size:12px;font-weight:500;color:#B8625C">kein Potenzial nach § 558</small>';
     } else {
       richtung = 'gleich'; abstand = '0,0 %';
-      html = '<span>an der Soll-Miete — kein Potenzial</span>';
+      html = '<span>an der Soll-Miete, kein Potenzial</span>';
     }
     el.innerHTML = html;
     el.className = 'cf';

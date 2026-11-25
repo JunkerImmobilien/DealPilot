@@ -361,7 +361,7 @@
        ausgibt) und Prüfung gegen die 15-%-Grenze. Hier mitgerechnet, stünde sie doppelt im Steuer-Reiter. */
     if (ohneMea) teile.push('ohne Miteigentumsanteil nicht anteilig rechenbar');
     if (anteil != null && anteil !== 1 && erh > 0) teile.push('Anteil ' + String(Math.round(anteil * 10000) / 100).replace('.', ',') + ' %');
-    if (erh > 0) aus.push({ jahr: jahr, feld: 'erhaltungsaufwand', wort: 'Erhaltungsaufwand', betrag: Math.round(erh), hinweis: teile.join(', ') + ' · absetzbar im Jahr, in dem die Gemeinschaft das Geld für Erhaltung ausgibt; in den ersten drei Jahren nach Kauf zählt es zur 15-%-Grenze - mit dem Steuerberater abstimmen' });
+    if (erh > 0) aus.push({ jahr: jahr, feld: 'erhaltungsaufwand', wort: 'Erhaltungsaufwand', betrag: Math.round(erh), hinweis: teile.join(', ') + ' · absetzbar im Jahr, in dem die Gemeinschaft das Geld für Erhaltung ausgibt, in den ersten drei Jahren nach Kauf zählt es zur 15-%-Grenze - mit dem Steuerberater abstimmen' });
     return aus;
   }
   /* v3092 · N100 · die Sonderumlagen eines Wirtschaftsplans/einer Abrechnung (sonderumlagen) oder eines
@@ -521,7 +521,7 @@
       /* Ein gescanntes PDF gibt fast nichts her. Das gehoert benannt,
          sonst sucht der Nutzer den Fehler bei sich.                  */
       if (!text || text.replace(/\s/g, '').length < 120) {
-        _status('Aus diesem PDF kommt kaum Text — vermutlich ein Scan. '
+        _status('Aus diesem PDF kommt kaum Text, vermutlich ein Scan. '
               + 'Texterkennung ist für diesen Weg noch nicht eingebaut.', 'warn');
         return;
       }
@@ -546,7 +546,7 @@
   }
 
   function _zeigeAuswahl(antwort, file) {
-    _status('Die Art liess sich nicht sicher bestimmen — bitte auswählen.', 'warn');
+    _status('Die Art liess sich nicht sicher bestimmen, bitte auswählen.', 'warn');
     var res = document.getElementById('dpdi-result');
     if (!res) return;
     var liste = (antwort.auswahl || []).filter(function (a) { return a.extrahierbar; });
@@ -646,7 +646,7 @@
     if (!a.rechenbar && (a.fehlende_pflichtfelder || []).length) {
       html += '<div class="dpdi-warn"><strong>Fehlende Pflichtangaben:</strong> '
             + _esc(a.fehlende_pflichtfelder.join(', '))
-            + '. Ohne sie wird nicht gerechnet — eine Zahl aus Standardwerten '
+            + '. Ohne sie wird nicht gerechnet, eine Zahl aus Standardwerten '
             + 'saehe richtig aus und wäre es nicht.</div>';
     }
 
@@ -677,7 +677,7 @@
       var objekt = window._currentObjKey ? 'diesem Objekt' : 'dem offenen Formular';
       html += '<h3 class="dpdi-h3">Abgleich mit ' + objekt + '</h3>'
         + (nAbw ? '<div class="dpdi-warn"><strong>' + nAbw + (nAbw === 1 ? ' Angabe weicht' : ' Angaben weichen') + ' vom Objekt ab.</strong> '
-            + 'Sie sind nicht vorgehakt — hak sie an, wenn das Dokument recht hat.</div>' : '')
+            + 'Sie sind nicht vorgehakt, hak sie an, wenn das Dokument recht hat.</div>' : '')
         + '<table class="dpdi-table" id="dpdi-abgleich"><tr><th></th><th>Feld</th><th>im Dokument</th><th>im Objekt</th></tr>'
         + abg.map(function (z) {
             var farbe = (z.status === 'abweichung' || z.status === 'vivi_abweichung') ? ' style="background:rgba(217,164,65,.14)"' : '';
@@ -701,7 +701,7 @@
       html += '<h3 class="dpdi-h3">Ergebnis des fremden Gutachtens</h3>'
             + '<table class="dpdi-table dpdi-table-vgl">' + vergleich.join('') + '</table>'
             + '<p class="dpdi-hinweis">Diese Werte werden <strong>nicht übernommen</strong>. '
-            + 'DealPilot rechnet selbst — sie dienen dem Abgleich. Eine übernommene Zahl, '
+            + 'DealPilot rechnet selbst, sie dienen dem Abgleich. Eine übernommene Zahl, '
             + 'die niemand gegenprueft, ist eine Behauptung.</p>';
     }
 

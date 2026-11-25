@@ -111,7 +111,7 @@
   function hoch() {
     if (!uid || !window.Auth || typeof Auth.apiCall !== 'function') return;
     var w = Object.assign({}, daten, { nutzer: uid, stand: new Date().toISOString() });
-    try { Auth.apiCall('/user-settings/' + SCHLUESSEL, { method: 'PUT', body: { wert: w } }).catch(function () { toast('⚠ Vermögensstand nur in diesem Browser gespeichert – Server nicht erreichbar.'); }); } catch (e) {}
+    try { Auth.apiCall('/user-settings/' + SCHLUESSEL, { method: 'PUT', body: { wert: w } }).catch(function () { toast('⚠ Vermögensstand nur in diesem Browser gespeichert, Server nicht erreichbar.'); }); } catch (e) {}
   }
   function speichern() {
     lokalSchreiben();
@@ -268,7 +268,7 @@
   }
   function hinweisHtml() {
     var l = letzterStand();
-    if (!l) return '<div class="vm-hinweis"><span><b>Empfehlung:</b> Speichere jeden Monat einen Stand – am besten zum Monatsanfang. So entsteht dein Verlauf, und der Track Record zeigt der Bank die Entwicklung.</span></div>';
+    if (!l) return '<div class="vm-hinweis"><span><b>Empfehlung:</b> Speichere jeden Monat einen Stand, am besten zum Monatsanfang. So entsteht dein Verlauf, und der Track Record zeigt der Bank die Entwicklung.</span></div>';
     var t = tageSeit(l.datum);
     if (t != null && t > MONAT_TAGE) return '<div class="vm-hinweis"><span>Dein letzter Stand ist vom <b>' + datumDe(l.datum) + '</b> (' + t + ' Tage alt). Empfehlung: monatlich einen Stand speichern.</span><button type="button" class="btn btn-gold btn-sm" data-a="zum-stand">Stand jetzt speichern</button></div>';
     return '';
@@ -288,7 +288,7 @@
             var an = daten.immo.aus.indexOf(String(o.key)) < 0;
             var w = mw && o.marktwert > 0 ? o.marktwert : o.kaufpreis;
             return '<tr><td><input type="checkbox" data-a="immo-mit" data-key="' + esc(o.key) + '"' + (an ? ' checked' : '') + ' style="width:auto"></td>'
-              + '<td>' + esc(o.name) + (o.ort ? ' <span style="color:var(--muted)">· ' + esc(o.ort) + '</span>' : '') + (mw && !o.hatMarktwert ? ' <span style="color:var(--muted);font-size:11px">(kein Marktwert erfasst – Kaufpreis)</span>' : '') + '</td>'
+              + '<td>' + esc(o.name) + (o.ort ? ' <span style="color:var(--muted)">· ' + esc(o.ort) + '</span>' : '') + (mw && !o.hatMarktwert ? ' <span style="color:var(--muted);font-size:11px">(kein Marktwert erfasst, Kaufpreis)</span>' : '') + '</td>'
               + '<td class="r num">' + eur(w) + '</td><td class="r num">' + eur(o.rest) + '</td><td class="r num">' + eur(w - (o.rest || 0)) + '</td></tr>';
           }).join('')
           + '<tr class="vm-summe"><td></td><td>Summe Immobilien</td><td class="r num">' + eur(S.immo) + '</td><td class="r num">' + eur(S.immoSchuld) + '</td><td class="r num">' + eur(S.immo - S.immoSchuld) + '</td></tr>'
@@ -299,7 +299,7 @@
     /* v3226 · „PDF abrufen“ - einheitliches Dokument-Design (dp-dokumente.js Typ vermoegen) */
     s.innerHTML = '<div class="vm-kopf"><div class="vm-kopfzeile"><div><div class="vm-kicker">Ansicht · Vermögen</div><h2>Vermögen &amp; Haushalt</h2></div>'
       + '<button type="button" class="btn btn-outline btn-sm" data-a="pdf" title="Vermögensaufstellung, Haushaltsrechnung und Verlauf als PDF">PDF abrufen</button></div>'
-      + '<p>Deine Vermögensaufstellung und Haushaltsrechnung an einer Stelle – so, wie die Bank sie in der Selbstauskunft sehen will. Die Immobilien kommen automatisch aus deinen Objekten im Bestand, alles andere trägst du selbst ein. Mit „Stand speichern“ hältst du den Monat fest; daraus entsteht dein Verlauf.</p></div>'
+      + '<p>Deine Vermögensaufstellung und Haushaltsrechnung an einer Stelle, so, wie die Bank sie in der Selbstauskunft sehen will. Die Immobilien kommen automatisch aus deinen Objekten im Bestand, alles andere trägst du selbst ein. Mit „Stand speichern“ hältst du den Monat fest, daraus entsteht dein Verlauf.</p></div>'
       + hinweisHtml()
       + '<div data-s="kacheln">' + kacheln(S) + '</div>'
 
@@ -308,7 +308,7 @@
       + immoHtml
       + '<h3 style="margin:18px 0 8px;font-size:13px">Weitere Vermögenswerte</h3>'
       + '<div class="vm-scroll"><table class="vm-tab"><thead><tr><th>Kategorie</th><th>Bezeichnung</th><th class="r">Wert</th><th>Kommentar</th><th></th></tr></thead><tbody>'
-      + (V.length ? V.map(function (p) { return zeile('posten', p, KAT_V); }).join('') : '<tr><td colspan="5" class="vm-leer">Noch keine Posten – z. B. Girokonto, Tagesgeld, Depot, Altersvorsorge, Fahrzeug.</td></tr>')
+      + (V.length ? V.map(function (p) { return zeile('posten', p, KAT_V); }).join('') : '<tr><td colspan="5" class="vm-leer">Noch keine Posten, z. B. Girokonto, Tagesgeld, Depot, Altersvorsorge, Fahrzeug.</td></tr>')
       + '</tbody></table></div>'
       + '<button type="button" class="btn btn-outline btn-sm vm-add" data-a="neu-vermoegen">+ Vermögensposten</button>'
       + '<h3 style="margin:18px 0 8px;font-size:13px">Weitere Verbindlichkeiten <span style="font-weight:400;color:var(--muted)">(Immobiliendarlehen kommen aus den Objekten)</span></h3>'
@@ -515,7 +515,7 @@
       var t = standAlt(); if (!t) return;
       var s = ls(), k = 'dp_vermoegen_hinweis_tag:' + (uid || 'lokal'), h = heute();
       try { if (s && s.getItem(k) === h) return; if (s) s.setItem(k, h); } catch (e) {}
-      toast('Dein letzter Vermögensstand ist ' + t + ' Tage alt – Empfehlung: monatlich speichern (Ansichten › Vermögen & Haushalt).');
+      toast('Dein letzter Vermögensstand ist ' + t + ' Tage alt, Empfehlung: monatlich speichern (Ansichten › Vermögen & Haushalt).');
     });
   }
 
@@ -555,7 +555,7 @@
     }
     return '<div class="dp-vm-foto"' + (f ? ' style="background-image:url(\'' + f + '\')"' : '') + '>' + (f ? '' : 'kein Foto') + '</div>'
       + '<div><h3 class="ip-section" style="margin-top:0">Dein Profil für Track Record und Bank</h3>'
-      + '<p class="hint">Foto, Vermögensaufstellung und Haushaltsrechnung sind wichtig für deinen Track Record und die Bank – keine Pflicht. Das Foto steht auf dem Deckblatt des Track Records.</p>'
+      + '<p class="hint">Foto, Vermögensaufstellung und Haushaltsrechnung sind wichtig für deinen Track Record und die Bank, keine Pflicht. Das Foto steht auf dem Deckblatt des Track Records.</p>'
       + '<ul class="dp-vm-check">' + L.map(function (x) { return '<li><span class="' + (x.ok ? 'ok' : 'nein') + '">' + (x.ok ? '✓' : '○') + '</span>' + esc(x.t) + '</li>'; }).join('') + '</ul>'
       + '<div class="dp-vm-knoepfe"><label class="btn btn-outline btn-sm" style="cursor:pointer">Foto hochladen<input type="file" accept="image/*" data-vm="foto" style="display:none"></label>'
       + (f ? '<button type="button" class="btn btn-outline btn-sm" data-vm="foto-weg">Foto entfernen</button>' : '')

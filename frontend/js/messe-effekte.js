@@ -347,7 +347,7 @@
           '<div class="mfx-danach" style="animation-delay:3.2s;background:transparent"><div>' + marke() + '<div class="mfx-claim" style="margin-top:1.4cqw">' + esc(t.claim) + '</div></div></div></div>';
       },
       start: function (e) { zaehle(e.querySelector('[data-zaehl]'), 0, +e.querySelector('[data-zaehl]').getAttribute('data-zaehl'), 2200, 400); } },
-    boardingpass: { name: 'Boarding Pass', dauer: 5800, felder: { von: 'EXPOSÉ', vonK: 'PDF · SPRACHE · INSERAT', nach: 'URTEIL', nachK: 'SCORE · LAGE · PILOT', gate: 'Messe', zeit: '30 Sek.', sitz: 'Cockpit', stempel: 'CLEARED', claim: 'Bitte anschnallen — es geht los' },
+    boardingpass: { name: 'Boarding Pass', dauer: 5800, felder: { von: 'EXPOSÉ', vonK: 'PDF · SPRACHE · INSERAT', nach: 'URTEIL', nachK: 'SCORE · LAGE · PILOT', gate: 'Messe', zeit: '30 Sek.', sitz: 'Cockpit', stempel: 'CLEARED', claim: 'Bitte anschnallen, es geht los' },
       html: function (t) {
         return '<div class="mfx-voll i-pass" style="position:absolute;inset:0"><div class="pass"><div class="l"><div class="k">Boarding Pass · DealPilot</div>' +
           '<div class="route"><div class="ort"><b>' + esc(t.von) + '</b><i>' + esc(t.vonK) + '</i></div><div class="flug"></div><div class="ort" style="text-align:right"><b>' + esc(t.nach) + '</b><i>' + esc(t.nachK) + '</i></div></div>' +
@@ -411,7 +411,7 @@
       } },
     /* v2253 · Reihen-Intro „So funktioniert DealPilot": Marke, Modulnummer,
        Titel, eine Zeile worum es geht. Gleich für jedes Modul. */
-    reihe: { name: 'Reihe · Modul', dauer: 7000, felder: { reihe: 'So funktioniert DealPilot', modul: '02', titel: 'Vom Quick Boarding zum Objekt', unter: 'Zwei Wege ins Portfolio — und was dabei mitwandert.' },
+    reihe: { name: 'Reihe · Modul', dauer: 7000, felder: { reihe: 'So funktioniert DealPilot', modul: '02', titel: 'Vom Quick Boarding zum Objekt', unter: 'Zwei Wege ins Portfolio, und was dabei mitwandert.' },
       html: function (t) {
         return '<div class="mfx-voll r-grund" style="position:absolute;inset:0"><div class="r-kopf"><div class="mfx-claim mfx-a" style="animation-delay:.4s">' + esc(t.reihe) + '</div></div>' +
           '<div class="r-spur"></div><div class="r-fl">' + FLIEGER + '</div>' +
@@ -436,14 +436,14 @@
         var vg = e.querySelector('.vg'), w = e.querySelector('.wert');
         setTimeout(function () { vg.style.strokeDashoffset = 283 * (1 - (+t.bis || 0) / 100); vg.style.stroke = (+t.bis >= 70 ? '#3FA56C' : 'var(--wl-c9a84c,#C9A84C)'); zaehle(w, +t.von, +t.bis, 1600); }, 1300);
       } },
-    urteil: { name: 'Urteil zweispaltig', dauer: 7000, felder: { kick: 'Gegen deine Lage · C-Lage', titel: 'Nicht kaufen — 6,6 % statt deiner 7,0 %', nein: ['Zielrendite der C-Lage verfehlt', 'Ziel erst bei 131.314 €'], ja: ['Score 71 · Gut', 'Cashflow +111 € · DSCR 1,45'], ton: 'rot' },
+    urteil: { name: 'Urteil zweispaltig', dauer: 7000, felder: { kick: 'Gegen deine Lage · C-Lage', titel: 'Nicht kaufen, 6,6 % statt deiner 7,0 %', nein: ['Zielrendite der C-Lage verfehlt', 'Ziel erst bei 131.314 €'], ja: ['Score 71 · Gut', 'Cashflow +111 € · DSCR 1,45'], ton: 'rot' },
       html: function (t) {
         var farbe = t.ton === 'gruen' ? '#3FA56C' : '#D8564C';
         function sp(titel, liste, cls, d) { return '<div class="mfx-kachel" style="animation-delay:' + d + 's;padding:1cqw 1.2cqw"><i class="' + cls + '">' + esc(titel) + '</i>' + (liste || []).map(function (x) { return '<p style="font-size:1.2cqw;color:#FDFCFA;margin:.4cqw 0">' + esc(x) + '</p>'; }).join('') + '</div>'; }
         return ziel(t) + '<div class="mfx-karte" style="' + pos(t, { x: 30, y: 24, w: 42 }) + ';border-color:' + farbe + '"><div class="mfx-kick" style="color:' + farbe + '">' + esc(t.kick) + '</div><h2>' + esc(t.titel) + '</h2>' +
           '<div style="display:grid;grid-template-columns:1fr 1fr;gap:.9cqw">' + sp('Warum nicht', t.nein, 'ro', 1.4) + sp('Warum trotzdem gut', t.ja, 'gr', 2.2) + '</div></div>';
       } },
-    zahl: { name: 'Große Zahl', dauer: 5500, felder: { kick: 'Marktwert', bis: 251000, einheit: '€', unter: 'Spanne 199.000 € – 351.000 €', delta: '+44 % zum Kaufpreis' },
+    zahl: { name: 'Große Zahl', dauer: 5500, felder: { kick: 'Marktwert', bis: 251000, einheit: '€', unter: 'Spanne 199.000 €, 351.000 €', delta: '+44 % zum Kaufpreis' },
       html: function (t) {
         return ziel(t) + '<div class="mfx-karte" style="' + pos(t, { x: 60, y: 30, w: 32 }) + '"><div class="mfx-kick">' + esc(t.kick) + '</div>' +
           '<div style="font:700 5.4cqw/1.1 Space Grotesk;margin:.8cqw 0"><span data-zahl>0</span> <span style="font-size:3cqw;color:var(--wl-e8cc7a,#E8CC7A)">' + esc(t.einheit) + '</span></div>' +
@@ -470,7 +470,7 @@
       html: function (t) {
         return ziel(t) + '<div class="mfx-karte k-callout" style="' + pos(t, { x: 55, y: 18, w: 24 }) + '">' + esc(t.text) + '<span class="linie" style="left:-' + (+t.linie || 8) + 'cqw;top:50%;width:' + (+t.linie || 8) + 'cqw;transform-origin:100% 50%"></span></div>';
       } },
-    pilot: { name: 'Pilot sagt', dauer: 7500, felder: { kick: 'Die Pilot-Analyse', text: 'Ein guter Deal: Bruttomietrendite 8,7 % über deinem Ziel. Verhandeln lohnt trotzdem — der Zins liegt über dem Marktzins.' },
+    pilot: { name: 'Pilot sagt', dauer: 7500, felder: { kick: 'Die Pilot-Analyse', text: 'Ein guter Deal: Bruttomietrendite 8,7 % über deinem Ziel. Verhandeln lohnt trotzdem, der Zins liegt über dem Marktzins.' },
       html: function (t) {
         return ziel(t) + '<div class="mfx-karte" style="' + pos(t, { x: 52, y: 58, w: 42 }) + '"><div class="mfx-kick">' + esc(t.kick) + '</div><div class="k-pilot" style="margin-top:1cqw"><div class="kopf">✈</div><div class="tipp" data-text="' + esc(t.text) + '"></div></div></div>';
       },
@@ -478,7 +478,7 @@
         var el = e.querySelector('.tipp'), txt = el.getAttribute('data-text'), i = 0;
         setTimeout(function () { var iv = setInterval(function () { el.textContent = txt.slice(0, ++i); if (i >= txt.length) clearInterval(iv); }, 32); }, 900);
       } },
-    band: { name: 'Schritt-Band', dauer: 5000, felder: { nr: '03', kick: 'Schritt 3 von 6', titel: 'Marktbewertung — der Markt schätzt mit', schritte: 6, aktiv: 3 },
+    band: { name: 'Schritt-Band', dauer: 5000, felder: { nr: '03', kick: 'Schritt 3 von 6', titel: 'Marktbewertung, der Markt schätzt mit', schritte: 6, aktiv: 3 },
       html: function (t) {
         var s = ''; for (var i = 1; i <= (+t.schritte || 6); i++) s += '<i class="' + (i <= (+t.aktiv || 1) ? 'an' : '') + '"></i>';
         return ziel(t) + '<div class="mfx-karte k-band" style="top:' + ((t.pos && t.pos.y) != null ? t.pos.y : 82) + '%"><span class="nr">' + esc(t.nr) + '</span><div><div class="mfx-kick">' + esc(t.kick) + '</div><div style="font:700 2cqw Space Grotesk;margin-top:.3cqw">' + esc(t.titel) + '</div></div><div class="schritte">' + s + '</div></div>';
@@ -520,7 +520,7 @@
         return '<div class="mfx-voll i-pass" style="position:absolute;inset:0"><div class="pass" style="animation-duration:.9s"><div class="l"><div class="k">Boarding Pass · DealPilot</div><div class="mfx-gross" style="margin-top:2.4cqw;color:#1a1407">' + esc(t.titel) + '</div>' +
           '<div class="stempel" style="top:auto;bottom:2.4cqw;right:2cqw;animation-delay:1.4s">' + esc(t.stempel) + '</div></div><div class="r" style="align-items:center;justify-content:center"><div class="mfx-qr" data-qr="' + esc(t.url) + '" style="width:12cqw"></div></div></div></div>';
       } },
-    kennzahlen: { name: 'Kennzahlen-Wirbel', dauer: 5500, felder: { werte: ['Score 76', 'DSCR 1,73', '+357 €', '8,7 %', 'Gut', 'B-Lage'], claim: 'Alles, was zählt — in einem Urteil.', url: 'dealpilot.immo' },
+    kennzahlen: { name: 'Kennzahlen-Wirbel', dauer: 5500, felder: { werte: ['Score 76', 'DSCR 1,73', '+357 €', '8,7 %', 'Gut', 'B-Lage'], claim: 'Alles, was zählt, in einem Urteil.', url: 'dealpilot.immo' },
       html: function (t) {
         var w = (t.werte || []).map(function (x, i) { var a = i / (t.werte.length) * Math.PI * 2; return '<span class="mfx-pille" style="position:absolute;left:50%;top:50%;white-space:nowrap;color:var(--wl-e8cc7a,#E8CC7A);font-size:2cqw;padding:.6cqw 1.3cqw;transform:translate(-50%,-50%);animation:oWirbel 2s ' + (i * .12) + 's cubic-bezier(.6,0,.3,1) forwards;--x:' + (Math.cos(a) * 34) + 'cqw;--y:' + (Math.sin(a) * 16) + 'cqw">' + esc(x) + '</span>'; }).join('');
         return '<style>@keyframes oWirbel{0%{transform:translate(calc(-50% + var(--x)),calc(-50% + var(--y)));opacity:1}80%{opacity:1}100%{transform:translate(-50%,-50%) scale(.2);opacity:0}}</style>' +

@@ -26,7 +26,7 @@
    ══════════════════════════════════════════════════════════════════════ */
 (function () {
   if (!window.Auth || typeof window.Auth.apiCall !== 'function') {
-    console.warn('[qc-ai] Auth.apiCall fehlt — Vermittler nicht installiert');
+    console.warn('[qc-ai] Auth.apiCall fehlt, Vermittler nicht installiert');
     return;
   }
 

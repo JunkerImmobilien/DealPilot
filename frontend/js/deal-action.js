@@ -298,11 +298,11 @@ window.DealPilotDealAction = (function() {
         return [
           '<div class="da-rnd-banner-info" style="margin:14px 0;background:#fff8e8;border:1px solid var(--wl-c9a84c, #C9A84C);border-radius:8px;padding:14px 18px;">',
           '  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">',
-          '    <div style="font-family:Cormorant Garamond,serif;font-size:16px;font-weight:600;color:#2A2727;">RND-Analyse möglich — Baujahr fehlt</div>',
+          '    <div style="font-family:Cormorant Garamond,serif;font-size:16px;font-weight:600;color:#2A2727;">RND-Analyse möglich, Baujahr fehlt</div>',
           '    <button type="button" class="da-cta-mini" style="background:transparent;border:1px solid var(--wl-c9a84c, #C9A84C);color:var(--wl-c9a84c, #C9A84C);padding:5px 14px;border-radius:3px;font-size:12px;cursor:pointer;font-family:inherit" onclick="DealPilotDealAction.gotoObjektTab()">→ Objekt-Tab öffnen</button>',
           '  </div>',
           '  <div style="margin-top:6px;font-size:12px;color:#7A7370;line-height:1.5">',
-          '    Mit Baujahr kann DealPilot prüfen, ob ein Restnutzungsdauer-Gutachten den AfA-Hebel erhöht — bei Objekten >40 J. oft sehr lohnend.',
+          '    Mit Baujahr kann DealPilot prüfen, ob ein Restnutzungsdauer-Gutachten den AfA-Hebel erhöht, bei Objekten >40 J. oft sehr lohnend.',
           '  </div>',
           '</div>'
         ].join('');
@@ -473,7 +473,7 @@ window.DealPilotDealAction = (function() {
     var fehltSprung = '';
     if (!bodenrichtwert && !grundstueckGroesse) {
       datenStatus = '<div style="margin-top:10px;padding:10px 12px;background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 10%, transparent);border-radius:4px;font-size:12px;color:#7A7370;line-height:1.5">' +
-        '<strong style="color:#2A2727">Hinweis:</strong> Für eine präzise Argumentation gegenüber dem Finanzamt fehlen Bodenrichtwert und Grundstücks­fläche. Diese im Objekt-Tab unter "Erweiterte Angaben" pflegen — dann kann auch eine konkrete BMF-konforme Aufteilung vorgeschlagen werden.';
+        '<strong style="color:#2A2727">Hinweis:</strong> Für eine präzise Argumentation gegenüber dem Finanzamt fehlen Bodenrichtwert und Grundstücks­fläche. Diese im Objekt-Tab unter "Erweiterte Angaben" pflegen, dann kann auch eine konkrete BMF-konforme Aufteilung vorgeschlagen werden.';
       fehltSprung = '<button type="button" class="da-cta-mini" style="background:transparent;border:1px solid var(--wl-c9a84c, #C9A84C);color:var(--wl-c9a84c, #C9A84C);padding:4px 10px;margin-left:8px;border-radius:3px;font-size:11px;cursor:pointer" onclick="DealPilotDealAction.gotoObjektTab()">→ Objekt-Tab öffnen</button>';
       datenStatus = datenStatus.replace('</div>', fehltSprung + '</div>');
     }
@@ -485,7 +485,7 @@ window.DealPilotDealAction = (function() {
       '    <div style="font-family:Cormorant Garamond,serif;font-size:18px;font-weight:600;color:#2A2727;">Kaufpreis-Aufteilung Grund/Boden vs. Gebäude</div>',
       '  </div>',
       '  <div style="margin-top:6px;font-size:13px;color:#7A7370;line-height:1.5">',
-      '    Aktuell ' + gebAntPct + ' % Gebäudeanteil. Mit Bodenrichtwert-Argumentation oder Sachverständigen-Gutachten lässt sich i.d.R. <strong>85 %</strong> ansetzen — höherer Anteil = mehr AfA-Basis = weniger Steuer über die ganze Halte­dauer.',
+      '    Aktuell ' + gebAntPct + ' % Gebäudeanteil. Mit Bodenrichtwert-Argumentation oder Sachverständigen-Gutachten lässt sich i.d.R. <strong>85 %</strong> ansetzen, höherer Anteil = mehr AfA-Basis = weniger Steuer über die ganze Halte­dauer.',
       '  </div>',
       '  <div style="margin-top:12px;display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;">',
       '    <div><div style="font-size:10px;font-weight:700;color:var(--wl-c9a84c, #C9A84C);letter-spacing:0.6px">DIFFERENZ AfA-BASIS</div><div style="font-family:Cormorant Garamond,serif;font-size:24px;font-weight:600;color:#2A2727;">' + fmtEur(diffBasis) + '</div></div>',
@@ -495,7 +495,7 @@ window.DealPilotDealAction = (function() {
       '  </div>',
       '  <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;align-items:center">',
       '    <button type="button" class="da-cta" style="background:#2A2727;color:#fff;border:none;padding:10px 18px;border-radius:4px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit" onclick="DealPilotDealAction.openExpertWithGutachten()">Gutachten zur Aufteilung anfragen</button>',
-      '    <span style="font-size:12px;color:#7A7370">Verkehrswert-Gutachten mit getrennter Ausweisung Grund/Boden vs. Gebäude — argumentations-fest gegenüber Finanzamt.</span>',
+      '    <span style="font-size:12px;color:#7A7370">Verkehrswert-Gutachten mit getrennter Ausweisung Grund/Boden vs. Gebäude, argumentations-fest gegenüber Finanzamt.</span>',
       '  </div>',
       datenStatus,
       '  <div style="margin-top:10px;font-size:11px;color:#7A7370;line-height:1.5">',
@@ -512,7 +512,7 @@ window.DealPilotDealAction = (function() {
       '<div class="da-bank-card">',
       '  <div class="da-bank-head">',
       '    <div class="da-bank-title">Bankgespräch vorbereiten</div>',
-      '    <div class="da-bank-sub">Alle Unterlagen griffbereit haben — das spart Termine und stärkt deine Verhandlungsposition.</div>',
+      '    <div class="da-bank-sub">Alle Unterlagen griffbereit haben, das spart Termine und stärkt deine Verhandlungsposition.</div>',
       '  </div>',
       '  <div class="da-bank-cols">',
       '    <div class="da-bank-col">',
@@ -539,7 +539,7 @@ window.DealPilotDealAction = (function() {
       '  <div class="da-bank-pdf-row">',
       '    <div class="da-bank-pdf-text">',
       '      <div class="da-bank-pdf-title">DealPilot Investment-PDF</div>',
-      '      <div class="da-bank-pdf-desc">Kaufpreis, Finanzierungsstruktur, Cashflow, Rendite, Risiken — bank-fertig aufbereitet.</div>',
+      '      <div class="da-bank-pdf-desc">Kaufpreis, Finanzierungsstruktur, Cashflow, Rendite, Risiken, bank-fertig aufbereitet.</div>',
       '    </div>',
       '    <button type="button" class="da-bank-pdf-btn" onclick="if(typeof exportPDF===\'function\')exportPDF()">',
       '      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px;vertical-align:-3px"><path d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/></svg>',
@@ -645,7 +645,7 @@ window.DealPilotDealAction = (function() {
     var emailEl = document.getElementById('dp-banner-email');
     
     if (titleEl) titleEl.textContent = (b.company || 'DealPilot') + ' · Dein Partner für die nächsten Schritte';
-    if (subEl) subEl.textContent = 'Bankanfragen, Gutachten, Restnutzungsdauer, Sanierungskonzept — alles aus einer Hand.';
+    if (subEl) subEl.textContent = 'Bankanfragen, Gutachten, Restnutzungsdauer, Sanierungskonzept, alles aus einer Hand.';
     if (phoneEl && b.phone) {
       phoneEl.textContent = '📞 ' + b.phone;
       phoneEl.setAttribute('href', 'tel:' + b.phone.replace(/[^+0-9]/g, ''));
@@ -1451,11 +1451,11 @@ window.DealPilotDealAction = (function() {
         renderObjectPreview(data),
         '<div class="da-cmt"><label>Welche Leistung benötigst du?</label>',
         '  <div class="da-opt-grid">',
-        optRadio('expert-type', 'verkehrswert', ico('house', 16) + ' Verkehrswertgutachten', 'Marktwert nach §194 BauGB — gerichtsfest, für Bank/Erbschaft/Verkauf', opts.typ !== 'kaufpreisaufteilung'),
-        optRadio('expert-type', 'kaufpreisaufteilung', ico('fileText', 16) + ' Kaufpreisaufteilung', 'Gutachten zur Aufteilung Grund und Boden / Gebäude fürs Finanzamt — die Berechnung aus dem BMF-Rechner geht als PDF mit', opts.typ === 'kaufpreisaufteilung'),
-        optRadio('expert-type', 'rnd',          ico('refresh', 16) + ' Restnutzungsdauer-Gutachten', 'Wizard mit Einschätzung ob es sich lohnt — danach optional anfragen'),
+        optRadio('expert-type', 'verkehrswert', ico('house', 16) + ' Verkehrswertgutachten', 'Marktwert nach §194 BauGB, gerichtsfest, für Bank/Erbschaft/Verkauf', opts.typ !== 'kaufpreisaufteilung'),
+        optRadio('expert-type', 'kaufpreisaufteilung', ico('fileText', 16) + ' Kaufpreisaufteilung', 'Gutachten zur Aufteilung Grund und Boden / Gebäude fürs Finanzamt, die Berechnung aus dem BMF-Rechner geht als PDF mit', opts.typ === 'kaufpreisaufteilung'),
+        optRadio('expert-type', 'rnd',          ico('refresh', 16) + ' Restnutzungsdauer-Gutachten', 'Wizard mit Einschätzung ob es sich lohnt, danach optional anfragen'),
         optRadio('expert-type', 'sanierung',    ico('shield', 16) + ' Sanierungskonzept', 'Konkrete Maßnahmen + Kostenplanung für Bestandsobjekt'),
-        optRadio('expert-type', 'projektentw',  ico('building', 16) + ' Projektentwicklung', 'Mehrfamilienhaus / Aufstockung / Umbau — Begleitung A bis Z'),
+        optRadio('expert-type', 'projektentw',  ico('building', 16) + ' Projektentwicklung', 'Mehrfamilienhaus / Aufstockung / Umbau, Begleitung A bis Z'),
         optRadio('expert-type', 'sonstiges',    ico('fileText', 16) + ' Etwas anderes', 'Beschreibe unten frei, was du brauchst'),
         '  </div>',
         '</div>',
@@ -1621,14 +1621,14 @@ window.DealPilotDealAction = (function() {
         '  <div class="da-consult-card">',
         '    <div class="da-consult-icon">' + ico('lightbulb', 24) + '</div>',
         '    <div class="da-consult-title">Schnell-Check</div>',
-        '    <div class="da-consult-desc">Beschreibe dein Anliegen, lade Fotos hoch — Antwort per E-Mail innerhalb 1–2 Werktagen.</div>',
+        '    <div class="da-consult-desc">Beschreibe dein Anliegen, lade Fotos hoch, Antwort per E-Mail innerhalb 1–2 Werktagen.</div>',
         '    <div class="da-consult-price">' + (c.consult.priceQuick === 0 ? 'Kostenlos bei Pro/Business' : fmtEur(c.consult.priceQuick)) + '</div>',
         '    <button class="btn btn-primary" onclick="DealPilotDealAction.openConsultQuick()">' + ico('mail', 14) + ' Anfrage stellen</button>',
         '  </div>',
         '  <div class="da-consult-card">',
         '    <div class="da-consult-icon">' + ico('calendar', 24) + '</div>',
         '    <div class="da-consult-title">Persönliches Gespräch</div>',
-        '    <div class="da-consult-desc">Video oder Telefon — direkt im Kalender einen freien Slot wählen.</div>',
+        '    <div class="da-consult-desc">Video oder Telefon, direkt im Kalender einen freien Slot wählen.</div>',
         '    <div class="da-consult-price">' + esc(calPrice) + '</div>',
         '    <div class="da-consult-options">',
               bookingHtml,
@@ -1656,7 +1656,7 @@ window.DealPilotDealAction = (function() {
         '<div class="da-cmt"><label>Was beschäftigt dich? *</label>',
         '  <textarea id="da-consult-msg" rows="5" placeholder="z.B. Unsicher wegen Lage / Sanierungsbedarf / Mietspiegel / Finanzierungsstruktur..."></textarea>',
         '</div>',
-        '<div class="da-cmt"><label>Fotos (Innen/Außen, Risse, Schäden — alles was hilft)</label>',
+        '<div class="da-cmt"><label>Fotos (Innen/Außen, Risse, Schäden, alles was hilft)</label>',
         '  <input type="file" id="da-consult-photos" multiple accept="image/*" style="display:none" onchange="DealPilotDealAction._onPhotos(this,\'consult\')">',
         '  <button class="btn btn-outline" type="button" onclick="document.getElementById(\'da-consult-photos\').click()">' + ico('image', 14) + ' Fotos auswählen</button>',
         '  <span id="da-consult-photos-cnt" style="margin-left:10px;color:var(--muted);font-size:12px"></span>',
@@ -1774,7 +1774,7 @@ window.DealPilotDealAction = (function() {
     if (typeof window.DealPilotRND_Wizard === 'undefined' ||
         typeof window.DealPilotRND_Wizard.open !== 'function') {
       // Fallback wenn Wizard noch nicht geladen
-      console.warn('[deal-action] RND-Wizard nicht verfügbar — falle zurück auf Expert-Maske');
+      console.warn('[deal-action] RND-Wizard nicht verfügbar, falle zurück auf Expert-Maske');
       return openExpertFallbackRnd();
     }
     // Aktuelles Objekt als Prefill
@@ -2138,11 +2138,11 @@ window.DealPilotDealAction = (function() {
     } else if (result.final_rnd && result.final_rnd <= 30) {
       lohntStufe = 'wahrscheinlich lohnenswert';
       lohntFarbe = '#3FA56C';
-      lohntText = 'RND ' + result.final_rnd + ' Jahre — i.d.R. attraktiver AfA-Hebel.';
+      lohntText = 'RND ' + result.final_rnd + ' Jahre, i.d.R. attraktiver AfA-Hebel.';
     } else {
       lohntStufe = 'eher nicht lohnenswert';
       lohntFarbe = 'var(--wl-c9a84c, #C9A84C)';
-      lohntText = 'RND ' + (result.final_rnd || '?') + ' Jahre — kaum Steuerhebel.';
+      lohntText = 'RND ' + (result.final_rnd || '?') + ' Jahre, kaum Steuerhebel.';
     }
 
     var fmtE = function(v) {
@@ -2342,7 +2342,7 @@ window.DealPilotDealAction = (function() {
     } else {
       // Fallback wenn das UI-Modul noch nicht geladen ist
       try { localStorage.setItem('dp_ps_unlocked', 'true'); } catch(e) {}
-      alert('Portfolio-Strategiemodul wird geladen — bitte Seite neu laden.');
+      alert('Portfolio-Strategiemodul wird geladen, bitte Seite neu laden.');
     }
   }
 
@@ -2376,7 +2376,7 @@ window.DealPilotDealAction = (function() {
         setTimeout(function() {
           var msgField = document.querySelector('#da-expert-msg, textarea[id*="msg"]');
           if (msgField && !msgField.value) {
-            msgField.value = 'Ich benötige ein Verkehrswert-Gutachten mit getrennter Ausweisung Grund und Boden vs. Gebäude — zur Optimierung der AfA-Bemessungsgrundlage gegenüber dem Finanzamt (§6 Abs. 1 Nr. 1 EStG, BFH IX R 26/19).';
+            msgField.value = 'Ich benötige ein Verkehrswert-Gutachten mit getrennter Ausweisung Grund und Boden vs. Gebäude, zur Optimierung der AfA-Bemessungsgrundlage gegenüber dem Finanzamt (§6 Abs. 1 Nr. 1 EStG, BFH IX R 26/19).';
           }
         }, 100);
       }, 200);

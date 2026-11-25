@@ -118,7 +118,7 @@ window.dpNkAusEinstellungen = function () {
     Object.keys(vorher).forEach(function (id) { var e = el(id); if (!e) return; e.value = vorher[id];
       try { e.dispatchEvent(new Event('input', { bubbles: true })); } catch (x) {} });
     try { if (typeof calc === 'function') calc(); } catch (x) {}
-    info.textContent = 'Zurückgenommen — die vorherigen Werte gelten wieder.';
+    info.textContent = 'Zurückgenommen, die vorherigen Werte gelten wieder.';
   };
 };
 
@@ -289,7 +289,7 @@ function loadExample() {
   sv('mea',       5);
   sv('gsfl',      500);
   sv('brw',       200);
-  sv('thesis',    'ETW unter Marktwert – sofortiger Wertpuffer 50.000 €. Positiver Cashflow nach Steuern. Buy & Hold.');
+  sv('thesis',    'ETW unter Marktwert, sofortiger Wertpuffer 50.000 €. Positiver Cashflow nach Steuern. Buy & Hold.');
 }
 
 /**
@@ -326,7 +326,7 @@ function loadExamplePlaceholders() {
     mea:         '5',
     gsfl:        '500',
     brw:         '200',
-    thesis:      'z.B. ETW unter Marktwert – Buy & Hold-Strategie'
+    thesis:      'z.B. ETW unter Marktwert, Buy & Hold-Strategie'
   };
   Object.keys(examples).forEach(function(id) {
     var e = document.getElementById(id);
