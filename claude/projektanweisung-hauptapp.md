@@ -45679,3 +45679,10 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** staging 91ff4713 · main 4fb12468. Nur Prüfer, keine App-Änderung, kein Rollout nötig.
 - **Nachweis:** 177/177, Gegenprobe rot; gold-audit Staging sauber.
 - **Rest:** Partnerfarbe nicht im Browser nachgemessen.
+
+### Rollout 1.0.219 · v4860 Dokumentenablage (Fork UU4)
+
+- **Was:** „Meine Dokumente“ je Objekt und Jahr, Häkchen „Original aufbewahren“, Kontingente Free 0 / Starter 500 MB / Investor 1 GB / Pro 3 GB / Business 25 GB / Partner 5 GB, Datei 20 MB, Löschfrist 90 Tage (Takt `ablageFristen`, trocken bis `ABLAGE_FRIST_TAKT=1`), Plattenwarnung 70 %.
+- **Commit:** staging 1db6474b, Merge 859c5819 · main 8650db53, Version fb02e70e. Migration 131 auf Prod angewandt.
+- **Nachweis:** dokumentenablage-pruefen 23/23, Live-Probe Staging 8/8, Browser (Karte, Jahr löschen, Klick daneben), buster-ebenen/vorschau/takt-sperre/prompt-lecks sauber, Prod-Sicherung haupt-/mb-20261125-1055-v4860 (7,0/31 MB, Kopf gelesen), Prod health, `dateiablage.js?v=v4860m` ausgeliefert.
+- **Rest:** neues Nachtsicherungs-Skript nicht auf Prod installiert (Rechteprüfung), Takt/Mails nicht scharf, Staging-Platte 85 %, `/root/ns-test` auf Staging.
