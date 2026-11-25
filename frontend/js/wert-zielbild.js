@@ -670,8 +670,8 @@
     var mw = W.marktpreisindikation.mitte;
     /* vier Spalten (nicht fünf): tabellen-karten.js baut ab fünf Spalten auf dem Handy Karten -
        hier stünden dann leere „untere/obere" untereinander. Die Spanne steht in einer Spalte. */
-    var sp = function (v) { return v.unten != null && v.oben != null ? esc(eur(v.unten)) + ' – ' + esc(eur(v.oben)) : ''; };
-    var t = '<div class="dp-wz-scroll"><table class="dp-wz-t dp-wz-verf"><thead><tr><th>Verfahren</th><th>Mitte / Wert</th><th class="dp-wz-spc">untere – obere</th><th>zur Markt&shy;preis&shy;indikation</th></tr></thead><tbody>';
+    var sp = function (v) { return v.unten != null && v.oben != null ? esc(eur(v.unten)) + ' bis ' + esc(eur(v.oben)) : ''; };
+    var t = '<div class="dp-wz-scroll"><table class="dp-wz-t dp-wz-verf"><thead><tr><th>Verfahren</th><th>Mitte / Wert</th><th class="dp-wz-spc">untere bis obere</th><th>zur Markt&shy;preis&shy;indikation</th></tr></thead><tbody>';
     W.verfahren.forEach(function (v) {
       var d = v.abw_zur_mpi_pct;
       t += '<tr class="' + (v.fuehrend ? 'fu' : '') + (v.schluessel === 'kaufpreis' ? ' kp' : '') + '" data-dp-wz-verf="' + v.schluessel + '"><td>' + esc(v.name)

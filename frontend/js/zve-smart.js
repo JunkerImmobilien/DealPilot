@@ -64,7 +64,7 @@
     banner.innerHTML = 
       '<div style="margin-bottom:8px"><strong>Existierender Steuerzeitraum gefunden</strong></div>' +
       '<div style="margin-bottom:8px;color:var(--muted,#7A7370)">' +
-        period.valid_from + ' – ' + (period.valid_to || 'laufend') + ': <strong style="color:var(--gold,#C9A84C)">' + fmtEUR(period.zve) + '</strong>' +
+        period.valid_from + ' bis ' + (period.valid_to || 'laufend') + ': <strong style="color:var(--gold,#C9A84C)">' + fmtEUR(period.zve) + '</strong>' +
       '</div>' +
       '<div style="display:flex;gap:6px">' +
         '<button onclick="DealPilotZveSmart.applySuggestion(' + period.zve + ')" style="padding:6px 12px;background:var(--gold,#C9A84C);color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer">Übernehmen</button>' +
@@ -176,7 +176,7 @@
     } else {
       // Conflict
       html += '<div style="font-size:17px;font-weight:600;color:var(--ch,#2A2727);margin-bottom:6px">zvE weicht ab</div>';
-      html += '<div style="font-size:13px;color:var(--muted,#7A7370);margin-bottom:16px">Für den Zeitraum <strong>' + opts.existingPeriod.valid_from + ' – ' + (opts.existingPeriod.valid_to || 'laufend') + '</strong> ist aktuell ein zvE von <strong>' + fmtEUR(opts.existingPeriod.zve) + '</strong> hinterlegt. Du hast <strong>' + fmtEUR(opts.newZve) + '</strong> eingetragen.</div>';
+      html += '<div style="font-size:13px;color:var(--muted,#7A7370);margin-bottom:16px">Für den Zeitraum <strong>' + opts.existingPeriod.valid_from + ' bis ' + (opts.existingPeriod.valid_to || 'laufend') + '</strong> ist aktuell ein zvE von <strong>' + fmtEUR(opts.existingPeriod.zve) + '</strong> hinterlegt. Du hast <strong>' + fmtEUR(opts.newZve) + '</strong> eingetragen.</div>';
       
       html += '<div style="display:flex;flex-direction:column;gap:8px">';
       html += '<button onclick="DealPilotZveSmart.optUpdate(\'' + opts.existingPeriod.id + '\',' + opts.newZve + ')" style="padding:11px 16px;background:var(--gold,#C9A84C);color:#fff;border:none;border-radius:8px;font-family:inherit;font-size:13.5px;font-weight:600;cursor:pointer">Bestehenden Steuerzeitraum aktualisieren</button>';

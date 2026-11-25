@@ -52,7 +52,7 @@
     
     const diff = newZve - period.zve;
     const sign = diff > 0 ? '+' : '';
-    const msg = 'Für den Zeitraum ' + period.valid_from + ' – ' + (period.valid_to || 'laufend') + ' ist aktuell zvE = ' + period.zve.toLocaleString('de-DE') + ' € hinterlegt.\n\n' +
+    const msg = 'Für den Zeitraum ' + period.valid_from + ' bis ' + (period.valid_to || 'laufend') + ' ist aktuell zvE = ' + period.zve.toLocaleString('de-DE') + ' € hinterlegt.\n\n' +
                 'Du hast ' + newZve.toLocaleString('de-DE') + ' € eingetragen (Δ ' + sign + diff.toLocaleString('de-DE') + ' €).\n\n' +
                 'Möchtest du den Steuerzeitraum aktualisieren?';
     if (confirm(msg)) {

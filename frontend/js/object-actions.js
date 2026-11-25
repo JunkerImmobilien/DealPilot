@@ -1199,7 +1199,7 @@
   function spanLabel() { return _span === 'low' ? 'Unten' : _span === 'high' ? 'Oben' : 'Durchschnitt'; }
   function spanRow(lo, mid, hi) {
     function piece(v, sel) { return sel ? '<b>' + fmt0(v) + ' €</b>' : fmt0(v) + ' €'; }
-    return 'Spanne ' + piece(lo, _span === 'low') + ' – ' + piece(mid, _span === 'mid') + ' – ' + piece(hi, _span === 'high');
+    return 'Spanne ' + piece(lo, _span === 'low') + ' · ' + piece(mid, _span === 'mid') + ' · ' + piece(hi, _span === 'high');
   }
   /* v742-avm-history-ui: Bewertungshistorie unter den Karten */
   function _v742FmtEur(n) { if (n == null) return '\u2013'; try { return Number(n).toLocaleString('de-DE') + ' \u20ac'; } catch (e) { return n + ' \u20ac'; } }
