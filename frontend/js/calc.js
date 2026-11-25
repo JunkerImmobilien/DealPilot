@@ -1324,18 +1324,20 @@ function _calcImmediate(){
        indikation   Marktpreisindikation (Angebote)        kein Wertpuffer, keine LTV-Basis
        eigene       Marktwert (eigene Schaetzung)          keine LTV-Basis
      Ohne Auswahl: der Vermerk der Uebernahme (dealpilot-mb.js), sonst „eigene". */
+  var _svwHerkExpl = false;   /* v4900 · Marcel 25.11.2026: eine Wertangabe ohne Herkunft ist nie maßgebend, sie steht nur daneben */
   var _svwHerk = (function () {
     if (!(svw > 0)) return null;
-    var s = el('svw_herkunft'); if (s && s.value) return s.value;
-    try { var h = window._dpSvHerkunftMb ? window._dpSvHerkunftMb() : null; if (h) return h.amtlich ? 'marktbericht' : 'indikation'; } catch (e) {}
+    var s = el('svw_herkunft'); if (s && s.value) { _svwHerkExpl = true; return s.value; }
+    try { var h = window._dpSvHerkunftMb ? window._dpSvHerkunftMb() : null; if (h) { _svwHerkExpl = true; return h.amtlich ? 'marktbericht' : 'indikation'; } } catch (e) {}
     return 'eigene';
   })();
   var _SVW_LABEL = { gutachten: 'Verkehrswert (§ 194 BauGB, Gutachten)', bank: 'Marktwert laut Bankbewertung',
     marktbericht: 'Wert aus dem DealPilot-Marktbericht (indikativ)', indikation: 'Marktpreisindikation aus Angebotspreisen', eigene: 'Marktwert (eigene Schätzung)' };
   State.svw_herkunft = _svwHerk;
+  State.svw_ohne_herkunft = svw > 0 && !_svwHerkExpl;
   State.svw_label = _svwHerk ? _SVW_LABEL[_svwHerk] || _SVW_LABEL.eigene : null;
   var _svwBelastbar = _svwHerk === 'gutachten' || _svwHerk === 'bank';
-  var wp=(svw>0 && _svwHerk !== 'indikation')?svw-kp:0;
+  var wp=(svw>0 && _svwHerk !== 'indikation' && _svwHerkExpl)?svw-kp:0;   /* v4900 */
   var wpBox=el('wert-puffer');if(wpBox)wpBox.style.display=wp>0?'flex':'none';
   st('wert-puffer-val',wp>0?fE(wp,0,true):'');
   // V63.65: Startwert für Wertsteigerung — Reihenfolge:
@@ -1381,7 +1383,8 @@ function _calcImmediate(){
       /* Stufe M: führt der Vergleichswert ohne amtliche Basis, IST er die Marktpreisindikation nach Abschlag */
       else if (_wzW.fuehrend === 'vergleichswert' && !_wzW.vergleichswert && _mpiM > 0) _mbAnker = { wert: Math.max(0, _mpiM - _erbAbzug), art: 'vergleichswert_m', datum: _wzW.wert_stichtag || _wzW.bericht_datum, erstellt: _wzW.bericht_datum, stichtag_eigen: !!_wzW.wert_stichtag };
     }
-    if (_wzW && !_mbAnker && _ankWahl !== 'mpi_ohne' && _mpiM > 0 && (_ankWahl === 'mpi_mit' || _wzW.ohne_abschlag)) _mbAnker = { wert: Math.max(0, _mpiM - _erbAbzug), art: 'mpi_mit', datum: _wzW.wert_stichtag || _wzW.bericht_datum, erstellt: _wzW.bericht_datum, stichtag_eigen: !!_wzW.wert_stichtag };
+    /* v4900 · ohne gerechnetes Verfahren gilt die Marktpreisindikation aus Angeboten (gekennzeichnet, kein Verkehrswert), auch wenn der Bericht keinen Abschlag ausweist */
+    if (_wzW && !_mbAnker && _ankWahl !== 'mpi_ohne' && _mpiM > 0) _mbAnker = { wert: Math.max(0, _mpiM - _erbAbzug), art: _wzW.ohne_abschlag || _ankWahl === 'mpi_mit' ? 'mpi_mit' : 'mpi_ohne', datum: _wzW.wert_stichtag || _wzW.bericht_datum, erstellt: _wzW.bericht_datum, stichtag_eigen: !!_wzW.wert_stichtag };
     if (_wzW && !_mbAnker && _ankWahl === 'mpi_ohne' && (_mpiO > 0 || _mpiM > 0)) _mbAnker = { wert: Math.max(0, (_mpiO > 0 ? _mpiO : _mpiM) - _erbAbzug), art: _mpiO > 0 ? 'mpi_ohne' : 'mpi_mit', datum: _wzW.wert_stichtag || _wzW.bericht_datum, erstellt: _wzW.bericht_datum, stichtag_eigen: !!_wzW.wert_stichtag };
   } catch (_e) { _mbAnker = null; }
   State.wert_anker_wahl = _ankWahl || 'massgebend';
@@ -1391,7 +1394,7 @@ function _calcImmediate(){
     wert_basis = svw; _wbQuelle = 'verkehrswert';
   } else if (_mbAnker && _mbAnker.wert > 0) {
     wert_basis = _mbAnker.wert; _wbQuelle = 'marktbericht';
-  } else if (svw > 0 && _svwHerk !== 'indikation') {
+  } else if (svw > 0 && _svwHerkExpl && _svwHerk !== 'indikation') {
     wert_basis = svw; _wbQuelle = 'verkehrswert';
   } else if (_bankval > kp) {
     wert_basis = _bankval; _wbQuelle = 'bankbewertung';
@@ -1407,8 +1410,21 @@ function _calcImmediate(){
     jahr: (function () { var d = _mbAnker.datum ? new Date(_mbAnker.datum) : null; return d && !isNaN(d) ? d.getFullYear() : null; })(),
     monat: (function () { var d = _mbAnker.datum ? new Date(_mbAnker.datum) : null; return d && !isNaN(d) ? d.getMonth() + 1 : null; })() } : null;
   State.wert_basis_text = _wbQuelle === 'verkehrswert' ? (State.svw_label || 'Wertangabe') + ' (Reiter Objekt)'
-    : _wbQuelle === 'marktbericht' ? ({ ertragswert: 'Ertragswert', sachwert: 'Sachwert', vergleichswert: 'Vergleichswert', vergleichswert_m: 'Vergleichswert', mpi_mit: 'Marktpreisindikation nach Abschlag', mpi_ohne: 'Marktpreisindikation ohne Abschlag' }[_mbAnker.art] || 'Wert') + ' aus dem Marktbericht'
+    : _wbQuelle === 'marktbericht' ? ({ ertragswert: 'Ertragswert', sachwert: 'Sachwert', vergleichswert: 'Vergleichswert', vergleichswert_m: 'Vergleichswert', mpi_mit: 'Marktpreisindikation nach Abschlag (aus Angebotspreisen, kein Verkehrswert)', mpi_ohne: 'Marktpreisindikation (aus Angebotspreisen, kein Verkehrswert)' }[_mbAnker.art] || 'Wert') + ' aus dem Marktbericht'
     : _wbQuelle === 'bankbewertung' ? 'Bankbewertung' : 'Kaufpreis';
+  /* v4900 · Hinweise am Wertanker: Wertangabe ohne Herkunft, und kein gerechneter Verkehrswert */
+  try { (function () {
+    var sel = el('svw_herkunft'), f = sel && sel.closest ? sel.closest('.f') : null; if (!f) return;
+    var h = document.getElementById('wa-anker-hinweis');
+    var ohneVerfahren = !(_mbAnker && /^(ertragswert|sachwert|vergleichswert)$/.test(_mbAnker.art)) && !(svw > 0 && _svwBelastbar);
+    var t = [];
+    if (State.svw_ohne_herkunft) t.push('Der Wert im Feld hat keine Herkunft und rechnet nicht mit. Bitte Herkunft angeben.');
+    if (ohneVerfahren) t.push(_mbAnker ? 'Kein Verkehrswert gerechnet, maßgebend ist die Marktpreisindikation aus Angebotspreisen.' : 'Kein Verkehrswert gerechnet.');
+    if (!t.length) { if (h) h.remove(); return; }
+    if (!h) { h = document.createElement('div'); h.id = 'wa-anker-hinweis'; h.className = 'cf-hint'; h.style.marginTop = '4px'; f.appendChild(h); }
+    h.textContent = t.join(' ') + (ohneVerfahren ? ' Für Ertrags- oder Sachwert den Marktbericht auf Stufe 3 abrufen, bei gemischter Nutzung als Objektart Mehrfamilienhaus bzw. Wohn- und Geschäftshaus wählen. ' : ' ');
+    if (ohneVerfahren && typeof window.openMarktberichtView === 'function') { var b = document.createElement('button'); b.type = 'button'; b.className = 'btn btn-outline'; b.style.cssText = 'margin-left:6px;padding:2px 8px;font-size:11.5px'; b.textContent = 'Stufe 3 abrufen'; b.onclick = function () { try { localStorage.setItem('dp_mb_stufe', '3'); } catch (e) {} window.openMarktberichtView(); }; h.appendChild(b); }
+  })(); } catch (_eWh) {}
   var gs_a=v('gsfl')*(v('mea')/100);
   st('gs_ant',gs_a.toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2})+' m²');  /* v3023: stand „58.60 m²" */st('bodenwert',fE(gs_a*v('brw')));
   var nkm=v('nkm'),ze=v('ze'),uf=v('umlagef');
@@ -2636,7 +2652,7 @@ function _calcImmediate(){
      Angebotspreisen traegt keinen. Bis v3005 rechnete der Score (K.wp_kpi, DealScore
      „Potenzial") und das Bank-PDF („Sofortiger Wertpuffer") ihn trotzdem mit, waehrend
      die Kachel ihn ausblendete - zwei Antworten auf dieselbe Frage. */
-  var wp_kpi=(svw>0 && _svwHerk !== 'indikation')?svw-kp:0;
+  var wp_kpi=(svw>0 && _svwHerk !== 'indikation' && _svwHerkExpl)?svw-kp:0;   /* v4900 · ohne Herkunft kein Wertpuffer aus dem Feld */
   /* v4420 · Marcel 24.11.2026 („ja ändern, so dass es passt“): Score, Kachel und PDF rechnen den Wertpuffer mit DEMSELBEN
      Wert. Stammt die Wertangabe im Reiter Objekt aus einem Marktbericht und weicht vom maßgebenden Objektwert
      (State.wert_anker, Stichtag v4390) ab, gilt der maßgebende Wert gegen den Kaufpreis (Demostraße 5: 130.000 − 145.000).
@@ -2646,7 +2662,7 @@ function _calcImmediate(){
   /* v4580 · dieselbe Rangfolge wie wert_basis (v2996): eine Wertangabe ohne Gutachten oder Bankbewertung (Herkunft „eigene“, auch ohne
      Auswahl) tritt hinter den Marktbericht zurück. Gemessen Westerfeldstr. 146: Feld 567.000 € ohne Herkunft (Demodaten), Anker 740.000 €,
      Wertpuffer und Investment-PDF nannten trotzdem +22.000 € und „Marktwert (eigene Schätzung)“. */
-  try { var _waE = State.wert_anker; if (_waE && _waE.wert > 0 && svw > 0 && _svwHerk === 'eigene') wp_kpi = _waE.wert - kp; } catch (_eWe) {}
+  try { var _waE = State.wert_anker; if (_waE && _waE.wert > 0 && svw > 0 && !/^mpi/.test(_waE.art || '') && (_svwHerk === 'eigene' || !_svwHerkExpl)) wp_kpi = _waE.wert - kp; } catch (_eWe) {}
   var btj=parseInt(g('btj')||'20');
   /* v816-CUT: Privat-Objekt-Cut bei Ueberfuehrung. Gated ueber Feld 'ueberf_ende' (Datum).
      Kappt btj auf volle Jahre bis zum Stichtagsjahr; letztes Jahr wird anteilig (Monat/12) gerechnet.

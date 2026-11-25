@@ -662,6 +662,9 @@
   var _zbEwCache = null;
   function _wertAnsatz(o){
     var k = o && o._key, kp = _kpEuro(o), wa = o && o._wert_anker;
+    /* v4900 · Rangfolge wie calc.js: Gutachten/Bank > maßgebender Wert des Berichts > Marktpreisindikation > Kaufpreis; eine Wertangabe ohne Herkunft nie */
+    var _h = String((o && o.svw_herkunft) || ''), _sv = num(o && o.svwert);
+    if (_sv > 0 && (_h === 'gutachten' || _h === 'bank')) return { wert: _sv, quelle: 'anker', art: _h, datum: null };
     if (wa && num(wa.wert) > 0) return { wert: num(wa.wert), quelle: 'anker', art: wa.art || null, datum: wa.datum || null };
     var h = (k && _mbHist[k]) || null;
     var zz = null; try { zz = window.DpWertZielbild && DpWertZielbild.zielbildFuer ? DpWertZielbild.zielbildFuer(o) : null; } catch (e) { zz = null; }
@@ -675,11 +678,11 @@
       if (etw && vw) return { wert: vw, quelle: 'mb', art: 'vergleichswert', datum: d };
       if (etw && num(h.market_value) > 0) return { wert: num(h.market_value), quelle: 'mb', art: 'vergleichswert_m', datum: d };
       if (ew) return { wert: ew, quelle: 'mb', art: 'ertragswert', datum: d };
-      if (num(h.market_value) > 0) return { wert: num(h.market_value), quelle: 'mb', art: 'vergleichswert_m', datum: d };
+      if (num(h.market_value) > 0) return { wert: num(h.market_value), quelle: 'mb', art: 'mpi_mit', datum: d };   /* v4900 · kein Verfahren: Marktpreisindikation, kein Verkehrswert */
     }
     return { wert: kp, quelle: k && !(k in _mbHist) ? 'laedt' : 'kp', art: null, datum: null };
   }
-  var _ART_TXT = { ertragswert: 'Ertragswert', sachwert: 'Sachwert', vergleichswert: 'Vergleichswert', vergleichswert_m: 'Vergleichswert aus Angeboten', aufteiler: 'Haus als Ganzes', gutachten: 'Gutachten', bank: 'Bankbewertung' };
+  var _ART_TXT = { ertragswert: 'Ertragswert', sachwert: 'Sachwert', vergleichswert: 'Vergleichswert', vergleichswert_m: 'Vergleichswert aus Angeboten', mpi_mit: 'Marktpreisindikation aus Angeboten, kein Verkehrswert', mpi_ohne: 'Marktpreisindikation aus Angeboten, kein Verkehrswert', aufteiler: 'Haus als Ganzes', gutachten: 'Gutachten', bank: 'Bankbewertung' };
   function _wertAnsatzText(x){
     if (!x) return '';
     if (x.quelle === 'kp') return 'Kaufpreis (kein Bericht)';
