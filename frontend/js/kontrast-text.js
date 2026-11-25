@@ -39,7 +39,7 @@
   }
 
   var KL = ['dp-kt-gruen', 'dp-kt-rot', 'dp-kt-grau', 'dp-kt-gruen-d', 'dp-kt-rot-d', 'dp-kt-grau-d'];
-  var laeuft = false, offen = false;
+  var laeuft = false, offen = false, erledigt = new WeakSet();
 
   function pruefe() {
     laeuft = true; offen = false;
@@ -48,13 +48,16 @@
       while ((t = w.nextNode())) {
         if (!t.nodeValue || t.nodeValue.trim().length < 1) continue;
         var el = t.parentElement; if (!el || gesehen.has(el)) continue; gesehen.add(el);
-        if (el.closest('svg, .dp-kt-aus, [data-dp-kt="aus"], #dp-kv-panel')) continue;
-        var cs = getComputedStyle(el);
-        if (parseFloat(cs.fontSize) > 13.5) continue;
-        /* schon eingestuft: nicht erneut anfassen (jede Klassenänderung löst den Beobachter aus) */
-        if (KL.some(function (k) { return el.classList.contains(k); })) continue;
+        /* schon beurteilt: überspringen. Neu gezeichnete Inhalte sind neue Elemente und kommen von selbst dran. */
+        if (erledigt.has(el)) continue;
         /* unsichtbar (display:none, eingeklappter Reiter): beim Aufklappen meldet der Beobachter die Änderung */
         if (!el.getClientRects().length) continue;
+        erledigt.add(el);
+        if (el.closest('svg, .dp-kt-aus, [data-dp-kt="aus"], #dp-kv-panel')) continue;
+        /* schon eingestuft: nicht erneut anfassen (jede Klassenänderung löst den Beobachter aus) */
+        if (KL.some(function (k) { return el.classList.contains(k); })) continue;
+        var cs = getComputedStyle(el);
+        if (parseFloat(cs.fontSize) > 13.5) continue;
         var fg = rgb(cs.color);
         if (!fg) continue;
         var fam = familie(fg); if (!fam) continue;
@@ -75,10 +78,12 @@
     pruefe();
     try {
       new MutationObserver(function (ms) {
-        for (var i = 0; i < ms.length; i++) { var n = ms[i].target; if (ms[i].type === 'attributes' && n && n.className && /dp-kt-/.test(String(n.className))) continue; planen(); return; }
-      }).observe(document.body, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ['class', 'style', 'hidden'] });   /* Reiterwechsel schalten nur Sichtbarkeit um */
+        var neu = false;
+        for (var i = 0; i < ms.length; i++) { var n = ms[i].target; if (ms[i].type === 'attributes') { var alt = String(ms[i].oldValue || ''); if (ms[i].attributeName === 'class' && !/dp-kt-/.test(alt) && /dp-kt-/.test(String(n.className || ''))) continue; /* unsere eigene Klasse */ if (ms[i].attributeName !== 'class' && /dp-kt-/.test(String(n.className || ''))) continue; /* Stil-Animation an eingestuftem Element: nichts tun */ if (n && n.classList) KL.forEach(function (k) { n.classList.remove(k); }); /* fremder Wechsel (z. B. grün auf rot): neu beurteilen */ try { erledigt.delete(n); } catch (e) {} } neu = true; }   /* eigene Klasse: kein neuer Lauf; Klassen-/Stilwechsel: Element neu beurteilen */
+        if (neu) planen();
+      }).observe(document.body, { childList: true, subtree: true, characterData: true, attributes: true, attributeOldValue: true, attributeFilter: ['class', 'style', 'hidden'] });   /* Reiterwechsel schalten nur Sichtbarkeit um */
     } catch (e) {}
   }
-  window.DpKontrastText = { pruefe: pruefe, version: 'v4850d' };
+  window.DpKontrastText = { pruefe: pruefe, version: 'v4850e' };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
 })();
