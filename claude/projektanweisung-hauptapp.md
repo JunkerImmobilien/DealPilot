@@ -45551,3 +45551,9 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** staging cc722609, f15e0179, Merge 8333a69a · main d78c52ce, 803f3dfd, Version d4e43ae9.
 - **Nachweis:** Lindenallee 14 (2026-1192) 14 Zeilen, Filter 14 von 14, Sprung Wohnungen. buster-ebenen, vorschau, unterlagen-steuer 53/53 grün. Prod-Sicherung haupt/mb-20261125-0757-v4700 (7,0/31 MB, Kopf gelesen), Auslieferung per curl.
 - **Rest:** Auto-Pilot nach Übergabe greift ohne „Alle übernehmen“ nicht; hin('weg') landet in Bewirtschaftung; Prod nicht eingeloggt gemessen.
+
+### Rollout 1.0.205 · landing-blackweek-2 (25.11.2026)
+- **Was:** Black-Week-Fenster erscheint für alle einmal neu (neuer Merker `dp_bw26_popup_gesehen`).
+- **Commit:** staging 7b0c70b2 · main 37b40b70, Version af17ac3a.
+- **Nachweis:** Staging alter Merker gesetzt → Fenster 1×, danach nicht; Prod liefert blackweek-2.
+- **Rest:** keiner.
