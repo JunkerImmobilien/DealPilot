@@ -630,12 +630,12 @@
     if (o._ekr4 && o._ekr4.k1 != null) return o._ekr4;
     var cfv = o._kpis_cf_vs != null ? num(o._kpis_cf_vs) : null, cfn = o._kpis_cf_ns != null ? num(o._kpis_cf_ns) : null;
     if (cfv == null) return null;
-    var wa = o._wert_anker, kp = _kpEuro(o);
+    var wa = _wertAnsatz(o);   /* v4770 · dieselbe Wertbasis wie Vermoegen netto */
     return DpEkRendite.rechne({ cf_op: cfv, steuer: cfn != null ? cfv - cfn : 0,
       tilg: num(o.d1)*_pct(o.d1t)/100 + num(o.d2)*_pct(o.d2t)/100 + _dwO(o).tilg_j, bspar: 0, ek: num(o.ek),
-      wert: wa && wa.wert > 0 ? wa.wert : (num(o.svwert) > 0 ? num(o.svwert) : kp),
+      wert: wa && wa.wert > 0 ? wa.wert : null,
       darlehen0: num(o.d1) + num(o.d2) + _dwO(o).betrag, uebergang: o.wirtschaftlicher_uebergang || o.kaufdat || null,
-      stichtag: wa && wa.wert > 0 ? wa.datum : null, wstg: _pct(o.wertstg) / 100 });
+      stichtag: wa && wa.quelle !== 'kp' && wa.quelle !== 'laedt' ? wa.datum : null, wstg: _pct(o.wertstg) / 100 });
   }
   function _ekr4Portfolio(arr){ try { return window.DpEkRendite ? DpEkRendite.portfolio((arr || []).map(_ekr4Obj)) : null; } catch (e) { return null; } }
   function _renditeTip(){
@@ -685,7 +685,7 @@
     if (!x) return '';
     if (x.quelle === 'kp') return 'Kaufpreis (kein Bericht)';
     if (x.quelle === 'laedt') return 'Kaufpreis (Bericht wird geladen …)';
-    var d = x.datum && /^d{4}-d{2}-d{2}/.test(x.datum) ? x.datum.slice(8, 10) + '.' + x.datum.slice(5, 7) + '.' + x.datum.slice(0, 4) : (x.datum || '');
+    var d = x.datum && /^\d{4}-\d{2}-\d{2}/.test(x.datum) ? x.datum.slice(8, 10) + '.' + x.datum.slice(5, 7) + '.' + x.datum.slice(0, 4) : (x.datum || '');
     return (_ART_TXT[x.art] || 'maßgebender Wert') + (d ? ', Stichtag ' + d : '');
   }
   function _wertHeuteJeObjekt(arr){

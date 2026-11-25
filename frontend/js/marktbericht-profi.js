@@ -334,7 +334,7 @@
     var h = v.liste.map(function (x) {
       var w = Number(x.wert) || 0, zus = '';
       if (x.id === 'angebote') {
-        if (istZahl(x.low) && istZahl(x.high)) zus += 'Spanne ' + eur(x.low) + ' – ' + eur(x.high) + '. ';
+        if (istZahl(x.low) && istZahl(x.high)) zus += 'Spanne ' + eur(x.low) + ' bis ' + eur(x.high) + '. ';
         if (x.abschlag && istZahl(x.abschlag.pct)) zus += 'Angebotsabschlag ' + zahl(x.abschlag.pct, 1) + ' %' + (x.abschlag.roh && istZahl(x.abschlag.roh.estimated) ? ' auf ' + eur(x.abschlag.roh.estimated) : '') + '.';
       }
       return '<div class="vb"><div class="vn">' + esc(x.name) + '<i>' + (x.fuehrend ? 'führend · ' : '') + esc(x.recht) + ' · ' + esc(x.tag) + '</i></div>'
@@ -764,7 +764,7 @@
       var qm = wflQm ? '<div class="qm num">' + zahl(Number(x.wert) / wflQm, 0) + ' €/m²</div>' : '';
       var zus = '';
       if (x.id === 'angebote') {
-        if (istZahl(x.low) && istZahl(x.high)) zus += '<div class="zus">Spanne ' + eur(x.low) + ' – ' + eur(x.high)
+        if (istZahl(x.low) && istZahl(x.high)) zus += '<div class="zus">Spanne ' + eur(x.low) + ' bis ' + eur(x.high)
           + (wflQm ? ' · ' + zahl(x.low / wflQm, 0) + '–' + zahl(x.high / wflQm, 0) + ' €/m²' : '') + '</div>';
         var ab = x.abschlag;
         if (ab && istZahl(ab.pct)) zus += '<div class="zus">Angebotsabschlag ' + zahl(ab.pct, 1) + ' %'
@@ -779,8 +779,8 @@
     var mieten = [
       ['Ist-Miete laut Objekt', ewM.miete_ist_qm != null ? ewM.miete_ist_qm : band.ist_qm, 'eigene Angabe'],
       ['Im Ertragswert angesetzt', ewM.miete_qm, ewM.miete_modellkonform_grund || (ewM.miete_herkunft && ewM.miete_herkunft.vergleich ? 'marktüblich erzielbar' : 'marktüblich erzielbar')],
-      ['Band der Marktüblichkeit', istZahl(band.unten_qm) && istZahl(band.oben_qm) ? null : undefined, istZahl(band.unten_qm) ? zahl(band.unten_qm, 2) + ' – ' + zahl(band.oben_qm, 2) + ' €/m² (± ' + zahl(band.band_pct, 0) + ' %)' : ''],
-      ['Angebotsmieten (Median)', rm.median_per_sqm, istZahl(rm.q25_per_sqm) ? 'Quartile ' + zahl(rm.q25_per_sqm, 2) + ' – ' + zahl(rm.q75_per_sqm, 2) + ' €/m², ' + zahl(rm.sample_size, 0) + ' Angebote' : ''],
+      ['Band der Marktüblichkeit', istZahl(band.unten_qm) && istZahl(band.oben_qm) ? null : undefined, istZahl(band.unten_qm) ? zahl(band.unten_qm, 2) + ' bis ' + zahl(band.oben_qm, 2) + ' €/m² (± ' + zahl(band.band_pct, 0) + ' %)' : ''],
+      ['Angebotsmieten (Median)', rm.median_per_sqm, istZahl(rm.q25_per_sqm) ? 'Quartile ' + zahl(rm.q25_per_sqm, 2) + ' bis ' + zahl(rm.q75_per_sqm, 2) + ' €/m², ' + zahl(rm.sample_size, 0) + ' Angebote' : ''],
       ['Bestandsmiete Zensus 2022', zm.nettokaltmiete_qm, zm.available ? 'Gemeinde/Kreis, Stichtag Zensus' : '']
     ].filter(function (z) { return istZahl(z[1]) || (z[1] === null && z[2]); });
     var mietTab = mieten.length ? '<div class="block"><h3>Mieten je m² Wohnfläche</h3><table><tbody>' + mieten.map(function (z) {
@@ -842,7 +842,7 @@
       + '<div><span>Preisentwicklung</span><span class="num">' + (istZahl(p.price_trend_pct) ? (p.price_trend_pct > 0 ? '+' : '') + zahl(p.price_trend_pct, 1) + ' %' : '–') + '</span></div>'
       + '<div><span>Mietentwicklung</span><span class="num">' + (istZahl(p.rent_trend_pct) ? (p.rent_trend_pct > 0 ? '+' : '') + zahl(p.rent_trend_pct, 1) + ' %' : '–') + '</span></div>'
       + '<div><span>Vermarktungsdauer</span><span class="num">' + (p.market_dynamics && istZahl(p.market_dynamics.days_on_market) ? zahl(p.market_dynamics.days_on_market, 0) + ' Tage' : '–') + '</span></div>'
-      + '<div><span>Marktpreisindikation</span><span class="num">' + eur(mv.estimated) + (istZahl(mv.low) ? ' (' + eur(mv.low) + ' – ' + eur(mv.high) + ')' : '') + '</span></div></div>'
+      + '<div><span>Marktpreisindikation</span><span class="num">' + eur(mv.estimated) + (istZahl(mv.low) ? ' (' + eur(mv.low) + ' bis ' + eur(mv.high) + ')' : '') + '</span></div></div>'
       + ((p.valuation && p.valuation.notes || []).length ? '<p class="det" style="margin-top:3mm">' + esc(p.valuation.notes.join(' ')) + '</p>' : '')
       + kennzahlen(p, r) + marktentwicklung(p.market_history) + regionHtml));
     var vgl = vergleichsangebote(p);

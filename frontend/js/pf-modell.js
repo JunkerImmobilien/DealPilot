@@ -62,6 +62,7 @@
         kaufjahr: st.kaufjahr || null, ergVV: st.erg != null ? st.erg : null, steuerWirkung: st.wirkung != null ? st.wirkung : null, halter: st.halter || 'Privat',
         wert: z(r.wert), wertQuelle: r.wertText || (r.wertQ === 'kp' || r.wertQ === 'laedt' ? 'Kaufpreis' : 'maßgebender Wert'),
         bild: r.thumb || null, bildArt: r.thumb ? 'foto' : null,
+        adr: (function () { var s = [r.str, r.hnr].filter(Boolean).join(' ').trim(), o2 = [r.plz, r.ort].filter(Boolean).join(' ').trim(); return s && o2 ? s + ', ' + o2 : ''; })(),   /* v4770 · Lagekarte ohne Foto */
         ekr: r.ekr4 || null
       };
       x.ekHeute = (x.wert || 0) - (x.rest || 0);

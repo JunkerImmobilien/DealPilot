@@ -426,7 +426,7 @@
     html += '<div style="font-weight:600;font-size:13px;color:var(--red,#B8625C);margin-bottom:6px">⚠ Konflikt — überschneidende Zeiträume:</div>';
     html += '<ul style="font-size:12px;color:var(--ch,#2A2727);margin:6px 0 12px;padding-left:18px">';
     overlapping.forEach(o => {
-      html += '<li>' + fmtDate(o.valid_from) + ' – ' + (o.valid_to ? fmtDate(o.valid_to) : 'laufend') + ' · ' + fmtEUR(o.zve) + (o.reason ? ' (' + o.reason + ')' : '') + '</li>';
+      html += '<li>' + fmtDate(o.valid_from) + ' bis ' + (o.valid_to ? fmtDate(o.valid_to) : 'laufend') + ' · ' + fmtEUR(o.zve) + (o.reason ? ' (' + o.reason + ')' : '') + '</li>';
     });
     html += '</ul>';
     html += '<div style="display:flex;gap:8px;flex-wrap:wrap">';
@@ -459,7 +459,7 @@
   async function editPeriod(id) {
     const p = STATE.periods.find(x => x.id === id);
     if (!p) return;
-    const newZve = prompt('Neues zvE für ' + fmtDate(p.valid_from) + ' – ' + (p.valid_to ? fmtDate(p.valid_to) : 'laufend') + ':', String(p.zve));
+    const newZve = prompt('Neues zvE für ' + fmtDate(p.valid_from) + ' bis ' + (p.valid_to ? fmtDate(p.valid_to) : 'laufend') + ':', String(p.zve));
     if (newZve === null) return;
     const zve = parseDe(newZve);
     if (zve <= 0) return alert('Ungültiger Wert');

@@ -100,7 +100,18 @@ window.DpPfKit = (function () {
   var module = [];
   function modul(sel, fn) { var el = typeof sel === 'string' ? document.querySelector(sel) : sel; if (!el) return; module = module.filter(function (m) { return m.el !== el && document.contains(m.el); });
     if (el.id === 'kz' && !el.hasAttribute('data-ohne-ek')) { var _fn = fn; fn = function (w) { var h = _fn(w); if (h.indexOf('EK-Rendite') >= 0) return h; var m = /--kz:(\d+)/.exec(h), n = m ? Number(m[1]) + 1 : null; var kach = kz([ekKachel()], 1).replace(/^<div class="kz"[^>]*>/, '').replace(/<\/div>$/, ''); h = h.replace(/<\/div>$/, kach + '</div>'); return n ? h.replace(/--kz:\d+/, '--kz:' + n) : h; }; } module.push({ el: el, fn: fn }); zeichne(module[module.length - 1]); }
-  function zeichne(m) { var w = Math.max(260, Math.floor(m.el.clientWidth)); m.el.innerHTML = m.fn(w); }
+  function zeichne(m) { var w = Math.max(260, Math.floor(m.el.clientWidth)); m.el.innerHTML = m.fn(w); kartenNach(m.el); }
+  /* v4770 · Lagekarten fuer Objekte ohne Foto nachladen, je Objekt einmal je Sitzung (lagekarte.js, eigene OSM-Kacheln) */
+  var _pfKarten = {};
+  function kartenNach(host) {
+    if (!host || !window.DpLagekarte || !DpLagekarte.fuerAdresse) return;
+    [].forEach.call(host.querySelectorAll('.ob-leer[data-pf-adr]'), function (el) {
+      var id = el.getAttribute('data-pf-id'), a = el.getAttribute('data-pf-adr'); if (!a || !id) return;
+      var k = _pfKarten[id];
+      if (!k) { k = _pfKarten[id] = {}; k.p = DpLagekarte.fuerAdresse(a, { breite: 420, hoehe: 240, pin: 'haus' }).then(function (b) { k.src = b && b.src; return k.src; }).catch(function () { return null; }); }
+      k.p.then(function (src) { if (!src) return; [].forEach.call(document.querySelectorAll('.ob-leer[data-pf-id="' + id + '"]'), function (x) { x.classList.remove('ob-leer'); x.classList.add('ob-karte'); x.style.backgroundImage = "url('" + src + "')"; x.setAttribute('role', 'img'); x.setAttribute('aria-label', 'Lagekarte'); }); });
+    });
+  }
   function neu() { module = module.filter(function (m) { return document.contains(m.el); }); module.forEach(zeichne); }
   var rt; addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(neu, 120); });
 
@@ -460,7 +471,11 @@ window.DpPfKit = (function () {
 
   /* ══ Runde 2 (25.11.2026): Objektbilder, Modus Kompakt/Detail, EK-Rendite in vier Stufen ══ */
   function bild(o, cls) {
-    if (!o.bild) return '<span class="ob ' + (cls || '') + ' ob-leer"></span>';
+    if (!o.bild) {   /* v4770 · ohne Foto die OSM-Lagekarte mit Haeuschen-Pin wie in der Objektmatrix */
+      var kk = o.id != null ? _pfKarten[o.id] : null;
+      if (kk && kk.src) return '<span class="ob ' + (cls || '') + ' ob-karte" style="background-image:url(&quot;' + kk.src + '&quot;)" role="img" aria-label="Lagekarte"></span>';
+      return '<span class="ob ' + (cls || '') + ' ob-leer"' + (o.adr ? ' data-pf-adr="' + String(o.adr).replace(/"/g, '&quot;') + '" data-pf-id="' + String(o.id).replace(/"/g, '') + '"' : '') + '></span>';
+    }
     return '<span class="ob ' + (cls || '') + (o.bildArt !== 'foto' ? ' ob-karte' : '') + '" style="background-image:url(\'' + o.bild + '\')"></span>';
   }
   function bildText(o) { return o.bildArt === 'foto' ? 'Objektfoto' : o.bildArt === 'karte' ? 'Lagekarte' : 'Lagekarte nach Postleitzahl'; }

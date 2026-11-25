@@ -2397,7 +2397,7 @@
       h[i].innerHTML = marktHtml();
     }
   }
-  function spanne(a, b, f) { return a != null && b != null ? f(a) + ' – ' + f(b) : '—'; }
+  function spanne(a, b, f) { return a != null && b != null ? f(a) + ' bis ' + f(b) : '—'; }
   /* v2577 · Spanne klein unter der Zahl: in Tausend (die Werte sind auf 1.000/5.000 € gerundet - kein Verlust) */
   function spanneTsd(a, b) {
     if (a == null || b == null) return '';

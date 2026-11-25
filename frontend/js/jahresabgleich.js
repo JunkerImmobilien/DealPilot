@@ -468,7 +468,7 @@
       '.dp-ja-schritte{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border:1px solid ' + LI + ';border-radius:10px;overflow:hidden;background:#fff}',
       '.dp-ja-schritt{padding:14px 16px;border-right:1px solid ' + LI + ';display:flex;flex-direction:column;gap:7px;min-width:0}',
       '.dp-ja-schritt:last-child{border-right:none}',
-      '.dp-ja-kk{display:flex;align-items:center;gap:8px}.dp-ja-kk b{font:600 13.5px Inter,sans-serif}',
+      '.dp-ja-kk{display:flex;align-items:center;gap:4px 8px;flex-wrap:wrap}.dp-ja-kk b{font:600 13.5px Inter,sans-serif}',
       '.dp-ja-kk .st{margin-left:auto;font:400 11.5px Inter,sans-serif;color:' + M + '}',
       '.dp-ja-w{font:600 19px "Space Grotesk",Inter,sans-serif;font-variant-numeric:tabular-nums;color:' + T + ';overflow-wrap:anywhere}',
       '.dp-ja-vgl{font:400 12px Inter,sans-serif;color:' + M + ';font-variant-numeric:tabular-nums}',
@@ -494,7 +494,7 @@
       '.dp-ja-tab th,.dp-ja-tab td{text-align:right;padding:8px 7px;border-bottom:1px solid #F1EBDD;font-variant-numeric:tabular-nums;white-space:nowrap;vertical-align:top}',
       '.dp-ja-tab tbody tr:last-child td{border-bottom:none}',
       /* v4500 · Anlage-V-Aktion in der Zeile, Hilfe im Spaltenkopf */
-      '.dp-ja-tab .dp-ja-av{display:block;margin:3px 0 0 auto;padding:1px 7px;border:1px solid var(--wl-c9a84c, #C9A84C);border-radius:999px;background:transparent;color:' + T + ';font:500 10.5px/1.5 Inter,sans-serif;cursor:pointer;white-space:nowrap}',
+      '.dp-ja-tab .dp-ja-av{display:block;margin:3px 0 0 auto;padding:1px 7px;border:1px solid var(--wl-c9a84c, #C9A84C);border-radius:999px;background:transparent;color:' + T + ';font:500 10.5px/1.35 Inter,sans-serif;cursor:pointer;white-space:normal;max-width:100%;text-align:center;box-sizing:border-box}',
       '.dp-ja-tab .dp-ja-av:hover{background:color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 14%,transparent)}',
       '.dp-ja-tab th .dp-tip{margin-left:3px;vertical-align:middle}',
       '.dp-ja-tab td small.dp-ja-schlecht{color:#B8625C}', '.dp-ja-tab td small.dp-ja-gut{color:#2f7d52}',
