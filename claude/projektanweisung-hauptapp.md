@@ -45652,3 +45652,9 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** staging 6d9a89e7, 11483e54, 1dfba881 · main a4f00529, 3b41faea, ab5dd6d2.
 - **Nachweis:** einzelcheck-pruefen grün (Teil W mit Gegenprobe), buster-ebenen sauber, Muster Herford ETW/MFH -10 (15 Seiten, Abstand sichtbar), Prod healthy, Landing einzelcheck-10a, version 216, Sicherung 20261125-1003-ec10.
 - **Rest:** Anschrift-Rückweg nicht im Browser geklickt. Herford-MFH ohne Sachwert (kein Sachwertfaktor, modellkonform).
+
+### Rollout 1.0.217 · v4830 Portfolio-Cockpit optisch fertig (Fork QQ4)
+- **Was:** Score-Kopf kompakt (Investment-/Finanzierungs-Score wie Demo 07), Kennzahlen in einer Leiste, Filterzeile, pf-kit zeichnet Diagramme bei Breitenwechsel neu (Mini-Schrift weg), Kachelbeträge ohne Umbruch.
+- **Commit:** staging 74e2fee0, f524d40d, 273fb0db, 5bd93b11 · main 36a1d920, cdc29734, 17f21834, 5c991d52, Version 1f2e5daa.
+- **Nachweis:** iframe-Messung 1440/1024/390 alle neun Vorlagen (0 Querscrollen, 0 Texte < 7,5 px); buster-ebenen, vorschau, ek-rendite 51/51, score-ketten 216, gold-audit Staging/Prod RC 0; Prod-Sicherung haupt-/mb-20261125-1016-v4830 (7,0/31 MB, Kopf gelesen); Prod liefert v4830/v4830b/v4830c, version 217.
+- **Rest:** Prod nicht eingeloggt gemessen; Vorher-Bilder nicht abgelegt.
