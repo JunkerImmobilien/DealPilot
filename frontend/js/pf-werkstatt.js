@@ -447,6 +447,7 @@
     pal.addEventListener('focusin', function (ev) { var b = ev.target.closest && ev.target.closest('.pw-pim'); if (b) popZeigen(b); });
     pal.addEventListener('mouseleave', popWeg); pal.addEventListener('focusout', function (ev) { if (!pal.contains(ev.relatedTarget)) popWeg(); });
     p.querySelector('.pw-pliste').addEventListener('scroll', function () { popWeg(); reiterAktiv(); });
+    p.querySelector('.pw-buehne').addEventListener('transitionend', function (ev) { if (ev.propertyName === 'max-width') skalieren(); });
     ziehenEinrichten(p);
     document.addEventListener('keydown', taste, true); window.addEventListener('resize', zeichnen);
     zeichnen();
