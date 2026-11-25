@@ -45576,3 +45576,10 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** staging 9a7352c9, 4e92a013 · main 5f345570, 88269a41.
 - **Nachweis:** Hauptstr. 51 mit/ohne Ziel gemessen; Karte im Staging- und Prod-Container erzeugt; einzelcheck-pruefen, buster-ebenen, vorschau grün; Sicherung haupt-/mb-20261125-0901-v4750.
 - **Rest:** kein bezahlter Prod-Bericht gemessen; Marktbericht-Kopfkarte (mb-Dienst) weiter Geoapify.
+
+
+### Rollout 1.0.209 · v4730 Portfolio-Cockpit vollständig (Fork CC4)
+- **Was:** alle Module der Demos (Runde d) als Baukasten-Module (pf-kit/pf-bausteine/pf-katalog/pf-modell, pf-module.css), Vorlagen ohne Lücken, 38 Kennzahl-Karten, Kompakt/Detail = Einfach/Genau. Ein Wertansatz je Objekt (maßgebender Wert, dashboard.js _wertAnsatz), Vermögen netto überall Σ Wert − Σ Restschuld. Doppelte Kopf-Inhalte ohne Objektmatrix behoben.
+- **Commit:** staging 5a9534d5, ed2e6ef8, 2fc3f99e, de9d606d · main ab1ed337, 710ff755, 0c1e3108, 366dff42, Version 96c6baaa.
+- **Nachweis:** 9 Vorlagen und 36 Module auf Staging gemessen, hell/dunkel, Partnerfarbe, 390 px; Prüfer grün; Prod-Sicherung haupt-/mb-20261125-0910-v4730 (7,0/31 MB, Kopf gelesen); Prod liefert pf-*.js und version 209 (curl), gold-audit Prod RC 0.
+- **Rest:** Prod nicht eingeloggt gemessen; version.json-Paketname zeigt v4750 (vom Stempel-Werkzeug aus dem Log gelesen).
