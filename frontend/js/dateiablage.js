@@ -161,7 +161,7 @@
     var reihe = Object.keys(jahre).sort(function (a, b) { return String(b).localeCompare(String(a), 'de', { numeric: true }); });
     var h = '';
     if (s && !s.darf_ablegen) {
-      h += '<div style="font-size:13px;padding:10px 12px;border-radius:8px;background:rgba(201,168,76,.10);border-left:3px solid var(--wl-c9a84c,#C9A84C);margin-bottom:10px">'
+      h += '<div style="font-size:13px;padding:10px 12px;border-radius:8px;background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 10%, transparent);border-left:3px solid var(--wl-c9a84c,#C9A84C);margin-bottom:10px">'
         + 'Die Dokumentenablage gibt es ab dem Plan Starter. Eingelesene Unterlagen werden ausgelesen, das Original wird nicht gespeichert.'
         + (_liste.length ? ' Deine vorhandenen Dateien kannst du weiter ansehen und herunterladen' + (s.loeschung_am ? ', bis zum ' + esc(datum(s.loeschung_am)) + '. Danach werden sie gelöscht.' : '.') : '') + '</div>';
     }
