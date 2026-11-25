@@ -652,7 +652,7 @@
       while ((m = re.exec(css))) namen[m[1]] = 1;
       var cs = getComputedStyle(document.documentElement), v = [];
       Object.keys(namen).forEach(function (n) { var w = cs.getPropertyValue(n); if (w && w.trim()) v.push(n + ':' + w.trim()); });
-      _bcCss = '.dp-bc{' + v.join(';') + '}' + css + '.dp-bc .bc-card{break-inside:avoid;page-break-inside:avoid;box-shadow:none}';
+      _bcCss = '.dp-bc{' + v.join(';') + '}' + css + '.dp-bc{zoom:.84}.dp-bc .bc-card{break-inside:avoid;page-break-inside:avoid;box-shadow:none}'   /* v4790o · passt so unter die Phasen */;
     }
     return '<style>' + _bcCss + '</style><div class="dp-bc">' + html + '</div>';
   }
