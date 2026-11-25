@@ -1,4 +1,4 @@
-/* js/leerzustand.js — v5020 · Was ohne Objekt und ohne Bestand keinen Sinn ergibt
+/* js/leerzustand.js — v5020a · Was ohne Objekt und ohne Bestand keinen Sinn ergibt
  * ════════════════════════════════════════════════════════════════════════════════════════════════════════
  * Marcel 25.11.2026: „kannst du bitte auch prüfen, ob gewisse Sachen ausgeblendet werden sollten, wenn man noch
  * kein Objekt angelegt hat oder auf gewonnen gesetzt hat … Sachen, die keinen Sinn machen, sollten wir ausblenden
@@ -68,7 +68,9 @@
     var tr = Q.map(function (p) { return p + ".sb-act-item[onclick=\"sbActionsAction('trackrec')\"]"; }).join(',');
     s.textContent = aus + ',' + tr + '{display:none !important}'
       /* Reiter Steuer im Ankauf */
-      + 'html[data-dp-obj-phase="ankauf"] details.ytf-hinweis,html[data-dp-obj-phase="ankauf"] .fa-pdf-ctrl{display:none !important}'
+      + 'html[data-dp-obj-phase="ankauf"] details.ytf-hinweis,html[data-dp-obj-phase="ankauf"] .fa-pdf-ctrl,'
+      /* tax.js setzt am Handy html body #s3-tax .tax-module-card .fa-pdf-ctrl{display:grid!important} (1,2,2) */
+      + 'html[data-dp-obj-phase="ankauf"] body #s3-tax .tax-module-card .fa-pdf-ctrl,html[data-dp-obj-phase="ankauf"] body #s3-tax details.ytf-hinweis{display:none !important}'
       + '.dp-lz-fa{display:none}html[data-dp-obj-phase="ankauf"] .dp-lz-fa{display:block;flex:1 1 100%;margin:4px 0 0;font:400 12px/1.4 Inter,system-ui,sans-serif;color:#6B645A}'
       /* Leere Objektliste (storage.js _sbLeer) */
       + '.sb-leer{margin:14px 10px;padding:14px;border:1px dashed color-mix(in srgb,var(--gold,var(--wl-c9a84c,#C9A84C)) 55%,transparent);border-radius:12px;text-align:left}'
@@ -87,5 +89,5 @@
   }, true);
   setTimeout(phase, 1500);
 
-  window.DpLeerzustand = { VERSION: 'v5020', melden: melden, phase: phase };
+  window.DpLeerzustand = { VERSION: 'v5020a', melden: melden, phase: phase };
 })();
