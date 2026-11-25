@@ -1123,7 +1123,7 @@
     var mp = mietpotenzial(B, PD), ml = mieterliste(K, B), iS = ml.indexOf('<div class="block"><h3>Ist gegen Soll');
     /* Mieterliste und Obergrenzen-Tabelle doppeln Wohnung, Fläche und Ist: im Überblick nur Ist gegen Soll plus Obergrenze, die volle Mieterliste in der Vertiefung */
     add('Miete und Obergrenze', 'Ist gegen Soll, was rechtlich höchstens drin ist', mp ? (iS >= 0 ? ml.slice(iS) : '') + '<h3 style="margin-top:6mm">Mietpotenzial und Obergrenze</h3>' + mp : ml, 1);
-    if (kombi && mp && iS > 0) add('Einheiten und Zustand', 'Mieterliste mit Status und Modernisierungspunkten', ml.slice(0, iS), 2);
+    var mlB = (kombi && mp && iS > 0) ? ml.slice(0, iS) : '';   /* v4790k · Mieterliste steht in Teil B vor dem Ertrag statt allein auf einer Seite */
 
     /* 4 · Finanzierung */
     var dl = darlehen();
@@ -1151,7 +1151,7 @@
         var smK = stressMatrix(B);
         add('Investition, Finanzierung und Belastungsprobe', 'Investition, Darlehen, Phasen im Einzelnen, DSCR je Zins- und Mietszenario', finanzierungVoll(K, B, false) + '<h3>Phasen im Einzelnen</h3>' + phasenVoll(K, B) + (smK || ''), 2);
         var kz12 = kennzahlen12(K, B, SC).replace(/<div class="hi"><div class="l">Deal Score<\/div><div class="v">[^<]*<\/div>(<div class="s">[^<]*<\/div>)?<\/div>/, '');
-        add('Ertrag, Kennzahlen und Cashflow je Jahr', 'Von der Warmmiete zum Cashflow, Bewirtschaftung, alle Kennzahlen, ' + (St().cfRows || []).length + ' Jahre als Tabelle', ertragKette(K, B) + bewirtschaftungDetail(K, B) + '<h3>Alle Kennzahlen</h3>' + kz12 + '<h3>Cashflow je Jahr</h3>' + cfJahre(B), 2);
+        add(mlB ? 'Einheiten, Ertrag und Cashflow je Jahr' : 'Ertrag, Kennzahlen und Cashflow je Jahr', (mlB ? 'Mieterliste, ' : '') + 'von der Warmmiete zum Cashflow, Bewirtschaftung, alle Kennzahlen, ' + (St().cfRows || []).length + ' Jahre als Tabelle', mlB + ertragKette(K, B) + bewirtschaftungDetail(K, B) + '<h3>Alle Kennzahlen</h3>' + kz12 + '<h3>Cashflow je Jahr</h3>' + cfJahre(B), 2);
         add('Projektion und Vermögen', 'Wert, Restschuld, Eigenkapital, Zuwachs, Exit', vermoegenVoll(K, B), 2);
         /* Wertüberleitung ohne erzwungenen Seitenumbruch, damit „Wert je Wohnung“ nicht allein auf einer Seite steht */
         add('Wert und Zielbild im Detail', 'Wert je Wohnung, Wertüberleitung, Kennzahlen je Stufe', wertZielbild(K, B, WZo, PD, false, false).replace('<h3 style="break-before:page;page-break-before:always">Wertüberleitung', '<h3 style="break-inside:avoid;margin-top:6mm">Wertüberleitung'), 2);
