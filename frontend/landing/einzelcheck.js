@@ -63,7 +63,7 @@
 (function () {
   'use strict';
   if (window.DpEinzelCheck) return;
-  var VERSION = 'einzelcheck-9b';
+  var VERSION = 'einzelcheck-9d';
   var ANSCHLUSS_ZINS = 5.0;     /* v3946 · Marcel 22.11.2026: „Anschlussfinanzierung, die wir einfach auf fünf Prozent rechnen mit derselben Tilgung“ */
   var ABLAGE_STUNDEN = 2;       /* v3946 · Unterlagen im Browser höchstens so lange (die Stripe-Kasse läuft nach 60 Minuten ab) */
   var SPEICHER = 'dp_ec_kauf';
@@ -1444,6 +1444,10 @@
         { l: 'Cashflow', v: D.eurS(r.k.cf_m), s: 'im Monat nach Finanzierung', art: r.k.cf_m < 0 ? 'schlecht' : 'gut' }, { l: 'DSCR', v: r.k.d_total > 0 ? D.zahl(r.k.dscr, 2) : 'entfällt', s: 'volles Jahr, heutige Eingaben' }]) : '')
       + (r && r.k && r.k.d_total > 0 ? '<p class="sub">' + D.esc(dscrSatz(r, d.fin)) + '</p>' : '')
       + (g ? D.scoreRing(g.score, g.empfehlung ? g.empfehlung.text : '') : (r && r.k ? D.scoreRing(r.ds.score, r.st.wort) : ''))
+      /* hh4 (Marcel 25.11.2026: „beim Deal Score direkt Objekt und Finanzierung mit kurzer Begründung“) */
+      + (d.urteil && d.urteil.objekt != null ? D.kacheln([
+          { l: 'Das Objekt', v: d.urteil.objekt + ' / 100', s: (d.urteil.objektPunkte && d.urteil.objektPunkte[0]) || 'Rendite, Risiko, Potenzial', art: d.urteil.objekt >= 60 ? 'gut' : (d.urteil.objekt < 40 ? 'schlecht' : '') },
+          { l: 'Die Finanzierung', v: d.urteil.finanzierung + ' / 100', s: (d.urteil.finanzPunkte && d.urteil.finanzPunkte[0]) || 'Cashflow und Beleihung', art: d.urteil.finanzierung >= 60 ? 'gut' : (d.urteil.finanzierung < 40 ? 'schlecht' : '') }], true) : '')
       + (blick.length ? '<h3>Kurz gesagt</h3><ul>' + blick.map(function (x) { return '<li>' + D.esc(x) + '</li>'; }).join('') + '</ul>' : '')
       + '<div class="hinweis">Orientierung für deine Entscheidung, keine Rechts-, Steuer- oder Finanzierungsberatung. Alle Werte sind indikativ.</div>'));
 
@@ -1503,10 +1507,11 @@
       var SUB = [['rendite', 'Rendite'], ['risiko', 'Risiko'], ['potenzial', 'Potenzial und Wertpuffer'], ['cashflow', 'Cashflow'], ['ltv', 'Beleihung']];
       var punkte = function (l) { return l && l.length ? '<ul>' + l.map(function (x) { return '<li>' + D.esc(x) + '</li>'; }).join('') + '</ul>' : ''; };
       seiten.push(D.seite(c, 'Deal Score', D.abschnitt('Gesamturteil', 'Deal Score', 'Dieselbe Bewertung wie im Quick-Check von DealPilot, aus deinen Grundangaben, Unterlagen und dem Marktbericht.')
-        + D.scoreRing(r.ds.score, r.st.wort)
-        + D.kacheln([{ l: 'Das Objekt', v: u.objekt != null ? u.objekt + ' / 100' : 'offen', s: 'Rendite, Risiko, Potenzial', art: u.objekt >= 60 ? 'gut' : '' },
-          { l: 'Die Finanzierung', v: u.finanzierung != null ? u.finanzierung + ' / 100' : 'offen', s: 'Cashflow und Beleihung', art: u.finanzierung >= 60 ? 'gut' : (u.finanzierung != null && u.finanzierung < 40 ? 'schlecht' : '') },
-          { l: 'Gesamturteil', v: r.st.wort, s: r.ds.deckel ? kundenSatz(typeof r.ds.deckel === 'string' ? r.ds.deckel : (r.ds.deckel.text || r.ds.deckel.grund || '')) : 'Deal Score ' + r.ds.score + ' von 100', art: 'hi' }], true)
+        /* hh4 · Ring und Teilscores stehen auf „Auf einen Blick“, hier nur noch Zahl, Wort und Begründung (Seite knapper) */
+        + D.kacheln([{ l: 'Deal Score', v: r.ds.score + ' / 100', s: r.st.wort, art: 'hi' },
+          { l: 'Das Objekt', v: u.objekt != null ? u.objekt + ' / 100' : 'offen', s: 'Rendite, Risiko, Potenzial', art: u.objekt >= 60 ? 'gut' : '' },
+          { l: 'Die Finanzierung', v: u.finanzierung != null ? u.finanzierung + ' / 100' : 'offen', s: 'Cashflow und Beleihung', art: u.finanzierung >= 60 ? 'gut' : (u.finanzierung != null && u.finanzierung < 40 ? 'schlecht' : '') }], true)
+        + (r.ds.deckel ? '<p class="sub">' + D.esc(kundenSatz(typeof r.ds.deckel === 'string' ? r.ds.deckel : (r.ds.deckel.text || r.ds.deckel.grund || ''))) + '</p>' : '')
         + (u.satz ? '<p><b>' + D.esc(u.satz) + '</b></p>' : '')
         + '<div class="zwei"><div><h3>Das Objekt</h3>' + punkte(u.objektPunkte) + '</div><div><h3>Die Finanzierung</h3>' + punkte(u.finanzPunkte) + '</div></div>'
         + (u.braucht && u.braucht.length ? '<h3>Was es bräuchte</h3>' + punkte(u.braucht) : '')
@@ -1592,14 +1597,22 @@
     /* Weg in die App */
     var an = d.status && d.status.anrechnung;
     /* einzelcheck-2 · Quellen und der Weg in die App teilen sich eine Seite (vorher zwei halb leere) */
-    seiten.push(D.seite(c, 'Quellen und nächster Schritt', quellenHtml + '<div class="block">' + D.abschnitt('Der nächste Schritt', 'Weiter in DealPilot', 'Steuer, Finanzierung, Restnutzungsdauer und Wertermittlung im Detail.')
+    /* hh4 (Marcel 25.11.2026: „Kernaussagen als Fazit Richtung Schluss, Quellen und Methodik immer am Schluss“) ·
+       Fazit und nächster Schritt teilen sich die vorletzte Seite, Quellen stehen allein als letzte */
+    var uF = d.urteil || {};
+    var fazitHtml = D.abschnitt('Fazit', 'Was dieser Bericht sagt', 'Die Kernaussagen in wenigen Punkten.')
+      + (uF.satz ? '<p><b>' + D.esc(uF.satz) + '</b></p>' : '')
+      + (blick.length ? '<ul>' + blick.map(function (x) { return '<li>' + D.esc(x) + '</li>'; }).join('') + '</ul>' : '')
+      + (uF.braucht && uF.braucht.length ? '<h3>Was es bräuchte</h3><ul>' + uF.braucht.map(function (x) { return '<li>' + D.esc(x) + '</li>'; }).join('') + '</ul>' : '');
+    seiten.push(D.seite(c, 'Fazit und nächster Schritt', fazitHtml + '<div class="block">' + D.abschnitt('Der nächste Schritt', 'Weiter in DealPilot', 'Steuer, Finanzierung, Restnutzungsdauer und Wertermittlung im Detail.')
       + '<ul><li>Objekt anlegen: Die Zahlen dieses Berichts übernimmt DealPilot beim Start über die Pakete der Startseite.</li>'
       + (an ? '<li>Anrechnung: Buchst du bis ' + D.esc(datum(an.bis)) + ' ein Paket, rechnet DealPilot ' + D.esc(dez(an.cents / 100, 2)) + ' € an. Code ' + D.esc(an.code) + '. ' + D.esc(KOMBI) + '</li>' : '')
       + '<li>Kostenlos starten: vier Wochen voller Pro-Umfang ohne Zahlungsdaten, danach automatisch Free.</li></ul>'
       + '<p>' + D.esc(appBasis()) + '</p></div>'));
+    seiten.push(D.seite(c, 'Quellen und Methodik', quellenHtml));
     /* einzelcheck-2 (Marcel 24.11.2026: „immer ganze Seiten … relativ abgehackt“): Überschrift nie allein am Seitenende,
        Tabellen, Kacheln und Blöcke nicht zerreißen, Zeilen etwas dichter, damit ein Kapitel auf seine Seite passt */
-    var doc = D.dokument('DealPilot Einzel-Check · ' + titel, seiten, { css: 'h2,h3{break-after:avoid;page-break-after:avoid}.block,.kz,.zwei,table,.hinweis,ul{break-inside:avoid;page-break-inside:avoid}td{padding-top:1.35mm;padding-bottom:1.35mm}h3{margin-top:5mm}' });
+    var doc = D.dokument('DealPilot Einzel-Check · ' + titel, seiten, { css: 'h2,h3{break-after:avoid;page-break-after:avoid}.block,.kz,.zwei,table,.hinweis,ul{break-inside:avoid;page-break-inside:avoid}td{padding-top:1.35mm;padding-bottom:1.35mm}h3{margin-top:5mm}table+ul,table+p{margin-top:5mm}' });   /* hh4 · Abstand nach Tabellen (Mietpotenzial) */
     if (nurHtml) return { html: doc, titel: titel };   /* einzelcheck-2 · Mail: dasselbe Dokument, ohne Vorschau */
     D.vorschau(doc, 'Einzel-Check · ' + titel);
     return doc;
