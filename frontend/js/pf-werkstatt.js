@@ -205,10 +205,34 @@
     return '<div class="pw-mini ' + cls + '" data-maxh="' + maxH + '" aria-hidden="true" inert><div class="pw-mini-in" data-ew="' + m.w + '" style="width:' + m.w + 'px">' + huelle(m.h) + '</div></div>';
   }
   /* Score-Kopf so, wie er im Cockpit steht (echte Werte), sonst gekennzeichnete Beispielwerte */
+  /* v4950 · Der Klon verliert die ID (keine doppelten IDs), und damit fielen die kompakten Regeln von
+     dpsh-score-hero.js (v4830, alle an #dp-pscore-hero) weg: die Vorschau zeigte die große, aufgeklappte Fassung.
+     Deshalb werden genau diese Regeln aus den geladenen Stylesheets auf #dp-pw .pw-psk umgeschrieben. */
+  function scoreRegeln() {
+    if (document.getElementById('pw-psk-stil')) return;
+    function lauf(rules) {
+      var out = [];
+      [].forEach.call(rules || [], function (r) {
+        if (r.media && r.cssRules) { var inn = lauf(r.cssRules); if (inn.length) out.push('@media ' + r.media.mediaText + '{' + inn.join('') + '}'); return; }
+        if (!r.selectorText || r.selectorText.indexOf('#dp-pscore-hero') < 0) return;
+        var sel = r.selectorText.split(',').filter(function (x) { return x.indexOf('#dp-pscore-hero') >= 0; })
+          .map(function (x) { return x.slice(x.indexOf('#dp-pscore-hero')).replace(/#dp-pscore-hero/g, '#dp-pw .pw-psk'); }).join(',');
+        out.push(sel + '{' + r.style.cssText + '}');
+      });
+      return out;
+    }
+    var alle = [];
+    [].forEach.call(document.styleSheets, function (sh) { try { alle = alle.concat(lauf(sh.cssRules)); } catch (e) {} });
+    var st = document.createElement('style'); st.id = 'pw-psk-stil'; st.textContent = alle.join('\n'); document.head.appendChild(st);
+  }
   function scoreHtml() {
     if (_score) return _score;
     var h = document.getElementById('dp-pscore-hero');
-    if (h && h.innerHTML.length > 80 && h.offsetHeight) _score = { h: saeubern(h.cloneNode(true)).outerHTML, w: h.offsetWidth, echt: true };
+    if (h && h.innerHTML.length > 80 && h.offsetHeight) {
+      scoreRegeln();
+      var c = saeubern(h.cloneNode(true)); c.classList.add('pw-psk');
+      _score = { h: c.outerHTML, w: h.offsetWidth, echt: true };
+    }
     else _score = { h: '<div style="background:#0A0A0A;color:#FDFCFA;border-radius:12px;padding:18px 22px;font:600 18px Space Grotesk,sans-serif">Investor Portfolio Score <span style="color:var(--wl-c9a84c, #C9A84C)">72</span> · Investment 70 · Finanzierung 75 <small style="font:400 13px Inter;color:#C9C1B1">Beispielwerte, noch keine Objekte im Bestand</small></div>', w: appBreite(), echt: false };
     return _score;
   }
@@ -268,41 +292,51 @@
       + '<button type="button" data-pw="weg" data-k="' + k + '" title="Entfernen" aria-label="' + esc(a.t) + ' entfernen">×</button></span></div>'
       + sub + vorschau(a.gruppe ? 'projektion' : k) + '</div>';
   }
-  function palette() {
+  /* v4950 · Runde 4 (Marcel): Gruppen sind echte Reiter wie im Einstellungen-Fenster (.ms-tab mit Symbol, Titel,
+     Unterzeile). Die Palette zeigt nur die gewählte Gruppe, statt einer langen Liste mit Sprungmarken. */
+  var _gruppe = 'kz', _tabs = [];
+  function gruppenListe() {
     var A = API.stand(), an = {}; aktiv().forEach(function (k) { an[k] = 1; });
-    var kzan = {}; kzAktiv().forEach(function (k) { kzan[k] = 1; });
-    /* v4900 · Kennzahlen zuerst (Marcel), jede als kleine Karte mit ihrem echten Wert */
-    var kzL = API.kzdef.filter(function (d) { return !kzan[d.k]; });
-    var kzH = kzL.length ? '<div class="pw-pg" data-g="kz"><div class="pw-pt">' + symbol('kz') + 'Kennzahlen oben</div><div class="pw-pl pw-pl-kz">' + kzL.map(function (d) {
-      var w = kzWert(d.k);
-      return '<button type="button" class="pw-pi pw-pkz" draggable="true" data-pw="kzhinzu" data-k="' + d.k + '" title="Ziehen oder klicken: erscheint oben in der Kennzahl-Leiste"><span class="pw-kzl">' + esc(w.l) + '</span><b class="pw-kzv' + (w.c ? ' pw-' + w.c : '') + '">' + esc(w.v || '·') + '</b><i aria-hidden="true">+</i></button>';
-    }).join('') + '</div></div>' : '';
-    var h = kzH, tabs = kzL.length ? [{ k: 'kz', t: 'Kennzahlen' }] : [];
+    var kzan = {}, kzA = kzAktiv(); kzA.forEach(function (k) { kzan[k] = 1; });
+    var out = [{ k: 'kz', t: 'Kennzahlen', d: kzA.length + ' oben im Cockpit', L: API.kzdef.filter(function (d) { return !kzan[d.k]; }).map(function (d) { return d.k; }) }];
     var gesehen = {};
     GRUPPEN.forEach(function (g) { g.m.forEach(function (k) { gesehen[k] = 1; }); });
     var rest = API.ansicht.filter(function (a) { return !a.fest && !a.vb && !gesehen[a.k]; }).map(function (a) { return a.k; });
     GRUPPEN.concat(rest.length ? [{ k: 'rest', t: 'Weitere', m: rest }] : []).forEach(function (g) {
-      var L = g.m.filter(function (k) { var a = modul(k); return a && !a.fest && !a.vb && !an[k]; });
+      var alle = g.m.filter(function (k) { var a = modul(k); return a && !a.fest && !a.vb; });
+      var L = alle.filter(function (k) { return !an[k]; }), drin = alle.length - L.length;
       if (g.k === 'wert') { API.vbk.forEach(function (v) { if (!A.an[v]) L.push(v); }); }
-      if (!L.length) return;
-      tabs.push({ k: g.k, t: g.t.replace(' und Cashflow', '').replace(' und Ziele', '').replace(' und Vermögen', '') });
-      /* jeder Baustein mit seinem echten Mini-Bild; beim Überfahren erscheint es groß (pw-pop) */
-      h += '<div class="pw-pg" data-g="' + g.k + '"><div class="pw-pt">' + symbol(g.k) + esc(g.t) + '</div><div class="pw-pl">' + L.map(function (k) {
-        var a = modul(k);
-        return '<button type="button" class="pw-pi pw-pim" draggable="true" data-pw="hinzu" data-k="' + k + '" title="' + esc(a.w || '') + '"><span class="pw-pit"><b>' + esc(a.t) + (a.vb ? '<small>in Projektion und Verlauf</small>' : '') + '</b><i aria-hidden="true">+</i></span>'
-          + miniBox(a.vb ? 'projektion' : k, 'pw-pmini', 88) + '</button>';
-      }).join('') + '</div></div>';
+      out.push({ k: g.k, t: g.t, d: drin + ' im Cockpit · ' + L.length + ' zur Auswahl', L: L });
     });
-    _tabs = tabs;
-    return h;
+    return out;
   }
-  var _tabs = [];
+  function palette() {
+    var G = gruppenListe(); _tabs = G;
+    var g = G.filter(function (x) { return x.k === _gruppe; })[0] || G[0]; _gruppe = g.k;
+    var kopf = '<div class="pw-pt">' + esc(g.t) + '</div>';
+    if (!g.L.length) return '<div class="pw-pg" data-g="' + g.k + '">' + kopf + '<p class="pw-pleer">' + (g.k === 'kz' ? 'Alle Kennzahlen stehen schon oben im Cockpit.' : 'Alle Bausteine dieser Gruppe stehen schon im Cockpit.') + '</p></div>';
+    if (g.k === 'kz') return '<div class="pw-pg" data-g="kz">' + kopf + '<div class="pw-pl pw-pl-kz">' + g.L.map(function (k) {
+      var w = kzWert(k);
+      return '<button type="button" class="pw-pi pw-pkz" draggable="true" data-pw="kzhinzu" data-k="' + k + '" title="Ziehen oder klicken: erscheint oben in der Kennzahl-Leiste"><span class="pw-kzl">' + esc(w.l) + '</span><b class="pw-kzv' + (w.c ? ' pw-' + w.c : '') + '">' + esc(w.v || '·') + '</b><i aria-hidden="true">+</i></button>';
+    }).join('') + '</div></div>';
+    /* jeder Baustein mit seinem echten Mini-Bild, beim Überfahren erscheint es groß (pw-pop) */
+    return '<div class="pw-pg" data-g="' + g.k + '">' + kopf + '<div class="pw-pl">' + g.L.map(function (k) {
+      var a = modul(k);
+      return '<button type="button" class="pw-pi pw-pim" draggable="true" data-pw="hinzu" data-k="' + k + '" title="' + esc(a.w || '') + '"><span class="pw-pit"><b>' + esc(a.t) + (a.vb ? '<small>in Projektion und Verlauf</small>' : '') + '</b><i aria-hidden="true">+</i></span>'
+        + miniBox(a.vb ? 'projektion' : k, 'pw-pmini', 88) + '</button>';
+    }).join('') + '</div></div>';
+  }
   function reiterHtml() {
-    return _tabs.map(function (t, i) { return '<button type="button" class="pw-tab' + (i === 0 ? ' an' : '') + '" data-pw="tab" data-k="' + t.k + '">' + symbol(t.k) + '<span>' + esc(t.t) + '</span></button>'; }).join('');
+    return _tabs.map(function (t) {
+      var an = t.k === _gruppe;
+      return '<button type="button" class="help-sidebar-item st-tab ms-tab' + (an ? ' active' : '') + '" role="tab" aria-selected="' + an + '" data-pw="tab" data-k="' + t.k + '">'
+        + '<div class="help-sidebar-item-row"><span class="help-sidebar-item-icon">' + symbol(t.k) + '</span><span class="help-sidebar-item-title">' + esc(t.t) + '</span></div>'
+        + '<span class="help-sidebar-item-desc">' + esc(t.d) + '</span></button>';
+    }).join('');
   }
   function zeichnen() {
     var p = document.getElementById('dp-pw'); if (!p) return;
-    _klein = window.innerWidth < 820; p.classList.toggle('pw-klein', _klein);
+    _klein = window.innerWidth <= 768;   /* Umbruch wie das Einstellungen-Fenster */ p.classList.toggle('pw-klein', _klein);
     var A = API.stand();
     var fok = document.activeElement && p.contains(document.activeElement) ? [document.activeElement.getAttribute('data-pw') || 'blk', document.activeElement.getAttribute('data-k')] : null;
     p.querySelector('.pw-vl').innerHTML = API.vorlagen.map(function (v) {
@@ -341,19 +375,16 @@
       x.parentNode.style.height = Math.min(mx, Math.max(24, Math.round((x.scrollHeight || 300) * f))) + 'px';
     });
   }
-  /* Reiter der Palette: Klick springt zur Gruppe, beim Blättern folgt der aktive Reiter */
   function reiterAktiv() {
     var p = document.getElementById('dp-pw'); if (!p) return;
-    var pl = p.querySelector('.pw-pliste'), top = pl.getBoundingClientRect().top, akt = null;
-    [].forEach.call(pl.querySelectorAll('.pw-pg'), function (g) { if (g.getBoundingClientRect().top - top < 40) akt = g.getAttribute('data-g'); });
-    if (!akt) { var f = pl.querySelector('.pw-pg'); akt = f && f.getAttribute('data-g'); }
-    [].forEach.call(p.querySelectorAll('.pw-tab'), function (t) { t.classList.toggle('an', t.getAttribute('data-k') === akt); });
+    [].forEach.call(p.querySelectorAll('.pw-ptabs .ms-tab'), function (t) { var an = t.getAttribute('data-k') === _gruppe; t.classList.toggle('active', an); t.setAttribute('aria-selected', String(an)); });
   }
   function reiterSprung(g) {
     var p = document.getElementById('dp-pw'); if (!p) return;
-    var pl = p.querySelector('.pw-pliste'), z = pl.querySelector('.pw-pg[data-g="' + g + '"]'); if (!z) return;
-    pl.scrollTo({ top: Math.max(0, z.getBoundingClientRect().top - pl.getBoundingClientRect().top + pl.scrollTop - 4), behavior: 'smooth' });
-    [].forEach.call(p.querySelectorAll('.pw-tab'), function (t) { t.classList.toggle('an', t.getAttribute('data-k') === g); });
+    _gruppe = g; popWeg();
+    var pl = p.querySelector('.pw-pliste'); pl.innerHTML = palette(); pl.scrollTop = 0;
+    reiterAktiv(); skalierenIn(pl);
+    if (_klein) { var t = p.querySelector('.pw-ptabs .ms-tab.active'); if (t && t.scrollIntoView) t.scrollIntoView({ block: 'nearest', inline: 'center' }); }
   }
   /* Große Live-Vorschau beim Überfahren eines Bausteins in der Palette */
   function popZeigen(btn) {
@@ -424,6 +455,7 @@
     var p = document.getElementById('dp-pw'), h = document.getElementById('dp-pw-hg');
     if (p) p.parentNode.removeChild(p); if (h) h.parentNode.removeChild(h);
     var off = document.getElementById('pw-off'); if (off) off.parentNode.removeChild(off);
+    var pss = document.getElementById('pw-psk-stil'); if (pss) pss.parentNode.removeChild(pss);
     _mini = {}; _vmini = {}; _score = null; _warte = []; _wLauf = 0; _wGen++;
     _offen = false; _rueck = []; document.removeEventListener('keydown', taste, true); window.removeEventListener('resize', zeichnen);
     document.documentElement.classList.remove('pw-offen');
@@ -434,26 +466,32 @@
     if (window.DpVorschau && !api.__frei) { window.DpVorschau.frei('grafiken_neu').then(function (an) { if (an) { api.__frei = true; oeffnen(api); } }); return; }
     API = api; if (_offen) { zeichnen(); return; }
     _offen = true; _vorher = document.activeElement; _rueck = []; stil();
-    var hg = document.createElement('div'); hg.id = 'dp-pw-hg'; hg.className = 'pw-hg'; hg.setAttribute('aria-hidden', 'true'); document.body.appendChild(hg);
-    var p = document.createElement('div'); p.id = 'dp-pw'; p.className = 'pw'; p.setAttribute('role', 'dialog'); p.setAttribute('aria-modal', 'true'); p.setAttribute('aria-labelledby', 'pw-t');
+    /* v4950 · Runde 4: Aufbau und Klassen wie das Einstellungen-Fenster (settings.js, help.js): global-view-overlay,
+       set-modal-v2 set-modal-cream, dp-modal-topband (Markenleiste + goldener Kopf), modal-side mit .ms-tab-Reitern,
+       set-modal-content mit pane-wrap und settings-footer (btn-ghost, btn-gold). Das Raster setzt stil() unter #dp-pw. */
+    var p = document.createElement('div'); p.id = 'dp-pw'; p.className = 'pw global-view-overlay'; p.setAttribute('role', 'dialog'); p.setAttribute('aria-modal', 'true'); p.setAttribute('aria-labelledby', 'pw-t');
     _kzCache = {};
-    /* v4890 · Aufbau wie die übrigen DealPilot-Fenster (modal-boarding-skin): schwarze Markenleiste mit Logo und
-       goldgerahmtem ×, goldener Kopf mit Kicker und Titel, heller Inhalt, Fußleiste mit schwarzem Hauptknopf */
-    var X = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>';
-    p.innerHTML = '<div class="pw-brand"><span class="pw-logo">Deal<b>Pilot</b></span><span class="pw-tag">PORTFOLIO-COCKPIT · ANSICHT</span><button type="button" class="pw-x" data-pw="zu" aria-label="Schließen">' + X + '</button></div>'
-      + '<div class="pw-hero"><div class="pw-kt"><span class="pw-eye">Ansicht anpassen</span><b id="pw-t">Cockpit zusammenbauen</b>'
-      + '<small>Links Bausteine und Kennzahlen anklicken oder hineinziehen, im Arbeitsbereich verschieben, × entfernt. Alles speichert sofort.</small></div>'
-      + '<div class="pw-kb"><button type="button" class="pw-btn" data-pw="rueck" title="Rückgängig (Strg Z)">↶ Rückgängig</button><button type="button" class="pw-btn" data-pw="reset">Zurücksetzen</button>'
-      + '<button type="button" class="pw-btn pw-alt" data-pw="leiste" title="Die bisherige Liste">Als Liste</button></div></div>'
+    var X = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+    p.innerHTML = '<div class="global-view-modal set-modal-v2 set-modal-cream pw-m">'
+      + '<div class="dp-modal-topband"><div class="dp-mtb-brand"><span class="dp-mtb-logo">Deal<span class="dp-mtb-logo-g">Pilot</span></span><span class="dp-mtb-tag">PORTFOLIO-COCKPIT</span>'
+      + '<button type="button" class="set-modal-close dp-band-close pw-x" data-pw="zu" aria-label="Schließen" title="Schließen (ESC)">' + X + '</button></div>'
+      + '<div class="dp-mtb-hero dp-mtb-hero-titled"><div class="dp-mtb-h-title" id="pw-t">Ansicht anpassen</div>'
+      + '<div class="dp-mtb-h-sub">Links eine Gruppe wählen, Bausteine anklicken oder in den Arbeitsbereich ziehen. Alles speichert sofort.</div></div></div>'
+      + '<aside class="modal-side"><div class="ms-h"><div class="ms-title"><span class="gold">Bausteine</span></div><div class="ms-sub">Gruppen des Cockpits</div></div>'
+      + '<div class="settings-tabs ms-tabs pw-ptabs" role="tablist" aria-label="Gruppen"></div></aside>'
+      + '<div class="set-modal-content"><div class="pane-wrap pw-pane">'
       + '<div class="pw-vlw"><span class="pw-h">Vorlagen</span><div class="pw-vl"></div></div>'
-      + '<div class="pw-body"><aside class="pw-pal" aria-label="Bausteine zum Hinzufügen"><nav class="pw-ptabs" aria-label="Gruppen"></nav><div class="pw-pliste"></div></aside>'
+      + '<div class="pw-body"><div class="pw-pal" aria-label="Bausteine zum Hinzufügen"><div class="pw-pliste" role="tabpanel"></div></div>'
       + '<section class="pw-ab" aria-label="Arbeitsbereich"><div class="pw-abk"><span class="pw-h">So sieht dein Cockpit aus</span>'
       + '<span class="pw-geraet" role="group" aria-label="Ansicht"><button type="button" class="an" data-pw="geraet" data-k="pc" aria-pressed="true">Bildschirm</button><button type="button" data-pw="geraet" data-k="handy" aria-pressed="false">Handy</button></span></div>'
       + '<div class="pw-buehne">'
       + '<div class="pw-score" aria-label="Score-Kopf mit Investment- und Finanzierungs-Score, fest"></div>'
       + '<div class="pw-h">Kennzahlen oben</div><div class="pw-kz" role="list"></div>'
-      + '<div class="pw-h">Bausteine</div><div class="pw-raster" role="list"></div></div></section></div>'
-      + '<div class="pw-f"><span id="pw-live-msg" class="pw-msg" aria-live="polite"></span><button type="button" class="pw-ok" data-pw="zu">Fertig</button></div>'
+      + '<div class="pw-h">Bausteine</div><div class="pw-raster" role="list"></div></div></section></div></div>'
+      + '<div class="settings-footer save-row"><div class="save-info"><span class="save-info-text" id="pw-live-msg" aria-live="polite">Änderungen werden automatisch gespeichert</span></div>'
+      + '<div class="btns"><button type="button" class="btn btn-ghost" data-pw="rueck" title="Rückgängig (Strg Z)">Rückgängig</button><button type="button" class="btn btn-ghost" data-pw="reset">Zurücksetzen</button>'
+      + '<button type="button" class="btn btn-ghost pw-alt" data-pw="leiste" title="Die bisherige Liste">Als Liste</button><button type="button" class="btn btn-gold" data-pw="zu">Fertig</button></div></div>'
+      + '</div></div>'
       + '<div id="pw-pop" class="pw-pop" hidden aria-hidden="true"></div>';
     _mini = {}; _vmini = {}; _score = null; _warte = []; _wLauf = 0; _wGen++;
     document.body.appendChild(p); document.documentElement.classList.add('pw-offen');
@@ -489,7 +527,7 @@
     pal.addEventListener('mouseover', function (ev) { var b = ev.target.closest && ev.target.closest('.pw-pim'); if (b) popZeigen(b); });
     pal.addEventListener('focusin', function (ev) { var b = ev.target.closest && ev.target.closest('.pw-pim'); if (b) popZeigen(b); });
     pal.addEventListener('mouseleave', popWeg); pal.addEventListener('focusout', function (ev) { if (!pal.contains(ev.relatedTarget)) popWeg(); });
-    p.querySelector('.pw-pliste').addEventListener('scroll', function () { popWeg(); reiterAktiv(); });
+    p.querySelector('.pw-pliste').addEventListener('scroll', popWeg);
     p.querySelector('.pw-buehne').addEventListener('transitionend', function (ev) { if (ev.propertyName === 'max-width') skalieren(); });
     ziehenEinrichten(p);
     document.addEventListener('keydown', taste, true); window.addEventListener('resize', zeichnen);
@@ -514,42 +552,36 @@
     var W2 = 'color-mix(in srgb, ' + G + ' 2%, #fff)', W4 = 'color-mix(in srgb, ' + G + ' 4%, #fff)', W8 = 'color-mix(in srgb, ' + G + ' 8%, #fff)';
     s.textContent = [
       'html.pw-offen,html.pw-offen body{overflow:hidden}',
-      '.pw-hg{position:fixed;inset:0;background:rgba(20,18,16,.55);z-index:100040}',
-      '.pw{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(1180px,96vw);height:min(880px,94vh);z-index:100041;display:flex;flex-direction:column;background:#fff;color:' + T + ';border:1px solid ' + G35 + ';border-radius:16px;box-shadow:0 24px 80px rgba(0,0,0,.45);font-family:Inter,system-ui,sans-serif;overflow:hidden}',
-      '.pw-brand{flex:none;background:#070707;padding:14px 22px;display:flex;align-items:center;gap:12px}',
-      '.pw-logo{font:700 17px "Space Grotesk",Inter,system-ui,sans-serif;color:#fff;letter-spacing:.3px}', '.pw-logo b{color:' + GH + ';font-weight:700}',
-      '.pw-tag{margin-left:auto;font:700 10px "JetBrains Mono",monospace;letter-spacing:2px;color:' + GH + '}',
-      '.pw .pw-x{width:32px;height:32px;border-radius:9px;background:#17130d;border:1.5px solid ' + GH + ';color:' + GH + ';box-shadow:0 2px 8px rgba(0,0,0,.45);display:inline-flex;align-items:center;justify-content:center;padding:0 !important;min-height:0 !important;margin-left:8px;cursor:pointer;position:relative;flex:0 0 auto}',
-      '.pw .pw-x svg{width:15px;height:15px;pointer-events:none}', '.pw .pw-x::after{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:44px;height:44px}',
-      '.pw .pw-x:hover{background:' + G + ';color:#fff}',
-      '.pw-hero{flex:none;display:flex;gap:16px;align-items:flex-end;justify-content:space-between;padding:14px 22px 14px;background:linear-gradient(110deg,' + GH + ',' + G + ' 60%,' + GD + ')}',
-      '.pw-eye{display:block;font:700 11px "JetBrains Mono",monospace;letter-spacing:3px;text-transform:uppercase;color:#5A4A14;margin-bottom:4px}',
-      '.pw-kt b{display:block;font:700 21px/1.2 "Space Grotesk",Inter,sans-serif;color:#1A1407;margin:0 0 3px}',
-      '.pw-kt small{font:400 13px/1.5 Inter,sans-serif;color:#3A2E08}',
-      '.pw-dunkel .pw-eye{color:rgba(255,255,255,.78)}', '.pw-dunkel .pw-kt b{color:#fff}', '.pw-dunkel .pw-kt small{color:rgba(255,255,255,.86)}',
-      '.pw-dunkel .pw-btn{color:#fff;background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.35)}', '.pw-dunkel .pw-btn:hover:not(:disabled){background:rgba(255,255,255,.26)}',
-      '.pw-kb{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end}',
-      '.pw-btn{font:600 12.5px Inter,sans-serif;color:#1A1407;background:rgba(255,255,255,.6);border:1px solid rgba(26,20,7,.22);border-radius:8px;padding:8px 14px;cursor:pointer;min-height:34px}',
-      '.pw-btn:hover:not(:disabled){background:#fff}', '.pw-btn:disabled{opacity:.45;cursor:default}',
+      /* Gerüst wie das Einstellungen-Fenster, am 25.11.2026 per getComputedStyle gemessen: Fenster 1180 x 828, weiß, Radius 14,
+         Rand Gold 30 %, Schatten 0 30px 80px rgba(0,0,0,.5) + 1,5 px Gold, Seite 280 px dunkler Verlauf, Inhalt #FAFAF7,
+         Fuß dunkler Verlauf mit btn-gold. Markenleiste, Kopf, Reiter und Knöpfe kommen aus denselben Klassen in style.css. */
+      '#dp-pw.global-view-overlay{z-index:100040}',
+      '#dp-pw .pw-m{display:grid !important;grid-template-columns:280px minmax(0,1fr) !important;grid-template-rows:auto minmax(0,1fr) !important;grid-template-areas:"band band" "side main" !important;width:100% !important;max-width:1180px !important;height:min(828px,92vh) !important;max-height:92vh !important;padding:0 !important;margin:0 auto;background:#fff !important;border:1px solid color-mix(in srgb, ' + G + ' 30%, transparent) !important;border-radius:14px !important;box-shadow:0 30px 80px rgba(0,0,0,.5),0 0 0 1.5px ' + G + ' !important;overflow:hidden !important;color:' + T + ';font-family:Inter,system-ui,sans-serif}',
+      '#dp-pw .dp-modal-topband{grid-area:band !important}',
+      '#dp-pw .modal-side{grid-area:side !important;min-height:0;display:flex;flex-direction:column}', '#dp-pw .ms-h{display:none}',
+      '#dp-pw .ms-tabs{flex:1;min-height:0}',
+      '#dp-pw .help-sidebar-item-icon .pw-sym{width:16px;height:16px;flex:0 0 16px;padding:0;background:none;color:inherit;box-sizing:border-box}',
+      '#dp-pw .set-modal-content{grid-area:main !important;display:flex !important;flex-direction:column !important;min-height:0;overflow:hidden !important}',
+      '#dp-pw .pw-pane{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;padding:0 !important;overflow:hidden !important;background:#fff}',
+      '#dp-pw .settings-footer{flex:none}', '#dp-pw .settings-footer .btns{display:flex;gap:8px;align-items:center}',
+      '#dp-pw .settings-footer .btn:disabled{opacity:.4;cursor:default}',
+      '#dp-pw.pw-dunkel .dp-mtb-h-title{color:#fff !important}', '#dp-pw.pw-dunkel .dp-mtb-h-sub{color:rgba(255,255,255,.86) !important}',
       /* Vorlagen: echte verkleinerte Bilder */
-      '.pw-vlw{flex:none;display:flex;gap:12px;align-items:center;padding:10px 22px;border-bottom:1px solid ' + G25 + ';overflow-x:auto;background:#fff}',
+      '.pw-vlw{flex:none;display:flex;gap:12px;align-items:center;padding:12px 24px;border-bottom:1px solid ' + G25 + ';overflow-x:auto;background:#fff}',
       '.pw-h{font:700 11px "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:' + GD + ';white-space:nowrap}',
       '.pw-vl{display:flex;gap:10px}',
-      '.pw-v{display:flex;flex-direction:column;gap:6px;align-items:stretch;width:156px;flex:0 0 156px;padding:6px;background:' + W4 + ';border:1px solid ' + G25 + ';border-radius:10px;color:' + T + ';cursor:pointer;text-align:left}',
+      '.pw-v{display:flex;flex-direction:column;gap:6px;align-items:stretch;width:150px;flex:0 0 150px;padding:6px;background:#fff;border:1px solid ' + G25 + ';border-radius:10px;color:' + T + ';cursor:pointer;text-align:left}',
       '.pw-v b{font:600 11.5px Inter,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 2px}', '.pw-v:hover{border-color:' + G + '}',
-      '.pw-v.an{border-color:' + G + ';box-shadow:0 0 0 1.5px ' + G + ' inset}',
+      '.pw-v.an{border-color:' + G + ';box-shadow:0 0 0 1.5px ' + G + ' inset;background:' + W4 + '}',
       '.pw-vm{display:block;width:100%;border-radius:6px;background:#fff;border:1px solid ' + G25 + '}',
       /* Echte Mini-Bilder */
       '.pw-mini{position:relative;overflow:hidden;pointer-events:none}', '.pw-mini-in{transform-origin:0 0;position:absolute;left:0;top:0}',
-      '.pw-body{flex:1;display:grid;grid-template-columns:300px 1fr;min-height:0}',
-      '.pw-pal{display:flex;flex-direction:column;min-height:0;border-right:1px solid ' + G25 + ';background:' + W2 + '}',
-      '.pw-ptabs{flex:none;display:flex;flex-wrap:wrap;gap:4px;padding:10px 10px 8px;border-bottom:1px solid ' + G25 + ';background:#fff}',
-      '.pw-tab{display:inline-flex;align-items:center;gap:5px;font:600 11.5px Inter,sans-serif;color:' + T + ';background:#fff;border:1px solid ' + G25 + ';border-radius:8px;padding:5px 8px 5px 5px;cursor:pointer;min-height:0 !important}',
-      '.pw-tab .pw-sym{width:14px;height:14px;flex:0 0 14px;padding:2px}', '.pw-tab:hover{border-color:' + G + '}',
-      '.pw-tab.an{background:' + G + ';border-color:' + G + ';color:#fff}', '.pw-tab.an .pw-sym{background:rgba(255,255,255,.22);color:#fff}',
-      '.pw-pliste{flex:1;overflow:auto;padding:10px 12px 24px;position:relative}',
+      '.pw-body{flex:1;display:grid;grid-template-columns:272px minmax(0,1fr);min-height:0}',
+      '.pw-pal{display:flex;flex-direction:column;min-height:0;border-right:1px solid ' + G25 + ';background:#fff}',
+      '.pw-pleer{font:400 12px/1.5 Inter,sans-serif;color:' + M + ';margin:4px 2px}',
+      '.pw-pliste{flex:1;overflow:auto;padding:16px 16px 24px;position:relative}',
       '.pw-pg{margin-bottom:16px}',
-      '.pw-pt{display:flex;align-items:center;gap:7px;font:700 11px "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:' + GD + ';margin:2px 2px 8px}',
+      '.pw-pt{display:flex;align-items:center;gap:10px;font:700 11px "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:' + GD + ';margin:2px 2px 10px}', '.pw-pt::after{content:"";flex:1;height:1px;background:' + G25 + '}',
       '.pw-sym{width:18px;height:18px;flex:0 0 18px;color:' + GD + ';background:' + W8 + ';border-radius:6px;padding:3px;box-sizing:content-box}',
       '.pw-pl{display:flex;flex-direction:column;gap:7px}', '.pw-pl-kz{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}',
       '.pw-pi{position:relative;display:flex;align-items:center;gap:8px;width:100%;padding:7px 9px;background:' + W4 + ';border:1px solid ' + G25 + ';border-radius:10px;color:' + T + ';cursor:grab;text-align:left}',
@@ -564,7 +596,7 @@
       '.pw-pop-k b{display:block;font:600 14px "Space Grotesk",Inter,sans-serif;color:' + T + '}', '.pw-pop-k small{display:block;font:400 12px/1.4 Inter,sans-serif;color:' + M + ';margin:2px 0 8px}',
       '.pw-popbild{border:1px solid ' + G25 + ';border-radius:8px;background:#fff}', '.pw-popbild-leer{height:120px;display:flex;align-items:center;justify-content:center}',
       /* Arbeitsbereich */
-      '.pw-ab{overflow:auto;padding:12px 18px 24px;background:#F6F4EF}',
+      '.pw-ab{overflow:auto;padding:16px 20px 24px;background:#FAFAF7}',
       '.pw-abk{display:flex;align-items:center;justify-content:space-between;gap:10px;max-width:780px;margin:0 auto 8px}',
       '.pw-geraet{display:inline-flex;border:1px solid ' + G25 + ';border-radius:8px;overflow:hidden;background:#fff}',
       '.pw-geraet button{font:600 11.5px Inter,sans-serif;color:' + T + ';background:#fff;border:0;padding:5px 11px;cursor:pointer;min-height:0 !important}', '.pw-geraet button.an{background:' + G + ';color:#fff}',
@@ -609,15 +641,23 @@
       '.pw-zug-mod .pw-drop,.pw-zug-kz .pw-kzdrop{border-color:' + G + ';border-width:2px;color:' + T + ';background:color-mix(in srgb, ' + G + ' 12%, #fff)}',
       '.pw-zug-mod .pw-raster,.pw-zug-kz .pw-kz{outline:2px dashed ' + G45 + ';outline-offset:6px;border-radius:10px}',
       '.pw-ueber.pw-drop,.pw-ueber.pw-kzdrop{background:color-mix(in srgb, ' + G + ' 22%, #fff) !important}',
-      '.pw-f{flex:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 20px;border-top:1px solid rgba(42,39,39,.08);background:#fff}',
-      '.pw-msg{font:400 12px Inter,sans-serif;color:' + M + '}',
-      '.pw .pw-ok{font:600 12.5px Inter,sans-serif;background:#0A0A0A;color:' + GH + ';border:1px solid transparent;border-radius:8px;padding:8px 22px;cursor:pointer;min-height:37px}', '.pw .pw-ok:hover{background:#141414}',
-      '.pw.pw-klein{left:0;top:0;transform:none;width:100%;height:100%;border-radius:0}',
-      '.pw-klein .pw-hero{flex-direction:column;align-items:stretch;gap:8px}', '.pw-klein .pw-kt small{display:none}', '.pw-klein .pw-alt{display:none}', '.pw-klein .pw-tag{display:none}',
-      '.pw-klein .pw-kb{justify-content:flex-start}', '.pw-klein .pw-geraet{display:none}',
-      '.pw-klein .pw-body{display:flex;flex-direction:column;overflow:auto}', '.pw-klein .pw-pal{order:2;border-right:0;border-top:1px solid ' + G25 + '}', '.pw-klein .pw-pliste{overflow:visible}',
-      '.pw-klein .pw-ab{order:1;overflow:visible}', '.pw-klein .pw-raster{grid-template-columns:1fr}', '.pw-klein .pw-b.pw-halb{grid-column:1/-1}',
-      '.pw-klein .pw-kz{grid-template-columns:repeat(2,minmax(0,1fr))}', '.pw-klein .pw-pop{display:none}',
+      /* Handy: wie das Einstellungen-Fenster vollflächig, Reiter als waagerecht scrollbare Leiste, Inhalt scrollt */
+      '#dp-pw.pw-klein{padding:0 !important}',
+      '#dp-pw.pw-klein .pw-m{grid-template-columns:minmax(0,1fr) !important;grid-template-rows:auto auto minmax(0,1fr) !important;grid-template-areas:"band" "side" "main" !important;height:100vh !important;height:100dvh !important;max-height:none !important;max-width:100vw !important;border-radius:0 !important;border:0 !important;box-shadow:none !important}',
+      '#dp-pw.pw-klein .dp-mtb-hero{display:none !important}',
+      '#dp-pw.pw-klein .modal-side{flex-direction:row !important;height:auto !important;overflow:hidden !important;border-bottom:1px solid ' + G25 + '}',
+      '#dp-pw.pw-klein .ms-tabs{flex-direction:row !important;overflow-x:auto !important;overflow-y:hidden !important;padding:8px 10px !important;gap:6px !important;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch}',
+      '#dp-pw.pw-klein .ms-tab{flex:0 0 auto !important;width:auto !important;padding:8px 12px !important;scroll-snap-align:start;min-height:40px}',
+      '#dp-pw.pw-klein .ms-tab .help-sidebar-item-desc{display:none !important}',
+      '#dp-pw.pw-klein .pw-pane{overflow-y:auto !important;overflow-x:hidden !important}',
+      '#dp-pw.pw-klein .pw-vlw{padding:10px 12px}', '#dp-pw.pw-klein .pw-v{width:128px;flex-basis:128px}',
+      '#dp-pw.pw-klein .pw-body{display:flex;flex-direction:column;flex:none}',
+      '#dp-pw.pw-klein .pw-pal{border-right:0;border-bottom:1px solid ' + G25 + '}', '#dp-pw.pw-klein .pw-pliste{overflow:visible;padding:12px}',
+      '#dp-pw.pw-klein .pw-pl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}',
+      '#dp-pw.pw-klein .pw-ab{overflow:visible;padding:12px}', '#dp-pw.pw-klein .pw-raster{grid-template-columns:1fr}', '#dp-pw.pw-klein .pw-b.pw-halb{grid-column:1/-1}',
+      '#dp-pw.pw-klein .pw-kz{grid-template-columns:repeat(2,minmax(0,1fr))}', '#dp-pw.pw-klein .pw-pop,#dp-pw.pw-klein .pw-geraet,#dp-pw.pw-klein .pw-alt{display:none !important}',
+      '#dp-pw.pw-klein .settings-footer{padding:10px 12px !important;gap:8px !important}', '#dp-pw.pw-klein .save-info{display:none !important}',
+      '#dp-pw.pw-klein .settings-footer .btns{width:100%;justify-content:flex-end}',
       '@media (prefers-reduced-motion:reduce){.pw-b,.pw-buehne{transition:none}}'
     ].join('\n');
     document.head.appendChild(s);
@@ -625,6 +665,6 @@
 
   window.DpPfWerkstatt = {
     aktiv: function () { try { return localStorage.getItem('dp_pf_werkstatt') !== '0'; } catch (e) { return true; } },
-    oeffnen: oeffnen, zu: zu, version: 'v4900'
+    oeffnen: oeffnen, zu: zu, version: 'v4950'
   };
 })();
