@@ -45647,6 +45647,13 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **opt.css (Hinweis PP4):** gemessen per grep: nur `landing/einzelcheck.js:1624` gibt `opt.css` mit. Investment-PDF live, Muster, Bank-PDF, Kurzfassung, Bankexport (`{quer:true}`) geben keins mit, ihr Layout ändert sich durch einzelcheck-10 nicht.
 - **Muster:** `Dateien/Investment-PDF/v4790/*-v4790c.pdf` (b bleibt). Rest: Hauptstr. 51 hat keinen Ertragswert (nur Marktpreisindikation), die Wertseite ist dort kurz, KI-Texte älter als die Zahlen.
 
+### v4790m–v4790o · DSCR und LTV wieder als Bank-Cockpit (Fork LL4, Muster v4790d, nur Staging)
+
+- **Marcel 25.11.:** „Vor einer Woche hatten wir noch andere Grafiken und Charts dort“. Gesucht über `git log` seit 15.11. Fundstelle: **v4380 (eb7af915, 24.11.)** hat in `dp-dokumente.js bankCockpit()` die Linien aus `dp-dokument.js linien()` (mit Kacheln Jahr 1 / Ende Zinsbindung / Ende, Investment-PDF seit v3180 bac764f4, 04.11.) durch `grafiken-bewertung.js _verlaufHtml` ersetzt.
+- **Kandidaten im Bild** `Dateien/Investment-PDF/v4790/dscr-ltv-alt-gegen-neu.png`: aktuell (_verlaufHtml) · Kandidat 1 linien() vor v4380 · Kandidat 2 Bank-Cockpit der App (`bank-charts.js renderBankCockpit`, Reiter Bank und klassisches Bank-PDF: Kennzahl groß mit Stufe, Skala mit Marke, 20-Jahres-Verlauf, Heute / Ende EZB / Anschluss, Hinweis). Eingesetzt: **Kandidat 2**, weil nur er die „Grafiken und Charts“ nebeneinander zeigt. Linien() ist schlicht und im Bild als Alternative zu sehen.
+- **Bau:** `cockpitApp()` rechnet die Karte mit der App, nimmt den Kopf weg (den trägt der Abschnitt) und legt ihre `.bc-*`-Regeln samt aufgelösten Farbwerten (Whitelabel) als `<style>` ins Dokument; PDF-Maßstab `zoom:.84`, damit sie unter die Phasen auf „Finanzierung und Anschluss“ passt (A, B, C). Ohne BankCharts bleibt die bisherige Grafik.
+- **Falle:** `ohneStriche()` hätte im eingebetteten CSS „; “ zu „, “ gemacht; `<style>`-Blöcke bleiben jetzt unberührt.
+
 ### Rollout 1.0.216 · einzelcheck-10/10a (Fork PP4)
 - **Was:** Einzel-Check-PDF: `DpDokument.dokument()` nimmt `opt.css` (fiel bisher still weg, daher kein Abstand nach der Mietpotenzial-Tabelle). Grundangaben MFH: Anzahl Wohnungen + Ausstattung (Sachwert braucht NHK-Typ und Standardstufe). Anschrift nur im Browser-Tab (sessionStorage), Hinweisfeld im Notweg.
 - **Commit:** staging 6d9a89e7, 11483e54, 1dfba881 · main a4f00529, 3b41faea, ab5dd6d2.
