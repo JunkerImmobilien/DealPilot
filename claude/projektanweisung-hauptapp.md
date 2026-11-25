@@ -45570,3 +45570,9 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** staging a0b04166, 9d85f891 · main 72713aaa, d5e4ecdb, Version 8ae68a26.
 - **Nachweis:** Staging-Lauf mit Testunterlagen (Auswertung 14.294 Zeichen, Pilot lief), Sprung gemessen, Marken 0 Überdeckungen bei 340–1100 px. buster-ebenen, vorschau SAUBER, gold-audit Prod RC 0. Sicherung haupt-/mb-20261125-0903-v4740 (7,0/31 MB, Kopf gelesen).
 - **Rest:** 2026-1192 (Lindenallee) hat weiter keine Auswertung, nur durch erneutes Einlesen.
+### Rollout 1.0.207 · v4750 / einzelcheck-7 (25.11.2026, Fork EE4)
+
+- **Was:** Reiter Finanzierung & Bank zeigt Tipps an DSCR und Cashflow nur mit eigenem Ziel im Investmentprofil. Deal-Check-Deckblatt mit eigener OSM-Lagekarte (SVG aus osmKacheln, Häuschen-Pin, „© OpenStreetMap-Mitwirkende“) statt Geoapify.
+- **Commit:** staging 9a7352c9, 4e92a013 · main 5f345570, 88269a41.
+- **Nachweis:** Hauptstr. 51 mit/ohne Ziel gemessen; Karte im Staging- und Prod-Container erzeugt; einzelcheck-pruefen, buster-ebenen, vorschau grün; Sicherung haupt-/mb-20261125-0901-v4750.
+- **Rest:** kein bezahlter Prod-Bericht gemessen; Marktbericht-Kopfkarte (mb-Dienst) weiter Geoapify.
