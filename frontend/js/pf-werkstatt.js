@@ -297,6 +297,12 @@
       + '<div class="pw-h">Bausteine</div><div class="pw-raster" role="list"></div></div></section></div>'
       + '<div class="pw-f"><span id="pw-live-msg" class="pw-msg" aria-live="polite"></span><button type="button" class="pw-ok" data-pw="zu">Fertig</button></div>';
     document.body.appendChild(p); document.documentElement.classList.add('pw-offen');
+    try {   /* Helligkeit der Akzentfarbe (Partner) messen: dunkel => heller Kopftext */
+      var m = (getComputedStyle(p.querySelector('.pw-sym') || p).color || '').match(/d+(.d+)?/g);
+      var hel = getComputedStyle(document.documentElement).getPropertyValue('--wl-c9a84c').trim() || '#C9A84C';
+      var c = hel.charAt(0) === '#' ? [parseInt(hel.substr(1, 2), 16), parseInt(hel.substr(3, 2), 16), parseInt(hel.substr(5, 2), 16)] : (m ? m.slice(0, 3).map(Number) : [201, 168, 76]);
+      var lum = (0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]) / 255; p.classList.toggle('pw-dunkel', lum < 0.45);
+    } catch (e) {}
     p.addEventListener('click', function (ev) {
       var b = ev.target && ev.target.closest ? ev.target.closest('[data-pw]') : null; if (!b || !p.contains(b) || b.disabled) return;
       var a = b.getAttribute('data-pw'), k = b.getAttribute('data-k');
@@ -330,7 +336,7 @@
       '.pw{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(1180px,96vw);height:min(880px,94vh);z-index:100041;display:flex;flex-direction:column;background:#fff;color:' + T + ';border-radius:14px;box-shadow:0 24px 80px rgba(0,0,0,.45);font-family:Inter,system-ui,sans-serif;overflow:hidden}',
       '.pw-brand{flex:none;background:#070707;padding:12px 20px;display:flex;align-items:center;gap:12px}',
       '.pw-logo{font:700 17px "Space Grotesk",Inter,system-ui,sans-serif;color:#fff;letter-spacing:.3px}', '.pw-logo b{color:' + GH + ';font-weight:700}',
-      '.pw-tag{margin-left:auto;font:700 10px "JetBrains Mono",monospace;letter-spacing:2px;color:' + G + '}',
+      '.pw-tag{margin-left:auto;font:700 10px "JetBrains Mono",monospace;letter-spacing:2px;color:' + GH + '}',
       '.pw .pw-x{width:32px;height:32px;border-radius:9px;background:#17130d;border:1.5px solid ' + GH + ';color:' + GH + ';box-shadow:0 2px 8px rgba(0,0,0,.45);display:inline-flex;align-items:center;justify-content:center;padding:0 !important;min-height:0 !important;margin-left:8px;cursor:pointer;position:relative;flex:0 0 auto}',
       '.pw .pw-x svg{width:15px;height:15px;pointer-events:none}', '.pw .pw-x::after{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:44px;height:44px}',
       '.pw .pw-x:hover{background:' + G + ';color:#fff}',
@@ -338,6 +344,9 @@
       '.pw-eye{display:block;font:700 11px "JetBrains Mono",monospace;letter-spacing:3px;text-transform:uppercase;color:rgba(20,16,8,.72);margin-bottom:4px}',
       '.pw-kt b{display:block;font:700 21px/1.2 "Space Grotesk",Inter,sans-serif;color:#1a1407;margin:0 0 3px}',
       '.pw-kt small{font:400 13px/1.5 Inter,sans-serif;color:rgba(20,16,8,.82)}',
+      /* Dunkle Partnerfarbe: Kopftext hell statt dunkel (Kontrast), gemessen beim Öffnen */
+      '.pw-dunkel .pw-eye{color:rgba(255,255,255,.78)}', '.pw-dunkel .pw-kt b{color:#fff}', '.pw-dunkel .pw-kt small{color:rgba(255,255,255,.86)}',
+      '.pw-dunkel .pw-btn{color:#fff;background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.35)}', '.pw-dunkel .pw-btn:hover:not(:disabled){background:rgba(255,255,255,.26)}',
       '.pw-kb{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end}',
       '.pw-btn{font:600 12.5px Inter,sans-serif;color:#1a1407;background:rgba(255,255,255,.55);border:1px solid rgba(26,20,7,.25);border-radius:9px;padding:7px 12px;cursor:pointer;min-height:34px}',
       '.pw-btn:hover:not(:disabled){background:#fff}', '.pw-btn:disabled{opacity:.45;cursor:default}',
@@ -377,7 +386,7 @@
       '.pw-kz{display:grid;grid-template-columns:repeat(auto-fill,minmax(122px,1fr));gap:7px}',
       '.pw-kzc{position:relative;display:flex;flex-direction:column;gap:2px;background:#fff;border:1px solid ' + L + ';border-top:2px solid ' + G + ';border-radius:8px;padding:7px 22px 7px 10px;cursor:grab;min-width:0}',
       '.pw-kzc.pw-kzh{background:' + C + '}',
-      '.pw-kzl{font:500 9.5px Inter,sans-serif;letter-spacing:.05em;text-transform:uppercase;color:' + M + ';white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
+      '.pw-kzl{font:500 9.5px/1.25 Inter,sans-serif;letter-spacing:.05em;text-transform:uppercase;color:' + M + ';display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}',
       '.pw-kzv{font:600 15px "Space Grotesk",sans-serif;color:' + T + ';white-space:nowrap;overflow:hidden;text-overflow:ellipsis}', '.pw-kzv.pw-pos{color:#27704A}', '.pw-kzv.pw-neg{color:#9E4943}',
       '.pw-kzs{font:400 10px Inter,sans-serif;color:' + M + ';white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
       '.pw-kzc button,.pw-akt button[data-pw="weg"]{position:absolute;right:3px;top:3px;width:20px;height:20px;border:0;border-radius:50%;background:transparent;color:#8A8274;cursor:pointer;font-size:14px;padding:0 !important;min-height:0 !important;line-height:20px}',
