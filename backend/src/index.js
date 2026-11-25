@@ -690,6 +690,21 @@ async function start() {
     setInterval(_runAbl, 24 * 60 * 60 * 1000);
   } catch (e) { console.error('✗ Ablage-Fristen-Takt konnte nicht starten:', e.message); }
 
+  /* v4880 · Betrieb: Ampeln aus betrieb_messungen (Host-Takt tools/server/betrieb-sammeln.py), sofortige Mail bei Rot
+     (Platte, Nachtsicherung, TLS, Wiederherstellungsprobe, Messung fehlt), Wochenmail montags. Mails nur mit BETRIEB_MAIL=1. */
+  try {
+    const _betr = require('./services/betrieb');
+    const _betrScharf = String(process.env.BETRIEB_MAIL || '') === '1';
+    const _runBetr = require('./utils/taktSperre').takt('betrieb', async () => {
+      try {
+        const r = await _betr.lauf(require('./db/pool'), { trocken: !_betrScharf });
+        if (r.gesendet.length || r.rot.length) console.log('[betrieb]' + (_betrScharf ? '' : ' (trocken)'), JSON.stringify(r));
+      } catch (e) { console.error('[betrieb] Fehler:', e && e.message); }
+    });
+    setTimeout(_runBetr, 3 * 60 * 1000);
+    setInterval(_runBetr, 60 * 60 * 1000);
+  } catch (e) { console.error('✗ Betriebs-Takt konnte nicht starten:', e.message); }
+
   // v507: WebSocket-Relay fuer Live-Transkription (OpenAI Realtime)
   /* v538-ws-removed: Realtime-WS-Live-Pfad entfernt. Web-Audio liefert auf manchen
      Geraeten Stille -> Realtime unbrauchbar. Live-Mitschrift laeuft seit v536 ueber

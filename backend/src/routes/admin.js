@@ -2296,4 +2296,26 @@ router.get('/landing-analytics', requireAdmin, async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
+/* v4880 · Betrieb: Zustand der Server (nur lesend). Daten vom Host-Takt, Bewertung in services/betrieb.js. */
+router.get('/betrieb', requireAdmin, async (req, res) => {
+  try {
+    const betrieb = require('../services/betrieb');
+    const d = await betrieb.laden(req.app.get('db'));
+    const b = betrieb.bewerten({ messung: d.messung, verlauf: d.verlauf, probe: d.probe, audit: d.audit, schwellen: betrieb.schwellenAusUmgebung(), konfigOffsite: String(process.env.BETRIEB_KONFIG_OFFSITE || '') === '1' });
+    const reihe = d.verlauf.map((v) => ({ t: v.erfasst_am, platte: v.daten && v.daten.platte && v.daten.platte.pct,
+      ram: v.daten && v.daten.speicher && v.daten.speicher.pct, last: v.daten && v.daten.last && v.daten.last.kerne ? +(v.daten.last.l1 / v.daten.last.kerne).toFixed(2) : null }));
+    res.json({ server: d.server, stand: d.messung && d.messung.erfasst_am, messung: d.messung && d.messung.daten,
+      probe: d.probe, audit: d.audit, kunden: d.kunden, bewertung: b, reihe, schwellen: Object.assign({}, betrieb.SCHWELLEN, betrieb.schwellenAusUmgebung()),
+      mail_scharf: String(process.env.BETRIEB_MAIL || '') === '1' });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+router.get('/betrieb/mail-vorschau', requireAdmin, async (req, res) => {
+  try {
+    const betrieb = require('../services/betrieb');
+    const d = await betrieb.laden(req.app.get('db'));
+    const b = betrieb.bewerten({ messung: d.messung, verlauf: d.verlauf, probe: d.probe, audit: d.audit, schwellen: betrieb.schwellenAusUmgebung(), konfigOffsite: String(process.env.BETRIEB_KONFIG_OFFSITE || '') === '1' });
+    res.type('html').send(betrieb.mailHtml(d.server, b, 'Wochenbericht Betrieb ' + d.server + ' (Vorschau)'));
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 module.exports = router;
