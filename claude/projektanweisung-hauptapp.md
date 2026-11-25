@@ -45544,3 +45544,10 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** staging 89cec68a, f00f1f92 · main R3 v4650a–d (6c9119a5 … d2e62ff4 nach Rebase neu), 15288eee, 0e90f3fe, 19380876, Version fee07cb7.
 - **Nachweis:** Staging Westerfeldstr. 146 alle Reiter gemessen, 390 px, Partnerfarbe Gold/Navy/Blau. Prod curl: Buster v4710, version 203. Sicherung haupt/mb-20261125-0750-v4710.
 - **Rest:** Prod nicht eingeloggt gemessen.
+
+### Rollout 1.0.204 · v4700/v4700a Quick-Check-Verlauf (Fork Y3, 25.11.2026)
+
+- **Was:** Objekt aus dem Quick-Check bekommt in Haus & Unterlagen › „Eingelesen und übernommen“ je gelesener Unterlage einen Eintrag mit Art, Werten, Zuordnung und Zurücknehmen (object-actions.js `_qcEingang`/`_qcVerlauf`, unterlagen-eingang.js `inAuswertung`, Gruppe „Auswertung“).
+- **Commit:** staging cc722609, f15e0179, Merge 8333a69a · main d78c52ce, 803f3dfd, Version d4e43ae9.
+- **Nachweis:** Lindenallee 14 (2026-1192) 14 Zeilen, Filter 14 von 14, Sprung Wohnungen. buster-ebenen, vorschau, unterlagen-steuer 53/53 grün. Prod-Sicherung haupt/mb-20261125-0757-v4700 (7,0/31 MB, Kopf gelesen), Auslieferung per curl.
+- **Rest:** Auto-Pilot nach Übergabe greift ohne „Alle übernehmen“ nicht; hin('weg') landet in Bewirtschaftung; Prod nicht eingeloggt gemessen.
