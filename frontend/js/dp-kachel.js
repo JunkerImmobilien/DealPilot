@@ -1,20 +1,21 @@
 /* v4660 · Kachel-Baustein (css/dp-kachel.css)
    - setzt html[data-dp-kachel] für die Kachel-Optik (Entwurf a|b|c),
-     bis Marcel gewählt hat nur auf Staging voreingestellt
-     (?kachel=a|b|c wählt, ?kachel=aus schaltet ab, gemerkt in dp_kachel)
+     v4710 · Marcel 25.11.2026: Entwurf a ist Standard für alle Hosts
+     (?kachel=a|b|c wählt, ?kachel=aus schaltet ab, gemerkt in dp_kachel2,
+     neuer Merker, damit Testwahlen aus v4660 nicht weiter gelten)
    - gibt der Score-Karte (.dp-pa4-urteil) Score und Stufenfarbe als
      Variablen für den Ring; die Stufe kommt aus ScoreTier (score-tiers.js) */
 (function () {
   'use strict';
   var html = document.documentElement;
-  var STANDARD_STAGING = 'a';
+  var STANDARD = 'a';
   var wahl = null;
   try {
     var q = new URLSearchParams(location.search).get('kachel');
-    if (q) { localStorage.setItem('dp_kachel', q); }
-    wahl = localStorage.getItem('dp_kachel');
+    if (q) { localStorage.setItem('dp_kachel2', q); }
+    wahl = localStorage.getItem('dp_kachel2');
   } catch (e) { /* ohne Speicher gilt die Voreinstellung */ }
-  if (!wahl && /(^|\.)staging\./.test(location.hostname)) wahl = STANDARD_STAGING;
+  if (!wahl) wahl = STANDARD;
   if (wahl && /^[abc]$/.test(wahl)) html.setAttribute('data-dp-kachel', wahl);
 
   var FARBE = { top: '#2E7D50', green: '#3FA56C', gold: 'var(--wl-c9a84c,#C9A84C)', red: '#B8625C' };

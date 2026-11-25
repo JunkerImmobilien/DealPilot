@@ -113,12 +113,31 @@
       /* Punkt: Schein, weisser Ring, Kern in Markenfarbe */
       var g = gold(), mx = p.mitte.x, my = p.mitte.y;
       ctx.save();
-      ctx.globalAlpha = 0.22; ctx.fillStyle = g; ctx.beginPath(); ctx.arc(mx, my, 26, 0, Math.PI * 2); ctx.fill();
-      ctx.globalAlpha = 1;
-      ctx.shadowColor = 'rgba(0,0,0,0.35)'; ctx.shadowBlur = 4; ctx.shadowOffsetY = 1;
-      ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.arc(mx, my, 10.5, 0, Math.PI * 2); ctx.fill();
-      ctx.shadowColor = 'transparent';
-      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(mx, my, 7.5, 0, Math.PI * 2); ctx.fill();
+      if (o.pin === 'haus') {
+        /* v4690 · Stecknadel mit Häuschen (Portfolio-Cockpit, Marcel 25.11.2026: „so eine Stecknadel, wo das Häuschen ist").
+           Spitze auf der Anschrift, Kopf darüber. Ohne o.pin bleibt der Punkt wie bisher (PDF). */
+        var R = 13, cy = my - 25;
+        ctx.globalAlpha = 0.25; ctx.fillStyle = '#000000'; ctx.beginPath(); ctx.ellipse(mx, my + 1, 7, 2.6, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.globalAlpha = 1;
+        ctx.shadowColor = 'rgba(0,0,0,0.35)'; ctx.shadowBlur = 5; ctx.shadowOffsetY = 1.5;
+        ctx.fillStyle = g; ctx.beginPath();
+        ctx.moveTo(mx, my); ctx.bezierCurveTo(mx - 5, my - 9, mx - R, cy + 8, mx - R, cy);
+        ctx.arc(mx, cy, R, Math.PI, 0, false);
+        ctx.bezierCurveTo(mx + R, cy + 8, mx + 5, my - 9, mx, my); ctx.closePath(); ctx.fill();
+        ctx.shadowColor = 'transparent';
+        ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 1.6; ctx.stroke();
+        ctx.fillStyle = '#ffffff'; ctx.beginPath();
+        ctx.moveTo(mx, cy - 7); ctx.lineTo(mx + 7.5, cy - 0.5); ctx.lineTo(mx + 5, cy - 0.5); ctx.lineTo(mx + 5, cy + 6);
+        ctx.lineTo(mx + 1.6, cy + 6); ctx.lineTo(mx + 1.6, cy + 2); ctx.lineTo(mx - 1.6, cy + 2); ctx.lineTo(mx - 1.6, cy + 6);
+        ctx.lineTo(mx - 5, cy + 6); ctx.lineTo(mx - 5, cy - 0.5); ctx.lineTo(mx - 7.5, cy - 0.5); ctx.closePath(); ctx.fill();
+      } else {
+        ctx.globalAlpha = 0.22; ctx.fillStyle = g; ctx.beginPath(); ctx.arc(mx, my, 26, 0, Math.PI * 2); ctx.fill();
+        ctx.globalAlpha = 1;
+        ctx.shadowColor = 'rgba(0,0,0,0.35)'; ctx.shadowBlur = 4; ctx.shadowOffsetY = 1;
+        ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.arc(mx, my, 10.5, 0, Math.PI * 2); ctx.fill();
+        ctx.shadowColor = 'transparent';
+        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(mx, my, 7.5, 0, Math.PI * 2); ctx.fill();
+      }
       ctx.restore();
       /* Namensnennung (ODbL) unten rechts */
       ctx.font = '10px Inter, Helvetica, Arial, sans-serif';

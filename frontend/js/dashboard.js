@@ -4264,7 +4264,7 @@
       var S = aggStats(true), A = {}; try { A = _zielbildAgg(arr) || {}; } catch (e) { A = {}; }
       var W = _wertHeuteJeObjekt(arr), BW = _bewertungJeObjekt(arr, A), BS = _bewSummen(BW);
       var zw = 0, zws = 0; arr.forEach(function (o) { var z = _pct(o.d1z), r = _restschuldOf(o) || 1; if (z > 0) { zw += r; zws += z * r; } });
-      return { S: S, W: W, BW: BW, BS: BS, n: arr.length, avgZins: zw > 0 ? zws / zw : null, mbLaedt: W.some(function (x) { return x.quelle === 'laedt'; }) };
+      return { S: S, W: W, BW: BW, BS: BS, A: A, n: arr.length, avgZins: zw > 0 ? zws / zw : null, mbLaedt: W.some(function (x) { return x.quelle === 'laedt'; }) };   /* v4690 · A: Zielbild je Objekt (Objektmatrix) */
     },
     /* v4260 · Restliche Cockpit-Grafiken im neuen Stil (grafiken-portfolio.js): dieselben Quellen wie buildCharts()
        (_bilanzHeute, projectAll) und die Steuerkette - nur gelesen, nichts neu gerechnet. */
