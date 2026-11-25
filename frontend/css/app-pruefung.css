@@ -1,0 +1,27 @@
+/* v4770 · App-Gesamtprüfung 25.11.2026 (Fork GG4): gemessene Überläufe bei 1440/1024/820/390 px.
+   Jede Regel nennt den Befund. Letztes Stylesheet nach pf-module.css. */
+
+/* Investition: Badge „Unter Grenze (…), Erhaltungsaufwand sofort abziehbar“ wurde bei 1024 px um 23 px abgeschnitten */
+#san_limit_status .badge { white-space: normal; display: inline-block; max-width: 100%; line-height: 1.35; text-align: right; }
+
+/* Objekt: Plakette „wichtig“ ragte bei 1440 px 24 px aus dem schmalen Feldnamen (Label nowrap) */
+.f label:has(> .dp-oa-pflicht) { white-space: normal; overflow: visible; }
+
+/* Objekt: „als Verkehrswert übernehmen“ ragte bei 390 px 76 px über den Rand (Knopf nowrap) */
+#oe-vw-btn { white-space: normal; max-width: 100%; text-align: left; height: auto; line-height: 1.3; }
+
+/* Ankauf · Bestand · Zielbild (Detail): letzte Spalte der Abweichungstafel bei 390 px 4 px abgeschnitten */
+.abw-tafel-host { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+/* Objekt-Cockpit (Musterhof 8, ohne Pilot-Analyse): die alten Jahresverlauf-Grafiken (SVG mit fester Breite 821 px)
+   zogen bei 390 px die Rasterspalte der Analyse auf 889 px, der ganze Jahresabgleich lag 500 px rechts außerhalb */
+.dp-pa-wrap > * { min-width: 0; }
+.dp-pa-wrap .dp-pa-card svg[width] { max-width: 100%; height: auto; }
+.dp-pa-wrap .dp-pa-card .jbg-leg { max-width: 100%; flex-wrap: wrap; }
+
+/* Steuer, Haus & Unterlagen: Knopf „Belege, Unterlagen & Rechnungen einlesen“ ragte bei 390 px 22 px heraus */
+.dp-pa4-btn { white-space: normal; max-width: 100%; height: auto; text-align: center; }
+
+/* Potenzial & Exit (einfach): Karte „Aufteilung in Eigentum 985.200 €“ ragte bei 390 px 27 px aus der Kachel */
+.dp-pap-rkk > * { min-width: 0; overflow-wrap: anywhere; white-space: normal; }
+@media (max-width: 620px) { .dp-pap-rkk > b { font-size: 15px; } }

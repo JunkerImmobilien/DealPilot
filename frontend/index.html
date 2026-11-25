@@ -41,7 +41,7 @@
 <style>html[data-dpl-vorab] body{visibility:hidden}</style>
 <script>(function(){try{if(/[?&]layout=aus(&|$)/.test(location.search))return;var h=document.documentElement;h.setAttribute('data-dpl-vorab','1');setTimeout(function(){h.removeAttribute('data-dpl-vorab');},3000);}catch(e){}})();</script>
 <link rel="stylesheet" href="css/style.css?v=v4060">
-<link rel="stylesheet" href="css/avsec-streifen.css?v=v2780b"><!-- v1148-spalt-1025px -->
+<link rel="stylesheet" href="css/avsec-streifen.css?v=v4770"><!-- v1148-spalt-1025px -->
 <link rel="stylesheet" href="css/avsec-karte-neu.css?v=v2780a"><!-- v2760/v2780a · Kartenfassung unter 940 px Kartenbreite -->
 <script src="js/einbettung.js?v=v2998a"></script><!-- v2998 · Anmeldekarte eingebettet in die Landingpage (nur im iframe mit ?einbettung=1) -->
 <script src="js/avsec-karte-neu.js?v=v2780a"></script><!-- v2780 · nur noch Vergleich ?mwkarte=alt -->
@@ -1358,9 +1358,9 @@ label.dp-required.qc-required::after {
           <div class="f"><label>Baustatus</label><div class="iw"><select id="baustatus">
         <option value="">— keine Angabe —</option>
         <option value="bestand">Bestand</option>
-        <option value="bestand_erstbezug_saniert">Bestand – Erstbezug nach Sanierung</option>
-        <option value="neubau_erstbezug">Neubau – Erstbezug</option>
-        <option value="neubau_im_bau">Neubau – im Bau</option>
+        <option value="bestand_erstbezug_saniert">Bestand · Erstbezug nach Sanierung</option>
+        <option value="neubau_erstbezug">Neubau · Erstbezug</option>
+        <option value="neubau_im_bau">Neubau · im Bau</option>
         <option value="geplant">Geplant / Bauträger</option>
       </select></div></div>
           <div class="f"><label>Gemarkung</label><input id="gemarkung" type="text" placeholder="z.B. Hüllhorst"></div>
@@ -1615,16 +1615,16 @@ label.dp-required.qc-required::after {
       
       
       
-      <div class="f"><label>Garage / Carport – Bruttogrundfläche (m²)</label><div class="iw"><input id="garagen_bgf_qm" type="text" inputmode="decimal" placeholder="Länge × Breite, alle zusammen" class="tr"><span class="sfx">m²</span></div></div>
-      <div class="f"><label>Garage – Standardstufe</label><div class="iw"><select id="garagen_stufe">
+      <div class="f"><label>Garage / Carport · Bruttogrundfläche (m²)</label><div class="iw"><input id="garagen_bgf_qm" type="text" inputmode="decimal" placeholder="Länge × Breite, alle zusammen" class="tr"><span class="sfx">m²</span></div></div>
+      <div class="f"><label>Garage · Standardstufe</label><div class="iw"><select id="garagen_stufe">
         <option value="">— keine Angabe —</option>
         <option value="3">3 · Fertiggarage</option>
         <option value="4">4 · Massivbauweise</option>
         <option value="5">5 · Massiv mit besonderer Ausführung</option>
       </select></div></div>
       <!-- v3043 · eigene Restnutzungsdauer der Garage (GND 60 J.); leer = Baujahr des Hauses -->
-      <div class="f"><label>Garage – Baujahr</label><div class="iw"><input id="garagen_baujahr" type="text" inputmode="numeric" placeholder="leer = wie das Haus" class="tr"></div></div>
-      <div class="f"><label>Außenanlagen (% des Gebäudesachwerts)</label><div class="iw"><input id="aussenanlagen_pct" type="text" inputmode="decimal" placeholder="z. B. 5 bis 7 – alternativ Betrag" class="tr"><span class="sfx">%</span></div></div>
+      <div class="f"><label>Garage · Baujahr</label><div class="iw"><input id="garagen_baujahr" type="text" inputmode="numeric" placeholder="leer = wie das Haus" class="tr"></div></div>
+      <div class="f"><label>Außenanlagen (% des Gebäudesachwerts)</label><div class="iw"><input id="aussenanlagen_pct" type="text" inputmode="decimal" placeholder="z. B. 5 bis 7, alternativ Betrag" class="tr"><span class="sfx">%</span></div></div>
       <div class="f"><label>Außenanlagen (€)</label><div class="iw"><span class="pfx">€</span><input id="aussenanlagen" type="text" inputmode="decimal" placeholder="Wege, Einfriedung, Ver- und Entsorgung" class="trl"></div></div>
     </div>
 
@@ -2223,7 +2223,7 @@ label.dp-required.qc-required::after {
 
 <!-- ═══════════ TAB 4: STEUER-DETAILS (vorher Teil von Tab 3) ═══════════ -->
 <div class="sec" id="s3-tax">
-  <h2 class="sec-title">Steuer-Details</h2><p class="sec-desc">Vollständige Steuerlogik – AfA, Progression, jährliche Werbungskosten und Finanzamt-PDFs</p>
+  <h2 class="sec-title">Steuer-Details</h2><p class="sec-desc">Vollständige Steuerlogik: AfA, Progression, jährliche Werbungskosten und Finanzamt-PDFs</p>
 
   <!-- v1871: Marcel: "oben ist relativ textlastig" - Haftungshinweis und Erklaerung liegen hinter einem Knopf; der Kern des Hinweises bleibt in der Zeile sichtbar. -->
   <details class="dp-steuer-hinweise" id="steuer-hinweise"><summary><span class="dp-sh-warn">⚠ Keine Steuerberatung</span><span class="dp-sh-txt">Rechenhilfe, keine Beratung (§ 6 StBerG) · wie die Werte in die Steuer eingehen</span><span class="oe-btn dp-sh-btn">Wichtige Hinweise</span></summary>
@@ -2506,7 +2506,7 @@ label.dp-required.qc-required::after {
           <div class="f checkbox-row">
             <label class="cb-label">
               <input type="checkbox" id="afa_sonder7b_neubau">
-              <span>Neubau mit Bauantrag/Kaufvertrag 01.01.2023 – 30.09.2029</span>
+              <span>Neubau mit Bauantrag/Kaufvertrag 01.01.2023 bis 30.09.2029</span>
             </label>
           </div>
           <div class="info-box" style="margin-top:10px;background:rgba(70,130,180,0.06);border-left:3px solid #4682B4;padding:10px;border-radius:4px">
@@ -2900,7 +2900,7 @@ label.dp-required.qc-required::after {
   </div>
   <div class="col2">
     <div>
-      <div class="card"><div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-bank"/></svg></span>Darlehen I – Hauptdarlehen</div>
+      <div class="card"><div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-bank"/></svg></span>Darlehen I · Hauptdarlehen</div>
         <!-- v3238 · Marcel 09.11.2026: „Anschlussfinanzierung und Position der Felder nicht gut im Tab Finanzierung."
              Vorher: sieben .g2-Paare in Ladereihenfolge (Art|Auszahlung, EK allein, Summe allein, Zins|Tilgung,
              Rate allein, Zinsen|Tilgung, Zinsbindung|Verwendung|Restschuld = drei Felder in zwei Spalten),
@@ -3115,7 +3115,7 @@ label.dp-required.qc-required::after {
       <!-- DARLEHEN II (optional) -->
       <div class="card">
         <div class="ct-row">
-          <div class="ct ct-pro" style="margin:0;border:none;padding:0"><span class="ct-ico"><svg width="22" height="22"><use href="#i-bank"/></svg></span>Darlehen II – Zusatzdarlehen</div>
+          <div class="ct ct-pro" style="margin:0;border:none;padding:0"><span class="ct-ico"><svg width="22" height="22"><use href="#i-bank"/></svg></span>Darlehen II · Zusatzdarlehen</div>
           <label class="toggle-slim"><input type="checkbox" id="d2_enable" onchange="toggleD2()"> <span>Hinzufügen</span></label>
         </div>
         <div id="d2_content" style="display:none; padding-top:12px">
@@ -3261,7 +3261,7 @@ label.dp-required.qc-required::after {
         <div class="kv"><span>Monatliche Rate</span><span class="kv-v c-gold" id="r-rate">—</span></div>
         <div class="kv"><span>Zinssatz nominal</span><span class="kv-v" id="r-zins">—</span></div>
         <div class="kv"><span>Zinsbindung bis</span><span class="kv-v" id="r-bindend">—</span></div>
-        <div class="kv"><span>Restschuld EZB</span><span class="kv-v" id="r-rs">—</span></div>
+        <div class="kv"><span>Restschuld Ende Zinsbindung</span><span class="kv-v" id="r-rs">—</span></div>
         <div class="kv"><span>Anschlussrate / Monat</span><span class="kv-v" id="r-anschl">—</span></div>
         <hr class="dvd">
         <div class="ltv-labels"><span>Eigenkapital</span><span>Fremdkapital</span></div>
@@ -3269,11 +3269,11 @@ label.dp-required.qc-required::after {
         <div class="ltv-labels"><span class="c-gold fw5" id="ek-pct">16%</span><span id="fk-pct">84%</span></div>
         <div class="cf-hint" id="r-sanfin" style="margin-top:8px;display:none"></div><!-- v1445 -->
       </div>
-      <div class="card"><div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-check"/></svg></span>Bankargumente</div>
-        <div class="bank-item ok" id="bi-grundschuld"><div class="bank-dot green"></div><div><div class="bank-title">Erstrangige Grundschuld</div><div class="bank-desc">Immobilie als Sicherheit – stabile werthaltige Beleihung</div></div></div>
-        <div class="bank-item ok" id="bi-dscr"><div class="bank-dot"></div><div><div class="bank-title" id="bank-dscr-t">DSCR – Schuldendeckung</div><div class="bank-desc" id="bank-dscr-d">Mieteinnahmen decken Kapitaldienst</div></div></div>
+      <div class="card"><div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-check"/></svg></span>Was für die Finanzierung spricht</div>
+        <div class="bank-item ok" id="bi-grundschuld"><div class="bank-dot green"></div><div><div class="bank-title">Erstrangige Grundschuld</div><div class="bank-desc">Immobilie als Sicherheit, stabile und werthaltige Beleihung</div></div></div>
+        <div class="bank-item ok" id="bi-dscr"><div class="bank-dot"></div><div><div class="bank-title" id="bank-dscr-t">DSCR · Schuldendeckung</div><div class="bank-desc" id="bank-dscr-d">Mieteinnahmen decken Kapitaldienst</div></div></div>
         <div class="bank-item ok" id="bi-verm"><div class="bank-dot green"></div><div><div class="bank-title" id="bi-verm-t">Vollständig vermietet</div><div class="bank-desc" id="bi-verm-d">Nachgewiesene Mieterträge als stabile Einnahmebasis</div></div></div>
-        <div class="bank-item ok" id="bi-ltv"><div class="bank-dot green"></div><div><div class="bank-title" id="bank-ltv-t">LTV – Beleihungsquote</div><div class="bank-desc" id="bank-ltv-d">Beleihungsauslauf liegt im Rahmen</div></div></div>
+        <div class="bank-item ok" id="bi-ltv"><div class="bank-dot green"></div><div><div class="bank-title" id="bank-ltv-t">LTV · Beleihungsquote</div><div class="bank-desc" id="bank-ltv-d">Beleihungsauslauf liegt im Rahmen</div></div></div>
         <div class="bank-item warn" id="bi-zaer"><div class="bank-dot"></div><div><div class="bank-title">Zinsänderungsrisiko <button type="button" class="dp-tip" data-tip-id="tab5.zinsaenderungsrisiko" tabindex="-1" aria-label="Hilfe zu Zinsänderungsrisiko"></button></div><div class="bank-desc" id="bank-zaer-d">Anschlussfinanzierung kalkuliert</div></div></div>
       </div>
     </div>
@@ -3286,7 +3286,7 @@ label.dp-required.qc-required::after {
 
 <!-- ═══════════ TAB 4: BWK ═══════════ -->
 <div class="sec" id="s4">
-  <h2 class="sec-title">Bewirtschaftungskosten</h2><p class="sec-desc">Alle laufenden Kosten – umlagefähig und nicht umlagefähig pro Jahr</p>
+  <h2 class="sec-title">Bewirtschaftungskosten</h2><p class="sec-desc">Alle laufenden Kosten, umlagefähig und nicht umlagefähig pro Jahr</p>
 
   <!-- BWK Mode Switcher -->
   <div class="card" style="margin-bottom:14px">
@@ -3307,7 +3307,7 @@ label.dp-required.qc-required::after {
     <div class="col2">
       <div class="card">
         <div class="ct-row" style="padding:0 0 10px 0">
-          <div class="ct ct-pro" style="margin:0;padding:0;border:none"><span class="ct-ico"><svg width="22" height="22"><use href="#i-zap"/></svg></span>BWK – Quick-Eingabe</div>
+          <div class="ct ct-pro" style="margin:0;padding:0;border:none"><span class="ct-ico"><svg width="22" height="22"><use href="#i-zap"/></svg></span>BWK · Quick-Eingabe</div>
           <div class="bwk-mode-btns" style="font-size:10.5px">
             <button class="mode-btn active" data-pmode="nkm" onclick="switchBwkPctMode('nkm')">% der NKM</button>
             <button class="mode-btn" data-pmode="kp" onclick="switchBwkPctMode('kp')">% vom Kaufpreis</button>
@@ -3360,15 +3360,15 @@ label.dp-required.qc-required::after {
         <div id="bwk-pct-kp-block" style="display:none">
           <div class="f"><label>BWK gesamt (% vom Kaufpreis)</label>
             <div class="iw"><input id="bwk_kp_pct" type="text" inputmode="decimal" value="0.75" step="0.05" class="tr" oninput="calc()"><span class="sfx">%</span></div>
-            <span class="hint">Bewährter Erfahrungswert: <b>0,5 – 1,0% des Kaufpreises p.a.</b></span>
+            <span class="hint">Bewährter Erfahrungswert: <b>0,5 bis 1,0 % des Kaufpreises p.a.</b></span>
           </div>
           <div class="info-box info-blue" style="margin-top:8px">
-            <div class="info-box-title"><svg class="h-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z"/></svg> Erfahrungswerte – % vom Kaufpreis</div>
+            <div class="info-box-title"><svg class="h-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z"/></svg> Erfahrungswerte in % vom Kaufpreis</div>
             <div class="info-box-content">
-              • <b>0,5 %</b> – Sehr gute Bauqualität, kaum Sanierungsbedarf, junges Hausgeld<br>
-              • <b>0,7 – 0,8 %</b> – ETW Standard, gepflegte Anlage<br>
-              • <b>1,0 %</b> – Älterer Bestand, normaler Sanierungsstau<br>
-              • <b>1,5 %+</b> – Sanierungsbedürftig oder Mehrfamilienhaus
+              • <b>0,5 %</b>: sehr gute Bauqualität, kaum Sanierungsbedarf, junges Hausgeld<br>
+              • <b>0,7 bis 0,8 %</b>: ETW Standard, gepflegte Anlage<br>
+              • <b>1,0 %</b>: älterer Bestand, normaler Sanierungsstau<br>
+              • <b>1,5 %+</b>: sanierungsbedürftig oder Mehrfamilienhaus
             </div>
           </div>
         </div>
@@ -3521,12 +3521,12 @@ label.dp-required.qc-required::after {
           <div class="ai-pdf-gruppe-h">Ankauf <span class="ai-pdf-gruppe-st"></span></div>
           <label><input type="checkbox" id="ai-pdf-sec-verhandlung" checked> Verhandlungsempfehlung</label>
           <label><input type="checkbox" id="ai-pdf-sec-offerte" checked> Kaufpreis-Offerte</label>
-          <label><input type="checkbox" id="ai-pdf-sec-bank" checked> Bankargumente</label>
+          <label><input type="checkbox" id="ai-pdf-sec-bank" checked> Was für die Finanzierung spricht</label>
         </div>
         <div class="ai-pdf-gruppe" data-gruppe="bestand">
           <div class="ai-pdf-gruppe-h">Bestand <span class="ai-pdf-gruppe-st"></span></div>
           <label><input type="checkbox" id="ai-pdf-sec-bestandsstrategie" checked> Bestandsstrategie</label>
-          <label><input type="checkbox" id="ai-pdf-sec-anschluss" checked> Anschlussfinanzierung (mit Bankargumenten)</label>
+          <label><input type="checkbox" id="ai-pdf-sec-anschluss" checked> Anschlussfinanzierung (mit Argumenten für die Bank)</label>
           <label><input type="checkbox" id="ai-pdf-sec-exit" checked> Exit-Strategien</label>
           <label><input type="checkbox" id="ai-pdf-sec-ankaufheute" checked> Ankauf gegen heute</label>
         </div>
@@ -3686,7 +3686,7 @@ label.dp-required.qc-required::after {
   <div class="col2">
     <div class="card">
       <div class="cf-switcher">
-        <div class="ct ct-pro" id="cr-title" style="margin:0;padding:0;border:none;"><span class="ct-ico"><svg width="22" height="22"><use href="#i-coins"/></svg></span>Cashflow – Korrekte Berechnung</div>
+        <div class="ct ct-pro" id="cr-title" style="margin:0;padding:0;border:none;"><span class="ct-ico"><svg width="22" height="22"><use href="#i-coins"/></svg></span>Cashflow · korrekte Berechnung</div>
         <div class="cf-mode-btns">
           <button class="cf-mode-btn active" data-mode="heute" onclick="switchCFMode('heute')">Heute</button>
           <button class="cf-mode-btn" data-mode="ezb" onclick="switchCFMode('ezb')">Ende Zinsbindung</button>
@@ -3975,7 +3975,7 @@ label.dp-required.qc-required::after {
 
 <!-- ═══════════ TAB 7: GESPEICHERTE ═══════════ -->
 <div class="sec sec-hidden" id="s7">
-  <h2 class="sec-title">Gespeicherte Objekte</h2><p class="sec-desc">Lokal gespeicherte Kalkulationen – kein Server nötig</p>
+  <h2 class="sec-title">Gespeicherte Objekte</h2><p class="sec-desc">Lokal gespeicherte Kalkulationen, kein Server nötig</p>
   <div class="card" id="saved-list"><div style="color:var(--muted);text-align:center;padding:24px;font-size:13px">Noch keine Objekte gespeichert.</div></div>
   <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
     <button class="btn btn-outline" onclick="newObj()" style="flex:1;justify-content:center;padding:10px">➕ Neues Objekt</button>
@@ -4040,9 +4040,9 @@ label.dp-required.qc-required::after {
   <script src="js/afa-ui.js?v=v3687"></script>
   <script src="js/steuer-kontext.js?v=v3942"></script><!-- v3700 · P2 Rechenkontext: im Kundenstand rechnet die Steuer mit dem Steuerprofil des Kunden -->
   <script src="js/zve-manager.js?v=v3700"></script>
-  <script src="js/tax-periods.js?v=v3700"></script>
-  <script src="js/tax-periods-sync.js?v=1"></script>
-  <script src="js/zve-smart.js?v=1"></script>
+  <script src="js/tax-periods.js?v=v4770"></script>
+  <script src="js/tax-periods-sync.js?v=v4770"></script>
+  <script src="js/zve-smart.js?v=v4770"></script>
   <script src="js/wk-aggregator.js?v=v3700"></script>
   <!-- V276.2-no-sidebar-widget: wk-dashboard entfernt - Inhalt jetzt im Steuermodul -->
   <script src="js/all-objects-views.js?v=v2422"></script>
@@ -4055,7 +4055,7 @@ label.dp-required.qc-required::after {
   <script src="js/finanzierungskosten.js?v=v3994"></script><!-- v3992 · F6 Disagio, Bereitstellungszinsen (Rechenkern) -->
   <script src="js/ek-rendite.js?v=v4620a"></script><!-- v4610 · EK-Rendite in vier Stufen, VOR calc.js -->
   <script src="js/ek-rendite-ui.js?v=v4620c"></script><!-- v4620 · EK-Rendite-Karte: ein Tooltip, Klick schaltet die Stufen -->
-  <script src="js/calc.js?v=v4640"></script>
+  <script src="js/calc.js?v=v4770"></script>
   <script src="js/zahlenfelder.js?v=v3800e"></script>
 <script src="js/d1-type-handler.js?v=161"></script>
 <script src="js/icons.js?v=166"></script>
@@ -4121,7 +4121,7 @@ label.dp-required.qc-required::after {
 <script src="js/collapsible-cards.js?v=v3032"></script>
 <script src="js/v10.js?v=v2254"></script>
 <script src="js/marktdaten-modal.js?v=v2247c"></script>
-<script src="js/ui.js?v=v4570"></script>
+<script src="js/ui.js?v=v4770"></script>
 <script src="js/ki-text.js?v=v4230"></script><!-- v4230 · KI-Text ohne Markdown (Co-Pilot, Portfolio-Pilot) -->
 <script src="js/sidebar-collapse.js?v=20260611174630"></script>
 <script src="js/storage.js?v=v4540a"></script>
@@ -4175,7 +4175,7 @@ label.dp-required.qc-required::after {
 <script src="js/bodenrichtwert.js?v=v3208by"></script>
 <script src="js/brw-karte.js?v=v3241"></script><!-- v3237 · Bodenrichtwert-Karte -->
 <!-- v1391: welche Felder zu welcher Objektart gehoeren -->
-<script src="js/objektart-felder.js?v=v3945"></script>
+<script src="js/objektart-felder.js?v=v4770"></script>
 <script src="js/vgf-merkmale.js?v=v3008"></script>
 <!-- v3073: Detailgrad Einsteiger · Fortgeschritten · Experte - Zuordnung (erzeugt aus design/Vorschläge/arbeitsbereich-detailgrad-zuordnung.json) und Modul -->
 <script src="js/data/detailgrad-zuordnung.js?v=v3950"></script>
@@ -4197,7 +4197,7 @@ label.dp-required.qc-required::after {
 <script src="js/indexmiete.js?v=v3026"></script><!-- v3026 · Indexmiete § 557b BGB -->
 <script src="js/mietpotenzial-kern.js?v=v4220"></script><!-- v3075 · Kappung, Bremse, Termine, Soll-Miete: der reine Kern, vor potenzial.js -->
 <script src="js/miete-regel.js?v=v3845"></script><!-- v3845 · Neuvermietung ohne Mietpreisbremse 110/115/120 % (Einstellung, Vorgabe 120 %) -->
-<script src="js/potenzial.js?v=v4290"></script><script src="js/miete-max.js?v=v4290"></script><script src="js/miete-demo.js?v=v4120"></script><!-- v4060 · miete-max.js: die maximale Miete an EINER Stelle (DpMieteMax), alle Anzeigen lesen nur daraus --><!-- v3870 · Demo Reiter Miete neu, nur Staging -->
+<script src="js/potenzial.js?v=v4770"></script><script src="js/miete-max.js?v=v4290"></script><script src="js/miete-demo.js?v=v4120"></script><!-- v4060 · miete-max.js: die maximale Miete an EINER Stelle (DpMieteMax), alle Anzeigen lesen nur daraus --><!-- v3870 · Demo Reiter Miete neu, nur Staging -->
 <script src="js/mietvertrag-objekt.js?v=v3840b"></script>
 <script src="js/mieterhoehungen.js?v=v4090"></script><!-- v3362 · Mieterhöhungen als Liste (_erhoehungen, je Wohnung e.erhoehungen) -->
 <script src="js/hell-varianten.js?v=v1653e"></script>
@@ -4258,8 +4258,8 @@ label.dp-required.qc-required::after {
 <script src="js/jahresstaende.js?v=v4090"></script><!-- v2989 · Jahresstaende, Rechenstand, Zielerreichung im Bestand -->
 <script src="js/jahresbuch.js?v=v4500"></script><!-- v3363 · Jahr für Jahr: Plan gegen Ist im Bestand (_jahre) -->
 <script src="js/jahresbuch-grafik.js?v=v4090b"></script><!-- v3364 · Verlaufsgrafik Plan gegen Ist · v3430 Engine für Jahresabgleich und Haus -->
-<script src="js/jahresabgleich.js?v=v4670"></script><script src="js/jahresabschluss.js?v=v4410"></script><!-- v4100 · Assistent Jahresabschluss (ein Fenster, fünf Schritte) --><!-- v3420 · Jahresabgleich im Bestand: erster Unterreiter der Pilot-Analyse (Miete, Steuer, Wert, Haus) · v3430 Demo Fassung 2 -->
-<script src="js/wert-zielbild.js?v=v4580f"></script><!-- v2840 · Tab Bewertung: Segment „Wert &amp; Zielbild"; Pilot-Analyse: Einfach | Genau -->
+<script src="js/jahresabgleich.js?v=v4770"></script><script src="js/jahresabschluss.js?v=v4410"></script><!-- v4100 · Assistent Jahresabschluss (ein Fenster, fünf Schritte) --><!-- v3420 · Jahresabgleich im Bestand: erster Unterreiter der Pilot-Analyse (Miete, Steuer, Wert, Haus) · v3430 Demo Fassung 2 -->
+<script src="js/wert-zielbild.js?v=v4770"></script><!-- v2840 · Tab Bewertung: Segment „Wert &amp; Zielbild"; Pilot-Analyse: Einfach | Genau -->
 <script src="js/dealpilot-mb.js?v=v3945"></script>
 <script src="js/mb-abgleich.js?v=v4005"></script><!-- v3002 · Abgleich mit dem Marktbericht in den Reitern Objekt und Miete -->
 <script src="js/mb-auftrag.js?v=v3253"></script>
@@ -4277,10 +4277,10 @@ label.dp-required.qc-required::after {
 <!-- V63.76: Investmentprofil (Settings-Tab) -->
 <script src="js/investment-profile.js?v=v3349c"></script>
 <script src="js/bwk-profil.js?v=v3091"></script>
-<script src="js/dashboard.js?v=v4760"></script>
+<script src="js/dashboard.js?v=v4770"></script>
 <script src="js/grafiken-neu.js?v=v4520"></script><!-- v4140 · neue Grafiken Pilot-Analyse und Portfolio-Cockpit (Vorschau-Funktion grafiken_neu), v4160 Verlauf Jahresabgleich -->
 <script src="js/grafiken-premium.js?v=v4740a"></script><!-- v4160 · Pilot-Analyse im Premium-Stil: Einordnung, Fingerabdruck, Heatmap, Mieteuro, Fahrplan, Wertverlauf, Monte-Carlo, Hebel, Ausstieg (Vorschau grafiken_neu), API window.DpGrafiken -->
-<script src="js/pf-kit.js?v=v4730a"></script><script src="js/pf-bausteine.js?v=v4730a"></script><script src="js/pf-katalog.js?v=v4730a"></script><script src="js/pf-modell.js?v=v4730a"></script><!-- v4730 · Portfolio-Module aus den Demos (Runde d): Motor, Bausteine, Katalog, Datenmodell --><script src="js/portfolio-objektmatrix.js?v=v4690a"></script><!-- v4690 · Objektmatrix (Demo 07): Objektkarten zum Umdrehen --><script src="js/grafiken-portfolio.js?v=v4730c"></script><!-- v4480 · Pilot-Farben, Cashflow vor/nach Steuer je Objekt, Cashflow-Verlauf, Stichpunkte in Einfach · v4180 · Portfolio auf einen Blick: Kennzahlen und Gesamtbewertung oben vereint, je Objekt Miete, Cashflow n. St., Steuer; Zinsbindung mit Mehrbelastung (Vorschau grafiken_neu) -->
+<script src="js/pf-kit.js?v=v4770"></script><script src="js/pf-bausteine.js?v=v4730a"></script><script src="js/pf-katalog.js?v=v4730a"></script><script src="js/pf-modell.js?v=v4770"></script><!-- v4730 · Portfolio-Module aus den Demos (Runde d): Motor, Bausteine, Katalog, Datenmodell --><script src="js/portfolio-objektmatrix.js?v=v4690a"></script><!-- v4690 · Objektmatrix (Demo 07): Objektkarten zum Umdrehen --><script src="js/grafiken-portfolio.js?v=v4730c"></script><!-- v4480 · Pilot-Farben, Cashflow vor/nach Steuer je Objekt, Cashflow-Verlauf, Stichpunkte in Einfach · v4180 · Portfolio auf einen Blick: Kennzahlen und Gesamtbewertung oben vereint, je Objekt Miete, Cashflow n. St., Steuer; Zinsbindung mit Mehrbelastung (Vorschau grafiken_neu) -->
 <script src="js/grafiken-bewertung.js?v=v4280a"></script><!-- v4170 · Reiter Bewertung: Einordnung, DSCR- und Beleihungsverlauf, Zinsrisiko als Heatmap (Vorschau grafiken_neu) -->
 <script src="js/bewertung-ansicht.js?v=v4620a"></script><!-- v4320 · Reiter Bewertung: Erklärung beim Darüberfahren, Ansicht anpassen (Vorschau grafiken_neu) -->
 <script src="js/portfolio-strategie.js?v=v3380"></script><!-- v1880 · Modul hinter Feature-Schluessel -->
@@ -4293,7 +4293,7 @@ label.dp-required.qc-required::after {
 <script src="js/main.js?v=v3280"></script>
   <!-- v372-autocomplete-removed: <script src="js/autocomplete.js?v=160" defer></script> -->
   <script src="js/session-expired-banner.js?v=500"></script><!-- v500-session-banner -->
-  <script src="js/object-actions.js?v=v4740"></script>
+  <script src="js/object-actions.js?v=v4770"></script>
   <script src="js/unterlagen-eingang.js?v=v4740"></script><!-- v3120 · ein Eingang fuer Belege, Unterlagen, Rechnungen -->
   <script src="js/belege-anlage-v.js?v=v4340b"></script><script src="js/beleg-lupe.js?v=v4470"></script><!-- v4470 · Beleg groß ansehen (beleg-lupe.js) · v4340 · Belege je Jahr nach Anlage V, Vorschlag und Umbuchen -->
   <script src="js/ze-aufteilung.js?v=v3961"></script><!-- v3670 · Zusatzeinnahmen aufteilen (Reiter Miete) -->
@@ -4729,7 +4729,7 @@ document.addEventListener('DOMContentLoaded', function(){
 
 <script src="js/pilot-blase.js?v=v4450a"></script><!-- v3218 · W-4 · EINE Pilot-Blase unten rechts: Co-Pilot-Chat in jeder Ansicht, F1 bleibt Feld-Hilfe -->
 <script src="js/erinnerung-mieterhoehung.js?v=v3218"></script><!-- v3218 · W-12b · Einstellung Erinnerung vor Mieterhoehung -->
-<script src="js/copilot.js?v=v4230"></script>
+<script src="js/copilot.js?v=v4770"></script>
 <script src="js/copilot-pillen.js?v=v4510"></script>
 <script src="js/dp-diktat.js?v=v3681"></script><!-- v1760 · Mikrofon fuer Textfelder -->
 <script src="js/copilot-aenderungen.js?v=v1875a"></script><!-- v1760 · der Co-Pilot versteht Aenderungen -->
@@ -4759,8 +4759,8 @@ document.addEventListener('DOMContentLoaded', function(){
          weil es _dpDispSkin fuer den hellen Grund benutzt. -->
     <link rel="stylesheet" href="css/datenaufnahme.css?v=v3952"><!-- v1639 · aus der Bordkarte wird eine Zeile -->
     <link rel="stylesheet" href="css/layout-varianten.css?v=v4710">
-    <link rel="stylesheet" href="css/einheitlich.css?v=v4006"><link rel="stylesheet" href="css/dp-kachel.css?v=v4660a"><link rel="stylesheet" href="css/pf-module.css?v=v4730b"><!-- v4660 · ein Kachel-Baustein, eine Schriftstufe --><!-- v3239 · Marcel 09.11.2026: Felder, Karten, Schrift in allen Reitern und Fenstern wie im Reiter Objekt; Handy-Felder nie unter 16 px (iOS-Zoom). Letztes Stylesheet. -->
-    <script src="js/marktbericht-profi.js?v=v3338a"></script><!-- v3176 · Marktbericht Profi (HTML/A4) -->
+    <link rel="stylesheet" href="css/einheitlich.css?v=v4006"><link rel="stylesheet" href="css/dp-kachel.css?v=v4660a"><link rel="stylesheet" href="css/pf-module.css?v=v4730b"><link rel="stylesheet" href="css/app-pruefung.css?v=v4770"><!-- v4660 · ein Kachel-Baustein, eine Schriftstufe --><!-- v3239 · Marcel 09.11.2026: Felder, Karten, Schrift in allen Reitern und Fenstern wie im Reiter Objekt; Handy-Felder nie unter 16 px (iOS-Zoom). Letztes Stylesheet. -->
+    <script src="js/marktbericht-profi.js?v=v4770"></script><!-- v3176 · Marktbericht Profi (HTML/A4) -->
     <script src="js/dp-dokument.js?v=v4380"></script><!-- v3179 · einheitliches Dokument-Design -->
     <script src="js/dp-dokumente.js?v=v4620m"></script><!-- v3179 · Dokumente im einheitlichen Design (Demo) -->
     <script src="js/pdf-wahl.js?v=v3235"></script><!-- v1636 · Rueckfrage vor dem Export -->

@@ -1158,7 +1158,7 @@ function _calcImmediate(){
          im Sinne des § 255 Abs. 2 HGB (Erweiterung, Standardhebung) aber nie. „voll abzugsfaehig" war zu stark. */
       /* v3348 · Sanierung auf Raten: auch nach 3 Jahren rechnet das Finanzamt Maßnahmen eines einheitlichen
          Sanierungsplans zusammen (in der Regel innerhalb von 5 Jahren, BMF-Schreiben vom 18.07.2003 zur Abgrenzung von Anschaffungs-, Herstellungs- und Erhaltungsaufwand) */
-      sanStatusEl.innerHTML = '<span class="badge badge-green" title="Erweiterungen und Standardhebungen (§ 255 Abs. 2 HGB) bleiben auch unter der Grenze Herstellungskosten und laufen über die AfA. Achtung, Sanierung auf Raten: Maßnahmen nach einem einheitlichen Plan, in der Regel innerhalb von 5 Jahren, rechnet das Finanzamt auch nach den 3 Jahren zusammen.">✓ Unter Grenze ('+_san15Pct.toFixed(1).replace('.', ',')+' %) – Erhaltungsaufwand sofort abziehbar</span>';
+      sanStatusEl.innerHTML = '<span class="badge badge-green" title="Erweiterungen und Standardhebungen (§ 255 Abs. 2 HGB) bleiben auch unter der Grenze Herstellungskosten und laufen über die AfA. Achtung, Sanierung auf Raten: Maßnahmen nach einem einheitlichen Plan, in der Regel innerhalb von 5 Jahren, rechnet das Finanzamt auch nach den 3 Jahren zusammen.">✓ Unter Grenze ('+_san15Pct.toFixed(1).replace('.', ',')+' %), Erhaltungsaufwand sofort abziehbar</span>';
     } else {
       sanStatusEl.innerHTML = '<span class="badge badge-red">⚠ Über 15 % ('+_san15Pct.toFixed(1).replace('.', ',')+' %) – anschaffungsnahe HK ('+_sanNd+' Jahre AfA)</span>';
     }
@@ -2588,7 +2588,7 @@ function _calcImmediate(){
     var _ltvGt = String(_ltvG).replace('.', ','), _ltvRt = String(_ltvR).replace('.', ',');
     var ltv_ok=ltv<=_ltvG,ltv_warn=ltv<=_ltvR;
     bi_ltv.className='bank-item '+(ltv_ok?'ok':ltv_warn?'warn':'bad');
-    st('bank-ltv-t','LTV: '+fP(ltv,1)+' – '+(ltv_ok?'✓ Solide (bis '+_ltvGt+' %)':ltv_warn?'⚠ Erhöht ('+_ltvGt+'–'+_ltvRt+' %)':'✗ Kritisch (über '+_ltvRt+' %)'));
+    st('bank-ltv-t','LTV: '+fP(ltv,1)+': '+(ltv_ok?'✓ Solide (bis '+_ltvGt+' %)':ltv_warn?'⚠ Erhöht ('+_ltvGt+'–'+_ltvRt+' %)':'✗ Kritisch (über '+_ltvRt+' %)'));
     // V63.37: Detail-Text richtet sich nach LTV-Bezugsgröße
     st('bank-ltv-d','Darlehen '+fE(d_total)+' / '+ltv_basis_label+' '+fE(ltv_basis)+' · Eigenkapital '+fE(_ekValEarly));
   }
@@ -2602,7 +2602,7 @@ function _calcImmediate(){
     var vok=vmst==='Vollvermietet';
     bi_verm.className='bank-item '+(vok?'ok':'warn');
     st('bi-verm-t',vmst==='Vollvermietet'?'✓ Vollständig vermietet':vmst);
-    st('bi-verm-d',vok?'Nachgewiesene Mieterträge als stabile Einnahmebasis':'Leerstand erhöht das Risiko – Vermietung empfohlen');
+    st('bi-verm-d',vok?'Nachgewiesene Mieterträge als stabile Einnahmebasis':'Leerstand erhöht das Risiko, Vermietung empfohlen');
   }
   // V63.35: NMR auf Eigentümer-Sicht — NKM minus nicht-umlagef. (UL ist neutral, durchlaufend)
   var bmy=kp>0?nkm_j/kp*100:0,nmy=gi>0?(nkm_j-bwk_cf)/gi*100:0;

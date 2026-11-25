@@ -1961,7 +1961,7 @@ function _paMbNeuer(stand) {
     var mw = Number(b.market_value);
     return '<span data-dp-pa-mb="1">Seitdem gibt es einen <b>neueren Marktbericht vom ' + d.toLocaleDateString('de-DE') + '</b>'
       + (b.market_value != null && isFinite(mw) ? ' (Marktpreisindikation ' + Math.round(mw).toLocaleString('de-DE') + ' €)' : '')
-      + ' — Werte aus dem Bericht in den Texten unten stammen aus dem älteren Stand.</span>';
+      + '. Werte aus dem Bericht in den Texten unten stammen aus dem älteren Stand.</span>';
   } catch (e) { return ''; }
 }
 

@@ -211,12 +211,12 @@
          > trotzdem plausibel aussieht. */
       var mw = _eur(e.marktwert), lo = _eur(e.low), hi = _eur(e.high);
       if (mw) zeilen.push('Marktwert-Indikation: ' + mw
-        + (lo && hi ? '  (Spanne ' + lo + ' – ' + hi + ')' : '')
+        + (lo && hi ? '  (Spanne ' + lo + ' bis ' + hi + ')' : '')
         + (_eurQm(e.eurPerSqm) ? '  ·  ' + _eurQm(e.eurPerSqm) : ''));
 
       var mm = _eur(e.marktmieteCold), mlo = _eur(e.marktmieteLow), mhi = _eur(e.marktmieteHigh);
       if (mm) zeilen.push('Marktmiete (kalt): ' + mm + '/Monat'
-        + (mlo && mhi ? '  (Spanne ' + mlo + ' – ' + mhi + ')' : '')
+        + (mlo && mhi ? '  (Spanne ' + mlo + ' bis ' + mhi + ')' : '')
         + (_eurQm(e.marktmieteEurSqm) ? '  ·  ' + _eurQm(e.marktmieteEurSqm) : ''));
 
       if (!zeilen.length) {

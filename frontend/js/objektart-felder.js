@@ -167,7 +167,7 @@
         else if (lbl && GRUND[id]) {
           var w = document.createElement('span');
           w.className = 'dp-oa-warum';
-          w.textContent = 'passt nicht zu dieser Objektart — ' + GRUND[id];
+          w.textContent = 'passt nicht zu dieser Objektart: ' + GRUND[id];
           lbl.appendChild(w);
         }
         continue;
