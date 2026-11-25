@@ -100,7 +100,9 @@ window.DpPfKit = (function () {
   var module = [];
   function modul(sel, fn) { var el = typeof sel === 'string' ? document.querySelector(sel) : sel; if (!el) return; module = module.filter(function (m) { return m.el !== el && document.contains(m.el); });
     if (el.id === 'kz' && !el.hasAttribute('data-ohne-ek')) { var _fn = fn; fn = function (w) { var h = _fn(w); if (h.indexOf('EK-Rendite') >= 0) return h; var m = /--kz:(\d+)/.exec(h), n = m ? Number(m[1]) + 1 : null; var kach = kz([ekKachel()], 1).replace(/^<div class="kz"[^>]*>/, '').replace(/<\/div>$/, ''); h = h.replace(/<\/div>$/, kach + '</div>'); return n ? h.replace(/--kz:\d+/, '--kz:' + n) : h; }; } module.push({ el: el, fn: fn }); zeichne(module[module.length - 1]); }
-  function zeichne(m) { var w = Math.max(260, Math.floor(m.el.clientWidth)); m.el.innerHTML = m.fn(w); kartenNach(m.el); }
+  /* v4830 · Diagramme wurden gezeichnet, bevor die Karte ihre halbe Breite hatte (Breite 1156 statt 571): Schrift schrumpfte auf 4 px. Jetzt neu zeichnen, sobald sich die Breite der Karte ändert. */
+  var _ro = window.ResizeObserver ? new ResizeObserver(function (es) { es.forEach(function (e) { var m = module.filter(function (x) { return x.el === e.target; })[0]; if (!m) return; var w = Math.floor(e.contentRect.width); if (w > 0 && Math.abs(w - (m.w || 0)) > 8) zeichne(m); }); }) : null;
+  function zeichne(m) { var cw = Math.floor(m.el.clientWidth); if (!cw) { m.w = 0; if (_ro && !m.ro) { _ro.observe(m.el); m.ro = 1; } return; } var w = Math.max(260, cw); m.w = cw; m.el.innerHTML = m.fn(w); kartenNach(m.el); if (_ro && !m.ro) { _ro.observe(m.el); m.ro = 1; } }
   /* v4770 · Lagekarten fuer Objekte ohne Foto nachladen, je Objekt einmal je Sitzung (lagekarte.js, eigene OSM-Kacheln) */
   var _pfKarten = {};
   function kartenNach(host) {
