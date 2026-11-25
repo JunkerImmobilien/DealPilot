@@ -45686,3 +45686,10 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** staging 1db6474b, Merge 859c5819 · main 8650db53, Version fb02e70e. Migration 131 auf Prod angewandt.
 - **Nachweis:** dokumentenablage-pruefen 23/23, Live-Probe Staging 8/8, Browser (Karte, Jahr löschen, Klick daneben), buster-ebenen/vorschau/takt-sperre/prompt-lecks sauber, Prod-Sicherung haupt-/mb-20261125-1055-v4860 (7,0/31 MB, Kopf gelesen), Prod health, `dateiablage.js?v=v4860m` ausgeliefert.
 - **Rest:** neues Nachtsicherungs-Skript nicht auf Prod installiert (Rechteprüfung), Takt/Mails nicht scharf, Staging-Platte 85 %, `/root/ns-test` auf Staging.
+
+### v4860–v4860b · Investment-PDF-Muster mit neuen Zahlen (Fork TT4, nur Staging)
+
+- **Was:** Pilot-Analyse Westerfeldstr. 146 / Hauptstr. 51 neu abgerufen, Muster A/B/C neu erzeugt. KI-Text „Marktwert“ → „Marktpreis“ (nur Muster), Wertangabe ohne Herkunft neutral benannt, Investor Deal Score mit Stufenwort.
+- **Commit:** staging 799356e2, 8cc64b8d, 3bff6596, Wissen 2e95bfea. Nicht auf Prod.
+- **Nachweis:** Seiten gerendert und angesehen, Zahlen Text gegen Kacheln abgeglichen. Muster `Dateien/Investment-PDF/v4790-neu-2026-11-25/`.
+- **Rest:** Hauptstr. 51 Wertangabe 1.418.000 € ohne Herkunft gegen Marktpreisindikation 1.035.000 € (Daten/Anker-Regel), Prompt nennt die Marktpreisindikation weiter „Marktwert“.
