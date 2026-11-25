@@ -52,10 +52,10 @@ const RndRequestSchema = z.object({
   typ: z.string(),
   version: z.string().optional(),
   timestamp: z.string().optional(),
-  wizard_state: z.record(z.any()).optional(),
-  wizard_result: z.record(z.any()).optional(),
-  wizard_afa: z.record(z.any()).optional(),
-  meta: z.record(z.any()).optional()
+  wizard_state: z.record(z.string(), z.any()).optional(),
+  wizard_result: z.record(z.string(), z.any()).optional(),
+  wizard_afa: z.record(z.string(), z.any()).optional(),
+  meta: z.record(z.string(), z.any()).optional()
 }).passthrough();
 
 router.post('/', authenticate, rndLimiter, async (req, res) => {
@@ -63,7 +63,7 @@ router.post('/', authenticate, rndLimiter, async (req, res) => {
   try {
     parsed = RndRequestSchema.parse(req.body || {});
   } catch (err) {
-    const msg = err.errors && err.errors[0] ? err.errors[0].message : 'Ungültige Eingabe';
+    const msg = (err.issues || err.errors) && (err.issues || err.errors)[0] ? (err.issues || err.errors)[0].message : 'Ungültige Eingabe';
     return res.status(400).json({ error: msg });
   }
 

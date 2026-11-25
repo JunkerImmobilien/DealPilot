@@ -49,7 +49,7 @@ router.post('/', betaLimiter, async (req, res) => {
   try {
     parsed = BetaSchema.parse(req.body || {});
   } catch (err) {
-    const msg = err.errors && err.errors[0] ? err.errors[0].message : 'Ungültige Eingabe';
+    const msg = (err.issues || err.errors) && (err.issues || err.errors)[0] ? (err.issues || err.errors)[0].message : 'Ungültige Eingabe';
     return res.status(400).json({ error: msg });
   }
 

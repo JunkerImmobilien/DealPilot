@@ -11,7 +11,7 @@ router.use(authenticate);
 
 const idParam = z.object({ id: z.string().uuid() });
 const upsertBody = z.object({
-  wk_per_year: z.record(z.union([z.number(), z.string()]))
+  wk_per_year: z.record(z.string(), z.union([z.number(), z.string()]))
 }).strict();
 
 // GET /api/v1/tax-snapshots
