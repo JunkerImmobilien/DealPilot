@@ -45712,3 +45712,9 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Nachweis:** Prod-Sicherung haupt-/mb-20261125-1105-v4880 (7,0 / 31 MB, Kopf gelesen); Migration 133 eingespielt, backend healthy, `version.json` 220; Messung + Audit geschrieben; Probe bestanden (109/43 Tabellen, 0,62 % / 0,0 % Zeilenabweichung, 53 s, keine Probe-Container übrig).
 - **Host:** crontab Prod +3, Staging +2 Zeilen (alte crontab gesichert unter /root/backups/crontab-vor-v4880-*), `.env` Prod `BETRIEB_MAIL=1` (gesichert env-vor-v4880-*).
 - **Rest:** eine irrtümliche Rot-Mail (erste Probe vor v4880b); Admin-Ansicht nicht im echten Browser angemeldet geprüft (Passwort/TOTP), nur DOM-Probe und Backend-Auswertung im Container; Staging ohne Nachtsicherung; Vorschläge in wissen/2026-11-25.md.
+
+### Rollout 1.0.223 · v4910 Dokumentenablage scharf, Einstellungen › Dokumente (Fork D5, 25.11.2026)
+- **Was:** Löschfrist/Plattenwarnung scharf (`ABLAGE_FRIST_TAKT=1` Staging+Prod), Einsortieren nach Ordner/Jahr, Belegung in Prozent (Beleg-Dialog, Meine Dokumente), Reiter Einstellungen › Dokumente mit Ordner/Jahr löschen, `DELETE /dateien?objekt&ordner[&jahr]`.
+- **Commit:** staging 31c2ce92 · main 0e965506, 718504ea (1.0.223).
+- **Nachweis:** dokumentenablage-pruefen 31/31, Live-Probe Staging 6/6, buster-ebenen, vorschau sauber. Prod-Sicherung haupt/mb-20261125-1141-v4910 (7,1/31 MB, Kopf gelesen), `.env` gesichert.
+- **Rest:** `ADMIN_EMAIL` Prod ist Platzhalter (Betriebs-Mails kommen nicht an); Staging sendet täglich Plattenwarnung an info@, bis die Platte unter 70 % ist; nicht angemeldet im Browser geprüft.
