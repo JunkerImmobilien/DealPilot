@@ -284,9 +284,10 @@
      Wahl per ?dkstil=pille|reiter|runway|alt (wird gemerkt) oder DpDkStil('…').
      Standard nur auf Staging-Hosts: pille. Auf Prod bleibt ohne Wahl die bisherige Optik. */
   var DK_STILE = { pille: 1, reiter: 1, runway: 1, alt: 1 };
+  var dkUrlGelesen = false;   /* ?dkstil= nur beim ersten Aufbau, danach gilt die gemerkte Wahl */
   function dkStil() {
     var w = null;
-    try { var m = /[?&]dkstil=([a-z]+)/.exec(location.search || ''); if (m && DK_STILE[m[1]]) { w = m[1]; localStorage.setItem('dp_dk_stil', w); } } catch (e) {}
+    if (!dkUrlGelesen) { dkUrlGelesen = true; try { var m = /[?&]dkstil=([a-z]+)/.exec(location.search || ''); if (m && DK_STILE[m[1]]) { w = m[1]; localStorage.setItem('dp_dk_stil', w); } } catch (e) {} }
     if (!w) { try { var g = localStorage.getItem('dp_dk_stil'); if (g && DK_STILE[g]) w = g; } catch (e) {} }
     if (!w) w = /staging/i.test(String(location.hostname || '')) ? 'pille' : 'alt';
     if (w === 'alt') document.documentElement.removeAttribute('data-dk-stil');
