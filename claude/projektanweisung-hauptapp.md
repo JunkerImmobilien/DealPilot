@@ -45583,3 +45583,9 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** staging 5a9534d5, ed2e6ef8, 2fc3f99e, de9d606d · main ab1ed337, 710ff755, 0c1e3108, 366dff42, Version 96c6baaa.
 - **Nachweis:** 9 Vorlagen und 36 Module auf Staging gemessen, hell/dunkel, Partnerfarbe, 390 px; Prüfer grün; Prod-Sicherung haupt-/mb-20261125-0910-v4730 (7,0/31 MB, Kopf gelesen); Prod liefert pf-*.js und version 209 (curl), gold-audit Prod RC 0.
 - **Rest:** Prod nicht eingeloggt gemessen; version.json-Paketname zeigt v4750 (vom Stempel-Werkzeug aus dem Log gelesen).
+
+### v4760 · Investor Deal Score auf EK-Rendite Stufe 2 (nur Staging, wartet auf Freigabe)
+- **Was:** `dealscore2-ui.js` Eingabe `cashOnCash` = `ekr4.k2` (nach Steuer, mit Tilgung), neue Schwellen je Profil in `dealscore2.js`, Sprach-Import und Landing-Fächer gleich; Deal Score unverändert (hat keine EK-Kennzahl).
+- **Commit:** staging 61e7b6a9 (Buster dealscore2/-ui/voice-import v4760, Landing dealcheck-laden/landing-faecher/einzelcheck v4760).
+- **Nachweis:** 44 Staging-Objekte live, Mittel +0,2, −2 bis +4, kein Stufenwechsel; Prüfer grün (zwei-scores mit angepasstem V1). Doku `Dateien/Score/umstellung-ek-rendite-2026-11-25.md`.
+- **Rest:** Freigabe Marcel, dann Cherry-Pick; `dashboard.js` `_renditeTip` Text „Cash-on-Cash“ beim Rollout umbenennen.
