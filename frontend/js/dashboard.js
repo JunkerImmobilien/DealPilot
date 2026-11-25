@@ -396,8 +396,7 @@
      dann nach Kaufpreis gewichtet - wie aggregateCategories(). Objekte ohne
      belastbar gespeicherten Investor Deal Score (_ds2_score) zaehlen nicht mit. */
   function _zweiAnsicht(){
-    if (typeof window._dpScoreAnsicht === 'function') { try { return window._dpScoreAnsicht(); } catch (e) {} }
-    try { return localStorage.getItem('dp_score_ansicht') === 'zwei' ? 'zwei' : 'eins'; } catch (e) { return 'eins'; }
+    return 'zwei';   /* v4800 · immer zwei Scores */
   }
   function _zweiJeObjekt(d){
     var D2 = window.DealScore2;

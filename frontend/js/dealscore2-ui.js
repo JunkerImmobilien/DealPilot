@@ -357,9 +357,9 @@ window._dpDs2Schwelle = function () {
    beide Scores. 'eins' = Investor Deal Score wie bisher, 'zwei' = Investment-
    und Finanzierungs-Score mit Gesamturteil. Gesetzt im Reiter Deal Score der
    Einstellungen (settings.js), am Konto gehalten über vorgaben-sync.js. */
-window._dpScoreAnsicht = function () {
-  try { return localStorage.getItem('dp_score_ansicht') === 'zwei' ? 'zwei' : 'eins'; } catch (e) { return 'eins'; }
-};
+/* v4800 · Marcel 25.11.2026: der Investor Deal Score wird IMMER in zwei Scores gezeigt.
+   Die Wahl in den Einstellungen ist entfallen, ein alter Merker dp_score_ansicht wird ignoriert. */
+window._dpScoreAnsicht = function () { return 'zwei'; };
 
 /* v3076 · kompakte Zeilen fuer die (unter dem Score-Hero ausgeblendete) DS2-Karte */
 function _ds2ZweiKompakt(r) {

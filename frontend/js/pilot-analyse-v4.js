@@ -494,10 +494,14 @@
 
   /* ── Bausteine ───────────────────────────────────────────────────────── */
   function kpis() { try { return (window.State && window.State.kpis) || {}; } catch (e) { return {}; } }
+  var _invTeile = null;
+  function teileText() { return _invTeile ? 'Investment ' + _invTeile.inv + ' · Finanzierung ' + _invTeile.fin : ''; }
   function investorScore() {
     try {
       if (window.DealScore2 && typeof window._buildDeal2FromState === 'function') {
         var d = window.DealScore2.compute(window._buildDeal2FromState());
+        /* v4800 · immer zwei Scores: Teilscores für Kachel und Urteil merken */
+        _invTeile = (d && d.investment && d.finanzierung) ? { inv: Math.round(d.investment.score), fin: Math.round(d.finanzierung.score) } : null;
         if (d && isFinite(d.score)) return Math.round(d.score);
       }
     } catch (e) {}
@@ -689,7 +693,7 @@
     var WK = wertKacheln(w); z = z.concat(WK.kacheln);   /* v4410 · führend + Marktpreis mit Erklärung */
     var nVier = Math.max(4, Math.min(7, (EKK ? 4 : 3) + WK.kacheln.length));   /* v4490 · das stützende Verfahren kommt aus wertKacheln */
     var sc = vier ? null : sichtbarerScore();
-    if (sc) z.push(zahlKachel(sc.name, String(sc.wert), (window.ScoreTier && window.ScoreTier.stufe ? window.ScoreTier.stufe(sc.wert).wort : ''), '#2A2727'));
+    if (sc) z.push(zahlKachel(sc.name, String(sc.wert), (window.ScoreTier && window.ScoreTier.stufe ? window.ScoreTier.stufe(sc.wert).wort : '') + (sc.name === 'Investor Deal Score' && teileText() ? ' · ' + teileText() : ''), '#2A2727'));
     if (vier) z = z.slice(0, nVier);
     return '<div class="dp-pa4-zahlen' + (vier && z.length === 4 ? ' l4' : '') + (vier && z.length === 5 ? ' l5' : '') + (vier && z.length === 6 ? ' l6' : '') + (vier && z.length === 7 ? ' l7' : '') + '" data-dp-pa4-kz="' + (bestand ? 'b' : 'a') + (vier ? '4' : '') + '"' + (z.length ? '' : ' style="display:none"') + '>' + z.join('') + '</div>';
   }
@@ -876,7 +880,7 @@
     var satz = saetze(gb, 1) || saetze(a.empfehlung_begruendung, 1);
     var stufe = sc && window.ScoreTier && window.ScoreTier.stufe ? window.ScoreTier.stufe(sc.wert).wort : '';
     var rechts = (!bestand || sc) ? '<div class="dp-pa4-urteil">' + (bestand ? '' : '<span class="dp-pa-empf" style="background:' + st.farbe + '">' + esc(st.label) + '</span>')
-      + (sc ? '<span class="z">' + sc.wert + '</span><span class="u">' + (stufe ? '<b>' + esc(stufe) + '</b>' : '') + esc(sc.name) + '</span>' : '') + '</div>' : '';
+      + (sc ? '<span class="z">' + sc.wert + '</span><span class="u">' + (stufe ? '<b>' + esc(stufe) + '</b>' : '') + esc(sc.name) + (sc.name === 'Investor Deal Score' && teileText() ? '<i class="dp-pa4-teile" style="display:block;font-style:normal;font-size:11px;opacity:.8;margin-top:2px">' + esc(teileText()) + '</i>' : '') + '</span>' : '') + '</div>' : '';
     var h = (extra.hinweis || '') + (kpFehlen(a) ? '<p class="dp-pa5-hin dp-pa-e" style="margin:0 0 10px">Diese Analyse ist älter. Mit „Neu abrufen“ steht hier das Wichtigste in Stichpunkten.</p>' : '') + ergebnis(satz ? txt(satz) : (bestand ? 'Stand heute' : 'Urteil zum Ankauf'), rechts) + kennzahlen(bestand, true);
     /* Einordnung | Was jetzt zu tun ist (Bestand) bzw. Zu welchem Anleger der Kauf passt (Ankauf) */
     var links = abKopf(bestand ? 'Einordnung' : 'Begründung')

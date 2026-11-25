@@ -127,7 +127,7 @@
     try { if (window.DealScore && typeof DealScore.computeFromKpis === 'function') SC = DealScore.computeFromKpis(K); } catch (e) {}
     try { SCK = window._dpPdfScore ? _dpPdfScore(K) : null; } catch (e) {}
     /* wie pdf-investment-bank.js v2992: die ZAHL ist der Score der Objektkarte; die Deutung nur, wenn derselbe Score sie liefert */
-    if (SCK && SC && SCK.quelle !== 'kennzahlen') SC = { score: SCK.score, label: SCK.label };
+    if (SCK && SC && SCK.quelle !== 'kennzahlen') SC = { score: SCK.score, label: SCK.label, investor: true, inv: SCK.inv, fin: SCK.fin };   /* v4800 */
     else if (SCK && !SC) SC = { score: SCK.score, label: SCK.label };
     return SC || {};
   }
@@ -147,8 +147,14 @@
       { l: 'Kaltmiete', v: B.eur(da(K.nkm_j) !== null ? K.nkm_j : (rows[1] && rows[1].nkm_y)), s: 'p. a. inkl. Zusatzeinnahmen' },
       { l: 'Equity Multiple', v: da(K.em) === null ? '–' : B.zahl(K.em, 1) + 'x', s: 'über die Haltedauer' },
       svwVeraltet() ? { l: 'Wertpuffer', v: B.eurS(Number(St().wert_anker.wert) - (K.kp || 0)), s: 'Objektwert gegenüber Kaufpreis' } : { l: 'Wertpuffer', v: B.eurS(K.wp_kpi), s: 'gegenüber Kaufpreis' },   /* v4380 */
-      { l: 'Deal Score', v: SC.score ? B.zahl(SC.score, 0) + ' / 100' : '–', s: SC.label || '', art: 'hi' }
+      scKachel(B, SC)
     ]);
+  }
+  /* v4800 · Marcel 25.11.2026: Investor Deal Score immer mit seinen zwei Scores, dann kein zweiter Deal Score daneben */
+  function scTeile(SC) { return (SC && SC.investor && SC.inv != null && SC.fin != null) ? 'Investment ' + SC.inv + ' · Finanzierung ' + SC.fin : ''; }
+  function scKachel(B, SC) {
+    return SC.investor ? { l: 'Investor Deal Score', v: SC.score ? B.zahl(SC.score, 0) + ' / 100' : '–', s: [SC.label, scTeile(SC)].filter(Boolean).join(' · '), art: 'hi' }
+      : { l: 'Deal Score', v: SC.score ? B.zahl(SC.score, 0) + ' / 100' : '–', s: SC.label || '', art: 'hi' };
   }
   function ansprechpartner(c, B) {
     var b = c.marke || {}, z = [];
@@ -725,11 +731,11 @@
     var S = [], nr = 0, ab = function (t) { nr++; return 'Abschnitt ' + nr; };
     S.push(B.deckblatt(c, { bild: fotos[0] || info.karte || null, eyebrow: name, titel: o.adresse, unter: [o.art, o.wfl ? B.zahl(o.wfl, 0) + ' m² Wohnfläche' : '', o.bj ? 'Baujahr ' + B.jahr(o.bj) : ''].filter(Boolean).join(' · '),
       kz: [{ l: 'Kaufpreis', v: B.eur(K.kp) }, { l: 'Gesamtinvestition', v: B.eur(K.gi) }, { l: 'Eigenkapital', v: B.eur(K.ek) }, { l: 'Bruttomietrendite', v: B.pct(K.bmy, 2), art: 'hi' }],
-      meta: [['Objekt-Nr.', o.seq || '–'], ['Stand', c.stand], ['Deal Score', SC.score != null ? B.zahl(SC.score, 0) + ' · ' + (SC.label || '') : '–']],
+      meta: [['Objekt-Nr.', o.seq || '–'], ['Stand', c.stand], [SC.investor ? 'Investor Deal Score' : 'Deal Score', SC.score != null ? B.zahl(SC.score, 0) + ' · ' + (SC.label || '') + (scTeile(SC) ? ' (' + scTeile(SC) + ')' : '') : '–']],
       zitat: feld('thesis') || '', hinweisRechts: (bank || kurz) ? 'Finanzierungsunterlage' : 'Vertraulich' }));
     /* Überblick */
     S.push(B.seite(c, 'Überblick', B.abschnitt('Executive Summary', 'Investitionsüberblick', o.adresse + ' · ' + o.art)
-      + '<div class="zwei"><div>' + B.scoreRing(SC.score, SC.label) + '</div><div>' + B.kacheln([{ l: 'CF n. St. Jahr 1', v: B.eurS(K.cf_ns), art: (K.cf_ns || 0) >= 0 ? 'gut' : 'schlecht' }, { l: 'CF n. St. Ende Zinsbindung', v: B.eurS(K.cf_ns_ezb) }]).replace('class="kz"', 'class="kz" style="grid-template-columns:1fr 1fr"') + '</div></div>'
+      + '<div class="zwei"><div>' + B.scoreRing(SC.score, SC.label) + (scTeile(SC) ? '<p class="det">Investor Deal Score: ' + B.esc(scTeile(SC)) + '</p>' : '') + '</div><div>' + B.kacheln([{ l: 'CF n. St. Jahr 1', v: B.eurS(K.cf_ns), art: (K.cf_ns || 0) >= 0 ? 'gut' : 'schlecht' }, { l: 'CF n. St. Ende Zinsbindung', v: B.eurS(K.cf_ns_ezb) }]).replace('class="kz"', 'class="kz" style="grid-template-columns:1fr 1fr"') + '</div></div>'
       + '<h3>Kennzahlen</h3>' + kennzahlen12(K, B, SC) + (interp && !kurz ? '<div class="hinweis">Einordnung: ' + B.esc(String(interp).replace(/\s+/g, ' ')) + '</div>' : '')
       + (kurz ? '' : ansprechpartner(c, B))));
     /* Objekt und Finanzierung */

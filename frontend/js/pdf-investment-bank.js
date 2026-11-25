@@ -1058,7 +1058,7 @@
        Investment-PDF - Parkstr. 9 zeigte hier 99, auf der Karte 76. Die Deutung darunter
        bleibt die des Kennzahlen-Scores und steht nur, wenn er auch die Zahl liefert. */
     var SCK = null; try { SCK = window._dpPdfScore ? window._dpPdfScore(K) : null; } catch (e) {}
-    if (SCK && SC && SCK.quelle !== 'kennzahlen') SC = { score: SCK.score, label: SCK.label };
+    if (SCK && SC && SCK.quelle !== 'kennzahlen') SC = { score: SCK.score, label: SCK.label, investor: true, inv: SCK.inv, fin: SCK.fin };   /* v4800 */
     else if (SCK && !SC) SC = { score: SCK.score, label: SCK.label };
     /* v2900b · Kurzfassung: acht Kacheln (zwei Reihen) - mit zwoelf rutschte das Raster auf S. 2 */
     raster([
@@ -1077,7 +1077,7 @@
       ['Kaltmiete', da(K.nkm_j) !== null ? eur(K.nkm_j) : (rows[1] ? eur(rows[1].nkm_y) : '-'), 'pro Jahr, inkl. Zusatzeinnahmen'],
       ['Equity Multiple', da(K.em) === null ? '-' : fmt(K.em, 1) + 'x', 'über die Haltedauer'],
       ['Wertpuffer / Equity', eur(K.wp_kpi), 'heute'],
-      ['Deal Score', (SC && SC.score) ? fmt(SC.score, 0) + ' / 100' : '-', (SC && SC.label) ? SC.label : '']
+      [(SC && SC.investor) ? 'Investor Deal Score' : 'Deal Score', (SC && SC.score) ? fmt(SC.score, 0) + ' / 100' : '-', [(SC && SC.label) || '', (SC && SC.investor && SC.inv != null) ? 'Investment ' + SC.inv + ' · Finanzierung ' + SC.fin : ''].filter(Boolean).join(' · ')]   /* v4800 */
     ], { titel: 'Kennzahlen' });   /* v2940 · Kurzfassung mit allen zwölf Kennzahlen (Marcel: bis sechs Seiten) */
     if (SC && SC.interpretation && !KURZ) {
       platz(16);

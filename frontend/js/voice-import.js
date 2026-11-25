@@ -11106,7 +11106,7 @@
        neu, es ist R.investment / R.finanzierung / R.gesamt aus DealScore2.compute(). */
     var zweiKarte = '';
     try {
-      var _zw = (typeof window._dpScoreAnsicht === 'function') ? window._dpScoreAnsicht() : 'eins';
+      var _zw = 'zwei';   /* v4800 · immer zwei Scores */
       var _s2 = (_zw === 'zwei') ? _rfScore2() : null;
       var _R = _s2 && _s2.R;
       if (_R && _R.investment && _R.finanzierung && _R.gesamt) {
