@@ -366,7 +366,7 @@
       '</svg><div class="dpz-n">' + score + '</div></div>';
   }
   function zBalken(g) {
-    return '<div class="dpz-kz"><span class="dpz-t">' + esc(g.name) + ' <span class="dpz-anteil">' + zZahl(g.anteil) + '\u00a0%</span></span>' +
+    return '<div class="dpz-kz" title="' + esc((g.kpis || []).join(' \u00b7 ')) + '"><span class="dpz-t">' + esc(g.name) + ' <span class="dpz-anteil">' + zZahl(g.anteil) + '\u00a0%</span></span>' +
       '<span class="dpz-p">' + g.score + ' / 100</span>' +
       '<span class="dpz-bar"><i style="width:' + Math.max(0, Math.min(100, g.score)) + '%;background:' + zFarbe(g.score) + '"></i></span>' +
       '<span class="dpz-m">' + esc((g.kpis || []).join(' \u00b7 ')) + ' \u2014 ' + (g.availableKpis != null ? g.availableKpis + '/' : '') + g.totalKpis + ' KPIs' +   /* v3254: ohne availableKpis (Portfolio) nur die Zahl */
@@ -765,6 +765,26 @@
 '.dpz-fakt li.dpz-leer::before{content:none}',
 '.dpz-fakt li.dpz-leer{padding-left:0;color:#6b6356}',
 '.dpz-tag{font:600 10.5px/1 "JetBrains Mono",monospace;color:#6b6356;margin-left:4px}',
+/* v4830 · Portfolio-Cockpit: Investment- und Finanzierungs-Score kompakt wie Demo 07 (Marcel 25.11.2026: zu groß); Kennzahlen je Gruppe im Tooltip */
+'#dp-pscore-hero .dpz-zwei{gap:10px;margin-top:10px}',
+'#dp-pscore-hero .dpz-karte{border-radius:12px}',
+'#dp-pscore-hero .dpz-band{height:3px}',
+'#dp-pscore-hero .dpz-pad{padding:10px 14px 12px}',
+'#dp-pscore-hero .dpz-score{gap:10px}',
+'#dp-pscore-hero .dpz-ring{width:44px;height:44px}',
+'#dp-pscore-hero .dpz-n{font-size:16px}',
+'#dp-pscore-hero .dpz-score > div:last-child{display:flex;flex-wrap:wrap;align-items:center;gap:2px 8px}',
+'#dp-pscore-hero .dpz-h3{font-size:14px}',
+'#dp-pscore-hero .dpz-pill{margin-top:0;padding:3px 7px;font-size:9.5px}',
+'#dp-pscore-hero .dpz-was{flex:1 1 100%;margin-top:0;font-size:11.5px}',
+'#dp-pscore-hero .dpz-kat{margin-top:8px;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:6px 14px}',
+'#dp-pscore-hero .dpz-kz{margin:0;gap:2px 8px}',
+'#dp-pscore-hero .dpz-t{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
+'#dp-pscore-hero .dpz-anteil{font-size:9.5px}',
+'#dp-pscore-hero .dpz-p{font-size:11px}',
+'#dp-pscore-hero .dpz-bar{height:5px}',
+'#dp-pscore-hero .dpz-m{display:none}',
+'#dp-pscore-hero .dpz-summe{margin-top:6px;padding-top:6px;font-size:11px}',
 '.dpsh-pass{display:flex;border-radius:18px;overflow:hidden;position:relative;background:#1b1815;box-shadow:0 22px 60px -30px rgba(20,15,5,.5)}',
 '.dpsh-main{flex:1;position:relative;background:radial-gradient(120% 150% at 78% -10%,#0d0c09,#050505 62%);min-width:0}',
 '.dpsh-star{position:absolute;inset:0;opacity:.38;pointer-events:none;background-image:radial-gradient(1px 1px at 22% 28%,color-mix(in srgb, var(--gold, #C9A84C) 45%, transparent),transparent),radial-gradient(1px 1px at 72% 16%,rgba(255,255,255,.22),transparent),radial-gradient(1px 1px at 88% 60%,color-mix(in srgb, var(--gold, #C9A84C) 35%, transparent),transparent),radial-gradient(1px 1px at 42% 84%,rgba(255,255,255,.18),transparent)}',

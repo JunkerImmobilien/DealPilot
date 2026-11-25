@@ -276,8 +276,9 @@
     }; });
     var kzAn = kzReihe().filter(function (k) { return KZH[k]; });
     var kzHtml = kzAn.map(function (k, i) { var h = KZH[k](); return i === 0 ? h.replace(/^<div class="gp-k/, '<div class="gp-k gp-haupt') : h; });
-    var gross = kzHtml.length ? '<div class="gp-gross">' + kzHtml.slice(0, 4).join('') + '</div>' : '';
-    var klein = kzHtml.length > 4 ? '<div class="gp-klein">' + kzHtml.slice(4).join('') + '</div>' : '';
+    /* v4830 · Marcel 25.11.2026 „sieht nicht fertig aus“: alle gewählten Kennzahlen in EINER Leiste wie Demo 07, gleich breit, keine Einzelkarte über die volle Breite */
+    var gross = kzHtml.length ? '<div class="gp-gross gp-kzl" style="--gp-n:' + kzHtml.length + '">' + kzHtml.join('') + '</div>' : '';
+    var klein = '';
     var ohneEw = rows.filter(function (r) { return r.ew == null; });
     var gb = false ? '<div class="gp-gb"><span>Investiert <b>' + mio(S.gi) + '</b></span><span>Darlehen <b>' + mio(S.darl) + '</b></span><span>Eigenkapital eingesetzt <b>' + mio(S.ek) + '</b></span>'
       + (ohneEw.length ? '<span title="' + esc(ohneEw.map(function (r) { return r.name; }).join(', ')) + '">ohne Ertragswert: ' + ohneEw.length + '</span>' : '') + '</div>' : '';
@@ -734,6 +735,9 @@
       A + ' > *{flex:0 0 100%;max-width:100%;min-width:0;box-sizing:border-box}',
       '@media (min-width:1000px){' + A + ' > .gp-halb{flex:0 0 calc(50% - 7px);max-width:calc(50% - 7px)}}',
       M + ' .dp-gp .gp-klein{grid-template-columns:repeat(auto-fit,minmax(150px,1fr)) !important}',
+      M + ' .dp-gp .gp-gross.gp-kzl{grid-template-columns:repeat(auto-fit,minmax(138px,1fr)) !important;gap:8px}' + M + ' .dp-gp .gp-kzl .gp-k{min-width:0;padding:10px 12px}' + M + ' .dp-gp .gp-kzl .gp-v{font-size:19px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}' + M + ' .dp-gp .gp-kzl .gp-u,' + M + ' .dp-gp .gp-kzl .gp-s{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
+      '@media (max-width:640px){' + M + ' .dp-gp .gp-gross.gp-kzl{grid-template-columns:repeat(2,minmax(0,1fr)) !important}}',
+      M + ' .gp-filter label{display:inline-flex !important;flex-direction:row !important;align-items:center;gap:6px;margin:0 !important;white-space:nowrap}' + M + ' .gp-filter select{min-width:96px;height:30px;padding:3px 8px}' + M + ' .gp-filter label > input[type=range]{width:120px}',
       M + ' .dp-gp .gp-karte.dp-gx{margin:0;padding:18px 20px 16px}' + M + ' .dp-gp .gp-karte .gx-t em{font-style:normal;color:var(--dp-gold-txt,#7d682f);background:color-mix(in srgb,' + G + ' 22%,transparent);border-radius:5px;padding:0 5px}',
       'html[data-gx-stil="dunkel"] ' + M + ' .dp-gp .gp-karte .gx-t em{color:var(--wl-e8cc7a,#E8CC7A)}',
       '@media (max-width:640px){' + M + ' .dp-gp .gp-klein{grid-template-columns:repeat(2,minmax(0,1fr)) !important}}',
