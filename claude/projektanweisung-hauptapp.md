@@ -45500,3 +45500,10 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** staging a4742022, 8b071453, v4650b/c/d, Merge 1a7fcfbf · main 1ec9ed3d, Version 1d2e1c64. Prod-Sicherung haupt/mb-20261125-0737-v4650 (7,0/31 MB, Kopf gelesen). Prüfer: buster-ebenen SAUBER, vorschau SAUBER, gold-audit Staging RC 0.
 - **Bilder:** Dateien/Fehler/menue-umschalter-2026-11-25/ (A-pille, B-reiter, C-runway je Schreibtisch und 390 px, A hell und Partnerfarbe).
 - **Rest:** Runway: der Gold-Strich unter dem aktiven Reiter liegt unter der Mittellinie und ist kaum zu sehen. Pille: Schrift auf der aktiven Pille fest dunkel (#1b1508), bei sehr dunkler Partnerfarbe prüfen. Bei Wahl: Stil-Code per Cherry-Pick auf main und Standard für alle Hosts setzen.
+
+### Rollout 1.0.197 · v4660/v4660a Kachel-Baustein (Fork S3)
+
+- **Was:** `css/dp-kachel.css` + `js/dp-kachel.js`. Eine Schriftstufe für alle Kacheln der Pilot-Analyse und des Objekt-Cockpits (Ursache der Mischschrift: `layout-varianten.css .body span` !important). Kachel-Optik A/B/C nur auf Staging voreingestellt (A), Prod wartet auf Marcels Wahl.
+- **Commit:** staging 3f403371, aaa42264, Rückführung f6e20d65 · main 2c13e08c, e3b4777f, Version 445c88db.
+- **Nachweis:** Schrift je Reiter gemessen, 390 px im iframe, Partnerfarbe, gold-audit RC 0 (Staging, Prod), buster-ebenen sauber. Prod-Sicherung haupt-/mb-20261125-0739-v4660 (7,0/31 MB, Kopf gelesen). Prod nur Auslieferung geprüft (curl), nicht eingeloggt.
+- **Rest:** Inhalt der Pilot-Analyse ist in beiden Chrome-Skins weiß, daher nur im Standard gemessen. Jahresabgleich-Struktur (T3) und Haus-Tabelle (U3) bewusst nicht angefasst.
