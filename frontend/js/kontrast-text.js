@@ -69,7 +69,7 @@
     if (offen) planen();   /* während des Laufs gemeldete Änderungen nachholen */
   }
   var timer = null;
-  function planen() { if (laeuft) { offen = true; return; } clearTimeout(timer); timer = setTimeout(pruefe, 350); }
+  function planen() { if (laeuft) { offen = true; return; } if (timer) return; timer = setTimeout(function () { timer = null; pruefe(); }, 300); }   /* gedrosselt statt entprellt: laufende Animationen schieben den Lauf nicht endlos auf */
 
   function start() {
     pruefe();
@@ -79,6 +79,6 @@
       }).observe(document.body, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ['class', 'style', 'hidden'] });   /* Reiterwechsel schalten nur Sichtbarkeit um */
     } catch (e) {}
   }
-  window.DpKontrastText = { pruefe: pruefe, version: 'v4850c' };
+  window.DpKontrastText = { pruefe: pruefe, version: 'v4850d' };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
 })();
