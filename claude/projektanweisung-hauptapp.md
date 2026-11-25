@@ -45590,3 +45590,10 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Nachweis:** 44 Staging-Objekte live, Mittel +0,2, −2 bis +4, kein Stufenwechsel; Prüfer grün (zwei-scores mit angepasstem V1). Doku `Dateien/Score/umstellung-ek-rendite-2026-11-25.md`.
 - **Rest:** Freigabe Marcel, dann Cherry-Pick; `dashboard.js` `_renditeTip` Text „Cash-on-Cash“ beim Rollout umbenennen.
 - **Prod 1.0.210 (Freigabe Marcel 25.11.):** main 4a3aca10, 350374a8 (v4760a `_renditeTip` „EK-Rendite nach Steuer“), f854cd0a. Sicherung haupt-/mb-20261125-0924-v4760, Kopf gelesen. Nur Frontend, kein Rebuild. Nachweis per curl (Buster v4760, Schwellen 2/6/10/15 und `ekr4.k2` in der ausgelieferten Datei, patch 210). Nicht eingeloggt im Objekt gemessen.
+
+### Rollout 1.0.211 · einzelcheck-9 Deal-Check Mietpotenzial aus Investorensicht
+
+- **Was:** Deal-Check-Bericht rechnet Bestand gegen den Oberwert der Spanne und Neuvermietung Oberwert x 1,10 (Bremse/ungeklaert) bzw. x 1,20 (ohne), ueber mb lib/mietanker.js zielMaximum (zielAusAuszug), wie die App. Herford: Neuvermietung 9,36 EUR/m2 = 899 EUR statt Richtwert 670 EUR.
+- **Commit:** staging a94c2e8e, 075744cf, e272df31, f041d098 · main 0dd4ec34, 8111fea9, 23a0e0a0.
+- **Nachweis:** einzelcheck-pruefen Teil V + 4 Gegenproben, Staging-Dienst liefert ziel fuer Herford, Prod-mb-backend rechnet zielAusAuszug identisch, Landing liefert einzelcheck-9m aus.
+- **Rest:** Kein bezahlter Prod-Bericht nachgemessen (keine Testzahlung). HH4-Muster (Muster-komplett-2026-11-25) vor diesem Stand erzeugt, Seite Mietpotenzial neu erzeugen.
