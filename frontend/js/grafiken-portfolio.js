@@ -568,6 +568,8 @@
     A.ord.forEach(function (k, i) { var el = Z[k]; if (!el) return; el.style.order = String(10 + i); el.classList.toggle('gp-halb', breite(k) === 'halb'); });
     A.ordVb.forEach(function (k, i) { var el = Z[k]; if (!el) return; el.style.order = String(i); el.classList.toggle('gp-breit', breite(k) !== 'halb'); });
     var gb = Z.gb; if (gb) gb.removeAttribute('data-gp-fest');
+    /* v5000b · eben eingeblendete Module: Tabellen erst jetzt als Karten fassen (tabellen-karten.js liest die Spaltenköpfe per innerText, im ausgeblendeten Modul leer; gemessen: Zinsstress bei 390 px 556/298 px waagerecht) */
+    try { if (window.DealPilotTabellenKarten) setTimeout(function () { DealPilotTabellenKarten.alle(app); }, 0); } catch (e) {}
     /* v4690 · Objektmatrix eben eingeschaltet: einmal neu zeichnen (aus gezeichnet wird sie nicht gebaut) */
     if (Z.om && sichtbar('om') && !Z.om.querySelector('.om-raster') && !_omNeu) { _omNeu = setTimeout(function () { _omNeu = null; var h = document.querySelector('[data-dp-gp="kopf"]'); if (h) h.removeAttribute('data-gp-sig'); try { lauf(); } catch (e) {} }, 0); }
   }
