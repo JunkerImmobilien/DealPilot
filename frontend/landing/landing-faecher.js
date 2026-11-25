@@ -874,7 +874,6 @@
   }
   function datenbasis(sec) {
     if (!sec) return;
-    var box = $('#dtZusammen', sec);
     umfangDaten().then(function (U) {
       if (!U || !U.teile || !U.kopf) return;
       var T = U.teile, summe = 0, ok = true;
@@ -885,21 +884,7 @@
         var v = T[b.getAttribute('data-teil')];
         if (typeof v === 'number' && isFinite(v)) b.textContent = fmt(v); else b.style.display = 'none';
       });
-      if (!box || !ok || summe !== ges) return;
-      var reihe = TEILE.slice().sort(function (a, b) { return T[b[0]] - T[a[0]]; });
-      /* landing-handy-1 · Marcel 22.11.2026 (IMG_2056): „doppelt die amtlichen Zahlen, es reicht, wenn wir die darüber
-         animieren“. Die Summe und die Zahlen je Posten stehen oben (hochzaehlend) und in der Tabelle. Hier nur noch der
-         Balken mit den Namen, ohne zweite Zahlenreihe. */
-      box.innerHTML = '<div class="dt-z-kopf"><span class="dt-z-eye">So setzen sie sich zusammen</span></div>'
-        + '<div class="dt-z-balken" aria-hidden="true">' + reihe.map(function (t, i) {
-          return '<i data-i="' + i + '" style="--w:' + (T[t[0]] / ges * 100).toFixed(3) + '%"></i>';
-        }).join('') + '</div>'
-        + '<ul class="dt-z-liste dt-z-namen">' + reihe.map(function (t, i) {
-          return '<li><i class="dt-z-farbe" data-i="' + i + '" aria-hidden="true"></i><span>' + esc(t[1]) + '</span></li>';
-        }).join('') + '</ul>';
-      box.hidden = false;
-      if (ruhig) { box.classList.add('da'); return; }
-      sichtbar(box, function () { box.classList.add('da'); }, .35);
+      /* landing-zahlen-raus · Marcel 25.11.2026: Zusammensetzung (Balken „So setzen sie sich zusammen“) entfernt, nur noch Tabellenzahlen */
     });
     /* Tabelle im Fenster */
     var auf = $('#dtQuellenAuf', sec), dlg = $('#dtQuellen', sec);

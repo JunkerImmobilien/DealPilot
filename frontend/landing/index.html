@@ -73,7 +73,7 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
 <link rel="stylesheet" href="dp2-module.css?v=landing-module-2">
 <link rel="stylesheet" href="dp2-kern.css?v=landing-strecke-3">
 <link rel="stylesheet" href="dp2-dealcheck.css?v=einzelcheck-2">
-<link rel="stylesheet" href="landing-faecher.css?v=gold-hell-1"><!-- landing-faecher-1 · Streifen, Riss, Startbahn „Fächer“, Videothek als Slider · landing-faecher-2 Gesamturteil, Datenbasis, Partnerkarten -->
+<link rel="stylesheet" href="landing-faecher.css?v=zahlen-raus-1"><!-- landing-faecher-1 · Streifen, Riss, Startbahn „Fächer“, Videothek als Slider · landing-faecher-2 Gesamturteil, Datenbasis, Partnerkarten -->
 <link rel="stylesheet" href="seo.css?v=landing-seo-5">
 </head><body>
 
@@ -581,12 +581,7 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
     <div><b data-umfang="videos" data-zaehl>38</b><span>Videos in der Videothek, <i data-umfang="video_stunden">3,5</i> Stunden</span></div>
   </div>
 
-  <!-- landing-faecher-2 · Marcel 20.11.2026: die amtlichen Datenpunkte und wie sie sich zusammensetzen laufen hoch,
-       sobald der Abschnitt ins Bild kommt. Die acht Posten (teile) kommen aus GET /public/datenumfang
-       (window.DPS_ZAHLEN_LIVE, landing-zahlen.js) oder, wenn der nicht antwortet, aus datenumfang.js
-       (tools/datenumfang-messen.mjs). Gebaut von landing-faecher.js datenbasis(), nur wenn die Summe
-       der Posten genau die Gesamtzahl ergibt. -->
-  <div class="dt-zusammen" id="dtZusammen" hidden></div>
+  <!-- landing-zahlen-raus · Marcel 25.11.2026: Zusammensetzung der Datenpunkte (dtZusammen) entfernt -->
   <!-- landing-faecher-2 · Marcel 20.11.2026: „Klick auf die acht Quellen öffnet eine Tabellenansicht“. Vorbild
        design/Vorschläge/landing-neu-4/unterseite-daten.html (Tabelle „Flugbuch der Daten“), Inhalte und Namen
        wie bisher in den acht Karten hier und in methodik.html (Gutachterausschüsse, Zensus 2022, Statistische Ämter,
@@ -741,7 +736,7 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
      staging.dealpilot.immo -> app.staging.dealpilot.immo, sonst app.dealpilot.immo. -->
 <script src="dealcheck-laden.js?v=v4760"></script><!-- landing-seo-3 · Kerne + Deal-Check, Buster dort (buster-ebenen-pruefen liest die Datei) -->
 <script src="dp2-live.js?v=landing-pruefung-1"></script><!-- landing-faecher-1 · gibt window.DpVideoQuelle für den Slider heraus -->
-<script src="landing-faecher.js?v=einzelcheck-10a"></script>
+<script src="landing-faecher.js?v=zahlen-raus-1"></script>
 <script src="partner.js?v=landing-strecke-5"></script><!-- landing-strecke-1 · Aufzug der Strecke --><!-- landing-videothek-1, landing-partner-1 -->
 <!-- v1588: Zwei Funktionen, die der alten Landing schon gehoerten und
      hier gefehlt haben. Beide betreffen Geld, deshalb standen sie ganz
