@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-11-25T09:46:04.186Z",
+ "erzeugt_am": "2026-11-25T09:56:02.533Z",
  "quellen": {
-  "voice-import": "329fd45d5c175a2e",
+  "voice-import": "b034c89b8920e501",
   "objektart-felder": "f3795cd7fc2b9b70",
   "storage": "2d929d7da83d4809",
-  "index-html": "95986c0aebe1d537",
+  "index-html": "9e34844bc0638ae3",
   "grest": "81f3fb0a4de3a6cf"
  },
  "daten": {
@@ -4110,7 +4110,7 @@
      },
      {
       "h": "Zwei Scores: Investment und Finanzierung",
-      "text": "Den Investor Deal Score kannst du als zwei Scores sehen — einschalten unter Einstellungen › Deal Score › „Bewertung als“ › Zwei Scores: Investment + Finanzierung. Das ändert nur die Anzeige; gerechnet werden immer beide. Der Quick-Check und der DealPilot Score bleiben bei einem Score.\n\n• Investment-Score — das Objekt: Objektrendite (Brutto- und Nettomietrendite), Risiko & Zustand, Lage & Markt, Potenzial & Preis.\n• Finanzierungs-Score — die Finanzierung: Kapitaldienst & Beleihung, Cashflow & EK-Rendite.\n• Gesamtscore — das gewichtete Mittel beider Teile, also der Investor Deal Score selbst: dieselbe Zahl wie in Seitenleiste, Objektkarte und PDF.\n\nDie Kennzahlen behalten ihr Gewicht aus deinem Bewertungsprofil; die zwei Scores teilen sie nur auf. Die DSCR-Staffel begrenzt Finanzierungs-Score und Gesamtscore.\n\nDie Empfehlung hängt an zwei Schwellen:\n• Kaufen — Investment ab 70 und Finanzierung ab 50, und die Miete trägt den Kapitaldienst (DSCR ab 1,0). Beim Barkauf gilt die Finanzierung als erfüllt.\n• Objekt passt, Finanzierung umbauen — nur das Objekt erfüllt seine Schwelle.\n• Verhandeln — nur die Finanzierung erfüllt ihre.\n• Verhandeln, Finanzierung umbauen — keiner von beiden.\n• Nicht kaufen — Investment unter 50."
+      "text": "Der Investor Deal Score steht immer als zwei Scores da, Investment und Finanzierung, darüber das Gesamturteil aus beiden. Der Quick-Check und der DealPilot Score bleiben bei einem Score.\n\n• Investment-Score — das Objekt: Objektrendite (Brutto- und Nettomietrendite), Risiko & Zustand, Lage & Markt, Potenzial & Preis.\n• Finanzierungs-Score — die Finanzierung: Kapitaldienst & Beleihung, Cashflow & EK-Rendite.\n• Gesamtscore — das gewichtete Mittel beider Teile, also der Investor Deal Score selbst: dieselbe Zahl wie in Seitenleiste, Objektkarte und PDF.\n\nDie Kennzahlen behalten ihr Gewicht aus deinem Bewertungsprofil; die zwei Scores teilen sie nur auf. Die DSCR-Staffel begrenzt Finanzierungs-Score und Gesamtscore.\n\nDie Empfehlung hängt an zwei Schwellen:\n• Kaufen — Investment ab 70 und Finanzierung ab 50, und die Miete trägt den Kapitaldienst (DSCR ab 1,0). Beim Barkauf gilt die Finanzierung als erfüllt.\n• Objekt passt, Finanzierung umbauen — nur das Objekt erfüllt seine Schwelle.\n• Verhandeln — nur die Finanzierung erfüllt ihre.\n• Verhandeln, Finanzierung umbauen — keiner von beiden.\n• Nicht kaufen — Investment unter 50."
      }
     ]
    },
@@ -5746,7 +5746,7 @@
   }
  },
  "inhalt": {
-  "hilfe": "2a5bec521f3fb8c8",
+  "hilfe": "03ef585333a913f4",
   "bewertung": "4119201154a9f321"
  }
 }
