@@ -11,7 +11,7 @@
  *   · sofort eine Mail bei ROT in Platte, Nachtsicherung, TLS, Wiederherstellungsprobe, Messung fehlt
  *     (je Punkt höchstens einmal in 24 h),
  *   · montags eine Wochenmail mit Ampeln und Handlungsbedarf.
- * Empfänger: ADMIN_EMAIL (config.admin.email). Scharf nur mit BETRIEB_MAIL=1 (Prod), sonst trocken.
+ * Empfänger: BETRIEB_MAIL_TO, Rückfall ADMIN_EMAIL (config.admin.email, dient sonst dem Admin-Bootstrap). Scharf nur mit BETRIEB_MAIL=1 (Prod), sonst trocken.
  */
 
 const SCHWELLEN = Object.freeze({
@@ -227,8 +227,8 @@ async function lauf(db, opt) {
   const gemailt = {}; mails.forEach((x) => { gemailt[x.s] = new Date(x.t).getTime(); });
   const rot = rotZuMailen(b, gemailt, jetzt);
   const woche = wocheFaellig(gemailt.woche || null, jetzt);
-  const an = (require('../config').admin || {}).email || process.env.ADMIN_EMAIL || '';
-  const erg = { server: d.server, gesamt: b.gesamt, rot: rot.map((p) => p.bereich), woche, an: an ? 'ADMIN_EMAIL' : '', gesendet: [] };
+  const an = process.env.BETRIEB_MAIL_TO || (require('../config').admin || {}).email || process.env.ADMIN_EMAIL || '';
+  const erg = { server: d.server, gesamt: b.gesamt, rot: rot.map((p) => p.bereich), woche, an: an ? (process.env.BETRIEB_MAIL_TO ? 'BETRIEB_MAIL_TO' : 'ADMIN_EMAIL') : '', gesendet: [] };
   if (opt.trocken || !an) return erg;
   const { sendMail } = require('./mailerService');
   const merke = (schluessel) => db.query(`INSERT INTO betrieb_messungen (server, art, daten) VALUES ($1,'mail',$2)`, [d.server, JSON.stringify({ schluessel })]);
