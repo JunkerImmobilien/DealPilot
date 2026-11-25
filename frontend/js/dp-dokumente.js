@@ -1138,7 +1138,7 @@
 
     /* 5 · Wert und Rechenweg */
     _knapp = true;
-    try { var rw = rechenweg(B, P3, !kombi); add('Wert, Verfahren und Rechenweg', 'Werte je Verfahren, Wert je Stufe, Ertrags- und Sachwert Zeile für Zeile', wertZielbild(K, B, WZo, PD, true, bankF) + (rw ? '<h3 style="margin-top:5mm">Rechenweg</h3>' + rw : ''), 1); } finally { _knapp = false; }
+    try { var rw = rechenweg(B, P3, !kombi); add('Wert, Verfahren und Rechenweg', 'Werte je Verfahren, Wert je Stufe, Ertrags- und Sachwert Zeile für Zeile', wertZielbild(K, B, WZo, PD, true, bankF) + (rw ? '<h3 style="break-before:page;page-break-before:always">Rechenweg</h3>' + rw : ''), 1); } finally { _knapp = false; }
 
     /* 6 · Rendite und Steuer (nicht in der Bankfassung) */
     if (!bankF) add('EK-Rendite und Hebel', 'Vier Stufen, Hebel in beide Richtungen', ekRenditeSeite(B, K), 1);
