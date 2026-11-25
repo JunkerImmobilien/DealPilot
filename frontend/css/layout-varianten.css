@@ -9740,3 +9740,111 @@ html[data-dk-drei] .dk-schalter.dk-drei .dk-seg.aktiv b{ color:var(--wl-c9a84c,#
 @media (max-width: 900px){
   html[data-dp-layout] aside#sidebar #sb-list .sb-card.dk-weg{ display:none !important; }
 }
+
+/* ══ v4650 · Umschalter Aktionen · Ankauf · Bestand: drei Gestaltungen ══════════
+   Marcel 25.11.2026: „kriegen wir das vom Design her irgendwie cooler dargestellt?"
+   html[data-dk-stil] = pille | reiter | runway (doppelkarte.js dkStil()). Ohne
+   Attribut bleibt die Optik von v4600: Symbole, Pille und Leerzeile sind dann aus.
+   Gold nur über Whitelabel-Token, Statusfarben nicht berührt. */
+html[data-dk-drei] .dk-schalter.dk-drei .dk-ico,
+html[data-dk-drei] .dk-schalter.dk-drei .dk-pille,
+html[data-dk-drei] .dk-schalter.dk-drei .dk-ohne{ display:none !important; }
+html[data-dk-drei][data-dk-stil] .dk-schalter.dk-drei .dk-ico{ display:block !important; width:16px; height:16px; flex:0 0 auto; }
+html[data-dk-drei][data-dk-stil] .dk-schalter.dk-drei .dk-ohne{ display:block !important; visibility:hidden; }
+
+/* ── Variante A · pille: gleitende Gold-Pille ── */
+html[data-dk-drei][data-dk-stil="pille"] .dk-schalter.dk-drei{
+  position:relative !important; gap:0 !important; padding:4px !important;
+  background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02)) !important;
+  border:1px solid rgba(233,227,214,.16) !important; border-radius:14px !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.05), 0 6px 18px rgba(0,0,0,.28) !important;
+}
+html[data-dk-drei][data-dk-stil="pille"] .dk-schalter.dk-drei .dk-pille{
+  display:block !important; position:absolute; top:4px; bottom:4px; left:4px;
+  width:calc((100% - 8px) / 3); border-radius:10px; z-index:0; pointer-events:none;
+  background:linear-gradient(110deg, var(--wl-e8cc7a,#E8CC7A), var(--wl-c9a84c,#C9A84C) 55%, var(--wl-b8932f,#b8932f));
+  box-shadow:0 4px 14px color-mix(in srgb, var(--wl-c9a84c,#C9A84C) 38%, transparent), inset 0 1px 0 rgba(255,255,255,.35);
+  transition:transform .34s cubic-bezier(.3,1.25,.45,1);
+}
+html[data-dk-drei][data-dk-stil="pille"] .dk-schalter.dk-drei[data-wahl="ankauf"] .dk-pille{ transform:translateX(100%); }
+html[data-dk-drei][data-dk-stil="pille"] .dk-schalter.dk-drei[data-wahl="bestand"] .dk-pille{ transform:translateX(200%); }
+html[data-dk-drei][data-dk-stil="pille"] .dk-schalter.dk-drei .dk-seg{
+  position:relative; z-index:1; min-height:50px !important; gap:3px !important;
+  background:transparent !important; box-shadow:none !important; border-radius:10px !important;
+  font:600 11.5px/1.1 Inter,system-ui,sans-serif !important; color:rgb(191,183,169) !important;
+}
+html[data-dk-drei][data-dk-stil="pille"] .dk-schalter.dk-drei .dk-seg:hover{ color:rgb(240,234,222) !important; background:transparent !important; }
+html[data-dk-drei][data-dk-stil="pille"] .dk-schalter.dk-drei .dk-seg.aktiv{ color:#1b1508 !important; background:transparent !important; box-shadow:none !important; }
+html[data-dk-drei][data-dk-stil="pille"] .dk-schalter.dk-drei .dk-seg b{ font-size:9.5px !important; color:rgb(150,143,131); }
+html[data-dk-drei][data-dk-stil="pille"] .dk-schalter.dk-drei .dk-seg.aktiv b{ color:rgba(27,21,8,.72) !important; }
+
+/* ── Variante B · reiter: drei Karten mit Symbol und Zahl ── */
+html[data-dk-drei][data-dk-stil="reiter"] .dk-schalter.dk-drei{
+  gap:6px !important; padding:0 !important; background:transparent !important; border:0 !important; box-shadow:none !important;
+}
+html[data-dk-drei][data-dk-stil="reiter"] .dk-schalter.dk-drei .dk-seg{
+  position:relative; min-height:56px !important; gap:3px !important; padding:7px 4px 6px !important;
+  border-radius:11px !important; background:rgba(233,227,214,.045) !important;
+  box-shadow:inset 0 0 0 1px rgba(233,227,214,.13) !important;
+  font:600 11.5px/1.1 Inter,system-ui,sans-serif !important; color:rgb(191,183,169) !important;
+  transition:background .2s ease, box-shadow .2s ease, transform .2s ease, color .2s ease !important;
+}
+html[data-dk-drei][data-dk-stil="reiter"] .dk-schalter.dk-drei .dk-seg:hover{ transform:translateY(-1px); background:rgba(233,227,214,.08) !important; color:rgb(240,234,222) !important; }
+html[data-dk-drei][data-dk-stil="reiter"] .dk-schalter.dk-drei .dk-seg .dk-ico{ width:18px; height:18px; opacity:.85; }
+html[data-dk-drei][data-dk-stil="reiter"] .dk-schalter.dk-drei .dk-seg b{
+  position:absolute; top:5px; right:6px; min-width:16px; padding:1px 4px !important; border-radius:999px;
+  background:rgba(233,227,214,.1); font-size:9px !important; color:rgb(200,192,178);
+}
+html[data-dk-drei][data-dk-stil="reiter"] .dk-schalter.dk-drei .dk-seg b.dk-ohne{ display:none !important; }
+html[data-dk-drei][data-dk-stil="reiter"] .dk-schalter.dk-drei .dk-seg.aktiv{
+  color:var(--wl-e8cc7a,#E8CC7A) !important;
+  background:linear-gradient(180deg, color-mix(in srgb, var(--wl-c9a84c,#C9A84C) 24%, transparent), color-mix(in srgb, var(--wl-c9a84c,#C9A84C) 8%, transparent)) !important;
+  box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--wl-c9a84c,#C9A84C) 60%, transparent), inset 0 2px 0 var(--wl-c9a84c,#C9A84C), 0 6px 16px color-mix(in srgb, var(--wl-c9a84c,#C9A84C) 22%, transparent) !important;
+}
+html[data-dk-drei][data-dk-stil="reiter"] .dk-schalter.dk-drei .dk-seg.aktiv .dk-ico{ opacity:1; }
+html[data-dk-drei][data-dk-stil="reiter"] .dk-schalter.dk-drei .dk-seg.aktiv b{ background:var(--wl-c9a84c,#C9A84C); color:#1b1508 !important; }
+
+/* ── Variante C · runway: Leiste im Luftfahrt-Stil ── */
+html[data-dk-drei][data-dk-stil="runway"] .dk-schalter.dk-drei{
+  position:relative !important; gap:0 !important; padding:5px 4px 9px !important;
+  background:linear-gradient(180deg, #141210, #0b0a09) !important;
+  border:1px solid rgba(233,227,214,.14) !important; border-radius:12px !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04) !important; overflow:hidden;
+}
+html[data-dk-drei][data-dk-stil="runway"] .dk-schalter.dk-drei::after{
+  content:""; position:absolute; left:10px; right:10px; bottom:4px; height:2px; pointer-events:none;
+  background:repeating-linear-gradient(90deg, rgba(233,227,214,.28) 0 10px, transparent 10px 18px);
+}
+html[data-dk-drei][data-dk-stil="runway"] .dk-schalter.dk-drei .dk-seg{
+  position:relative; min-height:50px !important; gap:2px !important; background:transparent !important; box-shadow:none !important;
+  font:600 9.5px/1.1 'JetBrains Mono',ui-monospace,monospace !important; letter-spacing:.12em !important; text-transform:uppercase !important;
+  color:rgb(160,152,139) !important;
+}
+html[data-dk-drei][data-dk-stil="runway"] .dk-schalter.dk-drei .dk-seg + .dk-seg{ box-shadow:inset 1px 0 0 rgba(233,227,214,.08) !important; }
+html[data-dk-drei][data-dk-stil="runway"] .dk-schalter.dk-drei .dk-seg .dk-ico{ width:15px; height:15px; order:-2; }
+html[data-dk-drei][data-dk-stil="runway"] .dk-schalter.dk-drei .dk-seg b{
+  order:-1; font:600 15px/1 'Space Grotesk',Inter,system-ui,sans-serif !important; letter-spacing:0 !important; color:rgb(222,215,202);
+}
+html[data-dk-drei][data-dk-stil="runway"] .dk-schalter.dk-drei .dk-seg b.dk-ohne{ display:none !important; }
+html[data-dk-drei][data-dk-stil="runway"] .dk-schalter.dk-drei .dk-seg:hover{ color:rgb(233,227,214) !important; background:transparent !important; }
+html[data-dk-drei][data-dk-stil="runway"] .dk-schalter.dk-drei .dk-seg.aktiv{
+  color:var(--wl-e8cc7a,#E8CC7A) !important;
+  background:radial-gradient(120% 90% at 50% 100%, color-mix(in srgb, var(--wl-c9a84c,#C9A84C) 22%, transparent), transparent 70%) !important;
+}
+html[data-dk-drei][data-dk-stil="runway"] .dk-schalter.dk-drei .dk-seg.aktiv b{ color:var(--wl-e8cc7a,#E8CC7A); }
+html[data-dk-drei][data-dk-stil="runway"] .dk-schalter.dk-drei .dk-seg.aktiv::after{
+  content:""; position:absolute; left:50%; bottom:-6px; width:34px; height:3px; transform:translateX(-50%); border-radius:2px;
+  background:var(--wl-c9a84c,#C9A84C); box-shadow:0 0 10px var(--wl-c9a84c,#C9A84C);
+}
+@media (max-width: 900px){
+  html[data-dk-drei][data-dk-stil][data-dp-layout] aside#sidebar.sidebar .dk-schalter.dk-drei .dk-seg{ font-size:12px !important; }
+  html[data-dk-drei][data-dk-stil="runway"][data-dp-layout] aside#sidebar.sidebar .dk-schalter.dk-drei .dk-seg{ font-size:10px !important; }
+  html[data-dk-drei][data-dk-stil="pille"][data-dp-layout] aside#sidebar.sidebar .dk-schalter.dk-drei .dk-seg,
+  html[data-dk-drei][data-dk-stil="pille"][data-dp-layout] aside#sidebar.sidebar .dk-schalter.dk-drei .dk-seg.aktiv{ background:transparent !important; box-shadow:none !important; }
+  html[data-dk-drei][data-dk-stil="pille"][data-dp-layout] aside#sidebar.sidebar .dk-schalter.dk-drei .dk-seg.aktiv{ color:#1b1508 !important; }
+  html[data-dk-drei][data-dk-stil="runway"][data-dp-layout] aside#sidebar.sidebar .dk-schalter.dk-drei .dk-seg.aktiv{ background:radial-gradient(120% 90% at 50% 100%, color-mix(in srgb, var(--wl-c9a84c,#C9A84C) 22%, transparent), transparent 70%) !important; box-shadow:none !important; color:var(--wl-e8cc7a,#E8CC7A) !important; }
+}
+@media (max-width: 900px){
+  html[data-dk-drei][data-dk-stil="reiter"][data-dp-layout] aside#sidebar.sidebar .dk-schalter.dk-drei .dk-seg{ background:rgba(233,227,214,.045) !important; box-shadow:inset 0 0 0 1px rgba(233,227,214,.13) !important; }
+  html[data-dk-drei][data-dk-stil="reiter"][data-dp-layout] aside#sidebar.sidebar .dk-schalter.dk-drei .dk-seg.aktiv{ color:var(--wl-e8cc7a,#E8CC7A) !important; background:color-mix(in srgb, var(--wl-c9a84c,#C9A84C) 20%, transparent) !important; box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--wl-c9a84c,#C9A84C) 60%, transparent), inset 0 2px 0 var(--wl-c9a84c,#C9A84C) !important; }
+}
