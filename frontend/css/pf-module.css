@@ -345,3 +345,28 @@ html[data-gx-stil="dunkel"] .dp-gp.gp-pfm{--karte:#0E0D0B;--bg:#070706}
 .gp-halb .gx-seite b{font-size:18px}
 .gp-halb .gx-seite small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 @media (max-width:640px){.gx-seite b{font-size:17px}}
+
+/* ══ v5000 · Portfolio-Cockpit am Handy (Marcel 25.11.2026: „auf dem Handy … passend visualisiert …
+   im gleichen Stil wie die anderen Tabs“). Gemessen in der Messkabine bei 390 px, alle neun Vorlagen. ══ */
+@media (max-width:640px){
+  /* Filter: Art und Objekt nebeneinander, Beschriftung darüber, Projektion und Knopf je eine Zeile */
+  body.dp-gp-an #dashboard-main .dp-gp .gp-filter{display:grid !important;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 10px;width:100%}
+  body.dp-gp-an #dashboard-main .dp-gp .gp-filter label{display:flex !important;flex-direction:column !important;align-items:stretch !important;gap:3px !important;white-space:normal !important;font:500 10.5px/1.3 Inter,system-ui,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#6B645A}
+  body.dp-gp-an #dashboard-main .dp-gp .gp-filter select{width:100% !important;max-width:none !important;min-width:0 !important;height:36px !important;text-transform:none;letter-spacing:0}
+  body.dp-gp-an #dashboard-main .dp-gp .gp-filter label:has(input[type=range]){grid-column:1/-1;flex-direction:row !important;flex-wrap:wrap;align-items:center !important}
+  body.dp-gp-an #dashboard-main .dp-gp .gp-filter label > input[type=range]{flex:1 1 140px;width:auto !important}
+  body.dp-gp-an #dashboard-main .dp-gp .gp-filter .gp-zahn{grid-column:1/-1;justify-self:start}
+  /* Kennzahl-Kacheln: Unterzeile zweizeilig statt abgeschnitten („Wert 9,99 Mio € minus …“) */
+  body.dp-gp-an #dashboard-main .dp-gp .gp-s{white-space:normal !important;overflow:hidden;display:-webkit-box !important;-webkit-line-clamp:2;-webkit-box-orient:vertical;text-overflow:clip}
+  /* Kacheln unter den Grafiken: Betrag 17 px (24 px liefen bei 114 px Kachelbreite ab), Unterzeile bricht um */
+  body.dp-gp-an #dashboard-main .pfm.dp-gx .gx-seite b,body.dp-gp-an #dashboard-main .dp-gx.pfm .gx-seite b{font-size:17px !important}
+  body.dp-gp-an #dashboard-main .pfm .gx-seite small{white-space:normal !important;overflow:visible !important;text-overflow:clip !important}
+  /* Tabellen als Karten (tabellen-karten.js): volle Kartenbreite (gemessen 230 von 298 px, Tabelle inline-flex) */
+  body.dp-gp-an #dashboard-main .pfm table.dptk{display:block !important;width:100% !important}
+  body.dp-gp-an #dashboard-main .pfm table.dptk > tbody{display:block !important;width:100% !important}
+}
+@media (max-width:600px){
+  /* Je Objekt Bestand → Soll → Zielbild: der Objektname war als sticky Tabellenzelle (140 px, weißer Grund) in der Karte stehen geblieben */
+  body.dp-gp-an #dashboard-main #dp-stage table.zb-ot-tab tbody th,body.dp-gp-an #dashboard-main #dp-stage table.zb-ot-tab tfoot th{display:block !important;position:static !important;min-width:0 !important;max-width:none !important;width:auto !important;background:none !important;box-shadow:none !important;padding:0 0 6px !important;margin-bottom:4px;border-bottom:1px solid var(--dpl-linie,#E6E1D6) !important}
+}
+@media (max-width:640px){html[data-gx-stil="dunkel"] body.dp-gp-an #dashboard-main .dp-gp .gp-filter label{color:#A89F8F}}

@@ -1647,7 +1647,7 @@ label.dp-required.qc-required::after {
 
     <hr class="dvd">
     <div class="card-title">Eigene Werte · Stufe E</div><!-- v3034: hieß „Ansätze des Sachverständigen“ (Marcel 29.10.2026) -->
-    <p class="sec-desc" style="margin:-6px 0 12px" data-als-tip="" data-als-tip-titel="Eigene Werte · Stufe E">Nur wenn du einen eigenen Wert hast, etwa aus einem Gutachten oder vom Gutachterausschuss. Leer heißt: der Bericht holt den Wert selbst — Liegenschaftszins aus dem Register, Bodenrichtwert über BORIS. Ein eingetragener Wert steht im Bericht als <strong>Stufe E · eigene Angabe</strong>.</p>
+    <p class="sec-desc" style="margin:-6px 0 12px" data-als-tip="<" data-als-tip-titel="Eigene Werte · Stufe E">Nur wenn du einen eigenen Wert hast, etwa aus einem Gutachten oder vom Gutachterausschuss. Leer heißt: der Bericht holt den Wert selbst — Liegenschaftszins aus dem Register, Bodenrichtwert über BORIS. Ein eingetragener Wert steht im Bericht als <strong>Stufe E · eigene Angabe</strong>.</p>
     <div class="g3">
       <div class="f"><label title="Der Zinssatz, mit dem der Verkehrswert von Grundstücken im Durchschnitt marktüblich verzinst wird (Paragraf 21 Abs. 2 ImmoWertV). Er kommt vom örtlichen Gutachterausschuss und steuert den Ertragswert stark — schon ein halber Punkt verschiebt ihn spürbar.">Liegenschaftszinssatz (%)</label><div class="iw"><input id="lzs_pct" type="text" inputmode="decimal" placeholder="leer = amtlicher Wert" class="tr"><span class="sfx">%</span></div></div>
       <div class="f"><label>Bodenrichtwert manuell (€/m²)</label><div class="iw"><span class="pfx">€</span><input id="brw_manuell" type="text" inputmode="decimal" placeholder="leer = amtlicher Abruf" class="trl"></div></div>
@@ -2369,7 +2369,7 @@ label.dp-required.qc-required::after {
         <div class="f"><label>Anteil Dritte (%)</label><div class="iw"><input id="eig_anteil_dritte" type="text" inputmode="decimal" placeholder="0" class="tr"><span class="sfx">%</span></div></div>
         <div class="f"><label>Anteil erworben am (falls abweichend)</label><input id="eig_erwerb_datum" type="date" class="tr"></div>
       </div>
-      <p class="hint" style="margin-top:4px" data-als-tip="" data-als-tip-titel="Eigentumsanteile">Für Gestaltungen wie Ehegattenverkauf, Schenkung oder Güterstandsschaukel. Die Anteile sollten zusammen 100 % ergeben; Güterstand und Anfangsvermögen stehen im Investmentprofil.</p>
+      <p class="hint" style="margin-top:4px" data-als-tip="#eig-box > summary" data-als-tip-titel="Eigentumsanteile">Für Gestaltungen wie Ehegattenverkauf, Schenkung oder Güterstandsschaukel. Die Anteile sollten zusammen 100 % ergeben; Güterstand und Anfangsvermögen stehen im Investmentprofil.</p>
     </details>
     </div>
   </div>
@@ -2573,7 +2573,7 @@ label.dp-required.qc-required::after {
   <!-- Steuerverlauf über die Jahre -->
   <div class="card tax-module-card" id="tax-timeline-card" style="margin-top:14px">
     <div class="ct ct-pro" id="tax-timeline-header"><span class="ct-ico"><svg width="22" height="22"><use href="#i-calendar"/></svg></span>Steuerverlauf · Erstattung (grün) vs. Nachzahlung (rot)</div>
-    <p class="hint" style="margin-bottom:10px" data-als-tip="">
+    <p class="hint" style="margin-bottom:10px">
       Was <b>dieses Objekt</b> je Jahr steuerlich bewirkt: Ergebnis aus V+V (Verlust oder Überschuss) und die Erstattung bzw. Nachzahlung, die allein durch dieses Objekt entsteht — gerechnet auf deinem zvE und den vorher gekauften Objekten. Die Gesamtbetrachtung aller Objekte steht im Portfolio-Cockpit.
     </p>
     <div id="tax-timeline-box">
