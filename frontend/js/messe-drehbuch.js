@@ -11167,15 +11167,15 @@
         await b2oZeile(s, 'Risiken zuerst', 'Was die Unterlagen an Risiken zeigen, steht oben. Je Jahr filterbar, im Detail mit Quelle.');
       },
       async function (s) {   /* 2 · Protokolle */
-        var p = function () { var e = rhIm(k5Panel(), /Protokolle im Einzelnen/); return e && k5Eng(e, 420); };
+        var p = function () { var e = rhIm(k5Panel(), /Protokolle im Einzelnen/); return e && k5Eng(e, 60); };
         if (p()) {
-          await zeige(p, 8);
+          await zeigeGruppe(p, function () { var e = p(); return e && e.nextElementSibling; }, 8);
           await b2oZeile(s, 'Protokolle im Einzelnen', 'Je Versammlung Rücklage, Hausgeld, Sonderumlagen, Beschlüsse und Streitpunkte.');
         }
       },
       async function (s) {   /* 3 · Eingelesen und übernommen */
-        var t = function () { var e = rhIm(k5Panel(), /Eingelesen und übernommen/); return e && k5Eng(e, 460); };
-        if (t()) await zeige(t, 8);
+        var t = function () { var e = rhIm(k5Panel(), /Eingelesen und übernommen/); return e && k5Eng(e, 60); };
+        if (t()) await zeigeGruppe(t, function () { var e = t(); return e && e.nextElementSibling; }, 8);
         await b2oZeile(s, 'Eingelesen und übernommen', 'Jede Unterlage mit Zuordnung, ein Klick springt dorthin. Dazu ein Filter nach Art, Jahr und Stand.');
       },
       async function (s) {   /* 4 · Adressprüfung */
@@ -11202,8 +11202,9 @@
         await warteAuf(function () { return q('nav.tabs .tab[data-target-sec="s5"]'); }, 9000);
         if (!q('#s5.active')) { reiter('s5'); await warte(900); }
         await warteAuf(function () { return q('#ai-content .dp-pa-tab'); }, 10000);
-        await k5Tab(/^ViVi/);
-        await zeige(function () { return k5Panel(); }, 8);
+        /* ViVi-Unterreiter gibt es nur mit Pilot-Analyse; vor der Aufnahme für Musterhof 8 abrufen */
+        var hatVivi = q('#ai-content .dp-pa-tab') && await k5Tab(/^ViVi/);
+        await zeige(function () { return hatVivi ? k5Panel() : q('#s5'); }, 8);
         await b2oZeile(s, 'ViVi im Objekt-Cockpit', 'Oben der Stand des Abgleichs, die Felder aus ViVi und die Restschuld. Abweichungen sind markiert.');
       },
       async function (s) {   /* 2 · Deal-Aktion */
