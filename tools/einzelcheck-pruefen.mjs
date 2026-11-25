@@ -1316,5 +1316,36 @@ for (const [teil, was, ueber] of GEGEN) {
   if (/bild: deckFoto \|\| m\.karte \|\| deckBild\(\)/.test(front)) ok('Bericht: Deckblatt Foto, sonst Lagekarte'); else fehl('Bericht: Deckblatt ohne Karte');
 }
 
+
+/* einzelcheck-10 (25.11.2026) · Teil W: Druck-CSS des Berichts kommt im Dokument an, Wohnungszahl beim MFH,
+   Anschrift nur im Browser-Tab */
+{
+  console.log('\nW · Druck-CSS, Wohnungszahl, Anschrift im Tab');
+  const fsW = require('node:fs'), pathW = require('node:path');
+  const wurzelW = pathW.resolve(pathW.dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1')), '..');
+  const dokText = fsW.readFileSync(pathW.join(wurzelW, 'frontend/js/dp-dokument.js'), 'utf8');
+  const frontW = fsW.readFileSync(pathW.join(wurzelW, 'frontend/landing/einzelcheck.js'), 'utf8');
+  /* echtes dokument() im Sandkasten: opt.css muss im <style> stehen (vorher fiel es still weg) */
+  const vmW = require('node:vm'), ctx = { window: {}, location: { origin: '' }, document: {}, console };
+  ctx.window = ctx; vmW.createContext(ctx);
+  try { vmW.runInContext(dokText, ctx); } catch (e) {}
+  const DW = ctx.DpDokument || (ctx.window && ctx.window.DpDokument);
+  const html = DW && DW.dokument ? DW.dokument('T', ['<section class="seite"></section>'], { css: 'section.seite table+ul{margin-top:6mm!important}' }) : '';
+  if (/<style>[^<]*section\.seite table\+ul\{margin-top:6mm!important\}[^<]*<\/style>/.test(html)) ok('Dokument: eigenes Druck-CSS (opt.css) steht im <style>'); else fehl('Dokument: opt.css fällt weg, Abstand nach Tabellen wirkt nicht');
+  const ecW = require(pathW.join(wurzelW, 'backend/src/services/einzelcheck.js'));
+  const gW = ecW.grundSauber({ art: 'MFH', einheiten: 8, kp: 900000 });
+  if (gW.einheiten === 8) ok('Grundangaben: Wohnungszahl wird angenommen'); else fehl('Grundangaben: Wohnungszahl fällt weg');
+  if (ecW.grundSauber({ einheiten: 0 }).einheiten == null) ok('Grundangaben: Wohnungszahl 0 fällt weg'); else fehl('Grundangaben: Wohnungszahl 0 angenommen');
+  if (/class="ec-we-feld"' \+ \(g\.art === 'MFH' \? '' : ' hidden'\)/.test(frontW) && /einheiten: v\('ecgArt'\) === 'MFH' \? zahlAus\(v\('ecgWe'\)\) : null/.test(frontW)) ok('Formular: Anzahl Wohnungen nur beim Mehrfamilienhaus'); else fehl('Formular: Wohnungszahl fehlt oder gilt für jede Objektart');
+  if (/sessionStorage\.setItem\('dp_ec_adr'/.test(frontW) && !/localStorage\.setItem\('dp_ec_adr'/.test(frontW) && /x\.t === tokenLesen\(\)/.test(frontW)) ok('Anschrift: nur im Browser-Tab, je Kauf'); else fehl('Anschrift: falsch gemerkt');
+  if (/Anschrift erneut eingeben, sonst fehlt der Bodenrichtwert/.test(frontW)) ok('Anschrift: Hinweis im Notweg, wenn sie fehlt'); else fehl('Anschrift: kein Hinweis im Notweg');
+  /* Gegenprobe: dokument() ohne opt.css-Zweig muss rot werden */
+  const ohne = dokText.replace("(opt && typeof opt.css === 'string' ? opt.css : '') + ", '');
+  const ctx2 = { location: { origin: '' }, document: {}, console }; ctx2.window = ctx2; vmW.createContext(ctx2);
+  try { vmW.runInContext(ohne, ctx2); } catch (e) {}
+  const D2 = ctx2.DpDokument; const h2 = D2 && D2.dokument ? D2.dokument('T', [], { css: 'X{y:1}' }) : '';
+  if (!/X\{y:1\}/.test(h2) && ohne !== dokText) ok('Gegenprobe: ohne opt.css-Zweig fehlt das CSS'); else fehl('Gegenprobe greift nicht');
+}
+
 console.log('\n' + (rot ? 'ROT: ' + rot + ' Befund(e)' : 'GRÜN: alles sauber') + ' · RC=' + (rot ? 1 : 0));
 process.exit(rot ? 1 : 0);
