@@ -1,0 +1,52 @@
+[
+ {
+  "nr": "01",
+  "titel": "Asset-Manager-Cockpit",
+  "unter": "Alles, was ein Bestandshalter am Montagmorgen sehen will, auf einer Seite."
+ },
+ {
+  "nr": "02",
+  "titel": "Cockpit bei Nacht",
+  "unter": "Ein Instrumentenbrett statt Tabellen. Vier Instrumente gegen deine Ziele, darunter nur das, was sich bewegt."
+ },
+ {
+  "nr": "03",
+  "titel": "Risiko-Radar",
+  "unter": "Wo der Bestand verwundbar ist: Tragfähigkeit, Zinsbindung, Energie, Leerstand."
+ },
+ {
+  "nr": "04",
+  "titel": "Steuer-Jahr",
+  "unter": "Was die Steuer aus dem Cashflow macht, je Objekt und je Halter."
+ },
+ {
+  "nr": "05",
+  "titel": "Bank-Mappe",
+  "unter": "Der Bestand so, wie ihn eine Bank sieht: Sicherheiten, Beleihung, Kapitaldienst, Anschlussfinanzierung."
+ },
+ {
+  "nr": "06",
+  "titel": "Renditequellen",
+  "unter": "Was dein Eigenkapital verdient und woher: Überschuss, Tilgung, Steuer, Wertentwicklung."
+ },
+ {
+  "nr": "07",
+  "titel": "Objektmatrix",
+  "unter": "Jedes Objekt als kleine Karte, sortierbar. Für alle, die in Häusern denken, nicht in Summen."
+ },
+ {
+  "nr": "08",
+  "titel": "Wert und Zielbild",
+  "unter": "Was der Bestand heute wert ist und was der Plan daraus macht."
+ },
+ {
+  "nr": "09",
+  "titel": "Mieten-Hebel",
+  "unter": "Wo Miete liegen bleibt: Potenzial, Leerstand und Mietniveau je Objekt."
+ },
+ {
+  "nr": "10",
+  "titel": "Monatsbericht",
+  "unter": "Der Bestand als Bericht zum Lesen, Drucken und Weitergeben. Ruhig, in Sätzen und Zahlen."
+ }
+]

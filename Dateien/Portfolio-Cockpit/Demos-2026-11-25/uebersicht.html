@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Portfolio-Cockpit · Zehn Demos</title>
+<link rel="stylesheet" href="kit.css">
+<style>
+.demos{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px}
+.demo{background:var(--karte);border:1px solid var(--netz);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
+.demo a.bild{display:block;height:210px;overflow:hidden;border-bottom:1px solid var(--netz);background:var(--bg)}
+.demo a.bild img{width:100%;display:block;margin-top:-50px;transition:transform .4s}
+.demo a.bild:hover img{transform:translateY(-30px)}
+.demo .t{padding:11px 14px 13px;flex:1;display:flex;flex-direction:column;gap:6px}
+.demo h3{margin:0;font:600 15px "Space Grotesk",Inter,sans-serif}
+.demo .nr{font:600 10px "JetBrains Mono",monospace;color:var(--gold-d);letter-spacing:.08em}
+.demo p{margin:0;font:400 12.5px/1.5 Inter,sans-serif}
+.demo p b{font-weight:600}
+.demo .links{margin-top:auto;display:flex;gap:10px;font:600 12px Inter}
+.demo .links a{color:var(--gold-d);text-decoration:none}
+.demo.empf{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold)}
+h2.sek{font:600 18px "Space Grotesk",Inter,sans-serif;margin:26px 0 10px}
+.set{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+.set>div{background:var(--karte);border:1px solid var(--netz);border-radius:12px;padding:10px 12px;font:400 12.5px/1.5 Inter}
+.set>div b{display:block;font:600 13px "Space Grotesk",Inter}
+.set>div.std{border-left:3px solid var(--gold)}
+.set>div small{display:block;color:var(--leise);font-size:11px;margin-top:3px}
+.bk{display:grid;grid-template-columns:1.1fr 1fr;gap:14px}
+@media (max-width:900px){.bk{grid-template-columns:1fr}}
+.skizze{background:var(--karte);border:1px solid var(--netz);border-radius:14px;padding:14px}
+.skizze .zeile{display:grid;grid-template-columns:repeat(12,1fr);gap:6px;margin-bottom:6px}
+.skizze .m{border:1px dashed var(--grau);border-radius:8px;padding:8px;font:600 11px Inter;color:var(--leise);min-height:46px;position:relative;background:color-mix(in srgb,var(--gold) 5%,transparent)}
+.skizze .m.fix{background:var(--obsidian);color:#E9E4D8;border-style:solid;border-color:transparent}
+.skizze .m span{position:absolute;right:6px;top:5px;font:600 10px JetBrains Mono,monospace}
+</style>
+</head>
+<body>
+<div class="seite">
+ <div class="kopf"><div><div class="marke"><i></i>Portfolio-Cockpit · Runde 2 · 25.11.2026</div><h1>Zehn Demos für das Portfolio-Cockpit, Runde 2</h1>
+ <div class="unter">Jede Demo läuft mit den echten Werten des Demokontos (18 Objekte im Bestand). Oben steht in allen zehn derselbe Score-Kopf wie heute. Fahr in jeder Demo über Objekte, Balken und Punkte. Mit „Ohne Ziele“ siehst du, wie es ohne eingetragene Ziele im Investmentprofil aussieht.</div></div></div>
+ <h2 class="sek" style="margin-top:6px">Neu in Runde 2</h2>
+ <div class="set" style="margin-bottom:18px">
+  <div class="std"><b>Objektbilder</b>Je Objekt das Foto aus dem Objekt. Ohne Foto die Lagekarte, wie sie oben auf den Marktbericht gedruckt wird.<small>in Tabelle, Tooltip, Kacheln und Galerie</small></div>
+  <div class="std"><b>Kompakt und Detail</b>Oben umschalten. Detail zeigt zusätzlich die Gesamtbewertung (Investiert, Bilanz heute, Nach Bewertung), die EK-Rendite je Objekt, woher die Rendite kommt und alle Objekte mit Bild. Die Tabelle bekommt im Detail die Spalten EK-Rendite und Eigenkapital.<small>in allen zehn Demos</small></div>
+  <div class="std"><b>EK-Rendite in vier Stufen</b>Angezeigt wird die Hauptkennzahl nach Steuer mit Vermögensdelta. Oben auf Operativ, Nach Steuer oder Mit Wert umschalten, alle Diagramme folgen. Im Tooltip stehen alle vier mit Formel und Zahlen.<small>gerechnet mit ek-rendite.js der App</small></div>
+  <div class="std"><b>Farben wie das Objekt-Cockpit</b>Karte, Text, Achsen und Netz genau wie die Grafiken der Pilot-Analyse. Grün und Rot fest, Gold über die Partnerfarbe, kein Blau.<small>hell und dunkel</small></div>
+  <div class="std"><b>Zwei neue Demos</b>05 Bank-Mappe und 06 Renditequellen ersetzen Kapital-Landkarte und Flugplan.<small>Runde 1 liegt unverändert daneben</small></div>
+ </div>
+
+ <div class="demos" id="demos"></div>
+
+ <h2 class="sek">Meine Empfehlung: das Standard-Set</h2>
+ <p style="font:400 13px/1.6 Inter;max-width:900px;margin:0 0 12px">Als Startseite für jeden Kunden <b>Demo 01 Asset-Manager-Cockpit</b> in dieser Reihenfolge. Sie beantwortet die vier Fragen, die ein Bestandshalter jeden Monat hat: Wie steht der Bestand, was muss ich tun, wo kommt Geld rein und raus, wann wird es eng. Neu dazu in der Kennzahlenleiste die EK-Rendite (Hauptkennzahl, umschaltbar) und im Detail-Modus Gesamtbewertung, EK-Rendite je Objekt und die Objektgalerie. Alles Weitere sind Module zum Zuschalten. Als zweite Vorlage für Finanzierer empfehle ich Demo 05 Bank-Mappe.</p>
+ <div class="set">
+  <div class="std"><b>1 · Score-Kopf</b>Investment- und Finanzierungs-Score wie heute.<small>fest, immer oben</small></div>
+  <div class="std"><b>2 · Kennzahlenleiste</b>Wert, Eigenkapital, Miete, Cashflow vor und nach Steuer, DSCR, nächste Zinsbindung, EK-Rendite.<small>Standard</small></div>
+  <div class="std"><b>3 · Bestand und Zielbild je Objekt</b>Die Tabelle aus der Pilot-Analyse für alle Objekte, mit Tooltip und Zielabgleich.<small>Standard</small></div>
+  <div class="std"><b>4 · Was jetzt zu tun ist</b>Aus Regeln abgeleitet: Zinsbindung, DSCR unter Ziel, Zuzahler, Hebel, Energie.<small>Standard</small></div>
+  <div class="std"><b>5 · Cashflow vor und nach Steuer je Objekt</b>Zeigt in einer Zeile, wo die Steuer hilft und wo sie kostet.<small>Standard</small></div>
+  <div class="std"><b>6 · Zinsbindung</b>Zeitleiste, rot in den nächsten drei Jahren.<small>Standard</small></div>
+  <div class="std"><b>7 · Wohin die Miete geht</b>Brücke von der Kaltmiete zum Cashflow nach Steuer.<small>Standard</small></div>
+  <div class="std"><b>8 · Vermögensaufbau</b>Eigenkapital, Restschuld, Wert über zehn Jahre.<small>Standard</small></div>
+  <div><b>Sicherheiten je Objekt</b>Bild, Restschuld und freier Wert mit Beleihungsbalken.<small>zuschaltbar · Demo 05</small></div>
+  <div><b>Woher die Rendite kommt</b>Überschuss, Tilgung, Steuer und Wert bis zur EK-Rendite.<small>zuschaltbar · Demo 06, im Detail überall</small></div><div><b>EK-Rendite je Objekt</b>Vier Stufen je Objekt, Umschalter oben.<small>zuschaltbar · Demo 06, im Detail überall</small></div><div><b>Gesamtbewertung</b>Investiert, Bilanz heute, Nach Bewertung.<small>im Detail überall</small></div><div><b>Deine Objekte</b>Galerie mit Foto oder Lagekarte.<small>im Detail überall</small></div>
+  <div><b>Risikomatrix</b>Sieben Risiken je Objekt in Ampelfeldern.<small>zuschaltbar · Demo 03</small></div>
+  <div><b>Rendite gegen Tragfähigkeit</b>Streudiagramm mit Ziellinie.<small>zuschaltbar · Demo 03</small></div>
+  <div><b>Anschluss je Jahr und Zinsstress</b>Was ein höherer Anschlusszins kostet.<small>zuschaltbar · Demo 03 und 05</small></div>
+  <div><b>Steuer je Objekt und nach Halter</b>Privat gegen GmbH.<small>zuschaltbar · Demo 04</small></div>
+  <div><b>Was dein Eigenkapital verdient</b>Von operativ bis zur gewählten Stufe je Objekt.<small>zuschaltbar</small></div>
+  <div><b>Miethebel und Miete je m²</b>Heute gegen Zielbild.<small>zuschaltbar · Demo 09</small></div>
+  <div><b>Wert heute und im Zielbild</b>Ertragswert nach Kosten je Objekt.<small>zuschaltbar · Demo 08</small></div>
+  <div><b>Objektkacheln</b>Jedes Objekt als Karte, sortierbar.<small>zuschaltbar · Demo 07</small></div>
+  <div><b>Instrumente</b>Vier Messinstrumente gegen die Ziele.<small>zuschaltbar · Demo 02</small></div>
+  <div><b>Deine Ziele</b>Balken gegen Mindest-DSCR, Beleihung, Zuzahler.<small>zuschaltbar, nur mit Zielen</small></div>
+  <div><b>Wo die Miete herkommt</b>Anteil je Ort oder Objektart.<small>zuschaltbar · Demo 08 und 09</small></div>
+  <div><b>Monatsbericht</b>Eigene Ansicht zum Lesen und Drucken.<small>als Ansicht · Demo 10</small></div>
+ </div>
+
+ <h2 class="sek">Baukasten: der Kunde stellt sich sein Cockpit selbst zusammen</h2>
+ <div class="bk">
+  <div class="skizze">
+   <div class="zeile"><div class="m fix" style="grid-column:span 12">Score-Kopf <span>fest</span></div></div>
+   <div class="zeile"><div class="m" style="grid-column:span 12">Kennzahlenleiste <span>⋮⋮</span></div></div>
+   <div class="zeile"><div class="m" style="grid-column:span 8">Bestand und Zielbild <span>breit · ⋮⋮</span></div><div class="m" style="grid-column:span 4">Was jetzt zu tun ist <span>⋮⋮</span></div></div>
+   <div class="zeile"><div class="m" style="grid-column:span 6">Cashflow je Objekt <span>halb · ⋮⋮</span></div><div class="m" style="grid-column:span 6">Zinsbindung <span>halb · ⋮⋮</span></div></div>
+   <div class="zeile"><div class="m" style="grid-column:span 12;text-align:center;border-style:dashed;background:transparent;color:var(--gold-d)">+ Modul hinzufügen</div></div>
+  </div>
+  <div>
+   <ul class="punkte">
+    <li><b>Jedes Diagramm ist ein Modul.</b> In den Demos steckt jedes in einer eigenen Funktion (bausteine.js), genau so würde es in der App gebaut.</li>
+    <li><b>Ansicht anpassen:</b> Der heutige Knopf „Ansicht anpassen“ öffnet eine Liste aller Module mit Schalter. Ziehen ändert die Reihenfolge, je Modul die Breite halb oder ganz.</li>
+    <li><b>Fertige Vorlagen:</b> Asset Manager, Ein Blick, Risiko, Steuer, Finanzierung, Bericht. Ein Klick setzt die Module wie in den Demos.</li>
+    <li><b>Gespeichert wird in den Einstellungen</b> im vorhandenen Einstellungsspeicher, nicht im Browser. So sieht der Kunde dasselbe Cockpit am Handy.</li>
+    <li><b>Score-Kopf bleibt immer oben</b> und lässt sich nicht abschalten.</li>
+    <li><b>Ziele:</b> Module mit Zielabgleich zeigen ihn nur, wenn im Investmentprofil Ziele eingetragen sind. Sonst steht dort ein Satz, wo man sie einträgt.</li>
+    <li><b>Handy:</b> Alle Module laufen einspaltig, Tabellen scrollen in sich, Diagramme werden mit der gemessenen Breite neu gezeichnet.</li>
+    <li><b>Partner:</b> Gold kommt über die Whitelabel-Farben, Grün und Rot bleiben fest.</li>
+   </ul>
+  </div>
+ </div>
+ <div class="fuss">Runde 2 vom 25.11.2026, Runde 1 unverändert in Demos-2026-11-24. Entwurf. Nichts davon ist in der App eingebaut. Daten: Staging-Demokonto, nur gelesen.</div>
+</div>
+<script>
+var D=[
+ ['01','Asset-Manager-Cockpit','Bestandshalter mit mehreren Häusern, der jeden Monat einmal draufschaut.','Beantwortet auf einer Seite: Wie steht der Bestand, was ist zu tun, wo fließt Geld, wann wird es eng. Mein Vorschlag für den Standard.',1],
+ ['02','Cockpit bei Nacht','Investoren, die nur wissen wollen, ob alles im grünen Bereich ist.','Vier Instrumente gegen die eigenen Ziele statt Zahlenwände. Ganz anderer Look, dunkel wie ein Cockpit.'],
+ ['03','Risiko-Radar','Wer finanziert und vorsichtig plant, vor dem Bankgespräch.','Sieben Risiken je Objekt in einer Ampelmatrix, dazu Rendite gegen DSCR und der Zinsstress beim Anschluss.'],
+ ['04','Steuer-Jahr','Privatinvestoren mit hohem Steuersatz und GmbH-Bestand.','Zeigt, welches Objekt die Steuer senkt und welches sie treibt, und was nach Steuer wirklich bleibt.'],
+ ['05','Bank-Mappe','Wer bald anschlussfinanziert oder ein weiteres Haus finanzieren will.','Der Bestand so, wie ihn die Bank sieht: jedes Objekt mit Bild und Beleihungsbalken, was bis 2030 fällig wird, Zinsstress und die Argumente für das Gespräch.'],
+ ['06','Renditequellen','Wer wissen will, ob sein Eigenkapital richtig arbeitet.','Die EK-Rendite in vier Stufen und woher sie kommt: Überschuss, Tilgung, Steuer, Wertentwicklung. Dazu Eigenkapital gegen Rendite je Objekt und wo Umschichten zu prüfen ist.'],
+ ['07','Objektmatrix','Wer in Häusern denkt, nicht in Summen.','Jedes Objekt als kleine Karte mit Score, Cashflow, DSCR, Zinsbindung, Hebel. Sortierbar.'],
+ ['08','Wert und Zielbild','Aufteiler und Entwickler, die Wert schaffen wollen.','Die Tabelle Bestand und Zielbild als Herzstück, dazu Wertzuwachs nach Kosten und Miethebel je Objekt.'],
+ ['09','Mieten-Hebel','Bestandshalter mit Mieterhöhungs-Potenzial.','Wo Miete liegen bleibt: Potenzial ohne und mit Mieterwechsel, Leerstand, Miete je m².'],
+ ['10','Monatsbericht','Zum Lesen, Drucken und Weitergeben an Partner oder Bank.','Ruhige Berichtsform mit fünf Sätzen oben, dann nur die wichtigsten Tabellen und Bilder.']
+];
+document.getElementById('demos').innerHTML=D.map(function(d){return '<div class="demo'+(d[4]?' empf':'')+'"><a class="bild" href="demo-'+d[0]+'.html"><img src="bilder/demo-'+d[0]+'-kompakt-1440.jpg" alt="Demo '+d[0]+'" loading="lazy"></a><div class="t"><div class="nr">DEMO '+d[0]+(d[4]?' · EMPFEHLUNG':'')+'</div><h3>'+d[1]+'</h3><p><b>Für wen:</b> '+d[2]+'</p><p><b>Warum:</b> '+d[3]+'</p><div class="links"><a href="demo-'+d[0]+'.html">Öffnen</a><a href="demo-'+d[0]+'.html?modus=detail">Detail</a><a href="bilder/demo-'+d[0]+'-kompakt-390.jpg">Handy</a><a href="bilder/demo-'+d[0]+'-detail-1440.jpg">Bild Detail</a></div></div></div>';}).join('');
+</script>
+</body>
+</html>

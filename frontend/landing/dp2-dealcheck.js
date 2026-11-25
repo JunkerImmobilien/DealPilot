@@ -180,7 +180,11 @@
   var bindung = VORGABE.bindung;
   var lauf = 0;                 /* Zähler gegen überholte Animationen/Abrufe */
   var letztes = null;           /* landing-faecher-1 · letztes Ergebnis, für die Demo Einzel-Check */
-  window.DpDealCheck = { letztes: function () { return letztes; } };
+  /* einzelcheck-5 (Marcel 25.11.2026): Werte gehen nur an den Einzel-Check, wenn der Deal-Check wirklich gelaufen ist
+     („Deal prüfen“ mit Ergebnis). Wer gleich „genauer mit Unterlagen“ wählt, bekommt die Startwerte der Karte nicht
+     als „aus deinem Deal-Check“ untergeschoben, er trägt selbst ein oder die Unterlagen füllen. */
+  var gelaufen = false;
+  window.DpDealCheck = { letztes: function () { return gelaufen ? letztes : null; }, gelaufen: function () { return gelaufen; } };
 
   function zahl(el) {
     if (!el) return NaN;
@@ -507,6 +511,7 @@
       if (leer) leer.focus();
       return;
     }
+    gelaufen = true;   /* einzelcheck-5 · erst jetzt dürfen die Werte weiter */
     seite(true);
     zeigen(r);
     lage(String(F.plz.value || '').replace(/\D/g, '').slice(0, 5));
@@ -556,7 +561,7 @@
   if ($('dkBericht')) $('dkBericht').addEventListener('click', function () {
     var ec = window.DpEinzelCheck; if (!ec || typeof ec.auf !== 'function') return;
     /* die Eingaben gelten auch für den Einzel-Check (er liest Zins und Tilgung aus DpDealCheck.letztes()) */
-    var r = rechnen(); if (r) letztes = r;
+    if (gelaufen) { var r = rechnen(); if (r) letztes = r; }   /* einzelcheck-5 · ohne Deal-Check-Lauf keine Übernahme */
     ec.auf();
   });
   wegZeigen();

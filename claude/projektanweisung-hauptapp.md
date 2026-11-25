@@ -45484,3 +45484,33 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** staging 04dc3630, ec2ed687, 07198acf, a61bd73c, 2d8351a5 · main 9ca822a0 … 16e8a060, Version 458ea406, 8aa1c0ba. Prod-Sicherung haupt/mb-20261125-0723-v4630 (7,0/31 MB, Kopf gelesen), backend und mb-backend neu gebaut.
 - **Nachweis:** Staging im Browser (Landing-Strecke mit erfundenem Bericht, App-Stufenwahl), Prüfer grün, Prod `/public/einzelcheck/tiefe` und Buster per curl.
 - **Rest:** 390 px offen, Prod ohne Kauf gemessen.
+
+### Rollout 1.0.195 · v4670 Jahresabgleich: Liste der vier Schritte je Jahr (Fork T3, 25.11.2026)
+
+- **Was:** je Jahr Liste Miete/Wert/Haus/Steuer mit Stand, Satz, einem Knopf; laufendes Jahr „Schon möglich“; „Mieterhöhung vorbereiten“ nur noch dort; Einfach|Detail im Jahresabgleich ausgeblendet.
+- **Commit:** staging ac224063, 672d0507, Rückführung a6e60e2e · main e2f8649c, 5106270e, Version cea23ae9.
+- **Nachweis:** Staging Westerfeldstr. 146 gemessen (2025/2026, Umschalter), jahresabgleich-pruefen 177/177, jahresbuch 61/61, buster-ebenen SAUBER. Prod-Sicherung haupt/mb-20261125-0733-v4670, Auslieferung per curl (Buster v4670, version 195).
+- **Rest:** Prod nicht eingeloggt im Objekt gemessen, 390 px nur über Grid-Regel (kein echtes Fenster).
+
+### Rollout 1.0.196 · v4650 Sidebar-Umschalter Aktionen links (Fork R3)
+
+- **Was:** Marcel 25.11.2026: „Aktion müsste genau auf die andere Seite, also links hin“. Reihenfolge jetzt Aktionen · Ankauf · Bestand (doppelkarte.js). Auf Prod NUR die Reihenfolge, Optik wie v4600.
+- **Nur Staging (wartet auf Marcels Wahl):** v4650a–d drei Gestaltungen über html[data-dk-stil]: pille (gleitende Gold-Pille, Standard auf Staging-Hosts), reiter (drei Karten mit Symbol und Zahlplakette), runway (Leiste im Luftfahrt-Stil, Zahl groß, Mittellinie). Wahl per ?dkstil=pille|reiter|runway|alt oder DpDkStil('…'), gemerkt in localStorage dp_dk_stil. Ohne Wahl auf Prod-Hosts: alt.
+- **Gemessen:** Container schrumpfte als Flex-Kind der Schiene (flex 0 1 auto) auf 50,8 px, Runway-Beschriftung 6 px hoch → flex 0 0 auto (v4650c). Handy: v4600-Regel gab hellen Rand rgb(230,225,214) → leise bzw. bei Reiter ohne (v4650d). Ankauf-Filter 24 sichtbar, 0 gewonnen; 390 px scrollWidth 390; Partnerfarbe Blau färbt Pille.
+- **Commit:** staging a4742022, 8b071453, v4650b/c/d, Merge 1a7fcfbf · main 1ec9ed3d, Version 1d2e1c64. Prod-Sicherung haupt/mb-20261125-0737-v4650 (7,0/31 MB, Kopf gelesen). Prüfer: buster-ebenen SAUBER, vorschau SAUBER, gold-audit Staging RC 0.
+- **Bilder:** Dateien/Fehler/menue-umschalter-2026-11-25/ (A-pille, B-reiter, C-runway je Schreibtisch und 390 px, A hell und Partnerfarbe).
+- **Rest:** Runway: der Gold-Strich unter dem aktiven Reiter liegt unter der Mittellinie und ist kaum zu sehen. Pille: Schrift auf der aktiven Pille fest dunkel (#1b1508), bei sehr dunkler Partnerfarbe prüfen. Bei Wahl: Stil-Code per Cherry-Pick auf main und Standard für alle Hosts setzen.
+
+### Rollout 1.0.197 · v4660/v4660a Kachel-Baustein (Fork S3)
+
+- **Was:** `css/dp-kachel.css` + `js/dp-kachel.js`. Eine Schriftstufe für alle Kacheln der Pilot-Analyse und des Objekt-Cockpits (Ursache der Mischschrift: `layout-varianten.css .body span` !important). Kachel-Optik A/B/C nur auf Staging voreingestellt (A), Prod wartet auf Marcels Wahl.
+- **Commit:** staging 3f403371, aaa42264, Rückführung f6e20d65 · main 2c13e08c, e3b4777f, Version 445c88db.
+- **Nachweis:** Schrift je Reiter gemessen, 390 px im iframe, Partnerfarbe, gold-audit RC 0 (Staging, Prod), buster-ebenen sauber. Prod-Sicherung haupt-/mb-20261125-0739-v4660 (7,0/31 MB, Kopf gelesen). Prod nur Auslieferung geprüft (curl), nicht eingeloggt.
+- **Rest:** Inhalt der Pilot-Analyse ist in beiden Chrome-Skins weiß, daher nur im Standard gemessen. Jahresabgleich-Struktur (T3) und Haus-Tabelle (U3) bewusst nicht angefasst.
+
+### Rollout 1.0.198 · v4680 Eingelesen und übernommen: Zuordnung und Filter (Fork U3)
+
+- **Was:** Haus & Unterlagen › „Eingelesen und übernommen“ mit Spalte „Zugeordnet“ (Sprung zu Anlage V je Jahr, Feld im Reiter, Wohnungen, Protokolle), Werteliste in voller Breite mit Ziel je Wert, Filter Art/Jahr/Zugeordnet/Stand. Vorlage zur Dokumentenablage (`design/Vorschläge/dokumentenablage-2026-11-25.md`).
+- **Commit:** staging b905bed0, d9487c61, a5e87cf4, ad005319, Vorlage e3bfb670 · main 56d52e83, f94e4c42, 2c5af73c, a5076382, Version 21285579.
+- **Nachweis:** Staging an Westerfeldstr. 146 (Verlauf von Musterweg 7 nur im Browser), drei Sprünge, Filter einzeln und kombiniert, 390 px im iframe. Prüfer: buster-ebenen SAUBER, vorschau SAUBER, unterlagen-steuer 53/53, gold-audit RC 0. Prod-Sicherung haupt-/mb-20261125-0741-v4680 (7,0/31 MB, Kopf gelesen). Prod liefert `unterlagen-eingang.js?v=v4680c`, version.json 198.
+- **Rest:** Prod nicht eingeloggt im Objekt gemessen. Quick-Check-Objekte (2026-1190) haben keinen Verlauf. Westerfeldstr. 146 trägt updated_at 07:37:27 aus meinem Messlauf (loadSaved), `_dok_eingang` unverändert (1.269 Zeichen).
