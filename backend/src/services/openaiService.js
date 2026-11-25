@@ -484,6 +484,11 @@ function buildPrompt(payload, opts) {
     '- Schreibe durchgehend Deutsch - keine englischen Fachwörter wie „Benchmark", „Upside",',
     '  „Comparison", „Exit-Cap". Der DealPilot-Marktbericht ist KEIN Gutachten und KEIN',
     '  Wertgutachten - nenne ihn „Marktbericht", seine Werte „Marktpreisindikation" bzw. „Ertragswert".',
+    /* v4900 · Marcel 25.11.2026: klar trennen, was Marktpreisindikation, Verkehrswert und Verfahrenswert ist */
+    '- BEGRIFFE WERT (verbindlich): „Marktpreisindikation" = aus Angebotspreisen abzüglich Abschlag, KEIN Verkehrswert und',
+    '  KEIN Marktwert, nenne sie nie so. „Verkehrswert" bzw. „Marktwert" nur für ein Gutachten nach § 194 BauGB oder die',
+    '  Bankbewertung. Werte des Marktberichts heißen nach ihrem Verfahren (Ertragswert, Sachwert, Vergleichswert) mit ihrer',
+    '  Rolle „führend" oder „stützend". Nenne den Objektwert, von dem die App rechnet, mit genau seiner Herkunft.',
     '- Formuliere positiv-konkret: Ein LTV von 84 % ist SOLIDE und gehört in den',
     '  Stärken-Block, NICHT in die Risiken. Bezeichne diesen Bereich NIE als „hoch",',
     '  „relativ hoch" oder „erhöht" — das ist faktisch falsch und kontrastiert mit',
@@ -1142,7 +1147,7 @@ function buildPrompt(payload, opts) {
          + (_dpmb.makrolage ? '- Makrolage: ' + (_dpmb.makrolage.label || '–')
              + (_dpmb.makrolage.score != null ? ' (' + _dpmb.makrolage.score + '/100)' : '') + '\n' : '')
          + (_dpmb.wertentwicklung_pct_pa != null ? '- Wertentwicklung: ' + _p(_dpmb.wertentwicklung_pct_pa) + ' p.a.\n' : '')
-         + (_dpmb.marktwert != null ? '- Marktwert laut Karte: ' + _z(_dpmb.marktwert) + ' EUR\n' : '')
+         + (_dpmb.marktwert != null ? '- Marktpreisindikation laut Karte (aus Angebotspreisen, kein Verkehrswert): ' + _z(_dpmb.marktwert) + ' EUR\n' : '')
          + 'Diese Werte sind GEMESSEN. Weichen sie von der Selbsteinschaetzung '
          + 'des Investors ab, sage es und begruende mit diesen Zahlen.')
       : '',
@@ -1205,6 +1210,11 @@ function buildPrompt(payload, opts) {
          Wert 10,3 % darunter). Beide Richtungen kommen fertig gerechnet als Satz, die KI rechnet keinen eigenen Prozentwert. */
       var vg = _wertVergleich(Number(k.kp), Number(wa.wert));
       if (vg) t += '. ' + vg.satz + ' VERGLEICH KAUFPREIS UND OBJEKTWERT NUR MIT GENAU DIESEN ZAHLEN UND RICHTUNGEN, keinen eigenen Prozentwert rechnen';
+      /* v4900 · die Art des Werts als feste Bezeichnung, damit die KI keine Marktpreisindikation „Marktwert" nennt */
+      var ART = { ertragswert: 'Ertragswert, führendes Verfahren des Marktberichts', sachwert: 'Sachwert, führendes Verfahren des Marktberichts', vergleichswert: 'Vergleichswert, führendes Verfahren des Marktberichts',
+        vergleichswert_m: 'Vergleichswert aus Angebotspreisen, führend mangels amtlicher Kaufpreise, kein Verkehrswert', mpi_mit: 'Marktpreisindikation aus Angebotspreisen nach Abschlag, KEIN Verkehrswert und KEIN Marktwert', mpi_ohne: 'Marktpreisindikation aus Angebotspreisen, KEIN Verkehrswert und KEIN Marktwert' };
+      if (wa.art && ART[wa.art]) t += '. Bezeichnung dieses Werts im Text: ' + ART[wa.art];
+      else if (wa.quelle === 'verkehrswert') t += '. Bezeichnung dieses Werts im Text: Wertangabe aus dem Reiter Objekt mit ihrer Herkunft';
       return t + '. Ordne den Kaufpreis und die Gesamtbewertung an DIESEM Wert ein und nenne ihn mit seiner Herkunft.';
     })(),
     'Gesamtinvestition: ' + fmtEur(k.gi),
@@ -1235,7 +1245,7 @@ function buildPrompt(payload, opts) {
       L.push('## DEALPILOT-MARKTBERICHT (gemessene Daten — die BESTE Quelle hier, vor allem anderen nutzen)');
       L.push('- Stand: ' + new Date(a.created_at).toLocaleString('de-DE') + ' · ' + mbr.anzahl + ' Bericht(e) zu diesem Objekt');
       if (a.address) L.push('- Adresse laut Bericht: ' + a.address);
-      if (a.market_value != null) L.push('- Marktwert (Indikation): ' + fmtEur(a.market_value));
+      if (a.market_value != null) L.push('- Marktpreisindikation (aus Angebotspreisen, kein Verkehrswert): ' + fmtEur(a.market_value));
       if (a.market_value_low != null && a.market_value_high != null) {
         var lo = Number(a.market_value_low), hi = Number(a.market_value_high);
         L.push('- Vergleichsspanne: ' + fmtEur(lo) + ' bis ' + fmtEur(hi));
@@ -1519,7 +1529,7 @@ function buildPrompt(payload, opts) {
       /* ---- Verlauf: NUR wenn er etwas bedeutet ---------------------------- */
       var v = (mbr.verlauf || []).filter(function (x) { return x.marktwert != null; });
       if (v.length > 1) {
-        L.push('- Verlauf der Marktwert-Indikation:');
+        L.push('- Verlauf der Marktpreisindikation:');
         v.forEach(function (x) {
           L.push('  • ' + new Date(x.datum).toLocaleString('de-DE') + ': ' + fmtEur(x.marktwert));
         });
@@ -1625,17 +1635,17 @@ function buildPrompt(payload, opts) {
             '  auf den Eingaben allein, ohne Vergleichsdaten.', '']),
 
     '## MARKTBEWERTUNG (falls hinterlegt — vorrangig vor Schätzungen nutzen)',
-    mb.marktwert ? '- Hinterlegter Marktwert: ' + fmtEur(mb.marktwert) : '- Keine eigene Marktbewertung hinterlegt.',
+    mb.marktwert ? '- Wertangabe im Reiter Objekt (Formularfeld, kein gemessener Wert): ' + fmtEur(mb.marktwert) : '- Keine eigene Wertangabe hinterlegt.',
     mb.marktmiete_qm ? '- Hinterlegte Marktmiete: ' + fmtNum(mb.marktmiete_qm, 2) + ' €/m²' : '',
     mr.length ? ('- Marktpreisindikationen (mehrere Anbieter):\n' + mr.map(function (x) {
       var parts = [];
-      if (x.marktwert != null) parts.push('Marktwert ' + fmtEur(x.marktwert));
+      if (x.marktwert != null) parts.push('Marktpreisindikation ' + fmtEur(x.marktwert));
       if (x.low != null || x.high != null) parts.push('Spanne ' + fmtEur(x.low) + ' bis ' + fmtEur(x.high));
       if (x.konfidenz != null) parts.push('Konfidenz ' + x.konfidenz);
       return '  • ' + (x.provider || 'Anbieter') + ': ' + parts.join(', ');
     }).join('\n')) : '',
     (mr.length > 1) ? '- Es liegen MEHRERE Marktpreisindikationen vor — gehe auf ALLE ein, vergleiche sie, nenne jeweils Spanne und (falls vorhanden) Konfidenz und qualifiziere die Aussage. Es sind Marktpreisindikationen, KEIN Verkehrswert.' : '',
-    '- Wenn ein Marktwert hinterlegt ist, nutze ihn als VORRANGIGEN Vergleichsanker',
+    '- Wenn eine Wertangabe hinterlegt ist, nutze sie als VORRANGIGEN Vergleichsanker',
     '  für Kaufpreis-Einordnung, Offerte und Bewertung — vor allgemeinen Annahmen.',
     /* v947-mbsource: Rangfolge klarstellen. Der hinterlegte Marktwert ist ein
      * Formularfeld — der Marktbericht sind 822 gemessene Vergleichspreise. */
@@ -1765,7 +1775,7 @@ function buildPrompt(payload, opts) {
        `berichts_abgleich` steht im Antwortformat weiter unten; ohne
        Zielfeld faellt die Arbeit lautlos auf den Boden. */
     mbr ? '14. Abgleich mit dem Marktbericht — stelle deine Einordnung NEBEN seine\n'
-        + '   gemessenen Werte: Marktwert und Spanne, Marktmiete, Sach- und Ertragswert,\n'
+        + '   gemessenen Werte: Marktpreisindikation und Spanne, Marktmiete, Sach- und Ertragswert,\n'
         + '   das fuehrende Verfahren. Wo ihr uebereinstimmt, sage es kurz. Wo nicht,\n'
         + '   nenne BEIDE Zahlen und sage, welche woher kommt — der Bericht ist gemessen,\n'
         + '   deine Einordnung ist eine Einschaetzung. Nutze den tragenden Wert des\n'
@@ -1960,7 +1970,7 @@ function buildPrompt(payload, opts) {
     /* v2150 · DAS FELD FUER DEN ABGLEICH. Ohne Zielfeld verschwindet ein
        Prompt-Auftrag lautlos — der Auftrag unten in Aufgabe 14 braucht
        eine Stelle, an der die Antwort landen kann. */
-    '  "berichts_abgleich":   "Wenn ein Marktbericht vorliegt: 2-4 Sätze, wie deine Einordnung zu seinen gemessenen Werten steht (Marktwert, Marktmiete, Sach-/Ertragswert, führendes Verfahren). Weichen sie ab, nenne BEIDE Zahlen und sage, welche woher kommt. null ohne Bericht",',
+    '  "berichts_abgleich":   "Wenn ein Marktbericht vorliegt: 2-4 Sätze, wie deine Einordnung zu seinen gemessenen Werten steht (Marktpreisindikation, Marktmiete, Sach-/Ertragswert, führendes Verfahren). Weichen sie ab, nenne BEIDE Zahlen und sage, welche woher kommt. null ohne Bericht",',
     '  "kaufpreisniveau":     "Einordnung des Kaufpreises mit Vergleichswerten (EUR/m², Faktor, Bodenrichtwert, Marktbericht), 6-8 Sätze",',
     /* v2157 · Zielfeld fuer Aufgabe 15 (N62.4) */
     '  "lage_gegenueberstellung": [',
@@ -2361,6 +2371,44 @@ function _wertVergleichPruefen(a, payload) {
   return a;
 }
 
+/* v4900 · Nachpruefung der Begriffe: nennt der Text eine Marktpreisindikation (aus Angebotspreisen) „Marktwert" oder
+   „Verkehrswert", wird das Wort ersetzt. Erkannt wird sie an ihrem Betrag (Objektwert der Art mpi_*, Marktpreisindikation
+   des Berichts im Payload). Gezaehlt in a._wertbegriffe_korrigiert. */
+function _mpiBetraege(payload) {
+  var out = [];
+  try {
+    var wa = payload && payload.kennzahlen && payload.kennzahlen.wert_anker;
+    if (wa && /^mpi/.test(String(wa.art || '')) && Number(wa.wert) > 0) out.push(Number(wa.wert));
+    var gesehen = 0;
+    (function lauf(x, tiefe) {
+      if (!x || typeof x !== 'object' || tiefe > 5 || gesehen > 4000) return; gesehen++;
+      Object.keys(x).forEach(function (key) { var v = x[key];
+        if (/^(marktwert|market_value|marktpreisindikation|mpi)$/i.test(key) && Number(v) > 1000) out.push(Number(v));
+        else if (v && typeof v === 'object') lauf(v, tiefe + 1); });
+    })(payload, 0);
+  } catch (e) {}
+  return out.filter(function (v, i) { return out.indexOf(v) === i; });
+}
+function _wertBegriffePruefen(a, payload) {
+  try {
+    var B = _mpiBetraege(payload); if (!B.length) return a;
+    var zahl = function (v) { var r = Math.round(v); return '(?:' + r.toLocaleString('de-DE').replace(/\./g, '\\.') + '|' + String(r) + ')'; };
+    var Z = '(?:' + B.map(zahl).join('|') + ')';
+    var W = '(Marktwert|Verkehrswert)(?:es|s)?';
+    var vor = new RegExp(W + '(?=[^.]{0,60}?' + Z + ')', 'g'), nach = new RegExp('(' + Z + '[^.]{0,40}?)' + W, 'g'), n = 0;
+    var fix = function (t) { if (typeof t !== 'string') return t;
+      var r = t.replace(nach, function (m0, a1) { n++; return a1 + 'Marktpreisindikation'; });
+      /* Artikel mitziehen: der/den Marktwert → die Marktpreisindikation, des/dem → der */
+      var art = new RegExp('\\b([Dd])(er|en|es|em) ' + W + '(?=[^.]{0,60}?' + Z + ')', 'g');
+      r = r.replace(art, function (m0, d, e) { n++; return d + (e === 'er' || e === 'en' ? 'ie' : 'er') + ' Marktpreisindikation'; });
+      return r.replace(vor, function () { n++; return 'Marktpreisindikation'; }); };
+    var tief = function (x) { if (typeof x === 'string') return fix(x); if (Array.isArray(x)) return x.map(tief);
+      if (x && typeof x === 'object') { Object.keys(x).forEach(function (key) { if (key.charAt(0) !== '_') x[key] = tief(x[key]); }); return x; } return x; };
+    tief(a); if (n) a._wertbegriffe_korrigiert = n;
+  } catch (e) {}
+  return a;
+}
+
 /* v2264 · Die Offerte liegt nie ueber dem Kaufpreis - auch wenn das Modell die
    Regel im Prompt ueberliest. Gedeckelt wird auf den Kaufpreis, mit Vermerk. */
 function _offerteDeckeln(a, payload) {
@@ -2511,7 +2559,7 @@ async function analyze(payload, opts) {
        strukturierten Quellenfelder - die LANGTEXTE
        (`makrolage_recherche`, `kaufpreisniveau`, …) tragen ihre Links im
        Fliesstext und kamen dort nie an. */
-    analysis: _wertVergleichPruefen(_bestandModus(_offerteDeckeln(_analyseQuellenNeutral(_analyseUrlsSaeubern(parsed)), payload), payload), payload),   /* v4450a */
+    analysis: _wertBegriffePruefen(_wertVergleichPruefen(_bestandModus(_offerteDeckeln(_analyseQuellenNeutral(_analyseUrlsSaeubern(parsed)), payload), payload), payload), payload),   /* v4450a · v4900 Begriffe */
     raw_text: parsed ? null : used.text  // bei Parse-Fail Text zurückgeben für Debug
   };
 }
@@ -4932,3 +4980,4 @@ module.exports = {
 
 module.exports._wertVergleich = _wertVergleich;
 module.exports._wertVergleichPruefen = _wertVergleichPruefen;
+module.exports._wertBegriffePruefen = _wertBegriffePruefen;

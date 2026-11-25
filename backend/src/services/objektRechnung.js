@@ -267,7 +267,9 @@ function rechnen(daten, opt) {
   const wa2 = wertangabe(d);
   const svwIndikation = (wa2.wert || 0) > 0 && wa2.herkunft === 'indikation';
   const svw2 = svwIndikation ? 0 : (wa2.wert || 0);
-  let wp = svw2 > 0 ? svw2 - kp : (svwIndikation ? 0 : kp * 0.05);
+  /* v4900 · Spiegel calc.js: eine Wertangabe ohne Herkunft ist nie maßgebend und trägt keinen Wertpuffer (Frontend wp_kpi = 0) */
+  const svwOhneHerkunft = (wa2.wert || 0) > 0 && !wa2.herkunft;
+  let wp = svwOhneHerkunft ? 0 : (svw2 > 0 ? svw2 - kp : (svwIndikation ? 0 : kp * 0.05));
   /* v4420 · Spiegel von calc.js wp_kpi (Marcel 24.11.2026): stammt die Wertangabe aus einem Marktbericht und weicht vom
      maßgebenden Objektwert ab, den die App beim Speichern als _wert_anker ablegt (Stichtag-Regel v4390), gilt dieser
      gegen den Kaufpreis. Ohne gespeicherten Anker bleibt alles wie bisher. */
@@ -276,7 +278,7 @@ function rechnen(daten, opt) {
   if (wak != null && (wa2.wert || 0) > 0 && /^(marktbericht|indikation)$/.test(String(wa2.herkunft || '')) && Math.abs(wak - wa2.wert) > 1) wp = wak - kp;
   /* v4580 · Spiegel von calc.js: eine Wertangabe ohne Gutachten/Bankbewertung (Herkunft „eigene“ oder ohne Auswahl) tritt hinter den
      gespeicherten maßgebenden Wert zurück (dieselbe Rangfolge wie wert_basis). */
-  if (wak != null && (wa2.wert || 0) > 0 && !/^(gutachten|bank|marktbericht|indikation)$/.test(String(wa2.herkunft || ''))) wp = wak - kp;
+  if (wak != null && (wa2.wert || 0) > 0 && !/^mpi/.test(String((d._wert_anker && d._wert_anker.art) || '')) && !/^(gutachten|bank|marktbericht|indikation)$/.test(String(wa2.herkunft || ''))) wp = wak - kp;
   r.wpAnker = wak != null && wp === wak - kp ? wak : null;
   r.svw2 = svw2; r.svwIndikation = svwIndikation; r.wp = wp;
   r.wpAngenommen = !(svw2 > 0) && !svwIndikation;
