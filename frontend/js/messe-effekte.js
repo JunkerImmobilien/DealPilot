@@ -443,7 +443,7 @@
         return ziel(t) + '<div class="mfx-karte" style="' + pos(t, { x: 30, y: 24, w: 42 }) + ';border-color:' + farbe + '"><div class="mfx-kick" style="color:' + farbe + '">' + esc(t.kick) + '</div><h2>' + esc(t.titel) + '</h2>' +
           '<div style="display:grid;grid-template-columns:1fr 1fr;gap:.9cqw">' + sp('Warum nicht', t.nein, 'ro', 1.4) + sp('Warum trotzdem gut', t.ja, 'gr', 2.2) + '</div></div>';
       } },
-    zahl: { name: 'Große Zahl', dauer: 5500, felder: { kick: 'Marktwert', bis: 251000, einheit: '€', unter: 'Spanne 199.000 €, 351.000 €', delta: '+44 % zum Kaufpreis' },
+    zahl: { name: 'Große Zahl', dauer: 5500, felder: { kick: 'Marktwert', bis: 251000, einheit: '€', unter: 'Spanne 199.000 € bis 351.000 €', delta: '+44 % zum Kaufpreis' },
       html: function (t) {
         return ziel(t) + '<div class="mfx-karte" style="' + pos(t, { x: 60, y: 30, w: 32 }) + '"><div class="mfx-kick">' + esc(t.kick) + '</div>' +
           '<div style="font:700 5.4cqw/1.1 Space Grotesk;margin:.8cqw 0"><span data-zahl>0</span> <span style="font-size:3cqw;color:var(--wl-e8cc7a,#E8CC7A)">' + esc(t.einheit) + '</span></div>' +
