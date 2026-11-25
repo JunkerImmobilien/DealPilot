@@ -179,6 +179,9 @@
       H + ' .om-k{perspective:1200px;outline:none;cursor:pointer;min-width:0}',
       H + ' .om-in{display:grid;transition:transform .55s cubic-bezier(.2,.7,.2,1);transform-style:preserve-3d;min-height:100%;position:relative}',
       H + ' .om-gedreht .om-in{transform:rotateY(180deg)}',
+      /* Höhe folgt der sichtbaren Seite: die verdeckte Seite liegt absolut darüber und zählt nicht mit */
+      H + ' .om-k:not(.om-gedreht) .om-hinten{position:absolute;inset:0;overflow:hidden}',
+      H + ' .om-gedreht .om-vorn{position:absolute;inset:0;overflow:hidden}',
       H + ' .om-vorn,' + H + ' .om-hinten{grid-area:1/1;backface-visibility:hidden;-webkit-backface-visibility:hidden;background:var(--gx-karte);border:1px solid var(--gx-linie2);border-radius:12px;padding:10px 12px 22px;position:relative;overflow:hidden;min-width:0;color:var(--gx-tinte)}',
       H + ' .om-hinten{transform:rotateY(180deg);background:linear-gradient(var(--gx-flaeche),var(--gx-flaeche)),var(--gx-karte)}',
       H + ' .om-k:hover .om-vorn,' + H + ' .om-k:hover .om-hinten{border-color:var(--wl-c9a84c,#C9A84C)}',
