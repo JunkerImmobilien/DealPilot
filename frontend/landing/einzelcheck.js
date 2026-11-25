@@ -63,7 +63,7 @@
 (function () {
   'use strict';
   if (window.DpEinzelCheck) return;
-  var VERSION = 'einzelcheck-3';
+  var VERSION = 'einzelcheck-5';
   var ANSCHLUSS_ZINS = 5.0;     /* v3946 · Marcel 22.11.2026: „Anschlussfinanzierung, die wir einfach auf fünf Prozent rechnen mit derselben Tilgung“ */
   var ABLAGE_STUNDEN = 2;       /* v3946 · Unterlagen im Browser höchstens so lange (die Stripe-Kasse läuft nach 60 Minuten ab) */
   var SPEICHER = 'dp_ec_kauf';
@@ -310,6 +310,7 @@
       if (dc.zins >= 0) g.zins_pct = dc.zins; if (dc.tilg > 0) g.tilg_pct = dc.tilg; if (dc.bindung > 0) g.bindung_j = dc.bindung;
       if (dc.ek >= 0) g.ek_eur = dc.ek; if (dc.nkPct > 0) g.nk_pct = dc.nkPct;
     }
+    if (!dc) return g;   /* einzelcheck-5 · ohne Deal-Check-Lauf auch PLZ, Fläche und Baujahr der Karte nicht übernehmen */
     var plzEl = document.getElementById('dcPlz'); if (plzEl && /^\d{5}$/.test(plzEl.value)) g.plz = plzEl.value;
     var w = dom('dcWfl'); if (w > 0) g.wfl = w;
     var b = dom('dcBj'); if (b >= 1500 && b <= 2100) g.bj = Math.round(b);
@@ -580,7 +581,7 @@
   }
   function kundenSatz(t) { return String(t || '').replace(/\s*[—–]\s*/g, ', ').replace(/;/g, ','); }
   function annahmeText(r) {
-    return (r.e.grund ? 'Finanzierung aus deinen Grundangaben: ' + eur(r.ek) + ' Eigenkapital, Darlehen ' + eur(r.d1) + ', Nebenkosten ' : 'Finanzierung wie im Deal-Check: ' + eur(r.ek) + ' Eigenkapital (10 %), Nebenkosten ') + dez(r.e.nkPct, 1) + ' %, '
+    return (r.e.grund ? 'Finanzierung aus deinen Grundangaben: ' + eur(r.ek) + ' Eigenkapital, Darlehen ' + eur(r.d1) + ', Nebenkosten ' : (r.e.dc ? 'Finanzierung wie im Deal-Check: ' : 'Finanzierung mit Standardannahmen: ') + eur(r.ek) + ' Eigenkapital (10 %), Nebenkosten ') + dez(r.e.nkPct, 1) + ' %, '
       + dez(r.e.zins, 2) + ' % Zins' + (r.e.bindung ? ' bei ' + r.e.bindung + ' Jahren Zinsbindung' : '') + ', ' + dez(r.e.tilg, 2) + ' % Tilgung. '
       + (r.mitBwk ? 'Nicht umlagefähige Kosten aus dem Wirtschaftsplan.' : 'Ohne Wirtschaftsplan rechnet DealPilot mit 17 % der Kaltmiete als nicht umlagefähige Kosten.')
       + (r.e.herkunft.kp === 'dealcheck' ? ' Kaufpreis aus deinem Deal-Check.' : '') + (r.e.herkunft.nkm === 'dealcheck' ? ' Kaltmiete aus deinem Deal-Check.' : '');

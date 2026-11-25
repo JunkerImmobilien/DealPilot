@@ -67,6 +67,7 @@ const P = {
   mbGeo: path.join(WURZEL, 'marktbericht/backend/src/services/GeocodingService.js'),
   front: path.join(WURZEL, 'frontend/landing/einzelcheck.js'),
   faecher: path.join(WURZEL, 'frontend/landing/landing-faecher.js'),
+  dealcheck: path.join(WURZEL, 'frontend/landing/dp2-dealcheck.js'),
   ocr: path.join(WURZEL, 'backend/src/services/ocr.js'),
   flyerApp: path.join(WURZEL, 'frontend/js/flyer-code.js'),
   flyerLanding: path.join(WURZEL, 'frontend/landing/flyer-code.js'),
@@ -910,6 +911,34 @@ TEILE.S = async function (svc, q) {
   S0.grund = null; S0.frei = null; S0.herkunft = {};
   return f;
 };
+/* T · einzelcheck-5 (Marcel 25.11.2026): Werte aus dem Deal-Check nur, wenn er wirklich gelaufen ist.
+   Wer gleich „genauer mit Unterlagen“ wählt, bekommt weder die Startwerte der Karte (150.000/950) noch PLZ, Fläche
+   oder Baujahr als „aus deinem Deal-Check“. Echter Lauf von einzelcheck.js mit nachgebautem DpDealCheck. */
+TEILE.T = async function (svc, q) {
+  /* roh und als Textsuche: die Karte trägt HTML-Strings, die ohneKommentar zerschneidet */
+  const f = [], dc = (q.dealcheck || '').split(String.fromCharCode(13)).join('');
+  const hat = (t) => dc.indexOf(t) >= 0;
+  if (!hat('letztes: function () { return gelaufen ? letztes : null; }')) f.push('DpDealCheck.letztes() gibt Werte auch ohne Deal-Check-Lauf heraus');
+  const pr = dc.indexOf('gelaufen = true;'), sz = dc.indexOf('seite(true);', pr), zg = dc.indexOf('zeigen(r);', pr);
+  if (pr < 0 || sz < 0 || sz - pr > 120 || zg - pr > 160 || dc.lastIndexOf('function pruefen()', pr) < dc.lastIndexOf('function ', pr)) f.push('gelaufen wird nicht erst nach „Deal prüfen“ gesetzt');
+  if (dc.split('gelaufen = true').length !== 2) f.push('gelaufen wird an mehr als einer Stelle gesetzt');
+  if (!hat('if (gelaufen) { var r = rechnen(); if (r) letztes = r; }')) f.push('„Kompletten Bericht holen“ übernimmt die Karte ohne Deal-Check-Lauf');
+  let C; try { C = frontLaden(q.front, q.kerne); } catch (e) { return f.concat(['Frontend lädt nicht: ' + e.message]); }
+  const EC = C.DpEinzelCheck; if (!EC || !EC._vorbelegung) return f.concat(['_vorbelegung fehlt']);
+  const karte = { dcPlz: '32609', dcWfl: '70', dcBj: '1975' };
+  C.document.getElementById = (id) => (karte[id] != null ? { value: karte[id] } : null);
+  EC._S.grund = null; EC._S.frei = null; EC._S.herkunft = {};
+  C.DpDealCheck = { letztes: () => null };
+  let vb = EC._vorbelegung();
+  const fremd = ['kp', 'nkm', 'plz', 'wfl', 'bj'].filter((k) => vb.werte[k] != null && vb.werte[k] !== '');
+  if (fremd.length) f.push('ohne Deal-Check-Lauf vorbelegt: ' + fremd.join(', '));
+  if (Object.keys(vb.quelle).some((k) => vb.quelle[k] === 'dealcheck')) f.push('ohne Deal-Check-Lauf steht „aus deinem Deal-Check“');
+  C.DpDealCheck = { letztes: () => ({ kp: 150000, nkm: 950, zins: 3.8, tilg: 1.5, bindung: 10, ek: 15000, nkPct: 10 }) };
+  vb = EC._vorbelegung();
+  if (vb.werte.kp !== 150000 || vb.quelle.kp !== 'dealcheck' || vb.werte.plz !== '32609') f.push('nach dem Deal-Check-Lauf keine Übernahme: ' + JSON.stringify({ kp: vb.werte.kp, q: vb.quelle.kp, plz: vb.werte.plz }));
+  C.DpDealCheck = undefined;
+  return f;
+};
 /* Q · Nach dem Kauf kein zweites Hochladen: selber Tab, Ablage auf dem Gerät, Bericht startet von selbst, Ablage wird gelöscht */
 TEILE.Q = async function (svc, q) {
   const f = [], fr = ohneKommentar(q.front);
@@ -982,7 +1011,7 @@ function quellen(ueber) {
 const NAMEN = { A: 'Speicher-only', A2: 'pdftotext echt über stdin/stdout', B: 'Schwärzen vor dem KI-Aufruf', C: 'Bremse und Schalter', D: 'kostenlos höchstens 2 Unterlagen',
   E: 'Bericht nur mit gültigem Kauf-Token', F: 'Frist 14 Tage', G: 'Preis aus dem lookup_key', H: 'Webhook', I: 'Zahlen-Weissliste', J: 'Siegel', K: 'Marktbericht Stufe 3 ohne Ablage, Wertermittlung mit Herkunft, keine Quellennamen',
   L: 'gescannte PDFs: Texterkennung nur im Speicher', M: 'Rabatt-Vorrang Anrechnung vor Flyer-Code', N: 'Vergleichsmiete und Obergrenze für Investoren',
-  O: 'Finanzierung wie im Investment-PDF (Kerne)', P: 'Grundangaben Pflicht', Q: 'kein zweites Hochladen nach dem Kauf', R: 'Bericht: Kapitel, Deckblatt, Kundentext', S: 'Bewertungsbericht und Ablauf erst auslesen' };
+  O: 'Finanzierung wie im Investment-PDF (Kerne)', P: 'Grundangaben Pflicht', Q: 'kein zweites Hochladen nach dem Kauf', R: 'Bericht: Kapitel, Deckblatt, Kundentext', S: 'Bewertungsbericht und Ablauf erst auslesen', T: 'Deal-Check-Werte nur nach echtem Deal-Check-Lauf' };
 
 console.log('einzelcheck-pruefen · v3946');
 const svc = require(P.dienst);
@@ -1070,6 +1099,9 @@ const GEGEN = [
   ['R', 'KI-Kapitel im Browser nicht umbenannt', { front: ersetze(q0.front, "html += b.art === 'h' ? '<h3>' + D.esc(kapitel(b.text)) + '</h3>'", "html += b.art === 'h' ? '<h3>' + D.esc(b.text) + '</h3>'") }],
   ['R', 'Bodenrichtwert nicht auf dem Deckblatt', { front: ersetze(q0.front, "      kz: [{ l: 'Bodenrichtwert',", "      kz: [{ l: 'Grundwert',") }],
   ['R', 'Gedankenstrich im Kundentext', { front: ersetze(q0.front, "zeile('Tilgung im Jahr', dez(h.tilg, 2) + ' %', a && dez(a.tilg, 2) + ' %', { det: 'Anschluss mit derselben Tilgung' }),", "zeile('Tilgung im Jahr', dez(h.tilg, 2) + ' %', a && dez(a.tilg, 2) + ' %', { det: 'Anschluss – dieselbe Tilgung' }),") }],
+  ['T', 'letztes() ohne Lauf-Sperre', { dealcheck: ersetze(q0.dealcheck, 'letztes: function () { return gelaufen ? letztes : null; }', 'letztes: function () { return letztes; }') }],
+  ['T', 'Bericht-Knopf rechnet die Karte immer', { dealcheck: ersetze(q0.dealcheck, 'if (gelaufen) { var r = rechnen(); if (r) letztes = r; }', '{ var r = rechnen(); if (r) letztes = r; }') }],
+  ['T', 'PLZ, Fläche, Baujahr der Karte ohne Lauf', { front: ersetze(q0.front, '    if (!dc) return g;   /* einzelcheck-5', '    /* einzelcheck-5') }],
   ['M', 'mitCode lässt den Flyer-Code stehen', { front: ersetze(q0.front, "    ['code', 'promo', 'rabatt'].forEach(function (k) { u.searchParams.delete(k); });\n", '') }]
 ];
 for (const [teil, was, ueber] of GEGEN) {
