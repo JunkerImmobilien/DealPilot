@@ -45514,3 +45514,10 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** staging b905bed0, d9487c61, a5e87cf4, ad005319, Vorlage e3bfb670 · main 56d52e83, f94e4c42, 2c5af73c, a5076382, Version 21285579.
 - **Nachweis:** Staging an Westerfeldstr. 146 (Verlauf von Musterweg 7 nur im Browser), drei Sprünge, Filter einzeln und kombiniert, 390 px im iframe. Prüfer: buster-ebenen SAUBER, vorschau SAUBER, unterlagen-steuer 53/53, gold-audit RC 0. Prod-Sicherung haupt-/mb-20261125-0741-v4680 (7,0/31 MB, Kopf gelesen). Prod liefert `unterlagen-eingang.js?v=v4680c`, version.json 198.
 - **Rest:** Prod nicht eingeloggt im Objekt gemessen. Quick-Check-Objekte (2026-1190) haben keinen Verlauf. Westerfeldstr. 146 trägt updated_at 07:37:27 aus meinem Messlauf (loadSaved), `_dok_eingang` unverändert (1.269 Zeichen).
+
+### Rollout 1.0.199 · landing-blackweek-1 (25.11.2026)
+
+- **Was:** Black Week bis 06.12.2026 23:59:59 MEZ statt Black Friday bis 01.12. Landing blackfriday.js (Fenster, Etiketten, Datum), Stripe live und Sandbox: neuer Promotion-Code BLACKFRIDAY26 (live promo_1UfaqzGefFev8arzdA5HFh3y, Sandbox promo_1UfaqpKEjyPDo0wo7QDYswBh) auf den bisherigen Coupons, alte Codes inaktiv.
+- **Commit:** staging f856d55a · main de201a65, Version 4d653fee.
+- **Nachweis:** Checkout live 27,99 / 307,20 / 39,99 / 439,20, Starter abgelehnt. Prod liefert blackfriday.js?v=blackweek-1, version.json 199. Sicherung haupt/mb-20261125-0746-blackweek (7,0/31 MB, Kopf gelesen).
+- **Rest:** blackfriday.js nach dem 06.12. entfernen. JSON-LD-Preise bleiben regulär.
