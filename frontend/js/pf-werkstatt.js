@@ -191,8 +191,16 @@
     _mini[k] = r; return r;
   }
   /* Kasten mit verkleinertem Bild; skalieren() setzt Faktor und Höhe nach der Breite des Kastens */
+  /* v4900g · Ein Modul offscreen zu zeichnen kostet ~350 ms (gemessen), 42 Module + Vorlagen blockierten das Öffnen 20 s.
+     Deshalb: sofort Piktogramm, das echte Bild kommt einzeln nach (nachladen), Sichtbares zuerst */
+  function billig(k) {
+    if (Object.prototype.hasOwnProperty.call(_mini, k)) return true;
+    var el = API.ziel(k); return !!(el && el.innerHTML && el.innerHTML.length > 80 && el.offsetHeight);
+  }
   function miniBox(k, cls, maxH) {
-    var m = _klein && cls === 'pw-live' ? null : miniHtml(k);
+    if (_klein && cls === 'pw-live') return '<div class="pw-leer ' + cls + '-leer">' + piktogramm(k) + '</div>';
+    if (!billig(k)) { warte(k); return '<div class="pw-leer pw-wartet ' + cls + '-leer" data-mk="' + k + '" data-cls="' + cls + '" data-mh="' + maxH + '">' + piktogramm(k) + '</div>'; }
+    var m = miniHtml(k);
     if (!m) return '<div class="pw-leer ' + cls + '-leer">' + piktogramm(k) + '</div>';
     return '<div class="pw-mini ' + cls + '" data-maxh="' + maxH + '" aria-hidden="true" inert><div class="pw-mini-in" data-ew="' + m.w + '" style="width:' + m.w + 'px">' + huelle(m.h) + '</div></div>';
   }
@@ -207,6 +215,8 @@
   /* Vorlage als echtes, verkleinertes Bild: Score-Kopf und die ersten Bausteine im Raster der Vorlage */
   function vorlageMini(v) {
     if (!_vmini[v.k]) {
+      var fehlt = v.m.slice(0, 5).filter(function (x) { return !billig(x[0]); });
+      if (fehlt.length) { fehlt.forEach(function (x) { warte(x[0]); }); return '<span class="pw-vm pw-leer pw-wartet pw-vwartet" data-vk="' + v.k + '">' + piktogramm('kz') + '</span>'; }
       var W = appBreite(), s = scoreHtml();
       var mods = v.m.slice(0, 5).map(function (x) {
         var m = miniHtml(x[0]);
@@ -215,6 +225,38 @@
       _vmini[v.k] = '<span class="pw-vm pw-mini" data-maxh="78" aria-hidden="true" inert><span class="pw-mini-in" data-ew="' + W + '" style="width:' + W + 'px;display:block">' + huelle(s.h + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px">' + mods + '</div>') + '</span></span>';
     }
     return _vmini[v.k];
+  }
+  var _warte = [], _wLauf = 0, _wGen = 0;
+  function warte(k) { if (_warte.indexOf(k) < 0) _warte.push(k); if (!_wLauf) { _wLauf = 1; var g = _wGen; setTimeout(function () { ladeSchritt(g); }, 30); } }
+  function sichtbar(el, box) { var r = el.getBoundingClientRect(), b = box.getBoundingClientRect(); return r.bottom > b.top && r.top < b.bottom && r.right > b.left && r.left < b.right; }
+  function ladeSchritt(g) {
+    var p = document.getElementById('dp-pw');
+    if (g !== _wGen || !p) { _wLauf = 0; return; }
+    _warte = _warte.filter(function (k) { return !Object.prototype.hasOwnProperty.call(_mini, k); });
+    if (!_warte.length) { _wLauf = 0; vorlagenNach(p); return; }
+    /* Vorrang: was gerade im Arbeitsbereich oder in der Palette zu sehen ist */
+    var k = null;
+    [p.querySelector('.pw-ab'), p.querySelector('.pw-pliste')].some(function (box) {
+      if (!box) return false;
+      var e = [].filter.call(box.querySelectorAll('.pw-wartet[data-mk]'), function (x) { return sichtbar(x, box); })[0];
+      if (e) k = e.getAttribute('data-mk'); return !!k;
+    });
+    if (!k || _warte.indexOf(k) < 0) k = _warte[0];
+    _warte.splice(_warte.indexOf(k), 1);
+    miniHtml(k);
+    [].slice.call(p.querySelectorAll('.pw-wartet[data-mk="' + k + '"]')).forEach(function (x) {
+      var t = document.createElement('div'); t.innerHTML = miniBox(k, x.getAttribute('data-cls'), Number(x.getAttribute('data-mh')));
+      var n = t.firstChild; x.parentNode.replaceChild(n, x); skalierenIn(n);
+    });
+    vorlagenNach(p);
+    setTimeout(function () { ladeSchritt(g); }, 16);
+  }
+  function vorlagenNach(p) {
+    [].slice.call(p.querySelectorAll('.pw-vwartet')).forEach(function (x) {
+      var v = API.vorlagen.filter(function (y) { return y.k === x.getAttribute('data-vk'); })[0];
+      if (!v || v.m.slice(0, 5).some(function (y) { return !Object.prototype.hasOwnProperty.call(_mini, y[0]); })) return;
+      var t = document.createElement('div'); t.innerHTML = vorlageMini(v); var n = t.firstChild; x.parentNode.replaceChild(n, x); skalierenIn(n);
+    });
   }
   function vorschau(k) { return miniBox(k, 'pw-live', 210); }
   function block(k) {
@@ -289,9 +331,10 @@
       if (el) el.focus();
     }
   }
-  function skalieren() {
-    var p = document.getElementById('dp-pw'); if (!p) return;
-    [].forEach.call(p.querySelectorAll('.pw-mini-in'), function (x) {
+  function skalieren() { skalierenIn(document.getElementById('dp-pw')); }
+  function skalierenIn(p) {
+    if (!p) return;
+    [].forEach.call(p.classList && p.classList.contains('pw-mini') ? p.querySelectorAll(':scope > .pw-mini-in') : p.querySelectorAll('.pw-mini-in'), function (x) {
       /* maßstäblich: das Bild rechnet mit der echten Breite des Bausteins im Cockpit und wird auf die Kastenbreite verkleinert */
       var box = x.parentNode.clientWidth || 300, w = Number(x.getAttribute('data-ew')) || 900, f = Math.min(1, box / w), mx = Number(x.parentNode.getAttribute('data-maxh')) || 210;
       x.style.width = w + 'px'; x.style.transform = 'scale(' + f.toFixed(4) + ')';
@@ -381,7 +424,7 @@
     var p = document.getElementById('dp-pw'), h = document.getElementById('dp-pw-hg');
     if (p) p.parentNode.removeChild(p); if (h) h.parentNode.removeChild(h);
     var off = document.getElementById('pw-off'); if (off) off.parentNode.removeChild(off);
-    _mini = {}; _vmini = {}; _score = null;
+    _mini = {}; _vmini = {}; _score = null; _warte = []; _wLauf = 0; _wGen++;
     _offen = false; _rueck = []; document.removeEventListener('keydown', taste, true); window.removeEventListener('resize', zeichnen);
     document.documentElement.classList.remove('pw-offen');
     try { if (_vorher && _vorher.focus) _vorher.focus(); } catch (e) {}
@@ -412,7 +455,7 @@
       + '<div class="pw-h">Bausteine</div><div class="pw-raster" role="list"></div></div></section></div>'
       + '<div class="pw-f"><span id="pw-live-msg" class="pw-msg" aria-live="polite"></span><button type="button" class="pw-ok" data-pw="zu">Fertig</button></div>'
       + '<div id="pw-pop" class="pw-pop" hidden aria-hidden="true"></div>';
-    _mini = {}; _vmini = {}; _score = null;
+    _mini = {}; _vmini = {}; _score = null; _warte = []; _wLauf = 0; _wGen++;
     document.body.appendChild(p); document.documentElement.classList.add('pw-offen');
     try {   /* Helligkeit der Akzentfarbe (Partner) messen: dunkel => heller Kopftext */
       var m = (getComputedStyle(p.querySelector('.pw-sym') || p).color || '').match(/\d+(\.\d+)?/g);
@@ -438,7 +481,8 @@
       else if (a === 'geraet') {   /* „so sieht es am Handy aus“: Bühne in Handybreite, eine Spalte */
         var hy = k === 'handy'; p.querySelector('.pw-ab').classList.toggle('pw-als-handy', hy);
         [].forEach.call(p.querySelectorAll('[data-pw="geraet"]'), function (x) { var an = x.getAttribute('data-k') === k; x.classList.toggle('an', an); x.setAttribute('aria-pressed', String(an)); });
-        skalieren(); melden(hy ? 'Handy-Ansicht: so stehen die Bausteine untereinander' : 'Bildschirm-Ansicht');
+        skalieren(); setTimeout(skalieren, 320);   /* nach dem Übergang der Bühnenbreite neu messen */
+        melden(hy ? 'Handy-Ansicht: so stehen die Bausteine untereinander' : 'Bildschirm-Ansicht');
       }
     });
     var pal = p.querySelector('.pw-pal');
@@ -446,6 +490,7 @@
     pal.addEventListener('focusin', function (ev) { var b = ev.target.closest && ev.target.closest('.pw-pim'); if (b) popZeigen(b); });
     pal.addEventListener('mouseleave', popWeg); pal.addEventListener('focusout', function (ev) { if (!pal.contains(ev.relatedTarget)) popWeg(); });
     p.querySelector('.pw-pliste').addEventListener('scroll', function () { popWeg(); reiterAktiv(); });
+    p.querySelector('.pw-buehne').addEventListener('transitionend', function (ev) { if (ev.propertyName === 'max-width') skalieren(); });
     ziehenEinrichten(p);
     document.addEventListener('keydown', taste, true); window.addEventListener('resize', zeichnen);
     zeichnen();
@@ -552,6 +597,7 @@
       '.pw-sub button{border:0;background:transparent;color:#8A8274;cursor:pointer;font-size:13px;width:18px;height:18px;border-radius:50%;padding:0 !important;min-height:0 !important}', '.pw-sub button:hover{background:#B8625C;color:#fff}',
       '.pw-live{margin-top:7px;border-radius:8px;background:#fff;border:1px solid #EFE9DC}',
       '.pw-leer{margin-top:7px;border-radius:8px;background:' + W2 + ';border:1px dashed ' + G25 + ';display:flex;align-items:center;justify-content:center;min-height:56px}',
+      '.pw-vwartet{display:flex;height:78px;margin:0;min-height:0}.pw-wartet svg{animation:pwPuls 1.4s ease-in-out infinite}@keyframes pwPuls{50%{opacity:.35}}@media (prefers-reduced-motion:reduce){.pw-wartet svg{animation:none}}',
       '.pw-pik{flex:0 0 40px;height:26px;display:flex;align-items:flex-end;gap:2px;padding:3px;border-radius:5px;background:' + W8 + ';border:1px solid ' + G25 + ';color:' + G + ';box-sizing:border-box}',
       '.pw-pik-balken i{flex:1;background:' + G + ';border-radius:1px}', '.pw-pik-linie svg{width:100%;height:100%}',
       '.pw-pik-tab{flex-direction:column;align-items:stretch;justify-content:space-between}', '.pw-pik-tab i{height:2px;background:#B9AE99}', '.pw-pik-tab i:first-child{background:' + G + '}',
