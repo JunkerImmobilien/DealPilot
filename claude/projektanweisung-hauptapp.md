@@ -45455,3 +45455,10 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Was:** Alle Pakete des Tages ausgerollt (v4490–v4600, einzelcheck-3). Nicht live und auf Freigabe wartend: PDF-Muster v4580b (Staging, PDF-Dienst nur dort gebaut), Portfolio-Cockpit-Demos, Werbung Black Friday v2 Varianten und ViVi mit echtem Logo.
 - **Weiter:** BACKLOG.md „Offen aus dem 24.11.2026“ und wissen/2026-11-24.md „Abendstand“. Geltende Entscheidungen: Aufteiler rechnet mit dem Haus als Ganzes, Steuerfarben Grün Verlust/Rot Überschuss, DSCR-/CF-Tipps nur mit Ziel.
 - **Rest:** Prod nicht mit echtem Login im Objekt nachgemessen; deploy-staging.ps1 bricht bei fremden offenen Dateien im geteilten Arbeitsverzeichnis ab (Forks nutzen eigene Worktrees).
+
+### Rollout 1.0.191 · v4610 EK-Rendite in vier Stufen (Fork M3, 25.11.2026)
+
+- **Was:** EK-Rendite 1 operativ, 2 nach Steuer, 3 vor Steuer mit Vermögensdelta, 4 nach Steuer mit Vermögensdelta (Hauptkennzahl, angezeigt), alle vier im Tooltip. Rechnung nur in `frontend/js/ek-rendite.js`; Anzeige Reiter Kennzahlen, Bewertung, Pilot-Analyse/Cockpit Übersicht und Finanzierung & Bank, Portfolio-Cockpit, Investment-PDF. Deal Score unverändert.
+- **Commit:** staging 63b81fb1, Merge d5e66417 · main 26714a1d, Version 9735f9d2 (dp-dokumente.js auf main Buster v4610m, Staging v4610).
+- **Nachweis:** Staging Westerfeldstr. 146 33,2 % (operativ 12,2 %), Demostraße 5 11,4 %, Hauptstr. 51 9,3 %, Portfolio 11,3 %. Prüfer grün, Prod-Sicherung 20261125-0621-v4610, Prod liefert ek-rendite.js und calc.js v4610 aus.
+- **Rest:** Prod nicht eingeloggt gemessen; 390 px nicht gemessen (Regel l7 → 2 Spalten unter 640 px); Delta-Definition von Marcel zu bestätigen (wissen/2026-11-25.md).
