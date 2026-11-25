@@ -1224,11 +1224,20 @@ for (const [teil, was, ueber] of GEGEN) {
     if (e6 && e6.code === 'kein_dienst') ok('Mail: ohne PDF-Dienst 503 statt stiller Mail'); else fehl('Mail: ohne PDF-Dienst kein sauberer Fehler');
     if (s2.mailErlaubt(kaufer({ status: 'offen' })).code === 'nicht_bezahlt' && s2.mailErlaubt(kaufer({ gueltig_bis: '2020-01-01' })).code === 'kauf_abgelaufen') ok('Mail: nur bezahlt und gültig'); else fehl('Mail: offener oder abgelaufener Kauf darf mailen');
     s2._setzeDeps(deps());
-    const k1 = await s2.karteHolen({ lat: 52.27, lon: 8.62, street: 'Musterweg' });
-    const k0 = await s2.karteHolen({ city: 'Hüllhorst' });
-    if (k1 && /^data:image\/png;base64,/.test(k1.bild) && k1.genau && k0 === null) ok('Lagekarte: mit Koordinaten data:-Bild, ohne keine'); else fehl('Lagekarte: falsch ' + JSON.stringify([k1 && k1.genau, k0]));
-    s2._setzeDeps(deps({ mbFetch: async () => ({ ok: true, headers: { get: () => 'text/html' }, arrayBuffer: async () => Buffer.from('x') }) }));
-    if ((await s2.karteHolen({ lat: 52, lon: 8 })) === null) ok('Lagekarte: kein Bild, keine Karte'); else fehl('Lagekarte: HTML-Antwort wird als Bild genommen');
+    /* einzelcheck-7 · Lagekarte aus unseren OSM-Kacheln (statt Geoapify), Häuschen-Stecknadel, Namensnennung im Bild */
+    const PNG = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0, 0, 0, 0]);
+    const istPng = (b) => Buffer.isBuffer(b) && b.length > 8 && b[0] === 0x89 && b[1] === 0x50;
+    let abrufe = 0; const osmOk = { istPng, kachel: async () => { abrufe++; return { buf: PNG }; } };
+    const k1 = await s2.karteHolen({ lat: 52.27, lon: 8.62, street: 'Musterweg' }, { osm: osmOk });
+    const k0 = await s2.karteHolen({ city: 'Hüllhorst' }, { osm: osmOk });
+    const svg1 = k1 ? Buffer.from(k1.bild.split(',')[1], 'base64').toString('utf8') : '';
+    if (k1 && /^data:image\/svg\+xml;base64,/.test(k1.bild) && k1.genau && k1.quelle === 'osm' && k0 === null && abrufe > 0) ok('Lagekarte: OSM-Kacheln als Bild, ohne Koordinaten keine'); else fehl('Lagekarte: falsch ' + JSON.stringify([k1 && k1.genau, k1 && k1.quelle, k0, abrufe]));
+    if (/OpenStreetMap-Mitwirkende/.test(svg1) && /<path d="M600 280 C/.test(svg1) && !/geoapify/i.test(svg1)) ok('Lagekarte: Stecknadel auf der Mitte, Namensnennung, kein Geoapify'); else fehl('Lagekarte: Nadel oder Vermerk fehlt');
+    const k2 = await s2.karteHolen({ lat: 52.27, lon: 8.62 }, { osm: osmOk });
+    if (k2 && k2.genau === false) ok('Lagekarte: ohne Straße Nadel am Ort, Lage ungefähr'); else fehl('Lagekarte: ohne Straße falsch');
+    const osmLoch = { istPng, kachel: async (z, x) => (x % 2 ? { buf: PNG } : Promise.reject(new Error('429'))) };
+    if ((await s2.karteHolen({ lat: 52, lon: 8, street: 'A' }, { osm: osmLoch })) === null) ok('Lagekarte: fehlende Kachel, keine halbe Karte'); else fehl('Lagekarte: halbe Karte');
+    if (!/Geoapify/.test(front) && /OpenStreetMap-Mitwirkende/.test(front)) ok('Bericht: Kartenvermerk OpenStreetMap, kein Geoapify'); else fehl('Bericht: Geoapify noch im Vermerk');
   } finally { s2._setzeDeps(null); if (altG == null) delete process.env.PDF_DIENST_SECRET; else process.env.PDF_DIENST_SECRET = altG; }
   /* Fenster: Klick daneben schließt nicht (Marcel 24.11.2026), × und Esc schon */
   if (/class="ec-dunkel"><\/div>/.test(front) && !/class="ec-dunkel" data-zu/.test(front)) ok('Fenster: Klick auf den Hintergrund schließt nicht'); else fehl('Fenster: Hintergrund trägt data-zu und schließt');

@@ -1369,7 +1369,7 @@
         r && r.k ? { l: 'DSCR', v: r.k.d_total > 0 ? dez(r.k.dscr, 2) : 'entfällt', s: 'volles Jahr, heutige Eingaben' } : null].filter(Boolean),
       meta: [['Stand', d.stand], ['Unterlagen', (d.unterlagen.filter(function (u) { return u.gelesen; }).length || (z.unterlagen || 0)) + ' gelesen'], ['Bewertungsstichtag', stichtagText(m.stichtag) || d.stand]],
       hinweisRechts: 'Erstellt am ' + D.esc(d.stand) + '<br>Indikativ, kein Gutachten'
-        + (!deckFoto && m.karte ? '<br>Karte' + (m.karte_genau ? '' : ', Lage ungefähr (Ort)') + ': Powered by Geoapify, OpenStreetMap' : '') }));
+        + (!deckFoto && m.karte ? '<br>Karte' + (m.karte_genau ? '' : ', Lage ungefähr (Ort)') + ': © OpenStreetMap-Mitwirkende' : '') }));
 
     /* Auf einen Blick */
     var blick = fazit(d);
