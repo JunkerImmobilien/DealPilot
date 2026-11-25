@@ -205,7 +205,7 @@
     return '<div class="pw-mini ' + cls + '" data-maxh="' + maxH + '" aria-hidden="true" inert><div class="pw-mini-in" data-ew="' + m.w + '" style="width:' + m.w + 'px">' + huelle(m.h) + '</div></div>';
   }
   /* Score-Kopf so, wie er im Cockpit steht (echte Werte), sonst gekennzeichnete Beispielwerte */
-  /* v4950 · Der Klon verliert die ID (keine doppelten IDs), und damit fielen die kompakten Regeln von
+  /* v4985 · Der Klon verliert die ID (keine doppelten IDs), und damit fielen die kompakten Regeln von
      dpsh-score-hero.js (v4830, alle an #dp-pscore-hero) weg: die Vorschau zeigte die große, aufgeklappte Fassung.
      Deshalb werden genau diese Regeln aus den geladenen Stylesheets auf #dp-pw .pw-psk umgeschrieben. */
   function scoreRegeln() {
@@ -292,7 +292,7 @@
       + '<button type="button" data-pw="weg" data-k="' + k + '" title="Entfernen" aria-label="' + esc(a.t) + ' entfernen">×</button></span></div>'
       + sub + vorschau(a.gruppe ? 'projektion' : k) + '</div>';
   }
-  /* v4950 · Runde 4 (Marcel): Gruppen sind echte Reiter wie im Einstellungen-Fenster (.ms-tab mit Symbol, Titel,
+  /* v4985 · Runde 4 (Marcel): Gruppen sind echte Reiter wie im Einstellungen-Fenster (.ms-tab mit Symbol, Titel,
      Unterzeile). Die Palette zeigt nur die gewählte Gruppe, statt einer langen Liste mit Sprungmarken. */
   var _gruppe = 'kz', _tabs = [];
   function gruppenListe() {
@@ -466,7 +466,7 @@
     if (window.DpVorschau && !api.__frei) { window.DpVorschau.frei('grafiken_neu').then(function (an) { if (an) { api.__frei = true; oeffnen(api); } }); return; }
     API = api; if (_offen) { zeichnen(); return; }
     _offen = true; _vorher = document.activeElement; _rueck = []; stil();
-    /* v4950 · Runde 4: Aufbau und Klassen wie das Einstellungen-Fenster (settings.js, help.js): global-view-overlay,
+    /* v4985 · Runde 4: Aufbau und Klassen wie das Einstellungen-Fenster (settings.js, help.js): global-view-overlay,
        set-modal-v2 set-modal-cream, dp-modal-topband (Markenleiste + goldener Kopf), modal-side mit .ms-tab-Reitern,
        set-modal-content mit pane-wrap und settings-footer (btn-ghost, btn-gold). Das Raster setzt stil() unter #dp-pw. */
     var p = document.createElement('div'); p.id = 'dp-pw'; p.className = 'pw global-view-overlay'; p.setAttribute('role', 'dialog'); p.setAttribute('aria-modal', 'true'); p.setAttribute('aria-labelledby', 'pw-t');
@@ -665,6 +665,6 @@
 
   window.DpPfWerkstatt = {
     aktiv: function () { try { return localStorage.getItem('dp_pf_werkstatt') !== '0'; } catch (e) { return true; } },
-    oeffnen: oeffnen, zu: zu, version: 'v4950'
+    oeffnen: oeffnen, zu: zu, version: 'v4985'
   };
 })();
