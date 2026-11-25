@@ -10952,6 +10952,8 @@
      M28 Unterlagen, dazu ViVi. Gleiche Bauweise wie K5: Kopien der Demo-Objekte (nichts am Original),
      Ziele über den sichtbaren Text, Unterreiter wählen bis offen. Alte Drehbücher bleiben unverändert,
      damit vorhandene Tonspuren und Storybook-Seiten gültig bleiben. Texte ohne Gedankenstriche. */
+  /* Karte statt einzelner Zeile: erst .dp-pa-card, sonst nach oben bis 420 px Höhe */
+  function l6Karte(re) { return function () { var e = rhIm(k5Panel(), re); return e && (e.closest('.dp-pa-card') || k5Eng(e, 420)); }; }
   async function l6Ankauf() {   /* Ankauf-Kopie der Parkstr. 9, Pilot-Analyse offen */
     await r6KopieStart(R11_PARK, { ohneAnkauf: true });
     reiter('s5'); await warte(1200);
@@ -10988,7 +10990,7 @@
       async function (s) {   /* 1 · Übersicht */
         await l6Ankauf();
         await k5Tab(/^Übersicht/);
-        await zeige(function () { var e = qs('#s5 [data-dp-ekr]'); return (e && k5Eng(e, 260)) || k5Karte(/führend|Kaufpreis/)(); }, 8);
+        await zeige(function () { var e = qs('#s5 [data-dp-ekr]'); return (e && k5Eng(e, 260)) || l6Karte(/führend|Kaufpreis/)(); }, 8);
         await b2oZeile(s, 'Die Übersicht', 'Kaufpreis, maßgebender Wert mit führendem Verfahren, DSCR, Cashflow und EK-Rendite. Dazu der Investor Deal Score in zwei Teilen.');
       },
       async function (s) {   /* 2 · Ankauf · Soll · Zielbild */
@@ -10998,22 +11000,22 @@
       },
       async function (s) {   /* 3 · Wert & Lage */
         await k5Tab(/^Wert/);
-        await zeige(k5Karte(/führend|Ertragswert|Marktpreisindikation/), 8);
+        await zeige(l6Karte(/führend|Ertragswert|Marktpreisindikation/), 8);
         await b2oZeile(s, 'Wert und Lage', 'Führendes und stützendes Verfahren als Kacheln. Die Marktpreisindikation kommt aus Angeboten und ist kein Verkehrswert.');
       },
       async function (s) {   /* 4 · Steuer */
         await k5Tab(/^Steuer/);
-        await zeige(k5Karte(/Ergebnis aus Vermietung|Verlauf mit Steuern|AfA/), 8);
+        await zeige(l6Karte(/Ergebnis aus Vermietung|Verlauf mit Steuern|AfA/), 8);
         await b2oZeile(s, 'Steuer', 'AfA, Gebäudeanteil und Grenzsteuersatz als Kacheln, darunter das Ergebnis aus Vermietung Jahr für Jahr.');
       },
       async function (s) {   /* 5 · Haus & Unterlagen */
         await k5Tab(/^Haus/);
-        await zeige(k5Karte(/Risiken aus den Unterlagen|Unterlagen/), 8);
+        await zeige(l6Karte(/Risiken aus den Unterlagen|Unterlagen einlesen|Belege, Unterlagen/), 8);
         await b2oZeile(s, 'Haus und Unterlagen', 'Mietverträge, Protokolle und Wirtschaftsplan einlesen. Die Risiken stehen oben.');
       },
       async function (s) {   /* 6 · Potenzial & Risiken */
         await k5Tab(/^Potenzial/);
-        await zeige(k5Karte(/Hebel|rechtlich/), 8);
+        await zeige(l6Karte(/Hebel|rechtlich/), 8);
         await b2oZeile(s, 'Potenzial und Risiken', 'Deine Hebel und was rechtlich gilt, als kurze Karten.');
       },
       async function (s) {   /* 7 · Einfach und Detail */
@@ -11095,11 +11097,11 @@
       async function (s) {   /* 1 · Cockpit Steuer */
         await k5Cockpit();
         await k5Tab(/^Steuer/);
-        await zeige(k5Karte(/Ergebnis aus Vermietung/), 8);
+        await zeige(l6Karte(/Ergebnis aus Vermietung/), 8);
         await b2oZeile(s, 'Ergebnis aus Vermietung', 'Die Anlage V Jahr für Jahr. Grün heißt Verlust, die Steuer sinkt. Rot heißt Überschuss.');
       },
       async function (s) {   /* 2 · Kacheln */
-        await zeige(k5Karte(/AfA|Grenzsteuersatz/), 8);
+        await zeige(l6Karte(/AfA|Grenzsteuersatz/), 8);
         await b2oZeile(s, 'Die Eckdaten', 'AfA, Gebäudeanteil, Zehnjahresfrist und Grenzsteuersatz. Die Erklärung steht im Tooltip.');
       },
       async function (s) {   /* 3 · Verlauf mit Steuern im Tab Steuern */
@@ -11138,12 +11140,12 @@
       },
       async function (s) {   /* 4 · Potenzial & Exit */
         await k5Tab(/^Potenzial/);
-        await zeige(k5Karte(/rechtlich|Hebel/), 8);
+        await zeige(l6Karte(/rechtlich|Hebel/), 8);
         await b2oZeile(s, 'Was rechtlich gilt', 'Kappungsgrenze, Sperrfrist und Mietpreisbremse als kurze Karten. Der Rechenweg steht im Detail.');
       },
       async function (s) {   /* 5 · Jahresabgleich */
         await k5Tab(/^Jahresabgleich/);
-        await zeige(k5Karte(/zulässig/), 8);
+        await zeige(l6Karte(/zulässig/), 8);
         await b2oZeile(s, 'Im Jahresabgleich', 'Eingetragen, zulässig, Luft und ab wann. Jede Erhöhung wird an ihrem eigenen Tag geprüft.');
       }
     ]
@@ -11161,7 +11163,7 @@
         if (!q('#s5.active')) { reiter('s5'); await warte(900); }
         await warteAuf(function () { return q('#ai-content .dp-pa-tab'); }, 10000);
         await k5Tab(/^Haus/);
-        await zeige(k5Karte(/Risiken aus den Unterlagen/), 8);
+        await zeige(l6Karte(/Risiken aus den Unterlagen/), 8);
         await b2oZeile(s, 'Risiken zuerst', 'Was die Unterlagen an Risiken zeigen, steht oben. Je Jahr filterbar, im Detail mit Quelle.');
       },
       async function (s) {   /* 2 · Protokolle */
