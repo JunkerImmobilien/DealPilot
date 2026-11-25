@@ -3806,9 +3806,54 @@
     try {
       photos = _gewaehlteFotos(ov);   /* v2223: nur angehakte Gruppen */
     } catch (e) {}
+    /* v4700 · Verlauf für Haus & Unterlagen: Dateien und die im Quick-Check angehakten Werte merken, damit
+       applyQcPending beim Speichern als Objekt je Datei einen Eintrag schreibt. Bis v4690 blieb _dok_eingang
+       bei einem Objekt aus dem Quick-Check leer (gemessen an Lindenallee 14, 13 Unterlagen, 0 Einträge). */
+    try {
+      var _qcItems = [];
+      ov.querySelectorAll('.oabi-tbl input[type="checkbox"]:checked').forEach(function (cb) {
+        var id = cb.getAttribute('data-id'), it = id && _merged[id];
+        if (it && OBJ2QC[id]) _qcItems.push({ label: it.label, value: it.value, source: it.source });
+      });
+      _qcEingang = {
+        dateien: _files.filter(function (f) { return f.status === 'ok'; }).map(function (f) { return { name: f.name, typ: _dateiTyp(f), art: f.type }; }),
+        nicht: _files.filter(function (f) { return f.status !== 'ok'; }).map(function (f) { return f.name; }),
+        liste: _unterlagenListe().map(function (u) { return { label: u.label, datei: u.dateiname }; }),
+        qcItems: _qcItems
+      };
+    } catch (e) { _qcEingang = null; }
     var done = _oabiDone; _oabiDone = null;
     ov.remove();
     if (typeof done === 'function') { try { done({ qcData: qcData, pendingList: pendingList, photos: photos }); } catch (e) {} }
+  }
+  var _qcEingang = null;
+  function _dateiTyp(f) { return f.type === 'dokument' ? (f.dokLabel || 'Dokument') : f.type === 'rechnung' ? 'Rechnung' : f.type === 'market' ? 'Marktbericht' : 'Exposé'; }
+  /* v4700 · Aus welcher Datei kam ein Wert? source ist das Etikett der Unterlage (t.label), „Exposé“/„Marktbericht“
+     oder eine Sammelquelle („Unterlagen“). Sammelquellen haben keine Datei und bekommen eine eigene Zeile. */
+  function _dateiFuer(src, E) {
+    var s = String(src || '');
+    var u = E.liste.filter(function (x) { return x.label === s; })[0]; if (u) return u.datei;
+    var art = /^Mieterliste/.test(s) || s === 'Exposé' ? 'expose' : s === 'Marktbericht' ? 'market' : '';
+    var d = art && E.dateien.filter(function (x) { return x.art === art; })[0];
+    return d ? d.name : '';
+  }
+  /* v4700 · je gelesener Datei ein Verlaufseintrag (Art, Datum, übernommene Werte, Änderungen fürs Zurücknehmen) */
+  function _qcVerlauf(proItem, E) {
+    var D = window.DpEingang; if (!D || typeof D.protokoll !== 'function' || !E) return 0;
+    var B = {}, reihe = [];
+    function korb(k) { if (!B[k]) { B[k] = { w: [], a: [] }; reihe.push(k); } return B[k]; }
+    E.dateien.forEach(function (d) { korb(d.name); });
+    (E.qcItems || []).forEach(function (q) { korb(_dateiFuer(q.source, E)).w.push(q.label + ': ' + String(q.value).slice(0, 120)); });
+    proItem.forEach(function (p) { var b = korb(_dateiFuer(p.it.source, E)); b.w.push(p.it.label + ': ' + String(p.it.value).slice(0, 120)); b.a = b.a.concat(p.aend || []); });
+    var typ = {}; E.dateien.forEach(function (d) { typ[d.name] = d.typ; });
+    var n = 0;
+    reihe.forEach(function (k) {
+      var b = B[k]; if (!k && !b.w.length && !b.a.length) return;
+      D.protokoll({ quelle: 'Quick-Check', aenderungen: b.a, uebernommen: b.w, nicht_gelesen: [],
+        dokumente: [k ? { name: k, typ: typ[k] || 'Dokument' } : { name: 'alle Unterlagen zusammen', typ: 'Auswertung' }] }); n++;
+    });
+    (E.nicht || []).forEach(function (nm) { D.protokoll({ quelle: 'Quick-Check', aenderungen: [], uebernommen: [], nicht_gelesen: [nm], dokumente: [] }); n++; });
+    return n;
   }
   // v418: beim qc-save aufgerufen — Bucket B+C aus dem Stash ins frisch angelegte
   // Objekt schreiben (gleiche Schreiblogik wie applyMerged), gefiltert nach den im
@@ -3836,19 +3881,26 @@
     var n = 0, applied = [];
     var _mitUnterlagen = !!(_qcPendingMerged._dok_auswertung && (!targets || targets._dok_auswertung));
     _qcUebergabe = true;
+    var _E = window.DpEingang && window.DpEingang.txStart ? window.DpEingang : null, _proItem = [];   /* v4700 */
     try {
     Object.keys(_qcPendingMerged).forEach(function (id) {
       if (targets && !targets[id]) return;
       var it = _qcPendingMerged[id]; if (!it) return;
       if (!targets && it._aus) return;   /* v3349 · ohne Auswahl nur, was im Import angehakt war */
+      if (_E) _E.txStart();
+      var _vor = _E ? _E.feldStand(id) : null;
       var _art2 = _wertSchreiben(id, it);
+      if (_art2 && _E) { try { _E.feldGeaendert(id, _vor, it); } catch (e) {} }
+      var _aend = _E ? _E.txEnde() : [];
       if (_art2) {
         if (_art2 === "text" && id === "svwert") { try { markSvwertAvm(); } catch (e) {} }
-        n++; applied.push(id);
+        n++; applied.push(id); _proItem.push({ it: it, aend: _aend });
       }
     });
     } finally { _qcUebergabe = false; }
     _qcPendingMerged = {};
+    try { _qcVerlauf(_proItem, _qcEingang); } catch (e) { try { console.warn('[obj-actions] Verlauf nach Übergabe:', e); } catch (_) {} }
+    _qcEingang = null;
     if (_mitUnterlagen && applied.indexOf('_dok_auswertung') >= 0) _pilotNachUebergabe();
     try { if (typeof window._v236MarkQcLoaded === 'function' && applied.length) window._v236MarkQcLoaded(applied); } catch (e) {}
     try { if (typeof window.calc === 'function') window.calc(); } catch (e) {}
@@ -3961,7 +4013,7 @@
        gleicher Schreibweg inkl. Sterne + QC-Bucket-Logik). */
     _voice: {
       reset: function () { _merged = {}; _files = []; _importPhotos = []; _addrChoice = null; },
-      setMode: function (qc, done) { _qcMode = !!qc; _qcPendingMerged = {}; _oabiDone = (typeof done === 'function') ? done : null; },
+      setMode: function (qc, done) { _qcMode = !!qc; _qcPendingMerged = {}; _qcEingang = null; _oabiDone = (typeof done === 'function') ? done : null; },
       addRow: addRow,
       render: renderMergedTable,
       apply: applyMerged,
