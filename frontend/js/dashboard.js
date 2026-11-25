@@ -648,7 +648,7 @@
     var n = function(v){ return Math.round(num(v)); };
     return 'Rendite = Kategorie des Deal-Scores (' + n(gw) + ' % des Gesamt-Scores), NICHT die Bruttomietrendite. '
       + 'Je Objekt 0–100 Punkte aus vier Kennzahlen: Bruttomietrendite ' + n(sw.bruttorendite) + ' %, Nettomietrendite '
-      + n(sw.nettorendite) + ' %, Cashflow ' + n(sw.cashflow) + ' %, Cash-on-Cash ' + n(sw.cashOnCash)
+      + n(sw.nettorendite) + ' %, Cashflow ' + n(sw.cashflow) + ' %, EK-Rendite nach Steuer ' + n(sw.cashOnCash)
       + ' %. Über den Bestand nach Kaufpreis gewichtet.';
   }
   /* v4730 · EIN Wertansatz je Objekt für das ganze Portfolio-Cockpit (Kachel „Vermögen netto“, Bilanz heute,
@@ -3983,7 +3983,7 @@
     var ov=document.createElement('div'); ov.id='dp-score-modal-ov'; ov.className='dp-wk-modal-ov';
     ov.innerHTML='<div class="dp-wk-modal" style="max-width:430px">'
       + '<div class="dp-wk-modal-t">Volle 24-KPI-Analyse</div>'
-      + '<div class="dp-wk-modal-s">Im Investor-Plan fließen 24 Einzel-KPIs (ROE, Cash-on-Cash, DSCR, WALT, ESG …) in den Portfolio-Score und die Health-Leiste ein. Im Starter-Plan siehst du die Plan-Bewertung der fünf Kategorien.</div>'
+      + '<div class="dp-wk-modal-s">Im Investor-Plan fließen 24 Einzel-KPIs (ROE, EK-Rendite nach Steuer, DSCR, WALT, ESG …) in den Portfolio-Score und die Health-Leiste ein. Im Starter-Plan siehst du die Plan-Bewertung der fünf Kategorien.</div>'
       + '<button class="dp-wk-modal-x" onclick="DealPilotDashboard.closeScoreModal()">Verstanden</button></div>';
     ov.addEventListener('click',function(e){ if(e.target===ov) _scoreModalClose(); });
     document.body.appendChild(ov);
