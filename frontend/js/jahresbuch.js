@@ -349,7 +349,7 @@
   function fuehrendAus(D) {
     if (!D || !D.fuehrend) return null;
     var N = { ertragswert: 'Ertragswert', sachwert: 'Sachwert', vergleichswert: 'Vergleichswert' }, f = D[D.fuehrend];
-    if (f && f.wert > 0) return { art: D.fuehrend, name: N[D.fuehrend] + (f.vorlaeufig ? ' (vorläufig)' : ''), wert: f.wert, vorlaeufig: !!f.vorlaeufig, stufe_m: false,
+    if (f && f.wert > 0) return { art: D.fuehrend, name: N[D.fuehrend] + (f.vor_bog ? ' (vor besonderen objektspezifischen Grundstücksmerkmalen)' : (f.vorlaeufig ? ' (vorläufig)' : '')), wert: f.wert, vorlaeufig: !!f.vorlaeufig, stufe_m: false,
       lzs: D.fuehrend === 'ertragswert' && f.lzs_pct != null ? { pct: f.lzs_pct, stufe: f.lzs_stufe || null } : null };
     if (D.fuehrend === 'vergleichswert' && D.marktpreisindikation && D.marktpreisindikation.mitte > 0)
       return { art: 'vergleichswert_m', name: 'Marktpreisindikation', wert: D.marktpreisindikation.mitte, vorlaeufig: false, stufe_m: true, lzs: null };

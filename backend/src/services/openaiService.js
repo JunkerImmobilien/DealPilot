@@ -489,6 +489,9 @@ function buildPrompt(payload, opts) {
     '  KEIN Marktwert, nenne sie nie so. „Verkehrswert" bzw. „Marktwert" nur für ein Gutachten nach § 194 BauGB oder die',
     '  Bankbewertung. Werte des Marktberichts heißen nach ihrem Verfahren (Ertragswert, Sachwert, Vergleichswert) mit ihrer',
     '  Rolle „führend" oder „stützend". Nenne den Objektwert, von dem die App rechnet, mit genau seiner Herkunft.',
+    /* v4940 · vorläufiger Ertragswert ohne bezifferte boG ist maßgebend */
+    '  Ein „vorläufiger Ertragswert vor besonderen objektspezifischen Grundstücksmerkmalen" ist der Ertragswert, solange',
+    '  keine besonderen Merkmale beziffert sind. Nenne ihn mit diesem Zusatz, nicht als unsicher oder halben Wert.',
     '- Formuliere positiv-konkret: Ein LTV von 84 % ist SOLIDE und gehört in den',
     '  Stärken-Block, NICHT in die Risiken. Bezeichne diesen Bereich NIE als „hoch",',
     '  „relativ hoch" oder „erhöht" — das ist faktisch falsch und kontrastiert mit',

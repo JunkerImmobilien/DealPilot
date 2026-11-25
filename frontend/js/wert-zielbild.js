@@ -157,7 +157,7 @@
       abschlag_pct: ab, abschlag_herkunft: mitAb ? herkunftAbschlag(h.angebot_abschlag_herkunft) : null,
       ohne_abschlag: mitAb ? { unten: zahl(h.market_value_roh_low), mitte: roh, oben: zahl(h.market_value_roh_high) } : null,
       ertragswert: ew != null ? { wert: ew, von: zahl(h.ertragswert_von_eur), bis: zahl(h.ertragswert_bis_eur),
-        vorlaeufig: /vorläufig/.test(String(h.ertragswert_bezeichnung || '')), lzs_pct: zahl(h.lzs_pct), lzs_stufe: h.lzs_stufe || null } : null,
+        /* v4940 · Marcel 25.11.2026 („ja so machen“): der vorläufige Ertragswert vor besonderen objektspezifischen Grundstücksmerkmalen ist maßgebend, solange keine boG beziffert sind (sonst weist der Bericht den Ertragswert nach boG aus) */ vor_bog: /vor besonderen/.test(String(h.ertragswert_bezeichnung || '')), vorlaeufig: /vorläufig/.test(String(h.ertragswert_bezeichnung || '')) && !/vor besonderen/.test(String(h.ertragswert_bezeichnung || '')), lzs_pct: zahl(h.lzs_pct), lzs_stufe: h.lzs_stufe || null } : null,
       sachwert: sw != null ? { wert: sw, vorlaeufig: swVorl, faktor: zahl(h.sw_faktor) } : null,
       vergleichswert: vw != null ? { wert: vw, art: vwArt } : null,
       kaufpreis: kp, verfahren: []
@@ -166,7 +166,7 @@
     function z(s, name, zusatz, u, m, o, f) { V.push({ schluessel: s, name: name, zusatz: zusatz || null, unten: u, mitte: m, oben: o, fuehrend: !!f, abw_zur_mpi_pct: s === 'mpi' ? null : rund1(abw(m, mw)) }); }
     z('mpi', 'Marktpreisindikation', mitAb ? 'nach ' + dez(ab, 1) + ' % Abschlag auf Angebotspreise' : 'aus Angebotspreisen vergleichbarer Objekte', lo, mw, hi, fu === 'vergleichswert' && vw == null);
     if (mitAb) z('mpi_roh', 'ohne Abschlag', 'Angebotsniveau, wie es im Markt ausgeschrieben ist', D.ohne_abschlag.unten, roh, D.ohne_abschlag.oben, false);
-    if (ew != null) z('ertragswert', D.ertragswert.vorlaeufig ? 'Ertragswert (vorläufig)' : 'Ertragswert',
+    if (ew != null) z('ertragswert', D.ertragswert.vor_bog ? 'Ertragswert (vor besonderen objektspezifischen Grundstücksmerkmalen)' : (D.ertragswert.vorlaeufig ? 'Ertragswert (vorläufig)' : 'Ertragswert'),
       D.ertragswert.lzs_pct != null ? 'Liegenschaftszins ' + dez(D.ertragswert.lzs_pct, 2) + ' %' + (D.ertragswert.lzs_stufe ? ', Stufe ' + D.ertragswert.lzs_stufe : '') : null,
       D.ertragswert.von, ew, D.ertragswert.bis, fu === 'ertragswert');
     /* v2979 · wie wertvergleich.js: ohne Sachwertfaktor nur Plausibilitaet, kein Prozentabstand zur Marktpreisindikation */
