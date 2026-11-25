@@ -6,6 +6,7 @@
      data-als-tip=""            Ziel ist das Label des Feldes (.f > label) oder,
                                 ohne Feld, der Kartentitel (.ct / .card-title)
      data-als-tip="<Selektor>"  Ziel ausdrücklich (z. B. "#ze-auft > summary")
+     data-als-tip="<"           Ziel ist das Element direkt davor (Zwischentitel)
      data-als-tip-titel="…"     Titel des Tooltips, sonst der Text des Ziels
    Der Text bleibt im HTML (Suche, Co-Pilot, Prüfer), er wird nur ausgeblendet
    und als Tooltip der bestehenden Hilfe (tooltip-engine.js) registriert.
@@ -27,6 +28,7 @@
 
   function zielVon(h) {
     var sel = h.getAttribute('data-als-tip');
+    if (sel === '<') return h.previousElementSibling;
     if (sel) { try { return document.querySelector(sel) || (h.closest('label') && h.closest('label').querySelector(sel)); } catch (e) { return null; } }
     var f = h.closest('.f');
     if (f) { var l = f.querySelector(':scope > label'); if (l) return l; }
