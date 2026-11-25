@@ -1,0 +1,162 @@
+/* ════════════════════════════════════════════════════════════════════
+   v4660 · Ein Kachel-Baustein für Pilot-Analyse und Objekt-Cockpit
+   ────────────────────────────────────────────────────────────────────
+   Marcel 25.11.2026: „Vom Inhalt her passt das, rein optisch soll es
+   besser aussehen“ und „da ist die Schriftart auf einmal eine andere,
+   bitte alle Reiter durchgehen, Schriftart, Schriftgrößen, Farben“.
+
+   GEMESSEN (Westerfeldstr. 146, Staging, Layout Aktenmappe):
+   - Kachel-Beschriftungen kamen in drei Schriften: <span> in Inter
+     10,5 px (layout-varianten.css `.body span{font-family:… !important}`
+     schlägt die Mono-Regel der Pilot-Analyse), <small> in Potenzial &
+     Exit in JetBrains Mono 10 px, Haus & Unterlagen in Inter 12 px fett.
+   - Kachel-Zahlen in vier Größen: 20 px (Übersicht, Wert & Lage,
+     Steuer), 15 px (Jahresabgleich), 13,5 px (Potenzial & Exit),
+     12 px (Haus & Unterlagen).
+
+   TEIL A · gilt immer (auch Prod): EINE Stufenfolge
+     Beschriftung  Inter 10,5 px / 500, Versalien, Sperrung .06em
+     Zahl groß     Space Grotesk 20 px / 600 (Übersicht, Wert, Steuer)
+     Zahl klein    Space Grotesk 15 px / 600 (Potenzial, Jahresabgleich)
+     Unterzeile    Inter 12 px / 400
+   Die Beschriftung bleibt Inter, wie sie im Reiter Steuer erscheint,
+   den Marcel als Vorbild nennt. Die Augenbrauen der Grafiken (gx-eye)
+   bleiben Mono, sie gehören zum Grafik-Kopf.
+
+   TEIL B · Kachel-Optik, nur mit html[data-dp-kachel="a|b|c"]
+   (gesetzt von js/dp-kachel.js). Drei Entwürfe, bis Marcel wählt.
+   Statusfarben (Grün, Rot) bleiben fest, Akzent über Whitelabel-Token.
+   ════════════════════════════════════════════════════════════════════ */
+
+/* ── TEIL A ───────────────────────────────────────────────────────── */
+html .dp-pa-wrap[data-dp-pa-v4] .dp-pa4-z > span,
+html .dp-pa-wrap[data-dp-pa-v4] .dp-pap-rkk > small,
+html .dp-pa-wrap[data-dp-pa-v4] .dp-ja-pk > span,
+html .dp-pa-wrap[data-dp-pa-v4] .dp-eg-wohin li > b{
+  font-family:Inter,system-ui,sans-serif !important;
+  font-size:10.5px !important; font-weight:500 !important;
+  line-height:1.3 !important; letter-spacing:.06em !important;
+  text-transform:uppercase !important; color:#6B645A !important;
+}
+html .dp-pa-wrap[data-dp-pa-v4] .dp-pa4-z > b{
+  font-family:"Space Grotesk",Inter,sans-serif !important;
+  font-size:20px !important; font-weight:600 !important; line-height:1.25 !important;
+  font-variant-numeric:tabular-nums;
+}
+html .dp-pa-wrap[data-dp-pa-v4] .dp-pap-rkk > b,
+html .dp-pa-wrap[data-dp-pa-v4] .dp-ja-pk > b{
+  font-family:"Space Grotesk",Inter,sans-serif !important;
+  font-size:15px !important; font-weight:600 !important; line-height:1.3 !important;
+  font-variant-numeric:tabular-nums;
+}
+html .dp-pa-wrap[data-dp-pa-v4] .dp-pa4-z > em,
+html .dp-pa-wrap[data-dp-pa-v4] .dp-eg-wohin li > span{
+  font-family:Inter,system-ui,sans-serif !important;
+  font-size:12px !important; font-weight:400 !important; font-style:normal !important;
+  color:#6B645A !important;
+}
+html .dp-pa-wrap[data-dp-pa-v4] .dp-pa4-urteil .z{
+  font-family:"Space Grotesk",Inter,sans-serif !important;
+}
+@media (max-width:640px){
+  html .dp-pa-wrap[data-dp-pa-v4] .dp-pa4-z > b{font-size:17px !important}
+}
+
+/* ── TEIL B · gemeinsam für alle Entwürfe ─────────────────────────── */
+html[data-dp-kachel] .dp-pa-wrap[data-dp-pa-v4] .dp-pa4-z,
+html[data-dp-kachel] .dp-pa-wrap[data-dp-pa-v4] .dp-pap-rkk,
+html[data-dp-kachel] .dp-pa-wrap[data-dp-pa-v4] .dp-ja-pk,
+html[data-dp-kachel] .dp-pa-wrap[data-dp-pa-v4] .dp-eg-wohin li{
+  position:relative; transition:transform .15s ease, box-shadow .15s ease;
+}
+
+/* Score-Karte: Ring in der Stufenfarbe (--dpk-s Score, --dpk-t Farbe) */
+html[data-dp-kachel] .dp-pa-wrap[data-dp-pa-v4] .dp-pa4-urteil[data-dpk-s]{
+  gap:12px !important; padding:8px 14px 8px 8px !important;
+}
+html[data-dp-kachel] .dp-pa-wrap[data-dp-pa-v4] .dp-pa4-urteil[data-dpk-s] .z{
+  display:grid; place-items:center; width:52px; height:52px; border-radius:50%;
+  font-size:20px !important; color:#2A2727 !important;
+  background:
+    radial-gradient(closest-side, #fff 78%, transparent 80% 100%),
+    conic-gradient(var(--dpk-t,#C9A84C) calc(var(--dpk-s,0) * 1%), #EFEAE0 0);
+}
+html[data-dp-kachel] .dp-pa-wrap[data-dp-pa-v4] .dp-pa4-urteil[data-dpk-s] .u b{
+  color:var(--dpk-t,#2A2727) !important; text-transform:uppercase; letter-spacing:.06em; font-size:12px !important;
+}
+
+/* ── Entwurf A · Einzelkarten mit Akzentlinie ─────────────────────── */
+html[data-dp-kachel="a"] .dp-pa-wrap[data-dp-pa-v4] .dp-pa4-zahlen{
+  gap:10px !important; border:0 !important; border-radius:0 !important; overflow:visible !important;
+}
+html[data-dp-kachel="a"] .dp-pa-wrap[data-dp-pa-v4] .dp-pa4-z,
+html[data-dp-kachel="a"] .dp-pa-wrap[data-dp-pa-v4] .dp-pap-rkk,
+html[data-dp-kachel="a"] .dp-pa-wrap[data-dp-pa-v4] .dp-ja-pk,
+html[data-dp-kachel="a"] .dp-pa-wrap[data-dp-pa-v4] .dp-eg-wohin li{
+  background:#fff !important; border:1px solid #EFEAE0 !important; border-radius:12px !important;
+  border-top:3px solid var(--c,var(--wl-c9a84c,#C9A84C)) !important;
+  box-shadow:0 1px 2px rgba(42,39,39,.04), 0 4px 14px rgba(42,39,39,.05);
+  padding:12px 14px !important;
+}
+html[data-dp-kachel="a"] .dp-pa-wrap[data-dp-pa-v4] .dp-pap-rkk.warn{border-top-color:#B8625C !important}
+html[data-dp-kachel="a"] .dp-pa-wrap[data-dp-pa-v4] .dp-pa4-z:hover,
+html[data-dp-kachel="a"] .dp-pa-wrap[data-dp-pa-v4] .dp-pap-rkk:hover{
+  transform:translateY(-1px); box-shadow:0 2px 4px rgba(42,39,39,.05), 0 10px 22px rgba(42,39,39,.08);
+}
+html[data-dp-kachel="a"] .dp-pa-wrap[data-dp-pa-v4] .dp-pa4-z > b{font-size:22px !important}
+html[data-dp-kachel="a"] .dp-pa-wrap[data-dp-pa-v4] .dp-pap-rk,
+html[data-dp-kachel="a"] .dp-pa-wrap[data-dp-pa-v4] .dp-eg-wohin{
+  display:grid !important; grid-template-columns:repeat(auto-fill,minmax(170px,1fr)) !important; gap:10px !important;
+}
+
+/* ── Entwurf B · Cremekarten mit Seitenbalken ─────────────────────── */
+html[data-dp-kachel="b"] .dp-pa-wrap[data-dp-pa-v4] .dp-pa4-zahlen{
+  gap:8px !important; border:0 !important; overflow:visible !important;
+}
+html[data-dp-kachel="b"] .dp-pa-wrap[data-dp-pa-v4] .dp-pa4-z,
+html[data-dp-kachel="b"] .dp-pa-wrap[data-dp-pa-v4] .dp-pap-rkk,
+html[data-dp-kachel="b"] .dp-pa-wrap[data-dp-pa-v4] .dp-ja-pk,
+html[data-dp-kachel="b"] .dp-pa-wrap[data-dp-pa-v4] .dp-eg-wohin li{
+  background:#FBF6E9 !important; border:0 !important; border-radius:10px !important;
+  box-shadow:inset 4px 0 0 var(--c,var(--wl-c9a84c,#C9A84C));
+  padding:12px 14px 12px 18px !important;
+}
+html[data-dp-kachel="b"] .dp-pa-wrap[data-dp-pa-v4] .dp-pap-rkk.warn{box-shadow:inset 4px 0 0 #B8625C}
+html[data-dp-kachel="b"] .dp-pa-wrap[data-dp-pa-v4] .dp-pa4-z > b{font-size:22px !important}
+html[data-dp-kachel="b"] .dp-pa-wrap[data-dp-pa-v4] .dp-pap-rk,
+html[data-dp-kachel="b"] .dp-pa-wrap[data-dp-pa-v4] .dp-eg-wohin{
+  display:grid !important; grid-template-columns:repeat(auto-fill,minmax(170px,1fr)) !important; gap:8px !important;
+}
+
+/* ── Entwurf C · ruhiges Band mit Statuspunkt ─────────────────────── */
+html[data-dp-kachel="c"] .dp-pa-wrap[data-dp-pa-v4] .dp-pa4-zahlen{
+  background:linear-gradient(180deg,#fff,#FDFBF6) !important;
+  box-shadow:0 4px 18px rgba(42,39,39,.05);
+}
+html[data-dp-kachel="c"] .dp-pa-wrap[data-dp-pa-v4] .dp-pa4-z > span::before,
+html[data-dp-kachel="c"] .dp-pa-wrap[data-dp-pa-v4] .dp-pap-rkk > small::before{
+  content:""; display:inline-block; width:7px; height:7px; border-radius:50%;
+  background:var(--c,var(--wl-c9a84c,#C9A84C)); margin-right:6px; vertical-align:1px;
+}
+html[data-dp-kachel="c"] .dp-pa-wrap[data-dp-pa-v4] .dp-pap-rkk.warn > small::before{background:#B8625C}
+html[data-dp-kachel="c"] .dp-pa-wrap[data-dp-pa-v4] .dp-pa4-z > b{font-size:22px !important}
+html[data-dp-kachel="c"] .dp-pa-wrap[data-dp-pa-v4] .dp-pa4-z::after{
+  content:""; position:absolute; left:14px; right:14px; bottom:0; height:2px; border-radius:2px;
+  background:var(--c,transparent); opacity:.55;
+}
+html[data-dp-kachel="c"] .dp-pa-wrap[data-dp-pa-v4] .dp-pap-rk,
+html[data-dp-kachel="c"] .dp-pa-wrap[data-dp-pa-v4] .dp-eg-wohin{
+  display:grid !important; grid-template-columns:repeat(auto-fill,minmax(170px,1fr)) !important; gap:0 !important;
+  border:1px solid #EFEAE0 !important; border-radius:10px !important; overflow:hidden;
+}
+html[data-dp-kachel="c"] .dp-pa-wrap[data-dp-pa-v4] .dp-pap-rkk,
+html[data-dp-kachel="c"] .dp-pa-wrap[data-dp-pa-v4] .dp-eg-wohin li{
+  border:0 !important; border-right:1px solid #EFEAE0 !important; border-radius:0 !important;
+  background:#fff !important; padding:12px 14px !important;
+}
+
+@media (max-width:640px){
+  html[data-dp-kachel] .dp-pa-wrap[data-dp-pa-v4] .dp-pa4-z > b{font-size:18px !important}
+  html[data-dp-kachel] .dp-pa-wrap[data-dp-pa-v4] .dp-pap-rk,
+  html[data-dp-kachel] .dp-pa-wrap[data-dp-pa-v4] .dp-eg-wohin{grid-template-columns:repeat(2,minmax(0,1fr)) !important}
+}
