@@ -419,6 +419,12 @@
       '.mbst-info{margin-top:9px;padding:8px 10px;border-radius:6px;background:rgba(201,168,76,.10);',
         'font-size:11.5px;line-height:1.5}',
       '.mbst-info b{color:var(--wl-e8cc7a,#E8CC7A)}',
+      /* v4630 · Vorabprüfung der amtlichen Daten */
+      '.mbst-tiefe{margin-top:9px;padding:8px 10px;border-radius:6px;border:1px solid rgba(201,168,76,.22);font-size:11.5px;line-height:1.5}',
+      '.mbst-tiefe-t{font:600 9.5px/1.3 var(--mono,monospace);letter-spacing:.08em;text-transform:uppercase;opacity:.75;margin-bottom:3px}',
+      '.mbst-tiefe-z{display:grid;grid-template-columns:14px 1fr;gap:6px;margin-top:4px}',
+      '.mbst-tiefe-z span:first-child{font-weight:700;text-align:center}',
+      '.mbst-tiefe-k{margin-top:4px;opacity:.85}',
       /* ── v1202 · Die GEWÄHLTE Zeile muss man sehen, ohne sie zu suchen ────
          `.an` (erreicht) traegt bereits rgba(201,168,76,.13) — die Wahl
          braucht also etwas anderes als noch mehr Gold-Flaeche, sonst sind
@@ -624,11 +630,49 @@
       '<h4>Was soll der Bericht leisten?</h4>' +
       '<div class="mbst-sub">Tiefe wählen — der Preis richtet sich danach, nicht nach den Angaben.</div>' +
       ms +
-      '<div class="mbst-info">' + info + '</div>';
+      '<div class="mbst-info">' + info + '</div>' +
+      (g === 3 ? '<div class="mbst-tiefe" id="mbstTiefe">' + (_tiefe && _tiefe.html ? _tiefe.html : '') + '</div>' : '');
+    if (g === 3) tiefeHolen();
 
-    knopf(g);                                   /* v1202: der Preis folgt der WAHL */
+    knopf(g);                                  /* v1202: der Preis folgt der WAHL */
     feldMarken(g);                              /* v1199, seit v1202 fuer die Wahl */
   }
+  /* ── v4630 · Welche amtlichen Daten der Ort hat, BEVOR Stufe 3 abgerufen wird ──────────────────────
+     Marcel 25.11.2026: „ob wir für Stufe 3 die amtlichen Zahlen alle haben … damit er nicht etwas bezahlt, was er
+     nicht bekommt“. Der mb-Dienst fragt dieselben Zugänge wie der Bericht (lib/tiefe_vorab.js), keine zweite Rechnung.
+     Gefragt wird mit PLZ, Ort, Objektart, Fläche, Baujahr und ob eine Straße eingetragen ist. */
+  var _tiefe = null, _tiefeSchl = null, _tiefeUhr = null;
+  function tiefeHolen() {
+    var adr = wert('address'), m = /\b(\d{5})\b\s*([^,\d][^,]*)?/.exec(adr);
+    var plz = m ? m[1] : '', ort = m && m[2] ? m[2].trim() : '';
+    var vorn = adr.split(',')[0] || '', str = /\D{3,}\s*\d/.test(vorn) && !/^\s*\d{5}/.test(vorn) ? '1' : '0';
+    var schl = [plz, ort, wert('ptype'), str].join('|');
+    if (schl === _tiefeSchl) return;
+    _tiefeSchl = schl;
+    clearTimeout(_tiefeUhr);
+    _tiefeUhr = setTimeout(function () {
+      var box = $('mbstTiefe');
+      if (!/^\d{5}$/.test(plz)) { _tiefe = { html: '<div class="mbst-tiefe-k">Mit der Postleitzahl in der Anschrift zeigen wir hier vorab, welche amtlichen Daten es für den Ort gibt.</div>' }; if (box) box.innerHTML = _tiefe.html; return; }
+      var tok = null; try { tok = localStorage.getItem('ji_token'); } catch (e) {}
+      var q = '?plz=' + plz + '&ort=' + encodeURIComponent(ort) + '&objektart=' + encodeURIComponent(String(wert('ptype') || '').toLowerCase())
+        + '&wfl=' + encodeURIComponent(wert('area')) + '&baujahr=' + encodeURIComponent(wert('year')) + '&strasse=' + str;
+      fetch('/api/v1/marktbericht/tiefe-vorab' + q, { headers: tok ? { Authorization: 'Bearer ' + tok } : {} })
+        .then(function (x) { return x.ok ? x.json() : null; })
+        .then(function (t) {
+          if (schl !== _tiefeSchl) return;
+          var Z = { ja: '✓', teils: '◐', nein: '✕' }, F = { ja: '#3FA56C', teils: '#b8932f', nein: '#B8625C' };
+          var e = function (s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
+          _tiefe = { html: (!t || !t.verfuegbar || !Array.isArray(t.punkte))
+            ? '<div class="mbst-tiefe-k">' + e((t && t.text) || 'Die Vorabprüfung der amtlichen Daten ist gerade nicht erreichbar. Der Bericht zeigt je Verfahren, womit er rechnet.') + '</div>'
+            : '<div class="mbst-tiefe-t">Was es für diesen Ort amtlich gibt</div><div class="mbst-tiefe-k"><b>' + e(t.kurz) + '</b></div>'
+              + t.punkte.map(function (p) { return '<div class="mbst-tiefe-z"><span style="color:' + (F[p.ok] || 'inherit') + '">' + (Z[p.ok] || '') + '</span><span><b>' + e(p.name) + '</b> ' + e(p.text) + '</span></div>'; }).join('')
+              + '<div class="mbst-tiefe-k">' + e(t.hinweis || '') + '</div>' };
+          var b = $('mbstTiefe'); if (b) b.innerHTML = _tiefe.html;
+        })
+        .catch(function () {});
+    }, 500);
+  }
+
   /* Der Preis wandert an den Erzeugen-Knopf — dort wird er ausgegeben. */
   function knopf(s) {
     var b = $('goBtn');

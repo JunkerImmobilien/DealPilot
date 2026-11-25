@@ -703,6 +703,7 @@ const SCHEMATA = {
       '  "stichtag": string DD.MM.JJJJ|null,',
       '  "objektart": string|null, "wohnflaeche_m2": number|null, "grundstuecksflaeche_m2": number|null, "baujahr": number|null,',
       '  "nettokaltmiete_monat_eur": number|null (tatsaechliche Kaltmiete des Objekts im Monat in Euro, NICHT eine Marktmiete je m2),',
+      '  "strasse": string|null (Strasse und Hausnummer DES BEWERTETEN OBJEKTS, z. B. "Musterweg 12", nie die Anschrift eines Auftraggebers, Ausschusses oder Vergleichsobjekts),',
       '  "plz": string|null, "ort": string|null',
       '}'
     ],
