@@ -17,7 +17,7 @@ router.use(authenticate);
 
 // ── Schemas ──────────────────────────────────────────
 const objectBodySchema = z.object({
-  data: z.record(z.any()).optional().default({}),
+  data: z.record(z.string(), z.any()).optional().default({}),
   aiAnalysis: z.string().nullable().optional(),
   photos: z.array(z.string()).optional().default([]),
   expectedVersion: z.number().int().positive().optional()
@@ -280,7 +280,7 @@ router.post('/track-usage', validate({ body: trackUsageSchema }), async (req, re
 // Nutzt JSONB-Merge damit andere Felder in data unberuehrt bleiben.
 router.post('/:id/steuer-snapshot',
   validate({ params: idParamSchema, body: z.object({
-    wk_per_year: z.record(z.union([z.number(), z.string()]))
+    wk_per_year: z.record(z.string(), z.union([z.number(), z.string()]))
   }).strict() }),
   async (req, res, next) => {
     try {

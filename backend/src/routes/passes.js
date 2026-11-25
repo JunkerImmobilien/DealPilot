@@ -21,7 +21,7 @@ const extendBody = z.object({
 // qb-snapshot: Zwischenspeicher-Pass (KEIN echtes Objekt) — Score erreichbar im QC
 const snapBody = z.object({
   code: z.string().min(4).max(16).regex(/^[0-9A-Za-z]+$/).optional(),
-  data: z.record(z.any()),
+  data: z.record(z.string(), z.any()),
   photos: z.array(z.string()).max(6).optional(),   /* qb-snap-photos */
   title: z.string().max(255).optional(),
   days: z.number().int().min(1).max(30).optional()
