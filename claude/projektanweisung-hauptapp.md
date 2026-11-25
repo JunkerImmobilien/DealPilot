@@ -45530,3 +45530,10 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Nachweis (Staging, Demokonto 18 Objekte):** 18 Karten, 12 Fotos, 6 Lagekarten; Hell 0 dunkle Flächen, Dunkel 0 helle Flächen; 390-px-Rahmen scrollWidth = clientWidth, eine Spalte; Partnerfarbe Blau färbt Gold-Ringe, Grün/Rot fest; Drehen per Klick und Enter, EK-Klick schaltet 31,6 % → 18,9 % ohne zu drehen; Baukasten: Objektmatrix erste und aktive Vorlage. Prüfer: buster-ebenen SAUBER, vorschau, ek-rendite 51/51, score-ketten 216, gold-audit Staging/Prod RC 0. Prod: Sicherung haupt-/mb-20261125-0748-v4690 (7,0/31 MB, Kopf gelesen), curl liefert v4690a, version 201.
 - **Commit:** staging 52bf50c3, dc26e388 · main 7290be02, 7b3ba726, Version f28ccb4a.
 - **Rest:** Prod nicht eingeloggt nachgemessen. Lagekarten laden je Sitzung neu (Geocoder gecacht). Die Rückseite zeigt die gewählte EK-Stufe für alle Karten gleich (Verhalten von ek-rendite-ui).
+
+### Rollout 1.0.200 / 1.0.202 · einzelcheck-5/5a (Fork W3)
+
+- **Was:** Deal-Check-Werte gehen nur nach einem echten Deal-Check-Lauf in den Einzel-Check (dp2-dealcheck.js `gelaufen`, einzelcheck.js `grundVorbelegt`). Ergebnis ohne Unterlagen ohne „Alle 1 Unterlagen“ und ohne leeren Ausgelesen-Kasten. Landing Prod/Staging durchgeprüft (Links, Konsole, Modale, 390 px).
+- **Commit:** staging cf52bd12, 33358c4d · main 43989821, bf77938b, ab46c4e4, b2406b76.
+- **Nachweis:** einzelcheck-pruefen grün mit Teil T und drei Gegenproben, buster-ebenen sauber, Prod im Browser gemessen bis vor die Zahlung.
+- **Rest:** keine Testzahlung. Black Friday im Browser mit Flyer-Code aus (gewollt).
