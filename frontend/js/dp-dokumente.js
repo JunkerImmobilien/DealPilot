@@ -160,6 +160,8 @@
   }
   /* v4800 · Marcel 25.11.2026: Investor Deal Score immer mit seinen zwei Scores, dann kein zweiter Deal Score daneben */
   function scTeile(SC) { return (SC && SC.investor && SC.inv != null && SC.fin != null) ? 'Investment ' + SC.inv + ' · Finanzierung ' + SC.fin : ''; }
+  /* v4860a · Wort am Investor Deal Score wie in der App: die Stufe (69 → Solide), nicht die Profil-Empfehlung („Verhandeln“) */
+  function igWort(IG) { try { if (window.ScoreTier && IG && IG.score != null) return ScoreTier.stufe(IG.score).wort; } catch (e) {} return (IG && ((IG.empfehlung && IG.empfehlung.text) || IG.stufe)) || ''; }
   function scKachel(B, SC) {
     return SC.investor ? { l: 'Investor Deal Score', v: SC.score ? B.zahl(SC.score, 0) + ' / 100' : '–', s: [SC.label, scTeile(SC)].filter(Boolean).join(' · '), art: 'hi' }
       : { l: 'Deal Score', v: SC.score ? B.zahl(SC.score, 0) + ' / 100' : '–', s: SC.label || '', art: 'hi' };
@@ -1122,7 +1124,7 @@
     /* Marcel 25.11.2026: der Investor Deal Score steht immer mit zwei Scores (Investment und Finanzierung), der Deal Score nicht zusätzlich */
     var ds2 = null; try { ds2 = typeof window._dpComputeDS2Cached === 'function' ? window._dpComputeDS2Cached() : window._dpLastDS2Result; } catch (e) { ds2 = null; }
     var IG = ds2 && ds2.gesamt ? ds2.gesamt : null, II = ds2 && ds2.investment, IF = ds2 && ds2.finanzierung;
-    var idsKz = IG ? { l: 'Investor Deal Score', v: B.zahl(IG.score, 0) + ' / 100', s: (IG.empfehlung && IG.empfehlung.text) || IG.stufe || '' } : { l: 'Deal Score', v: SC.score ? B.zahl(SC.score, 0) + ' / 100' : '–', s: SC.label || '' };
+    var idsKz = IG ? { l: 'Investor Deal Score', v: B.zahl(IG.score, 0) + ' / 100', s: igWort(IG) || '' } : { l: 'Deal Score', v: SC.score ? B.zahl(SC.score, 0) + ' / 100' : '–', s: SC.label || '' };
     var Sx = [B.deckblatt(c, { bild: fotos[0] || info.karte || null, eyebrow: name, titel: o.adresse, unter: [o.art, o.wfl ? B.zahl(o.wfl, 0) + ' m² Wohnfläche' : '', o.bj ? 'Baujahr ' + B.jahr(o.bj) : '', K.kp ? 'Kaufpreis ' + B.eur(K.kp) : ''].filter(Boolean).join(' · '),
       kz: [mw ? { l: mw.name + ', führend', v: B.eur(mw.wert) } : { l: 'Gesamtinvestition', v: B.eur(K.gi) }, idsKz, { l: 'Cashflow vor Steuern', v: B.eurS(K.cf_m), s: 'im Monat nach Finanzierung', art: (K.cf_m || 0) >= 0 ? 'gut' : 'schlecht' }, { l: 'DSCR', v: B.zahl(K.dscr, 2), s: 'volles Jahr, heutige Eingaben' }],
       meta: [['Objekt-Nr.', o.seq || '–'], ['Stand', c.stand], ['Bewertungsstichtag', S0.wert_anker && S0.wert_anker.datum ? B.datum(S0.wert_anker.datum) : '–']],
@@ -1146,7 +1148,7 @@
     var kat = ds2 && (ds2.categories || ds2.kategorien), teil = [];
     if (kat && typeof kat === 'object') teil = (Array.isArray(kat) ? kat : Object.keys(kat).map(function (k) { var x = kat[k] || {}; return { name: x.label || x.name || k, score: x.score }; }))
       .map(function (x) { var n = String(x.name || x.label || ''); return { l: GN[n] || n, v: da(x.score) === null ? '–' : B.zahl(x.score, 0), s: 'von 100' }; });
-    var scoreBlock = IG ? '<div class="zwei"><div>' + B.scoreRing(IG.score, (IG.empfehlung && IG.empfehlung.text) || IG.stufe, 'Investor Deal Score von 100') + '<p class="det">Investor Deal Score: das Objekt aus Sicht des Investmentprofils, in zwei Scores. Rendite mit der EK-Rendite nach Steuer.</p></div><div>'
+    var scoreBlock = IG ? '<div class="zwei"><div>' + B.scoreRing(IG.score, igWort(IG), 'Investor Deal Score von 100') + '<p class="det">Investor Deal Score: das Objekt aus Sicht des Investmentprofils, in zwei Scores. Rendite mit der EK-Rendite nach Steuer.</p></div><div>'
       + B.kacheln([{ l: 'Investment-Score', v: B.zahl(II.score, 0) + ' / 100', s: (II.stufe || '') + (II.anteil != null ? ' · Anteil ' + B.pct(II.anteil, 1) : '') },
         { l: 'Finanzierungs-Score', v: B.zahl(IF.score, 0) + ' / 100', s: (IF.stufe || '') + (IF.gedeckelt && IF.deckel ? ' · gedeckelt: ' + IF.deckel : '') }]).replace('class="kz"', 'class="kz" style="grid-template-columns:1fr 1fr"')
       + '</div></div>' + (teil.length ? '<h3>Gruppen des Investor Deal Score</h3>' + B.kacheln(teil, true) : '') : B.scoreRing(SC.score, SC.label);
