@@ -360,7 +360,7 @@
       DpObjektmatrix.nachladen(hosts.om);
       try { if (window.DpEkrUi && DpEkrUi.anwenden) DpEkrUi.anwenden(); } catch (e) {}
     }
-    else host.innerHTML = T.kopf + T.ob + T.bk + T.det;
+    if (!hosts) host.innerHTML = T.kopf + T.ob + T.bk + T.det;   /* v4730 · seit v4690 hing das „else“ an der Objektmatrix: ohne sie standen Cashflow, Finanzierung und Details doppelt im Kopf */
     (hosts ? hosts.kopf : host).setAttribute('data-gp-pruef', nOk + '/' + P.length);
     return true;
   }
