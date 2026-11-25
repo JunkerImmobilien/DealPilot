@@ -10775,6 +10775,17 @@
     await warteAuf(function () { return q('#ai-content .dp-pa-tab'); }, 10000);
     await warte(800);
   }
+  /* das Cockpit setzt nach dem Laden mehrmals den ersten Unterreiter nach (objekt-cockpit.js v4540, ohne echten Klick);
+     deshalb wird der Unterreiter so lange gewählt, bis er wirklich offen ist */
+  async function k5Tab(re) {
+    for (var i = 0; i < 8; i++) {
+      await r11PaTab(re);
+      var an = q('#ai-content .dp-pa-tab.active');
+      if (an && re.test(r6Text(an))) { await warte(400); an = q('#ai-content .dp-pa-tab.active'); if (an && re.test(r6Text(an))) return true; }
+      await warte(700);
+    }
+    return false;
+  }
   function k5EkrZurueck() { try { sessionStorage.removeItem('dp_ekr_stufe'); } catch (e) {} }
 
   DREHBUECHER['neu-objekt-cockpit'] = {
@@ -10788,22 +10799,22 @@
         await b2oZeile(s, 'Gewonnen heißt Bestand', 'Ein gewonnenes Objekt öffnet direkt im <b>Objekt-Cockpit</b>, ganz vorne und in Gold.');
       },
       async function (s) {   /* 2 · Übersicht */
-        await r11PaTab(/^Übersicht/);
+        await k5Tab(/^Übersicht/);
         await zeige(function () { var e = qs('#s5 [data-dp-ekr]'); return (e && e.parentNode) || k5Karte(/führend/)(); }, 8);
         await b2oZeile(s, 'Übersicht', 'Kaufpreis, maßgebender Wert mit führendem Verfahren, DSCR, Cashflow und EK-Rendite auf einen Blick.');
       },
       async function (s) {   /* 3 · Ankauf · Bestand · Zielbild */
-        await r11PaTab(/Ankauf · Bestand/);
+        await k5Tab(/Ankauf · Bestand/);
         await zeige(function () { var e = rhIm(k5Panel(), /Nettokaltmiete/); return e && (e.closest('table') || e); }, 8);
         await b2oZeile(s, 'Ankauf, Bestand, Zielbild', 'Eine Tabelle: der Kauf, heute, nach Mieterhöhung und das Zielbild, Zeile für Zeile.');
       },
       async function (s) {   /* 4 · Steuer */
-        await r11PaTab(/^Steuer/);
+        await k5Tab(/^Steuer/);
         await zeige(k5Karte(/Ergebnis aus Vermietung|Verlauf mit Steuern/), 8);
         await b2oZeile(s, 'Steuer', 'Die Anlage V Jahr für Jahr. Grün heißt Verlust, die Steuer sinkt. Rot heißt Überschuss.');
       },
       async function (s) {   /* 5 · Haus & Unterlagen */
-        await r11PaTab(/^Haus/);
+        await k5Tab(/^Haus/);
         await zeige(k5Karte(/Risiken aus den Unterlagen|Hausgeld/), 8);
         await b2oZeile(s, 'Haus und Unterlagen', 'Oben die Risiken aus Protokollen und Abrechnungen, darunter Hausgeld, Rücklage und deine Dokumente.');
       }
@@ -10817,7 +10828,7 @@
     szenen: [
       async function (s) {   /* 1 · Zeitstrahl */
         await k5Cockpit();
-        await r11PaTab(/^Jahresabgleich/);
+        await k5Tab(/^Jahresabgleich/);
         await warte(900);
         await zeige(k5Karte(/abschließen|vorbereiten/), 8);
         await b2oZeile(s, 'Der Zeitstrahl', 'Vom Kauf bis zum Ende der Zinsbindung. Künftige Jahre sind grau, jedes Jahr zeigt, wie weit es fertig ist.');
@@ -10887,7 +10898,7 @@
     szenen: [
       async function (s) {   /* 1 · Meine Dokumente */
         await k5Cockpit();
-        await r11PaTab(/^Haus/);
+        await k5Tab(/^Haus/);
         await zeige(k5Karte(/Meine Dokumente|Eingelesen und übernommen/), 8);
         await b2oZeile(s, 'Eingelesen und aufbewahrt', 'Jede eingelesene Unterlage mit Zuordnung, die Originale nach Jahr, dazu die Belegung deiner Ablage.');
       },
@@ -10909,7 +10920,7 @@
     szenen: [
       async function (s) {   /* 1 · die Kachel */
         await k5Cockpit();
-        await r11PaTab(/^Übersicht/);
+        await k5Tab(/^Übersicht/);
         var k = function () { return qs('#s5 [data-dp-ekr]'); };
         await zeige(k, 10);
         await b2oZeile(s, 'Die EK-Rendite', 'Angezeigt wird die Hauptkennzahl: nach Steuer, mit Tilgung und Wertzuwachs.');
