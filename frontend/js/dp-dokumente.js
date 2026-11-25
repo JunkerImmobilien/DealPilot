@@ -1152,10 +1152,12 @@
     add('Fazit und Kernaussagen', 'Was dafür spricht, worauf zu achten ist, Kernaussagen', punkte('Was dafür spricht', pk) + punkte('Worauf zu achten ist', rk) + (kernL ? '<h3>Kernaussagen</h3>' + kernL : '')
       + '<div class="hinweis">Orientierung für die Entscheidung, keine Rechts-, Steuer- oder Finanzierungsberatung. Alle Werte sind indikativ.</div>', kombi ? 2 : 1);
 
+    /* Kombi: Teil B (Vertiefung) steht immer hinter Teil A, die Reihenfolge innerhalb der Teile bleibt */
+    if (kombi) { var ord = T.map(function (t, i) { return i; }).sort(function (a, b) { return ((T[a][2] || 1) - (T[b][2] || 1)) || (a - b); }); T = ord.map(function (i) { return T[i]; }); P = ord.map(function (i) { return P[i]; }); }
     var mark = function (html, k) { return html.replace('<section class="seite', '<section data-dp-abschnitt="' + k + '" class="seite'); };
     var nA = 0, nB = 0;
-    var TT = T.map(function (t, i) { var nr = !kombi ? String(i + 1) : (t[2] === 2 ? 'B' + (++nB) : 'A' + (++nA)); return [t[0], t[1], nr, 'a' + (i + 1)]; });
-    Sx.push(inhaltSeite(c, B, TT.concat([['Quellen, Methodik und Annahmen', 'Quellen, Methodik, Annahmen, Hinweise', 'Q', 'anh']])));
+    var TT = T.map(function (t, i) { var nr = !kombi ? String(i + 1) : (t[2] === 2 ? 'B' + (++nB) : 'A' + (++nA)); return [t[0], kombi ? '' : t[1], nr, 'a' + (i + 1)]; });
+    Sx.push(inhaltSeite(c, B, TT.concat([['Quellen, Methodik und Annahmen', kombi ? '' : 'Quellen, Methodik, Annahmen, Hinweise', 'Q', 'anh']])));
     P.forEach(function (p, i) {
       var eb = kombi ? (p[2] === 2 ? 'Teil B · Vertiefung' : 'Teil A · Überblick') : 'Abschnitt ' + (i + 1);
       Sx.push(mark(B.seite(c, p[0], B.abschnitt(eb, p[0]) + p[1]), 'a' + (i + 1)));
