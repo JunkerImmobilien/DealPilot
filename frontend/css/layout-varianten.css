@@ -9803,6 +9803,9 @@ html[data-dk-drei][data-dk-stil="reiter"] .dk-schalter.dk-drei .dk-seg.aktiv{
 }
 html[data-dk-drei][data-dk-stil="reiter"] .dk-schalter.dk-drei .dk-seg.aktiv .dk-ico{ opacity:1; }
 html[data-dk-drei][data-dk-stil="reiter"] .dk-schalter.dk-drei .dk-seg.aktiv b{ background:var(--wl-c9a84c,#C9A84C); color:#1b1508 !important; }
+/* v4710 · Marcel wählt reiter: lesbar auch bei dunkler Partnerfarbe (Navy gemessen: Plakette 1,58, Text 3,26). Plakette und Text mit Creme gemischt. */
+html[data-dk-drei][data-dk-stil="reiter"] .dk-schalter.dk-drei .dk-seg.aktiv b{ background:color-mix(in srgb, var(--wl-c9a84c,#C9A84C) 45%, #F0EADE) !important; color:#1b1508 !important; }
+html[data-dk-drei][data-dk-stil="reiter"] .dk-schalter.dk-drei .dk-seg.aktiv, html[data-dk-drei][data-dk-stil="reiter"][data-dp-layout] aside#sidebar.sidebar .dk-schalter.dk-drei .dk-seg.aktiv{ color:color-mix(in srgb, var(--wl-e8cc7a,#E8CC7A) 55%, #F0EADE) !important; }
 
 /* ── Variante C · runway: Leiste im Luftfahrt-Stil ── */
 html[data-dk-drei][data-dk-stil="runway"] .dk-schalter.dk-drei{
