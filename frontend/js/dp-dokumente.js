@@ -1075,7 +1075,22 @@
       return '>' + t.replace(/\s[–—]\s/g, ', ').replace(/^\s*[–—]\s+(?=\S)/, '').replace(/(&[#a-zA-Z0-9]+;)|;\s/g, function (x, ent) { return ent || ', '; }) + '<';   /* v4790l · Entitäten wie &amp; bleiben */
     });
   }
+  /* v4860 · Marcel 25.11.2026 (Investment-PDF „mit den neuen Zahlen“): Die KI nennt die Marktpreisindikation des Marktberichts
+     „Marktwert“. Maßgebend ist aber der Wert des Hauses als Ganzes (Entscheidung 24.11.), und die Marktpreisindikation ist
+     kein Verkehrswert. Im Investment-PDF heißt sie deshalb im KI-Text „Marktpreis“ (gleiches Geschlecht, Sätze bleiben
+     grammatisch). Nur die KI-Texte, nie die eigenen Beschriftungen. Die Ursache sitzt im Prompt (openaiService). */
+  function kiBegriffe(v) {
+    if (typeof v === 'string') return v.replace(/Marktwert(e?s)?(?![a-zäöüß])/g, function (m, g) { return g ? 'Marktpreises' : 'Marktpreis'; }).replace(/Marktwerte(?![a-zäöüß])/g, 'Marktpreise');
+    if (Array.isArray(v)) return v.map(kiBegriffe);
+    if (v && typeof v === 'object') { var o = {}; Object.keys(v).forEach(function (k) { o[k] = kiBegriffe(v[k]); }); return o; }
+    return v;
+  }
   async function investmentNeu(fassung) {
+    var alt = window._aiAnalysis;
+    try { if (alt) window._aiAnalysis = kiBegriffe(alt); return await investmentNeuInnen(fassung); }
+    finally { window._aiAnalysis = alt; }
+  }
+  async function investmentNeuInnen(fassung) {
     /* v4790b · Reihenfolge (Marcel 25.11.): erst das Objekt, dann Miete, Finanzierung, Wert, Rendite, Steuer; Fazit mit den
        Kernaussagen am Schluss vor Quellen und Methodik. Der Deal Score steht mit seinen Teilscores auf „Auf einen Blick“,
        keine eigene Seite. */
