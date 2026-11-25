@@ -143,7 +143,15 @@
   }
   function saeubern(c) {
     [].forEach.call(c.querySelectorAll('[id]'), function (n) { n.removeAttribute('id'); }); c.removeAttribute('id');
-    [].forEach.call(c.querySelectorAll('button,a,input,select,textarea,[tabindex]'), function (n) { n.setAttribute('tabindex', '-1'); });
+    [].forEach.call(c.querySelectorAll('[tabindex]'), function (n) { n.setAttribute('tabindex', '-1'); });
+    /* Bedienelemente im Bild werden zu reinen Spans: ein <button> im Bild würde den Knopf der Palette bzw. Vorlage
+       beim Einlesen des HTML schließen (verschachtelte Knöpfe sind nicht erlaubt) und das Fenster zerreißen */
+    [].slice.call(c.querySelectorAll('button,a,select,textarea,input,label')).reverse().forEach(function (n) {   /* innen zuerst */
+      var s = document.createElement('span'); s.className = n.className; var st = n.getAttribute('style'); if (st) s.setAttribute('style', st);
+      s.style.display = s.style.display || (/^(INPUT|SELECT|TEXTAREA)$/.test(n.tagName) ? 'inline-block' : '');
+      s.innerHTML = n.tagName === 'INPUT' ? esc(n.value || n.getAttribute('placeholder') || '') : n.tagName === 'SELECT' ? esc((n.options[n.selectedIndex] || {}).text || '') : n.innerHTML;
+      if (n.parentNode) n.parentNode.replaceChild(s, n);
+    });
     c.classList.remove('gp-aus'); c.style.order = ''; c.style.margin = '0'; c.style.display = '';
     return c;
   }
