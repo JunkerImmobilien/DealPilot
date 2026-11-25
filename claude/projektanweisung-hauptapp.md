@@ -45637,6 +45637,16 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Nachweis:** Muster `Dateien/Investment-PDF/v4790/*-v4790b.pdf`, jede Seite gerendert und angesehen (A 13/12, B 32/28, C 14/13 Seiten).
 - **Rest:** nicht auf Prod; KI-Texte älter als die Zahlen bis zum nächsten Abruf; drei dünne Fortsetzungsseiten in der Kombi.
 
+### v4790i–v4790l · Muster v4790c nach Marcels Rückmeldung (Fork LL4, nur Staging)
+
+- **Wert, Verfahren und Rechenweg** ist ein Abschnitt. Passt der Rechenweg nicht mehr auf die Wertseite, beginnt er geschlossen auf der Folgeseite (sonst zerfiel er in Bodenwert hier, Ertragswert dort). Ohne Stufe-3-Bericht heißt der Abschnitt nur „Wert und Verfahren“.
+- **DSCR und LTV im Verlauf** stehen in allen drei Fassungen nebeneinander auf „Finanzierung und Anschluss“ (`bankCockpit(B, true)`). Die großen Verläufe sind raus: Bankfassung heißt jetzt „Sicherheiten und Belastungsprobe“, die Kombi „Investition, Finanzierung und Belastungsprobe“ (Teil B).
+- **Score-Ring:** `DpDokument.scoreRing(score, wort, unter)`, drittes Argument optional, Vorgabe bleibt „Deal Score von 100“ (alle anderen Aufrufer unverändert). Muster: „Investor Deal Score von 100“. In „Alle Kennzahlen“ steht nur die Kachel Investor Deal Score mit Teilscores.
+- **Kombi dünner Seiten entledigt:** Mieterliste vor dem Ertrag in Teil B statt allein auf einer Seite, Ertrag + Kennzahlen + Cashflow je Jahr ein Abschnitt, Wertüberleitung ohne erzwungenen Umbruch.
+- **Falle:** `ohneStriche()` machte aus `&amp; ` ein `&amp, ` (Semikolon der Entität ersetzt) → im KI-Text stand „Lage &, Markt“. Jetzt bleiben Entitäten heil.
+- **opt.css (Hinweis PP4):** gemessen per grep: nur `landing/einzelcheck.js:1624` gibt `opt.css` mit. Investment-PDF live, Muster, Bank-PDF, Kurzfassung, Bankexport (`{quer:true}`) geben keins mit, ihr Layout ändert sich durch einzelcheck-10 nicht.
+- **Muster:** `Dateien/Investment-PDF/v4790/*-v4790c.pdf` (b bleibt). Rest: Hauptstr. 51 hat keinen Ertragswert (nur Marktpreisindikation), die Wertseite ist dort kurz, KI-Texte älter als die Zahlen.
+
 ### Rollout 1.0.216 · einzelcheck-10/10a (Fork PP4)
 - **Was:** Einzel-Check-PDF: `DpDokument.dokument()` nimmt `opt.css` (fiel bisher still weg, daher kein Abstand nach der Mietpotenzial-Tabelle). Grundangaben MFH: Anzahl Wohnungen + Ausstattung (Sachwert braucht NHK-Typ und Standardstufe). Anschrift nur im Browser-Tab (sessionStorage), Hinweisfeld im Notweg.
 - **Commit:** staging 6d9a89e7, 11483e54, 1dfba881 · main a4f00529, 3b41faea, ab5dd6d2.
