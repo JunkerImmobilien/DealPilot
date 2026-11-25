@@ -45491,3 +45491,12 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** staging ac224063, 672d0507, Rückführung a6e60e2e · main e2f8649c, 5106270e, Version cea23ae9.
 - **Nachweis:** Staging Westerfeldstr. 146 gemessen (2025/2026, Umschalter), jahresabgleich-pruefen 177/177, jahresbuch 61/61, buster-ebenen SAUBER. Prod-Sicherung haupt/mb-20261125-0733-v4670, Auslieferung per curl (Buster v4670, version 195).
 - **Rest:** Prod nicht eingeloggt im Objekt gemessen, 390 px nur über Grid-Regel (kein echtes Fenster).
+
+### Rollout 1.0.196 · v4650 Sidebar-Umschalter Aktionen links (Fork R3)
+
+- **Was:** Marcel 25.11.2026: „Aktion müsste genau auf die andere Seite, also links hin“. Reihenfolge jetzt Aktionen · Ankauf · Bestand (doppelkarte.js). Auf Prod NUR die Reihenfolge, Optik wie v4600.
+- **Nur Staging (wartet auf Marcels Wahl):** v4650a–d drei Gestaltungen über html[data-dk-stil]: pille (gleitende Gold-Pille, Standard auf Staging-Hosts), reiter (drei Karten mit Symbol und Zahlplakette), runway (Leiste im Luftfahrt-Stil, Zahl groß, Mittellinie). Wahl per ?dkstil=pille|reiter|runway|alt oder DpDkStil('…'), gemerkt in localStorage dp_dk_stil. Ohne Wahl auf Prod-Hosts: alt.
+- **Gemessen:** Container schrumpfte als Flex-Kind der Schiene (flex 0 1 auto) auf 50,8 px, Runway-Beschriftung 6 px hoch → flex 0 0 auto (v4650c). Handy: v4600-Regel gab hellen Rand rgb(230,225,214) → leise bzw. bei Reiter ohne (v4650d). Ankauf-Filter 24 sichtbar, 0 gewonnen; 390 px scrollWidth 390; Partnerfarbe Blau färbt Pille.
+- **Commit:** staging a4742022, 8b071453, v4650b/c/d, Merge 1a7fcfbf · main 1ec9ed3d, Version 1d2e1c64. Prod-Sicherung haupt/mb-20261125-0737-v4650 (7,0/31 MB, Kopf gelesen). Prüfer: buster-ebenen SAUBER, vorschau SAUBER, gold-audit Staging RC 0.
+- **Bilder:** Dateien/Fehler/menue-umschalter-2026-11-25/ (A-pille, B-reiter, C-runway je Schreibtisch und 390 px, A hell und Partnerfarbe).
+- **Rest:** Runway: der Gold-Strich unter dem aktiven Reiter liegt unter der Mittellinie und ist kaum zu sehen. Pille: Schrift auf der aktiven Pille fest dunkel (#1b1508), bei sehr dunkler Partnerfarbe prüfen. Bei Wahl: Stil-Code per Cherry-Pick auf main und Standard für alle Hosts setzen.
