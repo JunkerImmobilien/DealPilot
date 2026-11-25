@@ -882,15 +882,30 @@
     }
     return true;
   }
+  var _hvSchiebe = 0, _hvRO = null;
+  function schiebeGrafik() { if (_hvSchiebe > 60) return; _hvSchiebe++; setTimeout(mountGrafik, 350); }
   function mountGrafik() {
     if (typeof document === 'undefined') return;
+    _hvSchiebe = Math.min(_hvSchiebe, 60);
+    try {
+      if (!_hvRO && typeof ResizeObserver !== 'undefined') _hvRO = new ResizeObserver(function () { clearTimeout(_hvRO._t); _hvRO._t = setTimeout(mountGrafik, 120); });
+      if (_hvRO) Array.prototype.forEach.call(document.querySelectorAll('[data-dp-hv-grafik]'), function (h) { if (!h._hvBeob) { h._hvBeob = true; _hvRO.observe(h); } });
+    } catch (e) {}
     var hs = document.querySelectorAll('[data-dp-hv-grafik]'); if (!hs.length) return;
     var L0 = null, sp = null; try { L0 = lesen(); sp = grafikSpec(L0.jahre || [], { ausw: L0.d && L0.d.auswertung, liste: risikenAktiv(L0.d) }); } catch (e) { sp = null; }
     var Gx = g.DpGrafiken, G = g.DpJahresbuchGrafik;
     for (var i = 0; i < hs.length; i++) {
       try {
         if (!sp) { hs[i].innerHTML = ''; continue; }
-        if (Gx && Gx.karte && Gx.verlauf) { premiumKarte(hs[i], L0.jahre || [], risikenAktiv(L0.d)); continue; }
+        if (Gx && Gx.karte && Gx.verlauf) {
+          /* v4780a · gemessen: im verborgenen Reiter ist die Breite 0, das SVG wurde mit 640 gezeichnet und auf 870 px
+             hochgezogen (Schrift 1,4fach). Gezeichnet wird erst, wenn der Reiter sichtbar ist, und neu bei anderer Breite. */
+          var bw = hs[i].clientWidth;
+          if (!bw) { schiebeGrafik(); continue; }
+          if (hs[i]._hvW === bw && hs[i].querySelector('svg')) continue;
+          hs[i]._hvW = bw;
+          premiumKarte(hs[i], L0.jahre || [], risikenAktiv(L0.d)); continue;
+        }
         if (G && G.malen) { G.malen(hs[i], sp); }
       } catch (e) { try { console.warn('[hausverlauf] Grafik', e); } catch (x) {} hs[i].innerHTML = ''; }
     }
