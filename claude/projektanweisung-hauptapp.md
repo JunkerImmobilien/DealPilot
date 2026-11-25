@@ -45624,3 +45624,8 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** staging 7fe742db, f21d8a28, Merge 367f54b7 · main 90acdf0f, 3fb7d124, Version 754f22fe.
 - **Nachweis:** Staging Westerfeldstr. 146 Kopfleiste 69 | Investment 64 | Finanzierung 84, Übersicht gleich, Bewertung zwei Karten trotz Merker „eins“; Hauptstr. 51 58 · 57/62; 390 px kein Querscrollen. score-ketten 216 gleich, buster-ebenen, vorschau sauber, gold-audit Prod RC 0. Sicherung haupt-/mb-20261125-0955-v4800 (7,0/31 MB, Kopf gelesen). Prod per curl: Buster v4800/v4800b/v4800m, version 215.
 - **Rest:** Prod nicht eingeloggt gemessen; Laden der Testobjekte hat updated_at gesetzt (Messen speichert doch); Muster v4790 (LL4) noch mit Deal Score + Investor nebeneinander.
+### v4820 · Quick-Check-Übergabe Lindenallee (Fork OO4)
+
+- **Was:** II4-Befund nachgestellt, keine Regression (Ursachen: zu früher Klick vor v4780f, Messskript mit globalem `var el`). Neuer Prüfer `tools/qc-uebergabe-pruefen.mjs` (Quelltext-Verträge + `--objekt` Datensatz).
+- **Commit:** staging f0231e37, main nur Prüfer. Kein App-Code, keine Version.
+- **Nachweis:** 2026-1198 (Staging) 17/17, Gegenproben rot. 2026-1197 auf Verloren.
