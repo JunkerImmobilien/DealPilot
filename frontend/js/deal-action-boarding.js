@@ -272,6 +272,21 @@
       X + '.dab-row-sub{font-size:12px !important;color:#6B6356 !important;text-align:left !important}',
       X + '.dab-row-x{text-align:left !important}',
       '@media(max-width:700px){' + X + '.dab-tafel-rows{grid-template-columns:1fr}}',
+      /* v4780 · Marcel 25.11.2026: „Deal-Status offen, gewonnen und verloren ist ganz komisch eingerahmt“. Gemessen am
+         Schreibtisch: die Tafel trug einen eckigen 1-px-Rahmen (#s8 .dab-cockpit .dab-tafel, Radius 0, ohne Innenabstand)
+         um Kopfzeile UND Karten, die Kopfzeile klebte an der Linie. Bis v4779 fiel er nur unter 760 px. Jetzt in jeder
+         Breite ohne Rahmen; die drei Karten im Stil der Kacheln (weiß, Radius 10, die gewählte mit Kante oben in ihrer
+         Statusfarbe und Haken), Akzent über Whitelabel, Grün und Rot fest. */
+      X + '.dab-tafel,' + X + '.dab-cockpit .dab-tafel{border:0 !important;background:transparent !important;box-shadow:none !important;border-radius:0 !important;padding:0 !important;min-width:0 !important;overflow:visible !important}',
+      X + '.dab-cockpit .dab-tafel-bar{background:transparent !important;border:0 !important;padding:0 2px 8px !important;display:flex !important;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap;row-gap:2px}',
+      X + '.dab-row{position:relative;border-radius:10px !important;border:1px solid #E6E0D3 !important;background:#FFFFFF !important}',
+      X + '.dab-row .dab-row-dot{width:9px !important;height:9px !important;border-radius:50% !important;background:rgba(42,39,39,.18) !important;box-shadow:none !important}',
+      X + '.dab-row.active{background:#FFFFFF !important;border-color:color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 55%,#E6E0D3) !important;box-shadow:inset 0 2.2px 0 var(--wl-c9a84c, #C9A84C) !important}',
+      X + '.dab-row[data-status="won"].active{background:#FFFFFF !important;border-color:rgba(63,165,108,.55) !important;box-shadow:inset 0 2.2px 0 #3FA56C !important}',
+      X + '.dab-row[data-status="lost"].active{background:#FFFFFF !important;border-color:rgba(184,98,92,.55) !important;box-shadow:inset 0 2.2px 0 #B8625C !important}',
+      X + '.dab-row.active .dab-row-dot{background:var(--wl-c9a84c, #C9A84C) !important}' + X + '.dab-row[data-status="won"].active .dab-row-dot{background:#3FA56C !important}' + X + '.dab-row[data-status="lost"].active .dab-row-dot{background:#B8625C !important}',
+      X + '.dab-row.active::after{content:"✓";position:absolute;top:10px;right:12px;font:700 14px/1 Inter,sans-serif;color:var(--wl-c9a84c, #C9A84C)}' + X + '.dab-row[data-status="won"].active::after{color:#3FA56C}' + X + '.dab-row[data-status="lost"].active::after{color:#B8625C}',
+      X + '.dab-row:focus-visible{outline:2px solid var(--wl-c9a84c, #C9A84C) !important;outline-offset:2px}',
       /* v4013 · Marcel 23.11.2026 (Handy): „komischer Rahmen“ um Gewonnen / im Bestand. Gemessen bei 390 px:
          die Tafel trug einen eigenen Rahmen (#s8 .dab-cockpit .dab-tafel, 1 px) um Karten UND Ankauf-/ViVi-Zeilen,
          und der ViVi-Knopf (nowrap, 316 px) zog die Rasterspalte auf 347 px bei 277 px Platz: Karten und Knoepfe

@@ -289,8 +289,9 @@
     var d = null, su = [];
     try { var f = el('_dok_auswertung'); d = f && f.value ? JSON.parse(f.value) : null; } catch (e) { d = null; }
     try { su = g.DpSonderumlage && g.DpSonderumlage.liste ? g.DpSonderumlage.liste() : []; } catch (e) { su = []; }
-    var doks = d && Array.isArray(d.dokumente) ? d.dokumente : [];
-    var hatWeg = !!(d && d.auswertung && d.auswertung.weg) || doks.some(function (x) { return x && WEG_TYPEN.test(String(x.typ || '')); }) || su.length > 0;
+    /* v4780 · entfernte Unterlagen (Verlauf: Zurücknehmen/Löschen) zählen nicht mehr - ihre Protokolle, Jahre und Risiken fallen */
+    var doks = d && Array.isArray(d.dokumente) ? d.dokumente.filter(function (x) { return x && !x.entfernt; }) : [];
+    var hatWeg =!!(d && d.auswertung && d.auswertung.weg) || doks.some(function (x) { return x && WEG_TYPEN.test(String(x.typ || '')); }) || su.length > 0;
     var jahre = [];
     try { jahre = wegJahre(d && d.auswertung, su, doks, { etw: istEtw(), mea_pct: wert('mea') }); } catch (e) { jahre = []; }
     return { d: d, su: su, doks: doks, hatWeg: hatWeg, liste: ereignisse(d && d.auswertung, su, doks), jahre: jahre };
@@ -372,6 +373,46 @@
       '.dp-hv-risj span{font:400 11.5px Inter,sans-serif;color:#9A9285}',
       '.dp-hv-risj>.krit{border-color:rgba(184,98,92,.45);box-shadow:inset 3px 0 0 #B8625C}.dp-hv-risj>.hand{border-color:color-mix(in srgb,var(--wl-c9a84c,#C9A84C) 45%,transparent);box-shadow:inset 3px 0 0 var(--wl-c9a84c,#C9A84C)}',
       '.dp-hv-ampel{margin:4px 0 0 !important}',
+      /* v4780 · Jahreskacheln als Knöpfe mit Absprung, Risiken oben mit Jahresfilter, Tooltip ohne Browser-Titel */
+      '.dp-pa-wrap .dp-hv-risj>button{position:relative;text-align:left;cursor:pointer;font:inherit;border:1px solid #EFE8D6 !important;border-radius:8px !important;background:#fff !important;padding:7px 9px !important;display:grid;gap:2px;min-width:0;color:inherit;transition:border-color .15s,box-shadow .15s}',
+      '.dp-pa-wrap .dp-hv-risj>button:hover:not([disabled]),.dp-pa-wrap .dp-hv-risj>button:focus-visible{border-color:var(--wl-c9a84c,#C9A84C) !important}',
+      '.dp-pa-wrap .dp-hv-risj>button[disabled]{cursor:default;opacity:.75}',
+      '.dp-pa-wrap .dp-hv-risj>button.krit{border-color:rgba(184,98,92,.45) !important;box-shadow:inset 3px 0 0 #B8625C}',
+      '.dp-pa-wrap .dp-hv-risj>button.hand{border-color:color-mix(in srgb,var(--wl-c9a84c,#C9A84C) 45%,transparent) !important;box-shadow:inset 3px 0 0 var(--wl-c9a84c,#C9A84C)}',
+      '.dp-hv-risj .tt,.dp-hv-rk .tt{display:none;position:absolute;z-index:30;left:0;top:calc(100% + 6px);width:max-content;max-width:min(340px,86vw);background:#2A2727;color:#FDFCFA;font:400 12px/1.5 Inter,sans-serif;font-style:normal;padding:9px 11px;border-radius:8px;box-shadow:0 8px 22px rgba(0,0,0,.18);text-align:left;white-space:normal}',
+      '.dp-hv-risj .tt i{color:#E8CC7A;font-style:normal}.dp-hv-rk .tt small{display:block;margin-top:5px;color:#C9C2B6;font-size:11px}.dp-hv-rk .tt strong{color:#E8CC7A}',
+      '.dp-hv-risj>button:hover .tt,.dp-hv-risj>button:focus-visible .tt,.dp-hv-rk:hover .tt,.dp-hv-rk:focus .tt{display:block}',
+      '.dp-hv-ris{margin:16px 0 4px}.dp-hv-ris .dp-hv-abs{margin-top:6px}',
+      '.dp-hv-rf{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}',
+      '.dp-pa-wrap .dp-hv-rf button{border:1px solid #E6DCC2 !important;background:#fff !important;border-radius:999px !important;padding:3px 11px !important;font:600 11.5px Inter,sans-serif !important;color:#4A4542 !important;cursor:pointer}',
+      '.dp-pa-wrap .dp-hv-rf button i{font-style:normal;font-weight:500;color:#9A9285;margin-left:3px}',
+      '.dp-pa-wrap .dp-hv-rf button.on{background:#2A2727 !important;border-color:#2A2727 !important;color:#FDFCFA !important}.dp-pa-wrap .dp-hv-rf button.on i{color:#E8CC7A}',
+      '.dp-hv-rl{display:grid;gap:6px}',
+      '.dp-hv-rk{position:relative;display:grid;grid-template-columns:10px minmax(0,1fr) auto;align-items:center;gap:10px;border:1px solid #EFE8D6;border-radius:9px;background:#fff;padding:8px 12px;cursor:default;outline:none}',
+      '.dp-hv-rk:focus-visible{border-color:var(--wl-c9a84c,#C9A84C)}',
+      '.dp-hv-rk .pt{width:9px;height:9px;border-radius:50%;background:#9A9285}.dp-hv-rk.hoch .pt{background:#B8625C}.dp-hv-rk.mittel .pt{background:var(--wl-c9a84c,#C9A84C)}.dp-hv-rk.niedrig .pt{background:#3FA56C}',
+      '.dp-hv-rk b{font:600 13px/1.35 Inter,sans-serif;color:#2A2727;min-width:0;overflow-wrap:anywhere}',
+      '.dp-hv-rk .m{font:600 11.5px "JetBrains Mono",monospace;color:#6B645A;white-space:nowrap;font-variant-numeric:tabular-nums}',
+      '.dp-hv-rk.ueber{display:none}.dp-hv-ris:not([data-filter="alle"]) .dp-hv-rk.ueber{display:grid}',
+      '.dp-hv-rk.aus,.dp-hv-rkk.aus{display:none !important}',
+      '.dp-hv-rm{margin:4px 0 0;font:400 11.5px Inter,sans-serif;color:#7A7370}',
+      '.dp-hv-rleer{margin:6px 0 0;font:400 12px Inter,sans-serif;color:#7A7370}',
+      '.dp-hv-rd{display:grid;gap:8px}',
+      '.dp-hv-rkk{border:1px solid #EFE8D6;border-left:3px solid #9A9285;border-radius:9px;background:#fff;padding:10px 13px;display:grid;gap:5px}',
+      '.dp-hv-rkk.hoch{border-left-color:#B8625C}.dp-hv-rkk.mittel{border-left-color:var(--wl-c9a84c,#C9A84C)}.dp-hv-rkk.niedrig{border-left-color:#3FA56C}',
+      '.dp-hv-rkk .k{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px}.dp-hv-rkk .k b{font:600 13.5px/1.35 Inter,sans-serif;color:#2A2727}',
+      '.dp-hv-rkk .p{font:600 10px/1 Inter,sans-serif;padding:3px 8px;border-radius:999px;background:rgba(42,39,39,.07);color:#4A4542}',
+      '.dp-hv-rkk .p.hoch{background:rgba(184,98,92,.13);color:#B8625C}.dp-hv-rkk .p.mittel{background:color-mix(in srgb,var(--wl-c9a84c,#C9A84C) 18%,transparent);color:#8a6d1f}.dp-hv-rkk .p.niedrig{background:rgba(63,165,108,.14);color:#2f7d52}',
+      '.dp-hv-rkk .m{font:600 11.5px "JetBrains Mono",monospace;color:#6B645A;font-variant-numeric:tabular-nums}',
+      '.dp-pa-wrap .dp-hv-rkk p{margin:0;font:400 12.5px/1.55 Inter,sans-serif;color:#4A4542;text-align:left !important;hyphens:auto}',
+      '.dp-hv-rkk .f{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px}.dp-hv-rkk .f small{font:400 11px Inter,sans-serif;color:#9A9285;flex:1 1 220px;min-width:0}',
+      '.dp-hv-rkk .zu{display:flex;gap:6px;flex-wrap:wrap}',
+      '.dp-pa-wrap .dp-hv-rkk .zu button{border:1px solid color-mix(in srgb,var(--wl-c9a84c,#C9A84C) 55%,transparent) !important;background:#fff !important;border-radius:999px !important;padding:3px 10px !important;font:600 11px Inter,sans-serif !important;color:var(--wl-9a7f33,#9a7f33) !important;cursor:pointer}',
+      '.dp-hv-blink{animation:dpHvBlink 2.2s ease-out}',
+      '@keyframes dpHvBlink{0%,30%{box-shadow:0 0 0 3px color-mix(in srgb,var(--wl-c9a84c,#C9A84C) 55%,transparent)}100%{box-shadow:0 0 0 0 transparent}}',
+      '.dp-hv-gx{margin:18px 0 6px}.dp-hv-gx-rl{margin-top:10px;padding-top:10px;border-top:1px solid #F1EBDD}',
+      /* die Risiken stehen jetzt oben im Hausverlauf, der Teil Unterlagen darunter wiederholt sie nicht */
+      '#dp-pa-haus:has([data-dp-hv-ris]) .dpu-risk{display:none !important}',
       '@media (max-width:720px){.dp-hv-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.dp-hv-kpi:nth-child(2n){border-right:none}.dp-hv-kpi:nth-child(-n+2){border-bottom:1px solid #EFE8D6}.dp-hv-erg .satz{font-size:15.5px}}'
     ].join('\n');
     document.head.appendChild(s);
@@ -383,9 +424,10 @@
     return '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">'
       + '<button type="button" class="btn-clean dp-pa4-btn" onclick="' + HOCH + '">Unterlagen hochladen</button></div>';
   }
-  /* v4007 · Risiken der Auswertung je Jahr: hoch = kritisch, mittel = Handlungsbedarf (niedrig zaehlt nicht) */
-  function risikenJe(ausw) {
-    var r = ausw && Array.isArray(ausw.risiken) ? ausw.risiken : [], n = { hoch: 0, mittel: 0, niedrig: 0 }, j = {};
+  /* v4007 · Risiken der Auswertung je Jahr: hoch = kritisch, mittel = Handlungsbedarf (niedrig zaehlt nicht).
+     v4780 · liste = die noch geltenden Risiken (ohne die entfernter Unterlagen), sonst alle der Auswertung */
+  function risikenJe(ausw, liste) {
+    var r = Array.isArray(liste) ? liste : (ausw && Array.isArray(ausw.risiken) ? ausw.risiken : []), n = { hoch: 0, mittel: 0, niedrig: 0 }, j = {};
     r.forEach(function (x) {
       if (!x) return;
       var s = String(x.schwere || 'mittel').toLowerCase(); if (n[s] == null) s = 'mittel'; n[s]++;
@@ -395,13 +437,32 @@
     });
     return { n: n, jahre: j, gesamt: r.length };
   }
+  /* ── v4780 · Risiken hängen an ihrer Unterlage ────────────────────────────────────────────────────
+     Marcel 25.11.2026: „wenn ich gewisse Unterlagen lösche, dann sollen diese Risiken natürlich auch verschwinden“.
+     Jedes Risiko nennt seine Quelle mit Dateinamen (quelle: „07 Protokoll … 2025.pdf, TOP 3“). Ist jede genannte Datei
+     entfernt (dokumente[].entfernt, gesetzt beim Zurücknehmen oder Löschen im Verlauf), fällt das Risiko. Risiken ohne
+     erkennbare Datei bleiben stehen, sie kommen aus der Gesamtauswertung. */
+  function risikenAktiv(dat) {
+    var a = dat && dat.auswertung, r = a && Array.isArray(a.risiken) ? a.risiken.filter(function (x) { return x && typeof x === 'object'; }) : [];
+    var D = dat && Array.isArray(dat.dokumente) ? dat.dokumente : [];
+    var nm = function (d) { return String(d.datei || '').toLowerCase().trim(); };
+    var weg = D.filter(function (d) { return d && d.entfernt && nm(d).length > 4; }).map(nm);
+    if (!weg.length) return r;
+    var da = D.filter(function (d) { return d && !d.entfernt && nm(d).length > 4; }).map(nm);
+    return r.filter(function (x) {
+      var q = String(x.quelle || x.fundstelle || '').toLowerCase();
+      if (!q || !weg.some(function (n) { return q.indexOf(n) >= 0; })) return true;
+      return da.some(function (n) { return q.indexOf(n) >= 0; });
+    });
+  }
   function risText(z) {
     var t = [];
     if (z.hoch) t.push(z.hoch + ' kritisch');
     if (z.mittel) t.push(z.mittel + ' Handlungsbedarf');
     return t.join(', ');
   }
-  /** Leiste unter der Grafik: je Jahr, was kritisch ist und wo Handlungsbedarf besteht, mit Anzahl */
+  /** Kacheln unter der Grafik: je Jahr, was kritisch ist und wo Handlungsbedarf besteht. v4780 · ein Klick springt
+      zu den Risiken dieses Jahres (Marcel: „wenn man da draufklickt … den Absprung dahin, wo Handlungsbedarf ist“). */
   function risLeiste(R, J) {
     var js = Object.keys(R.jahre).map(Number);
     if (!js.length) return '';
@@ -411,10 +472,111 @@
     if (R.jahre[0]) alle.push(0);
     return '<div class="dp-hv-risj" role="list" aria-label="Risiken je Jahr">' + alle.map(function (y) {
       var z = R.jahre[y];
-      return '<div role="listitem" class="' + (z ? (z.hoch ? 'krit' : 'hand') : 'ruhig') + '"' + (z && z.titel.length ? ' title="' + esc(z.titel.join(' · ')) + '"' : '') + '><small>' + (y ? y : 'ohne Jahr') + '</small>'
-        + (z ? (z.hoch ? '<b class="k">' + z.hoch + ' kritisch</b>' : '') + (z.mittel ? '<b class="h">' + z.mittel + ' Handlungsbedarf</b>' : '') : '<span>nichts offen</span>') + '</div>';
+      var prot = (J || []).some(function (q) { return q.jahr === y && q.protokoll; });
+      var an = !!z || prot;
+      var tip = z ? z.titel.slice(0, 4).join(' · ') : 'Keine offenen Punkte in den Unterlagen';
+      return '<button type="button" role="listitem" class="btn-clean ' + (z ? (z.hoch ? 'krit' : 'hand') : 'ruhig') + '" data-dp-hv-sprung="' + y + '"'
+        + (an ? '' : ' disabled') + ' aria-label="' + esc((y || 'ohne Jahr') + ': ' + (z ? risText(z) : 'nichts offen')) + '">'
+        + '<small>' + (y ? y : 'ohne Jahr') + '</small>'
+        + (z ? (z.hoch ? '<b class="k">' + z.hoch + ' kritisch</b>' : '') + (z.mittel ? '<b class="h">' + z.mittel + ' Handlungsbedarf</b>' : '') : '<span>nichts offen</span>')
+        + (an ? '<em class="tt" role="tooltip">' + esc(tip) + '<br><i>' + (z ? 'Klick zeigt die Punkte' : 'Klick zeigt das Protokoll') + '</i></em>' : '') + '</button>';
     }).join('') + '</div>';
   }
+  /* v4780 · Wohin ein Risiko führt: Protokoll im Einzelnen, Belege des Jahres, Jahresabgleich (nur Bestand) */
+  function risSprunge(x) {
+    var q = String(x.quelle || x.fundstelle || ''), j = jahrAus(x.jahr), b = [], heute = new Date().getFullYear();
+    if (/protokoll|versammlung/i.test(q)) b.push('<button type="button" class="btn-clean" data-dp-hv-zu="prot" data-dp-hv-q="' + esc(q.split(',')[0]) + '">Zum Protokoll</button>');
+    if (j && j <= heute && typeof document !== 'undefined' && document.getElementById('dp-pa-tab-jahr')) b.push('<button type="button" class="btn-clean" data-dp-hv-zu="jahr" data-dp-hv-j="' + j + '">Jahresabgleich ' + j + '</button>');
+    else if (j && j <= heute && /beleg|rechnung|abrechnung|hausgeld|wirtschaftsplan/i.test(q + ' ' + (x.titel || ''))) b.push('<button type="button" class="btn-clean" data-dp-hv-zu="belege" data-dp-hv-j="' + j + '">Belege ' + j + '</button>');
+    return b.length ? '<span class="zu">' + b.slice(0, 2).join('') + '</span>' : '';
+  }
+  /** v4780 · „Risiken aus den Unterlagen“ oben im Reiter, nach Jahren. Einfach: die wichtigsten Punkte je eine Zeile,
+      die Erklärung beim Überfahren. Detail: jedes Risiko mit Beschreibung, Quelle und Absprung. */
+  function risikenHtml(liste) {
+    if (!liste.length) return '';
+    var ORD = { hoch: 0, mittel: 1, niedrig: 2 };
+    var sw = function (x) { var s = String(x.schwere || 'mittel').toLowerCase(); return ORD[s] == null ? 'mittel' : s; };
+    var r = liste.slice().sort(function (a, b) { return ORD[sw(a)] - ORD[sw(b)] || (Number(b.kosten_eur) || 0) - (Number(a.kosten_eur) || 0); });
+    var n = { hoch: 0, mittel: 0, niedrig: 0 }; r.forEach(function (x) { n[sw(x)]++; });
+    var jahre = []; r.forEach(function (x) { var j = jahrAus(x.jahr) || 0; if (jahre.indexOf(j) < 0) jahre.push(j); });
+    jahre.sort(function (a, b) { return (a || 9999) - (b || 9999); });
+    var WORT = { hoch: 'kritisch', mittel: 'Handlungsbedarf', niedrig: 'beobachten' };
+    var chips = '<div class="dp-hv-rf" role="group" aria-label="Risiken nach Jahr"><button type="button" class="btn-clean on" data-dp-hv-rj="alle" aria-pressed="true">Alle <i>' + r.length + '</i></button>'
+      + jahre.map(function (j) {
+        var c = r.filter(function (x) { return (jahrAus(x.jahr) || 0) === j; }).length;
+        return '<button type="button" class="btn-clean" data-dp-hv-rj="' + j + '" aria-pressed="false">' + (j || 'ohne Jahr') + ' <i>' + c + '</i></button>';
+      }).join('') + '</div>';
+    var zeile = function (x) {
+      var s = sw(x), j = jahrAus(x.jahr) || 0, kost = Number(x.kosten_eur) > 0 ? eur(Number(x.kosten_eur)) : '';
+      var tt = '<strong>' + esc(WORT[s]) + '.</strong> ' + esc(String(x.beschreibung || '').slice(0, 280)) + (x.quelle ? '<small>Quelle: ' + esc(x.quelle) + '</small>' : '');
+      return '<div class="dp-hv-rk ' + s + '" tabindex="0" data-j="' + j + '"><i class="pt"></i><b>' + esc(x.titel || 'Risiko') + '</b>'
+        + '<span class="m">' + (j ? String(j) : '') + (kost ? (j ? ' · ' : '') + kost : '') + '</span>'
+        + '<em class="tt" role="tooltip">' + tt + '</em></div>';
+    };
+    var karte = function (x) {
+      var s = sw(x), j = jahrAus(x.jahr) || 0, kost = Number(x.kosten_eur) > 0 ? eur(Number(x.kosten_eur)) : '';
+      return '<div class="dp-hv-rkk ' + s + '" data-j="' + j + '"><div class="k"><b>' + esc(x.titel || 'Risiko') + '</b><span class="p ' + s + '">' + esc(WORT[s]) + '</span>'
+        + (kost ? '<span class="m">' + kost + '</span>' : '') + (j ? '<span class="m">' + j + '</span>' : '') + '</div>'
+        + (x.beschreibung ? '<p>' + esc(x.beschreibung) + '</p>' : '')
+        + '<div class="f">' + (x.quelle ? '<small>Quelle: ' + esc(x.quelle) + '</small>' : '<small>aus der Gesamtauswertung</small>') + risSprunge(x) + '</div></div>';
+    };
+    var einfach = r.filter(function (x) { return sw(x) !== 'niedrig'; });
+    if (!einfach.length) einfach = r.slice();
+    var kopf = [n.hoch ? n.hoch + ' kritisch' : '', n.mittel ? n.mittel + ' Handlungsbedarf' : '', n.niedrig ? n.niedrig + ' beobachten' : ''].filter(Boolean).join(' · ');
+    return '<div class="dp-hv-ris" data-dp-hv-ris="1" data-filter="alle">'
+      + abschnitt('Risiken aus den Unterlagen', kopf)
+      + chips
+      + '<div class="dp-pa-e dp-hv-rl">' + einfach.map(function (x, i) { return zeile(x).replace('class="dp-hv-rk ', 'class="dp-hv-rk' + (i >= 5 ? ' ueber' : '') + ' '); }).join('')
+      + (einfach.length < r.length || einfach.length > 5 ? '<p class="dp-hv-rm">Alle ' + r.length + ' Punkte mit Beschreibung und Quelle unter Detail.</p>' : '') + '</div>'
+      + '<div class="dp-pa-d dp-hv-rd">' + r.map(karte).join('') + '</div>'
+      + '<p class="dp-hv-rleer" hidden>Für dieses Jahr nennen die Unterlagen kein Risiko.</p></div>';
+  }
+  /* v4780 · Filter und Absprünge (ein Horcher für alle Karten) */
+  function risFilter(box, j) {
+    if (!box) return;
+    box.setAttribute('data-filter', String(j));
+    var alle = String(j) === 'alle', n = 0;
+    Array.prototype.forEach.call(box.querySelectorAll('[data-dp-hv-rj]'), function (b) { var an = b.getAttribute('data-dp-hv-rj') === String(j); b.classList.toggle('on', an); b.setAttribute('aria-pressed', String(an)); });
+    Array.prototype.forEach.call(box.querySelectorAll('.dp-hv-rk,.dp-hv-rkk'), function (e) {
+      var sicht = alle || e.getAttribute('data-j') === String(j);
+      e.classList.toggle('aus', !sicht);
+      if (sicht && e.offsetParent !== null) n++;
+    });
+    var leer = box.querySelector('.dp-hv-rleer'); if (leer) leer.hidden = n > 0;
+    var m = box.querySelector('.dp-hv-rm'); if (m) m.hidden = !alle;
+  }
+  function markieren(e) {
+    if (!e) return;
+    try { e.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (x) { e.scrollIntoView(); }
+    e.classList.remove('dp-hv-blink'); void e.offsetWidth; e.classList.add('dp-hv-blink');
+    setTimeout(function () { e.classList.remove('dp-hv-blink'); }, 2400);
+  }
+  function protKarte(q) {
+    q = String(q || '').toLowerCase().trim();
+    var ks = document.querySelectorAll('.dp-hv-pk[data-datei]');
+    for (var i = 0; i < ks.length; i++) { var d = String(ks[i].getAttribute('data-datei') || '').toLowerCase(); if (d && (q.indexOf(d) >= 0 || d.indexOf(q) >= 0)) return ks[i]; }
+    return null;
+  }
+  function sprung(jahr) {
+    var box = document.querySelector('[data-dp-hv-ris]');
+    if (box && box.querySelector('[data-dp-hv-rj="' + jahr + '"]')) { risFilter(box, jahr); markieren(box); return; }
+    /* kein Risiko im Jahr: das Protokoll des Jahres */
+    var ks = document.querySelectorAll('.dp-hv-pk[data-jahr="' + jahr + '"]');
+    if (ks.length) { markieren(ks[0]); return; }
+    var row = document.querySelector('[data-dp-hv-jahr="' + jahr + '"]'); if (row) markieren(row);
+  }
+  if (typeof document !== 'undefined') document.addEventListener('click', function (ev) {
+    var t = ev.target && ev.target.closest ? ev.target : null; if (!t) return;
+    var f = t.closest('[data-dp-hv-rj]');
+    if (f) { risFilter(f.closest('[data-dp-hv-ris]'), f.getAttribute('data-dp-hv-rj')); return; }
+    var s = t.closest('[data-dp-hv-sprung]');
+    if (s && !s.disabled) { sprung(s.getAttribute('data-dp-hv-sprung')); return; }
+    var z = t.closest('[data-dp-hv-zu]'); if (!z) return;
+    var art = z.getAttribute('data-dp-hv-zu'), j = +z.getAttribute('data-dp-hv-j') || null;
+    if (art === 'prot') { var k = protKarte(z.getAttribute('data-dp-hv-q')); if (k) { var d = k.querySelector('details'); if (d) d.open = true; markieren(k); } return; }
+    if (art === 'belege') { try { if (g.DpEingang && g.DpEingang.oeffnen) g.DpEingang.oeffnen({ reiter: 'jahre', jahr: j }); } catch (x) {} return; }
+    if (art === 'jahr') { try { var tb = document.getElementById('dp-pa-tab-jahr'); if (tb) tb.click(); setTimeout(function () { var y = document.querySelector('[data-ja-jahr="' + j + '"],[data-jahr="' + j + '"]'); if (y && y.click) y.click(); }, 400); } catch (x) {} }
+  });
   function risAmpel(R) {
     if (!R.gesamt) return '';
     try { if (g.DpUnterlagen && g.DpUnterlagen.stil) g.DpUnterlagen.stil(); } catch (e) {}
@@ -472,7 +634,7 @@
     });
     /* v4007 · Risiken je Jahr als Marke an der Grundlinie (rot kritisch, Gold Handlungsbedarf), Text mit Anzahl */
     try {
-      var R = risikenJe(opt && opt.ausw);
+      var R = risikenJe(opt && opt.ausw, opt && opt.liste);
       Object.keys(R.jahre).forEach(function (y) { var z = R.jahre[y]; y = +y; if (!y) return;
         marken.push({ jahr: y, text: y + ': ' + risText(z), farbe: z.hoch ? (G.ROT || '#B8625C') : (G.GOLD || 'var(--wl-c9a84c,#C9A84C)'), art: z.hoch ? 'kritisch' : 'hand', legende: z.hoch ? 'Risiko kritisch' : 'Handlungsbedarf' }); });
     } catch (eR) {}
@@ -587,7 +749,7 @@
       if (p.verwalterwechsel) sonst.push('Verwaltung: ' + p.verwalterwechsel);
       if (sonst.length) voll += '<h5>Weiteres</h5><ul class="l">' + sonst.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul>';
       var nPunkte = be.length + su.length + ma.length + mg.length + st.length + sonst.length;
-      return '<div class="dp-hv-pk"><div class="dp-hv-pk-k"><span class="d">' + esc(x.datum || 'ohne Datum') + '</span><b>Eigentümerversammlung</b>'
+      return '<div class="dp-hv-pk" data-datei="' + esc(x.datei || '') + '" data-jahr="' + esc(x.jahr || '') + '"><div class="dp-hv-pk-k"><span class="d">' + esc(x.datum || 'ohne Datum') + '</span><b>Eigentümerversammlung</b>'
         + (p.verwalter ? '<span class="v">Verwaltung ' + esc(p.verwalter) + '</span>' : '') + '</div>'
         + (kz.length ? '<div class="dp-hv-pk-kz">' + kz.map(function (k) { return '<div' + (k[2] ? ' class="' + k[2] + '"' : '') + '><small>' + esc(k[0]) + '</small><b>' + esc(k[1]) + '</b></div>'; }).join('') + '</div>' : '')
         + (kurz.length ? '<ul class="kurz">' + kurz.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul>' : '')
@@ -618,15 +780,17 @@
     var eing = L.doks.filter(function (x) { return x && WEG_TYPEN.test(String(x.typ || '')); }).map(function (x) { return esc(x.label + (x.datum ? ' ' + x.datum : (x.jahr ? ' ' + x.jahr : ''))); });
     if (eing.length) h += '<p class="dp-pa-fuss dp-hv-eing">Eingelesen: ' + eing.join(' · ') + '</p>';
     h += kennzahlen(L, w);
-    var ausw = L.d && L.d.auswertung, sp = grafikSpec(J, { ausw: ausw }), R = risikenJe(ausw);
-    if (sp) h += abschnitt('Hausgeld und Rücklage', 'je Jahr · aus Wirtschaftsplänen und Abrechnungen') + '<div data-dp-hv-grafik="1"></div>';
-    if (Object.keys(R.jahre).length) h += (sp ? '' : abschnitt('Risiken je Jahr', 'aus der Auswertung der Unterlagen')) + risLeiste(R, J);
+    /* v4780 · Marcel 25.11.2026: „die Risiken aus den Unterlagen weiter oben, klar strukturiert, pro Jahr ansehbar“.
+       Reihenfolge jetzt: Ergebnis, Kennzahlen, Risiken (Jahresfilter, Einfach kurz, Detail voll), Grafik im Stil der
+       Pilot-Grafiken, Jahreskacheln mit Absprung, Jahr für Jahr, Protokolle. Die Ampel am Ende fällt. */
+    var ausw = L.d && L.d.auswertung, RL = risikenAktiv(L.d), sp = grafikSpec(J, { ausw: ausw, liste: RL }), R = risikenJe(ausw, RL);
+    h += risikenHtml(RL);
+    if (sp) h += '<div class="dp-hv-gx" data-dp-hv-grafik="1"></div>';
+    if (Object.keys(R.jahre).length) h += (sp ? '' : abschnitt('Jahre im Überblick', 'Klick springt zu den Punkten des Jahres')) + risLeiste(R, J);
     if (J.length) h += abschnitt('Jahr für Jahr', 'aus Protokollen, Wirtschaftsplänen, Abrechnungen') + tabelle(J)
       + '<p class="dp-pa-fuss" style="margin-top:6px">P Protokoll · W Wirtschaftsplan · A Jahresabrechnung. Ein Jahr ist im Jahresabgleich erledigt, wenn das Protokoll und der Wirtschaftsplan oder die Abrechnung des Jahres vorliegen.'
       + (!(w.jahre && w.jahre.length) ? ' Diese Auswertung ist älter als die Jahreswerte (v3430): Hausgeld und Rücklage je Jahr stehen hier, sobald du Unterlagen nachreichst.' : '') + '</p>';
     h += protokolleHtml(L, w);   /* v4530f */
-    /* v4007 · die Karten hoch/mittel/niedrig stehen unter „Jahr für Jahr“ (vorher im Teil Unterlagen, nur in Einfach) */
-    if (R.gesamt) h += abschnitt('Risiken aus den Unterlagen', R.gesamt + (R.gesamt === 1 ? ' Risiko' : ' Risiken') + ', Einzelheiten unter Detail') + risAmpel(R);
     h += '</div>';
     if (sp) setTimeout(mountGrafik, 0);
     if (opt && opt.ohneVerlauf) return h;
@@ -666,11 +830,70 @@
        die Liste „Eingelesen“ steht jetzt unter dem Ergebnissatz */
     return h;
   }
+  /* v4780 · Marcel 25.11.2026: „die Grafik sieht nicht so aus … so anpassen wie bei der Pilot-Analyse unter Steuern“.
+     Gezeichnet mit DpGrafiken (grafiken-premium.js): Karte mit Augenbraue, Titel als Satz, Unterzeile, Linien,
+     Tooltip je Jahr, Marken für Sonderumlagen und kritische Jahre, dieselben Farben. Die Rücklage der Gemeinschaft
+     hat eine andere Größenordnung als das Hausgeld und steht deshalb als zweite, flache Linie darunter. */
+  function premiumKarte(host, J, RL) {
+    var Gx = g.DpGrafiken, F = Gx.farben || {};
+    var mit = J.filter(function (z) { return z.hausgeld_plan_monat != null || z.hausgeld_ist_jahr != null || z.ruecklage_stand != null || z.su_anteil != null || z.su_gesamt != null; });
+    if (!mit.length) { host.innerHTML = ''; return false; }
+    var a = mit[0].jahr, b = mit[mit.length - 1].jahr; if (a === b) { a = a - 1; }
+    var X = []; for (var y = a; y <= b; y++) X.push(y);
+    var by = {}; J.forEach(function (z) { by[z.jahr] = z; });
+    var ist = X.map(function (j) { var z = by[j]; return z && z.hausgeld_ist_jahr != null ? z.hausgeld_ist_jahr : null; });
+    var plan = X.map(function (j) { var z = by[j]; return z && z.hausgeld_plan_monat != null ? Math.round(z.hausgeld_plan_monat * 12) : null; });
+    var rl = X.map(function (j) { var z = by[j]; return z && z.ruecklage_stand != null ? z.ruecklage_stand : null; });
+    var su = X.map(function (j) { var z = by[j]; var v = z ? (z.su_anteil != null ? z.su_anteil : z.su_gesamt) : null; return v > 0 ? v : null; });
+    var R = risikenJe(null, RL), hat = function (arr) { return arr.some(function (v) { return v != null; }); };
+    var letzt = function (arr) { for (var i = arr.length - 1; i >= 0; i--) if (arr[i] != null) return { j: X[i], v: arr[i] }; return null; };
+    var lI = letzt(ist), lP = letzt(plan), suJ = X.filter(function (j, i) { return su[i] != null; });
+    var wohn = istEtw() ? ' für deine Wohnung' : '';
+    var titel = (lP ? 'Hausgeld' + wohn + ' zuletzt ' + eur(lP.v) + ' im Jahr (Plan ' + lP.j + ')' : (lI ? 'Hausgeld' + wohn + ' ' + eur(lI.v) + ' laut Abrechnung ' + lI.j : 'Geld der Gemeinschaft je Jahr'))
+      + (suJ.length ? ', Sonderumlage ' + suJ.join(' und ') : ', keine Sonderumlage');
+    var unter = 'Hausgeld aus Wirtschaftsplan (Plan) und Jahresabrechnung (Ist), dazu der Stand der Erhaltungsrücklage. Rote Marken: Sonderumlage oder kritisches Risiko im Jahr.';
+    var i = Gx.karte(host, { eyebrow: 'Hausgeld und Rücklage', titel: titel, unter: unter, chips: ['aus deinen Unterlagen'] });
+    var ziel = document.createElement('div'); i.appendChild(ziel);
+    var marken = [];
+    X.forEach(function (j, q) {
+      var z = R.jahre[j];
+      if (su[q] != null) marken.push({ j: j, text: 'Sonderumlage', farbe: F.rot });
+      else if (z && z.hoch) marken.push({ j: j, text: z.hoch + ' kritisch', farbe: F.rot });
+    });
+    var reihen = [];
+    if (hat(ist)) reihen.push({ name: 'Abrechnung (Ist)', werte: ist, farbe: F.tinte, dick: 2.6, punkte: true });
+    if (hat(plan)) reihen.push({ name: 'Wirtschaftsplan (Plan)', werte: plan, farbe: F.tinte3, dick: 2, gestrichelt: true, punkte: true });
+    var streu = []; X.forEach(function (j, q) { if (su[q] != null) streu.push({ j: j, v: su[q], farbe: F.rot, tip: '<div class="t">Sonderumlage ' + j + '</div><b>' + eur(su[q]) + '</b>' + (istEtw() && by[j] && by[j].su_anteil != null ? ' dein Anteil' : ' Gemeinschaft') }); });
+    var tipJ = function (q, j) {
+      var z = by[j] || {}, rz = R.jahre[j];
+      return '<div class="t">' + j + '</div>' + (ist[q] != null ? 'Abrechnung <b>' + eur(ist[q]) + '</b><br>' : '') + (plan[q] != null ? 'Wirtschaftsplan <b>' + eur(plan[q]) + '</b><br>' : '')
+        + (su[q] != null ? 'Sonderumlage <b>' + eur(su[q]) + '</b><br>' : '') + (rl[q] != null ? 'Rücklage <b>' + eur(rl[q]) + '</b><br>' : '')
+        + (rz ? '<span style="color:' + F.rot + '">' + esc(risText(rz)) + '</span>' : (z.protokoll ? 'Protokoll liegt vor' : ''));
+    };
+    var leg = reihen.map(function (r) { return { n: r.name, f: r.farbe }; }); if (streu.length) leg.push({ n: 'Sonderumlage', f: F.rot });
+    var W = Math.max(260, (i.clientWidth || host.clientWidth || 640) - 2);
+    if (reihen.length || streu.length) Gx.verlauf(ziel, { x: X, reihen: reihen.length ? reihen : [{ name: 'leer', werte: X.map(function () { return null; }), farbe: 'transparent' }], streu: streu, marken: marken, tip: tipJ, legende: leg }, { breite: W, hoehe: 210, aria: 'Hausgeld je Jahr' });
+    if (hat(rl)) {
+      var zr = document.createElement('div'); zr.className = 'dp-hv-gx-rl'; i.appendChild(zr);
+      var lr = letzt(rl), er = rl.filter(function (v) { return v != null; })[0];
+      var kopf = document.createElement('div'); kopf.className = 'gx-s'; kopf.textContent = 'Erhaltungsrücklage der Gemeinschaft: ' + eur(lr.v) + ' (' + lr.j + ')' + (er !== lr.v ? ', vorher ' + eur(er) : '');
+      zr.appendChild(kopf); var zr2 = document.createElement('div'); zr2.style.marginTop = '4px'; zr.appendChild(zr2);
+      Gx.verlauf(zr2, { x: X, reihen: [{ name: 'Rücklage', werte: rl, farbe: F.gruen, dick: 2, punkte: true }], tip: function (q, j) { return '<div class="t">' + j + '</div>Rücklage <b>' + (rl[q] != null ? eur(rl[q]) : 'keine Angabe') + '</b>'; } }, { breite: W, hoehe: 130, aria: 'Erhaltungsrücklage je Jahr' });
+    }
+    return true;
+  }
   function mountGrafik() {
-    var G = g.DpJahresbuchGrafik; if (!G || !G.malen || typeof document === 'undefined') return;
+    if (typeof document === 'undefined') return;
     var hs = document.querySelectorAll('[data-dp-hv-grafik]'); if (!hs.length) return;
-    var sp = null; try { var L0 = lesen(); sp = grafikSpec(L0.jahre || [], { ausw: L0.d && L0.d.auswertung }); } catch (e) { sp = null; }
-    for (var i = 0; i < hs.length; i++) { try { if (sp) G.malen(hs[i], sp); else hs[i].innerHTML = ''; } catch (e) { hs[i].innerHTML = ''; } }
+    var L0 = null, sp = null; try { L0 = lesen(); sp = grafikSpec(L0.jahre || [], { ausw: L0.d && L0.d.auswertung, liste: risikenAktiv(L0.d) }); } catch (e) { sp = null; }
+    var Gx = g.DpGrafiken, G = g.DpJahresbuchGrafik;
+    for (var i = 0; i < hs.length; i++) {
+      try {
+        if (!sp) { hs[i].innerHTML = ''; continue; }
+        if (Gx && Gx.karte && Gx.verlauf) { premiumKarte(hs[i], L0.jahre || [], risikenAktiv(L0.d)); continue; }
+        if (G && G.malen) { G.malen(hs[i], sp); }
+      } catch (e) { try { console.warn('[hausverlauf] Grafik', e); } catch (x) {} hs[i].innerHTML = ''; }
+    }
   }
   if (typeof document !== 'undefined') document.addEventListener('click', function (ev) {
     var b = ev.target && ev.target.closest ? ev.target.closest('[data-dp-hv-art]') : null; if (!b) return;
@@ -679,6 +902,6 @@
     if (card) Array.prototype.forEach.call(card.querySelectorAll('[data-dp-hv-e="' + art + '"]'), function (e) { e.style.display = an ? '' : 'none'; });
   });
 
-  g.DpHausverlauf = { VERSION: 'v4530g', protokolle: protokolle, ereignisse: ereignisse, wegJahre: wegJahre, urteil: urteil, artDok: artDok, html: html, zeitleisteHtml: zeitleisteHtml, risikenJe: risikenJe, kurz: kurz, lesen: lesen, jahrDaten: jahrDaten, grafikSpec: grafikSpec, mountGrafik: mountGrafik, ARTEN: ARTEN };
+  g.DpHausverlauf = { VERSION: 'v4780', risikenAktiv: risikenAktiv, risikenHtml: risikenHtml, sprung: sprung, protokolle: protokolle, ereignisse: ereignisse, wegJahre: wegJahre, urteil: urteil, artDok: artDok, html: html, zeitleisteHtml: zeitleisteHtml, risikenJe: risikenJe, kurz: kurz, lesen: lesen, jahrDaten: jahrDaten, grafikSpec: grafikSpec, mountGrafik: mountGrafik, ARTEN: ARTEN };
   if (typeof module !== 'undefined' && module.exports) module.exports = g.DpHausverlauf;
 })(typeof window !== 'undefined' ? window : globalThis);
