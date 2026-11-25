@@ -339,3 +339,9 @@ html[data-gx-stil="dunkel"] .pfm,html[data-gx-stil="dunkel"] .pfm-tip{--surface:
 /* v4730 · Kasten wie die übrigen Cockpit-Karten (grafiken-premium.js --gx-*), hell wie dunkel */
 .dp-gp.gp-pfm{background:var(--gx-bg,var(--gx-karte,#FFFFFF))!important;border:1px solid var(--gx-rand,#EFE8DA);border-radius:16px;padding:14px 16px 12px;color:var(--gx-tinte,#2A2727);min-width:0}
 html[data-gx-stil="dunkel"] .dp-gp.gp-pfm{--karte:#0E0D0B;--bg:#070706}
+
+/* v4830 · Kacheln unter den Grafiken: Beträge nie umbrechen, in halber Breite kleiner (Marcel 25.11.2026: skaliert nicht vernünftig) */
+.pfm.dp-gx .gx-seite b,.dp-gx.pfm .gx-seite b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gp-halb .gx-seite b{font-size:18px}
+.gp-halb .gx-seite small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:640px){.gx-seite b{font-size:17px}}

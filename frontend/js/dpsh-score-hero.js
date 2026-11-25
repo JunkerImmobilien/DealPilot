@@ -777,7 +777,7 @@
 '#dp-pscore-hero .dpz-h3{font-size:14px}',
 '#dp-pscore-hero .dpz-pill{margin-top:0;padding:3px 7px;font-size:9.5px}',
 '#dp-pscore-hero .dpz-was{flex:1 1 100%;margin-top:0;font-size:11.5px}',
-'#dp-pscore-hero .dpz-kat{margin-top:8px;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:6px 14px}',
+'#dp-pscore-hero .dpz-kat{margin-top:8px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 16px}',
 '#dp-pscore-hero .dpz-kz{margin:0;gap:2px 8px}',
 '#dp-pscore-hero .dpz-t{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
 '#dp-pscore-hero .dpz-anteil{font-size:9.5px}',
