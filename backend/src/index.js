@@ -674,6 +674,22 @@ async function start() {
     console.error('✗ ViVi-Takt konnte nicht starten:', e.message);
   }
 
+  /* v4860 · Dokumentenablage: Löschfrist 90 Tage nach Vertragsende, unter takt('ablageFristen'). Erst scharf mit
+     ABLAGE_FRIST_TAKT=1 (nach Nachweis auf Staging); ohne Schalter läuft er trocken und schreibt nur ins Log. */
+  try {
+    const _abl = require('./services/dateiAblage');
+    const _scharf = String(process.env.ABLAGE_FRIST_TAKT || '') === '1';
+    const _runAbl = require('./utils/taktSperre').takt('ablageFristen', async () => {
+      try {
+        const r = await _abl.fristLauf(_scharf ? { mail: _abl.fristMail } : { trocken: true });
+        try { const w = await _abl.plattenWarnung({ trocken: !_scharf }); if (w.gewarnt) console.warn('[ablage-platte] ' + w.stand.belegt_pct + ' % belegt' + (_scharf ? ', Mail an ' + w.an : ' (trocken)')); } catch (e) {}
+        if (r.neu || r.geloescht_konten || r.aufgehoben) console.log('[ablage-fristen]' + (_scharf ? '' : ' (trocken)'), JSON.stringify(r));
+      } catch (e) { console.error('[ablage-fristen] Fehler:', e && e.message); }
+    });
+    setTimeout(_runAbl, 5 * 60 * 1000);
+    setInterval(_runAbl, 24 * 60 * 60 * 1000);
+  } catch (e) { console.error('✗ Ablage-Fristen-Takt konnte nicht starten:', e.message); }
+
   // v507: WebSocket-Relay fuer Live-Transkription (OpenAI Realtime)
   /* v538-ws-removed: Realtime-WS-Live-Pfad entfernt. Web-Audio liefert auf manchen
      Geraeten Stille -> Realtime unbrauchbar. Live-Mitschrift laeuft seit v536 ueber

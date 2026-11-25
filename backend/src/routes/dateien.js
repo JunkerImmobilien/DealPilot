@@ -7,6 +7,7 @@
  *   GET    /dateien/:id                  herunterladen (entschlüsselt)
  *   PATCH  /dateien/:id                  { ordner, name, objekt } verschieben/umbenennen
  *   DELETE /dateien/:id                  löschen (auch vom Laufwerk)
+ *   DELETE /dateien?objekt=<id>&jahr=J   v4860 · alle Dateien eines Jahres im Objekt löschen
  *
  * Auch mit API-Schlüssel nutzbar (Rechte read/write/delete wie die übrigen Aufrufe). */
 const express = require('express');
@@ -35,7 +36,7 @@ router.get('/', async (req, res, next) => {
 
 router.post('/', (req, res, next) => {
   upload(req, res, async (err) => {
-    if (err) return res.status(err.code === 'LIMIT_FILE_SIZE' ? 413 : 400).json({ error: err.code === 'LIMIT_FILE_SIZE' ? 'Datei größer als 25 MB.' : err.message });
+    if (err) return res.status(err.code === 'LIMIT_FILE_SIZE' ? 413 : 400).json({ error: err.code === 'LIMIT_FILE_SIZE' ? 'Datei größer als 20 MB.' : err.message });
     try {
       if (!req.file) return res.status(400).json({ error: 'Keine Datei (Feld „datei“).' });
       const b = req.body || {};
@@ -53,6 +54,16 @@ router.post('/', (req, res, next) => {
       next(e);
     }
   });
+});
+
+/* v4860 · ein ganzes Jahr löschen (Objekt Pflicht, damit nie versehentlich alle Objekte getroffen werden) */
+router.delete('/', async (req, res, next) => {
+  try {
+    const o = String(req.query.objekt || ''), j = Number(req.query.jahr);
+    if (!UUID.test(o) || !(j >= 1900 && j <= 2200)) return res.status(400).json({ error: 'objekt und jahr nötig' });
+    const n = await ablage.loeschenJahr(req.user.id, o, j);
+    res.json({ geloescht: n });
+  } catch (e) { next(e); }
 });
 
 router.get('/:id', async (req, res, next) => {

@@ -427,6 +427,27 @@
     setTimeout(neuZeichnen, 120);
     return true;
   }
+  /* v4860 · Löschen eines Eintrags fragt, ob die abgelegten Originale mit sollen (Marcel 25.11.2026, Dokumentenablage) */
+  function eintragLoeschenMitDatei(id) {
+    var x = lesen().verlauf.filter(function (v) { return v.id === id; })[0];
+    var ids = x ? (x.dokumente || []).filter(function (d) { return d && d.datei_id; }) : [];
+    if (!ids.length || !window.DpAblage) { eintragLoeschen(id); return; }
+    window.DpAblage.bestaetigen('Auch die Originale löschen?', 'Zu diesem Eintrag liegen ' + ids.length + (ids.length === 1 ? ' Datei' : ' Dateien') + ' in deiner Ablage. Übernommene Werte bleiben im Objekt stehen.',
+      [{ wert: 'mit', text: 'Eintrag und Dateien löschen', rot: true }, { wert: 'ohne', text: 'Nur Eintrag löschen' }, { wert: false, text: 'Abbrechen' }]).then(function (w) {
+      if (!w) return;
+      eintragLoeschen(id);
+      if (w === 'mit') ids.forEach(function (d) { window.DpAblage.loeschenDatei(d.datei_id); });
+      setTimeout(function () { try { window.DpAblage.fuellen(); } catch (e) {} }, 600);
+    });
+  }
+  /** v4860 · nach dem Ablegen: Datei-Kennungen an die jüngsten Verlaufseinträge hängen (Name → Kennung) */
+  function dateienVerknuepfen(ids) {
+    if (!ids || !Object.keys(ids).length) return 0;
+    var o = lesen(), n = 0;
+    o.verlauf.slice(-20).forEach(function (v) { (v.dokumente || []).forEach(function (d) { if (d && !d.datei_id && ids[d.name]) { d.datei_id = ids[d.name]; n++; } }); });
+    if (n) { schreiben(o); setTimeout(neuZeichnen, 200); }
+    return n;
+  }
   /* Zwei Klicks statt Bestätigungsfenster: der erste fragt im Knopf selbst nach.
      v3154g · gemessen: die Pilot-Analyse zeichnet nach dem Speichern neu - ein Merker AM Knopf ging
      zwischen erstem und zweitem Klick verloren. Der Merker liegt deshalb hier und übersteht das Neuzeichnen. */
@@ -449,7 +470,7 @@
       return;
     }
     _scharf = null;
-    if (art === 'zurueck') zuruecknehmen(id); else eintragLoeschen(id);
+    if (art === 'zurueck') zuruecknehmen(id); else eintragLoeschenMitDatei(id);
   }
   /** Eintrag ohne Kennung (vor v3154) bekommt beim ersten Zeichnen eine - löschen geht dann auch dort */
   function kennungenNachziehen(o) {
@@ -610,7 +631,8 @@
       + (sichtbar.length ? '' : '<div class="dp-eg-z dp-eg-leer" role="row"><span></span><span class="dp-eg-nichts">Kein Eintrag passt zum Filter.</span></div>')
       + sichtbar.map(function (r) {
         var x = r.x, nu = (x.uebernommen || []).length, docs = x.dokumente || [];
-        var marken = docs.map(function (d) { return '<span class="dp-eg-dok" title="' + esc(d.name) + '">' + (d.typ ? '<i>' + esc(d.typ) + '</i>' : '') + esc(d.name) + '</span>'; }).join('')
+        var marken = docs.map(function (d) { return '<span class="dp-eg-dok" title="' + esc(d.name) + '">' + (d.typ ? '<i>' + esc(d.typ) + '</i>' : '') + esc(d.name) + '</span>'
+          + (d.datei_id && window.DpAblage ? '<button type="button" class="dp-eg-orig" title="Original aus der Ablage ansehen" data-eg-orig="' + esc(d.datei_id) + '" data-eg-name="' + esc(d.name) + '" onclick="DpAblage.oeffnen(this.getAttribute(\'data-eg-orig\'),this.getAttribute(\'data-eg-name\'))">Original</button>' : ''); }).join('')
           + (x.nicht_gelesen || []).map(function (n) { return '<span class="dp-eg-dok warn" title="Nichts gelesen. Bitte von Hand prüfen.">' + '<i>nichts gelesen</i>' + esc(n) + '</span>'; }).join('');
         var zr = x.zurueck
           ? '<div class="dp-eg-hin">Zurückgenommen am ' + esc(datum(x.zurueck.am)) + ', ' + x.zurueck.anzahl + (x.zurueck.anzahl === 1 ? ' Wert' : ' Werte')
@@ -679,6 +701,7 @@
       + '.dp-eg-dat{font:600 12px/1.6 "JetBrains Mono",ui-monospace,monospace;color:#6B645A;font-variant-numeric:tabular-nums}'
       + '.dp-eg-doks{display:flex;flex-wrap:wrap;gap:5px;min-width:0}'
       + '.dp-eg-dok{display:inline-flex;align-items:center;gap:6px;max-width:100%;border:1px solid rgba(42,39,39,.12);border-radius:6px;padding:3px 8px;font-size:12px;line-height:1.35;background:#FDFCFA;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}'
+      + '.dp-eg-orig{font:600 11px/1 inherit;padding:3px 7px;margin-left:4px;border-radius:6px;cursor:pointer;background:transparent;border:1px solid var(--wl-c9a84c,#C9A84C);color:inherit}'
       + '.dp-eg-dok i{font-style:normal;font:600 9.5px/1 "JetBrains Mono",monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--wl-9a7f33,#9a7f33)}'
       + '.dp-eg-dok.warn{border-color:rgba(184,98,92,.5);color:#B8625C}.dp-eg-dok.warn i{color:#B8625C}'
       + '.dp-eg-hin{flex-basis:100%;font-size:11.5px;color:#8a7a55;margin-top:2px}'
@@ -968,5 +991,5 @@
     einheiten: einheiten, mvVorschlag: mvVorschlag, mvOptionen: mvOptionen, mvText: mvText, mvUebernehmen: mvUebernehmen, mvFelder: mvFelder,
     jahrStand: jahrStand, protokoll: protokoll, verlaufHtml: verlaufHtml, lesen: lesen, filtern: filtern, hin: hin, werteAuf: werteAuf, zieleVon: zieleVon /* v4680 */,
     /* v3154 */ txStart: txStart, txEnde: txEnde, feldStand: feldStand, feldGeaendert: feldGeaendert,
-    zuruecknehmen: zuruecknehmen, eintragLoeschen: eintragLoeschen, dokumenteEntfernen: dokumenteEntfernen, knopf: knopf, vorschau: vorschau };
+    zuruecknehmen: zuruecknehmen, eintragLoeschen: eintragLoeschen, eintragLoeschenMitDatei: eintragLoeschenMitDatei, dateienVerknuepfen: dateienVerknuepfen, dokumenteEntfernen: dokumenteEntfernen, knopf: knopf, vorschau: vorschau };
 })();

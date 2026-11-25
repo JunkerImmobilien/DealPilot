@@ -38,3 +38,27 @@ Prod nicht gemessen (Lesezugriff in dieser Sitzung gesperrt). Laut Code gleiche 
 ## Aufwand bei „A“
 
 Ein Paket: `dateiablage.js` einbinden (Karte im Reiter Haus & Unterlagen, Whitelabel, kein Schließen per Klick daneben), Eingang ruft `DpAblage.ablegen()` je gelesener Datei, in „Eingelesen und übernommen“ wird der Dateiname zum Link auf das Original, Löschkette am Objekt, Sicherung, Datenschutztext. Rund ein Tag inkl. Messung.
+
+## Entscheidung und Umsetzung (25.11.2026, v4860)
+
+Marcel: „Dokumentenablage machst du fertig“, danach „Investor 1 GB, Pro 3 GB“ und „Partner 5 GB“.
+
+| Plan | Ablage |
+|---|---|
+| Free | keine (nur Auslesen; vorhandene Dateien bleiben lesbar, Löschung 90 Tage nach Erkennen mit Mail) |
+| Starter | 500 MB |
+| Investor | 1 GB |
+| Pro | 3 GB |
+| Business | 25 GB |
+| Partner | 5 GB (Partner-Konto). Kunden eines Partners haben ein eigenes Abo (Investor per Platz) und damit ihr eigenes Kontingent (1 GB). |
+
+Datei höchstens 20 MB. Testphase (28 Tage Pro) hat 3 GB; endet sie ohne Abo, beginnt die 90-Tage-Frist.
+
+Abweichungen von der Vorlage, mit Grund:
+- Kontingente als Tabelle in `services/dateiAblage.js` (`GRENZE_JE_PLAN`), kein Plan-Merkmal in der Datenbank: eine Quelle, Prüfer liest sie.
+- Löschfrist 90 Tage nach Vertragsende (Vorlage: 30 Tage) nach Marcels Vorgabe im Auftrag.
+- Objekt gelöscht: Dateien bleiben (Objekte werden nicht gelöscht, nur „verloren“), wie bisher.
+- Partner-Zugriff: es gibt keinen Zugriff fremder Konten auf `/dateien` (nur das eigene Konto); eine Freigabe an Partner ist damit noch nicht gebaut, Standard ist „kein Zugriff“.
+- Sicherung: Prod-Nachtsicherung sichert das Uploads-Volume (inkl. `dateien/`) heute als Voll-tar, 7 Nächte. Neues Skript mit rsync-Schnappschüssen in `tools/server/nachtsicherung.sh` (auf Staging getestet).
+- Speicherort über `DATEI_ABLAGE_DIR` einstellbar (Storage Box ohne Umbau), Admin-Mail ab 70 % Plattenbelegung (`ABLAGE_PLATTE_WARN_PCT`, Empfänger `ABLAGE_WARN_TO`).
+- Datenschutz-Entwurf: `design/Vorschläge/dokumentenablage-datenschutz-entwurf-2026-11-25.md` (nicht veröffentlicht).

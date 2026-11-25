@@ -2970,9 +2970,12 @@
         '</div>' +
         (_jr ? '</div><div class="oabi-spalte oabi-spalte-jahre"><div class="oabi-spalte-t">Belege je Jahr</div><div class="oabi-body" id="oabi-r-jahre"></div></div></div>' : '') +
         '<div class="oabi-foot"><button type="button" class="oabi-btn" id="oabi-cancel">Schließen</button>' +
+          /* v4860 · Dokumentenablage: Häkchen „Original aufbewahren“ (nur mit Plan ab Starter sichtbar, Vorgabe an) */
+          '<label id="oabi-orig-w" title="Die eingelesenen Dateien bleiben verschlüsselt in „Meine Dokumente“ dieses Objekts." style="display:none;align-items:center;gap:6px;font-size:12.5px;margin-right:auto;margin-left:10px;cursor:pointer"><input type="checkbox" id="oabi-orig"> Original aufbewahren</label>' +
           '<button type="button" class="oabi-btn primary" id="oabi-apply" disabled><span style="display:inline-flex">' + svg('download', 14, '#fff') + '</span> Ausgewählte übernehmen</button></div>' +
       '</div>';
     document.body.appendChild(ov);
+    try { if (window.DpAblage) window.DpAblage.stand(true).then(function (s) { var w = document.getElementById('oabi-orig-w'), c = document.getElementById('oabi-orig'); if (w && c && s && s.darf_ablegen && s.bereit !== false) { w.style.display = 'inline-flex'; c.checked = true; } }); } catch (e) {}
     /* v1330: auch hier darf nichts dazwischenkommen - das Fenster ist
        schon weg, wenn der Rueckruf faellt. */
     /* v4470 · kein Schließen per Klick daneben, × oben und Esc schließen; läuft noch ein Lesevorgang, fragt der erste
@@ -3639,11 +3642,13 @@
       var _ohne = _files.filter(function (f) { return f.status !== 'ok' || (f.type !== 'rechnung' && !_hatWerte(f)); }).map(function (f) { return f.name; });
       /* v3163 · Marcel 03.11.2026: „lesen wir die nur aus und verwerfen die später … dann haben wir die Mietverträge
          nicht auf unserem Server“ - die Originale werden NICHT abgelegt (v3162 rückgebaut), nur die gelesenen Werte. */
+      var _orig = _ablageHaken() ? _files.filter(function (f) { return f.status === 'ok' && f.file; }) : [];   /* v4860 */
       if (window.DpEingang) window.DpEingang.protokoll({
         aenderungen: _aend, nicht_gelesen: _ohne, quelle: 'Eingang',
         dokumente: _files.filter(function (f) { return f.status === 'ok'; }).map(function (f) { return { name: f.name, typ: f.type === 'dokument' ? (f.dokLabel || 'Dokument') : f.type === 'rechnung' ? 'Rechnung' : f.type === 'market' ? 'Marktbericht' : 'Exposé' }; }),
         uebernommen: _applied.map(function (id) { var x = _merged[id]; return x ? (x.label + ': ' + String(x.value).slice(0, 120)) : id; })
       });
+      if (_orig.length) _originaleAblegen(_orig.map(function (f) { return { file: f.file, name: f.name, type: f.type, dokLabel: f.dokLabel }; }), 'eingang');   /* v4860 */
     } catch (e) {}
     } finally {
       /* v1330: kommt IMMER - auch wenn oben ein Feld geworfen hat. */
@@ -3832,7 +3837,8 @@
         if (it && OBJ2QC[id]) _qcItems.push({ label: it.label, value: it.value, source: it.source });
       });
       _qcEingang = {
-        dateien: _files.filter(function (f) { return f.status === 'ok'; }).map(function (f) { return { name: f.name, typ: _dateiTyp(f), art: f.type }; }),
+        dateien: _files.filter(function (f) { return f.status === 'ok'; }).map(function (f) { return { name: f.name, typ: _dateiTyp(f), art: f.type, file: f.file, dokLabel: f.dokLabel }; }),
+        original: _ablageHaken(),   /* v4860 */
         nicht: _files.filter(function (f) { return f.status !== 'ok'; }).map(function (f) { return f.name; }),
         liste: _unterlagenListe().map(function (u) { return { label: u.label, datei: u.dateiname }; }),
         qcItems: _qcItems
@@ -3843,6 +3849,23 @@
     if (typeof done === 'function') { try { done({ qcData: qcData, pendingList: pendingList, photos: photos }); } catch (e) {} }
   }
   var _qcEingang = null;
+  /* v4860 · Dokumentenablage (Marcel 25.11.2026): Originale verschlüsselt ablegen und an den Verlauf hängen.
+     Ohne gespeichertes Objekt wartet die Ablage bis zu 30 s auf die Objektkennung (Quick-Check-Übergabe speichert gleich danach). */
+  function _ablageHaken() { var c = document.getElementById('oabi-orig'), w = document.getElementById('oabi-orig-w'); return !!(c && w && w.style.display !== 'none' && c.checked); }
+  function _originaleAblegen(dateien, quelle) {
+    if (!window.DpAblage || !dateien || !dateien.length) return;
+    var t0 = Date.now();
+    (function warte() {
+      var o = window._currentObjKey;
+      if (!o) { if (Date.now() - t0 < 30000) return setTimeout(warte, 1000); try { if (window.toast) window.toast('Originale nicht abgelegt: Objekt noch nicht gespeichert.'); } catch (e) {} return; }
+      var liste = dateien.map(function (f) { return { file: f.file, name: f.name, ordner: window.DpAblage.ordnerFuer(f.type, f.dokLabel), meta: { art: f.dokLabel || f.type || '' } }; });
+      window.DpAblage.ablegenAlle(liste, { quelle: quelle, objekt: o }).then(function (e) {
+        try { if (window.DpEingang && window.DpEingang.dateienVerknuepfen) window.DpEingang.dateienVerknuepfen(e.ids); } catch (x) {}
+        try { if (e.fehler.length && window.toast) window.toast('Nicht abgelegt: ' + e.fehler.join(', ')); } catch (x) {}
+        try { window.DpAblage.fuellen(); } catch (x) {}
+      });
+    })();
+  }
   function _dateiTyp(f) { return f.type === 'dokument' ? (f.dokLabel || 'Dokument') : f.type === 'rechnung' ? 'Rechnung' : f.type === 'market' ? 'Marktbericht' : 'Exposé'; }
   /* v4700 · Aus welcher Datei kam ein Wert? source ist das Etikett der Unterlage (t.label), „Exposé“/„Marktbericht“
      oder eine Sammelquelle („Unterlagen“). Sammelquellen haben keine Datei und bekommen eine eigene Zeile. */
@@ -3920,6 +3943,7 @@
     } finally { _qcUebergabe = false; }
     _qcPendingMerged = {};
     try { _qcVerlauf(_proItem, _qcEingang); } catch (e) { try { console.warn('[obj-actions] Verlauf nach Übergabe:', e); } catch (_) {} }
+    try { if (_qcEingang && _qcEingang.original) _originaleAblegen(_qcEingang.dateien.filter(function (d) { return d.file; }).map(function (d) { return { file: d.file, name: d.name, type: d.art, dokLabel: d.dokLabel }; }), 'quickcheck'); } catch (e) {}   /* v4860 */
     _qcEingang = null;
     if (_mitUnterlagen && applied.indexOf('_dok_auswertung') >= 0) _pilotNachUebergabe();
     try { if (typeof window._v236MarkQcLoaded === 'function' && applied.length) window._v236MarkQcLoaded(applied); } catch (e) {}

@@ -1656,7 +1656,9 @@
   }
   function eingangVerlauf() {
     var vh = window.DpEingang ? window.DpEingang.verlaufHtml() : '';
-    return vh ? karte(kopfzeile('Eingelesen und übernommen') + vh, 'dp-pa4-mt') : '';
+    /* v4860 · Marcel 25.11.2026: Dokumentenablage für den Kunden. „Meine Dokumente“ steht direkt unter dem Verlauf. */
+    var ab = window.DpAblage ? karte(kopfzeile('Meine Dokumente') + window.DpAblage.html(), 'dp-pa4-mt') : '';
+    return (vh ? karte(kopfzeile('Eingelesen und übernommen') + vh, 'dp-pa4-mt') : '') + ab;
   }
 
   /* ══ v3440 · ANKAUF · BESTAND · ZIELBILD ALS EINE KENNZAHLEN-TABELLE ═════════════════════════════════

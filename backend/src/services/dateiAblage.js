@@ -21,9 +21,15 @@ const crypto = require('crypto');
 const { query } = require('../db/pool');
 
 const BASIS = process.env.DATEI_ABLAGE_DIR || path.join(__dirname, '..', '..', 'uploads', 'dateien');
-const MAX_DATEI = 25 * 1024 * 1024;
+const MAX_DATEI = 20 * 1024 * 1024;   /* v4860 · Marcel 25.11.2026: je Datei höchstens 20 MB */
 const MB = 1024 * 1024;
-const GRENZE_JE_PLAN = { free: 100 * MB, starter: 500 * MB, investor: 2048 * MB, pro: 10240 * MB, partner: 25600 * MB };
+/* v4860 · Dokumentenablage (Marcel 25.11.2026, Vorlage design/Vorschläge/dokumentenablage-2026-11-25.md):
+   Free keine Ablage (nur Auslesen) · Starter 500 MB · Investor 1 GB · Pro 3 GB · Business 25 GB · Partner 5 GB (Partner-Konto).
+   Marcel 25.11.2026: Investor 1 GB statt 2 GB, Pro 3 GB statt 10 GB, Partner 5 GB. Kunden eines Partners nutzen das
+   Kontingent ihres eigenen Plans.
+   Kunden eines Partners haben ihren eigenen Plan (Lizenz) und damit ihr eigenes Kontingent. */
+const GRENZE_JE_PLAN = { free: 0, starter: 500 * MB, investor: 1024 * MB, pro: 3072 * MB, business: 25600 * MB, partner: 5120 * MB };
+const FRIST_TAGE = 90;
 
 function _schluessel() {
   const k = String(process.env.DATEI_SCHLUESSEL || '').trim();
@@ -73,7 +79,10 @@ async function stand(userId) {
   const grenze = GRENZE_JE_PLAN[plan] != null ? GRENZE_JE_PLAN[plan] : GRENZE_JE_PLAN.free;
   const r = await query("SELECT COALESCE(SUM(groesse), 0)::bigint AS belegt, COUNT(*)::int AS anzahl FROM dateien WHERE user_id = $1 AND deleted_at IS NULL AND quelle IS DISTINCT FROM 'objektfoto'", [userId]);  /* v3310: Objektfotos zählen nicht */
   const belegt = Number(r.rows[0].belegt) || 0;
-  return { plan, grenze_bytes: grenze, belegt_bytes: belegt, frei_bytes: Math.max(0, grenze - belegt), anzahl: r.rows[0].anzahl, max_datei_bytes: MAX_DATEI, bereit: bereit() };
+  let frist = null;
+  try { const f = await query('SELECT frist_am FROM dateien_fristen WHERE user_id = $1', [userId]); if (f.rowCount) frist = f.rows[0].frist_am; } catch (e) {}
+  return { plan, grenze_bytes: grenze, belegt_bytes: belegt, frei_bytes: Math.max(0, grenze - belegt), anzahl: r.rows[0].anzahl, max_datei_bytes: MAX_DATEI, bereit: bereit(),
+    darf_ablegen: grenze > 0, loeschung_am: frist };
 }
 
 async function _objektGehoert(userId, objectId) {
@@ -88,7 +97,7 @@ async function ablegen(userId, opts) {
   const fehler = (s, t) => { const e = new Error(t); e.status = s; return e; };
   if (!bereit()) throw fehler(503, 'Die Ablage ist auf diesem Server noch nicht eingerichtet.');
   if (!Buffer.isBuffer(puffer) || !puffer.length) throw fehler(400, 'Leere Datei.');
-  if (puffer.length > MAX_DATEI) throw fehler(413, 'Datei größer als 25 MB.');
+  if (puffer.length > MAX_DATEI) throw fehler(413, 'Datei größer als 20 MB.');
   if (!(await _objektGehoert(userId, opts.objectId))) throw fehler(403, 'Objekt gehört nicht zu diesem Konto.');
   const sha = crypto.createHash('sha256').update(puffer).digest('hex');
   /* dieselbe Datei im selben Ordner desselben Objekts nicht doppelt ablegen */
@@ -97,6 +106,7 @@ async function ablegen(userId, opts) {
     [userId, sha, ordner, opts.objectId || null]);
   if (dup.rowCount) return Object.assign({ doppelt: true }, dup.rows[0]);
   const s = await stand(userId);
+  if (!s.darf_ablegen) throw fehler(403, 'Die Dokumentenablage gibt es ab dem Plan Starter. Vorhandene Dateien kannst du weiter ansehen.');
   if (puffer.length > s.frei_bytes) throw fehler(507, 'Speicher voll: ' + Math.round(s.belegt_bytes / MB) + ' von ' + Math.round(s.grenze_bytes / MB) + ' MB belegt (Plan ' + s.plan + ').');
   const schluessel = crypto.randomBytes(16).toString('hex');
   await _schreiben(userId, schluessel, puffer);
@@ -116,7 +126,7 @@ async function liste(userId, objectId) {
   if (objectId === null) w += ' AND object_id IS NULL';
   else if (objectId) { args.push(objectId); w += ' AND object_id = $2'; }
   const r = await query('SELECT id, object_id, ordner, name, mime, groesse, sha256, quelle, meta, created_at, updated_at FROM dateien WHERE ' + w + ' ORDER BY ordner, name', args);
-  return r.rows;
+  return r.rows.map((z) => Object.assign(z, { jahr: jahrVon(z) }));
 }
 
 async function holen(userId, id) {
@@ -147,9 +157,101 @@ async function loeschen(userId, id) {
   return true;
 }
 
+/* v4860 · Jahr einer Datei: Belegjahr aus meta.jahr, sonst das Jahr des Ablegens */
+function jahrVon(z) {
+  const j = z && z.meta && Number(z.meta.jahr);
+  if (j >= 1900 && j <= 2200) return j;
+  const d = z && z.created_at ? new Date(z.created_at) : null;
+  return d && !isNaN(d) ? d.getFullYear() : null;
+}
+
+/** v4860 · alle Dateien eines Jahres (je Objekt) löschen. Gibt die Zahl zurück. */
+async function loeschenJahr(userId, objectId, jahr) {
+  const j = Number(jahr); if (!(j >= 1900 && j <= 2200)) return 0;
+  const alle = await liste(userId, objectId);
+  let n = 0;
+  for (const d of alle) { if (d.jahr === j && await loeschen(userId, d.id)) n++; }
+  return n;
+}
+
+/** v4860 · Löschfrist nach Vertragsende. Konten mit Dateien, deren Plan keine Ablage mehr hat (Kündigung, Downgrade
+ *  auf Free): beim ersten Erkennen Frist = heute + 90 Tage und eine Mail; ist die Frist vorbei, werden die Dateien
+ *  gelöscht. Wieder ein Plan mit Ablage: die Frist fällt weg. opt: { mail(userId, fristAm), jetzt, trocken, nurNutzer } */
+async function fristLauf(opt) {
+  opt = opt || {};
+  const jetzt = opt.jetzt ? new Date(opt.jetzt) : new Date();
+  const erg = { geprueft: 0, neu: 0, aufgehoben: 0, geloescht_konten: 0, geloescht_dateien: 0 };
+  const args = [];
+  let w = "deleted_at IS NULL AND quelle IS DISTINCT FROM 'objektfoto'";
+  if (opt.nurNutzer) { args.push(opt.nurNutzer); w += ' AND user_id = $1'; }
+  const nutzer = await query('SELECT DISTINCT user_id FROM dateien WHERE ' + w, args);
+  for (const z of nutzer.rows) {
+    erg.geprueft++;
+    const s = await stand(z.user_id);
+    const f = await query('SELECT frist_am FROM dateien_fristen WHERE user_id = $1', [z.user_id]);
+    if (s.darf_ablegen) {
+      if (f.rowCount && !opt.trocken) { await query('DELETE FROM dateien_fristen WHERE user_id = $1', [z.user_id]); erg.aufgehoben++; }
+      continue;
+    }
+    if (!f.rowCount) {
+      const am = new Date(jetzt.getTime() + FRIST_TAGE * 864e5);
+      if (!opt.trocken) {
+        await query('INSERT INTO dateien_fristen (user_id, erkannt_am, frist_am) VALUES ($1, $2, $3) ON CONFLICT (user_id) DO NOTHING', [z.user_id, jetzt, am]);
+        try { if (opt.mail) { await opt.mail(z.user_id, am); await query('UPDATE dateien_fristen SET mail_am = $2 WHERE user_id = $1', [z.user_id, jetzt]); } } catch (e) {}
+      }
+      erg.neu++;
+      continue;
+    }
+    if (new Date(f.rows[0].frist_am) <= jetzt) {
+      const r = await query("SELECT id FROM dateien WHERE user_id = $1 AND deleted_at IS NULL AND quelle IS DISTINCT FROM 'objektfoto'", [z.user_id]);
+      if (!opt.trocken) {
+        for (const d of r.rows) { if (await loeschen(z.user_id, d.id)) erg.geloescht_dateien++; }
+        await query('DELETE FROM dateien_fristen WHERE user_id = $1', [z.user_id]);
+      }
+      erg.geloescht_konten++;
+    }
+  }
+  return erg;
+}
+
+/** v4860 · Hinweis-Mail zur Löschfrist (nur, wenn der Takt scharf ist) */
+async function fristMail(userId, fristAm) {
+  const r = await query('SELECT email FROM users WHERE id = $1', [userId]);
+  if (!r.rowCount || !r.rows[0].email) return;
+  const datum = new Date(fristAm).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'Europe/Berlin' });
+  const text = 'Hallo,\n\ndein Plan enthält keine Dokumentenablage mehr. Deine abgelegten Unterlagen kannst du bis zum ' + datum
+    + ' weiter ansehen und herunterladen. Danach löschen wir sie.\n\nWillst du sie behalten, lade sie vorher herunter oder wähle wieder einen Plan ab Starter.\n\nDein DealPilot-Team';
+  await require('./mailerService').sendMail({ to: r.rows[0].email, subject: 'Deine Dokumentenablage: Löschung am ' + datum, text });
+}
+
+/** v4860 · Plattenbelegung des Ablage-Laufwerks (Marcel 25.11.2026: Warnung ab 70 %). Der Speicherort ist über
+ *  DATEI_ABLAGE_DIR einstellbar (z. B. eine eingehängte Storage Box), ohne Umbau. Gibt null zurück, wenn statfs fehlt. */
+const PLATTE_WARN_PCT = Number(process.env.ABLAGE_PLATTE_WARN_PCT || 70);
+async function plattenStand() {
+  try {
+    await fs.promises.mkdir(BASIS, { recursive: true });
+    const s = await fs.promises.statfs(BASIS);
+    const gesamt = Number(s.blocks) * Number(s.bsize), frei = Number(s.bavail) * Number(s.bsize);
+    const pct = gesamt ? Math.round((1 - frei / gesamt) * 1000) / 10 : 0;
+    return { ort: BASIS, gesamt_bytes: gesamt, frei_bytes: frei, belegt_pct: pct, warn_pct: PLATTE_WARN_PCT, warnung: pct >= PLATTE_WARN_PCT };
+  } catch (e) { return null; }
+}
+/** Admin-Warnung (eine Mail je Lauf, der Takt läuft täglich). An ABLAGE_WARN_TO, sonst CREDIT_ALERT_TO, sonst info@. */
+async function plattenWarnung(opt) {
+  opt = opt || {};
+  const p = opt.stand || await plattenStand();
+  if (!p || !p.warnung) return { gewarnt: false, stand: p };
+  const an = process.env.ABLAGE_WARN_TO || process.env.CREDIT_ALERT_TO || 'info@dealpilot.immo';
+  const text = 'Die Dokumentenablage ist zu ' + String(p.belegt_pct).replace('.', ',') + ' % belegt (Warnschwelle ' + p.warn_pct + ' %).\n'
+    + 'Ort: ' + p.ort + '\nFrei: ' + Math.round(p.frei_bytes / MB) + ' MB von ' + Math.round(p.gesamt_bytes / MB) + ' MB.\n\n'
+    + 'Abhilfe: Volume vergrößern oder DATEI_ABLAGE_DIR auf einen größeren Speicher (Storage Box) umstellen und den Ordner umziehen.';
+  if (!opt.trocken) await (opt.mail || ((o) => require('./mailerService').sendMail(o)))({ to: an, subject: 'DealPilot · Dokumentenablage ' + p.belegt_pct + ' % belegt', text });
+  return { gewarnt: true, stand: p, an };
+}
+
 /** Konto gelöscht: alle Dateien vom Laufwerk (die Zeilen löscht die Kaskade). */
 async function kontoLeeren(userId) {
   try { await fs.promises.rm(path.join(BASIS, String(userId)), { recursive: true, force: true }); return true; } catch (e) { return false; }
 }
 
-module.exports = { ablegen, liste, holen, aendern, loeschen, stand, kontoLeeren, bereit, ordnerSauber, nameSauber, GRENZE_JE_PLAN, MAX_DATEI, _lesen, _schreiben, _entfernen };
+module.exports = { ablegen, liste, holen, aendern, loeschen, loeschenJahr, fristLauf, fristMail, plattenStand, plattenWarnung, jahrVon, FRIST_TAGE, stand, kontoLeeren, bereit, ordnerSauber, nameSauber, GRENZE_JE_PLAN, MAX_DATEI, _lesen, _schreiben, _entfernen };
