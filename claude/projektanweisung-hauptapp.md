@@ -45629,3 +45629,10 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Was:** II4-Befund nachgestellt, keine Regression (Ursachen: zu früher Klick vor v4780f, Messskript mit globalem `var el`). Neuer Prüfer `tools/qc-uebergabe-pruefen.mjs` (Quelltext-Verträge + `--objekt` Datensatz).
 - **Commit:** staging f0231e37, main nur Prüfer. Kein App-Code, keine Version.
 - **Nachweis:** 2026-1198 (Staging) 17/17, Gegenproben rot. 2026-1197 auf Verloren.
+
+### v4790–v4790h · Investment-PDF Muster im Deal-Check-Stil (nur Staging, wartet auf Marcel)
+
+- **Was:** drei Fassungen hinter `DpDokumente.dokument('iv_a_muster'|'iv_b_muster'|'iv_c_muster')`: Kurzfassung (A), Kombi mit Langfassung (B), Bankfassung (C). Rechenweg aus dem Stufe-3-Bericht, Investor Deal Score mit zwei Teilscores, Fazit am Schluss, Quellen immer zuletzt, Inhaltsverzeichnis auf einer Seite.
+- **Commit:** staging fb141830 … 55d8b1d1 (v4790–v4790h, Buster zuletzt `dp-dokumente.js?v=v4800a1` wegen paralleler v4800), Wissen 6694c73e.
+- **Nachweis:** Muster `Dateien/Investment-PDF/v4790/*-v4790b.pdf`, jede Seite gerendert und angesehen (A 13/12, B 32/28, C 14/13 Seiten).
+- **Rest:** nicht auf Prod; KI-Texte älter als die Zahlen bis zum nächsten Abruf; drei dünne Fortsetzungsseiten in der Kombi.
