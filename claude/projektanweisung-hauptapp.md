@@ -45672,3 +45672,10 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Nachweis:** Staging-Messung im iframe (Schreibzugriffe abgefangen, 89 geblockt): Westerfeldstr. 146, Demostraße 5, Hauptstr. 51 bei 1440/1024/820 hell; Westerfeldstr. 146 dunkler Skin 1440 und Partnerfarbe Blau 1440/390. Partnerfarbe: 0 Stellen hartes Gold in allen Reitern. Keine NaN/undefined, kein seitliches Scrollen. Alle Überläufe liegen in Scroll-Containern (Reiterleiste, Zeitstrahl, Abweichungstafel, Steuer-Schnellansicht) oder sind Screenreader-Text. Prüfer grün: buster-ebenen, rechenkerne-spiegeln, mietpotenzial 311, einzelcheck, steuerjahr 36, vorschau, unterlagen-steuer 53, sonderumlage 26, ek-rendite 51, jahresbuch 61, prompt-lecks, objekt-mapper; gold-audit Prod RC 0. Prod-Sicherung haupt-/mb-20261125-1021-v4810 (7,0/31 MB), Kopf gelesen.
 - **Commit:** staging 8b52f9d3, 40b5d40d · main 9d7bb194 (Version 1.0.218) plus Buster v4810m.
 - **Rest:** Kontrast: Statusfarben Grün/Rot und gedämpfte Grautöne als kleine Schrift liegen bei 3,0 bis 4,4 : 1 (Markenentscheidung, nicht geändert). mietpotenzial-kern-Texte mit Gedankenstrich bleiben (Wortlaut ist Teil der Prüfsumme und kommt aus mehreren Modulen). Einstellungen „Miete“ 11 px = Element der dahinterliegenden Ansicht, nicht sichtbar. jahresabgleich-pruefen G (hartes Gold) rot durch hausverlauf.js (Fork II4). Westerfeldstr. 146 updated_at 10:11:21 nach der Messung, Ursache nicht zuordenbar (Schreibzugriffe im iframe geblockt, andere Forks hatten das Objekt offen).
+
+### v4840 · jahresabgleich-pruefen G (RR4)
+
+- **Was:** Punkt G akzeptiert jedes Gold als Whitelabel-Token var(--wl-<hex>, #<hex>), wie gold-audit. hausverlauf.js war schon tokenisiert, rot war nur der zu enge Prüfer.
+- **Commit:** staging 91ff4713 · main 4fb12468. Nur Prüfer, keine App-Änderung, kein Rollout nötig.
+- **Nachweis:** 177/177, Gegenprobe rot; gold-audit Staging sauber.
+- **Rest:** Partnerfarbe nicht im Browser nachgemessen.
