@@ -633,6 +633,29 @@
       + '<div class="block"><h3>Beleihungsauslauf (LTV) im Verlauf</h3>' + B.kacheln([{ l: 'LTV heute', v: B.pct(CD.ltvToday, 1) }, { l: 'LTV Ende Zinsbindung', v: B.pct(CD.ltvEzb, 1), s: CD.bindj ? 'Jahr ' + CD.bindj : '' }, { l: 'LTV Ende', v: B.pct(CD.ltvEnd, 1), s: 'Betrachtungsende' }], true) + ltv + '</div>';
   }
   /* Belastungsprobe: die Matrix rechnet BankCharts (HTML), hier werden ihre 25 Zellen ausgelesen - wie pdf-investment-bank.js */
+  /* v4790m · DSCR und LTV wie im Bank-Cockpit der App (bank-charts.js renderBankCockpit), Marcel 25.11.2026: „Vor einer Woche
+     hatten wir noch andere Grafiken und Charts dort“. Die Karte wird mit der App gerechnet und mit ihren eigenen Regeln
+     (.bc-*) samt den aufgelösten Farbwerten (Whitelabel) ins Dokument gelegt. Kopf der Karte entfällt, den trägt der Abschnitt. */
+  var _bcCss = null;
+  function cockpitApp() {
+    if (!window.BankCharts || typeof BankCharts.renderBankCockpit !== 'function') return '';
+    var tmp = document.createElement('div'); tmp.style.cssText = 'position:fixed;left:-3000px;top:0;width:1000px'; document.body.appendChild(tmp);
+    try { BankCharts.renderBankCockpit(tmp, window.State); } catch (e) { tmp.remove(); return ''; }
+    var kopf = tmp.querySelector('.bc-head'); if (kopf) kopf.remove();
+    var html = tmp.innerHTML; tmp.remove();
+    if (!/bc-kpi/.test(html)) return '';
+    if (_bcCss === null) {
+      var r = [];
+      [].forEach.call(document.styleSheets, function (sh) { var l; try { l = sh.cssRules; } catch (e) { return; }
+        [].forEach.call(l || [], function (x) { if (x.selectorText && /\.bc-/.test(x.selectorText)) r.push(x.cssText); }); });
+      var css = r.join(''), namen = {}, m, re = /var\((--[a-zA-Z0-9_-]+)/g;
+      while ((m = re.exec(css))) namen[m[1]] = 1;
+      var cs = getComputedStyle(document.documentElement), v = [];
+      Object.keys(namen).forEach(function (n) { var w = cs.getPropertyValue(n); if (w && w.trim()) v.push(n + ':' + w.trim()); });
+      _bcCss = '.dp-bc{' + v.join(';') + '}' + css + '.dp-bc .bc-card{break-inside:avoid;page-break-inside:avoid;box-shadow:none}';
+    }
+    return '<style>' + _bcCss + '</style><div class="dp-bc">' + html + '</div>';
+  }
   function stressMatrix(B) {
     if (!window.BankCharts || typeof BankCharts.renderStressMatrix !== 'function') return '';
     var tmp = document.createElement('div'); tmp.style.cssText = 'position:fixed;left:-3000px;top:0;width:700px;height:420px'; document.body.appendChild(tmp);
@@ -1044,6 +1067,10 @@
   /* Kundentext ohne Gedankenstriche und Semikolons (Marcel 08.11.): nur im Text zwischen Tags, nie in Stil oder Attributen.
      Ein einzelnes „–“ als Platzhalter für „kein Wert“ bleibt. */
   function ohneStriche(html) {
+    /* v4790m · <style>-Blöcke (Bank-Cockpit) bleiben unberührt, sonst würde aus „a; b“ im CSS „a, b“ */
+    return String(html).split(/(<style[^>]*>[^<]*<\/style>)/).map(function (teil) { return /^<style/.test(teil) ? teil : ohneStricheText(teil); }).join('');
+  }
+  function ohneStricheText(html) {
     return String(html).replace(/>([^<]+)</g, function (m, t) {
       return '>' + t.replace(/\s[–—]\s/g, ', ').replace(/^\s*[–—]\s+(?=\S)/, '').replace(/(&[#a-zA-Z0-9]+;)|;\s/g, function (x, ent) { return ent || ', '; }) + '<';   /* v4790l · Entitäten wie &amp; bleiben */
     });
@@ -1129,7 +1156,8 @@
     var dl = darlehen();
     var dlT = dl.length ? '<table class="dicht"><thead><tr><th>Darlehen</th><th class="r">Betrag</th><th class="r">Zins</th><th class="r">Tilgung</th><th class="r">Bindung</th><th class="r">Rate / Monat</th></tr></thead><tbody>'
       + dl.map(function (d) { return '<tr><td>' + B.esc(d.name) + '</td><td class="r num">' + B.eur(d.betrag) + '</td><td class="r num">' + B.pct(d.zins, 2) + '</td><td class="r num">' + B.pct(d.tilg, 2) + '</td><td class="r num">' + (d.bind ? B.zahl(d.bind, 0) + ' J.' : '–') + '</td><td class="r num">' + B.eur(d.rate, 0) + '</td></tr>'; }).join('') + '</tbody></table>' : '';
-    add('Finanzierung und Anschluss', 'Darlehen, Rate und Cashflow je Phase, DSCR und LTV im Verlauf', dlT + dreiPhasen(K, B) + bankCockpit(B, true), 1);
+    add('Finanzierung und Anschluss', 'Darlehen, Rate und Cashflow je Phase', dlT + dreiPhasen(K, B), 1);
+    add('DSCR und LTV im Verlauf', 'Deckung und Beleihung heute, am Ende der Zinsbindung und im Anschluss', cockpitApp() || bankCockpit(B, true), 1);   /* v4790m */
     if (bankF) {
       var bc = bankCockpit(B, false), sm = stressMatrix(B), d1 = zahlAus('d1') || K.d_total || 0;
       add('Sicherheiten und Belastungsprobe', 'Objektwert und Beleihung, DSCR je Zins- und Mietszenario', '<h3>Sicherheiten</h3>' + B.liste([['Objektwert, maßgebend', mw ? B.eur(mw.wert) : '–', { det: mw ? mw.det : 'kein Marktbericht, Kaufpreis als Bezug' }], ['Kaufpreis', B.eur(K.kp)], ['Darlehen', B.eur(d1)],
