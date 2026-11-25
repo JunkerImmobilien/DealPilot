@@ -112,6 +112,11 @@
       /* Einfach: Leiste, die Karten (ohne „Heute", das steht in der Leiste), je Objekt und Finanzierung. Genau: alles. */
       E + ' > [data-dp-gp="gb"],' + E + ' > [data-dp-gp="det"]{display:none !important}',
       E + ' .gp-klein{display:none}' + E + ' #dp-einfach .ke2 > .ke2-k:first-child{display:none}',
+      /* v4870 · Marcel 25.11.2026: „im Standard unter Einfach sieht es nicht so aus wie die Matrix". Wie Demo 07 kompakt:
+         ist die Objektmatrix an, folgen auf die Kennzahlen direkt die Karten und die Tabelle Bestand und Zielbild,
+         die Einfach-Zusammenfassung (Gesamtbewertung, Zielbild, Steuer) entfällt dann. */
+      E + '.gp-om-an > #dp-einfach{display:none !important}',
+      E + '.gp-om-an > .cp-sek[data-sek="zielbild"]:not(.gp-aus){display:block !important}',
       B + ' .gp-sl{margin:6px 0 10px}',
       B + '{margin:14px 0 18px;color:var(--c-ptext,#2A2727);font-family:Inter,system-ui,sans-serif;--c-ptext:#2A2727;--c-pmut:color-mix(in srgb,#2A2727 62%,transparent);--c-line:color-mix(in srgb,#2A2727 10%,transparent)}',   /* v4280 · Farbschema Reiter Bewertung */
       B + ' .gp-kopf{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:8px 16px;margin:0 2px 10px}',
@@ -556,6 +561,7 @@
     var hero = document.getElementById('dp-pscore-hero'), app = hero && hero.parentNode; if (!app || !AN) return;
     var A = ansLaden(), Z = ansichtZiele(app);
     app.classList.add('gp-bk-raster');
+    app.classList.toggle('gp-om-an', !!(Z.om && sichtbar('om')));   /* v4870 */
     Object.keys(Z).forEach(function (k) { if (Z[k]) Z[k].classList.toggle('gp-aus', !sichtbar(k)); });
     A.ord.forEach(function (k, i) { var el = Z[k]; if (!el) return; el.style.order = String(10 + i); el.classList.toggle('gp-halb', breite(k) === 'halb'); });
     A.ordVb.forEach(function (k, i) { var el = Z[k]; if (!el) return; el.style.order = String(i); el.classList.toggle('gp-breit', breite(k) !== 'halb'); });
@@ -628,7 +634,23 @@
     if (ev.shiftKey && document.activeElement === a) { ev.preventDefault(); b.focus(); }
     else if (!ev.shiftKey && document.activeElement === b) { ev.preventDefault(); a.focus(); }
   }
+  /* v4870 · Schnittstelle für den Arbeitsbereich (pf-werkstatt.js). Ist er geladen und aktiv, öffnet „Ansicht anpassen“
+     ihn statt der Seitenleiste. Ohne die Datei bleibt alles wie bisher. */
+  var GP_API = {
+    stand: function () { return ansLaden(); },
+    setzen: function (a) { _ans = normal(a); },
+    ansicht: ANSICHT, vorlagen: VORLAGEN, kzdef: KZDEF, vbk: VBK, top: TOP,
+    kzStandard: kzStandard, ausVorlage: ausVorlage,
+    ziel: function (k) { var hero = document.getElementById('dp-pscore-hero'), app = hero && hero.parentNode; return app ? (ansichtZiele(app)[k] || null) : null; },
+    kopf: function () { return document.querySelector('[data-dp-gp="kopf"]'); },
+    speichern: function (mitKz) { if (mitKz) kzGeaendert(); else { ansSpeichern(); ansichtAnwenden(); } },
+    seitenleiste: function () { ansichtOeffnenLeiste(); }
+  };
   function ansichtOeffnen() {
+    try { if (window.DpPfWerkstatt && DpPfWerkstatt.aktiv()) { DpPfWerkstatt.oeffnen(GP_API); return; } } catch (e) {}
+    ansichtOeffnenLeiste();
+  }
+  function ansichtOeffnenLeiste() {
     ansLaden(); if (_bkOffen) { bkListe(); return; }
     _bkOffen = true; _bkVorher = document.activeElement; stil4();
     /* Hintergrund dunkelt ab, schließt aber NIE per Klick (Marcel 24.11.2026): nur ×, Fertig oder Esc */
@@ -1152,7 +1174,7 @@
     spaeter();
   }
   function pruefeFreigabe() { try { if (window.DpVorschau) window.DpVorschau.frei('grafiken_neu').then(function (an) { if (an) start(); }); } catch (e) {} }
-  window.DpGrafikenPortfolio = { zeichnen: function (host) { stil(); return zeichnen(host); }, an: function () { return AN; }, ansichtOeffnen: ansichtOeffnen, ANSICHT: ANSICHT, sichtbar: sichtbar, neu: function () { var h = document.querySelector('[data-dp-gp="kopf"]'); if (h) h.removeAttribute('data-gp-sig'); lauf(); },
+  window.DpGrafikenPortfolio = { zeichnen: function (host) { stil(); return zeichnen(host); }, an: function () { return AN; }, ansichtOeffnen: ansichtOeffnen, ANSICHT: ANSICHT, sichtbar: sichtbar, api: GP_API, neu: function () { var h = document.querySelector('[data-dp-gp="kopf"]'); if (h) h.removeAttribute('data-gp-sig'); lauf(); },
     _test: { projektion: projektion, bindKalender: bindKalender, hinweise: hinweise, bereich: bereich } };
   /* v4260 · Einstellungen › Anzeige-Optionen › „Portfolio-Cockpit: Grafiken auswählen“: Einstellungen zu, Cockpit auf, Panel auf */
   window._dpCockpitAnsicht = function () {

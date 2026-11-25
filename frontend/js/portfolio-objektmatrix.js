@@ -66,9 +66,17 @@
     z('DSCR', da(r.dscr) ? nf2.format(r.dscr) : null, dsTon);
     z('Zins bis', zb, zbBald != null && zbBald <= 3 ? 'om-minus' : '');
     z('EK-Rendite', ek != null ? pct(ek, 1) : null, ton(ek));
+    /* v4870 · wie Demo 07: EK eingesetzt, Hebel (Mietpotenzial im Jahr) und EK im Objekt */
+    var ekEin = r.ekr4 && da(r.ekr4.ek) ? r.ekr4.ek : (da(r.ek) ? r.ek : null);
+    z('EK eingesetzt', ekEin != null ? kurz(ekEin) : null);
+    var zbM = r.zb, mehrV = zbM && da(zbM.mZ) && da(zbM.mB) ? zbM.mZ - zbM.mB : null;
+    z('Hebel', mehrV != null && mehrV > 0 ? eurV(mehrV) : 'keiner', 'om-gold');
     z('EK im Objekt', da(r.wert) && da(r.rest) ? kurz(r.wert - r.rest) : null, da(r.wert) && da(r.rest) && r.wert - r.rest < 0 ? 'om-minus' : '');
     var art = [r.ort, r.art, r.we > 1 ? r.we + ' WE' : ''].filter(Boolean).join(' · ');
-    return bild(r) + '<div class="om-kopf"><div class="om-n">' + esc(r.name) + '</div><div class="om-o">' + esc(art) + '</div></div>' + ring(r.score)
+    /* v4870 · Name ohne angehängten Ort, der steht in der Zeile darunter */
+    var nm = String(r.name || '');
+    if (r.ort && nm.length > String(r.ort).length + 2 && nm.slice(-String(r.ort).length) === String(r.ort)) nm = nm.slice(0, -String(r.ort).length).replace(/[\s,]+$/, '');
+    return bild(r) + '<div class="om-kopf"><div class="om-n" title="' + esc(r.name) + '">' + esc(nm) + '</div><div class="om-o">' + esc(art) + '</div></div>' + ring(r.score)
       + '<div class="om-dl">' + dl.join('') + '</div><div class="om-dreh" aria-hidden="true">↻ mehr</div>';
   }
 
@@ -175,7 +183,7 @@
       H + ' .gx-kopf{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}',
       H + ' .om-sort{font:500 10.5px Inter,system-ui,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--gx-tinte3)}',
       H + ' .om-sort select{margin-left:6px;font:500 12px Inter,system-ui,sans-serif;text-transform:none;letter-spacing:0;color:var(--gx-tinte);background:var(--gx-karte);border:1px solid var(--gx-linie2);border-radius:8px;padding:3px 6px}',
-      H + ' .om-raster{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px;margin-top:12px}',
+      H + ' .om-raster{display:grid;grid-template-columns:repeat(auto-fill,minmax(178px,1fr));gap:12px;margin-top:12px}',
       H + ' .om-k{perspective:1200px;outline:none;cursor:pointer;min-width:0}',
       H + ' .om-in{display:grid;transition:transform .55s cubic-bezier(.2,.7,.2,1);transform-style:preserve-3d;min-height:100%;position:relative}',
       H + ' .om-gedreht .om-in{transform:rotateY(180deg)}',
@@ -189,14 +197,16 @@
       H + ' .om-bild{display:block;height:98px;margin:-10px -12px 9px;background:var(--gx-flaeche) center/cover no-repeat;border-bottom:1px solid var(--gx-linie)}',
       H + ' .om-leer{display:flex;align-items:center;justify-content:center}',
       H + ' .om-leer span{font:500 10.5px Inter,system-ui,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--gx-tinte3)}',
-      H + ' .om-kopf{padding-right:44px}',
-      H + ' .om-n{font:600 13.5px/1.25 "Space Grotesk",Inter,sans-serif;color:var(--gx-tinte)}',
-      H + ' .om-o{font:400 11.5px Inter,system-ui,sans-serif;color:var(--gx-tinte3);margin:1px 0 8px}',
-      H + ' .om-ring{position:absolute;right:9px;top:104px;width:38px;height:38px;background:var(--gx-karte);border-radius:50%}',
+      H + ' .om-kopf{padding-right:0}',
+      /* v4870 · wie Demo 07: Name einzeilig, Ring auf der unteren Bildkante, Raster enger */
+      H + ' .om-n{font:600 13px/1.25 "Space Grotesk",Inter,sans-serif;color:var(--gx-tinte);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
+      H + ' .om-o{font:400 11px Inter,system-ui,sans-serif;color:var(--gx-tinte3);margin:1px 0 7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
+      H + ' .om-ring{position:absolute;right:8px;top:56px;width:34px;height:34px;background:var(--gx-karte);border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,.18)}',
       H + ' .om-ring text{font:600 12px "Space Grotesk",Inter,sans-serif;fill:var(--gx-tinte)}',
-      H + ' .om-dl{display:grid;grid-template-columns:1fr 1fr;gap:6px 10px}',
-      H + ' .om-z span{display:block;font:500 9.5px Inter,system-ui,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--gx-tinte3)}',
-      H + ' .om-z b{display:block;font:600 14px "Space Grotesk",Inter,sans-serif;font-variant-numeric:tabular-nums;color:var(--gx-tinte)}',
+      H + ' .om-dl{display:grid;grid-template-columns:1fr 1fr;gap:4px 10px}',
+      H + ' .om-z span{display:block;font:500 9px Inter,system-ui,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--gx-tinte3)}',
+      H + ' .om-z b{display:block;font:600 13px "Space Grotesk",Inter,sans-serif;font-variant-numeric:tabular-nums;color:var(--gx-tinte);white-space:nowrap}',
+      H + ' .om-gold{color:var(--dp-gold-txt,#7d682f) !important}',
       H + ' .om-plus{color:' + GRUEN + ' !important}' + H + ' .om-minus{color:' + ROT + ' !important}',
       H + ' .om-dreh{position:absolute;right:10px;bottom:6px;font:600 9px "JetBrains Mono",monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--dp-gold-txt,#7d682f)}',
       H + ' .om-hn{font:600 12.5px "Space Grotesk",Inter,sans-serif;margin-bottom:4px}',
