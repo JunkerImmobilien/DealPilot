@@ -9848,3 +9848,11 @@ html[data-dk-drei][data-dk-stil="runway"] .dk-schalter.dk-drei .dk-seg.aktiv::af
   html[data-dk-drei][data-dk-stil="reiter"][data-dp-layout] aside#sidebar.sidebar .dk-schalter.dk-drei .dk-seg{ background:rgba(233,227,214,.045) !important; box-shadow:inset 0 0 0 1px rgba(233,227,214,.13) !important; }
   html[data-dk-drei][data-dk-stil="reiter"][data-dp-layout] aside#sidebar.sidebar .dk-schalter.dk-drei .dk-seg.aktiv{ color:var(--wl-e8cc7a,#E8CC7A) !important; background:color-mix(in srgb, var(--wl-c9a84c,#C9A84C) 20%, transparent) !important; box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--wl-c9a84c,#C9A84C) 60%, transparent), inset 0 2px 0 var(--wl-c9a84c,#C9A84C) !important; }
 }
+/* v4650c · gemessen: Container schrumpfte als Flex-Kind der Schiene (flex 0 1 auto) auf 50,8 px, die Runway-Beschriftung schrumpfte auf 6 px */
+html[data-dk-drei][data-dk-stil] .dk-schalter.dk-drei{ flex:0 0 auto !important; height:auto !important; min-height:0 !important; max-height:none !important; }
+html[data-dk-drei][data-dk-stil] .dk-schalter.dk-drei .dk-seg > span,
+html[data-dk-drei][data-dk-stil] .dk-schalter.dk-drei .dk-seg > b{ flex:0 0 auto !important; }
+html[data-dk-drei][data-dk-stil="runway"] .dk-schalter.dk-drei{ padding:6px 4px 12px !important; }
+html[data-dk-drei][data-dk-stil="runway"] .dk-schalter.dk-drei .dk-seg{ min-height:56px !important; padding:4px 2px !important; }
+html[data-dk-drei][data-dk-stil="runway"] .dk-schalter.dk-drei::after{ bottom:5px; }
+html[data-dk-drei][data-dk-stil="runway"] .dk-schalter.dk-drei .dk-seg.aktiv::after{ bottom:-9px; }
