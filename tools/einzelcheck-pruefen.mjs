@@ -1338,6 +1338,8 @@ for (const [teil, was, ueber] of GEGEN) {
   if (ecW.grundSauber({ einheiten: 0 }).einheiten == null) ok('Grundangaben: Wohnungszahl 0 fällt weg'); else fehl('Grundangaben: Wohnungszahl 0 angenommen');
   if (/class="ec-we-feld"' \+ \(g\.art === 'MFH' \? '' : ' hidden'\)/.test(frontW) && /einheiten: v\('ecgArt'\) === 'MFH' \? zahlAus\(v\('ecgWe'\)\) : null/.test(frontW)) ok('Formular: Anzahl Wohnungen nur beim Mehrfamilienhaus'); else fehl('Formular: Wohnungszahl fehlt oder gilt für jede Objektart');
   if (/sessionStorage\.setItem\('dp_ec_adr'/.test(frontW) && !/localStorage\.setItem\('dp_ec_adr'/.test(frontW) && /x\.t === tokenLesen\(\)/.test(frontW)) ok('Anschrift: nur im Browser-Tab, je Kauf'); else fehl('Anschrift: falsch gemerkt');
+  const mbW = ecW.mbEingabe({ art: 'MFH', einheiten: 8, plz: '32052' }, '').dealpilot, mbE = ecW.mbEingabe({ art: 'ETW', plz: '32052' }, '').dealpilot;
+  if (mbW.einheiten === 8 && mbW.ausst === 'normal' && !mbE.ausst) ok('Marktbericht: MFH mit Wohnungszahl und Ausstattung Normal (Standardstufe), ETW ohne'); else fehl('Marktbericht: MFH ohne Wohnungszahl oder Ausstattung');
   if (/Anschrift erneut eingeben, sonst fehlt der Bodenrichtwert/.test(frontW)) ok('Anschrift: Hinweis im Notweg, wenn sie fehlt'); else fehl('Anschrift: kein Hinweis im Notweg');
   /* Gegenprobe: dokument() ohne opt.css-Zweig muss rot werden */
   const ohne = dokText.replace("(opt && typeof opt.css === 'string' ? opt.css : '') + ", '');

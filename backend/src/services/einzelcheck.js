@@ -242,7 +242,7 @@ const ZAHL_GRENZEN = {
 };
 /* v3946 · GRUNDANGABEN des Kaeufers (Formular „Objekt“ und „Finanzierung“). Nur diese Felder, ueber dieselbe
    Weissliste wie die gelesenen Zahlen. Pflicht: GRUND_PFLICHT und PLZ oder Ort. */
-const GRUND_FELDER = ['kp', 'nkm', 'wfl', 'art', 'plz', 'ort', 'bj', 'gsfl', 'ze', 'nk_pct', 'mea_pct', 'einheiten', 'ek_eur', 'zins_pct', 'tilg_pct', 'bindung_j'];   /* einzelcheck-10 · einheiten: Wohnungszahl beim MFH (Sachwert) */
+const GRUND_FELDER = ['kp', 'nkm', 'wfl', 'art', 'plz', 'ort', 'bj', 'gsfl', 'ze', 'nk_pct', 'mea_pct', 'einheiten', 'ausst', 'ek_eur', 'zins_pct', 'tilg_pct', 'bindung_j'];   /* einzelcheck-10 · einheiten: Wohnungszahl beim MFH (Sachwert) */
 const GRUND_PFLICHT = ['kp', 'nkm', 'wfl', 'art', 'ek_eur', 'zins_pct', 'tilg_pct', 'bindung_j'];
 function grundSauber(g) {
   if (typeof g === 'string') { try { g = JSON.parse(g); } catch (e) { g = null; } }
@@ -261,6 +261,7 @@ const TEXT_REGELN = {
   plz: /^\d{5}$/,
   ort: /^[A-Za-zÄÖÜäöüß][A-Za-zÄÖÜäöüß .\-()/]{1,59}$/,
   art: /^(ETW|EFH|ZFH|DHH|RH|MFH|GEW)$/,
+  ausst: /^(einfach|normal|gehoben|luxus)$/,   /* einzelcheck-10 · Ausstattung beim MFH (Standardstufe des Sachwerts) */
   ek_klasse: /^(A\+|A|B|C|D|E|F|G|H)$/,
   zustand: /^(neubau|erstbezug|saniert|renoviert|modernisiert|renovierungsbeduerftig)$/,
   wert_verfahren: /^(vergleichswert|ertragswert|sachwert|marktpreisindikation|verkehrswert)$/
@@ -917,7 +918,10 @@ function mbEingabe(zahlen, adresse) {
   return { address: adr, wert_stufe: MB_STUFE,
     dealpilot: { plz: z.plz || '', ort: z.ort || '', objart: z.art || '', wfl: z.wfl || null, baujahr: z.bj || null, kp: z.kp || null,
       nkm: z.nkm || null, gsfl: z.gsfl || null, einheiten: z.einheiten || null, zimmer: z.zimmer || null, energieklasse: z.ek_klasse || null,
-      mea: z.mea_pct || null } };
+      mea: z.mea_pct || null,
+      /* einzelcheck-10 · Ausstattung: der Sachwert eines MFH braucht die Standardstufe (Mapper ausst → standardstufe).
+         Wie in der App, deren Formular „Normal“ vorauswählt. */
+      ausst: z.ausst || (z.art === 'MFH' && z.einheiten > 0 ? 'normal' : '') } };
 }
 /* KI-Posten des mb-Dienstes erfassen (wie routes/marktbericht.js), ohne Nutzer, im Weg des Berichts */
 function kostenErfassen(j) {

@@ -63,7 +63,7 @@
 (function () {
   'use strict';
   if (window.DpEinzelCheck) return;
-  var VERSION = 'einzelcheck-10';
+  var VERSION = 'einzelcheck-10a';
   var ANSCHLUSS_ZINS = 5.0;     /* v3946 · Marcel 22.11.2026: „Anschlussfinanzierung, die wir einfach auf fünf Prozent rechnen mit derselben Tilgung“ */
   var ABLAGE_STUNDEN = 2;       /* v3946 · Unterlagen im Browser höchstens so lange (die Stripe-Kasse läuft nach 60 Minuten ab) */
   var SPEICHER = 'dp_ec_kauf';
@@ -411,7 +411,8 @@
       + f('ecgZe', 'ze', 'Zusatzeinnahmen im Monat', feldText(g.ze), { einheit: '€', frei: 1, ph: 'Stellplatz, Küche' }) + f('ecgBj', 'bj', 'Baujahr', g.bj ? String(Math.round(g.bj)) : '', { frei: 1, max: 4 })
       + f('ecgGsfl', 'gsfl', 'Grundstücksfläche', feldText(g.gsfl), { einheit: 'm²', frei: 1, ph: 'bei Häusern' }) + f('ecgMea', 'mea_pct', 'Miteigentumsanteil', feldText(g.mea_pct, 2), { einheit: '%', frei: 1, ph: 'bei Wohnungen' })
       /* einzelcheck-10 · Anzahl Wohnungen nur bei Mehrfamilienhaus: ohne sie rechnet der Sachwert nicht */
-      + '<div class="ec-we-feld"' + (g.art === 'MFH' ? '' : ' hidden') + '>' + f('ecgWe', 'einheiten', 'Anzahl Wohnungen', g.einheiten != null ? String(Math.round(g.einheiten)) : '', { frei: 1, max: 4, ph: 'nötig für den Sachwert' }) + '</div>'
+      + '<div class="ec-we-feld"' + (g.art === 'MFH' ? '' : ' hidden') + '>' + f('ecgWe', 'einheiten', 'Anzahl Wohnungen', g.einheiten != null ? String(Math.round(g.einheiten)) : '', { frei: 1, max: 4, ph: 'nötig für den Sachwert' })
+        + '<label class="ec-f"><span>Ausstattung</span><select id="ecgAusst">' + [['einfach', 'Einfach'], ['normal', 'Normal'], ['gehoben', 'Gehoben'], ['luxus', 'Luxuriös']].map(function (a) { return '<option value="' + a[0] + '"' + ((g.ausst || 'normal') === a[0] ? ' selected' : '') + '>' + a[1] + '</option>'; }).join('') + '</select><small class="ec-her">bestimmt die Standardstufe im Sachwert</small></label></div>'
       + f('ecgStr', 'strasse', 'Straße und Hausnummer', strasse, { text: 1, frei: 1, breit: 1, ph: 'nur für den Bodenrichtwert, wird nicht gespeichert' })
       + '</div>' + wertInfo + '</fieldset><fieldset><legend>Finanzierung</legend><div class="ec-raster">'
       + f('ecgEk', 'ek_eur', 'Eigenkapital', feldText(g.ek_eur), { einheit: '€' }) + f('ecgNk', 'nk_pct', 'Kaufnebenkosten', feldText(g.nk_pct != null ? g.nk_pct : 10, 1), { einheit: '%' })
@@ -469,7 +470,7 @@
       e.preventDefault();
       var v = function (id) { var x = document.getElementById(id); return x ? x.value : ''; };
       var n = { art: v('ecgArt'), kp: zahlAus(v('ecgKp')), nkm: zahlAus(v('ecgNkm')), wfl: zahlAus(v('ecgWfl')), plz: String(v('ecgPlz')).replace(/\D/g, '').slice(0, 5),
-        ort: String(v('ecgOrt')).trim().slice(0, 60), ze: zahlAus(v('ecgZe')), bj: zahlAus(v('ecgBj')), gsfl: zahlAus(v('ecgGsfl')), mea_pct: zahlAus(v('ecgMea')), einheiten: v('ecgArt') === 'MFH' ? zahlAus(v('ecgWe')) : null,
+        ort: String(v('ecgOrt')).trim().slice(0, 60), ze: zahlAus(v('ecgZe')), bj: zahlAus(v('ecgBj')), gsfl: zahlAus(v('ecgGsfl')), mea_pct: zahlAus(v('ecgMea')), einheiten: v('ecgArt') === 'MFH' ? zahlAus(v('ecgWe')) : null, ausst: v('ecgArt') === 'MFH' ? v('ecgAusst') : null,
         ek_eur: zahlAus(v('ecgEk')), nk_pct: zahlAus(v('ecgNk')), zins_pct: zahlAus(v('ecgZins')), tilg_pct: zahlAus(v('ecgTilg')), bindung_j: zahlAus(v('ecgBind')) };
       Object.keys(n).forEach(function (k) { if (n[k] === null || n[k] === '') delete n[k]; });
       var m = $('.ec-grund-m', inhalt); if (!m) { m = document.createElement('p'); m.className = 'ec-meldung warn ec-grund-m'; m.setAttribute('role', 'alert'); $('.ec-knoepfe', inhalt).before(m); }
@@ -1662,7 +1663,7 @@
       .then(function (s) { S.status = s; return s; }).catch(function () { return null; });
   }
   /* v3946 · Grundangaben aus dem beim Kauf gespeicherten Zahlenstand (Notweg ohne Ablage im Browser) */
-  var GRUND_FELDER = ['kp', 'nkm', 'wfl', 'art', 'plz', 'ort', 'bj', 'gsfl', 'ze', 'nk_pct', 'mea_pct', 'einheiten', 'ek_eur', 'zins_pct', 'tilg_pct', 'bindung_j'];
+  var GRUND_FELDER = ['kp', 'nkm', 'wfl', 'art', 'plz', 'ort', 'bj', 'gsfl', 'ze', 'nk_pct', 'mea_pct', 'einheiten', 'ausst', 'ek_eur', 'zins_pct', 'tilg_pct', 'bindung_j'];
   function grundAusZahlen(z) { var g = {}; GRUND_FELDER.forEach(function (k) { if (z && z[k] != null) g[k] = z[k]; }); return grundFehlt(g).length ? null : g; }
   function rueckkehrPruefen() {
     var q = /[?&]einzelcheck=(bezahlt|abbruch)(&|$)/.exec(location.search || '');
