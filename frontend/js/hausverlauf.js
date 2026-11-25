@@ -379,9 +379,9 @@
       '.dp-pa-wrap .dp-hv-risj>button[disabled]{cursor:default;opacity:.75}',
       '.dp-pa-wrap .dp-hv-risj>button.krit{border-color:rgba(184,98,92,.45) !important;box-shadow:inset 3px 0 0 #B8625C}',
       '.dp-pa-wrap .dp-hv-risj>button.hand{border-color:color-mix(in srgb,var(--wl-c9a84c,#C9A84C) 45%,transparent) !important;box-shadow:inset 3px 0 0 var(--wl-c9a84c,#C9A84C)}',
-      '.dp-hv-risj .tt,.dp-hv-rk .tt{display:none;position:absolute;z-index:30;left:0;top:calc(100% + 6px);width:max-content;max-width:min(340px,86vw);background:#2A2727;color:#FDFCFA;font:400 12px/1.5 Inter,sans-serif;font-style:normal;padding:9px 11px;border-radius:8px;box-shadow:0 8px 22px rgba(0,0,0,.18);text-align:left;white-space:normal}',
-      '.dp-hv-risj .tt i{color:#E8CC7A;font-style:normal}.dp-hv-rk .tt small{display:block;margin-top:5px;color:#C9C2B6;font-size:11px}.dp-hv-rk .tt strong{color:#E8CC7A}',
-      '.dp-hv-risj>button:hover .tt,.dp-hv-risj>button:focus-visible .tt,.dp-hv-rk:hover .tt,.dp-hv-rk:focus .tt{display:block}',
+      '.dp-hv-risj .hv-tt,.dp-hv-rk .hv-tt{display:none;position:absolute;z-index:30;left:0;top:calc(100% + 6px);width:max-content;max-width:min(340px,86vw);background:#2A2727;color:#FDFCFA;font:400 12px/1.5 Inter,sans-serif;font-style:normal;padding:9px 11px;border-radius:8px;box-shadow:0 8px 22px rgba(0,0,0,.18);text-align:left;white-space:normal}',
+      '.dp-hv-risj .hv-tt i{color:#E8CC7A;font-style:normal}.dp-hv-rk .hv-tt small{display:block;margin-top:5px;color:#C9C2B6;font-size:11px}.dp-hv-rk .hv-tt strong{color:#E8CC7A}',
+      '.dp-hv-risj>button:hover .hv-tt,.dp-hv-risj>button:focus-visible .hv-tt,.dp-hv-rk:hover .hv-tt,.dp-hv-rk:focus .hv-tt{display:block}',
       '.dp-hv-ris{margin:16px 0 4px}.dp-hv-ris .dp-hv-abs{margin-top:6px}',
       '.dp-hv-rf{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}',
       '.dp-pa-wrap .dp-hv-rf button{border:1px solid #E6DCC2 !important;background:#fff !important;border-radius:999px !important;padding:3px 11px !important;font:600 11.5px Inter,sans-serif !important;color:#4A4542 !important;cursor:pointer}',
@@ -390,9 +390,9 @@
       '.dp-hv-rl{display:grid;gap:6px}',
       '.dp-hv-rk{position:relative;display:grid;grid-template-columns:10px minmax(0,1fr) auto;align-items:center;gap:10px;border:1px solid #EFE8D6;border-radius:9px;background:#fff;padding:8px 12px;cursor:default;outline:none}',
       '.dp-hv-rk:focus-visible{border-color:var(--wl-c9a84c,#C9A84C)}',
-      '.dp-hv-rk .pt{width:9px;height:9px;border-radius:50%;background:#9A9285}.dp-hv-rk.hoch .pt{background:#B8625C}.dp-hv-rk.mittel .pt{background:var(--wl-c9a84c,#C9A84C)}.dp-hv-rk.niedrig .pt{background:#3FA56C}',
+      '.dp-hv-rk .hv-pt{width:9px;height:9px;border-radius:50%;background:#9A9285}.dp-hv-rk.hoch .hv-pt{background:#B8625C}.dp-hv-rk.mittel .hv-pt{background:var(--wl-c9a84c,#C9A84C)}.dp-hv-rk.niedrig .hv-pt{background:#3FA56C}',
       '.dp-hv-rk b{font:600 13px/1.35 Inter,sans-serif;color:#2A2727;min-width:0;overflow-wrap:anywhere}',
-      '.dp-hv-rk .m{font:600 11.5px "JetBrains Mono",monospace;color:#6B645A;white-space:nowrap;font-variant-numeric:tabular-nums}',
+      '.dp-hv-rk .hv-m{font:600 11.5px "JetBrains Mono",monospace;color:#6B645A;white-space:nowrap;font-variant-numeric:tabular-nums}',
       '.dp-hv-rk.ueber{display:none}.dp-hv-ris:not([data-filter="alle"]) .dp-hv-rk.ueber{display:grid}',
       '.dp-hv-rk.aus,.dp-hv-rkk.aus{display:none !important}',
       '.dp-hv-rm{margin:4px 0 0;font:400 11.5px Inter,sans-serif;color:#7A7370}',
@@ -400,14 +400,14 @@
       '.dp-hv-rd{display:grid;gap:8px}',
       '.dp-hv-rkk{border:1px solid #EFE8D6;border-left:3px solid #9A9285;border-radius:9px;background:#fff;padding:10px 13px;display:grid;gap:5px}',
       '.dp-hv-rkk.hoch{border-left-color:#B8625C}.dp-hv-rkk.mittel{border-left-color:var(--wl-c9a84c,#C9A84C)}.dp-hv-rkk.niedrig{border-left-color:#3FA56C}',
-      '.dp-hv-rkk .k{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px}.dp-hv-rkk .k b{font:600 13.5px/1.35 Inter,sans-serif;color:#2A2727}',
-      '.dp-hv-rkk .p{font:600 10px/1 Inter,sans-serif;padding:3px 8px;border-radius:999px;background:rgba(42,39,39,.07);color:#4A4542}',
-      '.dp-hv-rkk .p.hoch{background:rgba(184,98,92,.13);color:#B8625C}.dp-hv-rkk .p.mittel{background:color-mix(in srgb,var(--wl-c9a84c,#C9A84C) 18%,transparent);color:#8a6d1f}.dp-hv-rkk .p.niedrig{background:rgba(63,165,108,.14);color:#2f7d52}',
-      '.dp-hv-rkk .m{font:600 11.5px "JetBrains Mono",monospace;color:#6B645A;font-variant-numeric:tabular-nums}',
+      '.dp-hv-rkk .hv-k{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px}.dp-hv-rkk .hv-k b{font:600 13.5px/1.35 Inter,sans-serif;color:#2A2727}',
+      '.dp-hv-rkk .hv-p{font:600 10px/1 Inter,sans-serif;padding:3px 8px;border-radius:999px;background:rgba(42,39,39,.07);color:#4A4542}',
+      '.dp-hv-rkk .hv-p.hoch{background:rgba(184,98,92,.13);color:#B8625C}.dp-hv-rkk .hv-p.mittel{background:color-mix(in srgb,var(--wl-c9a84c,#C9A84C) 18%,transparent);color:#8a6d1f}.dp-hv-rkk .hv-p.niedrig{background:rgba(63,165,108,.14);color:#2f7d52}',
+      '.dp-hv-rkk .hv-m{font:600 11.5px "JetBrains Mono",monospace;color:#6B645A;font-variant-numeric:tabular-nums}',
       '.dp-pa-wrap .dp-hv-rkk p{margin:0;font:400 12.5px/1.55 Inter,sans-serif;color:#4A4542;text-align:left !important;hyphens:auto}',
-      '.dp-hv-rkk .f{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px}.dp-hv-rkk .f small{font:400 11px Inter,sans-serif;color:#9A9285;flex:1 1 220px;min-width:0}',
-      '.dp-hv-rkk .zu{display:flex;gap:6px;flex-wrap:wrap}',
-      '.dp-pa-wrap .dp-hv-rkk .zu button{border:1px solid color-mix(in srgb,var(--wl-c9a84c,#C9A84C) 55%,transparent) !important;background:#fff !important;border-radius:999px !important;padding:3px 10px !important;font:600 11px Inter,sans-serif !important;color:var(--wl-9a7f33,#9a7f33) !important;cursor:pointer}',
+      '.dp-pa-wrap .dp-hv-rkk .hv-f{display:flex !important;flex-direction:row !important;flex-wrap:wrap;align-items:center !important;justify-content:flex-start !important;gap:6px 12px;height:auto}.dp-pa-wrap .dp-hv-rkk .hv-f small{display:block;text-align:left;font:400 11px Inter,sans-serif;color:#9A9285;flex:1 1 220px;min-width:0}',
+      '.dp-hv-rkk .hv-zu{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}',
+      '.dp-pa-wrap .dp-hv-rkk .hv-zu button{border:1px solid color-mix(in srgb,var(--wl-c9a84c,#C9A84C) 55%,transparent) !important;background:#fff !important;border-radius:999px !important;padding:3px 10px !important;font:600 11px Inter,sans-serif !important;color:var(--wl-9a7f33,#9a7f33) !important;cursor:pointer}',
       '.dp-hv-blink{animation:dpHvBlink 2.2s ease-out}',
       '@keyframes dpHvBlink{0%,30%{box-shadow:0 0 0 3px color-mix(in srgb,var(--wl-c9a84c,#C9A84C) 55%,transparent)}100%{box-shadow:0 0 0 0 transparent}}',
       '.dp-hv-gx{margin:18px 0 6px}.dp-hv-gx-rl{margin-top:10px;padding-top:10px;border-top:1px solid #F1EBDD}',
@@ -479,7 +479,7 @@
         + (an ? '' : ' disabled') + ' aria-label="' + esc((y || 'ohne Jahr') + ': ' + (z ? risText(z) : 'nichts offen')) + '">'
         + '<small>' + (y ? y : 'ohne Jahr') + '</small>'
         + (z ? (z.hoch ? '<b class="k">' + z.hoch + ' kritisch</b>' : '') + (z.mittel ? '<b class="h">' + z.mittel + ' Handlungsbedarf</b>' : '') : '<span>nichts offen</span>')
-        + (an ? '<em class="tt" role="tooltip">' + esc(tip) + '<br><i>' + (z ? 'Klick zeigt die Punkte' : 'Klick zeigt das Protokoll') + '</i></em>' : '') + '</button>';
+        + (an ? '<em class="hv-tt" role="tooltip">' + esc(tip) + '<br><i>' + (z ? 'Klick zeigt die Punkte' : 'Klick zeigt das Protokoll') + '</i></em>' : '') + '</button>';
     }).join('') + '</div>';
   }
   /* v4780 · Wohin ein Risiko führt: Protokoll im Einzelnen, Belege des Jahres, Jahresabgleich (nur Bestand) */
@@ -488,7 +488,7 @@
     if (/protokoll|versammlung/i.test(q)) b.push('<button type="button" class="btn-clean" data-dp-hv-zu="prot" data-dp-hv-q="' + esc(q.split(',')[0]) + '">Zum Protokoll</button>');
     if (j && j <= heute && typeof document !== 'undefined' && document.getElementById('dp-pa-tab-jahr')) b.push('<button type="button" class="btn-clean" data-dp-hv-zu="jahr" data-dp-hv-j="' + j + '">Jahresabgleich ' + j + '</button>');
     else if (j && j <= heute && /beleg|rechnung|abrechnung|hausgeld|wirtschaftsplan/i.test(q + ' ' + (x.titel || ''))) b.push('<button type="button" class="btn-clean" data-dp-hv-zu="belege" data-dp-hv-j="' + j + '">Belege ' + j + '</button>');
-    return b.length ? '<span class="zu">' + b.slice(0, 2).join('') + '</span>' : '';
+    return b.length ? '<span class="hv-zu">' + b.slice(0, 2).join('') + '</span>' : '';
   }
   /** v4780 · „Risiken aus den Unterlagen“ oben im Reiter, nach Jahren. Einfach: die wichtigsten Punkte je eine Zeile,
       die Erklärung beim Überfahren. Detail: jedes Risiko mit Beschreibung, Quelle und Absprung. */
@@ -509,16 +509,16 @@
     var zeile = function (x) {
       var s = sw(x), j = jahrAus(x.jahr) || 0, kost = Number(x.kosten_eur) > 0 ? eur(Number(x.kosten_eur)) : '';
       var tt = '<strong>' + esc(WORT[s]) + '.</strong> ' + esc(String(x.beschreibung || '').slice(0, 280)) + (x.quelle ? '<small>Quelle: ' + esc(x.quelle) + '</small>' : '');
-      return '<div class="dp-hv-rk ' + s + '" tabindex="0" data-j="' + j + '"><i class="pt"></i><b>' + esc(x.titel || 'Risiko') + '</b>'
-        + '<span class="m">' + (j ? String(j) : '') + (kost ? (j ? ' · ' : '') + kost : '') + '</span>'
-        + '<em class="tt" role="tooltip">' + tt + '</em></div>';
+      return '<div class="dp-hv-rk ' + s + '" tabindex="0" data-j="' + j + '"><i class="hv-pt"></i><b>' + esc(x.titel || 'Risiko') + '</b>'
+        + '<span class="hv-m">' + (j ? String(j) : '') + (kost ? (j ? ' · ' : '') + kost : '') + '</span>'
+        + '<em class="hv-tt" role="tooltip">' + tt + '</em></div>';
     };
     var karte = function (x) {
       var s = sw(x), j = jahrAus(x.jahr) || 0, kost = Number(x.kosten_eur) > 0 ? eur(Number(x.kosten_eur)) : '';
-      return '<div class="dp-hv-rkk ' + s + '" data-j="' + j + '"><div class="k"><b>' + esc(x.titel || 'Risiko') + '</b><span class="p ' + s + '">' + esc(WORT[s]) + '</span>'
-        + (kost ? '<span class="m">' + kost + '</span>' : '') + (j ? '<span class="m">' + j + '</span>' : '') + '</div>'
+      return '<div class="dp-hv-rkk ' + s + '" data-j="' + j + '"><div class="hv-k"><b>' + esc(x.titel || 'Risiko') + '</b><span class="hv-p ' + s + '">' + esc(WORT[s]) + '</span>'
+        + (kost ? '<span class="hv-m">' + kost + '</span>' : '') + (j ? '<span class="hv-m">' + j + '</span>' : '') + '</div>'
         + (x.beschreibung ? '<p>' + esc(x.beschreibung) + '</p>' : '')
-        + '<div class="f">' + (x.quelle ? '<small>Quelle: ' + esc(x.quelle) + '</small>' : '<small>aus der Gesamtauswertung</small>') + risSprunge(x) + '</div></div>';
+        + '<div class="hv-f">' + (x.quelle ? '<small>Quelle: ' + esc(x.quelle) + '</small>' : '<small>aus der Gesamtauswertung</small>') + risSprunge(x) + '</div></div>';
     };
     var einfach = r.filter(function (x) { return sw(x) !== 'niedrig'; });
     if (!einfach.length) einfach = r.slice();

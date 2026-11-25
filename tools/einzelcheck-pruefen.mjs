@@ -610,10 +610,15 @@ TEILE.M = async function (svc, q) {
    js/mietpotenzial-kern.js und der echten js/data/kappungsgrenzen.json. Fälle: mit Vergleichsmiete (Mietspiegel,
    ohne Bremse), ohne Vergleichsmiete, mit Bremse, Bremse ohne Vergleichsmiete, Näherung (ca.), Bremse offen. */
 const KUNDENTEXT_VERBOTEN = /[–—;]|mietwucher|immobilienscout|immo\s*scout|immowelt|geomap|pricehubble|sprengnetter|zensus|regionaldatenbank/i;
+/* einzelcheck-9 · der Auszug importiert lib/mietanker.js relativ - eine data:-URL kennt keine relativen Importe */
+function importAuszug(text) {
+  const abs = pathToFileURL(path.join(WURZEL, 'marktbericht/backend/src/lib/mietanker.js')).href;
+  return import('data:text/javascript,' + encodeURIComponent(String(text).split("'./mietanker.js'").join("'" + abs + "'")));
+}
 function frontMiete(front) {
   const vh = /var VGL_HERKUNFT = \{[\s\S]*?\};/.exec(front);
   const koepfe = ['function istZahl(v)', 'function dez(n, st)', 'function eur(n)', 'function eurS(n)', 'function mietpotenzialAus(MP, kappDaten, ist, wfl, m)',
-    'function qmText(x, ca)', 'function spanneText(vg)', 'function mieteZeilen(mi)', 'function mieteSaetze(mi)'];
+    'function qmText(x, ca)', 'function spanneText(vg)', 'function mieteZeilen(mi)', 'function mieteSaetzeInvestor(mi)', 'function mieteSaetze(mi)'];
   const teile = koepfe.map((k) => fnAus(front, k));
   if (!vh || teile.some((x) => !x)) return null;
   return new Function(vh[0] + '\n' + teile.join('\n') + '\n; return { mietpotenzialAus, mieteZeilen, mieteSaetze };')();
@@ -622,7 +627,7 @@ TEILE.N = async function (svc, q) {
   const f = [];
   /* 1 · mb-Auszug: nur Mietspiegel, amtliche Mietpreisübersicht, Näherung. Kein Quellentext nach außen. */
   let A;
-  try { A = await import('data:text/javascript,' + encodeURIComponent(q.mbVgl)); } catch (e) { return ['mb-Auszug lädt nicht: ' + e.message]; }
+  try { A = await importAuszug(q.mbVgl); } catch (e) { return ['mb-Auszug lädt nicht: ' + e.message]; }
   const cc = (code, qm, spanne) => ({ ertragswert: { available: true, value_eur: 185000, liegenschaftszins_pct: 2.9,
     miete_stufe: { code, etikett: 'Vergleichsmiete der Wohnung (qualifizierter Mietspiegel Musterstadt)', quelle: 'Mietspiegel Musterstadt 2025, S. 4, ImmobilienScout', qm },
     miete_band: spanne ? { spanne: { unten: spanne[0], mittel: spanne[1], oben: spanne[2], ca: code === 'naeherung' }, einordnung: { wahl: 'mittel', text: 'Einordnung am Mittelwert' } } : null } });
@@ -743,6 +748,65 @@ TEILE.N = async function (svc, q) {
   if (/\*\s*1[.,]1\d?\b|\*\s*1[.,]2\b|\*\s*\(1 \+ /.test(fk.split('function mietpotenzialAus')[1].split('function mieteSaetze')[0])) f.push('Frontend rechnet Kappung oder Bremse selbst');
   if (!/D\.liste\(mieteZeilen\(mi\), \['Miete', 'im Monat', 'Abstand im Monat', 'Abstand im Jahr'\]\)/.test(fk)) f.push('Tabelle der Obergrenze fehlt im PDF');
   if (!/DpMietpotenzial: 'js\/mietpotenzial-kern\.js\?v=/.test(fk)) f.push('Kern wird nicht nachgeladen');
+  return f;
+};
+
+/* einzelcheck-9 · V · Mietpotenzial aus Investorensicht wie die App (Marcel 18.11. und 25.11.2026)
+   Grenze im Bestand = OBERWERT der Spanne (§ 558 BGB, Kappung, Sperrfrist), Neuvermietung = Oberwert x 1,10 mit oder
+   bei ungeklaerter Mietpreisbremse, x 1,20 ohne (§ 5 WiStG). Gerechnet NUR mit mb lib/mietanker.js zielMaximum
+   (vergleichsmiete_auszug.js zielAusAuszug), der Dienst reicht nur Zahlen durch, das Frontend rechnet nichts nach.
+   Herford (Marcels Beispiel 25.11.2026): Spanne 6,00 / 6,98 / 7,80, Ist 850 EUR auf 96 m2 (8,85), keine Bremse. */
+TEILE.V = async function (svc, q) {
+  const f = [];
+  let A;
+  try { A = await importAuszug(q.mbVgl); } catch (e) { return ['mb-Auszug lädt nicht: ' + e.message]; }
+  if (typeof A.zielAusAuszug !== 'function') return ['mb: zielAusAuszug fehlt'];
+  const aus = { verfuegbar: true, qm: 6.98, art: 'mietspiegel', ca: false, unten: 6, mittel: 6.98, oben: 7.8, einordnung: 'mittel' };
+  const zFrei = A.zielAusAuszug(aus, { gilt: false }, 1994), zBr = A.zielAusAuszug(aus, { gilt: true }, 1994), zOff = A.zielAusAuszug(aus, { gilt: null }, 1994), zNeu = A.zielAusAuszug(aus, { gilt: true }, 2018);
+  if (!zFrei || zFrei.bestand_max_qm !== 7.8 || zFrei.neu_max_qm !== 9.36 || zFrei.faktor !== 1.2) f.push('ohne Bremse: ' + JSON.stringify(zFrei) + ' (erwartet Oberwert 7,80, Neuvermietung 9,36)');
+  if (!zBr || zBr.neu_max_qm !== 8.58 || zBr.faktor !== 1.1 || zBr.bremse_gilt !== true) f.push('mit Bremse: ' + JSON.stringify(zBr) + ' (erwartet 7,80 x 1,10 = 8,58)');
+  if (!zOff || zOff.neu_max_qm !== 8.58 || zOff.bremse_gilt !== null) f.push('Bremse offen rechnet nicht vorsichtig: ' + JSON.stringify(zOff));
+  if (!zNeu || zNeu.neu_max_qm !== 9.36 || !zNeu.neubau) f.push('Erstbezug ab 2015 ohne § 556f: ' + JSON.stringify(zNeu));
+  if (A.zielAusAuszug({ verfuegbar: false }, { gilt: false }, 1994) !== null) f.push('ohne Vergleichsmiete trotzdem eine Grenze');
+  const o = q.mbOrch;
+  if (!/_vglAuszug\.ziel = zielAusAuszug\(_vglAuszug, [\w$]+\(ref\.ags\), ref\.build_year\)/.test(o)) f.push('mb: Auszug bekommt die Obergrenze nicht (zielAusAuszug im Orchestrator)');
+  if (!/import \{[^}]*zielMaximum[^}]*\} from '\.\/mietanker\.js'/.test(q.mbVgl)) f.push('mb: zielAusAuszug rechnet nicht mit lib/mietanker.js zielMaximum');
+  const lauf = async (vgl) => { const U = umgebung({ vgl }); svc._setzeDeps(U.deps);
+    try { return await svc.markt({ plz: '32052', ort: 'Herford', wfl: 96, kp: 180000, nkm: 850, art: 'ETW' }, STRASSE + ', 32052 Herford'); } finally { svc._setzeDeps(null); } };
+  const m = await lauf(Object.assign({}, aus, { ziel: Object.assign({ texte: ['Mietspiegel Herford 2025'], quelle: 'X' }, zFrei) }));
+  const zj = JSON.stringify(m.vergleichsmiete && m.vergleichsmiete.ziel);
+  if (!m.vergleichsmiete || !m.vergleichsmiete.ziel || m.vergleichsmiete.ziel.neu_max_qm !== 9.36 || m.vergleichsmiete.ziel.bestand_max_qm !== 7.8) f.push('Dienst reicht die Obergrenze nicht durch: ' + zj);
+  if (/texte|quelle|Herford/.test(zj || '')) f.push('Dienst reicht Text der Obergrenze durch: ' + zj);
+  if (!m.vergleichsmiete || !m.vergleichsmiete.ziel) return f;
+  const F = frontMiete(q.front);
+  if (!F) return f.concat(['Frontend: Funktionen nicht gefunden']);
+  let MP, KD;
+  try { MP = require(P.kern); KD = JSON.parse(lies(P.kappDaten)); } catch (e) { return f.concat(['Kern laden: ' + e.message]); }
+  const mitOrt = (mm, ags) => Object.assign({}, mm, { lage: Object.assign({}, mm.lage, { ags }) });
+  const pruef = (name, mi, soll) => {
+    const sz = F.mieteSaetze(mi).join(' | '), zl = JSON.stringify(F.mieteZeilen(mi));
+    if (!mi.ziel) { f.push(name + ': rechnet ohne Obergrenze aus Investorensicht'); return ''; }
+    if (!mi.zul || Math.abs((mi.zul.vgl_qm || 0) - 7.8) > 0.001) f.push(name + ': Bestand nicht gegen den Oberwert 7,80 (' + (mi.zul && mi.zul.vgl_qm) + ')');
+    if (!mi.nv || mi.nv.qm !== soll.qm || mi.nv.monat !== soll.monat || mi.nv.plus_monat !== soll.plus) f.push(name + ': Neuvermietung ' + JSON.stringify(mi.nv) + ' (erwartet ' + JSON.stringify(soll) + ')');
+    if (!/rechnet aus Investorensicht mit dem Oberwert 7,80 €\/m²/.test(sz)) f.push(name + ': Satz zum Oberwert fehlt');
+    if (/Richtwert|dient die ortsübliche Vergleichsmiete/.test(sz + zl)) f.push(name + ': Mittelwert als Richtwert oder Grenze im Text');
+    if (!/Obergrenze bei Neuvermietung/.test(zl)) f.push(name + ': Zeile „Obergrenze bei Neuvermietung“ fehlt');
+    if (!/Sonst gilt der Mittelwert 6,98 €\/m²/.test(sz)) f.push(name + ': Bedingung Oberwert (sonst Mittelwert) fehlt');
+    if (KUNDENTEXT_VERBOTEN.test(sz + zl)) f.push(name + ': Kundentext mit Gedankenstrich, Semikolon oder Quelle');
+    return sz;
+  };
+  const a = F.mietpotenzialAus(MP, KD, 850, 96, mitOrt(m, '05758012'));
+  const sa = pruef('Herford ohne Bremse', a, { qm: 9.36, monat: 898.56, plus: 48.56 });
+  if (!a.zul || a.zul.grund !== 'vergleichsmiete_erreicht' || !a.bestand || a.bestand.monat !== 850) f.push('Herford Bestand: ' + JSON.stringify(a.bestand) + ' (Ist 8,85 über Oberwert 7,80, keine Erhöhung)');
+  if (sa && !/keine Mietpreisbremse\. Obergrenze bei Neuvermietung 9,36 €\/m², das sind 120 % der Vergleichsmiete am Oberwert/.test(sa)) f.push('Herford: Satz Neuvermietung ohne Bremse fehlt');
+  const mBr = Object.assign({}, m, { vergleichsmiete: Object.assign({}, m.vergleichsmiete, { ziel: Object.assign({}, m.vergleichsmiete.ziel, { neu_max_qm: 8.58, neu_sicher_qm: 7.68, faktor: 1.1, bremse_gilt: true }) }) });
+  const b = F.mietpotenzialAus(MP, KD, 700, 96, mitOrt(mBr, '05758012'));
+  pruef('Bremse, Ist 700', b, { qm: 8.58, monat: 823.68, plus: 123.68 });
+  if (!b.bestand || !(b.bestand.monat > 700) || b.bestand.monat > 748.81) f.push('Bestand mit Oberwert: ' + JSON.stringify(b.bestand) + ' (Ist 700, höchstens 7,80 x 96 = 748,80)');
+  if (b.nv && b.nv.art !== 'bremse') f.push('Bremse-Art: ' + b.nv.art);
+  const fk = ohneKommentar(q.front);
+  if (!/vgl_qm: \(zi \? zi\.bestand_max_qm : vglQm\) \|\| ''/.test(fk)) f.push('Frontend: zulaessig() nicht gegen den Oberwert');
+  if (/\*\s*1[.,]1\d?\b|\*\s*1[.,]2\b/.test(fk.split('function mietpotenzialAus')[1].split('function qmText')[0])) f.push('Frontend rechnet die Faktoren selbst');
   return f;
 };
 
@@ -1064,7 +1128,7 @@ function quellen(ueber) {
 const NAMEN = { A: 'Speicher-only', A2: 'pdftotext echt über stdin/stdout', B: 'Schwärzen vor dem KI-Aufruf', C: 'Bremse und Schalter', D: 'kostenlos höchstens 2 Unterlagen',
   E: 'Bericht nur mit gültigem Kauf-Token', F: 'Frist 14 Tage', G: 'Preis aus dem lookup_key', H: 'Webhook', I: 'Zahlen-Weissliste', J: 'Siegel', K: 'Marktbericht Stufe 3 ohne Ablage, Wertermittlung mit Herkunft, keine Quellennamen',
   L: 'gescannte PDFs: Texterkennung nur im Speicher', M: 'Rabatt-Vorrang Anrechnung vor Flyer-Code', N: 'Vergleichsmiete und Obergrenze für Investoren',
-  O: 'Finanzierung wie im Investment-PDF (Kerne)', P: 'Grundangaben Pflicht', Q: 'kein zweites Hochladen nach dem Kauf', R: 'Bericht: Kapitel, Deckblatt, Kundentext', S: 'Bewertungsbericht und Ablauf erst auslesen', T: 'Deal-Check-Werte nur nach echtem Deal-Check-Lauf', U: 'Deal Score genau wie im Quick-Check' };
+  O: 'Finanzierung wie im Investment-PDF (Kerne)', P: 'Grundangaben Pflicht', Q: 'kein zweites Hochladen nach dem Kauf', R: 'Bericht: Kapitel, Deckblatt, Kundentext', S: 'Bewertungsbericht und Ablauf erst auslesen', T: 'Deal-Check-Werte nur nach echtem Deal-Check-Lauf', U: 'Deal Score genau wie im Quick-Check', V: 'Mietpotenzial aus Investorensicht (Oberwert, Neuvermietung x 1,10 / 1,20)' };
 
 console.log('einzelcheck-pruefen · v3946');
 const svc = require(P.dienst);
@@ -1129,6 +1193,11 @@ const GEGEN = [
   ['N', 'Frontend rechnet die Bremse selbst (120 %)', { front: ersetze(q0.front, 'var grenze = vglQm ? MP.zielmieteBremse({ ziel_qm: vglQm, vgl_qm: vglQm, bremse: bremse }) : null;', 'var grenze = vglQm ? { obergrenze_qm: vglQm * 1.2 } : null;') }],
   ['N', 'Frontend nennt ohne Vergleichsmiete den Marktdurchschnitt als Richtwert', { front: ersetze(q0.front, "    else nv = { art: 'ohne', qm: null };", "    else nv = marktQm ? { art: 'richtwert', qm: marktQm } : { art: 'ohne', qm: null };") }],
   ['N', 'Frontend zeigt keinen Abstand im Jahr', { front: ersetze(q0.front, "' im Monat, ' + eurS(nv.plus_jahr) + ' im Jahr.'", "' im Monat.'") }],
+  /* einzelcheck-9 */
+  ['V', 'Frontend rechnet den Bestand wieder gegen den Mittelwert', { front: ersetze(q0.front, "vgl_qm: (zi ? zi.bestand_max_qm : vglQm) || ''", "vgl_qm: vglQm || ''") }],
+  ['V', 'mb gibt die Obergrenze nicht mit', { mbOrch: ersetze(q0.mbOrch, '_vglAuszug.ziel = zielAusAuszug(', '_vglAuszug.ziel_aus = zielAusAuszug(') }],
+  ['V', 'Neuvermietung ohne Bremse mit 110 statt 120 %', { mbVgl: ersetze(q0.mbVgl, "Number(baujahr) >= 2015 ? '556f_neubau' : '', undefined)", "Number(baujahr) >= 2015 ? '556f_neubau' : '', 1.1)") }],
+  ['V', 'Dienst lässt die Obergrenze fallen', { dienst: ersetze(D, '    ziel: zielAus(v.ziel) };', '    ziel: null };') }],
   /* v3946 */
   ['O', 'Restschuld jährlich statt Monat für Monat', { kerne: { 'darlehen-weitere.js': ersetze(lies(path.join(WURZEL, 'frontend/js/darlehen-weitere.js')), '      var zm = rs * z / 12;', '      var zm = (m - start) % 12 === 0 ? rs * z : 0; if ((m - start) % 12 !== 0) { if (cb) cb(m, 0, 0, rs); continue; }') } }],
   ['O', 'Anschluss mit 4 % statt 5 %', { front: ersetze(q0.front, 'var ANSCHLUSS_ZINS = 5.0;', 'var ANSCHLUSS_ZINS = 4.0;') }],
