@@ -3587,6 +3587,22 @@
     });
   }
   function applyMerged() {
+    /* v4780 · Lindenallee 14 im Quick-Check (25.11.2026): gleich nach dem letzten Haken an den Dateien übernommen, lief die
+       gemeinsame Auswertung (Risiken, WEG-Protokolle, These) noch. Sie fehlte danach ganz im Objekt, und die Pilot-Analyse
+       startete nicht. Jetzt wartet „Ausgewählte übernehmen“ auf die Auswertung (höchstens 3 Minuten) und übernimmt dann. */
+    if (_auswertungLaeuft) {
+      var _ab = $('oabi-apply');
+      if (_ab && !_ab._dpWartet) {
+        _ab._dpWartet = true; _ab.disabled = true; var _txt = _ab.innerHTML; _ab.textContent = 'Auswertung läuft, übernimmt gleich …';
+        var _t0 = Date.now();
+        (function warte() {
+          if (_auswertungLaeuft && Date.now() - _t0 < 180000) { setTimeout(warte, 500); return; }
+          var b2 = $('oabi-apply') || _ab; b2._dpWartet = false; _ab._dpWartet = false; b2.disabled = false; if (b2 === _ab) b2.innerHTML = _txt;
+          applyMerged();
+        })();
+      }
+      return;
+    }
     var ov = $('oabi-ov'); if (!ov) return;
     if (_qcMode) { return applyMergedQc(ov); }  /* v418 */
     var n = 0, _applied = [], _san = '', _folgen = '';
