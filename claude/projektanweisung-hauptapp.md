@@ -45713,6 +45713,11 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Host:** crontab Prod +3, Staging +2 Zeilen (alte crontab gesichert unter /root/backups/crontab-vor-v4880-*), `.env` Prod `BETRIEB_MAIL=1` (gesichert env-vor-v4880-*).
 - **Rest:** eine irrtümliche Rot-Mail (erste Probe vor v4880b); Admin-Ansicht nicht im echten Browser angemeldet geprüft (Passwort/TOTP), nur DOM-Probe und Backend-Auswertung im Container; Staging ohne Nachtsicherung; Vorschläge in wissen/2026-11-25.md.
 
+### v4890 · Arbeitsbereich „Ansicht anpassen“ Runde 2 (nur Staging, 25.11.2026)
+- **Was:** DealPilot-Fensterstil wie modal-boarding-skin, Gruppensymbole, Kennzahlen mit echten Werten (GP_API.kzKachel), maßstäbliche Vorschau, heller Kopftext bei dunkler Partnerfarbe.
+- **Commit:** staging 41bb37af, ce72c485, 7b26839e (+ Bilder/Doku).
+- **Nachweis:** iframe-Messung 1440/1280/390 und Navy, Bilder runde2/.
+- **Rest:** Freigabe Marcel, dann pf-werkstatt.js + grafiken-portfolio.js (kzKachel) per Cherry-Pick auf main.
 ### Rollout 1.0.223 · v4910 Dokumentenablage scharf, Einstellungen › Dokumente (Fork D5, 25.11.2026)
 - **Was:** Löschfrist/Plattenwarnung scharf (`ABLAGE_FRIST_TAKT=1` Staging+Prod), Einsortieren nach Ordner/Jahr, Belegung in Prozent (Beleg-Dialog, Meine Dokumente), Reiter Einstellungen › Dokumente mit Ordner/Jahr löschen, `DELETE /dateien?objekt&ordner[&jahr]`.
 - **Commit:** staging 31c2ce92 · main 0e965506, 718504ea (1.0.223).
