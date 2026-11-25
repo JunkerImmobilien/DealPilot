@@ -385,6 +385,23 @@ function updHeaderBadges() {
     { key: 'upside',       label: 'Upside',   icon: 'i-rocket' }
   ];
 
+  /* v4800 · Marcel 25.11.2026: der Investor Deal Score steht immer als zwei Scores da.
+     Statt der fünf Bereichs-Pillen zwei Pillen Investment und Finanzierung (aus DealScore2.compute). */
+  var _zweiP = (_headerHasDs2 && result.investment && result.finanzierung) ? [
+    { label: 'Investment', icon: 'i-trend', t: result.investment },
+    { label: 'Finanzierung', icon: 'i-coins', t: result.finanzierung }
+  ] : null;
+  if (_zweiP) kpiDefs = [];
+  (_zweiP || []).forEach(function(d) {
+    var pct = Math.round(d.t.score || 0);
+    var pillTier = pct >= 70 ? 'green' : pct >= 50 ? 'gold' : 'red';
+    html += '<div class="sc-pill sc-pill-zwei tier-' + pillTier + '" title="' + d.label + '-Score ' + pct + '/100' + (d.t.stufe ? ' · ' + d.t.stufe : '') + '">' +
+      '<div class="sc-pill-l"><span>' + d.label.toUpperCase() + '</span><span class="ic"><svg><use href="#' + d.icon + '"/></svg></span></div>' +
+      '<div class="sc-pill-v">' + pct + '<span class="sc-pill-v-max">/100</span></div>' +
+      '<div class="sc-pill-sub">' + (d.t.stufe ? String(d.t.stufe) : '') + '</div>' +
+      '<div class="sc-bar"><i style="width:' + pct + '%"></i></div>' +
+    '</div>';
+  });
   kpiDefs.forEach(function(d) {
     var c = cats[d.key];
     var compInfo = (kpiComp.byCategory && kpiComp.byCategory[d.key]) || { total: 0, filled: 0 };

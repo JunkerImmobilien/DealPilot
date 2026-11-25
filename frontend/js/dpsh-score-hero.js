@@ -353,8 +353,7 @@
      SVG-Attribute verstehen kein var(): Gold kommt über _dpshGold(). Gruen und
      Rot sind Statusfarben und bleiben fest. */
   function scoreAnsicht() {
-    if (typeof window._dpScoreAnsicht === 'function') { try { return window._dpScoreAnsicht(); } catch (e) {} }
-    try { return localStorage.getItem('dp_score_ansicht') === 'zwei' ? 'zwei' : 'eins'; } catch (e) { return 'eins'; }
+    return 'zwei';   /* v4800 · immer zwei Scores */
   }
   function zFarbe(s) { return s >= 70 ? '#3FA56C' : s >= 50 ? _dpshGold() : '#B8625C'; }
   function zKl(s) { return s >= 70 ? 'g' : s >= 50 ? 'o' : 'r'; }

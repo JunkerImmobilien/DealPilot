@@ -809,7 +809,8 @@ window._dpPdfScore = function (K) {
   try {
     if (typeof window._dpDs2Available === 'function' ? window._dpDs2Available() : (typeof _dpDs2Available === 'function' && _dpDs2Available())) {
       var r = window.DealScore2.compute(window._buildDeal2FromState());
-      if (r && r.score) { var s2 = Math.round(r.score); return { score: s2, label: stufe(s2, r.label), quelle: 'investor' }; }
+      if (r && r.score) { var s2 = Math.round(r.score); return { score: s2, label: stufe(s2, r.label), quelle: 'investor',
+        inv: r.investment ? Math.round(r.investment.score) : null, fin: r.finanzierung ? Math.round(r.finanzierung.score) : null }; }   /* v4800 · Teilscores */
     }
   } catch (e) {}
   try {
@@ -1691,7 +1692,8 @@ async function _exportPDFInner() {
     /* v2830 · aus der Bankfassung: interner Zinsfuss und Deal Score (Rechenkern
        DealScore.computeFromKpis, wie dort) */
     ['Interner Zinsfu\u00df (IRR)', (K.irr != null && isFinite(K.irr)) ? pP(K.irr, 2) : 'nicht bestimmbar'],
-    ['Deal Score', (function () { var sc = window._dpPdfScore(K); return sc ? sc.score + ' / 100' + (sc.label ? ' \u00b7 ' + sc.label : '') : '-'; })()]
+    (function () { var sc = window._dpPdfScore(K); var inv = sc && sc.quelle === 'investor';   /* v4800 · Investor Deal Score mit zwei Scores */
+      return [inv ? 'Investor Deal Score' : 'Deal Score', sc ? sc.score + ' / 100' + (sc.label ? ' · ' + sc.label : '') + (inv && sc.inv != null ? ' (Investment ' + sc.inv + ' · Finanzierung ' + sc.fin + ')' : '') : '-']; })()
   ], [4, 5, 12]);
   setPdfProgress(35);
 
