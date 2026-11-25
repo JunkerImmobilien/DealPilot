@@ -445,7 +445,7 @@
      Zuordnung und Stand. Grundlage sind nur die gespeicherten Änderungen (aenderungen), Buchungen und Wertzeilen
      des Verlaufs, nichts wird neu gerechnet. Der Filter lebt nur in dieser Sitzung (Modulvariable). */
   var SEC_NAME = { s0: 'Objekt', s1: 'Investition', s2: 'Miete', s3: 'Finanzierung', s4: 'Bewirtschaftung', 's3-tax': 'Steuer', s5: 'Pilot-Analyse', s6: 'Bewertung', s8: 'Deal-Aktion' };
-  var ZU_NAME = { av: 'Anlage V', feld: 'Objektdaten', we: 'Wohnungen', weg: 'WEG und Protokolle', sonst: 'Sonstiges' };
+  var ZU_NAME = { av: 'Anlage V', feld: 'Reiter und Felder', we: 'Wohnungen', weg: 'WEG und Protokolle', sonst: 'Sonstiges' };
   var STAND_NAME = { ueb: 'Übernommen', offen: 'Offen', zurueck: 'Zurückgenommen' };
   var _filt = { art: '', jahr: '', zu: '', stand: '' };
   function postenName(f) { for (var i = 0; i < POSTEN.length; i++) if (POSTEN[i][0] === f) return POSTEN[i][1]; return f; }
@@ -461,7 +461,10 @@
       if (a.t === 'feld' && a.label && t.indexOf(a.label) === 0) { var sec = feldSec(a.id); return { g: 'feld', text: (SEC_NAME[sec] || 'Objekt') + ' · ' + a.label, hin: 'feld:' + a.id + ':' + sec }; }
       if (a.t === 'einheit' && a.label && t.indexOf(a.label) === 0) return { g: 'we', text: 'Wohnungen · ' + a.label, hin: 'we:' + (a.i == null ? '' : a.i) };
     }
-    if (/^(WE|Wohnung|Einheit|Mietvertrag)\b/i.test(t)) return { g: 'we', text: 'Wohnungen', hin: 'we:' };
+    if (/^(WE|Wohnung|Einheit|Mietvertrag|Einheiten erfassen)\b/i.test(t)) return { g: 'we', text: 'Wohnungen', hin: 'we:' };
+    /* Werte ohne gemerkte Feldänderung (gleich geblieben oder Bewertung): „Bezeichnung: Wert“ führt zum Feld mit dieser Beschriftung */
+    var lm = t.match(/^([^:·]{2,48}?)(?: · (?:Qualität|Zustand))?: /);
+    if (lm) { var lb = lm[1].trim(); return { g: 'feld', text: 'Objekt · ' + lb, hin: 'lab:' + lb }; }
     return { g: 'sonst', text: 'Sonstiges', hin: '' };
   }
   /** Alle Ziele eines Eintrags, zusammengefasst je Ziel mit Anzahl */
@@ -497,6 +500,14 @@
         p = ['feld', 'mfh-oeffnen', 's0'];
       }
       if (p[0] === 'weg') { var w = document.querySelector('.dp-hv-prots') || document.querySelector('.dp-hv-abs'); if (w) { markieren(w); return; } if (window.toast) window.toast('Die Protokolle stehen im Reiter Haus & Unterlagen.'); return; }
+      if (p[0] === 'lab') {   /* Feld über seine Beschriftung finden, Reiter wechseln, markieren */
+        var lab = p.slice(1).join(':').toLowerCase(), treffer = null;
+        [].some.call(document.querySelectorAll('.sec label, .sec h4'), function (L) { var tx = (L.textContent || '').trim().toLowerCase(); if (tx.indexOf(lab) === 0) { treffer = L; return true; } return false; });
+        if (!treffer) { if (typeof window._dpReiterZu === 'function') window._dpReiterZu('s0'); if (window.toast) window.toast('Die Angabe „' + p.slice(1).join(':') + '“ steht im Reiter Objekt.'); return; }
+        var sc = treffer.closest('.sec'); if (sc && typeof window._dpReiterZu === 'function') window._dpReiterZu(sc.id);
+        setTimeout(function () { markieren(treffer.closest('.f') || treffer); }, 300);
+        return;
+      }
       if (p[0] === 'feld') {
         if (p[2] && typeof window._dpReiterZu === 'function') window._dpReiterZu(p[2]);
         setTimeout(function () { var e = el(p[1]); if (!e) { if (window.toast) window.toast('Das Feld gibt es in diesem Stand nicht.'); return; } markieren(e); }, 300);
@@ -893,7 +904,7 @@
   }
 
   try { _grundCss(); } catch (e) {}
-  window.DpEingang = { VERSION: 'v4680', schonHtml: schonHtml, start: start, jahresAnsicht: jahresAnsicht, jahresInRahmen: jahresInRahmen, oeffnen: oeffnen, istRechnung: istRechnung, belegeAuslesen: belegeAuslesen,
+  window.DpEingang = { VERSION: 'v4680a', schonHtml: schonHtml, start: start, jahresAnsicht: jahresAnsicht, jahresInRahmen: jahresInRahmen, oeffnen: oeffnen, istRechnung: istRechnung, belegeAuslesen: belegeAuslesen,
     einheiten: einheiten, mvVorschlag: mvVorschlag, mvOptionen: mvOptionen, mvText: mvText, mvUebernehmen: mvUebernehmen, mvFelder: mvFelder,
     jahrStand: jahrStand, protokoll: protokoll, verlaufHtml: verlaufHtml, lesen: lesen, filtern: filtern, hin: hin, zieleVon: zieleVon /* v4680 */,
     /* v3154 */ txStart: txStart, txEnde: txEnde, feldStand: feldStand, feldGeaendert: feldGeaendert,
