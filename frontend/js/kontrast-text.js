@@ -51,13 +51,14 @@
         if (el.closest('svg, .dp-kt-aus, [data-dp-kt="aus"], #dp-kv-panel')) continue;
         var cs = getComputedStyle(el);
         if (parseFloat(cs.fontSize) > 13.5) continue;
-        var schon = KL.filter(function (k) { return el.classList.contains(k); })[0];
-        /* Farbe ohne unsere Klasse beurteilen */
-        if (schon) el.classList.remove(schon);
-        var fg = rgb(getComputedStyle(el).color);
+        /* schon eingestuft: nicht erneut anfassen (jede Klassenänderung löst den Beobachter aus) */
+        if (KL.some(function (k) { return el.classList.contains(k); })) continue;
+        /* unsichtbar (display:none, eingeklappter Reiter): beim Aufklappen meldet der Beobachter die Änderung */
+        if (!el.getClientRects().length) continue;
+        var fg = rgb(cs.color);
         if (!fg) continue;
         var fam = familie(fg); if (!fam) continue;
-        var b = grund(el); if (!b) { if (schon) el.classList.add(schon); continue; }
+        var b = grund(el); if (!b) continue;
         if (fg.a < 1) fg = { r: fg.r * fg.a + b.r * (1 - fg.a), g: fg.g * fg.a + b.g * (1 - fg.a), b: fg.b * fg.a + b.b * (1 - fg.a) };
         if (kontrast(fg, b) >= 4.5) continue;
         var dunkelGrund = lum(b) < 0.25;
@@ -73,8 +74,8 @@
     pruefe();
     try {
       new MutationObserver(function (ms) {
-        for (var i = 0; i < ms.length; i++) { var n = ms[i].target; if (n && n.classList && ms[i].type === 'attributes' && ms[i].attributeName === 'class' && /dp-kt-/.test(n.className)) continue; planen(); return; }
-      }).observe(document.body, { childList: true, subtree: true, characterData: true });
+        for (var i = 0; i < ms.length; i++) { var n = ms[i].target; if (ms[i].type === 'attributes' && n && n.className && /dp-kt-/.test(String(n.className))) continue; planen(); return; }
+      }).observe(document.body, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ['class', 'style', 'hidden'] });   /* Reiterwechsel schalten nur Sichtbarkeit um */
     } catch (e) {}
   }
   window.DpKontrastText = { pruefe: pruefe, version: 'v4850' };
