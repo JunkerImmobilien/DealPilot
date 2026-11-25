@@ -242,7 +242,7 @@ const ZAHL_GRENZEN = {
 };
 /* v3946 · GRUNDANGABEN des Kaeufers (Formular „Objekt“ und „Finanzierung“). Nur diese Felder, ueber dieselbe
    Weissliste wie die gelesenen Zahlen. Pflicht: GRUND_PFLICHT und PLZ oder Ort. */
-const GRUND_FELDER = ['kp', 'nkm', 'wfl', 'art', 'plz', 'ort', 'bj', 'gsfl', 'ze', 'nk_pct', 'mea_pct', 'ek_eur', 'zins_pct', 'tilg_pct', 'bindung_j'];
+const GRUND_FELDER = ['kp', 'nkm', 'wfl', 'art', 'plz', 'ort', 'bj', 'gsfl', 'ze', 'nk_pct', 'mea_pct', 'einheiten', 'ek_eur', 'zins_pct', 'tilg_pct', 'bindung_j'];   /* einzelcheck-10 · einheiten: Wohnungszahl beim MFH (Sachwert) */
 const GRUND_PFLICHT = ['kp', 'nkm', 'wfl', 'art', 'ek_eur', 'zins_pct', 'tilg_pct', 'bindung_j'];
 function grundSauber(g) {
   if (typeof g === 'string') { try { g = JSON.parse(g); } catch (e) { g = null; } }

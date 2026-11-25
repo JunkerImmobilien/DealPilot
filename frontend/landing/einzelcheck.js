@@ -63,7 +63,7 @@
 (function () {
   'use strict';
   if (window.DpEinzelCheck) return;
-  var VERSION = 'einzelcheck-9e';
+  var VERSION = 'einzelcheck-10';
   var ANSCHLUSS_ZINS = 5.0;     /* v3946 · Marcel 22.11.2026: „Anschlussfinanzierung, die wir einfach auf fünf Prozent rechnen mit derselben Tilgung“ */
   var ABLAGE_STUNDEN = 2;       /* v3946 · Unterlagen im Browser höchstens so lange (die Stripe-Kasse läuft nach 60 Minuten ab) */
   var SPEICHER = 'dp_ec_kauf';
@@ -102,7 +102,7 @@
   }
 
   /* ── Kerne nachladen (Buster wie frontend/index.html, tools/buster-ebenen-pruefen.mjs) ── */
-  var KERNE = { DpDokument: 'js/dp-dokument.js?v=v4380', DpMietpotenzial: 'js/mietpotenzial-kern.js?v=v4220', DealScore2: 'js/dealscore2.js?v=v4760',
+  var KERNE = { DpDokument: 'js/dp-dokument.js?v=v4830', DpMietpotenzial: 'js/mietpotenzial-kern.js?v=v4220', DealScore2: 'js/dealscore2.js?v=v4760',
     DpDarlehenWeitere: 'js/darlehen-weitere.js?v=v3256',
     pdfjsLib: 'vendor/cdn/pdf.js/3.11.174/pdf.min.js' };   /* einzelcheck-2 · Fotos aus dem Exposé (wie js/pdf-import.js) */   /* v3946 · Monatsplan der Darlehen (Restschuld, Anschluss) */
   var _geladen = {};
@@ -165,6 +165,10 @@
     },
     loeschen: function () { return dbTun('readwrite', function (st) { return st.delete(DB_KEY); }).catch(function () {}); }
   };
+  /* einzelcheck-10 · Anschrift nur im Browser-Tab (sessionStorage), je Kauf, nie auf dem Server gespeichert.
+     Ohne sie fehlt beim erneuten Bericht der Bodenrichtwert. */
+  function adrMerken() { try { var t = tokenLesen(); if (t && S.adresse) sessionStorage.setItem('dp_ec_adr', JSON.stringify({ t: t, a: S.adresse })); } catch (e) {} }
+  function adrHolen() { if (S.adresse) return; try { var x = JSON.parse(sessionStorage.getItem('dp_ec_adr') || 'null'); if (x && x.t === tokenLesen() && x.a) S.adresse = String(x.a); } catch (e) {} }
   function ablageAus(token) {
     return { zeit: Date.now(), token: token, grund: S.grund, adresse: S.adresse || '', frei: S.frei,
       dateien: S.dateien.map(function (f) { return { name: f.name, type: f.type || 'application/pdf', blob: f }; }) };
@@ -317,7 +321,7 @@
     return g;
   }
   /* einzelcheck-3 · Felder, die eine Unterlage vorbelegen kann, mit Art des Vergleichs */
-  var VORBELEGBAR = { kp: 'eur', nkm: 'eur', wfl: 'qm', ze: 'eur', bj: 'jahr', gsfl: 'qm', mea_pct: 'pct', nk_pct: 'pct', plz: 'text', ort: 'text', art: 'art' };
+  var VORBELEGBAR = { kp: 'eur', nkm: 'eur', wfl: 'qm', ze: 'eur', bj: 'jahr', gsfl: 'qm', mea_pct: 'pct', nk_pct: 'pct', plz: 'text', ort: 'text', art: 'art', einheiten: 'zahl' };
   var AUS_ART = { 'Exposé': 'dem Exposé', 'Mietaufstellung': 'der Mietaufstellung', 'Marktbericht': 'dem Marktbericht', 'Energieausweis': 'dem Energieausweis',
     'Wirtschaftsplan': 'dem Wirtschaftsplan', 'WEG-Protokoll': 'dem WEG-Protokoll', 'Mietvertrag': 'dem Mietvertrag', 'Teilungserklärung': 'der Teilungserklärung' };
   function ausText(art) { return 'aus ' + (AUS_ART[art] || 'den Unterlagen'); }
@@ -351,7 +355,7 @@
     stufe(2); ++schritt;
     var vb = vorbelegung(), g = vb.werte, offen = {};
     Object.keys(vb.konflikt).forEach(function (k) { offen[k] = true; });
-    var IDS = { kp: 'ecgKp', nkm: 'ecgNkm', wfl: 'ecgWfl', art: 'ecgArt', plz: 'ecgPlz', ort: 'ecgOrt', ze: 'ecgZe', bj: 'ecgBj', gsfl: 'ecgGsfl', mea_pct: 'ecgMea',
+    var IDS = { kp: 'ecgKp', nkm: 'ecgNkm', wfl: 'ecgWfl', art: 'ecgArt', plz: 'ecgPlz', ort: 'ecgOrt', ze: 'ecgZe', bj: 'ecgBj', gsfl: 'ecgGsfl', mea_pct: 'ecgMea', einheiten: 'ecgWe',
       ek_eur: 'ecgEk', nk_pct: 'ecgNk', zins_pct: 'ecgZins', tilg_pct: 'ecgTilg', bindung_j: 'ecgBind' };
     var pflicht = function (k) { return GRUND_PFLICHT.indexOf(k) >= 0 || k === 'plz'; };
     /* Zeile unter dem Feld: Herkunft, „fehlt“ oder die Wahl bei Widerspruch */
@@ -406,6 +410,8 @@
       + f('ecgOrt', 'ort', 'Ort', g.ort || '', { text: 1, frei: 1, ph: 'wenn ohne PLZ' })
       + f('ecgZe', 'ze', 'Zusatzeinnahmen im Monat', feldText(g.ze), { einheit: '€', frei: 1, ph: 'Stellplatz, Küche' }) + f('ecgBj', 'bj', 'Baujahr', g.bj ? String(Math.round(g.bj)) : '', { frei: 1, max: 4 })
       + f('ecgGsfl', 'gsfl', 'Grundstücksfläche', feldText(g.gsfl), { einheit: 'm²', frei: 1, ph: 'bei Häusern' }) + f('ecgMea', 'mea_pct', 'Miteigentumsanteil', feldText(g.mea_pct, 2), { einheit: '%', frei: 1, ph: 'bei Wohnungen' })
+      /* einzelcheck-10 · Anzahl Wohnungen nur bei Mehrfamilienhaus: ohne sie rechnet der Sachwert nicht */
+      + '<div class="ec-we-feld"' + (g.art === 'MFH' ? '' : ' hidden') + '>' + f('ecgWe', 'einheiten', 'Anzahl Wohnungen', g.einheiten != null ? String(Math.round(g.einheiten)) : '', { frei: 1, max: 4, ph: 'nötig für den Sachwert' }) + '</div>'
       + f('ecgStr', 'strasse', 'Straße und Hausnummer', strasse, { text: 1, frei: 1, breit: 1, ph: 'nur für den Bodenrichtwert, wird nicht gespeichert' })
       + '</div>' + wertInfo + '</fieldset><fieldset><legend>Finanzierung</legend><div class="ec-raster">'
       + f('ecgEk', 'ek_eur', 'Eigenkapital', feldText(g.ek_eur), { einheit: '€' }) + f('ecgNk', 'nk_pct', 'Kaufnebenkosten', feldText(g.nk_pct != null ? g.nk_pct : 10, 1), { einheit: '%' })
@@ -423,6 +429,7 @@
       }); });
       if (el) el.addEventListener(k === 'art' ? 'change' : 'input', function () { delete offen[k]; if (w.parentNode) w.parentNode.classList.remove('wahl'); standWahl(); });
     });
+    (function () { var a = document.getElementById('ecgArt'), w = $('.ec-we-feld', inhalt); if (a && w) a.addEventListener('change', function () { w.hidden = a.value !== 'MFH'; }); })();
     /* hh4 (25.11.2026) · Zeile unter dem Feld folgt dem Tippen: ein selbst geänderter Wert heißt „deine Angabe“,
        ein gefülltes Pflichtfeld verliert „fehlt, bitte ergänzen“ (vorher blieb „aus deinem Deal-Check“ bei 0 € Eigenkapital stehen) */
     Object.keys(IDS).forEach(function (k) {
@@ -462,7 +469,7 @@
       e.preventDefault();
       var v = function (id) { var x = document.getElementById(id); return x ? x.value : ''; };
       var n = { art: v('ecgArt'), kp: zahlAus(v('ecgKp')), nkm: zahlAus(v('ecgNkm')), wfl: zahlAus(v('ecgWfl')), plz: String(v('ecgPlz')).replace(/\D/g, '').slice(0, 5),
-        ort: String(v('ecgOrt')).trim().slice(0, 60), ze: zahlAus(v('ecgZe')), bj: zahlAus(v('ecgBj')), gsfl: zahlAus(v('ecgGsfl')), mea_pct: zahlAus(v('ecgMea')),
+        ort: String(v('ecgOrt')).trim().slice(0, 60), ze: zahlAus(v('ecgZe')), bj: zahlAus(v('ecgBj')), gsfl: zahlAus(v('ecgGsfl')), mea_pct: zahlAus(v('ecgMea')), einheiten: v('ecgArt') === 'MFH' ? zahlAus(v('ecgWe')) : null,
         ek_eur: zahlAus(v('ecgEk')), nk_pct: zahlAus(v('ecgNk')), zins_pct: zahlAus(v('ecgZins')), tilg_pct: zahlAus(v('ecgTilg')), bindung_j: zahlAus(v('ecgBind')) };
       Object.keys(n).forEach(function (k) { if (n[k] === null || n[k] === '') delete n[k]; });
       var m = $('.ec-grund-m', inhalt); if (!m) { m = document.createElement('p'); m.className = 'ec-meldung warn ec-grund-m'; m.setAttribute('role', 'alert'); $('.ec-knoepfe', inhalt).before(m); }
@@ -778,6 +785,7 @@
         var j = x[0];
         if (!j._ok) { zeigeRueckkehr(j.code === 'berichte_aufgebraucht' ? 'Für diesen Kauf sind alle Berichte erstellt.' : (j.error || 'Der Bericht konnte nicht entstehen.')); return; }
         S.bericht = berichtDaten(j, x[3]);
+        adrMerken();
         ablage.loeschen();   /* v3946 · Bericht fertig: die Unterlagen verlassen das Gerät nicht und bleiben nicht liegen */
         zeigeBericht(S.bericht);
       }).catch(function () { if (nr === schritt) zeigeRueckkehr('Keine Verbindung. Bitte noch einmal versuchen.'); });
@@ -1631,18 +1639,22 @@
       return;
     }
     /* v3946 · nur noch der Notweg: die Ablage im Browser fehlte (privates Fenster) oder der Bericht schlug fehl */
+    adrHolen();
+    var adrFeld = S.adresse ? '' : '<label class="ec-f breit"><span>Straße und Hausnummer <em>optional</em></span><div class="ec-ein"><input id="ecrStr" inputmode="text" maxlength="80" autocomplete="off" placeholder="nur für den Bodenrichtwert, wird nicht gespeichert"></div><small class="ec-her">Anschrift erneut eingeben, sonst fehlt der Bodenrichtwert und der Score kann abweichen.</small></label>';
     setze('<h3 id="ecTitel">Zahlung erhalten.</h3>' + (hinweis ? meldung(hinweis, 'warn') : '')
       + '<p class="ec-lead">' + (S.dateien.length ? 'Starte den Bericht hier noch einmal.' : 'Dein Browser hat die Unterlagen nicht aufbewahrt, zum Beispiel in einem privaten Fenster. Der Bericht rechnet mit deinen Grundangaben und den schon gelesenen Zahlen. Wenn du magst, wähle die Unterlagen noch einmal, dann liest DealPilot sie vollständig.') + '</p>'
       + '<label class="ec-ablage-zone"><input type="file" class="ec-datei" accept="application/pdf,.pdf" multiple><span><b>Unterlagen wählen</b><br><small>Bis zu ' + INFO.voll_max + ' PDFs</small></span></label>'
       + '<p class="ec-fein">' + (S.dateien.length ? S.dateien.length + ' Unterlagen gewählt.' : '') + ' Noch ' + (s.berichte_rest != null ? s.berichte_rest : '') + ' Berichte zu diesem Kauf, gültig bis ' + esc(datum(s.gueltig_bis)) + '.</p>'
-      + '<div class="ec-knoepfe"><button type="button" class="btn-p ec-erst"' + (S.dateien.length ? '' : ' disabled') + '>Bericht erstellen</button><button type="button" class="btn-l ec-ohne">Ohne Unterlagen, mit den gespeicherten Zahlen</button></div>', 'h3');
+      + adrFeld + '<div class="ec-knoepfe"><button type="button" class="btn-p ec-erst"' + (S.dateien.length ? '' : ' disabled') + '>Bericht erstellen</button><button type="button" class="btn-l ec-ohne">Ohne Unterlagen, mit den gespeicherten Zahlen</button></div>', 'h3');
     var inp = $('.ec-datei', inhalt);
     inp.addEventListener('change', function () {
       [].slice.call(inp.files || []).forEach(function (f) { if (S.dateien.length < INFO.voll_max && /pdf/i.test(f.type || f.name) && f.size <= INFO.max_mb * 1048576) S.dateien.push(f); });
       if (nr === schritt) zeigeRueckkehr();
     });
-    $('.ec-erst', inhalt).addEventListener('click', erstelleBericht);
-    $('.ec-ohne', inhalt).addEventListener('click', function () { S.dateien = []; erstelleBericht(); });
+    var adrUebernehmen = function () { var x = document.getElementById('ecrStr'), str = x ? String(x.value).trim().slice(0, 80) : '', g = S.grund || {};
+      if (str.length >= 3) { S.adresse = str + ', ' + [g.plz, g.ort].filter(Boolean).join(' '); adrMerken(); } };
+    $('.ec-erst', inhalt).addEventListener('click', function () { adrUebernehmen(); erstelleBericht(); });
+    $('.ec-ohne', inhalt).addEventListener('click', function () { adrUebernehmen(); S.dateien = []; erstelleBericht(); });
   }
   function statusLaden() {
     var t = tokenLesen(); if (!t) return Promise.resolve(null);
@@ -1650,7 +1662,7 @@
       .then(function (s) { S.status = s; return s; }).catch(function () { return null; });
   }
   /* v3946 · Grundangaben aus dem beim Kauf gespeicherten Zahlenstand (Notweg ohne Ablage im Browser) */
-  var GRUND_FELDER = ['kp', 'nkm', 'wfl', 'art', 'plz', 'ort', 'bj', 'gsfl', 'ze', 'nk_pct', 'mea_pct', 'ek_eur', 'zins_pct', 'tilg_pct', 'bindung_j'];
+  var GRUND_FELDER = ['kp', 'nkm', 'wfl', 'art', 'plz', 'ort', 'bj', 'gsfl', 'ze', 'nk_pct', 'mea_pct', 'einheiten', 'ek_eur', 'zins_pct', 'tilg_pct', 'bindung_j'];
   function grundAusZahlen(z) { var g = {}; GRUND_FELDER.forEach(function (k) { if (z && z[k] != null) g[k] = z[k]; }); return grundFehlt(g).length ? null : g; }
   function rueckkehrPruefen() {
     var q = /[?&]einzelcheck=(bezahlt|abbruch)(&|$)/.exec(location.search || '');
@@ -1666,6 +1678,7 @@
     /* v3946 · zuerst die Ablage dieses Kaufs zurückholen (Dateien, Grundangaben, kostenloses Ergebnis) */
     ablage.lesen().then(function (rec) {
       if (rec && rec.token === tokenLesen()) ablageEin(rec);
+      adrHolen();
       var versuch = 0;
       (function los() {
         statusLaden().then(function (s) {

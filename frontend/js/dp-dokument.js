@@ -275,7 +275,7 @@
     var fonts = (location && location.origin ? location.origin : '') + '/fonts/dp-fonts.css';
     /* Querformat fuer das ganze Dokument (Bankexport): die Seitenregel kommt NACH der hochkant-Regel */
     var quer = opt && opt.quer ? '@page{size:A4 landscape;margin:12mm 0 14mm}@page:first{size:A4 landscape;margin:12mm 0 14mm}' : '';
-    return '<!doctype html><html lang="de"><head><meta charset="utf-8"><title>' + esc(titel) + '</title><link rel="stylesheet" href="' + fonts + '"><style>' + CSS + quer + markenGold() + '</style></head><body>' + seiten.join('') + '</body></html>';
+    return '<!doctype html><html lang="de"><head><meta charset="utf-8"><title>' + esc(titel) + '</title><link rel="stylesheet" href="' + fonts + '"><style>' + CSS + quer + markenGold() + (opt && typeof opt.css === 'string' ? opt.css : '') + '</style></head><body>' + seiten.join('') + '</body></html>';
   }
   function vorschau(doc, titel) {
     var alt = document.getElementById('dp-dok-vorschau'); if (alt) alt.remove();
