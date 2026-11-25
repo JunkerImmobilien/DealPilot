@@ -45563,3 +45563,10 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** staging f9b14313 · main b0b54d02, Version 8396df9f · Rückführung 1785261c.
 - **Nachweis:** Herford 43 → 66 Solide (Objekt 81, Finanzierung 34). einzelcheck-pruefen U grün mit Gegenproben, score-ketten, rechenkerne, ki-text-zahlen, buster, vorschau grün. Prod-Sicherung haupt/mb-20261125-0810-ec6 (7,0/31 MB, Kopf gelesen), Backend Staging und Prod neu gebaut, healthy, /pdf antwortet 403 ohne Kauf, Dateien mit Bustern ausgeliefert.
 - **Rest:** kein bezahlter Bericht auf Prod gemessen. Quick-Check ohne Marktbericht kennt keine Vergleichsmiete (Potenzial weicht dann ab).
+
+### Rollout 1.0.207 · v4750 / einzelcheck-7 (25.11.2026, Fork EE4)
+
+- **Was:** Reiter Finanzierung & Bank zeigt Tipps an DSCR und Cashflow nur mit eigenem Ziel im Investmentprofil. Deal-Check-Deckblatt mit eigener OSM-Lagekarte (SVG aus osmKacheln, Häuschen-Pin, „© OpenStreetMap-Mitwirkende“) statt Geoapify.
+- **Commit:** staging 9a7352c9, 4e92a013 · main 5f345570, 88269a41.
+- **Nachweis:** Hauptstr. 51 mit/ohne Ziel gemessen; Karte im Staging- und Prod-Container erzeugt; einzelcheck-pruefen, buster-ebenen, vorschau grün; Sicherung haupt-/mb-20261125-0901-v4750.
+- **Rest:** kein bezahlter Prod-Bericht gemessen; Marktbericht-Kopfkarte (mb-Dienst) weiter Geoapify.
