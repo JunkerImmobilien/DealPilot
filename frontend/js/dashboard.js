@@ -651,15 +651,48 @@
       + n(sw.nettorendite) + ' %, Cashflow ' + n(sw.cashflow) + ' %, Cash-on-Cash ' + n(sw.cashOnCash)
       + ' %. Über den Bestand nach Kaufpreis gewichtet.';
   }
+  /* v4730 · EIN Wertansatz je Objekt für das ganze Portfolio-Cockpit (Kachel „Vermögen netto“, Bilanz heute,
+     Objektmatrix, Module, Tooltips). Entscheidung 25.11.2026: der maßgebende Wert.
+       1. o._wert_anker (gespeichert von calc.js: führendes Verfahren des letzten Berichts, bei Aufteilern das Haus als Ganzes,
+          Einstellung dp_wert_anker, Gutachten/Bank vorrangig)
+       2. Objekt hat einen Bericht, aber noch keinen gespeicherten Anker (vor v4420 gespeichert): dieselbe Regel wie calc.js
+          aus dem letzten Bericht. Wohnungseigentum: amtlicher Vergleichswert, sonst Vergleichswert aus Angeboten (Stufe M,
+          Marktpreisindikation nach Abschlag). Alles andere: Ertragswert (Zielbild-Lauf, sonst Bericht).
+       3. sonst Kaufpreis, als solcher gekennzeichnet.
+     Bis v4720 nahm die Kachel die Marktpreisindikation (2,41 Mio auf Staging), die Bilanz heute den Kaufpreis (1,79 Mio). */
+  var _zbEwCache = null;
+  function _wertAnsatz(o){
+    var k = o && o._key, kp = _kpEuro(o), wa = o && o._wert_anker;
+    if (wa && num(wa.wert) > 0) return { wert: num(wa.wert), quelle: 'anker', art: wa.art || null, datum: wa.datum || null };
+    var h = (k && _mbHist[k]) || null;
+    if (h) {
+      var art = String(o.objart || o.objektart || '').toLowerCase(), etw = /etw|wohnung|eigentumsw/.test(art);
+      var vw = num(h.irw_vergleichswert_eur) > 0 ? num(h.irw_vergleichswert_eur) : (h.vergleichsfaktor_amtlich && num(h.vergleichswert_eur) > 0 ? num(h.vergleichswert_eur) : null);
+      var zbe = null; try { var zz = window.DpWertZielbild && DpWertZielbild.zielbildFuer ? DpWertZielbild.zielbildFuer(o) : null; zbe = zz && zz.ewB != null ? num(zz.ewB) : null; } catch (e) { zbe = null; }
+      var ew = zbe > 0 ? zbe : (num(h.ertragswert_eur) > 0 ? num(h.ertragswert_eur) : null);
+      var d = h.created_at ? String(h.created_at).slice(0, 10) : null;
+      if (etw && vw) return { wert: vw, quelle: 'mb', art: 'vergleichswert', datum: d };
+      if (etw && num(h.market_value) > 0) return { wert: num(h.market_value), quelle: 'mb', art: 'vergleichswert_m', datum: d };
+      if (ew) return { wert: ew, quelle: 'mb', art: 'ertragswert', datum: d };
+      if (num(h.market_value) > 0) return { wert: num(h.market_value), quelle: 'mb', art: 'vergleichswert_m', datum: d };
+    }
+    return { wert: kp, quelle: k && !(k in _mbHist) ? 'laedt' : 'kp', art: null, datum: null };
+  }
+  var _ART_TXT = { ertragswert: 'Ertragswert', sachwert: 'Sachwert', vergleichswert: 'Vergleichswert', vergleichswert_m: 'Vergleichswert aus Angeboten', aufteiler: 'Haus als Ganzes', gutachten: 'Gutachten', bank: 'Bankbewertung' };
+  function _wertAnsatzText(x){
+    if (!x) return '';
+    if (x.quelle === 'kp') return 'Kaufpreis (kein Bericht)';
+    if (x.quelle === 'laedt') return 'Kaufpreis (Bericht wird geladen …)';
+    var d = x.datum && /^d{4}-d{2}-d{2}/.test(x.datum) ? x.datum.slice(8, 10) + '.' + x.datum.slice(5, 7) + '.' + x.datum.slice(0, 4) : (x.datum || '');
+    return (_ART_TXT[x.art] || 'maßgebender Wert') + (d ? ', Stichtag ' + d : '');
+  }
   function _wertHeuteJeObjekt(arr){
     return arr.map(function(o){
-      var k = o._key, h = (k && _mbHist[k]) || null, kp = _kpEuro(o);
-      var mw = h && num(h.market_value) > 0 ? num(h.market_value) : null;
+      var k = o._key, kp = _kpEuro(o), a = _wertAnsatz(o);
       var darl = num(o.d1) + num(o.d2);   /* wie aggStats().darl: ursprüngliche Darlehenssumme */
-      return { key: k, name: _objName(o), kp: kp, darl: darl,
-        wert: mw != null ? mw : kp,
-        quelle: mw != null ? 'mb' : (k && !(k in _mbHist) ? 'laedt' : 'kp'),
-        stand: h && h.created_at ? _fDat(h.created_at) : '' };
+      return { key: k, name: _objName(o), kp: kp, darl: darl, rest: _restschuldOf(o),
+        wert: a.wert, quelle: a.quelle, art: a.art, datum: a.datum, text: _wertAnsatzText(a),
+        stand: a.datum ? _wertAnsatzText(a).replace(/^.*Stichtag /, '') : '' };
     });
   }
   /* v3227 · Kennzahlen als EINE Karte im Stil des Reiters Objekt: Kopf mit
@@ -675,8 +708,9 @@
     var arr = detailArr();
     var W = _wertHeuteJeObjekt(arr);
     var wSum = 0, dSum = 0, nMb = 0, nKp = 0, nLaedt = 0;
-    W.forEach(function(x){ wSum += x.wert; dSum += x.darl; if (x.quelle === 'mb') nMb++; else { nKp++; if (x.quelle === 'laedt') nLaedt++; } });
-    var delta = wSum - dSum, deltaP = wSum > 0 ? delta / wSum * 100 : null;
+    var rSum = 0;
+    W.forEach(function(x){ wSum += x.wert; dSum += x.darl; rSum += x.rest || 0; if (x.quelle === 'mb' || x.quelle === 'anker') nMb++; else { nKp++; if (x.quelle === 'laedt') nLaedt++; } });
+    var delta = wSum - rSum,   /* v4730 · Vermögen netto = Wertansatz minus Restschuld heute (bis v4720 minus Darlehen bei Kauf) */ deltaP = wSum > 0 ? delta / wSum * 100 : null;
     var ek = S.ek, ekOk = ek > 100;
     var r = function(z){ return ekOk ? z / ek * 100 : null; };
     var ekrVs = r(S.cfVsJ), ekrNs = r(S.cfNsJ), ekrTg = r(S.cfVsJ + S.tilgJ);
@@ -712,8 +746,8 @@
       + k('Finanziert', fE(S.darl), '', 'Ursprüngliche Darlehenssumme beim Ankauf (alle Darlehen).', 'Darlehen beim Ankauf')
       + k('Eingesetztes EK', fE(S.ek), '', 'Eigenkapital laut Objekt-Eingabe, Summe.', 'laut Objekten')
       + k('Restschuld gesamt', fE(S.rest), '', 'Offener Teil der Darlehen heute.', 'Verbindlichkeiten heute')
-      + k('Darlehen ↔ Wert heute', sg(delta), ton(delta),
-          'Abstand = Wert heute − ursprüngliches Darlehen; Prozent = Abstand ÷ Wert heute. Wert heute je Objekt: letzter Marktbericht (Marktpreisindikation), sonst Kaufpreis.',
+      + k('Vermögen netto', sg(delta), ton(delta),
+          'Wertansatz minus Restschuld heute. Wertansatz je Objekt: maßgebender Wert des letzten Berichts (führendes Verfahren, bei Aufteilern das Haus als Ganzes), sonst Kaufpreis (' + nMb + ' von ' + W.length + ' mit Bericht).',
           (deltaP != null ? _fPr(deltaP, 1) + ' des Werts · ' : '') + 'Wert ' + fE(wSum));
     var E4 = _ekr4Portfolio(arr);   /* v4610 */
     var p4 = function(v){ return v == null ? 'k. A.' : _fPr(v, 1); };
@@ -737,7 +771,7 @@
       }).join('');
     }
     var liste = W.map(function(x){
-      var q = x.quelle === 'mb' ? 'Marktbericht' + (x.stand ? ' vom ' + x.stand : '') : (x.quelle === 'laedt' ? 'Kaufpreis (Marktbericht wird geladen …)' : 'Kaufpreis (kein Marktbericht)');
+      var q = x.text || 'Kaufpreis';   /* v4730 · maßgebender Wert */
       var dd = x.wert - x.darl;
       return '<li><span class="kz-on">' + esc(x.name) + '<small>' + esc(q) + '</small></span><span class="kz-ow">' + _fE(x.wert)
         + '<small class="' + (dd >= 0 ? 'pos' : 'neg') + '">' + (dd >= 0 ? '+' : '−') + _fE(Math.abs(dd)).replace(/^−/, '') + ' zum Darlehen</small></span></li>';
@@ -1049,8 +1083,8 @@
      Helfer, ueber die aggStats() summiert (_kpEuro, _restschuldOf) */
   function _bilanzHeute(arr){
     var objs = arr.map(function(o){
-      var w=_kpEuro(o), r=_restschuldOf(o);
-      return { name:_objName(o), key:o._key, ort:(o._ort||o.ort||'ohne Ort'), wert:w, rest:r, ek:w-r };
+      var wa=_wertAnsatz(o), w=wa.wert, r=_restschuldOf(o);   /* v4730 · Wertansatz statt Kaufpreis */
+      return { name:_objName(o), key:o._key, ort:(o._ort||o.ort||'ohne Ort'), wert:w, kp:_kpEuro(o), rest:r, ek:w-r, quelle:wa.quelle, text:_wertAnsatzText(wa) };
     }).filter(function(x){ return x.wert>0 || x.rest>0; });
     var H = objs.reduce(function(s,x){ s.wert+=x.wert; s.rest+=x.rest; return s; }, {wert:0,rest:0});
     H.ek = H.wert - H.rest; H.objs = objs;
@@ -1475,7 +1509,7 @@
       + (Math.abs(s.gi - s.darl - s.ek) >= 1 ? z((s.gi - s.darl - s.ek > 0 ? 'nicht zugeordnet' : 'mehr finanziert als investiert'), _fE(Math.abs(s.gi - s.darl - s.ek)), 'gb-sub', 'Reiter Finanzierung prüfen') : '')
       + '</div>';
     var b2 = '<div class="gb-k"><div class="gb-t"><span>2</span>Bilanz heute</div>'
-      + z('Objektwerte (Kaufpreis)', EK(H.wert), '', H.objs.length + ' Objekte')
+      + z('Objektwerte (Wertansatz)', EK(H.wert), '', H.objs.length + ' Objekte · maßgebender Wert, sonst Kaufpreis')
       + z('− Restschuld', EK(H.rest))
       + z('= Eigenkapital im Bestand', EK(H.ek), 'gb-sum', 'Quote ' + _fPr(H.wert ? H.ek / H.wert * 100 : null))
       + '</div>';

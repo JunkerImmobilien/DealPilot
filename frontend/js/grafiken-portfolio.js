@@ -44,7 +44,7 @@
       var dar = zahl(o.darlehen_eur) || 0, zinsJ = zahl(o.zins_eur_jahr) || 0, tilgJ = zahl(o.tilgung_eur_jahr) || 0;
       var cfvs = zahl(o.cashflow_vor_steuer_eur_jahr), cfns = zahl(o.cashflow_nach_steuer_eur_jahr);
       return { id: o.id, name: o.name || ('Objekt ' + (i + 1)), art: o.objektart || 'Objekt', kp: zahl(o.kaufpreis_eur) || 0,
-        wert: w.wert != null ? w.wert : (zahl(o.kaufpreis_eur) || 0), wertQ: w.quelle || 'kp', rest: zahl(o.restschuld_eur) || 0, darlehen: dar,
+        wert: w.wert != null ? w.wert : (zahl(o.kaufpreis_eur) || 0), wertQ: w.quelle || 'kp', wertText: w.text || null, rest: zahl(o.restschuld_eur) || 0, darlehen: dar,
         zinsPct: dar ? zinsJ / dar * 100 : null, rateJ: zinsJ + tilgJ, mieteJ: zahl(o.miete_kalt_eur_jahr), cfvs: cfvs, cfns: cfns,
         steuer: cfns != null && cfvs != null ? cfns - cfvs : null, dscr: zahl(o.dscr), bmy: zahl(o.bruttomietrendite_prozent),
         wfl: zahl(o.wohnflaeche_qm), we: zahl(o.wohneinheiten), ekr4: (function () { try { return D.ekr4Obj ? D.ekr4Obj(d) : null; } catch (e) { return null; } })(),   /* v4610 */
@@ -228,7 +228,7 @@
     var brutto = gesamt ? S.brutto : (KP ? MJ / KP * 100 : null);
     var dscr = gesamt ? S.dscr : (rows.length === 1 ? rows[0].dscr : null);
     var proj = projektion(rows, JE), pj = proj[_f.jahr - J0] || proj[proj.length - 1];
-    var nMb = rows.filter(function (r) { return r.wertQ === 'mb'; }).length;
+    var nMb = rows.filter(function (r) { return r.wertQ === 'mb' || r.wertQ === 'anker'; }).length;   /* v4730 · maßgebender Wert */
     var BS = B.BS || {}, ewS = summe(rows, function (r) { return r.ew; }), kpEw = summe(rows.filter(function (r) { return r.ew != null; }), function (r) { return r.kp; });
     var nEw = rows.filter(function (r) { return r.ew != null; }).length, mpiS = summe(rows, function (r) { return r.mpi; }), kpMpi = summe(rows.filter(function (r) { return r.mpi != null; }), function (r) { return r.kp; });
     var nMpi = rows.filter(function (r) { return r.mpi != null; }).length;
@@ -245,9 +245,9 @@
        gewählten stehen groß, die übrigen klein darunter. Nächste Zinsbindung und Wertansatz kamen aus den Demos dazu. */
     var Kb = bindKalender(rows), nB = Kb.L.filter(function (x) { return x.jahr >= J0; })[0] || null;
     var KZH = {
-      wert: function () { return kachel('Wertansatz', mio(Wert), nMb + ' von ' + rows.length + ' mit Marktbericht', '', 'Wert heute je Objekt: letzter Marktbericht, sonst Kaufpreis.'); },
+      wert: function () { return kachel('Wertansatz', mio(Wert), nMb + ' von ' + rows.length + ' mit Bericht', '', 'Wertansatz je Objekt: maßgebender Wert des letzten Berichts (führendes Verfahren, bei Aufteilern das Haus als Ganzes), sonst Kaufpreis. ' + rows.map(function (r) { return r.name + ': ' + mio(r.wert) + (r.wertText ? ' (' + r.wertText + ')' : ''); }).join(' · ')); },
       zinsb: function () { return kachel('Nächste Zinsbindung', nB ? String(nB.jahr) : 'keine Angabe', nB ? mio(nB.rest) + ' Restschuld · ' + nB.obs.length + ' Obj.' : '', nB && nB.jahr - J0 <= 2 ? 'gp-gold' : '', nB ? 'Bindungsende: ' + nB.obs.map(function (r) { return r.name; }).join(', ') + '. Bei 1 Prozentpunkt mehr Zins rund ' + nf0.format(Math.round(nB.p1)) + ' € mehr im Monat.' : 'Keine Zinsbindung eingetragen.'); },
-      netto: function () { return kachel('Vermögen netto', mio(Wert - Rest), 'Wert ' + mio(Wert) + ' minus Restschuld', '', 'Wert heute je Objekt: letzter Marktbericht, sonst Kaufpreis (' + nMb + ' von ' + rows.length + ' mit Marktbericht). Minus Restschuld heute.'); },
+      netto: function () { return kachel('Vermögen netto', mio(Wert - Rest), 'Wert ' + mio(Wert) + ' minus Restschuld', '', 'Wertansatz minus Restschuld heute. Wertansatz je Objekt: maßgebender Wert des letzten Berichts, sonst Kaufpreis (' + nMb + ' von ' + rows.length + ' mit Bericht). Dieselbe Zahl wie Eigenkapital im Bestand in der Gesamtbewertung.'); },
       cfns: function () { return kachel('Cashflow nach Steuer', eurV(CFns / 12), 'im Monat · ' + eurV(CFns) + ' im Jahr', ton(CFns), 'Summe der Objekte nach Zins, Tilgung, Bewirtschaftung und Steuer. Vor Steuer ' + eurV(CFvs) + ' im Jahr.'); },
       miete: function () { return kachel('Mieteinnahmen', eur(MJ / 12), 'im Monat · Rendite ' + (brutto != null ? nf2.format(brutto) + ' %' : 'keine Angabe'), '', 'Nettokaltmiete plus Zusatzeinnahmen. Rendite brutto = Jahresmiete zu Kaufpreisen.'); },
       proj: function () { return kachel('Netto ' + _f.jahr, mio(pj.netto), 'Projektion · heute ' + mio(proj[0].netto), 'gp-gold', 'Modell: Wertsteigerung je Objekt (sonst 1,5 % im Jahr), Zins und Rate wie heute. Keine Garantie.'); },
@@ -267,6 +267,13 @@
       ew: function () { return kachel('Ertragswert', nEw ? (kpEw ? (ewS / kpEw >= 1 ? '+' : '−') + nf1.format(Math.abs(ewS / kpEw * 100 - 100)) + ' %' : '') : 'keine Angabe', nEw ? nEw + ' von ' + rows.length + ' Obj.' : '', nEw && kpEw ? (ewS >= kpEw ? 'gp-pos' : 'gp-neg') : '', 'Gesamtbewertung: Summe Ertragswerte ' + mio(ewS) + ' gegen die Kaufpreise derselben Objekte ' + mio(kpEw) + '.'); },
       mp: function () { return kachel('Marktpreis', nMpi ? (kpMpi ? (mpiS / kpMpi >= 1 ? '+' : '−') + nf1.format(Math.abs(mpiS / kpMpi * 100 - 100)) + ' %' : '') : 'keine Angabe', nMpi ? nMpi + ' von ' + rows.length + ' Obj.' : '', nMpi && kpMpi ? (mpiS >= kpMpi ? 'gp-pos' : 'gp-neg') : '', 'Gesamtbewertung: Marktpreisindikation ' + mio(mpiS) + ' gegen die Kaufpreise derselben Objekte ' + mio(kpMpi) + '.'); }
     };
+    /* v4730 · Kennzahl-Karten aus dem Modul-Katalog (pf-katalog.js), Daten aus pf-modell.js (immer über alle Objekte) */
+    try { if (window.DpPfModell) DpPfModell.setze(alle, B); } catch (e) { try { console.warn('[grafiken-portfolio] Module', e); } catch (x) {} }
+    KZDEF.forEach(function (d) { if (d.x && !KZH[d.k]) KZH[d.k] = function () {
+      var r = window.DpPfModell ? DpPfModell.kachel(d.x) : null; if (!r) return kachel(d.t, 'keine Angabe', '', '', 'Für diese Kennzahl fehlen Angaben im Bestand.');
+      var tip = String(r.tip || '').replace(/<br\s*\/?>|<\/div>|<hr>/g, ' · ').replace(/<[^>]+>/g, '').replace(/(\s*·\s*)+/g, ' · ').replace(/^ · | · $/g, '').trim();
+      return kachel(r.l || d.t, r.v, r.s ? String(r.s).replace(/<[^>]+>/g, '') : '', r.c === 'ok' ? 'gp-pos' : r.c === 'nok' ? 'gp-neg' : r.c === 'warn' ? 'gp-gold' : '', tip);
+    }; });
     var kzAn = kzReihe().filter(function (k) { return KZH[k]; });
     var kzHtml = kzAn.map(function (k, i) { var h = KZH[k](); return i === 0 ? h.replace(/^<div class="gp-k/, '<div class="gp-k gp-haupt') : h; });
     var gross = kzHtml.length ? '<div class="gp-gross">' + kzHtml.slice(0, 4).join('') + '</div>' : '';
@@ -373,6 +380,42 @@
      Gespeichert im Einstellungsspeicher (cockpit_ansicht, v: 2), localStorage nur als schneller Rückfall.
      Die Grafiken unter „Projektion und Verlauf“ (vb-*) liegen in EINER Karte: sie sortieren sich untereinander,
      die Gruppe als Ganzes steht im Hauptraster. */
+  /* v4730 · Module aus den Demos (Runde d), gezeichnet von pf-modell.js: [Schlüssel im Katalog, Titel, Breite 1 bis 12, Satz] */
+  var PFM = [
+    ['todo','Was jetzt zu tun ist',4,'Aus deinen Zahlen abgeleitet, wichtigstes zuerst.'],
+    ['ek','EK-Rendite je Objekt',7,'Vier Stufen je Objekt, die gewählte Stufe als Balken.'],
+    ['rq','Woher die Rendite kommt',5,'Überschuss, Tilgung, Steuer und Wert als Bausteine der EK-Rendite.'],
+    ['ke','Was dein Eigenkapital verdient',6,'Eigenkapital je Objekt gegen das, was es im Jahr bringt.'],
+    ['cf','Cashflow je Objekt, vor und nach Steuer',6,'Welches Objekt Geld bringt und was die Steuer daraus macht.'],
+    ['br','Wohin die Miete geht',6,'Von der Kaltmiete über Bewirtschaftung, Zins, Tilgung und Steuer zum Cashflow.'],
+    ['vp','Vermögensaufbau',6,'Wert, Restschuld und Eigenkapital über die Jahre.'],
+    ['zb','Zinsbindung je Objekt',6,'Wann welche Bindung endet und wie viel Restschuld dann offen ist.'],
+    ['fj','Anschlussfinanzierung je Jahr',6,'Restschuld, die je Jahr neu finanziert wird.'],
+    ['zs','Zinsstress beim Anschluss',12,'Was ein höherer Zins nach der Bindung je Objekt kostet.'],
+    ['rm','Risikomatrix',7,'Sieben Risiken je Objekt als Ampel.'],
+    ['rd','Rendite gegen Tragfähigkeit',5,'Bruttomietrendite gegen DSCR je Objekt.'],
+    ['st','Steuer je Objekt',6,'Ergebnis aus Vermietung und Wirkung auf den Cashflow je Objekt.'],
+    ['tp','Steuer nach Halter',5,'Privat gegen Gesellschaft, Wirkung auf den Cashflow im Jahr.'],
+    ['mh','Miethebel je Objekt',6,'Mehr Miete aus Mieterhöhung und Zielbild je Objekt.'],
+    ['wz','Wert heute und im Zielbild',6,'Ertragswert heute gegen Zielbild je Objekt.'],
+    ['zbal','Deine Ziele',6,'Wie viele Objekte deine Ziele erreichen, nur wenn im Investmentprofil eingetragen.'],
+    ['zus','Wo die Miete herkommt',5,'Anteil der Kaltmiete nach Ort.'],
+    ['gal','Deine Objekte mit Bild',12,'Foto, EK-Rendite und Cashflow je Objekt als Galerie.'],
+    ['sich','Sicherheiten je Objekt',8,'Restschuld gegen Wertansatz je Objekt, sortiert nach Beleihung.'],
+    ['argu','Was für die Finanzierung spricht',4,'Argumente für das Bankgespräch aus deinen Zahlen.'],
+    ['streu','Wo dein Kapital arbeitet',6,'Eigenkapital gegen EK-Rendite je Objekt.'],
+    ['umsch','Kapital umschichten?',6,'Objekte, bei denen sich ein zweiter Blick lohnt.'],
+    ['qm','Miete je Quadratmeter',6,'Miete je m² heute gegen Zielbild.'],
+    ['lead','Der Monat in Sätzen',12,'Der Bestand in fünf Sätzen, zum Lesen und Weitergeben.'],
+    ['treppe','Zinsbindungs-Treppe',6,'Wie viel Restschuld in welchem Jahr neu verhandelt wird, aufsummiert.'],
+    ['restwert','Restschuld und Wert',6,'Wert und Restschuld über zehn Jahre, dazwischen dein Eigenkapital.'],
+    ['mieteist','Miete heute, Plan und Zielbild',6,'Je Objekt die Miete heute gegen Plan und Zielbild.'],
+    ['ekstapel','EK-Rendite, woraus sie besteht',7,'Überschuss, Tilgung, Steuer und Wert in Prozent vom Eigenkapital.'],
+    ['hebelsens','Hebel und Zins',5,'Wie die EK-Rendite auf den Darlehenszins reagiert und wo der Hebel kippt.'],
+    ['wertdarl','Wert gegen Darlehen',6,'Restschuld gegen Wertansatz je Objekt.'],
+    ['kapdienst','Wohin der Kapitaldienst geht',6,'Zins und Tilgung je Objekt im Monat.'],
+    ['spread','Mietrendite gegen Zins',6,'Bruttomietrendite gegen Darlehenszins je Objekt.']
+  ];
   var ANSICHT = [
     { k: 'kopf', t: 'Kennzahlen auf einen Blick', fest: true, w: 'Die wichtigsten Zahlen des Portfolios in einer Leiste.' },
     { k: 'om', t: 'Objektkarten zum Umdrehen', b: 'ganz', w: 'Jedes Objekt als Karte mit Foto oder Lage. Klick dreht sie um: EK-Rendite, Finanzierung, Miete, Risiken.' },   /* v4690 */
@@ -390,32 +433,24 @@
     { k: 'steuer', t: 'Steuer über alle Objekte', b: 'ganz', w: 'Wirkung jedes Objekts auf deine Steuer, Progression und Steuer-Mappe.' },
     { k: 'gesamtproj', t: 'Gesamt-Projektion als Tabelle', b: 'ganz', w: 'Alle Jahre der Modellprojektion in Zahlen.' },
     { k: 'det', t: 'Objekte im Einzelnen und Rechenprüfung', b: 'ganz', w: 'Liste je Objekt mit Hinweisen und die Prüfung der Summen.' }
-  ];
+  ].concat(PFM.map(function (m) { return { k: 'x-' + m[0], x: m[0], t: m[1], b: m[2] >= 7 ? 'ganz' : 'halb', w: m[3] }; }));
   function modul(k) { return ANSICHT.filter(function (x) { return x.k === k; })[0] || null; }
   var TOP = ANSICHT.filter(function (a) { return !a.fest && !a.vb; }).map(function (a) { return a.k; });
   var VBK = ANSICHT.filter(function (a) { return a.vb; }).map(function (a) { return a.k; });
   /* Vorlagen nach den Demos (Dateien/Portfolio-Cockpit/Demos-2026-11-25c/baukasten.js). m: [Schlüssel, Breite] in Reihenfolge. */
   /* v4690 · Marcel 25.11.2026: „Cockpit mit Demo 07“ → die Objektmatrix ist der Standard (VORLAGEN[0] = neue Nutzer und Zurücksetzen).
      Das Asset-Manager-Cockpit behält seinen Schlüssel 'standard', damit gespeicherte Stände ihre Vorlage wiederfinden. */
+  /* v4730 · Vorlagen = die Demos der Runde d. Keine fehlt mehr: alle Module laufen über pf-modell.js. */
   var VORLAGEN = [
-    { k: 'matrix', t: 'Objektmatrix', u: 'Standard · jedes Objekt als Karte, per Klick umzudrehen',
-      m: [['om', 'ganz'], ['zielbild', 'ganz']], kommt: [], kz: ['wert', 'netto', 'miete', 'cfvs', 'dscr', 'zinsb', 'ekr'] },
-    { k: 'standard', t: 'Asset-Manager-Cockpit', u: 'Was ein Bestandshalter am Montagmorgen sehen will',
-      m: [['zielbild', 'ganz'], ['ob', 'halb'], ['bk', 'halb'], ['vb-eq', 'ganz'], ['gb', 'ganz']], kommt: ['Was jetzt zu tun ist', 'Wohin die Miete geht'] },   /* gb: Gesamtbewertung zeigt sich in Genau (Demo Detail-Modus) */
-    { k: 'risiko', t: 'Risiko-Radar', u: 'Wo der Bestand verwundbar ist',
-      m: [['bk', 'ganz'], ['zielbild', 'ganz']], kommt: ['Risikomatrix', 'Rendite gegen Tragfähigkeit', 'Zinsstress beim Anschluss'] },
-    { k: 'steuer', t: 'Steuer-Jahr', u: 'Was die Steuer aus dem Cashflow macht',
-      m: [['steuer', 'ganz'], ['ob', 'ganz'], ['zielbild', 'ganz']], kommt: ['Wohin die Miete geht', 'Steuer nach Halter'] },
-    { k: 'bank', t: 'Bank-Mappe', u: 'Der Bestand so, wie ihn eine Bank sieht',
-      m: [['bk', 'ganz'], ['zielbild', 'ganz']], kommt: ['Sicherheiten je Objekt', 'Was für die Finanzierung spricht', 'Zinsstress beim Anschluss'] },
-    { k: 'rendite', t: 'Renditequellen', u: 'Was dein Eigenkapital verdient und woher',
-      m: [['zielbild', 'ganz']], kommt: ['Woher die Rendite kommt', 'EK-Rendite je Objekt', 'Wo dein Kapital arbeitet', 'Kapital umschichten?'] },
-    { k: 'wert', t: 'Wert und Zielbild', u: 'Was der Bestand heute wert ist und was der Plan daraus macht',
-      m: [['zielbild', 'ganz'], ['vb-eq', 'ganz']], kommt: ['Wert heute und im Zielbild', 'Miethebel', 'Wo die Miete herkommt'] },
-    { k: 'miete', t: 'Mieten-Hebel', u: 'Wo Miete liegen bleibt',
-      m: [['zielbild', 'ganz']], kommt: ['Miethebel', 'Wo die Miete herkommt', 'Miete je Quadratmeter', 'Was jetzt zu tun ist'] },
-    { k: 'bericht', t: 'Monatsbericht', u: 'Zum Lesen, Drucken und Weitergeben',
-      m: [['zielbild', 'ganz'], ['ob', 'halb'], ['bk', 'halb']], kommt: ['Der Monat in Sätzen', 'Für diesen Monat'] }
+    { k: 'matrix', t: 'Objektmatrix', u: 'Standard · jedes Objekt als Karte, per Klick umzudrehen', m: [['om', 'ganz'], ['zielbild', 'ganz']], kommt: [], kz: ['wert', 'netto', 'miete', 'cfvs', 'dscr', 'zinsb', 'ekr'] },
+    { k: 'standard', t: 'Asset-Manager-Cockpit', u: 'Was ein Bestandshalter am Montagmorgen sehen will', m: [['zielbild', 'ganz'], ['x-todo', 'halb'], ['x-cf', 'halb'], ['x-restwert', 'halb'], ['x-br', 'halb'], ['x-zb', 'halb'], ['gb', 'ganz']], kommt: [], kz: ['wert', 'netto', 'miete', 'cfvs', 'cfns', 'dscr', 'zinsb', 'ekr'] },
+    { k: 'risiko', t: 'Risiko-Radar', u: 'Wo der Bestand verwundbar ist', m: [['x-rm', 'ganz'], ['x-rd', 'halb'], ['x-treppe', 'halb'], ['x-wertdarl', 'halb'], ['x-zs', 'ganz'], ['zielbild', 'ganz']], kommt: [], kz: ['x-unterziel', 'x-zuzahler', 'zinsb', 'ltv', 'x-energie', 'x-leer', 'ekr'] },
+    { k: 'steuer', t: 'Steuer-Jahr', u: 'Was die Steuer aus dem Cashflow macht', m: [['x-st', 'halb'], ['x-cf', 'halb'], ['x-br', 'ganz'], ['x-tp', 'halb'], ['steuer', 'ganz'], ['zielbild', 'ganz']], kommt: [], kz: ['x-vuv', 'x-stsaldo', 'cfvs', 'cfns', 'x-grenz', 'x-gmbh', 'ekr'] },
+    { k: 'bank', t: 'Bank-Mappe', u: 'Der Bestand so, wie ihn eine Bank sieht', m: [['x-sich', 'ganz'], ['x-argu', 'halb'], ['x-treppe', 'halb'], ['x-kapdienst', 'halb'], ['x-wertdarl', 'halb'], ['x-spread', 'halb'], ['x-zs', 'ganz'], ['zielbild', 'ganz']], kommt: [], kz: ['rest', 'ltv', 'dscr', 'x-faellig', 'netto', 'ekr'] },
+    { k: 'rendite', t: 'Renditequellen', u: 'Was dein Eigenkapital verdient und woher', m: [['x-rq', 'halb'], ['x-ekstapel', 'ganz'], ['x-hebelsens', 'halb'], ['x-spread', 'halb'], ['x-streu', 'halb'], ['x-umsch', 'halb'], ['zielbild', 'ganz']], kommt: [], kz: ['x-ekein', 'x-ueber', 'x-tilg', 'x-stw', 'x-delta', 'ekr'] },
+    { k: 'wert', t: 'Wert und Zielbild', u: 'Was der Bestand heute wert ist und was der Plan daraus macht', m: [['zielbild', 'ganz'], ['x-wz', 'halb'], ['x-mh', 'halb'], ['x-restwert', 'ganz'], ['x-zus', 'halb'], ['gb', 'ganz']], kommt: [], kz: ['x-ewheute', 'x-zielnk', 'x-zuwachs', 'x-massn', 'x-rendite', 'x-mpi', 'ekr'] },
+    { k: 'miete', t: 'Mieten-Hebel', u: 'Wo Miete liegen bleibt', m: [['x-mieteist', 'ganz'], ['x-zus', 'halb'], ['x-mh', 'halb'], ['x-qm', 'halb'], ['zielbild', 'ganz'], ['x-todo', 'ganz']], kommt: [], kz: ['miete', 'x-ohnewechsel', 'x-mitumbau', 'x-mietezb', 'x-leer', 'x-mietniveau', 'ekr'] },
+    { k: 'bericht', t: 'Monatsbericht', u: 'Zum Lesen, Drucken und Weitergeben', m: [['x-lead', 'ganz'], ['zielbild', 'ganz'], ['x-restwert', 'halb'], ['x-zb', 'halb'], ['x-todo', 'ganz']], kommt: [], kz: ['netto', 'miete', 'cfns', 'dscr', 'ekr'] }
   ];
   /* Kennzahl-Leiste (Marcel 25.11.2026: nicht fest, wählbar und sortierbar). Standard wie die Demos: acht Kacheln. */
   var KZDEF = [
@@ -423,7 +458,13 @@
     { k: 'cfns', t: 'Cashflow nach Steuer' }, { k: 'dscr', t: 'DSCR' }, { k: 'zinsb', t: 'Nächste Zinsbindung' }, { k: 'ekr', t: 'EK-Rendite' },
     { k: 'proj', t: 'Vermögen netto in der Projektion' }, { k: 'rest', t: 'Restschuld' }, { k: 'ltv', t: 'LTV' }, { k: 'zins', t: 'Ø-Zins' },
     { k: 'ew', t: 'Ertragswert gegen Kaufpreis' }, { k: 'mp', t: 'Marktpreis gegen Kaufpreis' }
-  ];
+  ].concat([   /* v4730 · aus dem Modul-Katalog (pf-katalog.js KZ) */
+    ['unterziel', 'Unter DSCR-Ziel'], ['zuzahler', 'Zahlen zu'], ['energie', 'Energie F und G'], ['leer', 'Leerstand'], ['vuv', 'Ergebnis Anlage V'],
+    ['stsaldo', 'Steuer-Saldo'], ['grenz', 'Grenzsteuersatz'], ['gmbh', 'Ergebnis Gesellschaft'], ['faellig', 'Bis Ende 2030 fällig'], ['ekein', 'Eigenkapital eingesetzt'],
+    ['ueber', 'Überschuss vor Steuer'], ['tilg', 'Tilgung'], ['stw', 'Steuerwirkung'], ['delta', 'Vermögensdelta'], ['ewheute', 'Ertragswert heute'],
+    ['zielnk', 'Zielbild nach Kosten'], ['zuwachs', 'Wertzuwachs'], ['massn', 'Maßnahmen'], ['rendite', 'Rendite heute und Zielbild'], ['mpi', 'Marktpreisindikation'],
+    ['mietezb', 'Miete im Zielbild'], ['ohnewechsel', 'Mieterhöhung ohne Wechsel'], ['mitumbau', 'Mit Umbau und Neuvermietung'], ['mietniveau', 'Mietniveau']
+  ].map(function (x) { return { k: 'x-' + x[0], x: x[0], t: x[1] }; }));
   var KZ_STD = ['wert', 'netto', 'miete', 'cfvs', 'dscr', 'zinsb', 'ekr'];   /* v4690 · Kennzahlen der Demo 07 */
   function kzStandard() { var a = KZ_STD.map(function (k) { return { k: k, an: true }; }); KZDEF.forEach(function (x) { if (KZ_STD.indexOf(x.k) < 0) a.push({ k: x.k, an: false }); }); return a; }
   function kzReihe() { return (ansLaden().kz || kzStandard()).filter(function (x) { return x.an; }).map(function (x) { return x.k; }); }
@@ -500,13 +541,15 @@
   function breite(k) { var A = ansLaden(); return (A.br && A.br[k]) || (modul(k) || {}).b || 'ganz'; }
   function ansichtZiele(app) {
     var q = function (s) { return app ? app.querySelector(s) : null; };
-    return {
+    var Z = {
       'vb-eq': q('[data-gp-k="vb-eq"]'), 'vb-bilanz': q('[data-gp-k="vb-bilanz"]'), 'vb-objekte': q('[data-gp-k="vb-objekte"]'), 'vb-quellen': q('[data-gp-k="vb-quellen"]'), 'vb-cf': q('[data-gp-k="vb-cf"]'),
       om: q(':scope > [data-dp-gp="om"]'), gb: q(':scope > [data-dp-gp="gb"]'), ob: q(':scope > [data-dp-gp="ob"]'), bk: q(':scope > [data-dp-gp="bk"]'), det: q(':scope > [data-dp-gp="det"]'),
       zielbild: q(':scope > .cp-sek[data-sek="zielbild"]'), steuer: q(':scope > .cp-sek[data-sek="steuer"]'),
       gesamtproj: q(':scope > .cp-sek[data-sek="gesamtproj"]'), pp: q(':scope > #dp-pp-slot'),
       projektion: q(':scope > .cp-sek[data-sek="projektion"]')
     };
+    ANSICHT.forEach(function (a) { if (a.x) Z[a.k] = q(':scope > [data-dp-gp="' + a.k + '"]'); });   /* v4730 */
+    return Z;
   }
   function ansichtAnwenden() {
     var hero = document.getElementById('dp-pscore-hero'), app = hero && hero.parentNode; if (!app || !AN) return;
@@ -1002,6 +1045,22 @@
     document.head.appendChild(s);
   }
 
+  /* v4730 · Module aus dem Katalog (pf-modell.js). Je Modul ein Kasten im Hauptraster, gezeichnet nur wenn sichtbar.
+     Neu gezeichnet wird, wenn sich der Datenstand (Motor) oder die Ansicht Einfach/Genau ändert. Genau = Detail der Demos. */
+  function pfmZeichnen(app) {
+    if (!window.DpPfModell || !app) return;
+    var E = DpPfModell.E; if (!E) { try { var Dd = daten(); if (Dd) E = DpPfModell.setze(Dd.rows, Dd.B); } catch (e) { E = null; } } if (!E) return;
+    var genau = false; try { genau = localStorage.getItem('dp_cockpit_ansicht') === 'genau'; } catch (e) {}
+    var detailNeu = E.K.detail() !== genau; if (detailNeu) { try { E.K.setDetail(genau); } catch (e) {} }
+    ANSICHT.forEach(function (a) {
+      if (!a.x) return;
+      var h = app.querySelector(':scope > [data-dp-gp="' + a.k + '"]');
+      if (!sichtbar(a.k)) { if (h) h.classList.add('gp-aus'); return; }
+      if (!h) { h = document.createElement('div'); h.setAttribute('data-dp-gp', a.k); h.className = 'dp-gp gp-karte gp-pfm dp-gx dp-gx-frei pfm'; app.appendChild(h); }
+      if (h._pfmE === E && h.firstChild) return;
+      h._pfmE = E; DpPfModell.zeichne(h, a.x);
+    });
+  }
   /* ── Lauf ──────────────────────────────────────────────────────── */
   function lauf() {
     if (!AN) return;
@@ -1036,8 +1095,9 @@
     try { skZeichnen(app); } catch (e) { try { console.warn('[grafiken-portfolio] Steuer', e); } catch (x) {} }
     try { textPflege(document.getElementById('dp-stage')); } catch (e) {}   /* v4480 */
     try { zbTipps(app); } catch (e) {}   /* v4640 */
-    if (sig && host.getAttribute('data-gp-sig') === sig) { ansichtAnwenden(); return; }
+    if (sig && host.getAttribute('data-gp-sig') === sig) { pfmZeichnen(app); ansichtAnwenden(); return; }
     if (zeichnen(host, hosts)) { host.setAttribute('data-gp-sig', sig); document.body.classList.add('dp-gp-an'); panelNeu(); }
+    pfmZeichnen(app);
     ansichtAnwenden();
   }
   /* v4480 · Marcel 24.11.2026: „mit Bullet Points arbeiten, übersichtlich". Lange Sätze im Cockpit werden in der Ansicht
