@@ -45749,3 +45749,9 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** staging cff53363, main bdaca803 + Version 9b30038b, Merge main→staging 4e569b5e.
 - **Nachweis:** beleg-adresse-pruefen 33/33, buster-ebenen, vorschau, prompt-lecks, ki-deckel, unterlagen-steuer 53/53, beleg-leser, sonderumlage, qc-uebergabe, einzelcheck grün; Staging-Browser Westerfeldstr. 146 + Exposé Musterweg 7 abgelehnt, Datensatz unverändert; Prod-Sicherung haupt-/mb-20261125-1214-v4930 (7,1/31 MB, Kopf gelesen), Backend healthy, gold-audit RC 0.
 - **Rest:** Prod nicht eingeloggt im Objekt gemessen; Schadensliste nur lesend (Prod leer, Staging 2 Testflow-Objekte).
+
+### Rollout 1.0.226 · landing-zahlen-raus-1 (25.11.2026)
+- **Was:** Landing-Startseite ohne die Box „So setzen sie sich zusammen“ (#dtZusammen), Marcels Wunsch.
+- **Commit:** staging 7d31b610, main 7931e7e3 + 0435e4a9 (Version).
+- **Nachweis:** Staging Box weg, 390 px ohne Querscrollen, Quellen-Fenster 8 Zeilen, Konsole sauber; Prod liefert landing-faecher.*?v=zahlen-raus-1, version 226.
+- **Rest:** keiner.
