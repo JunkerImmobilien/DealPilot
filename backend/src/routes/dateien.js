@@ -8,6 +8,7 @@
  *   PATCH  /dateien/:id                  { ordner, name, objekt } verschieben/umbenennen
  *   DELETE /dateien/:id                  löschen (auch vom Laufwerk)
  *   DELETE /dateien?objekt=<id>&jahr=J   v4860 · alle Dateien eines Jahres im Objekt löschen
+ *                    &ordner=O           v4910 · oder eines Ordners (auch kombiniert)
  *
  * Auch mit API-Schlüssel nutzbar (Rechte read/write/delete wie die übrigen Aufrufe). */
 const express = require('express');
@@ -59,9 +60,11 @@ router.post('/', (req, res, next) => {
 /* v4860 · ein ganzes Jahr löschen (Objekt Pflicht, damit nie versehentlich alle Objekte getroffen werden) */
 router.delete('/', async (req, res, next) => {
   try {
-    const o = String(req.query.objekt || ''), j = Number(req.query.jahr);
-    if (!UUID.test(o) || !(j >= 1900 && j <= 2200)) return res.status(400).json({ error: 'objekt und jahr nötig' });
-    const n = await ablage.loeschenJahr(req.user.id, o, j);
+    const o = String(req.query.objekt || ''), jq = req.query.jahr, oq = req.query.ordner;
+    const j = jq != null && jq !== '' ? Number(jq) : null;
+    /* v4910 · Ordner und/oder Jahr; das Objekt bleibt Pflicht */
+    if (!UUID.test(o) || ((j == null || !(j >= 1900 && j <= 2200)) && !oq)) return res.status(400).json({ error: 'objekt und jahr oder ordner nötig' });
+    const n = await ablage.loeschenGruppe(req.user.id, o, { jahr: j, ordner: oq });
     res.json({ geloescht: n });
   } catch (e) { next(e); }
 });

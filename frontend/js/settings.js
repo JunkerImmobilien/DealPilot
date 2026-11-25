@@ -255,6 +255,13 @@ function showSettings(initialTab) {
            Zwei-Faktor stehen: unter Account & Sicherheit. Der Inhalt ist
            unveraendert, nur sein Platz nicht mehr ein eigener Reiter. */
 
+        /* v4910 · Dokumente (Marcel 25.11.2026: „Einstellungen, dass die da reinkommen, das verwalten können und da auch die
+           Belege in den Ordnern sehen“): Belegung, Objekt › Ordner › Jahr, Ansehen, Verschieben, Löschen (dateiablage.js). */
+        '<button class="help-sidebar-item st-tab ms-tab" data-tab="dokumente" onclick="_swSet(this)">' +
+          '<div class="help-sidebar-item-row"><span class="help-sidebar-item-icon"><svg width="16" height="16" viewBox="0 0 24 24"><use href="#i-file-text"/></svg></span>' +
+            '<span class="help-sidebar-item-title">Dokumente</span></div>' +
+          '<span class="help-sidebar-item-desc">Ablage, Ordner, Speicher</span>' +
+        '</button>' +
         '<button class="help-sidebar-item st-tab ms-tab" data-tab="mandanten" onclick="_swSet(this)">' +
           '<div class="help-sidebar-item-row"><span class="help-sidebar-item-icon"><svg width="16" height="16" viewBox="0 0 24 24"><use href="#i-home"/></svg></span>' +
             '<span class="help-sidebar-item-title">Mandanten</span></div>' +
@@ -765,6 +772,10 @@ function showSettings(initialTab) {
         '<div id="mand-settings-host"><!-- mand v803: lazy --></div>' +
       '</div>' +
 
+      '<div class="st-pane" data-pane="dokumente" style="display:none">' +
+        '<h2 class="set-section-h2">Dokumente</h2>' +
+        '<div id="st-dokumente-host"><!-- v4910 · DpAblage.verwaltung füllt beim Tab-Wechsel --></div>' +
+      '</div>' +
       '<div class="st-pane" data-pane="datenraum" style="display:none">' +
         '<h2 class="set-section-h2">Datenraum</h2>' +
         '<div id="dr-settings-host"><!-- wird beim Tab-Wechsel befüllt --></div>' +
@@ -1268,6 +1279,7 @@ function _swSet(btn) {
       darstellung:['Darstellung','Was angezeigt wird und wie es aussieht.'],
 
       datenraum:['Datenraum','Geteilte Objekte und Portfolio-P\u00e4sse.'],
+      dokumente:['Dokumente','Deine abgelegten Unterlagen nach Objekt, Ordner und Jahr.'],
       mandanten:['Mandanten','Gesellschaften, Halter und Steuerregime verwalten.'],
       plan:['Plan','Dein aktueller Tarif und dein Bewertungs-Kontingent.'],
       info:['Info','Version, Changelog und Systemstatus.'],
@@ -1282,6 +1294,8 @@ function _swSet(btn) {
       if (_sub) _sub.textContent = _e[1];
     }
   } catch (e) {}
+  /* v4910 · Dokumente: Verwaltung beim Öffnen frisch laden */
+  if (pane === 'dokumente') { try { var _dh = document.getElementById('st-dokumente-host'); if (_dh && window.DpAblage && window.DpAblage.verwaltung) window.DpAblage.verwaltung(_dh); } catch (e) {} }
   document.querySelectorAll('.st-pane').forEach(function(p) {
     var show = p.dataset.pane === pane;
     p.classList.toggle('active', show);

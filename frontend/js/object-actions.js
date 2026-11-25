@@ -2975,7 +2975,7 @@
           '<button type="button" class="oabi-btn primary" id="oabi-apply" disabled><span style="display:inline-flex">' + svg('download', 14, '#fff') + '</span> Ausgewählte übernehmen</button></div>' +
       '</div>';
     document.body.appendChild(ov);
-    try { if (window.DpAblage) window.DpAblage.stand(true).then(function (s) { var w = document.getElementById('oabi-orig-w'), c = document.getElementById('oabi-orig'); if (w && c && s && s.darf_ablegen && s.bereit !== false) { w.style.display = 'inline-flex'; c.checked = true; } }); } catch (e) {}
+    try { if (window.DpAblage) window.DpAblage.stand(true).then(function (s) { var w = document.getElementById('oabi-orig-w'), c = document.getElementById('oabi-orig'); if (w && c && s && s.darf_ablegen && s.bereit !== false) { w.style.display = 'inline-flex'; c.checked = true; } /* v4910 · Belegung der Ablage neben dem Häkchen */ if (w && s && s.grenze_bytes && window.DpAblage.belegungHtml && !w.querySelector('.dp-ab-belegung')) { var bz = document.createElement('span'); bz.style.marginLeft = '8px'; bz.innerHTML = window.DpAblage.belegungHtml(s, { zeile: true }); w.appendChild(bz); } }); } catch (e) {}
     /* v1330: auch hier darf nichts dazwischenkommen - das Fenster ist
        schon weg, wenn der Rueckruf faellt. */
     /* v4470 · kein Schließen per Klick daneben, × oben und Esc schließen; läuft noch ein Lesevorgang, fragt der erste
@@ -3858,7 +3858,7 @@
     (function warte() {
       var o = window._currentObjKey;
       if (!o) { if (Date.now() - t0 < 30000) return setTimeout(warte, 1000); try { if (window.toast) window.toast('Originale nicht abgelegt: Objekt noch nicht gespeichert.'); } catch (e) {} return; }
-      var liste = dateien.map(function (f) { return { file: f.file, name: f.name, ordner: window.DpAblage.ordnerFuer(f.type, f.dokLabel), meta: { art: f.dokLabel || f.type || '' } }; });
+      var liste = dateien.map(function (f) { return { file: f.file, name: f.name, ordner: window.DpAblage.ordnerFuer(f.type, f.dokLabel), meta: { art: f.dokLabel || f.type || '', jahr: (window.DpAblage.jahrAus ? window.DpAblage.jahrAus({ c: f.cache, d: f.data, r: f.result }) : null) || undefined } }; });
       window.DpAblage.ablegenAlle(liste, { quelle: quelle, objekt: o }).then(function (e) {
         try { if (window.DpEingang && window.DpEingang.dateienVerknuepfen) window.DpEingang.dateienVerknuepfen(e.ids); } catch (x) {}
         try { if (e.fehler.length && window.toast) window.toast('Nicht abgelegt: ' + e.fehler.join(', ')); } catch (x) {}
