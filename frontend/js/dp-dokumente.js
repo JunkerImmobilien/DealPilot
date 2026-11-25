@@ -1032,6 +1032,7 @@
     gb = String(gb).split(/(?<=[.!?])\s+/).filter(function (x) { return !(/(halten|gehalten|verkauf|kaufen|gekauft|einstieg)/i.test(x) && /(sollte|empfehl|geeignet|lohnt|ratsam)/i.test(x)); }).join(' ');
     var lm = [ai.mikrolage_recherche ? 'Mikrolage: ' + kuerzen(ai.mikrolage_recherche, 260) : '', ai.makrolage_recherche ? 'Makrolage: ' + kuerzen(ai.makrolage_recherche, 260) : '', ai.kaufpreisniveau ? 'Kaufpreisniveau: ' + kuerzen(ai.kaufpreisniveau, 220) : ''].filter(Boolean);
     var pa = pilotAnalyse(B, true, bank); if (!bank) pa = pa.replace(/<div class="fliess"><h3>Was für die Finanzierung spricht<\/h3>[\s\S]*?<\/ul><\/div>/, '');   /* steht in der Bankfassung */
+    return (gb ? '<p>' + B.esc(kuerzen(gb, 900)) + '</p>' : '') + pa
       + (lm.length ? '<h3>Lage und Markt</h3><ul>' + lm.map(function (x) { return '<li>' + B.esc(x) + '</li>'; }).join('') + '</ul>' : '');
   }
   /* Kundentext ohne Gedankenstriche und Semikolons (Marcel 08.11.): nur im Text zwischen Tags, nie in Stil oder Attributen.
