@@ -198,7 +198,7 @@
     var el = API.ziel(k); return !!(el && el.innerHTML && el.innerHTML.length > 80 && el.offsetHeight);
   }
   function miniBox(k, cls, maxH) {
-    if (_klein && cls === 'pw-live') return '<div class="pw-leer ' + cls + '-leer">' + piktogramm(k) + '</div>';
+    if (_klein && (cls === 'pw-live' || cls === 'pw-pmini')) return '<div class="pw-leer ' + cls + '-leer">' + piktogramm(k) + '</div>';   /* Handy: nur die Vorlagen zeichnen, der Rest bremst die Bedienung */
     if (!billig(k)) { warte(k); return '<div class="pw-leer pw-wartet ' + cls + '-leer" data-mk="' + k + '" data-cls="' + cls + '" data-mh="' + maxH + '">' + piktogramm(k) + '</div>'; }
     var m = miniHtml(k);
     if (!m) return '<div class="pw-leer ' + cls + '-leer">' + piktogramm(k) + '</div>';
