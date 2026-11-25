@@ -195,6 +195,7 @@
     document.head.appendChild(s);
   }
   function zeige(el) {
+    if (el.hasAttribute('data-dp-ekr')) return;   /* v4620 · EK-Rendite hat ihren eigenen Tooltip (ek-rendite-ui.js) */
     var key = el.getAttribute('data-bwe'), f = ERKL[key]; if (!f) return;
     var d = null; try { d = f(); } catch (e) { d = null; }
     if (!d) return;
@@ -217,7 +218,7 @@
     var s6 = document.getElementById('s6'); if (!s6) return;
     ['kpi-ekr', 'kpi-bmy', 'kpi-nmy', 'kpi-irr', 'kpi-em', 'kpi-dscr', 'kpi-ltv', 'kpi-be', 'kpi-fak'].forEach(function (id) {
       var v = document.getElementById(id), kach = v && v.closest('.kpi');
-      if (kach && !kach.hasAttribute('data-bwe')) { kach.setAttribute('data-bwe', id); kach.setAttribute('tabindex', '0'); }
+      if (kach && !kach.hasAttribute('data-bwe') && !kach.hasAttribute('data-dp-ekr')) { kach.setAttribute('data-bwe', id); kach.setAttribute('tabindex', '0'); }
     });
     var rows = s6.querySelectorAll('.bw-cf-row');
     if (rows[0] && !rows[0].hasAttribute('data-bwe')) { rows[0].setAttribute('data-bwe', 'cf-vst'); rows[0].setAttribute('tabindex', '0'); }

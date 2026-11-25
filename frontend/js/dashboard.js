@@ -704,7 +704,8 @@
       + '\n2 Nach Steuer ' + p4(E4.k2) + '\n3 Vor Steuer mit Vermögensdelta ' + p4(E4.k3) + '\n4 Nach Steuer mit Vermögensdelta ' + p4(E4.k4) + ' (Hauptkennzahl)'
       + '\nVermögensdelta = Bewertung minus Darlehen bei Kauf minus Eigenkapital, je Haltejahr, im Ankauf aus der Wertsteigerungsannahme. '
       + E4.mit_delta + ' von ' + arr.length + ' Objekten mit Bewertung.' : '';
-    var g3 = (E4 ? k('EK-Rendite', p4(E4.haupt), ton(E4.haupt), tip4 + EKt, 'nach Steuer mit Vermögensdelta · operativ ' + p4(E4.k1))
+    var g3 = (E4 ? (window.DpEkrUi ? DpEkrUi.einbauen(k('EK-Rendite', p4(E4.haupt), ton(E4.haupt), '', 'nach Steuer mit Vermögensdelta'), E4, 'cpt-v', 'cpt-s')   /* v4620 · ein Tooltip, Klick schaltet */
+                  : k('EK-Rendite', p4(E4.haupt), ton(E4.haupt), tip4 + EKt, 'nach Steuer mit Vermögensdelta · operativ ' + p4(E4.k1)))
                : k('EK-Rendite v. St.', pr(ekrVs), ton(ekrVs), tipEkr + ' Cashflow vor Steuer.' + EKt, 'n. St. ' + pr(ekrNs) + ' · inkl. Tilgung ' + pr(ekrTg)))
       + k('Tilgung p. a.', fE(S.tilgJ), '', 'Summe Darlehen × anfängliche Tilgung, je Jahr – Vermögensaufbau, der im Cashflow schon abgezogen ist.', 'Vermögensaufbau');
     var HK = null; try { HK = _healthKacheln(); } catch (e) { HK = null; }

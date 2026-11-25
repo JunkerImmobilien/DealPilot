@@ -5878,9 +5878,11 @@ window._dpEkrZeigen = function (e) {
     if (!e || !window.DpEkRendite) return;
     var p = function (x) { return x == null ? 'k. A.' : x.toLocaleString('de-DE', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + ' %'; };
     var tip = DpEkRendite.tooltip(e);
-    if (el) { el.textContent = p(e.haupt); el.title = tip; if (typeof setKpiColor === 'function') setKpiColor('kpi-ekr', e.haupt, 8, 4); }
-    if (sub) { sub.textContent = (e.haupt_art === 'k4' ? 'nach Steuer mit Vermögensdelta' : 'nach Steuer') + ', operativ ' + p(e.k1); sub.title = tip; }
-    if (r4) { r4.textContent = p(e.haupt); r4.title = tip; }
-    var kp = el && el.closest ? el.closest('.kpi') : null; if (kp) kp.title = tip;
+    if (el) { el.textContent = p(e.haupt); el.removeAttribute('title'); if (typeof setKpiColor === 'function') setKpiColor('kpi-ekr', e.haupt, 8, 4); }
+    if (r4) { r4.textContent = p(e.haupt); r4.removeAttribute('title'); }
+    var kp = el && el.closest ? el.closest('.kpi') : null; if (kp) kp.removeAttribute('title');
+    /* v4620 · ein Tooltip, Klick schaltet die Stufen (ek-rendite-ui.js) */
+    if (kp && window.DpEkrUi) DpEkrUi.einrichten(kp, e, el, sub);
+    else if (sub) sub.textContent = (e.haupt_art === 'k4' ? 'nach Steuer mit Vermögensdelta' : 'nach Steuer') + ', operativ ' + p(e.k1);
   } catch (_e) {}
 };

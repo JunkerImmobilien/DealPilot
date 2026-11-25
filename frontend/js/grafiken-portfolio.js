@@ -252,6 +252,7 @@
         var E = window.DpEkRendite ? DpEkRendite.portfolio(rows.map(function (r) { return r.ekr4; })) : null;
         if (!E) return kachel('EK-Rendite', 'keine Angabe', '', '', 'Kein Eigenkapital oder kein Cashflow gespeichert.');
         var p = function (x) { return nf1.format(x) + ' %'; };
+        if (window.DpEkrUi) return DpEkrUi.einbauen(kachel('EK-Rendite', p(E.haupt), 'nach Steuer mit Vermögensdelta', E.haupt >= 0 ? 'gp-pos' : 'gp-neg', ''), E, 'gp-v', 'gp-s');   /* v4620 */
         return kachel('EK-Rendite', p(E.haupt), 'nach Steuer mit Vermögensdelta', E.haupt >= 0 ? 'gp-pos' : 'gp-neg',
           'EK-Rendite in vier Stufen, nach Eigenkapital gewichtet (' + mio(E.ek) + '). 1 Operativ ' + p(E.k1) + '. 2 Nach Steuer ' + p(E.k2) + '. 3 Vor Steuer mit Vermögensdelta ' + p(E.k3) + '. 4 Nach Steuer mit Vermögensdelta ' + p(E.k4) + ', Hauptkennzahl. Vermögensdelta = Bewertung minus Darlehen bei Kauf minus Eigenkapital, je Haltejahr.');
       })()
