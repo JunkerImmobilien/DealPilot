@@ -115,7 +115,7 @@
     var app = el.parentNode, st = document.getElementById('dp-stage'), dm = document.getElementById('dashboard-main');
     var huelle = function (inner) {
       if (!st || !dm || !app) return inner;
-      return '<div id="dashboard-main" class="' + esc(dm.className) + '" style="all:unset;display:block"><div id="dp-stage" class="' + esc(st.className) + '"><div class="' + esc(app.className) + '">' + inner + '</div></div></div>';
+      return '<div id="dashboard-main" class="' + esc(dm.className) + '" style="all:unset;display:block"><div id="dp-stage" class="' + esc(st.className) + '" style="max-width:none;margin:0;padding:0"><div class="' + esc(app.className) + '" style="max-width:none;margin:0;padding:0">' + inner + '</div></div></div>';
     };
     return '<div class="pw-live" aria-hidden="true" inert><div class="pw-live-in" data-ew="' + (el.offsetWidth || 900) + '">' + huelle(c.outerHTML) + '</div></div>';
   }
