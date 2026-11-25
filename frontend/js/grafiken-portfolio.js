@@ -380,7 +380,7 @@
   /* Vorlagen nach den Demos (Dateien/Portfolio-Cockpit/Demos-2026-11-25c/baukasten.js). m: [Schlüssel, Breite] in Reihenfolge. */
   var VORLAGEN = [
     { k: 'standard', t: 'Asset-Manager-Cockpit', u: 'Standard · was ein Bestandshalter am Montagmorgen sehen will',
-      m: [['zielbild', 'ganz'], ['ob', 'halb'], ['bk', 'halb'], ['vb-eq', 'ganz']], kommt: ['Was jetzt zu tun ist', 'Wohin die Miete geht'] },
+      m: [['zielbild', 'ganz'], ['ob', 'halb'], ['bk', 'halb'], ['vb-eq', 'ganz'], ['gb', 'ganz']], kommt: ['Was jetzt zu tun ist', 'Wohin die Miete geht'] },   /* gb: Gesamtbewertung zeigt sich in Genau (Demo Detail-Modus) */
     { k: 'risiko', t: 'Risiko-Radar', u: 'Wo der Bestand verwundbar ist',
       m: [['bk', 'ganz'], ['zielbild', 'ganz']], kommt: ['Risikomatrix', 'Rendite gegen Tragfähigkeit', 'Zinsstress beim Anschluss'] },
     { k: 'steuer', t: 'Steuer-Jahr', u: 'Was die Steuer aus dem Cashflow macht',
@@ -675,7 +675,6 @@
       DK + ' .dpz-kopf{background:linear-gradient(180deg,#16140F,#0E0D0B);border:1px solid #26231E}',
       DK + ' select,' + DK + ' textarea,' + DK + ' input:not([type=checkbox]):not([type=range]),' + DK + ' .cp-ans-sw button:not(.on),' + DK + ' .pj-sw button:not(.on),' + DK + ' .sl-yrs button:not(.active),' + DK + ' .sl .cp-chev{background:#16140F !important;color:#E9E3D6 !important;border-color:#3A352D !important}',
       DK + ' .cp-ans-sw{background:#16140F !important}',
-      DK + ' #dp-dash-objsel,html[data-gx-stil="dunkel"] body.dp-gp-an #dp-dash-objsel{background:#16140F !important;color:#E9E3D6 !important;border-color:#3A352D !important}',
       DK + ' .zb-neu-btn,' + DK + ' .zb-btn,' + DK + ' .dp-pp-t,' + DK + ' .dp-pp-a,' + DK + ' .dp-pp-go{color:#E9E3D6 !important}' + DK + ' .dp-pp-s,' + DK + ' .dp-pp-hint,' + DK + ' .dp-pp-web{color:#B9B2A3 !important}',
       DK + ' .zb-neu-btn,' + DK + ' .zb-btn,' + DK + ' .dp-pp-go,' + DK + ' .dp-pp-a,' + DK + ' .dp-pp-chip{background:#16140F !important;border-color:#3A352D !important}',
       /* Seitenleiste „Ansicht anpassen“ (am body, nie per Klick daneben zu) */
