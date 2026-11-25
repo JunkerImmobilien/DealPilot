@@ -853,6 +853,7 @@
       + (suJ.length ? ', Sonderumlage ' + suJ.join(' und ') : ', keine Sonderumlage');
     var unter = 'Hausgeld aus Wirtschaftsplan (Plan) und Jahresabrechnung (Ist), dazu der Stand der Erhaltungsrücklage. Rote Marken: Sonderumlage oder kritisches Risiko im Jahr.';
     var i = Gx.karte(host, { eyebrow: 'Hausgeld und Rücklage', titel: titel, unter: unter, chips: ['aus deinen Unterlagen'] });
+    var rlE = letzt(rl); if (rlE && rl.filter(function (v) { return v != null; }).length < 2) { var ft = document.createElement('div'); ft.className = 'gx-s'; ft.style.marginTop = '2px'; ft.textContent = 'Erhaltungsrücklage der Gemeinschaft: ' + eur(rlE.v) + ' (' + rlE.j + '), ein Stand. Mit weiteren Abrechnungen entsteht hier der Verlauf.'; i.parentNode.insertBefore(ft, i); }
     var ziel = document.createElement('div'); i.appendChild(ziel);
     var marken = [];
     X.forEach(function (j, q) {
@@ -873,7 +874,7 @@
     var leg = reihen.map(function (r) { return { n: r.name, f: r.farbe }; }); if (streu.length) leg.push({ n: 'Sonderumlage', f: F.rot });
     var W = Math.max(260, (i.clientWidth || host.clientWidth || 640) - 2);
     if (reihen.length || streu.length) Gx.verlauf(ziel, { x: X, reihen: reihen.length ? reihen : [{ name: 'leer', werte: X.map(function () { return null; }), farbe: 'transparent' }], streu: streu, marken: marken, tip: tipJ, legende: leg }, { breite: W, hoehe: 210, aria: 'Hausgeld je Jahr' });
-    if (hat(rl)) {
+    if (rl.filter(function (v) { return v != null; }).length >= 2) {
       var zr = document.createElement('div'); zr.className = 'dp-hv-gx-rl'; i.appendChild(zr);
       var lr = letzt(rl), er = rl.filter(function (v) { return v != null; })[0];
       var kopf = document.createElement('div'); kopf.className = 'gx-s'; kopf.textContent = 'Erhaltungsrücklage der Gemeinschaft: ' + eur(lr.v) + ' (' + lr.j + ')' + (er !== lr.v ? ', vorher ' + eur(er) : '');
