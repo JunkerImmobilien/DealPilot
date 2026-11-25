@@ -468,10 +468,11 @@
       var tipA = 'Ankauf: Objekte in der Akquise, noch nicht gewonnen. Verlorene stehen ausgegraut am Ende.';
       var tipB = 'Bestand: gewonnene Objekte mit ihrem laufenden Stand. Den eingefrorenen Ankauf-Stand zeigt das Objekt-Cockpit.';
       var tipX = 'Aktionen: Ansichten, Anlegen, Ausgeben und System.';
+      /* v4650 · Marcel 25.11.2026: „Aktion müsste genau auf die andere Seite, also links hin" */
       var htmlDrei =
-          '<button type="button" data-dk-modus="ankauf" class="dk-seg dk-drei-seg" title="' + tipA + '"><span>Ankauf</span><b>' + nA + '</b></button>'
-        + '<button type="button" data-dk-modus="bestand" class="dk-seg dk-drei-seg" title="' + tipB + '"><span>Bestand</span><b>' + nB + '</b></button>'
-        + '<button type="button" data-dk-modus="aktionen" class="dk-seg dk-drei-seg" title="' + tipX + '"><span>Aktionen</span></button>';
+          '<button type="button" data-dk-modus="aktionen" class="dk-seg dk-drei-seg" title="' + tipX + '"><span>Aktionen</span></button>'
+        + '<button type="button" data-dk-modus="ankauf" class="dk-seg dk-drei-seg" title="' + tipA + '"><span>Ankauf</span><b>' + nA + '</b></button>'
+        + '<button type="button" data-dk-modus="bestand" class="dk-seg dk-drei-seg" title="' + tipB + '"><span>Bestand</span><b>' + nB + '</b></button>';
       if (s.getAttribute('data-drei-html') !== htmlDrei) {
         s.innerHTML = htmlDrei;
         s.setAttribute('data-drei-html', htmlDrei);
