@@ -39,7 +39,7 @@
   var ENDE = Date.UTC(2026, 11, 6, 22, 59, 59);      /* 06.12.2026 23:59:59 MEZ (Black Week, landing-blackweek-1) */
   var FAKTOR = 0.8;
   var PLAENE = { investor: 1, pro: 1 };
-  var GESEHEN = 'dp_bf26_popup_gesehen';
+  var GESEHEN = 'dp_bw26_popup_gesehen'; /* landing-blackweek-2: neuer Merker, Black-Week-Fenster erscheint einmal neu */
   var ID = 'dp-bf-popup';
 
   function jetzt() {
