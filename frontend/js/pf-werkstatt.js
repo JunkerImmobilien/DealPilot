@@ -184,7 +184,7 @@
     if (_score) return _score;
     var h = document.getElementById('dp-pscore-hero');
     if (h && h.innerHTML.length > 80 && h.offsetHeight) _score = { h: saeubern(h.cloneNode(true)).outerHTML, w: h.offsetWidth, echt: true };
-    else _score = { h: '<div style="background:#0A0A0A;color:#FDFCFA;border-radius:12px;padding:18px 22px;font:600 18px Space Grotesk,sans-serif">Investor Portfolio Score <span style="color:#C9A84C">72</span> · Investment 70 · Finanzierung 75 <small style="font:400 13px Inter;color:#C9C1B1">Beispielwerte, noch keine Objekte im Bestand</small></div>', w: appBreite(), echt: false };
+    else _score = { h: '<div style="background:#0A0A0A;color:#FDFCFA;border-radius:12px;padding:18px 22px;font:600 18px Space Grotesk,sans-serif">Investor Portfolio Score <span style="color:var(--wl-c9a84c, #C9A84C)">72</span> · Investment 70 · Finanzierung 75 <small style="font:400 13px Inter;color:#C9C1B1">Beispielwerte, noch keine Objekte im Bestand</small></div>', w: appBreite(), echt: false };
     return _score;
   }
   /* Vorlage als echtes, verkleinertes Bild: Score-Kopf und die ersten Bausteine im Raster der Vorlage */
@@ -399,7 +399,7 @@
     document.body.appendChild(p); document.documentElement.classList.add('pw-offen');
     try {   /* Helligkeit der Akzentfarbe (Partner) messen: dunkel => heller Kopftext */
       var m = (getComputedStyle(p.querySelector('.pw-sym') || p).color || '').match(/\d+(\.\d+)?/g);
-      var hel = getComputedStyle(document.documentElement).getPropertyValue('--wl-c9a84c').trim() || '#C9A84C';
+      var hel = getComputedStyle(document.documentElement).getPropertyValue('--wl-c9a84c').trim();
       var c = hel.charAt(0) === '#' ? [parseInt(hel.substr(1, 2), 16), parseInt(hel.substr(3, 2), 16), parseInt(hel.substr(5, 2), 16)] : (m ? m.slice(0, 3).map(Number) : [201, 168, 76]);
       var lum = (0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]) / 255; p.classList.toggle('pw-dunkel', lum < 0.45);
     } catch (e) {}
