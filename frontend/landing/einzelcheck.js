@@ -63,7 +63,7 @@
 (function () {
   'use strict';
   if (window.DpEinzelCheck) return;
-  var VERSION = 'einzelcheck-9a';
+  var VERSION = 'einzelcheck-9b';
   var ANSCHLUSS_ZINS = 5.0;     /* v3946 · Marcel 22.11.2026: „Anschlussfinanzierung, die wir einfach auf fünf Prozent rechnen mit derselben Tilgung“ */
   var ABLAGE_STUNDEN = 2;       /* v3946 · Unterlagen im Browser höchstens so lange (die Stripe-Kasse läuft nach 60 Minuten ab) */
   var SPEICHER = 'dp_ec_kauf';
@@ -1480,6 +1480,9 @@
         var betrag = x.wert != null ? D.eur(x.wert) : (x.faktor != null ? '× ' + dez(x.faktor, x.faktor >= 10 ? 2 : (Math.abs(x.faktor - Math.round(x.faktor * 100) / 100) > 0.00001 ? 4 : 2)) : '');
         return [x.pos, betrag, { det: x.detail || '', art: x.summe ? 'ende' : '' }];
       });
+      /* die Wertindikation ist auf volle Tausend gerundet, die letzte Zeile der Staffel nicht (MFH: 708.304 € gegen 710.000 €) */
+      var letzte = v.rechenweg[v.rechenweg.length - 1];
+      if (v.wert_eur > 0 && letzte && letzte.wert != null && Math.round(letzte.wert) !== Math.round(v.wert_eur)) zl.push([v.name + ', gerundet', D.eur(v.wert_eur), { art: 'ende' }]);
       var her = v.art === 'ertragswert'
         ? [v.lzs_pct != null ? 'Liegenschaftszinssatz ' + dez(v.lzs_pct, 2) + ' %' + (v.stufe ? ' (Stufe ' + v.stufe + (v.stufe === 'A' ? ', amtlich' : ', nicht amtlich') + ')' : '') : '',
            v.rnd_j && v.gnd_j ? 'Restnutzungsdauer ' + dez(v.rnd_j, v.rnd_j % 1 ? 1 : 0) + ' von ' + dez(v.gnd_j, 0) + ' Jahren' : '',
