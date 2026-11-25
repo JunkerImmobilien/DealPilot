@@ -785,6 +785,7 @@
 '#dp-pscore-hero .dpz-bar{height:5px}',
 '#dp-pscore-hero .dpz-m{display:none}',
 '#dp-pscore-hero .dpz-summe{margin-top:6px;padding-top:6px;font-size:11px}',
+'@media(max-width:640px){#dp-pscore-hero .dpz-kat{grid-template-columns:1fr}}',
 '.dpsh-pass{display:flex;border-radius:18px;overflow:hidden;position:relative;background:#1b1815;box-shadow:0 22px 60px -30px rgba(20,15,5,.5)}',
 '.dpsh-main{flex:1;position:relative;background:radial-gradient(120% 150% at 78% -10%,#0d0c09,#050505 62%);min-width:0}',
 '.dpsh-star{position:absolute;inset:0;opacity:.38;pointer-events:none;background-image:radial-gradient(1px 1px at 22% 28%,color-mix(in srgb, var(--gold, #C9A84C) 45%, transparent),transparent),radial-gradient(1px 1px at 72% 16%,rgba(255,255,255,.22),transparent),radial-gradient(1px 1px at 88% 60%,color-mix(in srgb, var(--gold, #C9A84C) 35%, transparent),transparent),radial-gradient(1px 1px at 42% 84%,rgba(255,255,255,.18),transparent)}',
