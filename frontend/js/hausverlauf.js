@@ -455,6 +455,7 @@
       return da.some(function (n) { return q.indexOf(n) >= 0; });
     });
   }
+  function kuerz(t, n) { t = String(t || '').trim(); if (t.length <= n) return t; var c = t.slice(0, n); var p = c.lastIndexOf('. '); return p > n * 0.6 ? c.slice(0, p + 1) : c.replace(/\s+\S*$/, '') + ' …'; }
   function risText(z) {
     var t = [];
     if (z.hoch) t.push(z.hoch + ' kritisch');
@@ -508,7 +509,7 @@
       }).join('') + '</div>';
     var zeile = function (x) {
       var s = sw(x), j = jahrAus(x.jahr) || 0, kost = Number(x.kosten_eur) > 0 ? eur(Number(x.kosten_eur)) : '';
-      var tt = '<strong>' + esc(WORT[s]) + '.</strong> ' + esc(String(x.beschreibung || '').slice(0, 280)) + (x.quelle ? '<small>Quelle: ' + esc(x.quelle) + '</small>' : '');
+      var tt = '<strong>' + esc(WORT[s]) + '.</strong> ' + esc(kuerz(x.beschreibung, 280)) + (x.quelle ? '<small>Quelle: ' + esc(x.quelle) + '</small>' : '');
       return '<div class="dp-hv-rk ' + s + '" tabindex="0" data-j="' + j + '"><i class="hv-pt"></i><b>' + esc(x.titel || 'Risiko') + '</b>'
         + '<span class="hv-m">' + (j ? String(j) : '') + (kost ? (j ? ' · ' : '') + kost : '') + '</span>'
         + '<em class="hv-tt" role="tooltip">' + tt + '</em></div>';
