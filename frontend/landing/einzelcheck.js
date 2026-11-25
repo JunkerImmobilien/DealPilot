@@ -63,7 +63,7 @@
 (function () {
   'use strict';
   if (window.DpEinzelCheck) return;
-  var VERSION = 'einzelcheck-5a';
+  var VERSION = 'einzelcheck-8';
   var ANSCHLUSS_ZINS = 5.0;     /* v3946 · Marcel 22.11.2026: „Anschlussfinanzierung, die wir einfach auf fünf Prozent rechnen mit derselben Tilgung“ */
   var ABLAGE_STUNDEN = 2;       /* v3946 · Unterlagen im Browser höchstens so lange (die Stripe-Kasse läuft nach 60 Minuten ab) */
   var SPEICHER = 'dp_ec_kauf';
@@ -423,6 +423,23 @@
       }); });
       if (el) el.addEventListener(k === 'art' ? 'change' : 'input', function () { delete offen[k]; if (w.parentNode) w.parentNode.classList.remove('wahl'); standWahl(); });
     });
+    /* hh4 (25.11.2026) · Zeile unter dem Feld folgt dem Tippen: ein selbst geänderter Wert heißt „deine Angabe“,
+       ein gefülltes Pflichtfeld verliert „fehlt, bitte ergänzen“ (vorher blieb „aus deinem Deal-Check“ bei 0 € Eigenkapital stehen) */
+    Object.keys(IDS).forEach(function (k) {
+      var el = document.getElementById(IDS[k]); if (!el) return;
+      var lab = el.closest('label.ec-f'); if (!lab) return;
+      var start = el.value, startHtml = (lab.querySelector('small.ec-her') || {}).outerHTML || '';
+      el.addEventListener(el.tagName === 'SELECT' ? 'change' : 'input', function () {
+        if (vb.konflikt[k]) return;
+        var alt = lab.querySelector('small.ec-her'), leer = String(el.value).trim() === '';
+        var ortEl = document.getElementById('ecgOrt');
+        var html = leer ? ((pflicht(k) && !(k === 'plz' && ortEl && ortEl.value.trim())) ? '<small class="ec-her fehlt">fehlt, bitte ergänzen</small>' : '')
+          : (el.value === start ? startHtml : '<small class="ec-her">deine Angabe</small>');
+        lab.classList.toggle('fehlt', /fehlt/.test(html));
+        if (alt) alt.remove();
+        if (html) lab.insertAdjacentHTML('beforeend', html);
+      });
+    });
     /* Zeile oben nachziehen, sobald gewählt ist */
     function standWahl() {
       var li = $('.ec-stand li.wahl', inhalt); if (!li) return;
@@ -621,7 +638,7 @@
         + '<div><span>Bruttorendite</span><b>' + dez(r.k.bmy, 2) + ' %</b></div>'
         + '<div><span>Nettorendite</span><b>' + dez(r.k.nmy, 2) + ' %</b></div>'
         + '<div><span>DSCR</span><b>' + (r.k.d_total > 0 ? dez(r.k.dscr, 2) : 'entfällt') + '</b></div></div>'
-        + '<p class="ec-annahme">' + esc(annahmeText(r)) + '</p>';
+        + '<p class="ec-annahme">' + esc(annahmeText(r)) + ' Vorläufig, noch ohne Marktbericht: Im Bericht kommen der Wertpuffer aus der Marktpreisindikation und das Mietpotenzial dazu, der Deal Score kann sich dadurch noch ändern.</p>';
     } else {
       var fehlt = r && r.fehlt === 'kp' ? 'den Kaufpreis' : (r && r.fehlt === 'nkm' ? 'die Kaltmiete' : 'den Zins');
       kern = '<p class="ec-lead">' + (r ? 'Es fehlt ' + fehlt + '. Trag ' + fehlt + ' in den Grundangaben ein, dann rechnet die Einschätzung mit.' : 'Die Rechenkerne sind gerade nicht geladen. Lade die Seite neu.') + '</p>';
@@ -807,7 +824,7 @@
     var k = r.k, e = r.e, o = [], f = [], n = [];
     if (k.nmy != null) o.push('Nettomietrendite ' + dez(k.nmy, 2) + ' %' + (b.rendite >= 70 ? ', für den Kaufpreis gut' : b.rendite >= 50 ? ', solide' : ', eher niedrig') + '.');
     if (opt.marktwert > 0) { var ab = abstandPct(e.kp, opt.marktwert); o.push('Kaufpreis ' + dez(Math.abs(ab), 1) + ' % ' + (ab <= 0 ? 'unter' : 'über') + ' der Marktpreisindikation von ' + eur(opt.marktwert) + '.'); }   /* gleiche Rechnung wie „Kurz gesagt“ */
-    if (opt.mietPotPct != null) o.push(opt.mietPotPct > 0.05 ? 'Bestandsmiete darf in drei Jahren um ' + dez(opt.mietPotPct, 1) + ' % steigen.' : 'Die Miete liegt schon an der ortsüblichen Vergleichsmiete, eine Erhöhung ist kaum möglich.');
+    if (opt.mietPotPct != null) o.push(opt.mietPotPct > 0.05 ? 'Bestandsmiete darf in drei Jahren um ' + dez(opt.mietPotPct, 1) + ' % steigen.' : 'Die Miete liegt schon an oder über der ortsüblichen Vergleichsmiete, eine Erhöhung ist kaum möglich.');
     if (k.dscr != null) f.push('DSCR ' + dez(k.dscr, 2) + (k.dscr >= 1.2 ? ', die Miete trägt Zins und Tilgung mit Puffer.' : k.dscr >= 1 ? ', die Miete trägt Zins und Tilgung nur knapp.' : ', die Miete trägt Zins und Tilgung nicht.'));
     if (k.ltv != null) f.push('Beleihung ' + dez(k.ltv, 0) + ' % des Kaufpreises' + (r.ek > 0 ? ', ' + eur(r.ek) + ' Eigenkapital.' : ', ohne Eigenkapital, auch die Nebenkosten sind finanziert.'));
     if (fin && fin.anschluss && fin.anschluss.dscr != null) f.push('Im Anschluss bei ' + dez(fin.anschluss.zins, 1) + ' % Zins DSCR ' + dez(fin.anschluss.dscr, 2) + ', Cashflow ' + (fin.anschluss.cf_nach_m >= 0 ? '+' : '−') + eur(Math.abs(fin.anschluss.cf_nach_m)) + ' im Monat.');
@@ -960,7 +977,7 @@
     else s.push('Für diesen Ort liegen keine amtlichen Mietdaten zur Vergleichsmiete vor. DealPilot nennt deshalb keine Zahl.');
     /* Bestand nach drei Jahren */
     if (z && z.miete_monat > 0) {
-      if (z.grund === 'vergleichsmiete_erreicht') s.push('Die Miete liegt schon an der ortsüblichen Vergleichsmiete. Eine Erhöhung nach § 558 BGB ist nicht möglich.');
+      if (z.grund === 'vergleichsmiete_erreicht') s.push('Die Miete liegt schon an oder über der ortsüblichen Vergleichsmiete. Eine Erhöhung nach § 558 BGB ist nicht möglich.');
       else if (z.plus_pct > 0.05) s.push('Zulässig in drei Jahren: ' + eur(z.miete_monat) + ' im Monat, das sind ' + dez(z.plus_pct, 1) + ' % mehr'
         + (z.grund === 'kappung' ? ', begrenzt durch die Kappungsgrenze von ' + mi.kPct + ' %.' : ', bis zur ortsüblichen Vergleichsmiete.'));
       if (z.vgl_fehlt) s.push('Gerechnet ist deshalb nur bis zur Kappungsgrenze. Liegt die Vergleichsmiete darunter, ist sie die Grenze.');
@@ -976,7 +993,7 @@
     if (nv.qm > 0) {
       if (nv.plus_monat > 0.5) s.push('Abstand zur Ist-Miete bei Neuvermietung: ' + eurS(nv.plus_monat) + ' im Monat, ' + eurS(nv.plus_jahr) + ' im Jahr.');
       else if (nv.art === 'bremse') s.push('Die Ist-Miete liegt schon an oder über dieser Grenze. Bei Neuvermietung darf eine höhere Vormiete weiter verlangt werden (§ 556e BGB).');
-      else s.push('Die Ist-Miete liegt schon an oder über der Vergleichsmiete.');
+      else if (!(z && z.grund === 'vergleichsmiete_erreicht')) s.push('Die Ist-Miete liegt schon an oder über der Vergleichsmiete.');   /* hh4 · sonst steht derselbe Satz zweimal */
       if (mi.markt_qm > 0 && mi.markt_qm < nv.qm - 0.004) s.push('Der aktuelle Marktdurchschnitt liegt mit ' + qmText(mi.markt_qm) + ' darunter. Ob die Grenze erreichbar ist, hängt von Wohnung und Lage ab.');
     }
     if (mi.bestand && mi.bestand.plus_monat > 0.5) s.push('Abstand zur Ist-Miete im Bestand: ' + eurS(mi.bestand.plus_monat) + ' im Monat, ' + eurS(mi.bestand.plus_jahr) + ' im Jahr.');
@@ -1412,7 +1429,7 @@
       + D.kacheln([{ l: 'Kaufpreis', v: r && r.e.kp ? eur(r.e.kp) : 'fehlt' },
         { l: wi ? (VW_LANG[wi.verfahren] || 'Wertindikation') : 'Wertindikation', v: wi ? eur(wi.wert_eur) : 'keine', s: wi ? wiRecht(wi, false) : 'kein führendes Verfahren', art: 'hi' },
         { l: 'Marktpreisindikation', v: m.markt && m.markt.wert > 0 ? eur(m.markt.wert) : 'keine', s: 'Angebotspreise abzüglich Verhandlungsabschlag, kein Verkehrswert' }, { l: 'Bodenrichtwert', v: bo.verfuegbar ? dez(bo.brw_qm, 0) + ' €/m²' : 'kein Wert' }])
-      + (r && r.k ? D.kacheln([{ l: 'Bruttorendite', v: D.pct(r.k.bmy), s: 'Faktor ' + D.zahl(r.k.fak, 1) }, { l: 'Nettorendite', v: D.pct(r.k.nmy) },
+      + (r && r.k ? D.kacheln([{ l: 'Bruttorendite', v: D.pct(r.k.bmy), s: 'Faktor ' + D.zahl(r.k.fak, 1) + (r.e.ze > 0 ? ', mit Zusatzeinnahmen' : '') }, { l: 'Nettorendite', v: D.pct(r.k.nmy) },
         { l: 'Cashflow', v: D.eurS(r.k.cf_m), s: 'im Monat nach Finanzierung', art: r.k.cf_m < 0 ? 'schlecht' : 'gut' }, { l: 'DSCR', v: r.k.d_total > 0 ? D.zahl(r.k.dscr, 2) : 'entfällt', s: 'volles Jahr, heutige Eingaben' }]) : '')
       + (r && r.k && r.k.d_total > 0 ? '<p class="sub">' + D.esc(dscrSatz(r, d.fin)) + '</p>' : '')
       + (g ? D.scoreRing(g.score, g.empfehlung ? g.empfehlung.text : '') : (r && r.k ? D.scoreRing(r.ds.score, r.st.wort) : ''))
@@ -1457,7 +1474,8 @@
         + (u.satz ? '<p><b>' + D.esc(u.satz) + '</b></p>' : '')
         + '<div class="zwei"><div><h3>Das Objekt</h3>' + punkte(u.objektPunkte) + '</div><div><h3>Die Finanzierung</h3>' + punkte(u.finanzPunkte) + '</div></div>'
         + (u.braucht && u.braucht.length ? '<h3>Was es bräuchte</h3>' + punkte(u.braucht) : '')
-        + '<h3>Teilwerte</h3>' + D.liste(SUB.filter(function (x) { return b[x[0]] != null; }).map(function (x) { return [x[1], b[x[0]] + ' / 100']; }), ['Teil', 'Punkte'])));
+        /* hh4 · Teilwerte als eine Zeile statt Tabelle: die Tabelle schob den Seitenfuß auf eine eigene, sonst leere Seite (Herford, 25.11.2026) */
+        + '<p style="font-size:9pt;color:var(--muted)"><b>Teilwerte (je von 100):</b> ' + SUB.filter(function (x) { return b[x[0]] != null; }).map(function (x) { return D.esc(x[1]) + ' ' + b[x[0]]; }).join(' · ') + '</p>'));
     }
 
     /* Mietpotenzial */
