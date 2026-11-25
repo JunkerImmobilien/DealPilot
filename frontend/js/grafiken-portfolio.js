@@ -279,6 +279,7 @@
       var tip = String(r.tip || '').replace(/<br\s*\/?>|<\/div>|<hr>/g, ' · ').replace(/<[^>]+>/g, '').replace(/(\s*·\s*)+/g, ' · ').replace(/^ · | · $/g, '').trim();
       return kachel(r.l || d.t, r.v, r.s ? String(r.s).replace(/<[^>]+>/g, '') : '', r.c === 'ok' ? 'gp-pos' : r.c === 'nok' ? 'gp-neg' : r.c === 'warn' ? 'gp-gold' : '', tip);
     }; });
+    _KZH_LETZT = KZH;   /* v4890 · Arbeitsbereich zeigt Kennzahlen mit ihren Werten (GP_API.kzKachel) */
     var kzAn = kzReihe().filter(function (k) { return KZH[k]; });
     var kzHtml = kzAn.map(function (k, i) { var h = KZH[k](); return i === 0 ? h.replace(/^<div class="gp-k/, '<div class="gp-k gp-haupt') : h; });
     /* v4830 · Marcel 25.11.2026 „sieht nicht fertig aus“: alle gewählten Kennzahlen in EINER Leiste wie Demo 07, gleich breit, keine Einzelkarte über die volle Breite */
@@ -489,7 +490,7 @@
     br.projektion = 'ganz';
     return { v: 2, an: an, ord: ord, ordVb: ordVb, br: br, vorlage: v.k, kz: (_ans && _ans.kz) || kzStandard() };
   }
-  var _ans = null, _ansServer = false, _bkOffen = false, _bkVorher = null, _bkPut = null;
+  var _ans = null, _ansServer = false, _bkOffen = false, _bkVorher = null, _bkPut = null, _KZH_LETZT = null;
   /* v1 (v4260) kannte nur an/aus: die Häkchen bleiben, Reihenfolge und Breite kommen aus Standard */
   function normal(s) {
     var basis = ausVorlage(VORLAGEN[0]);
@@ -643,6 +644,8 @@
     kzStandard: kzStandard, ausVorlage: ausVorlage,
     ziel: function (k) { var hero = document.getElementById('dp-pscore-hero'), app = hero && hero.parentNode; return app ? (ansichtZiele(app)[k] || null) : null; },
     kopf: function () { return document.querySelector('[data-dp-gp="kopf"]'); },
+    /* v4890 · eine Kennzahl als Karte mit ihrem echten Wert (aus dem letzten Zeichnen), null wenn noch nicht gezeichnet */
+    kzKachel: function (k) { try { return _KZH_LETZT && _KZH_LETZT[k] ? _KZH_LETZT[k]() : null; } catch (e) { return null; } },
     speichern: function (mitKz) { if (mitKz) kzGeaendert(); else { ansSpeichern(); ansichtAnwenden(); } },
     seitenleiste: function () { ansichtOeffnenLeiste(); }
   };
