@@ -12,6 +12,8 @@ direkt unter den Punkt — nicht kommentarlos liegenlassen.
 
 Einzelheiten: wissen/2026-11-25.md, Abschnitt „Stand 25.11.2026 mittags“. Investment-PDF-Muster, Deal-Score-Grundlage, EK-Rendite-Delta, Tipps Reiter Bank, Portfolio Lagekarte/Vermögenswert, Dokumentenablage, Werbung (Black Week Handy, #dealpilotimmo, LinkedIn, ViVi-OK), Logodateien, Meta-Sprache.
 
+**v5020 (Staging, QQ5):** Leerzustände (Ausgeben ohne Objekt aus, Track Record erst mit Bestand, Steuer-Tipp Jahresende und Finanzamt-PDF im Ankauf aus, leere Objektliste mit Weg) und Besichtigungs-Checkliste in der Pilot-Analyse (Kaufpreis & Offerte, auch ohne Analyse). Marcel prüft auf Staging, dann Prod. Einzelheiten wissen/2026-11-25.md, Abschnitt v5020.
+
 ## → Offen aus dem 24.11.2026 (Marcel entscheidet)
 
 Stand und Einzelheiten: `wissen/2026-11-24.md`, Abschnitt „Abendstand 24.11.2026“. Prod 1.0.190.

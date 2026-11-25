@@ -1088,6 +1088,7 @@ label.dp-required.qc-required::after {
   <input type="hidden" id="dp_stufe" value="">  <!-- v3073: Detailgrad JE OBJEKT (js/detailgrad.js): 1 Einsteiger · 2 Fortgeschritten · 3 Experte; leer bei einem Bestandsobjekt = Experte -->
   <input type="hidden" id="_mb_state" value="">  <!-- v540: DealPilot-Marktbewertung Snapshot -->
   <input type="hidden" id="_vivi" value="">  <!-- v3950: ViVi-Verknuepfung im Objekt (js/vivi-felder.js), JSON: verknuepft, stand, felder (Anzeige-Spiegel), eigen (lokal ueberschriebene Werte). Massgeblich bleibt vivi_werte im Backend -->
+  <input type="hidden" id="_besichtigung" value="">  <!-- v5020: Checkliste der Besichtigung (js/besichtigung.js), JSON: Haken und Notizen je Punkt -->
   <input type="hidden" id="_dok_eingang" value="">  <!-- v3120: Herkunft der Steuerposten und Verlauf des Eingangs (unterlagen-eingang.js), JSON -->
   <input type="hidden" id="_dok_auswertung" value="">  <!-- v3016: Auswertung der Unterlagen (WEG, Grundbuch, Teilung), JSON - unterlagen.js -->
   <input type="hidden" id="_lage_herkunft" value="">  <!-- v2515: Herkunft je Lage-Feld (gemessen | ki | eigen), JSON -->
@@ -4065,8 +4066,8 @@ label.dp-required.qc-required::after {
 <script src="js/tax.js?v=v4810"></script>
 <script src="js/steuer-verlauf.js?v=v4810"></script>
 <script src="js/pa-potenzial.js?v=v4810"></script><!-- v3323 · Pilot-Analyse: Reiter Potenzialanalyse -->
-<script src="js/hausverlauf.js?v=v4780g"></script><!-- v3323 · Pilot-Analyse: Reiter Hausverlauf (WEG-Unterlagen chronologisch) · v3430 Haus je Jahr -->
-<script src="js/pilot-analyse-v4.js?v=v4940"></script><script src="js/objekt-cockpit.js?v=v4540a"></script><!-- v4460 · Objekt-Cockpit vorne bei gewonnenen Objekten --><!-- v3099 · Pilot-Analyse Fassung 4 (v3259: eine Kopfzeile + Reiterleiste; Kopfzeile, Einfach/Detail, Uebersicht, Risiken & Szenarien, Wertverlauf) -->
+<script src="js/hausverlauf.js?v=v4780g"></script><script src="js/besichtigung.js?v=v5020"></script><!-- v5020 · Besichtigungs-Checkliste (Pilot-Analyse, Kaufpreis & Offerte) --><!-- v3323 · Pilot-Analyse: Reiter Hausverlauf (WEG-Unterlagen chronologisch) · v3430 Haus je Jahr -->
+<script src="js/pilot-analyse-v4.js?v=v5020"></script><script src="js/objekt-cockpit.js?v=v4540a"></script><!-- v4460 · Objekt-Cockpit vorne bei gewonnenen Objekten --><!-- v3099 · Pilot-Analyse Fassung 4 (v3259: eine Kopfzeile + Reiterleiste; Kopfzeile, Einfach/Detail, Uebersicht, Risiken & Szenarien, Wertverlauf) -->
 <script src="js/config.js?v=v4810"></script>
 <script src="js/dealcheck-uebernahme.js?v=v4810"></script><!-- v3313 · Deal-Check der Startseite: Fragment vor auth.js/register-easter-egg.js annehmen -->
 <script src="js/gnotkg.js?v=v3088"></script><!-- v3088 · Notar und Grundbuch nach Gebuehrenordnung -->
@@ -4124,7 +4125,7 @@ label.dp-required.qc-required::after {
 <script src="js/ui.js?v=v4810"></script>
 <script src="js/ki-text.js?v=v4230"></script><!-- v4230 · KI-Text ohne Markdown (Co-Pilot, Portfolio-Pilot) -->
 <script src="js/sidebar-collapse.js?v=20260611174630"></script>
-<script src="js/storage.js?v=v4540a"></script>
+<script src="js/storage.js?v=v5020"></script><script src="js/leerzustand.js?v=v5020"></script><!-- v5020 · Leerzustände ohne Objekt / ohne Bestand -->
 <script src="js/nachrechnen.js?v=v3031"></script><!-- v3031: Kennzahlen/Scores gespeicherter Objekte neu rechnen (nur auf Aufruf) -->
 <!-- v845-newsearch-removed: sb-search.js entfernt (Kollision mit sidebar-search.js) -->
 <script src="js/inventar-sync.js?v=v3006c"></script><!-- V291-inv-sync-applied -->
