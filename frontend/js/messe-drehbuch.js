@@ -10975,10 +10975,10 @@
   async function l6ObjektSuchen(re) {   /* Objekt im Konto über die Anschrift finden (nicht verloren, jüngstes zuerst) */
     try {
       var r = await Auth.apiCall('/objects');
-      var arr = (r && (r.data || r.objects)) || (Array.isArray(r) ? r : []);
-      var t = arr.filter(function (o) { var d = o.data || o; var s = String((d.str || '') + ' ' + (d.hnr || '') + ' ' + (o.name || o.title || '')); return re.test(s) && !(d._deal_lost); });
+      var arr = (r && (r.items || r.data || r.objects)) || (Array.isArray(r) ? r : []);
+      var t = arr.filter(function (o) { var s = String((o.str || '') + ' ' + (o.hnr || '') + ' ' + (o.name || '')); return re.test(s) && !o.deal_lost; });
       t.sort(function (a, b) { return String(b.updated_at || '').localeCompare(String(a.updated_at || '')); });
-      return t[0] ? (t[0].id || (t[0].data && t[0].data.id)) : null;
+      return t[0] ? t[0].id : null;
     } catch (e) { return null; }
   }
 
@@ -11084,7 +11084,7 @@
       },
       async function (s) {   /* 4 · Dokumente */
         await r13Zeige(/^Dokumente/);
-        await b2oZeile(s, 'Dokumente und Exporte', 'Investment-PDF in Kurzfassung, Kombi oder für die Bank, dazu Bankexport und Marktberichte.');
+        await b2oZeile(s, 'Dokumente und Exporte', 'Investment-PDF und Kurzfassung, Track Record, Finanzamt-PDF, Kaufpreisaufteilung und deine Marktberichte.');
       }
     ]
   };
@@ -11097,16 +11097,16 @@
       async function (s) {   /* 1 · Cockpit Steuer */
         await k5Cockpit();
         await k5Tab(/^Steuer/);
-        await zeige(l6Karte(/Ergebnis aus Vermietung/), 8);
+        await zeige(l6Karte(/Ergebnis aus Vermietungs*·s*Anlage V/i), 8);
         await b2oZeile(s, 'Ergebnis aus Vermietung', 'Die Anlage V Jahr für Jahr. Grün heißt Verlust, die Steuer sinkt. Rot heißt Überschuss.');
       },
       async function (s) {   /* 2 · Kacheln */
-        await zeige(l6Karte(/AfA|Grenzsteuersatz/), 8);
+        await zeige(function () { var e = rhIm(k5Panel(), /Grenzsteuersatz/); return e && k5Eng(e, 180); }, 8);
         await b2oZeile(s, 'Die Eckdaten', 'AfA, Gebäudeanteil, Zehnjahresfrist und Grenzsteuersatz. Die Erklärung steht im Tooltip.');
       },
       async function (s) {   /* 3 · Verlauf mit Steuern im Tab Steuern */
         reiter('s3-tax'); await warte(1400);
-        await zeige(function () { return k5Eng(rhIm(q('#s3-tax') || document.body, /Verlauf mit Steuern/), 420); }, 8);
+        await zeige(function () { return k5Eng(rhIm(q('#s3-tax') || document.body, /Verlauf mit Steuern/), 720); }, 8);
         await b2oZeile(s, 'Verlauf mit Steuern', 'Dieselbe Grafik auch im Reiter Steuern, mit denselben Zahlen.');
       },
       async function (s) {   /* 4 · Belege je Jahr */
@@ -11122,10 +11122,10 @@
     abspann: [{ ms: 6200, html: ABSPANN_LOGO }],
     aufraeumen: function () { rhAufraeumen(); },
     szenen: [
-      async function (s) {   /* 1 · Tabelle (Westerfeldstr. 146, aufgeteilt) */
+      async function (s) {   /* 1 · Tabelle (Westerfeldstr., Bestand) */
         await l6Cockpit(R11_WESTERFELD);
         await k5Tab(/Ankauf · Bestand/);
-        await zeige(function () { var e = rhIm(k5Panel(), /Nettokaltmiete/); return e && (e.closest('table') || e); }, 8);
+        await zeige(function () { var p = k5Panel(); return p && p.querySelector('table'); }, 8);
         await b2oZeile(s, 'Eine Tabelle', 'Ankauf, heute, nach Mieterhöhung und Zielbild. Abweichungen sind markiert, Texte darunter gibt es nicht mehr.');
       },
       async function (s) {   /* 2 · Investorenlogik */
@@ -11145,7 +11145,7 @@
       },
       async function (s) {   /* 5 · Jahresabgleich */
         await k5Tab(/^Jahresabgleich/);
-        await zeige(l6Karte(/zulässig/), 8);
+        await zeige(function () { var e = rhIm(k5Panel(), /Luft/); return e && k5Eng(e, 260); }, 8);
         await b2oZeile(s, 'Im Jahresabgleich', 'Eingetragen, zulässig, Luft und ab wann. Jede Erhöhung wird an ihrem eigenen Tag geprüft.');
       }
     ]
