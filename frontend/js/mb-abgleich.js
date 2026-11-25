@@ -199,7 +199,7 @@
     var erkl = '';
     if (a.cls !== 'ok' && a.cls !== 'fehlt') {
       erkl = (eig ? 'Deine Angabe' : 'Der Abruf im Reiter') + ' weicht vom Bericht ab. Der Bericht misst: ' + (st.basis || LAGE_BASIS[id] || '') + ' — Wert ' + String(st.wert).replace('.', ',') + ' ' + (st.einheit || '') + '. '
-        + (eig && eigH === 'eigene Angabe' ? 'Eine Einschätzung vor Ort darf abweichen (z. B. Lärm, Straßenbild) — sie geht so in den Deal Score ein. ' : '')
+        + (eig && eigH === 'eigene Angabe' ? 'Eine Einschätzung vor Ort darf abweichen (z. B. Lärm, Straßenbild), sie geht so in den Deal Score ein. ' : '')
         + (m && eig && norm(m.stufe) === norm(ber) ? 'Messung im Reiter und Bericht stimmen überein.' : '');
     } else if (a.cls === 'fehlt' && !ber) {
       erkl = opt.ohneBericht || '';
@@ -249,7 +249,7 @@
         abr: abr != null ? { w: qm(abr), h: 'Feld Bodenrichtwert' + (fv('brw_stichtag') ? ' · Stichtag ' + fv('brw_stichtag') : '') } : null,
         ber: ber != null ? { w: qm(ber), h: bwH } : null, a: a,
         woher: 'amtlich: Bodenrichtwert des Gutachterausschusses' + (aus ? ' (' + aus + ')' : '') + ', Bodenrichtwertinformationssystem des Landes (Open Data)' + (lv.quellenvermerk ? ' · ' + lv.quellenvermerk : ''),
-        erkl: (a.cls === 'ab' || a.cls === 'stark') ? 'Unterschiedliche Bodenrichtwerte entstehen meist durch einen anderen Stichtag (Jahrgang) oder eine andere Zone — der Bericht sucht die Zone an der Adresse, ohne Straße fällt der Abruf auf den Ortsmittelpunkt.' : '' });
+        erkl: (a.cls === 'ab' || a.cls === 'stark') ? 'Unterschiedliche Bodenrichtwerte entstehen meist durch einen anderen Stichtag (Jahrgang) oder eine andere Zone, der Bericht sucht die Zone an der Adresse, ohne Straße fällt der Abruf auf den Ortsmittelpunkt.' : '' });
       var bw = cc.bodenwert || {};
       if (zahl(bw.wert) != null) {
         var sch = (bw.schritte || []).map(function (x) { return x.detail || x.pos; }).filter(Boolean).join(' · ');
@@ -269,7 +269,7 @@
         erkl = eig != null ? 'Dein eigener Ansatz ersetzt im nächsten Bericht den amtlichen Satz.'
           : (r && r.berichtsjahr && ass.liegenschaftszins_berichtsjahr && String(r.berichtsjahr) !== String(ass.liegenschaftszins_berichtsjahr))
             ? 'Im Register liegt inzwischen ein neuer Jahrgang (' + r.berichtsjahr + ' statt ' + ass.liegenschaftszins_berichtsjahr + ' im Bericht). Ein neuer Bericht rechnet mit dem neuen Satz.'
-          : 'Automatik und Bericht unterscheiden sich — meist, weil sich Objektangaben (Objektart → Zweig, Baujahr, Modernisierungspunkte → Restnutzungsdauer) seit dem Bericht geändert haben oder ein neuer Jahrgang im Register liegt.';
+          : 'Automatik und Bericht unterscheiden sich, meist, weil sich Objektangaben (Objektart → Zweig, Baujahr, Modernisierungspunkte → Restnutzungsdauer) seit dem Bericht geändert haben oder ein neuer Jahrgang im Register liegt.';
       }
       z.push({ k: 'Liegenschaftszins', eig: eig != null ? { w: fmt(eig, 2) + ' %', h: 'eigener Ansatz' } : null,
         abr: abr != null ? { w: fmt(abr, 2) + ' %', h: 'Automatik · Stufe ' + (r.stufe || '?') + (r.berichtsjahr ? ' · ' + r.berichtsjahr : '') } : (r ? { leer: 'kein Wert' } : null),
@@ -289,7 +289,7 @@
         abr: sq ? { w: sq.verfuegbar ? 'Tabelle vorhanden' : 'keine Tabelle', h: String(sq.ausschuss || '').split(',')[0] } : null,
         ber: ber != null ? { w: fmt(ber, 2), h: [stf, sw.marktangepasst === false ? 'nicht marktangepasst' : ''].filter(Boolean).join(' · ') } : (sw.available === false || sw.vorlaeufig ? { leer: 'kein Faktor' } : null),
         a: eig != null ? ampelZahl(eig, ber, 2) : (ber != null ? { cls: 'info', txt: 'Zahl nur im Bericht' } : { cls: 'fehlt', txt: 'fehlt im Bericht' }),
-        woher: 'amtlich: Sachwertfaktor des Gutachterausschusses (§ 21 Abs. 3 ImmoWertV), im Bericht aus dem vorläufigen Sachwert abgelesen — vorher gibt es keine Zahl' + (sw.sachwertfaktor_grund ? ' · ' + sw.sachwertfaktor_grund : ''),
+        woher: 'amtlich: Sachwertfaktor des Gutachterausschusses (§ 21 Abs. 3 ImmoWertV), im Bericht aus dem vorläufigen Sachwert abgelesen, vorher gibt es keine Zahl' + (sw.sachwertfaktor_grund ? ' · ' + sw.sachwertfaktor_grund : ''),
         erkl: '' });
     })();
     /* GND / RND */
@@ -304,7 +304,7 @@
         abr: abr != null ? { w: abr + ' Jahre', h: 'GND ' + (r.gnd_jahre || '?') + (r.rnd_quelle === 'anlage2' ? ' · Anlage 2' : r.rnd_quelle === 'geschaetzt' ? ' · geschätzt' : '') } : null,
         ber: berR != null ? { w: Math.round(berR) + ' Jahre', h: berG ? 'GND ' + berG : '' } : null, a: a,
         woher: 'Anlage 1/2 ImmoWertV: Gesamtnutzungsdauer aus dem Modell des Ausschusses, Restnutzungsdauer aus Baujahr und Modernisierungspunkten',
-        erkl: (a.cls === 'ab' || a.cls === 'stark') ? 'Meist haben sich Baujahr oder Modernisierungspunkte seit dem Bericht geändert — die Abrufparameter unten zeigen, womit der Bericht gerechnet hat.' : '' });
+        erkl: (a.cls === 'ab' || a.cls === 'stark') ? 'Meist haben sich Baujahr oder Modernisierungspunkte seit dem Bericht geändert, die Abrufparameter unten zeigen, womit der Bericht gerechnet hat.' : '' });
     })();
     /* Verkehrswert */
     (function () {
@@ -322,7 +322,7 @@
       z.push({ k: 'Verkehrswert / Marktwert', eig: eig != null ? { w: eur(eig), h: her } : null, abr: null,
         ber: ber != null ? { w: eur(ber), h: namen[fu] + ' (führend)' } : null, a: a,
         woher: 'Bericht: ' + (alle.join(' · ') || '—') + (vf.grund ? ' · führend: ' + vf.grund + (vf.quelle ? ' (' + vf.quelle + ')' : '') : ''),
-        erkl: (a.cls === 'ab' || a.cls === 'stark') ? 'Ein Verkehrswert nach § 194 BauGB entsteht nur durch ein Gutachten; der Bericht ist eine Wertermittlung nach ImmoWertV mit Herkunftsstufen. Weicht dein Wert ab, lohnt der Blick auf das führende Verfahren und seine Parameter (Zins, Miete, Bodenwert).' : '' });
+        erkl: (a.cls === 'ab' || a.cls === 'stark') ? 'Ein Verkehrswert nach § 194 BauGB entsteht nur durch ein Gutachten, der Bericht ist eine Wertermittlung nach ImmoWertV mit Herkunftsstufen. Weicht dein Wert ab, lohnt der Blick auf das führende Verfahren und seine Parameter (Zins, Miete, Bodenwert).' : '' });
     })();
     return z;
   }
@@ -342,7 +342,7 @@
       z.push({ k: 'Ist-Miete (kalt)', eig: istF != null ? { w: qm(istF), h: eur(nkm) + ' / ' + fmt(wfl, 0) + ' m²' } : null, abr: null,
         ber: istB != null ? { w: qm(istB), h: eur(zahl(ref.monthly_net_rent)) + ' / ' + fmt(zahl(ref.living_area), 0) + ' m²' } : null, a: a,
         woher: 'eigene Angabe: Nettokaltmiete durch Wohnfläche. Der Bericht rechnet mit dem Stand zum Berichtsdatum.',
-        erkl: (a.cls === 'ab' || a.cls === 'stark') ? 'Miete oder Wohnfläche haben sich seit dem Bericht geändert — der Bericht rechnet mit dem alten Stand. Für einen aktuellen Abgleich einen neuen Bericht erstellen.' : '' });
+        erkl: (a.cls === 'ab' || a.cls === 'stark') ? 'Miete oder Wohnfläche haben sich seit dem Bericht geändert, der Bericht rechnet mit dem alten Stand. Für einen aktuellen Abgleich einen neuen Bericht erstellen.' : '' });
     })();
     (function () {
       var eig = zahl(fv('ds2_marktmiete')), abr = km ? km.markt_qm : null;
@@ -351,12 +351,12 @@
       var a = ampelZahl(cmp, ber, 5);
       var et = ms ? ms.etikett : (band ? band.anker_etikett : '');
       var erkl = '';
-      if (a.p != null && a.p > 5) erkl = (eig != null ? 'Deine Marktmiete' : 'Die Pilot-Recherche') + ' liegt über dem Anker des Berichts. Angebotsmieten liegen typisch über Bestandsmieten; der Bericht setzt die marktüblich erzielbare Miete an (§ 31 Abs. 2 ImmoWertV) und misst sie an der ' + et + ' — der Liegenschaftszins gilt nur mit der Miete, aus der er abgeleitet ist (§ 10 ImmoWertV).';
-      else if (a.p != null && a.p < -5) erkl = (eig != null ? 'Deine Marktmiete' : 'Die Pilot-Recherche') + ' liegt unter dem Anker des Berichts (' + et + '). Wer niedriger ansetzt, rechnet vorsichtiger; der Ertragswert nimmt die Ist-Miete, solange sie im Band liegt.';
+      if (a.p != null && a.p > 5) erkl = (eig != null ? 'Deine Marktmiete' : 'Die Pilot-Recherche') + ' liegt über dem Anker des Berichts. Angebotsmieten liegen typisch über Bestandsmieten, der Bericht setzt die marktüblich erzielbare Miete an (§ 31 Abs. 2 ImmoWertV) und misst sie an der ' + et + ' — der Liegenschaftszins gilt nur mit der Miete, aus der er abgeleitet ist (§ 10 ImmoWertV).';
+      else if (a.p != null && a.p < -5) erkl = (eig != null ? 'Deine Marktmiete' : 'Die Pilot-Recherche') + ' liegt unter dem Anker des Berichts (' + et + '). Wer niedriger ansetzt, rechnet vorsichtiger, der Ertragswert nimmt die Ist-Miete, solange sie im Band liegt.';
       z.push({ k: 'Marktmiete', eig: eig != null ? { w: qm(eig), h: 'Feld Marktmiete (Deal Score)' } : null,
         abr: abr != null ? { w: qm(abr), h: 'Pilot-Recherche (KI mit Websuche)' } : { leer: 'Recherche nicht gelaufen' },
         ber: ber != null ? { w: qm(ber), h: 'Anker: ' + et } : null, a: a,
-        woher: 'Bericht: Anker der Marktüblichkeit in dieser Rangfolge — amtliche Miete des Gutachterausschusses, Ø Miete des Liegenschaftszinssatzes, Bestandsmiete Zensus 2022 (fortgeschrieben), zuletzt der aktuelle Marktdurchschnitt' + (ms && ms.quelle ? ' · hier: ' + ms.quelle : ''),
+        woher: 'Bericht: Anker der Marktüblichkeit in dieser Rangfolge, amtliche Miete des Gutachterausschusses, Ø Miete des Liegenschaftszinssatzes, Bestandsmiete Zensus 2022 (fortgeschrieben), zuletzt der aktuelle Marktdurchschnitt' + (ms && ms.quelle ? ' · hier: ' + ms.quelle : ''),
         /* v3002 · kein Übernehmen-Knopf: das Feld Marktmiete trägt im Deal Score die erzielbare Neuvermietungsmiete (Upside),
            der Anker des Berichts die modellkonforme Bestandsmiete - welche dort hingehört, entscheidet Marcel */
         erkl: erkl });
@@ -370,7 +370,7 @@
         ber: ber != null ? { w: qm(ber), h: (am.ausschuss || '').replace(/^Der /, '') } : { leer: am ? 'liegt nicht vor' : '—' },
         a: abr != null ? ampelZahl(abr, ber, 1) : (ber != null ? { cls: 'info', txt: 'nur im Bericht' } : { cls: 'fehlt', txt: 'fehlt' }),
         woher: 'amtlich: Mietpreisübersicht des Gutachterausschusses' + (am && am.quelle ? ' — ' + am.quelle : '') + (st ? ' · Rechenweg: ' + st : ''),
-        erkl: ber == null ? 'Wo der Ausschuss keine Mietpreisübersicht veröffentlicht, steht der Weg dorthin: qualifizierter Mietspiegel der Gemeinde oder Grundstücksmarktbericht des Ausschusses — dort nachsehen und als Marktmiete eintragen.' : '' });
+        erkl: ber == null ? 'Wo der Ausschuss keine Mietpreisübersicht veröffentlicht, steht der Weg dorthin: qualifizierter Mietspiegel der Gemeinde oder Grundstücksmarktbericht des Ausschusses, dort nachsehen und als Marktmiete eintragen.' : '' });
     })();
     (function () {
       var ber = band ? zahl(band.satz_qm) : null;
@@ -404,7 +404,7 @@
       if (rent.sample_size) h.push(rent.sample_size + ' Angebote');
       if (zahl(rent.used_radius_m)) h.push(fmt(rent.used_radius_m / 1000, 1) + ' km');
       var a = abr != null ? ampelZahl(abr, ber, 2) : (istF != null ? ampelZahl(istF, ber, 5) : { cls: ber != null ? 'info' : 'fehlt', txt: ber != null ? 'nur im Bericht' : 'fehlt' });
-      var erkl = (ber != null && istF != null && ber > istF * 1.05) ? 'Die Angebotsmiete liegt ' + fmt((ber / istF - 1) * 100, 0) + ' % über deiner Ist-Miete. Inserate sind Angebote, keine Abschlüsse, und zeigen Neuvermietung — Bestandsmieten liegen typisch darunter. Ein Abschlag für Mieten ist nicht gemessen; der Bericht nimmt die Angebotsmiete nur, wenn alles andere fehlt.' : '';
+      var erkl = (ber != null && istF != null && ber > istF * 1.05) ? 'Die Angebotsmiete liegt ' + fmt((ber / istF - 1) * 100, 0) + ' % über deiner Ist-Miete. Inserate sind Angebote, keine Abschlüsse, und zeigen Neuvermietung, Bestandsmieten liegen typisch darunter. Ein Abschlag für Mieten ist nicht gemessen, der Bericht nimmt die Angebotsmiete nur, wenn alles andere fehlt.' : '';
       if (abr != null) a.txt = a.txt.replace('weicht ab', 'Beleg weicht ab');
       z.push({ k: 'Angebotsmiete', ref: true, eig: null,
         abr: abr != null ? { w: qm(abr), h: 'Beleg der Pilot-Recherche' } : null,
@@ -418,8 +418,8 @@
       var a = istF == null ? { cls: 'fehlt', txt: 'Ist-Miete fehlt' } : (istF >= u && istF <= o ? { cls: 'ok', txt: 'Ist-Miete im Band' } : { cls: 'ab', txt: 'Ist-Miete ' + (istF > o ? 'über' : 'unter') + ' dem Band' });
       z.push({ k: 'Band der Marktüblichkeit', eig: istF != null ? { w: qm(istF), h: 'deine Ist-Miete' } : null, abr: null,
         ber: { w: fmt(u, 2) + '–' + fmt(o, 2) + ' €/m²', h: band.regel || '' }, a: a,
-        woher: 'Bericht: Anker ± ' + (band.band_pct || 20) + ' % — DealPilot-Analyseparameter, keine gesetzliche Grenze. Ist-Miete im Band gilt als marktüblich (§ 31 Abs. 2 ImmoWertV), geprüft je Wohnung.',
-        erkl: a.cls === 'ab' ? 'Außerhalb des Bandes setzt der Ertragswert die Bandkante bzw. den Anker an; die Über- oder Untervermietung ist ein besonderes objektspezifisches Merkmal (§ 8 Abs. 3 ImmoWertV), nur für die gesicherte Restlaufzeit des Vertrags.' : '' });
+        woher: 'Bericht: Anker ± ' + (band.band_pct || 20) + ' %, DealPilot-Analyseparameter, keine gesetzliche Grenze. Ist-Miete im Band gilt als marktüblich (§ 31 Abs. 2 ImmoWertV), geprüft je Wohnung.',
+        erkl: a.cls === 'ab' ? 'Außerhalb des Bandes setzt der Ertragswert die Bandkante bzw. den Anker an, die Über- oder Untervermietung ist ein besonderes objektspezifisches Merkmal (§ 8 Abs. 3 ImmoWertV), nur für die gesicherte Restlaufzeit des Vertrags.' : '' });
     })();
     (function () {
       var mh = ew.miete_herkunft || {}, ber = zahl(mh.angesetzt_qm != null ? mh.angesetzt_qm : ew.miete_qm);
@@ -483,7 +483,7 @@
       var p = P[k]; if (!p || p[1] == null || p[2] == null) return;
       if (Math.abs(p[1] - p[2]) < 0.5) return;
       var w = function (v) { return (k === 'baujahr' ? String(v) : fmt(v, 0)) + (k === 'mod' ? ' Punkte' : k === 'nkm' ? ' €/Monat' : p[3]); };
-      H.push({ satz: p[0] + ' hat sich seit dem Bericht geändert — der Bericht rechnet noch mit ' + (k === 'baujahr' ? p[2] : fmt(p[2], 0)) + p[3] + '. Ein neuer Bericht bringt die Werte auf den aktuellen Stand.', stufe3: true,
+      H.push({ satz: p[0] + ' hat sich seit dem Bericht geändert, der Bericht rechnet noch mit ' + (k === 'baujahr' ? p[2] : fmt(p[2], 0)) + p[3] + '. Ein neuer Bericht bringt die Werte auf den aktuellen Stand.', stufe3: true,
         k: p[5], reiter: w(p[1]), bericht: w(p[2]) });
     });
     return H;
@@ -499,26 +499,26 @@
       var eig = fv(x[0]), b = st[x[1]];
       if (!eig || !b || !b.stufe || lageHerkunft(x[0]) !== 'eigene Angabe') return;
       var d = stufenAbstand(x[0], eig, b.stufe); if (Math.abs(d) < 2) return;
-      H.push({ satz: 'Deine Einschätzung der ' + x[2] + ' („' + wortVon(x[0], eig) + '") liegt deutlich ' + (d > 0 ? 'unter' : 'über') + ' der Messung im Bericht („' + (b.wort || wortVon(x[0], b.stufe)) + '") — das ' + (d > 0 ? 'senkt' : 'hebt') + ' deinen Deal Score; bitte prüfen.',
+      H.push({ satz: 'Deine Einschätzung der ' + x[2] + ' („' + wortVon(x[0], eig) + '") liegt deutlich ' + (d > 0 ? 'unter' : 'über') + ' der Messung im Bericht („' + (b.wort || wortVon(x[0], b.stufe)) + '"), das ' + (d > 0 ? 'senkt' : 'hebt') + ' deinen Deal Score, bitte prüfen.',
         ueb: { id: x[0], wert: norm(b.stufe), text: 'Messung übernehmen' },
         k: x[2], reiter: wortVon(x[0], eig) + ' (eigene Angabe)', bericht: (b.wort || wortVon(x[0], b.stufe)) + ' (gemessen)' });
     });
     /* Bodenrichtwert */
     var lv = B.land_value || {}, bBrw = lv.available ? zahl(lv.value_sqm) : null, eBrw = zahl(fv('brw_manuell')) != null ? zahl(fv('brw_manuell')) : zahl(fv('brw'));
-    if (bBrw && eBrw && pct(eBrw, bBrw) >= 5) H.push({ satz: 'Dein Bodenrichtwert (' + qm(eBrw) + ') weicht vom amtlichen Wert im Bericht ab (' + qm(bBrw) + (lv.stichtag ? ', Stand ' + datum(lv.stichtag) : '') + ') — bitte Stand und Lage prüfen.',
+    if (bBrw && eBrw && pct(eBrw, bBrw) >= 5) H.push({ satz: 'Dein Bodenrichtwert (' + qm(eBrw) + ') weicht vom amtlichen Wert im Bericht ab (' + qm(bBrw) + (lv.stichtag ? ', Stand ' + datum(lv.stichtag) : '') + '), bitte Stand und Lage prüfen.',
       k: 'Bodenrichtwert', reiter: qm(eBrw), bericht: qm(bBrw) + (lv.stichtag ? ' (Stand ' + datum(lv.stichtag) + ')' : '') });
     /* Liegenschaftszins: neuer Jahrgang oder eigener Ansatz */
     var r = zinsAbruf(), bZ = zahl(ass.liegenschaftszins_pct_effektiv), eZ = zahl(fv('lzs_pct'));
-    if (eZ != null && bZ != null && Math.abs(eZ - bZ) >= 0.25) H.push({ satz: 'Dein eigener Liegenschaftszins (' + fmt(eZ, 2) + ' %) weicht vom Satz des Gutachterausschusses ab (' + fmt(bZ, 2) + ' %) — er verändert den Ertragswert spürbar.',
+    if (eZ != null && bZ != null && Math.abs(eZ - bZ) >= 0.25) H.push({ satz: 'Dein eigener Liegenschaftszins (' + fmt(eZ, 2) + ' %) weicht vom Satz des Gutachterausschusses ab (' + fmt(bZ, 2) + ' %), er verändert den Ertragswert spürbar.',
       k: 'Liegenschaftszins', reiter: fmt(eZ, 2) + ' % (eigener Ansatz)', bericht: fmt(bZ, 2) + ' %' });
     else if (eZ == null && r && r.verfuegbar && bZ != null && r.berichtsjahr && ass.liegenschaftszins_berichtsjahr && String(r.berichtsjahr) !== String(ass.liegenschaftszins_berichtsjahr) && Math.abs(zahl(r.wert_pct) - bZ) >= 0.05)
-      H.push({ satz: 'Der Gutachterausschuss hat einen neuen Liegenschaftszins veröffentlicht (' + fmt(zahl(r.wert_pct), 2) + ' % statt ' + fmt(bZ, 2) + ' %) — ein neuer Bericht rechnet damit.', stufe3: true,
+      H.push({ satz: 'Der Gutachterausschuss hat einen neuen Liegenschaftszins veröffentlicht (' + fmt(zahl(r.wert_pct), 2) + ' % statt ' + fmt(bZ, 2) + ' %), ein neuer Bericht rechnet damit.', stufe3: true,
         k: 'Liegenschaftszins', reiter: fmt(zahl(r.wert_pct), 2) + ' % (Jahrgang ' + r.berichtsjahr + ')', bericht: fmt(bZ, 2) + ' % (Jahrgang ' + ass.liegenschaftszins_berichtsjahr + ')' });
     /* Verkehrswert */
     var vf = cc.verfahrenswahl || {}, fu = String(vf.verfahren || ''), W = { ertragswert: zahl((cc.ertragswert || {}).value_eur), sachwert: zahl((cc.sachwert || {}).value_eur), vergleichswert: zahl((cc.comparison || {}).vergleichswert_eur) };
     var bW = W[fu], eW = zahl(fv('svwert'));
     var name = { ertragswert: 'Ertragswert', sachwert: 'Sachwert', vergleichswert: (vf.basis === 'angebote' ? 'indikativen Vergleichswert' : 'Vergleichswert') }[fu];   /* v3242 */
-    if (bW && eW && pct(eW, bW) >= 10) H.push({ satz: 'Dein Markt-/Verkehrswert liegt ' + pct(eW, bW) + ' % ' + (eW > bW ? 'über' : 'unter') + ' dem ' + name + ' des Berichts (' + eur(bW) + ') — Finanzierung und Wertpuffer rechnen mit deinem Wert.',
+    if (bW && eW && pct(eW, bW) >= 10) H.push({ satz: 'Dein Markt-/Verkehrswert liegt ' + pct(eW, bW) + ' % ' + (eW > bW ? 'über' : 'unter') + ' dem ' + name + ' des Berichts (' + eur(bW) + '), Finanzierung und Wertpuffer rechnen mit deinem Wert.',
       k: 'Markt-/Verkehrswert', reiter: eur(eW), bericht: eur(bW) + ' (' + name + ')' });
     return H;
   }
@@ -532,9 +532,9 @@
       : (ms && ms.code === 'mietspiegel') ? 'laut Mietspiegel' : (ms && ms.code === 'naeherung') ? 'laut DealPilot-Näherung' : 'im Bericht';   /* v3343 · Anker Vergleichsmiete der Wohnung */
     if (ist != null && anker) {
       var oben = band ? zahl(band.oben_qm) : null, unten = band ? zahl(band.unten_qm) : null;
-      if (unten != null && ist < unten) H.push({ satz: 'Deine Ist-Miete (' + qm(ist) + ') liegt ' + pct(ist, anker) + ' % unter der marktüblichen Miete ' + quelle + ' (' + qm(anker) + ') — Mieterhöhung prüfen.',
+      if (unten != null && ist < unten) H.push({ satz: 'Deine Ist-Miete (' + qm(ist) + ') liegt ' + pct(ist, anker) + ' % unter der marktüblichen Miete ' + quelle + ' (' + qm(anker) + '), Mieterhöhung prüfen.',
         k: 'Ist-Miete', reiter: qm(ist), bericht: 'marktüblich ' + qm(anker) });
-      else if (oben != null && ist > oben) H.push({ satz: 'Deine Ist-Miete (' + qm(ist) + ') liegt über dem, was der Bericht als marktüblich ansieht (bis ' + qm(oben) + ') — bei einem Mieterwechsel ist diese Miete womöglich nicht wieder zu erzielen.',
+      else if (oben != null && ist > oben) H.push({ satz: 'Deine Ist-Miete (' + qm(ist) + ') liegt über dem, was der Bericht als marktüblich ansieht (bis ' + qm(oben) + '), bei einem Mieterwechsel ist diese Miete womöglich nicht wieder zu erzielen.',
         k: 'Ist-Miete', reiter: qm(ist), bericht: 'marktüblich bis ' + qm(oben) });
     }
     var mm = zahl(fv('ds2_marktmiete'));
@@ -543,7 +543,7 @@
     var st = (B.assessment_stufen || {}).mietausfallrisiko, ea = fv('ds2_mietausfall');
     if (st && st.stufe && ea && lageHerkunft('ds2_mietausfall') === 'eigene Angabe') {
       var d = stufenAbstand('ds2_mietausfall', ea, st.stufe);
-      if (Math.abs(d) >= 2) H.push({ satz: 'Dein Mietausfallrisiko („' + wortVon('ds2_mietausfall', ea) + '") weicht deutlich vom gemessenen Leerstand ab („' + (st.wort || st.stufe) + '", ' + String(st.wert).replace('.', ',') + ' % laut Zensus 2022) — bitte prüfen.',
+      if (Math.abs(d) >= 2) H.push({ satz: 'Dein Mietausfallrisiko („' + wortVon('ds2_mietausfall', ea) + '") weicht deutlich vom gemessenen Leerstand ab („' + (st.wort || st.stufe) + '", ' + String(st.wert).replace('.', ',') + ' % laut Zensus 2022), bitte prüfen.',
         ueb: { id: 'ds2_mietausfall', wert: norm(st.stufe), text: 'Messung übernehmen' },
         k: 'Mietausfallrisiko', reiter: wortVon('ds2_mietausfall', ea) + ' (eigene Angabe)', bericht: (st.wort || st.stufe) + ' (gemessen)' });
     }
@@ -560,7 +560,7 @@
        Stufe 3 bleibt der Block in Miete leer, der Weg zum Bericht steht im Reiter Objekt. */
     if ((!S.bericht || S.nurIndikation) && art === 'miete') return '';
     if (!S.bericht || S.nurIndikation) {
-      return '<div class="mba-zeile"><span>' + (S.bericht ? 'Bisher nur eine Marktpreisindikation — für den Abgleich mit amtlichen Werten fehlt ein Marktbericht Stufe 3.' : 'Noch kein Marktbericht zu diesem Objekt. Mit ihm prüft DealPilot deine Angaben gegen amtliche Werte.')
+      return '<div class="mba-zeile"><span>' + (S.bericht ? 'Bisher nur eine Marktpreisindikation, für den Abgleich mit amtlichen Werten fehlt ein Marktbericht Stufe 3.' : 'Noch kein Marktbericht zu diesem Objekt. Mit ihm prüft DealPilot deine Angaben gegen amtliche Werte.')
         + '</span>' + knopfStufe3(S.bericht ? 'Marktbericht Stufe 3 erstellen' : 'Marktbericht erstellen') + '</div>';
     }
     var d = datum(S.zeile && S.zeile.created_at);

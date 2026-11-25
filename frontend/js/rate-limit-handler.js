@@ -43,7 +43,7 @@
   'use strict';
 
   if (!window.Auth || typeof window.Auth.apiCall !== 'function') {
-    console.warn('[429-handler] Auth.apiCall nicht gefunden — Handler nicht installiert');
+    console.warn('[429-handler] Auth.apiCall nicht gefunden, Handler nicht installiert');
     return;
   }
 
@@ -70,7 +70,7 @@
       + 'gestellt. DealPilot bremst das automatisch ab, damit der Dienst für alle '
       + 'schnell bleibt.</div>'
       + '<div class="dp-lh-fuss">In etwa ' + Math.max(5, sekunden || 60)
-      + ' Sekunden geht es normal weiter. Es passiert nichts weiter — deinem Konto '
+      + ' Sekunden geht es normal weiter. Es passiert nichts weiter, deinem Konto '
       + 'entsteht kein Nachteil.</div>'
       + '<button type="button" class="dp-lh-zu" aria-label="Schließen">&times;</button>';
 

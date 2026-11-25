@@ -230,7 +230,7 @@
   function aufteilungAus(z) {
     var a = z && z.aufteilung; if (!a || z.ertragswert_gesperrt) return null;
     var T = a.aufteiler && a.aufteiler.bestand;
-    if (!T) return { gesperrt: a.aufteiler_gesperrt || 'Aufteilerwert noch nicht gerechnet – im Objekt neu rechnen.' };
+    if (!T) return { gesperrt: a.aufteiler_gesperrt || 'Aufteilerwert noch nicht gerechnet, im Objekt neu rechnen.' };
     return { wert: zahl(T.wert), summe: zahl(T.summe), bezeichnung: T.bezeichnung || null, vollstaendig: !!T.vollstaendig, kosten: zahl(a.kosten) || 0,
       n: (a.je_wohnung || []).filter(function (w) { return w.art !== 'gewerbe'; }).length || null,
       zielbild: a.aufteiler.zielbild ? zahl(a.aufteiler.zielbild.wert) : null };
@@ -242,12 +242,12 @@
   function zielbildGrund(d) {
     var p = d && d._potenzial, z = p && p.zusammenfassung, S = z && z.stufen;
     if (!p || !p.ergebnis) return { code: 'kein_lauf', text: 'Noch nicht erfasst: Im Objekt sind weder Soll-Miete noch Zielbild eingetragen (Reiter Miete › Mieterhöhung und Zielbild).' };
-    if (!z || !S || !S.bestand) return { code: 'ohne_stufen', text: 'Die Berechnung ist älter und hat noch keine Stufen – im Objekt einmal neu rechnen.' };
-    if (!S.mieterhoehung && !S.zielbild) return { code: 'ohne_ziel', text: 'Weder Soll-Miete noch Zielbild eingetragen – es gibt nichts zu vergleichen.' };
-    if (z.ertragswert_gesperrt) return { code: 'stufe3', text: 'Ertragswert je Stufe nur mit DealPilot Stufe 3 – Miete und Maßnahmen zählen, der Wert nicht.' };
+    if (!z || !S || !S.bestand) return { code: 'ohne_stufen', text: 'Die Berechnung ist älter und hat noch keine Stufen, im Objekt einmal neu rechnen.' };
+    if (!S.mieterhoehung && !S.zielbild) return { code: 'ohne_ziel', text: 'Weder Soll-Miete noch Zielbild eingetragen, es gibt nichts zu vergleichen.' };
+    if (z.ertragswert_gesperrt) return { code: 'stufe3', text: 'Ertragswert je Stufe nur mit DealPilot Stufe 3, Miete und Maßnahmen zählen, der Wert nicht.' };
     var T = S.zielbild || S.mieterhoehung;
-    if (S.bestand.ertragswert == null || T.ertragswert == null) return { code: 'ohne_ew', text: 'Ertragswert noch nicht gerechnet – im Objekt unter Bewertung kostenlos rechnen.' };
-    if (!S.zielbild) return { code: 'nur_mh', text: 'Nur Mieterhöhung erfasst, kein Zielbild – zählt mit der Mieterhöhung als höchster Stufe.' };
+    if (S.bestand.ertragswert == null || T.ertragswert == null) return { code: 'ohne_ew', text: 'Ertragswert noch nicht gerechnet, im Objekt unter Bewertung kostenlos rechnen.' };
+    if (!S.zielbild) return { code: 'nur_mh', text: 'Nur Mieterhöhung erfasst, kein Zielbild, zählt mit der Mieterhöhung als höchster Stufe.' };
     return null;
   }
 
@@ -285,7 +285,7 @@
       ertragswert_gesperrt: !!(sw && sw.gesperrt), ertragswert_veraltet: !!(sw && sw.veraltet),
       lzs: sw && sw.lzs ? { pct: zahl(sw.lzs.pct), stufe: sw.lzs.stufe || null, etikett: sw.lzs.etikett || null } : null,
       satz: pd && pd.satz_bank ? String(pd.satz_bank) : '',
-      kurz_ausblick: PZ.KURZ_AUSBLICK || 'Mieterhöhung: Wert zum heutigen Stichtag, Erhöhungen erst ab Wirksamkeit und abgezinst. Zielbild: Ausblick mit umgesetzten Maßnahmen – kein heutiger Verkehrswert.'
+      kurz_ausblick: PZ.KURZ_AUSBLICK || 'Mieterhöhung: Wert zum heutigen Stichtag, Erhöhungen erst ab Wirksamkeit und abgezinst. Zielbild: Ausblick mit umgesetzten Maßnahmen, kein heutiger Verkehrswert.'
     };
   }
 
@@ -330,7 +330,7 @@
     if (!Z) return K;
     var B = Z.stufen.bestand, M = Z.stufen.mieterhoehung, T = Z.stufen.zielbild, J = Z.jahre || {};
     var top = T || M, topK = T ? 'zielbild' : 'mieterhoehung';
-    var alt = Z.ertragswert_quelle === 'abruf' ? 'Stand Abruf ' + (Z.ertragswert_abruf_datum || '') + ', veraltet – wird neu gerechnet' : '';
+    var alt = Z.ertragswert_quelle === 'abruf' ? 'Stand Abruf ' + (Z.ertragswert_abruf_datum || '') + ', veraltet, wird neu gerechnet' : '';
     var stufeWort = T ? 'Zielbild' + (J.zielbild ? ' ' + J.zielbild : '') : 'nach Mieterhöhung' + (J.mieterhoehung ? ' ' + J.mieterhoehung : '');
     if (!top) return K;
     K.push({ schluessel: 'miete', titel: 'Kaltmiete im Jahr · ' + stufeWort, wert: top.miete_jahr, wert_text: eur(top.miete_jahr),
@@ -373,7 +373,7 @@
       var kp = W ? W.kaufpreis : kaufpreis();
       K.push({ schluessel: 'mpi', titel: 'Marktpreisindikation heute', wert: mw, wert_text: eur(mw),
         vergleich_text: (ab > 0 ? 'nach ' + dez(ab, 1) + ' % Abschlag' : 'ohne Abschlag') + (ohne != null && ab > 0 ? ' · ohne ' + eur(ohne) : ''),
-        text: 'Aus Angebotspreisen am Ort; der Abschlag holt sie auf gezahlte Kaufpreise' + (kp != null ? '. Dein Kaufpreis ' + eur(kp) + ' liegt ' + dez(Math.abs((kp - mw) / mw * 100), 1) + ' % ' + (kp < mw ? 'darunter' : 'darüber') : '') + '.' });
+        text: 'Aus Angebotspreisen am Ort, der Abschlag holt sie auf gezahlte Kaufpreise' + (kp != null ? '. Dein Kaufpreis ' + eur(kp) + ' liegt ' + dez(Math.abs((kp - mw) / mw * 100), 1) + ' % ' + (kp < mw ? 'darunter' : 'darüber') : '') + '.' });
     }
     return K;
   }
@@ -415,8 +415,8 @@
     if (Z && !Z.ertragswert_gesperrt && Z.ertragswert_quelle !== 'lauf') {
       Z.ertragswert_veraltet = true;
       Z.ertragswert_hinweis = Z.ertragswert_quelle === 'abruf'
-        ? 'Ertragswerte: Stand des Abrufs vom ' + (Z.ertragswert_abruf_datum || '') + ', veraltet – werden neu gerechnet (kostenlos).'
-        : 'Ertragswerte noch nicht gerechnet – werden gerechnet (kostenlos).';
+        ? 'Ertragswerte: Stand des Abrufs vom ' + (Z.ertragswert_abruf_datum || '') + ', veraltet, werden neu gerechnet (kostenlos).'
+        : 'Ertragswerte noch nicht gerechnet, werden gerechnet (kostenlos).';
       autoRechnen();
     } else if (Z) Z.ertragswert_hinweis = null;
     var K = []; try { K = kernaussagen(Z, W); } catch (e) { K = []; }

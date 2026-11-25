@@ -93,7 +93,7 @@
     html += '<div style="margin-top:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">'
       + '<input id="dp-apikey-name" type="text" maxlength="80" placeholder="Wofür? z. B. Makler-Hub" style="flex:1 1 200px;min-width:0">'
       + '<button type="button" class="btn btn-sm btn-outline" onclick="DealPilotApiKeys.create()">Neuen Key erzeugen</button></div>'
-      + '<div style="margin-top:8px;font-size:11.5px;color:var(--muted);line-height:1.5">Ein Key wird nur beim Erzeugen einmal vollständig angezeigt – danach speichert DealPilot nur noch seinen Fingerabdruck, auch wir können ihn nicht mehr auslesen. '
+      + '<div style="margin-top:8px;font-size:11.5px;color:var(--muted);line-height:1.5">Ein Key wird nur beim Erzeugen einmal vollständig angezeigt, danach speichert DealPilot nur noch seinen Fingerabdruck, auch wir können ihn nicht mehr auslesen. '
       + 'Verloren? Neuen erzeugen und den alten widerrufen. Höchstens 5 aktive Keys.</div>'
       + '<div style="margin-top:6px;font-size:11.5px;color:var(--muted)">Header <code>X-API-Key</code> · Basis-URL <code>/api/v1</code> · voller CRUD · '
       /* v2977 · Rechenkerne (RND, Verkehrswert) als Zusatz - Doku fuer die Anbindung */

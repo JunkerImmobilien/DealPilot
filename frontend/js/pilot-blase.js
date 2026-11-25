@@ -179,7 +179,7 @@
     if (bar && !bar.querySelector('.dpb-anh')) {
       var k = document.createElement('button');
       k.type = 'button'; k.className = 'dpb-anh'; k.innerHTML = KLAMMER;
-      k.title = 'Datei anhängen: Mietvertrag, Wirtschaftsplan, Protokoll, Rechnung … – geht in den Unterlagen-Eingang';
+      k.title = 'Datei anhängen: Mietvertrag, Wirtschaftsplan, Protokoll, Rechnung …, geht in den Unterlagen-Eingang';
       k.setAttribute('aria-label', 'Datei anhängen');
       var inp = document.createElement('input');
       inp.type = 'file'; inp.multiple = true; inp.style.display = 'none';
@@ -206,7 +206,7 @@
     var liste = [].slice.call(files || []);
     if (!liste.length) return;
     if (!window._currentObjKey) { sag('Unterlagen gehören zu einem Objekt. Öffne zuerst das Objekt, dann nehme ich die Datei entgegen.'); return; }
-    if (!(window.DpEingang && typeof DpEingang.oeffnen === 'function')) { sag('Der Unterlagen-Eingang ist gerade nicht geladen – lade die Seite bitte neu.'); return; }
+    if (!(window.DpEingang && typeof DpEingang.oeffnen === 'function')) { sag('Der Unterlagen-Eingang ist gerade nicht geladen, lade die Seite bitte neu.'); return; }
     var namen = liste.map(function (f) { return '„' + f.name + '“'; }).join(', ');
     zu();
     DpEingang.oeffnen();
@@ -222,7 +222,7 @@
     } catch (e) { uebergeben = false; }
     sag(uebergeben
       ? 'Ich habe ' + namen + ' an den Unterlagen-Eingang gegeben. Im Fenster siehst du, was ausgelesen wurde, und entscheidest selbst, was übernommen wird.'
-      : 'Der Unterlagen-Eingang ist offen – wähle ' + namen + ' dort bitte noch einmal aus (dein Browser lässt die Übergabe nicht zu).');
+      : 'Der Unterlagen-Eingang ist offen, wähle ' + namen + ' dort bitte noch einmal aus (dein Browser lässt die Übergabe nicht zu).');
   }
 
   /* ── Bezug: welches Objekt, oder nur Fragen ─────────────────────────── */
@@ -241,8 +241,8 @@
     if (inp && fenster.contains(inp)) inp.placeholder = mit ? 'Frage oder Änderung' : 'Deine Frage';
     var hint = fenster.querySelector('.dp-cp-hint');
     if (hint) hint.textContent = mit
-      ? 'Frag mich zu Lage, Verhandlung, Finanzierung oder Bank – ich arbeite mit den Daten dieses Objekts. Änderungen wie „Miete auf 9 €/m² erhöhen“ schlage ich vor, du bestätigst. Mit der Klammer gibst du eine Unterlage in den Eingang.'
-      : 'Es ist kein Objekt offen – ich beantworte Fragen zu DealPilot, Kennzahlen und Vorgehen. Für Änderungen und Unterlagen öffne zuerst ein Objekt.';
+      ? 'Frag mich zu Lage, Verhandlung, Finanzierung oder Bank, ich arbeite mit den Daten dieses Objekts. Änderungen wie „Miete auf 9 €/m² erhöhen“ schlage ich vor, du bestätigst. Mit der Klammer gibst du eine Unterlage in den Eingang.'
+      : 'Es ist kein Objekt offen, ich beantworte Fragen zu DealPilot, Kennzahlen und Vorgehen. Für Änderungen und Unterlagen öffne zuerst ein Objekt.';
   }
 
   function auf() {

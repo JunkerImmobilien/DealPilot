@@ -56,12 +56,12 @@
     },
     'tab1.wert_standardstufe': {
       title: 'Standardstufe',
-      body: 'Im Marktbericht: Die Standardstufe (1 sehr einfach bis 5 stark gehoben) bestimmt die Baukosten je m² im Sachwert (Normalherstellungskosten 2010). Für den Ertragswert spielt sie keine Rolle — dort zählt die Miete.',
+      body: 'Im Marktbericht: Die Standardstufe (1 sehr einfach bis 5 stark gehoben) bestimmt die Baukosten je m² im Sachwert (Normalherstellungskosten 2010). Für den Ertragswert spielt sie keine Rolle, dort zählt die Miete.',
       severity: 'beginner'
     },
     'tab1.wert_geschosse': {
       title: 'Geschosse und Unterkellerung',
-      body: 'Im Marktbericht: Wählt den Gebäudetyp in der Baukostentabelle des Sachwerts — ein Keller oder ein ausgebautes Dachgeschoss ändern die Baukosten je m². Im Ertragswert wirkt es nicht.',
+      body: 'Im Marktbericht: Wählt den Gebäudetyp in der Baukostentabelle des Sachwerts, ein Keller oder ein ausgebautes Dachgeschoss ändern die Baukosten je m². Im Ertragswert wirkt es nicht.',
       severity: 'beginner'
     },
     'tab1.wert_stellplaetze': {
@@ -71,7 +71,7 @@
     },
     'tab1.wert_lage': {
       title: 'Lage im Verkehrswert',
-      body: 'Im Marktbericht: Die Lage-Einschätzung fließt in den Deal Score. Den Verkehrswert bestimmt die Lage über den Bodenrichtwert, die marktübliche Miete und die Kaufpreise vergleichbarer Objekte in der Umgebung — nicht über dieses Feld.',
+      body: 'Im Marktbericht: Die Lage-Einschätzung fließt in den Deal Score. Den Verkehrswert bestimmt die Lage über den Bodenrichtwert, die marktübliche Miete und die Kaufpreise vergleichbarer Objekte in der Umgebung, nicht über dieses Feld.',
       severity: 'beginner'
     },
     'tab1.ds2_zustand': {
@@ -81,7 +81,7 @@
     },
     'tab1.vermietungsstand': {
       title: 'Vermietungsstand',
-      body: 'Aktueller Stand: vollvermietet, teilvermietet, leerstehend oder Eigenbedarf. Banken zahlen für vollvermietete Objekte deutlich bessere Konditionen — Mieteinnahmen sind nachgewiesen.',
+      body: 'Aktueller Stand: vollvermietet, teilvermietet, leerstehend oder Eigenbedarf. Banken zahlen für vollvermietete Objekte deutlich bessere Konditionen, Mieteinnahmen sind nachgewiesen.',
       severity: 'beginner'
     },
     'tab1.exitstrategie': {
@@ -91,7 +91,7 @@
       severity: 'beginner'
     },
     /* v727-eq-tips: Ausstattungsdetails fuer Marktbewertung */
-    'tab1.eq_heating': { title: 'Heizung', body: 'Heizungsart der Wohnung. Fließt in die Marktbewertung ein — Fußboden- und Zentralheizung wirken werterhöhend gegenüber Einzelöfen.' },
+    'tab1.eq_heating': { title: 'Heizung', body: 'Heizungsart der Wohnung. Fließt in die Marktbewertung ein, Fußboden- und Zentralheizung wirken werterhöhend gegenüber Einzelöfen.' },
     'tab1.eq_windows': { title: 'Verglasung', body: 'Fenstertyp. Relevant für die Marktbewertung und Energiebewertung. Dreifachverglasung = modern/energieeffizient, Kastenfenster = Altbau.' },
     'tab1.eq_floor': { title: 'Bodenbelag', body: 'Hauptbodenbelag. Parkett/Naturstein gilt als hochwertig, Teppich/Laminat als einfacher. Beeinflusst die Ausstattungsbewertung in der Marktbewertung.' },
     'tab1.eq_bath': { title: 'Bad', body: 'Badausstattung. „Mit Fenster“ und „mehr als ein Bad“ wirken werterhöhend. Geht in die Marktbewertung ein.' },
@@ -99,17 +99,17 @@
     'tab1.eq_store_room': { title: 'Keller / Abstellraum', body: 'Lage des Abstellraums. Relevant für die Ausstattungsbewertung in der Marktbewertung.' },
     'tab1.eq_walls': { title: 'Außenwände', body: 'Sind die Außenwände gedämmt? Energetisch und für die Marktbewertung relevant.' },
     'tab1.eq_roof': { title: 'Dacheindeckung', body: 'Art der Dacheindeckung (v.a. bei Häusern relevant). Fließt in die Marktbewertung ein.' },
-    'tab1.eq_elevator': { title: 'Aufzug', body: 'Aufzug im Gebäude vorhanden? Werterhöhend besonders in oberen Etagen — geht in die Marktbewertung ein.' },
+    'tab1.eq_elevator': { title: 'Aufzug', body: 'Aufzug im Gebäude vorhanden? Werterhöhend besonders in oberen Etagen, geht in die Marktbewertung ein.' },
 
     'tab1.wfl': {
       title: 'Wohnfläche',
-      body: 'Wohnfläche nach Wohnflächenverordnung (WoFlV). Wichtig für: Miete pro m², Bodenrichtwert-Hochrechnung, BMF-AfA-Berechnung und § 7b Sonder-AfA-Cap (max. 4.000 €/m² förderfähig). Im Marktbericht: Grundlage der Miete je m² im Ertragswert, des Vergleichswerts (Preis je m² × Fläche) und — über die Bruttogrundfläche — der Baukosten im Sachwert.',
+      body: 'Wohnfläche nach Wohnflächenverordnung (WoFlV). Wichtig für: Miete pro m², Bodenrichtwert-Hochrechnung, BMF-AfA-Berechnung und § 7b Sonder-AfA-Cap (max. 4.000 €/m² förderfähig). Im Marktbericht: Grundlage der Miete je m² im Ertragswert, des Vergleichswerts (Preis je m² × Fläche) und, über die Bruttogrundfläche, der Baukosten im Sachwert.',
       paragraph: 'WoFlV',
       severity: 'beginner'
     },
     'tab1.baujahr': {
       title: 'Baujahr',
-      body: 'Errichtungsjahr des Gebäudes. Bestimmt den linearen AfA-Satz: fertiggestellt vor 1925 = 2,5%, 1925 bis 2022 = 2,0%, fertiggestellt ab 2023 = 3,0% (§ 7 Abs. 4 Satz 1 Nr. 2 EStG). 5,0% degressiv (§ 7 Abs. 5a) nur bei Baubeginn oder Kaufvertrag zwischen 01.10.2023 und 30.09.2029. Auch relevant für GEG-Sanierungspflichten. Im Marktbericht: Baujahr und Modernisierungspunkte ergeben die Restnutzungsdauer — sie bestimmt im Ertragswert den Vervielfältiger und im Sachwert die Alterswertminderung.',
+      body: 'Errichtungsjahr des Gebäudes. Bestimmt den linearen AfA-Satz: fertiggestellt vor 1925 = 2,5%, 1925 bis 2022 = 2,0%, fertiggestellt ab 2023 = 3,0% (§ 7 Abs. 4 Satz 1 Nr. 2 EStG). 5,0% degressiv (§ 7 Abs. 5a) nur bei Baubeginn oder Kaufvertrag zwischen 01.10.2023 und 30.09.2029. Auch relevant für GEG-Sanierungspflichten. Im Marktbericht: Baujahr und Modernisierungspunkte ergeben die Restnutzungsdauer, sie bestimmt im Ertragswert den Vervielfältiger und im Sachwert die Alterswertminderung.',
       paragraph: '§ 7 Abs. 4 EStG',
       severity: 'beginner'
     },
@@ -120,12 +120,12 @@
     },
     'tab1.investitionsthese': {
       title: 'Investitionsthese',
-      body: 'Deine Begründung warum dieser Deal Sinn macht — in einem Satz. Beispiel: "ETW unter Marktwert, Buy-and-Hold, Mietsteigerung durch lokales Bevölkerungswachstum". Wird in der KI-Analyse mitberücksichtigt.',
+      body: 'Deine Begründung warum dieser Deal Sinn macht, in einem Satz. Beispiel: "ETW unter Marktwert, Buy-and-Hold, Mietsteigerung durch lokales Bevölkerungswachstum". Wird in der KI-Analyse mitberücksichtigt.',
       severity: 'pro'
     },
     'tab1.bekannte_risiken': {
       title: 'Bekannte Risiken',
-      body: 'Risiken die dir bewusst sind — z.B. Sanierungsstau am Dach, anstehende GEG-Pflicht für Heizungstausch, Mieterwechsel geplant. Hilft dir bei späteren Verhandlungen ehrlich zu bleiben und fließt in die KI-Risikoanalyse.',
+      body: 'Risiken die dir bewusst sind, z.B. Sanierungsstau am Dach, anstehende GEG-Pflicht für Heizungstausch, Mieterwechsel geplant. Hilft dir bei späteren Verhandlungen ehrlich zu bleiben und fließt in die KI-Risikoanalyse.',
       severity: 'pro'
     },
     /* v1253 · Testbericht: „Weiteres Notizfeld neben den Risiken und
@@ -137,30 +137,30 @@
        zeigt den Inhalt dem Berater in der Mandanten-Ansicht. */
     'tab1.notizen': {
       title: 'Zusätzliche Notizen',
-      body: 'Alles, was kein Argument (Investitionsthese) und kein Risiko ist: Absprachen mit dem Makler, Besichtigungstermine, Nachfragen an die Verwaltung, Zustand einzelner Räume. Zwei Besonderheiten: der Exposé- und ImmoMetrica-Import hängt seine Objektbeschreibung hier an, statt sie zu überschreiben — deine eigenen Notizen bleiben also stehen. Und arbeitest du mit einem Berater über das Partner-Portal, sieht er diesen Text in seiner Mandanten-Ansicht.',
+      body: 'Alles, was kein Argument (Investitionsthese) und kein Risiko ist: Absprachen mit dem Makler, Besichtigungstermine, Nachfragen an die Verwaltung, Zustand einzelner Räume. Zwei Besonderheiten: der Exposé- und ImmoMetrica-Import hängt seine Objektbeschreibung hier an, statt sie zu überschreiben, deine eigenen Notizen bleiben also stehen. Und arbeitest du mit einem Berater über das Partner-Portal, sieht er diesen Text in seiner Mandanten-Ansicht.',
       severity: 'pro'
     },
     'tab1.verkehrswert': {
       title: 'Verkehrswert (§ 194 BauGB)',
-      body: 'Der "objektive" Marktwert nach Sachverständigen-Gutachten — meist via Sachwertverfahren, Ertragswertverfahren oder Vergleichswertverfahren. Wenn höher als Kaufpreis → Wertpuffer und besseres Verhandlungsargument bei der Bank.',
+      body: 'Der "objektive" Marktwert nach Sachverständigen-Gutachten, meist via Sachwertverfahren, Ertragswertverfahren oder Vergleichswertverfahren. Wenn höher als Kaufpreis → Wertpuffer und besseres Verhandlungsargument bei der Bank.',
       paragraph: '§ 194 BauGB',
       severity: 'pro'
     },
     'tab1.bankbewertung': {
       title: 'Bankbewertung',
-      body: 'Beleihungswert nach BelWertV (Beleihungswertermittlungsverordnung). Banken setzen typisch 80-90% des Verkehrswerts an — der dann als Sicherheit dient. Wenn unbekannt: Verkehrswert nutzen.',
+      body: 'Beleihungswert nach BelWertV (Beleihungswertermittlungsverordnung). Banken setzen typisch 80-90% des Verkehrswerts an, der dann als Sicherheit dient. Wenn unbekannt: Verkehrswert nutzen.',
       paragraph: 'BelWertV',
       severity: 'pro'
     },
     'tab1.bodenrichtwert': {
       title: 'Bodenrichtwert',
-      body: 'Durchschnittspreis pro m² Bauland in deiner Lage. Wird von Gutachterausschüssen festgelegt und ist die Basis für die Aufteilung Boden-/Gebäudeanteil. Du findest aktuelle Werte im BORIS-Portal des jeweiligen Bundeslands. Im Marktbericht: Bodenrichtwert × Grundstücksfläche ergibt den Bodenwert — er steckt im Ertragswert und im Sachwert.',
+      body: 'Durchschnittspreis pro m² Bauland in deiner Lage. Wird von Gutachterausschüssen festgelegt und ist die Basis für die Aufteilung Boden-/Gebäudeanteil. Du findest aktuelle Werte im BORIS-Portal des jeweiligen Bundeslands. Im Marktbericht: Bodenrichtwert × Grundstücksfläche ergibt den Bodenwert, er steckt im Ertragswert und im Sachwert.',
       example: 'Beispiel: München-Schwabing: 8.000 €/m². Münster-Geist: 420 €/m².',
       severity: 'beginner'
     },
     'tab1.miteigentumsanteil': {
       title: 'Miteigentumsanteil (MEA)',
-      body: 'Dein Anteil am gesamten Grundstück (in % oder als Bruch wie "75/1000"). Steht in der Teilungserklärung und im Kaufvertrag. Multipliziert mit Grundstücksfläche ergibt das deinen Grundstücksanteil — relevant für AfA und Bodenwert.',
+      body: 'Dein Anteil am gesamten Grundstück (in % oder als Bruch wie "75/1000"). Steht in der Teilungserklärung und im Kaufvertrag. Multipliziert mit Grundstücksfläche ergibt das deinen Grundstücksanteil, relevant für AfA und Bodenwert.',
       severity: 'pro'
     },
 
@@ -178,12 +178,12 @@
     },
     'tab2.makler': {
       title: 'Maklerprovision',
-      body: 'Übliche Höhe in Deutschland: 3,57% inkl. USt für den Käufer (Bestellerprinzip seit 2020 oft 50/50 zwischen Käufer und Verkäufer). 0 bei Privatkauf. Maklerkosten sind Anschaffungsnebenkosten — sie erhöhen die Gebäude-AfA-Basis nicht direkt, sondern nur anteilig.',
+      body: 'Übliche Höhe in Deutschland: 3,57% inkl. USt für den Käufer (Bestellerprinzip seit 2020 oft 50/50 zwischen Käufer und Verkäufer). 0 bei Privatkauf. Maklerkosten sind Anschaffungsnebenkosten, sie erhöhen die Gebäude-AfA-Basis nicht direkt, sondern nur anteilig.',
       severity: 'beginner'
     },
     'tab2.notar': {
       title: 'Notarkosten',
-      body: 'Notar- und Grundbuchgebühren. DealPilot rechnet sie für neue Objekte nach der Gebührenordnung (GNotKG) aus Kaufpreis und Darlehen, bei 150.000 € rund 1,2 % Notar, bei 500.000 € rund 0,9 %, dazu rund 0,5 % Grundbuch. Umstellen auf feste Sätze: Einstellungen › Investmentprofil › Vorbelegung für neue Objekte. Wird teilweise zwischen Käufer und Verkäufer aufgeteilt — meist trägt der Käufer die Kosten für die Auflassungsvormerkung und Eigentumsumschreibung. Die Bestellung der Grundschuld ist kein Teil der Anschaffungskosten, sondern Finanzierungskosten (sofort abziehbar): im Reiter Steuern im Kaufjahr unter „Notar/Grundschuld (anteilig)“ eintragen, dann fällt sie aus der AfA-Basis.',
+      body: 'Notar- und Grundbuchgebühren. DealPilot rechnet sie für neue Objekte nach der Gebührenordnung (GNotKG) aus Kaufpreis und Darlehen, bei 150.000 € rund 1,2 % Notar, bei 500.000 € rund 0,9 %, dazu rund 0,5 % Grundbuch. Umstellen auf feste Sätze: Einstellungen › Investmentprofil › Vorbelegung für neue Objekte. Wird teilweise zwischen Käufer und Verkäufer aufgeteilt, meist trägt der Käufer die Kosten für die Auflassungsvormerkung und Eigentumsumschreibung. Die Bestellung der Grundschuld ist kein Teil der Anschaffungskosten, sondern Finanzierungskosten (sofort abziehbar): im Reiter Steuern im Kaufjahr unter „Notar/Grundschuld (anteilig)“ eintragen, dann fällt sie aus der AfA-Basis.',
       paragraph: 'GNotKG',
       severity: 'beginner'
     },
@@ -196,18 +196,18 @@
       body: 'Alles, was neben Notar, Grunderwerbsteuer, Grundbuchamt und Makler anfällt: '
         + 'Bausachverständiger für die Kaufprüfung, Anfahrten zu Besichtigungen, '
         + 'Behördengebühren, Kopien aus der Teilungserklärung. '
-        + 'Der Vorschlag von 1,5 % ist eine Faustzahl — wer seine echten Positionen kennt, '
+        + 'Der Vorschlag von 1,5 % ist eine Faustzahl, wer seine echten Positionen kennt, '
         + 'trägt sie ein.',
       severity: 'beginner'
     },
     'tab2.grundbuchamt': {
       title: 'Grundbuchamt',
-      body: 'Eintragungsgebühren beim Grundbuchamt — typisch 0,5-1,0% des Kaufpreises. Inkludiert: Auflassungsvormerkung, Eigentumsumschreibung, Eintragung der Grundschuld (falls Finanzierung). Steuerlich gehört nur der Erwerb zu den Anschaffungskosten; die Kosten der Grundschuld (Notar und Grundbuch) sind Finanzierungskosten und sofort abziehbare Werbungskosten. Trag sie im Reiter Steuern im Kaufjahr unter „Notar/Grundschuld (anteilig)“ ein — DealPilot nimmt sie dann aus der AfA-Basis heraus; die Gesamtinvestition bleibt gleich.',
+      body: 'Eintragungsgebühren beim Grundbuchamt, typisch 0,5-1,0% des Kaufpreises. Inkludiert: Auflassungsvormerkung, Eigentumsumschreibung, Eintragung der Grundschuld (falls Finanzierung). Steuerlich gehört nur der Erwerb zu den Anschaffungskosten, die Kosten der Grundschuld (Notar und Grundbuch) sind Finanzierungskosten und sofort abziehbare Werbungskosten. Trag sie im Reiter Steuern im Kaufjahr unter „Notar/Grundschuld (anteilig)“ ein, DealPilot nimmt sie dann aus der AfA-Basis heraus, die Gesamtinvestition bleibt gleich.',
       severity: 'beginner'
     },
     'tab2.grunderwerbsteuer': {
       title: 'Grunderwerbsteuer',
-      body: 'Bundesland-spezifisch zwischen 3,5% (Bayern, Sachsen) und 6,5% (NRW, Schleswig-Holstein, Saarland, Brandenburg). DealPilot ermittelt den Satz automatisch aus der PLZ — manuelles Übersteuern bleibt möglich.',
+      body: 'Bundesland-spezifisch zwischen 3,5% (Bayern, Sachsen) und 6,5% (NRW, Schleswig-Holstein, Saarland, Brandenburg). DealPilot ermittelt den Satz automatisch aus der PLZ, manuelles Übersteuern bleibt möglich.',
       paragraph: 'GrEStG',
       severity: 'beginner'
     },
@@ -231,7 +231,7 @@
     },
     'tab2.15prozent_grenze': {
       title: '15%-Grenze (§ 6 Abs. 1 Nr. 1a EStG)',
-      body: 'Sanierungen in den ersten 3 Jahren nach Kauf, die 15% der Gebäude-Anschaffungskosten überschreiten, gelten als "anschaffungsnahe Herstellungskosten". Sie sind NICHT mehr als Werbungskosten sofort absetzbar, sondern müssen über die Gebäude-Nutzungsdauer (33-50 Jahre) abgeschrieben werden — ein erheblicher steuerlicher Nachteil.',
+      body: 'Sanierungen in den ersten 3 Jahren nach Kauf, die 15% der Gebäude-Anschaffungskosten überschreiten, gelten als "anschaffungsnahe Herstellungskosten". Sie sind NICHT mehr als Werbungskosten sofort absetzbar, sondern müssen über die Gebäude-Nutzungsdauer (33-50 Jahre) abgeschrieben werden, ein erheblicher steuerlicher Nachteil.',
       paragraph: '§ 6 Abs. 1 Nr. 1a EStG',
       format: 'infobox',
       severity: 'critical'
@@ -240,7 +240,7 @@
     // ──────── TAB 3: MIETE ────────────────────────────────────────────────
     'tab3.nkm': {
       title: 'Nettokaltmiete',
-      body: 'Reine Miete für die Wohnung ohne Nebenkosten — Zins, Tilgung und Werbungskosten beziehen sich darauf. Heizung, Wasser, Müllabfuhr etc. sind NICHT enthalten (das sind die umlagefähigen Nebenkosten).',
+      body: 'Reine Miete für die Wohnung ohne Nebenkosten, Zins, Tilgung und Werbungskosten beziehen sich darauf. Heizung, Wasser, Müllabfuhr etc. sind NICHT enthalten (das sind die umlagefähigen Nebenkosten).',
       severity: 'beginner'
     },
     'tab3.ze': {
@@ -296,7 +296,7 @@
     },
     'tab3.umlagefaehig': {
       title: 'Umlagefähige Kosten',
-      body: 'Betriebskosten die der Mieter zahlt: Heizung, Wasser, Müllabfuhr, Grundsteuer, Versicherungen (Gebäudehaftpflicht), Hausmeister, Aufzugswartung. Sind in der Bewirtschaftung als "durchlaufender Posten" — Mieter zahlt, Verwaltung leitet weiter.',
+      body: 'Betriebskosten die der Mieter zahlt: Heizung, Wasser, Müllabfuhr, Grundsteuer, Versicherungen (Gebäudehaftpflicht), Hausmeister, Aufzugswartung. Sind in der Bewirtschaftung als "durchlaufender Posten", Mieter zahlt, Verwaltung leitet weiter.',
       paragraph: 'BetrKV',
       severity: 'beginner'
     },
@@ -328,7 +328,7 @@
     },
     'tab3.leerstand': {
       title: 'Leerstand p.a.',
-      body: 'Anteil der Monate pro Jahr ohne Miete. Bei langjährigen Mietern: 0%. Mit gelegentlichem Mieterwechsel: 2-5%. In strukturschwachen Lagen ggf. 10%+. Wird von der Miete abgezogen: mindert Cashflow, Nettomietrendite und die steuerpflichtigen Einnahmen. Die Bruttomietrendite bleibt auf der vollen Miete. Daraus entsteht der kalkulatorische Mietausfall im Reiter Bewirtschaftung: Jahresnettokaltmiete × Leerstand % — er zählt genau einmal.',   /* v3030 · v3238 */
+      body: 'Anteil der Monate pro Jahr ohne Miete. Bei langjährigen Mietern: 0%. Mit gelegentlichem Mieterwechsel: 2-5%. In strukturschwachen Lagen ggf. 10%+. Wird von der Miete abgezogen: mindert Cashflow, Nettomietrendite und die steuerpflichtigen Einnahmen. Die Bruttomietrendite bleibt auf der vollen Miete. Daraus entsteht der kalkulatorische Mietausfall im Reiter Bewirtschaftung: Jahresnettokaltmiete × Leerstand %, er zählt genau einmal.',   /* v3030 · v3238 */
       severity: 'beginner'
     },
     'tab3.btj': {
@@ -339,20 +339,20 @@
     },
     'tab3.exit_bmy': {
       title: 'Exit-Rendite (Verkauf)',
-      body: 'Erwartete Brutto-Mietrendite des Käufers beim Exit — bestimmt den Verkaufspreis. Wir berechnen: Exit-Preis = Jahres-NKM ÷ Exit-Rendite. Niedrigere Exit-Rendite = höherer Verkaufspreis. Beispiel: 10.000 € NKM / 5% = 200.000 € Verkaufspreis (20-fache Jahresmiete).',
+      body: 'Erwartete Brutto-Mietrendite des Käufers beim Exit, bestimmt den Verkaufspreis. Wir berechnen: Exit-Preis = Jahres-NKM ÷ Exit-Rendite. Niedrigere Exit-Rendite = höherer Verkaufspreis. Beispiel: 10.000 € NKM / 5% = 200.000 € Verkaufspreis (20-fache Jahresmiete).',
       severity: 'pro'
     },
 
     // ──────── TAB 4: STEUER-DETAILS ───────────────────────────────────────
     'tab4.zve': {
-      title: 'zvE — zu versteuerndes Einkommen',
+      title: 'zvE, zu versteuerndes Einkommen',
       body: 'Dein zu versteuerndes Einkommen ohne diese Immobilie. Du findest es im letzten Steuerbescheid unter "zu versteuerndes Einkommen". Daraus berechnet sich der Grenzsteuersatz (Tarif 2026, ohne Soli und Kirchensteuer): bei zvE 30.000 € rund 28 %, bei 60.000 € rund 39 %, ab 69.879 € 42 % (Spitzensteuersatz), ab 277.826 € 45 %.',
       paragraph: '§ 32a EStG',
       severity: 'beginner'
     },
     'tab4.grenzsteuersatz': {
       title: 'Grenzsteuersatz',
-      body: 'Steuer auf den nächsten verdienten Euro – Einkommensteuer plus Solidaritätszuschlag (und Kirchensteuer, falls angegeben). Entscheidend für die Wirkung der V+V-Verluste. Er kann über 42 % liegen: knapp über der Soli-Freigrenze wächst der Soli mit 11,9 % jeder Mehrsteuer (Milderungszone), 42 % × 1,119 = 47 %. Reichensteuer (45 %) ab 277.826 € zvE.',
+      body: 'Steuer auf den nächsten verdienten Euro, Einkommensteuer plus Solidaritätszuschlag (und Kirchensteuer, falls angegeben). Entscheidend für die Wirkung der V+V-Verluste. Er kann über 42 % liegen: knapp über der Soli-Freigrenze wächst der Soli mit 11,9 % jeder Mehrsteuer (Milderungszone), 42 % × 1,119 = 47 %. Reichensteuer (45 %) ab 277.826 € zvE.',
       paragraph: '§ 32a EStG',
       severity: 'beginner'
     },
@@ -369,14 +369,14 @@
     },
     'tab4.degressive_afa': {
       title: 'Degressive AfA § 7 Abs. 5a EStG',
-      body: 'Nur für Wohngebäude, deren Herstellung (Baubeginnsanzeige) zwischen 01.10.2023 und 30.09.2029 begonnen hat oder die aufgrund eines Kaufvertrags aus diesem Zeitraum angeschafft werden — beim Kauf nur bis zum Ende des Fertigstellungsjahres. Die AfA wird in den ersten Jahren deutlich höher (5% vom Restbuchwert) und sinkt jedes Jahr — bringt frühe Steuervorteile, hilft bei der Anlauf-Cashflow-Phase.',
+      body: 'Nur für Wohngebäude, deren Herstellung (Baubeginnsanzeige) zwischen 01.10.2023 und 30.09.2029 begonnen hat oder die aufgrund eines Kaufvertrags aus diesem Zeitraum angeschafft werden, beim Kauf nur bis zum Ende des Fertigstellungsjahres. Die AfA wird in den ersten Jahren deutlich höher (5% vom Restbuchwert) und sinkt jedes Jahr, bringt frühe Steuervorteile, hilft bei der Anlauf-Cashflow-Phase.',
       paragraph: '§ 7 Abs. 5a EStG',
       format: 'infobox',
       severity: 'critical'
     },
     'tab4.sonder_7b': {
       title: '§ 7b Sonder-AfA',
-      body: 'Nur für Mietwohnungs-Neubau (Effizienzhaus 40 NH, Baukosten ≤ 5.200 €/m², 10 Jahre Vermietungspflicht, Bauantrag oder Bauanzeige zwischen 01.01.2023 und 30.09.2029; beim Kauf bis Ende des Fertigstellungsjahres). Wenn alle 4 Bedingungen erfüllt: zusätzliche 5% AfA p.a. in den ersten 4 Jahren — 20% Bonus auf förderfähige Basis (max. 4.000 €/m²).',
+      body: 'Nur für Mietwohnungs-Neubau (Effizienzhaus 40 NH, Baukosten ≤ 5.200 €/m², 10 Jahre Vermietungspflicht, Bauantrag oder Bauanzeige zwischen 01.01.2023 und 30.09.2029; beim Kauf bis Ende des Fertigstellungsjahres). Wenn alle 4 Bedingungen erfüllt: zusätzliche 5% AfA p.a. in den ersten 4 Jahren, 20% Bonus auf förderfähige Basis (max. 4.000 €/m²).',
       paragraph: '§ 7b EStG',
       format: 'infobox',
       severity: 'critical'
@@ -385,12 +385,12 @@
     // ──────── TAB 5: FINANZIERUNG ─────────────────────────────────────────
     'tab5.eigenkapital': {
       title: 'Eigenkapital',
-      body: 'Wieviel zahlst du aus eigener Tasche? Banken geben für Wohnimmobilien typischerweise bis zu 100% Kaufpreis-Finanzierung — die Erwerbsnebenkosten (~10%) musst du aus eigenen Mitteln zahlen. Mehr EK = besserer LTV = bessere Konditionen.',
+      body: 'Wieviel zahlst du aus eigener Tasche? Banken geben für Wohnimmobilien typischerweise bis zu 100% Kaufpreis-Finanzierung, die Erwerbsnebenkosten (~10%) musst du aus eigenen Mitteln zahlen. Mehr EK = besserer LTV = bessere Konditionen.',
       severity: 'beginner'
     },
     'tab5.ltv_basis': {
       title: 'LTV-Bezugsgröße',
-      body: 'Loan-to-Value — Darlehen geteilt durch was? Standard-Bankenpraxis: LTV gegen Kaufpreis (oder Verkehrswert). Konservativere Sicht: LTV gegen Gesamtinvestition inkl. Nebenkosten — strenger, weil Notar/GrESt/Makler nicht als Sicherheit zählen.',
+      body: 'Loan-to-Value, Darlehen geteilt durch was? Standard-Bankenpraxis: LTV gegen Kaufpreis (oder Verkehrswert). Konservativere Sicht: LTV gegen Gesamtinvestition inkl. Nebenkosten, strenger, weil Notar/GrESt/Makler nicht als Sicherheit zählen.',
       severity: 'pro'
     },
     'tab5.zinsbindung': {
@@ -401,7 +401,7 @@
     /* v2557 · am Feld Zinssatz (d1z) hing bis hier der Text zur Zinsbindung - gefunden beim Handbuch */
     'tab5.zinssatz': {
       title: 'Zinssatz nominal',
-      body: 'Der Sollzins deines Darlehens laut Bankangebot, in Prozent pro Jahr. Er bestimmt die Zinsen und damit Rate, Cashflow und DSCR — und über die Schuldzinsen auch die Werbungskosten in der Steuer. Vorbelegt wird er aus deinen Einstellungen (eigener Zins oder indikativer Marktzins); mit einem echten Angebot trägst du hier dessen Satz ein.',
+      body: 'Der Sollzins deines Darlehens laut Bankangebot, in Prozent pro Jahr. Er bestimmt die Zinsen und damit Rate, Cashflow und DSCR, und über die Schuldzinsen auch die Werbungskosten in der Steuer. Vorbelegt wird er aus deinen Einstellungen (eigener Zins oder indikativer Marktzins); mit einem echten Angebot trägst du hier dessen Satz ein.',
       severity: 'beginner'
     },
     'tab5.tilgung': {
@@ -411,21 +411,21 @@
     },
     'tab5.kfw': {
       title: 'KfW-Förderdarlehen',
-      body: 'Die KfW vergibt vergünstigte Darlehen für Wohngebäude (KfW 261), energetische Sanierung (KfW 458), Familien (KfW 300) und mehr. Niedrige Zinsen, teils Tilgungszuschüsse — aber strenge Bedingungen. Lohnt sich fast immer zu prüfen.',
+      body: 'Die KfW vergibt vergünstigte Darlehen für Wohngebäude (KfW 261), energetische Sanierung (KfW 458), Familien (KfW 300) und mehr. Niedrige Zinsen, teils Tilgungszuschüsse, aber strenge Bedingungen. Lohnt sich fast immer zu prüfen.',
       severity: 'pro'
     },
     'tab5.tilgungsaussetzung': {
       title: 'Tilgungsaussetzungsdarlehen',
-      body: 'Während der Laufzeit zahlst du nur Zinsen — die Tilgung erfolgt am Ende über einen Tilgungsträger (Bausparvertrag, Lebensversicherung, Fondssparplan). Steuerlich vorteilhaft: Zinskosten bleiben konstant hoch = mehr abzugsfähige Werbungskosten. Aber höheres Risiko bei Marktrückgang.',
+      body: 'Während der Laufzeit zahlst du nur Zinsen, die Tilgung erfolgt am Ende über einen Tilgungsträger (Bausparvertrag, Lebensversicherung, Fondssparplan). Steuerlich vorteilhaft: Zinskosten bleiben konstant hoch = mehr abzugsfähige Werbungskosten. Aber höheres Risiko bei Marktrückgang.',
       severity: 'pro'
     },
     'tab5.dscr': {
-      title: 'DSCR — Debt Service Coverage Ratio',
+      title: 'DSCR, Debt Service Coverage Ratio',
       body: 'Schuldendeckungsgrad wie bei der Bank: Reinertrag ÷ Kapitaldienst (Zins + Tilgung). Reinertrag = Miete minus nicht umlagefähige Bewirtschaftungskosten (Instandhaltung, Verwaltung, Mietausfall, Leerstand). Banken wollen ≥ 1,2 sehen. Steuern sind nicht enthalten. Darunter steht der Wert ohne Kosten (brutto) zum Vergleich.',   /* v3031 */
       severity: 'pro'
     },
     'tab5.ltv': {
-      title: 'LTV — Loan-to-Value',
+      title: 'LTV, Loan-to-Value',
       body: 'Beleihungsauslauf: Darlehenssumme ÷ Verkehrswert (oder Kaufpreis). Bis 60% = Top-Konditionen ("Premium"). 60-80% = Standard. 80-90% = Risikoaufschlag. Über 90% = "Vollfinanzierung", deutlich teurer und nicht von allen Banken angeboten.',
       severity: 'pro'
     },
@@ -448,7 +448,7 @@
        im Profimodus nicht. */
     'rnd.mod_dach': {
       title: "Dacherneuerung inkl. Wärmedämmung",
-      body: "Wann wurde das Dach zuletzt erneuert — samt Dämmung? Das ist der schwerste Posten der Anlage 2: er bringt bis zu 4 von 20 Punkten. Je frischer, desto mehr Punkte, und desto länger die Restnutzungsdauer.",
+      body: "Wann wurde das Dach zuletzt erneuert, samt Dämmung? Das ist der schwerste Posten der Anlage 2: er bringt bis zu 4 von 20 Punkten. Je frischer, desto mehr Punkte, und desto länger die Restnutzungsdauer.",
       paragraph: 'ImmoWertV Anlage 2',
       severity: 'beginner'
     },
@@ -460,13 +460,13 @@
     },
     'rnd.mod_leitungen': {
       title: "Leitungssysteme (Strom, Gas, Wasser)",
-      body: "Erneuerte Steig- und Verteilleitungen zählen bis zu 2 von 20 Punkten. Eine neue Sicherung allein genügt nicht — gemeint ist die Erneuerung der Stränge.",
+      body: "Erneuerte Steig- und Verteilleitungen zählen bis zu 2 von 20 Punkten. Eine neue Sicherung allein genügt nicht, gemeint ist die Erneuerung der Stränge.",
       paragraph: 'ImmoWertV Anlage 2',
       severity: 'beginner'
     },
     'rnd.mod_heizung': {
       title: "Heizungsanlage",
-      body: "Ein erneuerter Wärmeerzeuger zählt bis zu 2 von 20 Punkten. Der Austausch des Kessels reicht; eine gewartete Altanlage zählt nicht.",
+      body: "Ein erneuerter Wärmeerzeuger zählt bis zu 2 von 20 Punkten. Der Austausch des Kessels reicht, eine gewartete Altanlage zählt nicht.",
       paragraph: 'ImmoWertV Anlage 2',
       severity: 'beginner'
     },
@@ -484,13 +484,13 @@
     },
     'rnd.mod_innenausbau': {
       title: "Innenausbau (Decken, Fußböden, Treppen)",
-      body: "Erneuerter Innenausbau zählt bis zu 2 von 20 Punkten — Decken, Fußböden, Treppen. Tapete und Farbe sind Instandhaltung, keine Modernisierung.",
+      body: "Erneuerter Innenausbau zählt bis zu 2 von 20 Punkten, Decken, Fußböden, Treppen. Tapete und Farbe sind Instandhaltung, keine Modernisierung.",
       paragraph: 'ImmoWertV Anlage 2',
       severity: 'beginner'
     },
     'rnd.mod_grundriss': {
       title: "Wesentliche Änderung des Grundrisses",
-      body: "Eine wesentliche Grundrissänderung zählt bis zu 2 von 20 Punkten — etwa das Zusammenlegen von Räumen oder ein nachträgliches Bad. Eine versetzte Zwischenwand allein genügt nicht.",
+      body: "Eine wesentliche Grundrissänderung zählt bis zu 2 von 20 Punkten, etwa das Zusammenlegen von Räumen oder ein nachträgliches Bad. Eine versetzte Zwischenwand allein genügt nicht.",
       paragraph: 'ImmoWertV Anlage 2',
       severity: 'beginner'
     },
@@ -502,23 +502,23 @@
     },
     'tab6.hg_nicht_umlagefaehig': {
       title: 'Hausgeld (nicht umlagefähig)',
-      body: 'Anteil des Hausgelds, den DU trägst — kann NICHT auf den Mieter umgelegt werden: Verwaltergebühren, WEG-Rücklage, Bankgebühren, anteilige Sanierungen aus der Rücklage. Typisch 30-50% des Gesamthausgelds.',
+      body: 'Anteil des Hausgelds, den DU trägst, kann NICHT auf den Mieter umgelegt werden: Verwaltergebühren, WEG-Rücklage, Bankgebühren, anteilige Sanierungen aus der Rücklage. Typisch 30-50% des Gesamthausgelds.',
       severity: 'beginner'
     },
     'tab6.weg_ruecklage': {
       title: 'WEG-Rücklage (nur Info!)',
-      body: 'Anteil der monatlichen WEG-Rücklage am Hausgeld — wird NICHT zusätzlich summiert, ist BEREITS Teil des nicht-umlagefähigen Hausgelds. Nur zur Information für deine eigene Übersicht. Doppelt-Einrechnen führt zu falscher Cashflow-Berechnung!',
+      body: 'Anteil der monatlichen WEG-Rücklage am Hausgeld, wird NICHT zusätzlich summiert, ist BEREITS Teil des nicht-umlagefähigen Hausgelds. Nur zur Information für deine eigene Übersicht. Doppelt-Einrechnen führt zu falscher Cashflow-Berechnung!',
       format: 'infobox',
       severity: 'critical'
     },
     'tab6.eigene_irl': {
       title: 'Eigene Instandhaltungsrücklage',
-      body: 'Zusätzliches Geld, das DU zurücklegst — NEBEN der WEG-Rücklage. Für sondereigentums-spezifische Sanierungen (eigenes Bad, Heizung, Fenster). Faustregel: 1-2% vom Kaufpreis p.a. bei ETW, 5-10% der NKM bei MFH.',
+      body: 'Zusätzliches Geld, das DU zurücklegst, NEBEN der WEG-Rücklage. Für sondereigentums-spezifische Sanierungen (eigenes Bad, Heizung, Fenster). Faustregel: 1-2% vom Kaufpreis p.a. bei ETW, 5-10% der NKM bei MFH.',
       severity: 'pro'
     },
     'tab6.sonderverwaltung': {
       title: 'Sonderverwaltung',
-      body: 'Zusätzliche Verwalter-Gebühren für Sonderaufgaben: WEG-Versammlungs-Vorbereitung, juristische Beratung, Sonder-Abrechnungen. Bei MFH selbst-verwaltet: 0. Bei ETW im WEG: meist im Hausgeld enthalten — hier dann 0.',
+      body: 'Zusätzliche Verwalter-Gebühren für Sonderaufgaben: WEG-Versammlungs-Vorbereitung, juristische Beratung, Sonder-Abrechnungen. Bei MFH selbst-verwaltet: 0. Bei ETW im WEG: meist im Hausgeld enthalten, hier dann 0.',
       severity: 'pro'
     },
     'tab6.kalkulat_mietausfall': {
@@ -593,7 +593,7 @@
     },
     'tab8.wertpuffer': {
       title: 'Wertpuffer',
-      body: 'Marktwert minus Kaufpreis. Positiv = du kaufst unter Wert, negativ = du zahlst über Marktwert. Gerechnet wird mit Gutachten, Bankbewertung, dem Wert aus dem DealPilot-Marktbericht und deiner eigenen Schätzung — nicht mit der Marktpreisindikation aus Angeboten. Der Beleihungsauslauf (LTV) nimmt dagegen nur Gutachten oder Bankbewertung.',
+      body: 'Marktwert minus Kaufpreis. Positiv = du kaufst unter Wert, negativ = du zahlst über Marktwert. Gerechnet wird mit Gutachten, Bankbewertung, dem Wert aus dem DealPilot-Marktbericht und deiner eigenen Schätzung, nicht mit der Marktpreisindikation aus Angeboten. Der Beleihungsauslauf (LTV) nimmt dagegen nur Gutachten oder Bankbewertung.',
       severity: 'pro'
     },
     'tab8.tilgung_vom_mieter': {
@@ -614,25 +614,25 @@
   },
   'tab6.su_anteil': {
     title: 'Anteil dieses Objekts',
-    body: 'Der Betrag, den DU für dieses Objekt zahlst — nicht der Betrag der ganzen Gemeinschaft. Er geht einmalig im Jahr der Fälligkeit in den Cashflow. Ist die Umlage vor dem wirtschaftlichen Übergang fällig, trägt sie der Verkäufer und steht nicht im Cashflow.',
+    body: 'Der Betrag, den DU für dieses Objekt zahlst, nicht der Betrag der ganzen Gemeinschaft. Er geht einmalig im Jahr der Fälligkeit in den Cashflow. Ist die Umlage vor dem wirtschaftlichen Übergang fällig, trägt sie der Verkäufer und steht nicht im Cashflow.',
     severity: 'critical'
   },
   'tab6.su_art': {
     title: 'Steuer: Art',
-    body: '<b>Erhaltung</b>: die Gemeinschaft repariert oder ersetzt Vorhandenes (Dach neu eindecken, Fassade streichen, Heizung tauschen). Das sind Werbungskosten im Jahr der Verwendung — in den drei Jahren nach dem Kauf zählen sie zur 15-%-Grenze.<br><br><b>Herstellung</b>: es entsteht etwas Neues oder deutlich Besseres (Aufzug anbauen, Dachgeschoss ausbauen). Kein Sofortabzug, die Kosten erhöhen anteilig die AfA-Bemessungsgrundlage.<br><br>Im Zweifel mit dem Steuerberater abstimmen.',
+    body: '<b>Erhaltung</b>: die Gemeinschaft repariert oder ersetzt Vorhandenes (Dach neu eindecken, Fassade streichen, Heizung tauschen). Das sind Werbungskosten im Jahr der Verwendung, in den drei Jahren nach dem Kauf zählen sie zur 15-%-Grenze.<br><br><b>Herstellung</b>: es entsteht etwas Neues oder deutlich Besseres (Aufzug anbauen, Dachgeschoss ausbauen). Kein Sofortabzug, die Kosten erhöhen anteilig die AfA-Bemessungsgrundlage.<br><br>Im Zweifel mit dem Steuerberater abstimmen.',
     paragraph: '§ 9 EStG, § 6 Abs. 1 Nr. 1a EStG',
     severity: 'critical'
   },
   'tab6.su_verw_jahr': {
     title: 'Steuer: Jahr der Verwendung',
-    body: 'Absetzbar ist eine Sonderumlage erst, wenn die Gemeinschaft das Geld für die Maßnahme AUSGIBT — nicht schon, wenn du zahlst. Vorbelegt ist das Fälligkeitsjahr (die Maßnahme folgt sofort). Liegt die Rechnung der Gemeinschaft später, trag hier das Jahr ein, in dem sie bezahlt wird.',
+    body: 'Absetzbar ist eine Sonderumlage erst, wenn die Gemeinschaft das Geld für die Maßnahme AUSGIBT, nicht schon, wenn du zahlst. Vorbelegt ist das Fälligkeitsjahr (die Maßnahme folgt sofort). Liegt die Rechnung der Gemeinschaft später, trag hier das Jahr ein, in dem sie bezahlt wird.',
     paragraph: 'BFH 14.01.2025, IX R 19/24',
     severity: 'critical'
   },
   /* v3213 · W-7: Haltung im Anlegerprofil (einstellungen-schlank.js) */
   'profil.risikoneigung': {
     title: 'Risikoneigung',
-    body: 'Sagt der Pilot-Analyse, wie vorsichtig sie urteilen soll.<br><br>• <b>Konservativ</b>: Sicherheit zuerst — die Analyse betont Risiken (knapper Cashflow, hoher Beleihungsauslauf, Sanierungsstau) und empfiehlt eher Abstand.<br>• <b>Moderat</b>: ausgewogen zwischen Rendite und Risiko.<br>• <b>Chancenorientiert</b>: höhere Rendite ist wichtig — die Analyse nimmt mehr Risiko in Kauf, wenn die Chance es trägt.<br><br><b>Nur die Pilot-Analyse</b> (Text und Empfehlung) richtet sich danach. Kennzahlen, Deal Score und Berechnungen ändern sich nicht.',
+    body: 'Sagt der Pilot-Analyse, wie vorsichtig sie urteilen soll.<br><br>• <b>Konservativ</b>: Sicherheit zuerst, die Analyse betont Risiken (knapper Cashflow, hoher Beleihungsauslauf, Sanierungsstau) und empfiehlt eher Abstand.<br>• <b>Moderat</b>: ausgewogen zwischen Rendite und Risiko.<br>• <b>Chancenorientiert</b>: höhere Rendite ist wichtig, die Analyse nimmt mehr Risiko in Kauf, wenn die Chance es trägt.<br><br><b>Nur die Pilot-Analyse</b> (Text und Empfehlung) richtet sich danach. Kennzahlen, Deal Score und Berechnungen ändern sich nicht.',
     severity: 'critical'
   },
   'profil.strategie': {
@@ -642,8 +642,8 @@
   },
   // ─── V235.1: tab8.ltv_basis (rest waren Duplikate) ──────────────
   'tab8.ltv_basis': {
-    title: 'LTV — Loan-to-Value',
-    body: 'Das <b>Loan-to-Value</b>-Verhältnis zeigt wie hoch deine Restschuld im Verhältnis zum Immobilien-Wert ist. Die Bank nutzt das als wichtigstes Risikomaß.<br><br><b>Welcher Wert ist die Basis?</b><br>• <b>Wenn Sachverständigenwert vorhanden</b>: dieser wird genutzt<br>• <b>Sonst</b>: Bankbewertung, dann Kaufpreis<br><br><b>LTV-Stufen:</b><br>• Unter 60 % — Tier 1 (beste Konditionen)<br>• 60-80 % — Standard<br>• 80-95 % — Risikoaufschlag<br>• Über 95 % — Vollfinanzierung, höchste Zinsen<br><br><b>Im Zeitverlauf</b> sinkt der LTV durch Tilgung und Wertsteigerung — wichtig für Anschlussfinanzierung.'
+    title: 'LTV, Loan-to-Value',
+    body: 'Das <b>Loan-to-Value</b>-Verhältnis zeigt wie hoch deine Restschuld im Verhältnis zum Immobilien-Wert ist. Die Bank nutzt das als wichtigstes Risikomaß.<br><br><b>Welcher Wert ist die Basis?</b><br>• <b>Wenn Sachverständigenwert vorhanden</b>: dieser wird genutzt<br>• <b>Sonst</b>: Bankbewertung, dann Kaufpreis<br><br><b>LTV-Stufen:</b><br>• Unter 60 %, Tier 1 (beste Konditionen)<br>• 60-80 %, Standard<br>• 80-95 %, Risikoaufschlag<br>• Über 95 %, Vollfinanzierung, höchste Zinsen<br><br><b>Im Zeitverlauf</b> sinkt der LTV durch Tilgung und Wertsteigerung, wichtig für Anschlussfinanzierung.'
   },
 
   };

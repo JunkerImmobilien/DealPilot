@@ -109,7 +109,7 @@
          gibt es in der App seit V194 nicht mehr, und seit v1970 auch die
          Module nicht — der Untertitel versprach einen Knopf, den niemand
          findet. Das Gutachten entsteht über die Anfrage, nicht hier. */
-      sub: 'Restnutzungsdauer berechnet — Werte übernehmen oder Gutachten anfragen',
+      sub: 'Restnutzungsdauer berechnet, Werte übernehmen oder Gutachten anfragen',
       render: renderStep9, validate: function () { return []; } }
   ];
 
@@ -399,7 +399,7 @@
       + '</table>'
       + '<div style="margin-top:8px;font-weight:700;color:' + (vorteil >= 0 ? '#3FA56C' : '#B8625C') + '">'
       + (vorteil >= 0 ? 'Steuervorteil ' : 'Steuernachteil ') + eur(Math.abs(vorteil)) + ' im Jahr</div>';
-    btn.disabled = true; btn.style.opacity = '.6'; btn.textContent = '✓ Übernommen — im Reiter Steuer als eigener AfA-Satz';
+    btn.disabled = true; btn.style.opacity = '.6'; btn.textContent = '✓ Übernommen, im Reiter Steuer als eigener AfA-Satz';
     try { if (typeof global.toast === 'function') global.toast('✓ Restnutzungsdauer ' + rnd + ' Jahre übernommen · AfA ' + (100 / rnd).toFixed(2).replace('.', ',') + ' %'); } catch (e) {}
   }
   document.addEventListener('click', function (e) {
@@ -1229,7 +1229,7 @@
     let html = '<div class="rnd-wiz-info-box">'
       + '<strong>Wurden sichtbare Mängel oder Schäden festgestellt?</strong><br>'
       + 'Mehrfachauswahl möglich. Im Standardfall werden die Schäden nur im Gutachten '
-      + 'dokumentiert — das ist die übliche Vorgehensweise.'
+      + 'dokumentiert, das ist die übliche Vorgehensweise.'
       + '</div>';
 
     html += '<div class="rnd-wiz-schaden-list">';
@@ -1332,7 +1332,7 @@
     let html = ''
       + '<div style="background:#FDFCFA;border:1px solid #E6E0D3;border-top:3px solid #C9A84C;border-radius:12px;padding:26px 30px 24px;margin-bottom:18px">'
       + '  <p style="font:600 10.5px/1 JetBrains Mono,ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase;color:#9a7f33;margin:0 0 3px;text-align:center">Geschätzte Restnutzungsdauer</p>'
-      + '  <p style="font-size:11px;color:#8A8272;text-align:center;margin:0 0 16px">Ersteinschätzung — die verbindliche Berechnung steht im Gutachten</p>'
+      + '  <p style="font-size:11px;color:#8A8272;text-align:center;margin:0 0 16px">Ersteinschätzung, die verbindliche Berechnung steht im Gutachten</p>'
       + '  <div style="text-align:center">'
       + '    <span style="font-family:Space Grotesk,Inter,sans-serif;font-size:64px;font-weight:700;color:var(--wl-b8932f,#b8932f);line-height:1;letter-spacing:-2px;font-variant-numeric:tabular-nums">'
       + (function () {
@@ -1376,7 +1376,7 @@
       + '  <div style="text-align:center;margin-top:16px">'
       + '    <button type="button" id="rnd-uebernehmen" data-rnd="' + Math.round(Number(result.final_rnd) || 0) + '" '
       + 'style="background:linear-gradient(110deg,var(--wl-e8cc7a,#E8CC7A),var(--wl-c9a84c,#C9A84C) 55%,var(--wl-b8932f,#b8932f));color:#1c1b18;border:0;border-radius:8px;padding:10px 20px;font:600 14px Inter,sans-serif;cursor:pointer' + ((result.pruefung && result.pruefung.uebernahme_gesperrt) ? ';opacity:.55;cursor:not-allowed' : '') + '"' + ((result.pruefung && result.pruefung.uebernahme_gesperrt) ? ' disabled title="Sachverständig zu würdigen"' : '') + '>'
-      + ((result.pruefung && result.pruefung.uebernahme_gesperrt) ? 'Übernahme gesperrt — erst nach sachverständiger Beurteilung' : 'Restnutzungsdauer ' + Math.round(Number(result.final_rnd) || 0) + ' Jahre übernehmen') + '</button>'
+      + ((result.pruefung && result.pruefung.uebernahme_gesperrt) ? 'Übernahme gesperrt, erst nach sachverständiger Beurteilung' : 'Restnutzungsdauer ' + Math.round(Number(result.final_rnd) || 0) + ' Jahre übernehmen') + '</button>'
       + '    <div id="rnd-uebernahme-vergleich" style="margin-top:14px"></div>'
       + '  </div>'
       + '</div>';

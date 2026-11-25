@@ -350,7 +350,7 @@
         sucEl.style.display = 'block';
         sucEl.innerHTML =
           '<strong style="color:#3FA56C">✓ Willkommen an Bord!</strong><br>' +
-          'Du bist drin — wir haben dir parallel eine Bestätigungs-Mail an <strong>'
+          'Du bist drin, wir haben dir parallel eine Bestätigungs-Mail an <strong>'
           + _esc(email) + '</strong> geschickt.<br>' +
           '<span style="color:#666;font-size:12px">Bitte bestätige sie innerhalb von '
           + (data.verifyGraceHours || 6) + ' Stunden, sonst wird der Zugang gesperrt.</span>';
@@ -374,7 +374,7 @@
       var _agbL = document.getElementById('dp-reg-consent-label'); if (_agbL) _agbL.style.display = 'none';
       var _nlI = document.getElementById('dp-reg-newsletter'); if (_nlI && _nlI.closest) { var _nlL = _nlI.closest('label'); if (_nlL) _nlL.style.display = 'none'; }
     } catch (e) {
-      _error(errEl, 'Netzwerkfehler — bitte später erneut versuchen');
+      _error(errEl, 'Netzwerkfehler, bitte später erneut versuchen');
       btn.disabled = false;
       btn.innerHTML = '<span>Konto erstellen</span><span class="auth-btn-arrow">→</span>';
     }
@@ -432,7 +432,7 @@
           localStorage.removeItem('dp_verify_frist');
           if (window.DealPilotVerifyFrist) window.DealPilotVerifyFrist.stop();
         } catch (e) {}
-        console.log('[register V204] Mail bestätigt — Token gespeichert, Welcome-Toast');
+        console.log('[register V204] Mail bestätigt, Token gespeichert, Welcome-Toast');
 
         // URL bereinigen — Query UND Hash entfernen
         var clean = window.location.pathname;
@@ -584,5 +584,5 @@ var mo = new MutationObserver(function () {
   // Wir aliasen damit _v10OpenRegister() auch funktioniert.
   window.RegisterModal = window.DealPilotRegister;
 
-  console.log('[register V169] Easter Egg aktiv — DealPilotRegister.show() zum Öffnen');
+  console.log('[register V169] Easter Egg aktiv, DealPilotRegister.show() zum Öffnen');
 })();

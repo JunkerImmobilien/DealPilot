@@ -9,7 +9,7 @@ var DemoMode = (function() {
 
   // Beispiel-Objekt für Demo
   var DEMO_OBJECT = {
-    _name: 'DEMO – Musterstraße 12, Musterstadt',
+    _name: 'DEMO, Musterstraße 12, Musterstadt',
     plz: '12345',
     ort: 'Musterstadt',
     str: 'Musterstraße',
@@ -66,7 +66,7 @@ var DemoMode = (function() {
       loadData(DEMO_OBJECT);
       setTimeout(function() {
         if (typeof calc === 'function') calc();
-        if (typeof toast === 'function') toast('✓ Demo-Modus aktiviert – Beispiel-Objekt geladen');
+        if (typeof toast === 'function') toast('✓ Demo-Modus aktiviert, Beispiel-Objekt geladen');
       }, 100);
     }
   }
@@ -184,7 +184,7 @@ var Paywall = (function() {
         }
         renderUsageBadge._retryCount++;
         if (renderUsageBadge._retryCount > 10) {
-          console.warn('[V243] renderUsageBadge: sb-user nach 10 Versuchen nicht gefunden — gebe auf');
+          console.warn('[V243] renderUsageBadge: sb-user nach 10 Versuchen nicht gefunden, gebe auf');
           return;
         }
         setTimeout(renderUsageBadge, 800);
@@ -229,7 +229,7 @@ var Paywall = (function() {
 
     var allUsed_class = allUsed ? ' pw-compact-warn' : '';
     container.innerHTML =
-      '<div class="pw-compact' + allUsed_class + '" onclick="Paywall.showUpgradeModal()" title="Free Plan – Klick für Details">' +
+      '<div class="pw-compact' + allUsed_class + '" onclick="Paywall.showUpgradeModal()" title="Free Plan, Klick für Details">' +
         '<span class="pw-compact-label">FREE</span>' +
         '<span class="pw-compact-counter">' + usage.calculations + '/' + FREE_LIMITS.calculations + ' · ' +
           usage.ai_calls + '/' + FREE_LIMITS.ai_calls + ' · ' +

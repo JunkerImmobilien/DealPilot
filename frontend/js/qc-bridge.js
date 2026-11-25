@@ -396,7 +396,7 @@
     // die Rohwerte bleiben in object-actions (_qcPendingMerged) bis zum qc-save.
     try { window._qcExposePhotos = []; } catch (e) {}
     if (!(window.ObjectActions && typeof window.ObjectActions.openImport === 'function')) {
-      console.warn('[qc-bridge] ObjectActions.openImport fehlt — Import nicht möglich.');
+      console.warn('[qc-bridge] ObjectActions.openImport fehlt, Import nicht möglich.');
       _postToFrame({ source: 'dp-app', type: 'qc-import-result', data: {}, pending: [] });
       return;
     }
@@ -417,7 +417,7 @@
      (v418): qcData -> qc_*-Felder im iframe, Rest -> pendingList (Save-Transfer). */
   function _handleVoice() {
     if (!(window.VoiceImport && typeof window.VoiceImport.open === 'function')) {
-      console.warn('[qc-bridge] VoiceImport.open fehlt — Sprachaufzeichnung nicht möglich.');
+      console.warn('[qc-bridge] VoiceImport.open fehlt, Sprachaufzeichnung nicht möglich.');
       _postToFrame({ source: 'dp-app', type: 'qc-import-result', data: {}, pending: [] });
       return;
     }

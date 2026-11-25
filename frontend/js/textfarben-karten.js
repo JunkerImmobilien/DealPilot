@@ -94,7 +94,7 @@
     if (!b || !b.tonFuerGrund) {
       if (!branding._gemeldet) {
         branding._gemeldet = true;
-        try { console.warn('[v1123] DealPilotConfig.branding fehlt — Kartentexte werden NICHT nachgezogen.'); } catch (e) {}
+        try { console.warn('[v1123] DealPilotConfig.branding fehlt, Kartentexte werden NICHT nachgezogen.'); } catch (e) {}
       }
       return null;
     }
@@ -160,15 +160,15 @@
       el.textContent = (erg.traegtGross && erg.traegtKlein)
         ? 'Trägt. Wird unverändert an deine Mandanten gegeben.'
         : 'Für deine Mandanten nachgezogen auf ' + erg.sm.toUpperCase() +
-          ' (kleine Texte) — dein Farbton bleibt, nur die Helligkeit wandert.';
+          ' (kleine Texte), dein Farbton bleibt, nur die Helligkeit wandert.';
       return;
     }
     if (erg.traegtGross && erg.traegtKlein) { el.style.display = 'none'; el.textContent = ''; return; }
     el.style.display = 'block';
     el.style.color = '#B8625C';
     el.textContent = erg.traegtKlein
-      ? 'Große Werte tragen nicht — lesbar wäre ' + erg.lg.toUpperCase() + '.'
-      : 'Kleine Beschriftungen tragen nicht — lesbar wäre ' + erg.sm.toUpperCase() + '.';
+      ? 'Große Werte tragen nicht, lesbar wäre ' + erg.lg.toUpperCase() + '.'
+      : 'Kleine Beschriftungen tragen nicht, lesbar wäre ' + erg.sm.toUpperCase() + '.';
   }
 
   window._dpDispHeroText = function (h) {

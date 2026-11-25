@@ -587,7 +587,7 @@ function updateUserDisplay(session) {
   if (!footer) {
     updateUserDisplay._retries = (updateUserDisplay._retries || 0) + 1;
     if (updateUserDisplay._retries > 20) {
-      console.warn('[V244] updateUserDisplay: .sb-footer nach 20 Versuchen nicht da — gebe auf');
+      console.warn('[V244] updateUserDisplay: .sb-footer nach 20 Versuchen nicht da, gebe auf');
       return;
     }
     setTimeout(function() { updateUserDisplay(session); }, 100);
@@ -704,7 +704,7 @@ function openUpgradeFromMenu() {
       }
     }, 100);
   } else {
-    alert('Settings nicht verfügbar — bitte Seite neu laden.');
+    alert('Settings nicht verfügbar, bitte Seite neu laden.');
   }
 }
 window.openUpgradeFromMenu = openUpgradeFromMenu;
@@ -924,7 +924,7 @@ async function handlePwReset() {
   } catch(e) {
     msg.style.display = 'block';
     msg.style.color = '#DDA29E';
-    msg.textContent = 'Fehler beim Senden — bitte später erneut versuchen.';
+    msg.textContent = 'Fehler beim Senden, bitte später erneut versuchen.';
     btn.disabled = false;
     btn.querySelector('span:first-child').textContent = 'Reset-Link anfordern';
   }
@@ -1016,7 +1016,7 @@ window.handlePwReset = handlePwReset;
       } else {
         var err = await resp.json().catch(function(){ return {}; });
         msg.style.color = '#DDA29E';
-        msg.textContent = err.error || 'Fehler — Token ungültig oder abgelaufen. Bitte erneut anfordern.';
+        msg.textContent = err.error || 'Fehler, Token ungültig oder abgelaufen. Bitte erneut anfordern.';
         btn.disabled = false;
         btn.querySelector('span').textContent = 'Passwort speichern';
       }

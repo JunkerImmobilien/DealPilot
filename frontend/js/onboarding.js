@@ -73,7 +73,7 @@ window.DealPilotOnboarding = (function () {
       fuer: 'Zwei Schienen: links wo du bist, rechts was du tun kannst.' },
     { id: 'v2b', name: 'Tower',      karte: 'bordkarte',
       unter: 'Aktionen links, Score und Ausgaben rechts',
-      fuer: 'Alles im Blick wie im Cockpit — für den zweiten Bildschirm.' }
+      fuer: 'Alles im Blick wie im Cockpit, für den zweiten Bildschirm.' }
   ];
 
   /* Die Vorgabe steht an EINER Stelle und wird nicht zweimal genannt. */
@@ -150,7 +150,7 @@ window.DealPilotOnboarding = (function () {
     } catch (e) {}
     if (!ps || !ps.length) {
       return [{ id: 'balanced', name: 'Ausgewogen',
-        unter: 'Der Mittelweg — die Vorbelegung, wenn du dich nicht festlegst.',
+        unter: 'Der Mittelweg, die Vorbelegung, wenn du dich nicht festlegst.',
         dscr: 1.20, ltv: 90, ek: 10, risk: 'Moderat (ausgewogen)' }];
     }
     return ps.map(function (p) {
@@ -326,7 +326,7 @@ window.DealPilotOnboarding = (function () {
     return '<div class="dpo-handy" style="margin:0 0 14px;padding:11px 13px;border-radius:10px;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 55%, transparent);'
       + 'background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 10%, transparent);font-size:13px;line-height:1.5">'
       + '<b>Tipp: am Desktop oder Tablet arbeitet es sich am besten.</b> '
-      + 'DealPilot läuft auch auf dem Handy – Quick-Check, Objekte und Co-Pilot sind unterwegs da. '
+      + 'DealPilot läuft auch auf dem Handy, Quick-Check, Objekte und Co-Pilot sind unterwegs da. '
       + 'Den vollen Umfang mit Wertermittlung, Einheiten erfassen, Unterlagen einlesen, PDF-Berichten '
       + 'und Portfolio-Cockpit nutzt du am großen Bildschirm am bequemsten.</div>';
   }
@@ -379,7 +379,7 @@ window.DealPilotOnboarding = (function () {
       + '<rect x="2" y="4" width="14" height="10" rx="1.5"/><path d="M6 18h6"/><rect x="17" y="8" width="5" height="12" rx="1.2"/></svg></span>'
       + '<span class="hh-t">Am Rechner oder Tablet am besten</span></div>'
       + '<p>Für den vollen Funktionsumfang empfehlen wir DealPilot im Browser am Rechner oder auf dem Tablet. '
-      + 'Auf dem Handy funktioniert alles Wichtige – Quick-Check, Objekte, Kennzahlen und Co-Pilot.</p>'
+      + 'Auf dem Handy funktioniert alles Wichtige, Quick-Check, Objekte, Kennzahlen und Co-Pilot.</p>'
       + '<button type="button" class="hh-ok">Verstanden</button>';
     function zu() { _lsSet(HANDY_KEY, String(Date.now())); if (k.parentNode) k.parentNode.removeChild(k); }
     k.querySelector('.hh-x').addEventListener('click', zu);
@@ -399,7 +399,7 @@ window.DealPilotOnboarding = (function () {
     if (_klein()) _lsSet(HANDY_KEY, 'einrichtung-' + Date.now());   /* v3340: Schritt 1 nennt es schon */
     return _handyHinweis()
       + '<p class="dpo-vor">Womit möchtest du arbeiten? Du kannst das jederzeit '
-      + 'unter <b>Darstellung</b> ändern — auch mitten im Betrieb.'
+      + 'unter <b>Darstellung</b> ändern, auch mitten im Betrieb.'
       /* v2096: Der Hinweis steht NUR, wo er stimmt. Unter 900 px fuellt der
          Kasten den Schirm, dann gibt es kein „dahinter" — ein Hinweis, der
          auf etwas Unsichtbares zeigt, ist schlimmer als keiner. Die Grenze
@@ -446,7 +446,7 @@ window.DealPilotOnboarding = (function () {
     }
     return ''
       + '<p class="dpo-vor">Diese Angaben stehen später im Kopf deiner '
-      + '<b>Investment-PDFs und Bankunterlagen</b> — dort, wo sonst ein '
+      + '<b>Investment-PDFs und Bankunterlagen</b>, dort, wo sonst ein '
       + 'leeres Feld steht. Du kannst den Schritt überspringen und es '
       + 'später unter <b>Einstellungen → Profil</b> nachtragen.</p>'
       + '<div class="dpo-raster">'
@@ -538,21 +538,21 @@ window.DealPilotOnboarding = (function () {
       + '</label>'
       + '<div class="dpo-raster">'
       +   _sel('dpo_zinsbindung', 'Zinsbindung', [[5,'5 Jahre'],[10,'10 Jahre'],[15,'15 Jahre'],[20,'20 Jahre']], profil('zinsbindung_default', 10),
-          'Wie lange der Zins festgeschrieben ist. Je länger, desto teurer — dafür planbar.')
+          'Wie lange der Zins festgeschrieben ist. Je länger, desto teurer, dafür planbar.')
       +   _sel('dpo_margin', 'Zinsstufe', [['premium','Premium (LTV 60 %)'],['standard','Standard (LTV 80 %)'],['schwach','Schwach (LTV 90 %)'],['voll','Vollfinanzierung (LTV 100 %)']], profil('zins_margin', 'standard'),
           'Der Aufschlag der Bank auf den Pfandbriefsatz. Er hängt am Beleihungsauslauf: wer wenig Eigenkapital mitbringt, zahlt mehr.')
       +   _num('dpo_zins', 'Eigener Zinssatz', _eigenerZins(), '% p. a.',
           'Nur wenn der Haken oben raus ist. Dann rechnet DealPilot mit DIESEM Satz statt mit dem Marktzins.')
       +   _num('dpo_tilgung', 'Anfangstilgung', profil('tilgung_default', 1.5), '%',
-          'Wie viel du im ersten Jahr tilgst. 1,5 % ist der übliche Einstieg; darunter läuft die Finanzierung sehr lang, darüber drückt es den Cashflow.')
+          'Wie viel du im ersten Jahr tilgst. 1,5 % ist der übliche Einstieg, darunter läuft die Finanzierung sehr lang, darüber drückt es den Cashflow.')
       +   _num('dpo_ek', 'Eigenkapital', profil('ek_quote_default', 10), '% vom Kaufpreis',
-          'Vorbelegt mit 10 % — das deckt in der Regel die Kaufnebenkosten. 0 % ist die Vollfinanzierung inklusive Nebenkosten.')
+          'Vorbelegt mit 10 %, das deckt in der Regel die Kaufnebenkosten. 0 % ist die Vollfinanzierung inklusive Nebenkosten.')
       +   _num('dpo_ltv', 'Beleihungsauslauf (LTV)', profil('max_ltv', 90), '% vom Kaufpreis',
           'Wie viel vom Kaufpreis die Bank beleiht. 100 % ist die Vollfinanzierung des Kaufpreises, über 100 % geht nur mit zusätzlicher Sicherheit. Der DealScore warnt, wenn ein Objekt darüber liegt.')
       +   _num('dpo_mietausfall', 'Kalkulatorischer Mietausfall', profil('mietausfall_pct', 1), '% der Nettokaltmiete',
           'Rücklage für Leerstand und Zahlungsausfall. 1 % ist vorsichtig gerechnet und entspricht etwa einer ausgefallenen Monatsmiete in acht Jahren.')
       +   _num('dpo_dscr', 'Mindest-DSCR', profil('min_dscr', 1.20), 'ab hier kaufst du',
-          'Debt Service Coverage Ratio: Jahresreinertrag geteilt durch Kapitaldienst. 1,0 heißt, die Miete deckt Zins und Tilgung genau. 1,20 lässt 20 % Luft — darunter wird es bei jeder Mietminderung eng. Banken verlangen meist 1,1 bis 1,3.')
+          'Debt Service Coverage Ratio: Jahresreinertrag geteilt durch Kapitaldienst. 1,0 heißt, die Miete deckt Zins und Tilgung genau. 1,20 lässt 20 % Luft, darunter wird es bei jeder Mietminderung eng. Banken verlangen meist 1,1 bis 1,3.')
       + '</div>'
       + '</div>';   /* v2184: Ende #dpo-s3-eigen */
   }
@@ -620,14 +620,14 @@ window.DealPilotOnboarding = (function () {
     return ''
       + '<p class="dpo-vor">Der <b>Grenzsteuersatz</b> ist der Satz auf den '
       + '<i>nächsten</i> verdienten Euro. DealPilot rechnet damit die '
-      + 'Steuerwirkung deiner Immobilie — Abschreibung, Werbungskosten, '
+      + 'Steuerwirkung deiner Immobilie, Abschreibung, Werbungskosten, '
       + 'Cashflow nach Steuern.</p>'
       + '<div class="dpo-raster dpo-raster-2">'
       +   _num('dpo_grenz', 'Grenzsteuersatz', profil('grenzsteuersatz', 40.45), '%',
           'Nicht dein Durchschnittssatz, sondern der Satz auf den nächsten Euro. '
         + 'Er ist immer höher als der Durchschnitt und ist die richtige Größe, '
         + 'wenn man wissen will, was eine zusätzliche Einnahme oder eine '
-        + 'Abschreibung wirklich bringt. Vorbelegt mit 40,45 % — das ist der '
+        + 'Abschreibung wirklich bringt. Vorbelegt mit 40,45 %, das ist der '
         + 'Satz eines Alleinstehenden mit rund 66.000 € zu versteuerndem '
         + 'Einkommen (Einkommensteuer; Soli fällt dort noch nicht an).')
       + '</div>'
@@ -667,7 +667,7 @@ window.DealPilotOnboarding = (function () {
       +     '<p class="dpo-fuss"><b>Nicht verwechseln:</b> das Bruttogehalt ist es '
       +       'nicht, und in der <b>Lohnsteuerbescheinigung</b> steht es gar nicht — '
       +       'die kennt nur den Bruttoarbeitslohn. Wer nie eine Steuererklärung '
-      +       'abgegeben hat, hat auch keinen Bescheid; dann trag den Satz oben '
+      +       'abgegeben hat, hat auch keinen Bescheid, dann trag den Satz oben '
       +       'direkt ein oder frag deinen Steuerberater. '
       +       '<b>Diese Rechnung ersetzt keine Steuerberatung.</b></p>'
       +   '</div>'
@@ -679,7 +679,7 @@ window.DealPilotOnboarding = (function () {
     return ''
       + '<p class="dpo-vor">Wonach soll DealPilot deine Objekte bewerten? '
       + 'Das Profil gewichtet Rendite, Finanzierung, Risiko, Lage und Upside '
-      + 'im DealScore — und lässt sich jederzeit ändern.</p>'
+      + 'im DealScore, und lässt sich jederzeit ändern.</p>'
       /* v1776: Der Satz sagt jetzt, WAS das Profil tut und was es NICHT
          tut. Vorher stand hier „setzt die Schwellen für Score und
          Empfehlung" — und genau das stimmte zur Haelfte: es setzte auch
@@ -689,7 +689,7 @@ window.DealPilotOnboarding = (function () {
       + (_sets() ? '' : '<p class="dpo-vor dpo-vor-klein">Deine Finanzierungsgrenzen aus '
       + 'Schritt <b>Finanzierung</b> bleiben, wie du sie eingestellt hast. '
       + 'Die Zahlen auf den Kacheln zeigen nur, was für das jeweilige Profil '
-      + 'typisch ist. Ändern kannst du sie dort — oder später unter '
+      + 'typisch ist. Ändern kannst du sie dort, oder später unter '
       + '<b>Einstellungen › Investmentprofil</b>.</p>')
       /* v2551 · Ist ein Anlegerprofil gewählt, steht hier nur noch seine Kachel
          und darunter die Feinjustierung (wie im Reiter Deal Score). */
@@ -704,7 +704,7 @@ window.DealPilotOnboarding = (function () {
               + '<span class="dpo-k-unter">' + esc(t.unter) + '</span></button>';
           };
           return '<p class="dpo-vor dpo-vor-klein">' + (_wahl.basis
-              ? 'Dein Anlegerprofil aus Schritt <b>Finanzierung</b> gewichtet den Deal Score. Willst du einen Schwerpunkt setzen, wähle ihn darunter — die Rechenwerte bleiben.'
+              ? 'Dein Anlegerprofil aus Schritt <b>Finanzierung</b> gewichtet den Deal Score. Willst du einen Schwerpunkt setzen, wähle ihn darunter, die Rechenwerte bleiben.'
               : 'Du hast die Rechenwerte selbst festgelegt. Wähle, wie der Deal Score gewichten soll.') + '</p>'
             + '<div class="dpo-kacheln dpo-kacheln-3">' + haupt.map(function (t) { return kachel(t, _wahl.basis ? 'Anlegerprofil · ' : ''); }).join('') + '</div>'
             + '<p class="dpo-vor dpo-vor-klein" style="margin-top:12px"><b>Feinjustierung</b> · optional, nur die Gewichte des Deal Scores</p>'
@@ -747,7 +747,7 @@ window.DealPilotOnboarding = (function () {
             + '<b>Lageklassen.</b> Investoren gliedern Standorte in A, B und C '
             + 'und knüpfen daran eine Mindestrendite. Im Quick-Check wählst du '
             + 'die Klasse, und DealPilot rechnet aus, auf welchen Kaufpreis du '
-            + 'verhandeln müsstest. Die Vorbelegung ist marktüblich — gute Lage, '
+            + 'verhandeln müsstest. Die Vorbelegung ist marktüblich, gute Lage, '
             + 'wenig Rendite.</p>'
             + '<div class="dpo-lage">'
             + LP.KLASSEN.map(function (k) {
@@ -786,8 +786,8 @@ window.DealPilotOnboarding = (function () {
                   + '<p class="dpo-vor dpo-vor-klein dpo-lage-std-why">'
                   + 'Diese Klasse steht in jedem neuen Quick-Check vorausgewählt, '
                   + 'damit die Zielrendite sofort greift. Sie ist als Vorgabe '
-                  + 'gekennzeichnet; du änderst sie dort im Feld oder sagst beim '
-                  + 'Diktat einfach „B-Lage" — was du ausdrücklich angibst, gilt.</p>';
+                  + 'gekennzeichnet, du änderst sie dort im Feld oder sagst beim '
+                  + 'Diktat einfach „B-Lage", was du ausdrücklich angibst, gilt.</p>';
               })();
         })();
   }
@@ -864,7 +864,7 @@ window.DealPilotOnboarding = (function () {
     { n: 2, name: 'Fortgeschritten', unter: 'Marktbericht Stufe 2 · erweiterte Indikation',
       fuer: 'Dazu Gewerke, Sanierung, Mietvertrag, zweites Darlehen und Erbbaurecht (rund 155 Felder).' },
     { n: 3, name: 'Experte', unter: 'Marktbericht Stufe 3 · Wertermittlung nach ImmoWertV',
-      fuer: 'Alle Felder, mit Mieterhöhung und Zielbild, Bauteilen und Sach- und Ertragswert — wie ein Gutachten.' }
+      fuer: 'Alle Felder, mit Mieterhöhung und Zielbild, Bauteilen und Sach- und Ertragswert, wie ein Gutachten.' }
   ];
   function _dgVorgabe() {
     try { var n = parseInt(localStorage.getItem('dp_detailgrad_zuletzt'), 10); return (n >= 1 && n <= 3) ? n : 1; } catch (e) { return 1; }
@@ -872,7 +872,7 @@ window.DealPilotOnboarding = (function () {
   function sDetailgrad() {
     var akt = _wahl.detailgrad || _dgVorgabe();
     return '<p class="dpo-vor">Wie viele Felder möchtest du bei einem Objekt sehen? '
-      + 'Das lässt sich <b>jederzeit umschalten</b> — in den Einstellungen unter Mein Profil, '   /* v3720: seit v3077 je Nutzer, nicht mehr über den Reitern */
+      + 'Das lässt sich <b>jederzeit umschalten</b>, in den Einstellungen unter Mein Profil, '   /* v3720: seit v3077 je Nutzer, nicht mehr über den Reitern */
       + 'für alle Objekte. <b>Nichts geht verloren:</b> ausgeblendete Felder behalten '
       + 'ihre Werte und rechnen weiter.</p>'
       + '<div class="dpo-kacheln dpo-kacheln-3">'
@@ -892,7 +892,7 @@ window.DealPilotOnboarding = (function () {
   var SCHRITTE = [
     { titel: 'Wie soll DealPilot aussehen?', kurz: 'Aussehen',    bau: s1 },
     { titel: 'Deine Daten',                  kurz: 'Daten',       bau: s2 },
-    { titel: 'Dein Anlegerprofil — womit sollen wir rechnen?', kurz: 'Finanzierung',bau: s3 },
+    { titel: 'Dein Anlegerprofil, womit sollen wir rechnen?', kurz: 'Finanzierung',bau: s3 },
     { titel: 'Steuer',                       kurz: 'Steuer',      bau: s4 },
     { titel: 'Wie soll DealPilot bewerten?', kurz: 'Bewertung',   bau: s5 },
     { titel: 'Wie tief möchtest du einsteigen?', kurz: 'Detailgrad', bau: sDetailgrad },   /* v3073 */
@@ -1000,7 +1000,7 @@ window.DealPilotOnboarding = (function () {
       +   '<div class="dpo-marke">DealPilot</div>'
       /* v3410 · Schliessen-Knopf wie in allen Fenstern (Marcel 15.11.2026: „das soll einheitlich
          aussehen"). Schliessen heisst „spaeter weiter", nicht „erledigt" - siehe _schliessen(). */
-      +   '<button type="button" class="dpo-zu" id="dpo-zu" aria-label="Schließen" title="Schließen – beim nächsten Start geht es hier weiter">'
+      +   '<button type="button" class="dpo-zu" id="dpo-zu" aria-label="Schließen" title="Schließen, beim nächsten Start geht es hier weiter">'
       +     '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>'
       +   '</button>'
       +   '<div class="dpo-schritte" id="dpo-schritte"></div>'
@@ -1126,7 +1126,7 @@ window.DealPilotOnboarding = (function () {
     var g = _grenzsatz(zve, k, ((el('dpo_veranl') || {}).value === '1'));
     if (g == null) {
       erg.innerHTML = '<span class="dpo-r-fehl">'
-        + (zve > 0 ? 'Der Steuerrechner ist gerade nicht geladen — trag den Satz bitte direkt ein.'
+        + (zve > 0 ? 'Der Steuerrechner ist gerade nicht geladen, trag den Satz bitte direkt ein.'
                    : 'Bitte ein zu versteuerndes Einkommen eintragen.')
         + '</span>';
       return;
@@ -1375,7 +1375,7 @@ window.DealPilotOnboarding = (function () {
         + '<i></i>' + esc(x.kurz) + '</span>';
     }).join('');
     el('dpo-zurueck').style.visibility = _schritt === 0 ? 'hidden' : '';
-    el('dpo-weiter').textContent = (_schritt === SCHRITTE.length - 1) ? 'Fertig — los geht’s' : 'Weiter';
+    el('dpo-weiter').textContent = (_schritt === SCHRITTE.length - 1) ? 'Fertig, los geht’s' : 'Weiter';
     try { el('dpo-inhalt').scrollTop = 0; } catch (e) {}
 
     /* v1750 · Das Zinsfeld richtet sich nach dem Haken — beim Zeichnen UND

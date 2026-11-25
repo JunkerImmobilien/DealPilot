@@ -403,7 +403,7 @@
       });
     });
     if (n > alt) hinweis('Auf ' + NAMEN[n] + ' erweitert: ' + dazu + (dazu === 1 ? ' Feld' : ' Felder') + ' dazu. Deine Angaben bleiben, wie sie sind.' + (n === 3 ? ' Die Wertermittlung (Stufe 3) ist jetzt abrufbar.' : ''));
-    else hinweis('Auf ' + NAMEN[n] + ' vereinfacht. ' + (weg ? weg + (weg === 1 ? ' ausgefülltes Feld ist' : ' ausgefüllte Felder sind') + ' ausgeblendet und rechne' + (weg === 1 ? 't' : 'n') + ' weiter — nichts wird gelöscht.' : 'Keine ausgefüllten Felder ausgeblendet.'));
+    else hinweis('Auf ' + NAMEN[n] + ' vereinfacht. ' + (weg ? weg + (weg === 1 ? ' ausgefülltes Feld ist' : ' ausgefüllte Felder sind') + ' ausgeblendet und rechne' + (weg === 1 ? 't' : 'n') + ' weiter, nichts wird gelöscht.' : 'Keine ausgefüllten Felder ausgeblendet.'));
   }
 
   /* ── Anwenden ────────────────────────────────────────────────────── */
@@ -496,7 +496,7 @@
      Zeile fällt weg (dokument-import.js „ohne Miteigentumsanteil …"). Der
      Gebäudeanteil (AfA) wird von keinem Importweg geschrieben. */
   var RECHENPFLICHT = {
-    mea: 'Miteigentumsanteil – daraus rechnet DealPilot den Anteil der Wohnung an Hausgeld und Sonderumlage'
+    mea: 'Miteigentumsanteil, daraus rechnet DealPilot den Anteil der Wohnung an Hausgeld und Sonderumlage'
   };
   /* Zeilen ohne eigenes sichtbares Feld: Einheiten (der Dialog ist ab Fortgeschritten),
      Modus der Mietentwicklung (Einsteiger hat nur die Prognose), Wohnungsliste des Zielbilds */

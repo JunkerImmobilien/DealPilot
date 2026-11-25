@@ -180,13 +180,13 @@
           ? ' wechseln Verlust- und Gewinnjahre (Erstattungen ' + sgn(A.erstattung) + ', Steuer ' + eur(A.vorherSteuer) + ', zusammen ' + sgn(A.netto) + '). <b>Ab ' + A.jahr + ' bleibt das Ergebnis positiv</b>'
           : ' senkt das Objekt deine Steuer (Erstattungen ' + sgn(A.erstattung) + '). <b>Ab ' + A.jahr + ' wird das Ergebnis positiv</b>')
         + ' – ab hier zahlst du auf dieses Objekt Steuern. Das ist der Zeitpunkt, an dem ein weiteres Investment mit Anfangsverlusten (Zinsen, AfA, Sanierung) die Steuerlast wieder ausgleichen kann.'
-      : (w === 0 ? 'Dieses Objekt ist <b>vom ersten Jahr an steuerlich positiv</b> – es bringt keine Erstattung, die Steuer steigt mit der Miete (' + R[0].jahr + ': ' + eur(Math.max(0, -R[0].steuer)) + ', ' + R[n - 1].jahr + ': ' + eur(Math.max(0, -R[n - 1].steuer)) + ' im Jahr). Ein Objekt mit Anfangsverlusten daneben würde die Last senken.'
+      : (w === 0 ? 'Dieses Objekt ist <b>vom ersten Jahr an steuerlich positiv</b>, es bringt keine Erstattung, die Steuer steigt mit der Miete (' + R[0].jahr + ': ' + eur(Math.max(0, -R[0].steuer)) + ', ' + R[n - 1].jahr + ': ' + eur(Math.max(0, -R[n - 1].steuer)) + ' im Jahr). Ein Objekt mit Anfangsverlusten daneben würde die Last senken.'
         : (function () {
             /* v3273 · Ravensberger Weg 38: 2026–2029 positiv, ab 2030 (Anschluss 5 % statt 4 %) wieder
                Verlust bis zum Ende. „senkt deine Steuer in jedem Jahr" stimmte nicht - jetzt nennt der
                Satz die Gewinnjahre und, wenn sie zusammenfällt, das Ende der Zinsbindung. */
             var plus = R.filter(function (r) { return r.erg > 0; });
-            if (!plus.length) return 'Das Objekt bleibt im Betrachtungszeitraum steuerlich negativ – es senkt deine Steuer in jedem Jahr (zusammen ' + sgn(A.erstattung) + ').';
+            if (!plus.length) return 'Das Objekt bleibt im Betrachtungszeitraum steuerlich negativ, es senkt deine Steuer in jedem Jahr (zusammen ' + sgn(A.erstattung) + ').';
             var letzt = plus[plus.length - 1].jahr, danach = letzt + 1;
             var bind = E.filter(function (e) { return e[1] === 'Zinsbindung endet'; })[0];
             var grund = bind && bind[0] === danach ? ' – mit dem Ende der Zinsbindung ' + danach + ' rechnet die Anschlussfinanzierung höhere Zinsen' : '';
@@ -224,7 +224,7 @@
       + '<div class="dp-stv-leg"><span><i style="background:' + C.verlust + '"></i>Verlust · Steuererstattung</span><span><i style="background:' + C.gewinn + '"></i>Gewinn · Steuer fällig</span>'
       + (pkt.length > 1 ? '<span><i class="l" style="background:' + C.linie + '"></i>Cashflow nach Steuern</span>' : '') + (w > 0 ? '<span><i class="l" style="background:' + C.marke + '"></i>Wendepunkt</span>' : '') + '</div>'
       + '<div class="dp-stv-ch"><svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Steuerverlauf über ' + n + ' Jahre' + (A.jahr ? ', steuerlich positiv ab ' + A.jahr : '') + '">' + s + '</svg><div class="dp-stv-tip"></div></div>'
-      + '<p class="dp-stv-fuss">Ergebnis aus V+V = Einnahmen minus Werbungskosten (Zinsen, AfA, Bewirtschaftung, Werbungskosten im Detail) – dieselbe Rechnung wie das Steuerformular. Steuerwirkung als Unterschied der Steuer mit und ohne dieses Objekt: Einkommensteuer nach § 32a EStG (Grund- oder Splittingtabelle laut deinen Steuerangaben), Solidaritätszuschlag und, wenn angegeben, Kirchensteuer – saldiert mit deinen früher gekauften Objekten, ein Verlust über dein Einkommen hinaus als Vortrag ins Folgejahr. Keine Steuerberatung.</p>'
+      + '<p class="dp-stv-fuss">Ergebnis aus V+V = Einnahmen minus Werbungskosten (Zinsen, AfA, Bewirtschaftung, Werbungskosten im Detail), dieselbe Rechnung wie das Steuerformular. Steuerwirkung als Unterschied der Steuer mit und ohne dieses Objekt: Einkommensteuer nach § 32a EStG (Grund- oder Splittingtabelle laut deinen Steuerangaben), Solidaritätszuschlag und, wenn angegeben, Kirchensteuer, saldiert mit deinen früher gekauften Objekten, ein Verlust über dein Einkommen hinaus als Vortrag ins Folgejahr. Keine Steuerberatung.</p>'
       + '</div></div>';
     if (klappbar) {
       anwenden(host, istOffen());

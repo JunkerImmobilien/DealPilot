@@ -51,7 +51,7 @@
       try { if (window.showToast) showToast(an ? 'Erinnerung vor Mieterhöhung eingeschaltet' : 'Erinnerung vor Mieterhöhung ausgeschaltet'); } catch (e) {}
     }).catch(function () {
       if (cb) { cb.checked = !an; cb.disabled = false; }
-      if (info) info.textContent = 'Nicht gespeichert – bitte noch einmal versuchen.';
+      if (info) info.textContent = 'Nicht gespeichert, bitte noch einmal versuchen.';
     });
   }
 
@@ -63,7 +63,7 @@
       + '<label style="display:flex;gap:9px;align-items:flex-start;cursor:pointer;font-size:13px;line-height:1.4">'
       + '<input type="checkbox" id="' + ID + '" style="margin-top:2px" disabled onchange="DealPilotErinnerung.setzen(this.checked)">'
       + '<span><b>Erinnerung vor Mieterhöhung</b><br><span class="hint" style="color:var(--muted)">'
-      + 'Ich bekomme eine E-Mail ein bis zwei Monate, bevor laut Rechnung eine Mieterhöhung nach § 558 BGB verlangt werden kann – je Einheit und Termin einmal, nur für Objekte im Bestand. '
+      + 'Ich bekomme eine E-Mail ein bis zwei Monate, bevor laut Rechnung eine Mieterhöhung nach § 558 BGB verlangt werden kann, je Einheit und Termin einmal, nur für Objekte im Bestand. '
       + 'Grundlage sind die Termine beim letzten Speichern des Objekts (Ist-Miete, letzte Erhöhung, Kappungsgrenze). Kein Mietername, keine Rechtsberatung. Standard: aus.'
       + '</span><br><span class="hint" id="' + ID + '-info" style="color:var(--muted)">Stand wird geladen …</span></span></label>';
   }

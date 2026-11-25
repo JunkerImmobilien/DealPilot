@@ -61,12 +61,12 @@
       titel: 'Kaufpreisaufteilung als PDF',
       unter: 'für das Finanzamt',
       fuer: 'Die fertige Anlage: Aufteilung, AfA-Bemessungsgrundlage und ' +
-            'Verprobung — als Dokument zum Einreichen.',
+            'Verprobung, als Dokument zum Einreichen.',
       /* Der einzige Weg hier, der etwas voraussetzt. */
       sperre: function () {
         var p = window.DpBmfAusgabe && DpBmfAusgabe.pruefen();   /* v3184: rechnet bei Bedarf selbst (bmf-ausgabe.js) */
         if (p) return p.ok ? null : 'Fehlen noch Werte: ' + p.fehlt.join(', ');
-        return gerechnet() ? null : 'Erst berechnen — die Anlage druckt das Ergebnis.';
+        return gerechnet() ? null : 'Erst berechnen, die Anlage druckt das Ergebnis.';
       },
       tun: function () {
         if (hat('exportPDFKaufpreisaufteilung')) return window.exportPDFKaufpreisaufteilung();   /* v3018d · der genaue Export */
@@ -117,7 +117,7 @@
       '<div class="dpw-kasten" role="dialog" aria-modal="true" aria-label="Kaufpreisaufteilung">' +
       '<div class="dpw-kopf"><b>Kaufpreisaufteilung · BMF</b>' +
       '<button type="button" class="dpw-zu" aria-label="Schliessen">×</button></div>' +
-      '<p class="dpw-vor">Rechnen oder ausgeben – die Ausgaben sind aktiv, sobald die Werte des Objekts reichen.</p>' +
+      '<p class="dpw-vor">Rechnen oder ausgeben, die Ausgaben sind aktiv, sobald die Werte des Objekts reichen.</p>' +
       '<div class="dpw-liste">' + karten + '</div>' +
       '</div>';
 

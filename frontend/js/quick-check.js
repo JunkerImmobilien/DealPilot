@@ -1157,7 +1157,7 @@
     var ekInp = document.getElementById('qc_ek');
     if (ekInp) ekInp.dataset.userSet = '1';
     var hint = document.getElementById('qc-ek-hint');
-    if (hint) hint.textContent = 'Manuell — LTV-Buttons setzen automatisch passenden Wert';
+    if (hint) hint.textContent = 'Manuell, LTV-Buttons setzen automatisch passenden Wert';
     qcCalc();
   }
 
@@ -1296,7 +1296,7 @@
       _qcRenderKiDetail(collected);
       qcCalc();
       var nn = Object.keys(combined).length;
-      if (typeof toast === 'function') toast('✓ KI hat ' + nn + ' Feld' + (nn===1?'':'er') + ' befüllt — Quellen unter dem Score');
+      if (typeof toast === 'function') toast('✓ KI hat ' + nn + ' Feld' + (nn===1?'':'er') + ' befüllt, Quellen unter dem Score');
     } catch (err) {
       if (typeof toast === 'function') toast('⚠ KI-Fehler: ' + (err.message || 'unbekannt'));
     } finally {
@@ -1481,7 +1481,7 @@
 
         var nkmMon = n('qc_nkm');
         if (nkmMon <= 0) {
-          console.log('[V207 bewirt] qc_nkm leer/0 — kann nichts berechnen');
+          console.log('[V207 bewirt] qc_nkm leer/0, kann nichts berechnen');
         } else {
           // Werte ermitteln
           var hgPctVal, nulPctVal, quelle, isAi;
@@ -1545,7 +1545,7 @@
               hgParent.appendChild(hgSrc);
             }
           }
-          console.log('[V207 bewirt] OK — HG=' + hgMon + '€/Mo (=' + hgPctVal + '% NKM), Split=' + nulPctVal + '%');
+          console.log('[V207 bewirt] OK, HG=' + hgMon + '€/Mo (=' + hgPctVal + '% NKM), Split=' + nulPctVal + '%');
 
           // In KI-Info-Box eine Bewirt-Karte zeigen
           suggestions._bewirtCard = {
@@ -1569,7 +1569,7 @@
               var zinsSrc = document.createElement('span');
               zinsSrc.className = 'qc-ai-src';
               zinsSrc.style.cssText = 'display:block;font-size:11px;color:#7A7370;margin-top:4px;font-style:italic';
-              zinsSrc.innerHTML = '✨ Marktzins — Quelle: ' +
+              zinsSrc.innerHTML = '✨ Marktzins, Quelle: ' +
                 (typeof window._ds2RenderSourceLink === 'function' ?
                   window._ds2RenderSourceLink(zins.source || 'Interhyp') :
                   _escHtmlQc(zins.source || 'Interhyp'));
@@ -1761,7 +1761,7 @@
         '</span>' +
       '</div>' +
       '<div class="qc-ai-result-value" style="color:#7A7370;font-style:italic;font-size:13px">' +
-        'Nicht aussagekräftig — KI hat zu wenig verlässliche Datenpunkte.' +
+        'Nicht aussagekräftig, KI hat zu wenig verlässliche Datenpunkte.' +
       '</div>' +
       (source ? '<div class="qc-ai-result-source">' +
         (typeof window._ds2RenderSourceLink === 'function' ?
@@ -2218,7 +2218,7 @@
     if (typeof calc === 'function') calc();
     // V63.76: Standalone-Mode verlassen, in normale Tab-Ansicht (Objekt = Tab 0) wechseln.
     // Vorher (V63.9): User blieb im Quick-Check. Jetzt explizit: Quick-Check-Übernahme = Workflow weiter.
-    if (typeof toast === 'function') toast('✓ Übernommen — du bist jetzt im Tab Objekt.');
+    if (typeof toast === 'function') toast('✓ Übernommen, du bist jetzt im Tab Objekt.');
     if (typeof exitQuickCheckMode === 'function') {
       setTimeout(function() {
         exitQuickCheckMode();
@@ -2388,12 +2388,12 @@
             '<span style="font-size:12px;line-height:1.5;display:block;margin-top:6px">' +
             'Bitte ergänzen: <b>' + json.missing_fields.join(', ') + '</b>. ' +
             'Tipp: Wenn die Plattform Daten nicht freigibt, das Inserat als PDF speichern (Strg+P) und ' +
-            'mit "PDF importieren" hochladen — die KI extrahiert dann zuverlässig alle Felder.' +
+            'mit "PDF importieren" hochladen, die KI extrahiert dann zuverlässig alle Felder.' +
             '</span>';
           status.className = 'qc-url-status qc-url-warn';
         }
       } else if (status) {
-        status.textContent = '✓ Daten übernommen — bitte prüfen.';
+        status.textContent = '✓ Daten übernommen, bitte prüfen.';
         status.className = 'qc-url-status qc-url-ok';
       }
       qcCalc();

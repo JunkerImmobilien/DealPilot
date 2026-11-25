@@ -205,7 +205,7 @@
     }
     var parsed = parseD1Auszahl(auszahlEl.value);
     if (!parsed) {
-      return { ok: false, level: 'error', msg: 'Format ungültig — bitte MM.YYYY (z.B. 05.2025)' };
+      return { ok: false, level: 'error', msg: 'Format ungültig, bitte MM.YYYY (z.B. 05.2025)' };
     }
     if (!kdEl || !kdEl.value) {
       return { ok: true, level: null, msg: null };
@@ -217,10 +217,10 @@
     var diffMonths = (parsed.year - kdY) * 12 + (parsed.month - kdM);
     // Extreme: >36 Monate Distanz → Tippfehler-Verdacht
     if (diffMonths < -36) {
-      return { ok: false, level: 'error', msg: '⚠ Auszahlung mehr als 3 Jahre VOR Kauf — bitte prüfen' };
+      return { ok: false, level: 'error', msg: '⚠ Auszahlung mehr als 3 Jahre VOR Kauf, bitte prüfen' };
     }
     if (diffMonths > 36) {
-      return { ok: false, level: 'error', msg: '⚠ Auszahlung mehr als 3 Jahre NACH Kauf — bitte prüfen' };
+      return { ok: false, level: 'error', msg: '⚠ Auszahlung mehr als 3 Jahre NACH Kauf, bitte prüfen' };
     }
     // Info-Bereich
     if (diffMonths < -6) {
@@ -230,7 +230,7 @@
       return { ok: true, level: 'info', msg: 'Nachträglich finanziert' };
     }
     if (diffMonths > 24) {
-      return { ok: true, level: 'warn', msg: 'Auszahlung deutlich nach Kauf — Umschuldung oder Forward?' };
+      return { ok: true, level: 'warn', msg: 'Auszahlung deutlich nach Kauf, Umschuldung oder Forward?' };
     }
     if (diffMonths < 0) {
       return { ok: true, level: 'info', msg: 'Auszahlung vor Kauf (z.B. Notar-Anderkonto)' };

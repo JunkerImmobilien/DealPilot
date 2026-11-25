@@ -334,7 +334,7 @@
       /* Abgrenzung Zielbild: dieselbe Arbeit nicht zweimal */
       var zb = 0; try { if (window.DpPotenzial && DpPotenzial.herkunft) zb = (DpPotenzial.herkunft() || {}).summe || 0; } catch (e) {}
       var plan = l.reduce(function (a, e) { return a + (zahl(e.betrag) > 0 ? zahl(e.betrag) : 0); }, 0);
-      if (zb > 0 && plan > 0) t += (t ? '<br>' : '') + 'Zielbild-Maßnahmen ' + eur(zb) + ' · geplante Sanierungen ' + eur(plan) + ' — zwei getrennte Angaben: das Zielbild zieht seine Maßnahmen nur vom Wertzuwachs ab, diese Liste geht in Cashflow und Steuer. Ist es dieselbe Arbeit, steht sie doppelt — dann eine der beiden Angaben leeren.';
+      if (zb > 0 && plan > 0) t += (t ? '<br>' : '') + 'Zielbild-Maßnahmen ' + eur(zb) + ' · geplante Sanierungen ' + eur(plan) + ' — zwei getrennte Angaben: das Zielbild zieht seine Maßnahmen nur vom Wertzuwachs ab, diese Liste geht in Cashflow und Steuer. Ist es dieselbe Arbeit, steht sie doppelt, dann eine der beiden Angaben leeren.';
       sum.innerHTML = t;
     }
   }

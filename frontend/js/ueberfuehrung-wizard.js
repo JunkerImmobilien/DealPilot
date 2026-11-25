@@ -56,7 +56,7 @@
   function open() {
     var _ck = (typeof _currentObjKey !== 'undefined') ? _currentObjKey : (window._currentObjKey || null);
     if (!_ck) { if (typeof toast === 'function') toast('Bitte zuerst ein Objekt öffnen, das ueberfuehrt werden soll.'); return; }
-    if (!K()) { if (typeof toast === 'function') toast('Rechenkern der Überführung nicht geladen — bitte Seite neu laden.'); return; }
+    if (!K()) { if (typeof toast === 'function') toast('Rechenkern der Überführung nicht geladen, bitte Seite neu laden.'); return; }
 
     var corps = _corpMandanten();
     if (!corps.length) {
@@ -70,7 +70,7 @@
        Objekt ablesbar und werden mit Grund abgewiesen. */
     var _herkEl = document.getElementById('obj_herkunft');
     if (_herkEl && _herkEl.value === 'ueberfuehrung') {
-      if (typeof toast === 'function') toast('Dieses Objekt ist bereits das Ergebnis einer Überführung — es gehört schon einer Gesellschaft.');
+      if (typeof toast === 'function') toast('Dieses Objekt ist bereits das Ergebnis einer Überführung, es gehört schon einer Gesellschaft.');
       return;
     }
     var _endeEl0 = document.getElementById('ueberf_ende');
@@ -165,7 +165,7 @@
     var gr = null;
     try { if (window.DealPilotGrest && DealPilotGrest.forPlz && b.plz) gr = DealPilotGrest.forPlz(b.plz); } catch (e) {}
     w.grestSatz = (gr && gr.rate != null) ? gr.rate : _num(b.gest_p);
-    w.grestQuelle = (gr && gr.rate != null) ? (gr.name + ' (aus PLZ ' + b.plz + ')') : 'Satz des Privatobjekts — bitte prüfen';
+    w.grestQuelle = (gr && gr.rate != null) ? (gr.name + ' (aus PLZ ' + b.plz + ')') : 'Satz des Privatobjekts, bitte prüfen';
     w.notarPct = 2.0;
     var brw = _num(b.brw), gsfl = _num(b.gsfl), mea = _num(b.mea);
     if (brw != null && brw > 0 && gsfl != null && gsfl > 0) {
@@ -217,7 +217,7 @@
     var t = (a.privatMonate > 0)
       ? 'Privat rechnet im Jahr ' + a.jahr + ' noch <b>' + a.privatMonate + '/12</b> (bis Ende ' + mon[a.monat - 1] + '), die Gesellschaft ab <b>' + mon[a.monat] + ' ' + a.jahr + '</b> mit ' + a.gesellschaftMonate + '/12.'
       : 'Das ganze Jahr ' + a.jahr + ' gehört der Gesellschaft (12/12), privat endet mit dem 31.12.' + (a.jahr - 1) + '.';
-    if (!a.monatsErster) t += '<br><b>Hinweis:</b> DealPilot rechnet monatsgenau — der Stichtagsmonat gehört ganz der Gesellschaft. Tagesgenau wären es ' + a.privatTage + ' Tage privat. Üblich und empfohlen ist der Übergang von Nutzen und Lasten zum <b>Monatsersten</b>.';
+    if (!a.monatsErster) t += '<br><b>Hinweis:</b> DealPilot rechnet monatsgenau, der Stichtagsmonat gehört ganz der Gesellschaft. Tagesgenau wären es ' + a.privatTage + ' Tage privat. Üblich und empfohlen ist der Übergang von Nutzen und Lasten zum <b>Monatsersten</b>.';
     return t;
   }
 
@@ -296,14 +296,14 @@
         '<div style="margin-bottom:6px"><label style="' + LAB + '">Art der &Uuml;bertragung</label>' + artOpts + '</div>' +
         '<div style="' + g2 + '">' +
           _feld('dpuew-vw', 'Verkehrswert zum Stichtag (gemeiner Wert) €', _de0(w.vw), w.vwQuelle ? 'Vorschlag: ' + esc(w.vwQuelle) : '<b style="color:#B8625C">Bitte eintragen</b> (Gutachten, Marktbericht)') +
-          (mitPreis ? _feld('dpuew-kp', 'Kaufpreis laut Vertrag €', _de0(w.kp), 'Gegenleistung inkl. übernommener Schulden — Bemessung der GrESt') : _feld('dpuew-gbw', 'Grundbesitzwert (BewG) €', _de0(w.gbw), 'stellt das Finanzamt fest (§ 8 Abs. 2 GrEStG, §§ 151, 157 ff. BewG). Leer = GrESt vorläufig auf den Verkehrswert')) +
+          (mitPreis ? _feld('dpuew-kp', 'Kaufpreis laut Vertrag €', _de0(w.kp), 'Gegenleistung inkl. übernommener Schulden, Bemessung der GrESt') : _feld('dpuew-gbw', 'Grundbesitzwert (BewG) €', _de0(w.gbw), 'stellt das Finanzamt fest (§ 8 Abs. 2 GrEStG, §§ 151, 157 ff. BewG). Leer = GrESt vorläufig auf den Verkehrswert')) +
         '</div>' +
         '<div style="' + g2 + '">' +
           _feld('dpuew-grest', 'GrESt-Satz %', _pct(w.grestSatz, 2), esc(w.grestQuelle || '')) +
           _feld('dpuew-notar', 'Notar + Grundbuch %', _pct(w.notarPct, 2), 'Vorschlag 2 %, kein Makler') +
         '</div>' +
         '<div style="' + g2 + '">' +
-          _feld('dpuew-boden', 'Bodenwert zum Stichtag €', _de0(w.boden), w.bodenQuelle ? 'Vorschlag: ' + w.bodenQuelle : '<b style="color:#B8625C">Bitte eintragen</b> — sonst wird der Gebäudeanteil des Privatobjekts übernommen') +
+          _feld('dpuew-boden', 'Bodenwert zum Stichtag €', _de0(w.boden), w.bodenQuelle ? 'Vorschlag: ' + w.bodenQuelle : '<b style="color:#B8625C">Bitte eintragen</b>, sonst wird der Gebäudeanteil des Privatobjekts übernommen') +
           '<div></div>' +
         '</div>' +
         '<div style="' + g2 + '">' +
@@ -316,7 +316,7 @@
         '</div>' +
         '<div style="' + g2 + '">' +
           _feld('dpuew-quote', 'Deine Beteiligung %', _pct(w.quote, 2), 'für § 32d Abs. 2 EStG') +
-          _feld('dpuew-w23', 'Weitere § 23-Gewinne im Jahr €', _de0(w.weitere23), (w._w23auto && !w._w23manuell && w._w23auto.betrag > 0) ? 'aus der Gruppe (schon übertragene Objekte ' + w._w23auto.jahr + ') — für die Freigrenze von 1.000 €' : 'für die Freigrenze von 1.000 €') +
+          _feld('dpuew-w23', 'Weitere § 23-Gewinne im Jahr €', _de0(w.weitere23), (w._w23auto && !w._w23manuell && w._w23auto.betrag > 0) ? 'aus der Gruppe (schon übertragene Objekte ' + w._w23auto.jahr + '), für die Freigrenze von 1.000 €' : 'für die Freigrenze von 1.000 €') +
         '</div>' +
         '<div id="dpuew-live" style="margin-top:14px"></div>';
     }
@@ -373,17 +373,17 @@
        TATSAECHLICH abgezogenen AfA (§ 23 Abs. 3 Satz 4 EStG) - der Hinweis sagt nur, dass sie zu niedrig war. */
     try {
       var _a25 = (window.Afa && Afa.pruefeSatzFertigstellung) ? Afa.pruefeSatzFertigstellung({ baujahr: b.baujahr, afaSatz: b.afa_satz, eigen: (_num(b.afa_eigen) || 0) > 0 }) : null;
-      if (_a25 && _a25.warnen) r.warn.push('Privat lief die AfA mit 2,0 %, obwohl das Gebäude vor 1925 fertiggestellt ist (Baujahr ' + esc(String(b.baujahr)) + '; 2,5 % nach § 7 Abs. 4 Satz 1 Nr. 2 Buchst. c EStG). Der § 23-Gewinn rechnet mit der tatsächlich abgezogenen AfA (§ 23 Abs. 3 Satz 4 EStG). Offene Jahre lassen sich gegebenenfalls noch berichtigen – bitte mit der Steuerberatung klären. Die Gesellschaft schreibt mit ' + (r.ak && r.ak.ok && r.ak.afaSatzPct ? _pct(r.ak.afaSatzPct, 1) : '2,5') + ' % ab.');
+      if (_a25 && _a25.warnen) r.warn.push('Privat lief die AfA mit 2,0 %, obwohl das Gebäude vor 1925 fertiggestellt ist (Baujahr ' + esc(String(b.baujahr)) + '; 2,5 % nach § 7 Abs. 4 Satz 1 Nr. 2 Buchst. c EStG). Der § 23-Gewinn rechnet mit der tatsächlich abgezogenen AfA (§ 23 Abs. 3 Satz 4 EStG). Offene Jahre lassen sich gegebenenfalls noch berichtigen, bitte mit der Steuerberatung klären. Die Gesellschaft schreibt mit ' + (r.ak && r.ak.ok && r.ak.afaSatzPct ? _pct(r.ak.afaSatzPct, 1) : '2,5') + ' % ab.');
     } catch (_e25) {}
     if ((_num(b.makler_p) || 0) > 0) r.warn.push('Der private Makler (' + _pct(_num(b.makler_p), 2) + ' %) zählt zu den privaten AK, nicht zu denen der Gesellschaft.');
     if (b.afa_sonder7b_aktiv === true || /deg/.test(String(b.afa_satz || ''))) r.warn.push('Privat war degressive AfA oder § 7b gewählt. Für die Gesellschaft ausgeschlossen (§ 7 Abs. 5a, § 7b EStG: Anschaffung nur bis Ende des Fertigstellungsjahres) — sie schreibt linear ab.');
     if (r.ak.ok && r.ak.wert.vga > 0) r.warn.push('Der Kaufpreis liegt ' + _eur(r.ak.wert.vga) + ' über dem Verkehrswert: der Mehrbetrag ist eine <b>verdeckte Gewinnausschüttung</b> (§ 8 Abs. 3 S. 2 KStG) und beim Gesellschafter Kapitalertrag.');
-    if (w.art === 'kauf' && r.ak.ok && r.ak.wert.verdeckteEinlage > 0) r.warn.push('Der Kaufpreis liegt unter dem Verkehrswert — das ist ein <b>teilentgeltlicher</b> Kauf: die Differenz (' + _eur(r.ak.wert.verdeckteEinlage) + ') ist verdeckte Einlage. Für § 23 zählt dann der gemeine Wert. Bitte „Teilentgeltlich“ wählen.');
-    if (w.art === 'teilentgeltlich') r.warn.push('GrESt: gerechnet auf den vereinbarten Preis (Gegenleistung, § 8 Abs. 1 GrEStG; BFH II R 28/15 für Verträge zwischen Gesellschaft und Gesellschafter). Das Finanzamt kann bei einem deutlich zu niedrigen Preis den Grundbesitzwert ansetzen — verbindliche Auskunft empfohlen.');
-    if (r.ak.ok && r.ak.bodenQuelle === 'uebernommen') r.warn.push('Kein Bodenwert zum Stichtag: der Gebäudeanteil des Privatobjekts (' + _pct(_num(b.geb_ant), 1) + ' %) wird übernommen. <b>Bitte ergänzen</b> — die Aufteilung gilt zum Erwerb durch die Gesellschaft.');
+    if (w.art === 'kauf' && r.ak.ok && r.ak.wert.verdeckteEinlage > 0) r.warn.push('Der Kaufpreis liegt unter dem Verkehrswert, das ist ein <b>teilentgeltlicher</b> Kauf: die Differenz (' + _eur(r.ak.wert.verdeckteEinlage) + ') ist verdeckte Einlage. Für § 23 zählt dann der gemeine Wert. Bitte „Teilentgeltlich“ wählen.');
+    if (w.art === 'teilentgeltlich') r.warn.push('GrESt: gerechnet auf den vereinbarten Preis (Gegenleistung, § 8 Abs. 1 GrEStG; BFH II R 28/15 für Verträge zwischen Gesellschaft und Gesellschafter). Das Finanzamt kann bei einem deutlich zu niedrigen Preis den Grundbesitzwert ansetzen, verbindliche Auskunft empfohlen.');
+    if (r.ak.ok && r.ak.bodenQuelle === 'uebernommen') r.warn.push('Kein Bodenwert zum Stichtag: der Gebäudeanteil des Privatobjekts (' + _pct(_num(b.geb_ant), 1) + ' %) wird übernommen. <b>Bitte ergänzen</b>, die Aufteilung gilt zum Erwerb durch die Gesellschaft.');
     if (r.ak.ok && r.ak.gebAntPct == null) r.fehlt.push('Bodenwert oder Gebäudeanteil');
     if (r.ak.ok && !r.ak.afaSicher) r.warn.push(r.ak.afaGrund);
-    if (w.rs == null) r.warn.push('Restschuld zum Stichtag fehlt — die Gesellschaft rechnet dann ohne Bankdarlehen. Bitte mit dem Kontoauszug abgleichen.');
+    if (w.rs == null) r.warn.push('Restschuld zum Stichtag fehlt, die Gesellschaft rechnet dann ohne Bankdarlehen. Bitte mit dem Kontoauszug abgleichen.');
     if (w.zins === '' && w.rs > 0) r.fehlt.push('Zins des Darlehens');
     r.gd = k.gesellschafterdarlehen({ betrag: w.gd, zinsPct: w.gdZins, beteiligungPct: w.quote });
     if (_rf() === 'ug') r.warn.push('UG: 25 % des Jahresüberschusses (nach Verlustvortrag) gehen in die gesetzliche Rücklage, bis das Stammkapital auf 25.000 € erhöht ist (§ 5a Abs. 3 GmbHG).');
@@ -395,7 +395,7 @@
       if (_d3.text) r.warn.push((_d3.ueberGrenze ? '<b style="color:#B8625C">' : '') + esc(_d3.text) + (_d3.ueberGrenze ? '</b>' : ''));
       r.dreiObjekt = _d3;
     }
-    r.warn.push('Die Bank muss der Übernahme des Darlehens zustimmen (§§ 414, 415 BGB). Prüfe außerdem die Drei-Objekt-Grenze (gewerblicher Grundstückshandel — die Übertragung zählt als Veräußerung) und bei Mitgesellschaftern die Schenkungsteuer (§ 7 Abs. 8 ErbStG).');
+    r.warn.push('Die Bank muss der Übernahme des Darlehens zustimmen (§§ 414, 415 BGB). Prüfe außerdem die Drei-Objekt-Grenze (gewerblicher Grundstückshandel, die Übertragung zählt als Veräußerung) und bei Mitgesellschaftern die Schenkungsteuer (§ 7 Abs. 8 ErbStG).');
     return r;
   }
 
@@ -411,7 +411,7 @@
         _zeile('Ansatz (' + (w.art === 'kauf' ? 'Kaufpreis' : 'Teilwert = Verkehrswert') + ')', _eur(a.wert.ansatz)) +
         (a.wert.verdeckteEinlage > 0 ? _zeile('davon verdeckte Einlage (Kapitalrücklage, § 27 KStG)', _eur(a.wert.verdeckteEinlage)) : '') +
         (a.wert.sacheinlage > 0 ? _zeile('davon Sacheinlage gegen Anteile', _eur(a.wert.sacheinlage)) : '') +
-        _zeile('Grunderwerbsteuer ' + _pct(g.satzPct, 2) + ' % auf ' + _eur(g.basis) + ' (' + (g.quelle === 'gegenleistung' ? 'Gegenleistung, § 8 Abs. 1 GrEStG' : g.quelle === 'grundbesitzwert' ? 'Grundbesitzwert, § 8 Abs. 2 GrEStG' : '<b style="color:#B8625C">vorläufig auf den Verkehrswert</b> — Grundbesitzwert stellt das Finanzamt fest') + ')', _eur(g.betrag)) +
+        _zeile('Grunderwerbsteuer ' + _pct(g.satzPct, 2) + ' % auf ' + _eur(g.basis) + ' (' + (g.quelle === 'gegenleistung' ? 'Gegenleistung, § 8 Abs. 1 GrEStG' : g.quelle === 'grundbesitzwert' ? 'Grundbesitzwert, § 8 Abs. 2 GrEStG' : '<b style="color:#B8625C">vorläufig auf den Verkehrswert</b>, Grundbesitzwert stellt das Finanzamt fest') + ')', _eur(g.betrag)) +
         _zeile('Notar + Grundbuch ' + _pct(a.notarPct, 2) + ' %', _eur(a.notar)) +
         _zeile('Anschaffungskosten der Gesellschaft', _eur(a.ak), true) +
         _zeile('Gebäudeanteil ' + _pct(a.gebAntPct, 1) + ' %' + (a.bodenQuelle === 'uebernommen' ? ' <b style="color:#B8625C">(übernommen)</b>' : ' (Bodenwert zum Stichtag)'), _eur(a.gebaeudeAK)) +
@@ -421,7 +421,7 @@
     }
     var p = r.p23 || {};
     h += '<div style="' + H + '">Privat &middot; § 23 EStG</div>';
-    if (p.steuerfrei) h += '<div style="font-size:12.5px;color:#3FA56C;margin-bottom:10px"><b>Steuerfrei</b> — Zehnjahresfrist abgelaufen (' + esc(p.frist.text) + ').</div>';
+    if (p.steuerfrei) h += '<div style="font-size:12.5px;color:#3FA56C;margin-bottom:10px"><b>Steuerfrei</b>, Zehnjahresfrist abgelaufen (' + esc(p.frist.text) + ').</div>';
     else if (p.fehlt) h += '<div style="font-size:12.5px;color:#B8625C;margin-bottom:10px">Nicht berechenbar: ' + esc(p.fehlt.join(', ')) + '.</div>';
     else {
       h += '<table style="' + T + '">' +
@@ -434,7 +434,7 @@
         (r.st23 ? _zeile('Indikative Einkommensteuer (' + esc(r.st23.methode) + ')', r.st23.betrag != null ? _eur(r.st23.betrag) : '<b style="color:#B8625C">Grenzsteuersatz fehlt</b>', true) : '') +
         '</table>';
     }
-    if (r.gd && w.gd > 0) h += '<div style="font-size:12px;color:#5f594f;margin-bottom:8px">Gesellschafterdarlehen ' + _eur(w.gd) + ' × ' + _pct(w.gdZins, 3) + ' % = Zins ' + _eur(r.gd.zins) + '/Jahr — Betriebsausgabe der Gesellschaft; bei dir: ' + esc(r.gd.regel) + '.</div>';
+    if (r.gd && w.gd > 0) h += '<div style="font-size:12px;color:#5f594f;margin-bottom:8px">Gesellschafterdarlehen ' + _eur(w.gd) + ' × ' + _pct(w.gdZins, 3) + ' % = Zins ' + _eur(r.gd.zins) + '/Jahr, Betriebsausgabe der Gesellschaft, bei dir: ' + esc(r.gd.regel) + '.</div>';
     if (r.warn.length) h += '<div style="' + H + '">Hinweise</div><ul style="margin:0 0 6px 16px;padding:0;font-size:12px;line-height:1.5;color:#5f594f">' + r.warn.map(function (x) { return '<li style="margin:3px 0">' + x + '</li>'; }).join('') + '</ul>';
     h += '<div style="font-size:11.5px;color:#8a8378;margin-top:8px">Verbindliche Auskunft (§ 89 Abs. 2 AO) vor dem Notartermin ist der sichere Weg. DealPilot rechnet, es berät nicht.</div>';
     return h;
@@ -498,7 +498,7 @@
       var d = document.getElementById('dpuew-stichtag');
       if (!d || !d.value) { if (typeof toast === 'function') toast('Bitte einen Stichtag wählen.'); return false; }
       _ctx._stichtag = d.value;
-      if (_ctx.w.rs == null) { var v = _rsVorschlag(d.value); if (v != null) { _ctx.w.rs = v; _ctx.w.rsQuelle = 'Vorschlag aus der Finanzierung des Privatobjekts — bitte mit dem Kontoauszug abgleichen'; } }
+      if (_ctx.w.rs == null) { var v = _rsVorschlag(d.value); if (v != null) { _ctx.w.rs = v; _ctx.w.rsQuelle = 'Vorschlag aus der Finanzierung des Privatobjekts, bitte mit dem Kontoauszug abgleichen'; } }
       if (!_ctx._halterId && _ctx.corps[0]) { _ctx._halterId = _ctx.corps[0].id; _ctx._halterName = _ctx.corps[0].name; }
     }
     if (_cur === 2) {
@@ -652,7 +652,7 @@
         }
       } catch (e) { try { console.warn('[v3470] Gruppe nicht fortgeschrieben', e); } catch (e2) {} }
       close();
-      if (typeof toast === 'function') toast('✓ Überführt — Gesellschaftsobjekt angelegt, Privatobjekt eingefroren.');
+      if (typeof toast === 'function') toast('✓ Überführt, Gesellschaftsobjekt angelegt, Privatobjekt eingefroren.');
       /* v3472: Name ohne den Rechtsform-Zusatz der Auswahlliste („… GmbH (Test) (GmbH)") */
       var _corpName = c._halterName;
       try { var _cm = DealPilotMandanten.get(c._halterId); if (_cm && _cm.id === c._halterId) _corpName = _cm.name; } catch (e) {}

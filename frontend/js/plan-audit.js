@@ -27,7 +27,7 @@
     if (!plans) return;
 
     console.log('═══════════════════════════════════════════════════════════');
-    console.log('  DealPilot Plan-Audit — V159');
+    console.log('  DealPilot Plan-Audit, V159');
     console.log('═══════════════════════════════════════════════════════════');
 
     var keys = ['free', 'starter', 'investor', 'pro'];
@@ -66,7 +66,7 @@
       current = window.DealPilotConfig.pricing.current();
     } catch (e) {}
     if (!current) {
-      console.error('Kein aktiver Plan ermittelbar — Session?');
+      console.error('Kein aktiver Plan ermittelbar, Session?');
       return;
     }
     console.log('Aktueller User-Plan: ' + current.label + ' (' + current.key + ')');
@@ -98,5 +98,5 @@
   }
 
   window.DealPilotPlanAudit = { run: run, checkUser: checkUser, compare: compare };
-  console.log('[plan-audit-v159] geladen — Aufrufen: DealPilotPlanAudit.run() / .checkUser() / .compare("free","starter")');
+  console.log('[plan-audit-v159] geladen, Aufrufen: DealPilotPlanAudit.run() / .checkUser() / .compare("free","starter")');
 })();

@@ -276,7 +276,7 @@ window.DealPilotInvestmentProfile = (function() {
       ].join('');
     }
     return [
-      '<p class="hint" style="margin-bottom:18px">Deine persönlichen Standard-Annahmen. Werden bei jedem neuen Objekt automatisch vor-eingefüllt — du kannst sie pro Objekt jederzeit überschreiben.</p>',
+      '<p class="hint" style="margin-bottom:18px">Deine persönlichen Standard-Annahmen. Werden bei jedem neuen Objekt automatisch vor-eingefüllt, du kannst sie pro Objekt jederzeit überschreiben.</p>',
 
       '<h3 class="ip-section">Finanzierung</h3>',
       '<div class="ip-grid">',
@@ -291,7 +291,7 @@ window.DealPilotInvestmentProfile = (function() {
             '<label><input type="radio" name="ip_zins_modus" value="eigen"' + ((p.zins_override != null && String(p.zins_override) !== '') ? ' checked' : '') + '> Eigener Zinssatz</label>' +
           '</div>',
         field('ip_zins_override', 'Eigener Zinssatz', p.zins_override, '%', 'Marktzins: Pfandbrief-Rendite der Zinsbindung plus Bonitätsaufschlag, täglich aktuell') + '</div>',
-        (function(){ var mg = String(p.zins_margin || 'standard'); var L = [['premium','Top (LTV 60 %)'],['standard','Normal (LTV 80 %)'],['schwach','Schwächer (LTV 90 %)'],['voll','Vollfinanzierung (LTV 100 %)']]; var o = L.map(function(x){ return '<option value="'+x[0]+'"'+(x[0]===mg?' selected':'')+'>'+x[1]+'</option>'; }).join(''); return '<div class="ip-field"><label for="ip_zins_margin">Zins-Stufe (Bonität / LTV)</label><div class="ip-field-row"><select id="ip_zins_margin">'+o+'</select></div><div class="ip-hint">Zuschlag nach Beleihung auf den Marktzins (Bundesanleihe + Marktaufschlag): 60 / 80 / 90 % — nur bei indikativem Zins (eigener Zinssatz übersteuert)</div></div>'; })(),
+        (function(){ var mg = String(p.zins_margin || 'standard'); var L = [['premium','Top (LTV 60 %)'],['standard','Normal (LTV 80 %)'],['schwach','Schwächer (LTV 90 %)'],['voll','Vollfinanzierung (LTV 100 %)']]; var o = L.map(function(x){ return '<option value="'+x[0]+'"'+(x[0]===mg?' selected':'')+'>'+x[1]+'</option>'; }).join(''); return '<div class="ip-field"><label for="ip_zins_margin">Zins-Stufe (Bonität / LTV)</label><div class="ip-field-row"><select id="ip_zins_margin">'+o+'</select></div><div class="ip-hint">Zuschlag nach Beleihung auf den Marktzins (Bundesanleihe + Marktaufschlag): 60 / 80 / 90 %, nur bei indikativem Zins (eigener Zinssatz übersteuert)</div></div>'; })(),
         field('ip_ek_quote_default',    'Standard-Eigenkapital',     p.ek_quote_default,    '% v. KP', 'wird automatisch in € umgerechnet'),
       '</div>',
 
@@ -312,10 +312,10 @@ window.DealPilotInvestmentProfile = (function() {
            in die Einstellungen packen." Die nicht-umlagefähige Quote stand
            hier schon — sie kam nur nie im Formular an (siehe main.js
            _dpProfilWert, bis v1431 _dpProfil). Jetzt wirken alle drei. */
-        field('ip_bwk_ul_pct_default', 'Bewirtschaftung umlagefähig', p.bwk_ul_pct_default, '% der NKM', 'Hausgeld umlagefähig, Grundsteuer — typisch 15–20 %'),
-        field('ip_bwk_anteil_default', 'Bewirtschaftung nicht umlagefähig', p.bwk_anteil_default, '% der NKM', 'Verwaltung, Rücklagen — typisch 15–22 %'),
-        field('ip_mietausfall_pct', 'Kalkulatorischer Mietausfall', p.mietausfall_pct, '% der NKM', 'wird beim neuen Objekt in Euro umgerechnet (sobald eine Miete eingetragen ist) und gilt bei Euro-Werten (Detailliert) — bei Prozent der Nettokaltmiete steckt er nicht in der Quote; A-Lage eher 1 %, C-Lage eher 3 % (ImmoWertV: 2 % Wohnen).'),
-        (function(){ var presets = ['','0.5','1.0','1.5','2.0','2.5','3.0','4.0','5.0']; var cur = (p.hausgeld_pct != null && p.hausgeld_pct !== '') ? String(p.hausgeld_pct) : ''; var isP = presets.indexOf(cur) >= 0; var o = [['','— (aus)'],['0.5','0,5 % vom KP / Jahr'],['1.0','1,0 %'],['1.5','1,5 %'],['2.0','2,0 %'],['2.5','2,5 %'],['3.0','3,0 %'],['4.0','4,0 %'],['5.0','5,0 %']].map(function(x){ return '<option value="'+x[0]+'"'+(x[0]===(isP?cur:'')?' selected':'')+'>'+x[1]+'</option>'; }).join(''); return '<div class="ip-field"><label for="ip_hausgeld_sel">Hausgeld-Annahme</label><div class="ip-field-row"><select id="ip_hausgeld_sel">'+o+'</select></div><div class="ip-hint">Anteil vom Kaufpreis p.a. — Fallback — nur wenn keine Wohnfläche vorliegt (sonst Wohnflächen-Schätzung)</div></div>'; })(),
+        field('ip_bwk_ul_pct_default', 'Bewirtschaftung umlagefähig', p.bwk_ul_pct_default, '% der NKM', 'Hausgeld umlagefähig, Grundsteuer, typisch 15–20 %'),
+        field('ip_bwk_anteil_default', 'Bewirtschaftung nicht umlagefähig', p.bwk_anteil_default, '% der NKM', 'Verwaltung, Rücklagen, typisch 15–22 %'),
+        field('ip_mietausfall_pct', 'Kalkulatorischer Mietausfall', p.mietausfall_pct, '% der NKM', 'wird beim neuen Objekt in Euro umgerechnet (sobald eine Miete eingetragen ist) und gilt bei Euro-Werten (Detailliert), bei Prozent der Nettokaltmiete steckt er nicht in der Quote; A-Lage eher 1 %, C-Lage eher 3 % (ImmoWertV: 2 % Wohnen).'),
+        (function(){ var presets = ['','0.5','1.0','1.5','2.0','2.5','3.0','4.0','5.0']; var cur = (p.hausgeld_pct != null && p.hausgeld_pct !== '') ? String(p.hausgeld_pct) : ''; var isP = presets.indexOf(cur) >= 0; var o = [['','— (aus)'],['0.5','0,5 % vom KP / Jahr'],['1.0','1,0 %'],['1.5','1,5 %'],['2.0','2,0 %'],['2.5','2,5 %'],['3.0','3,0 %'],['4.0','4,0 %'],['5.0','5,0 %']].map(function(x){ return '<option value="'+x[0]+'"'+(x[0]===(isP?cur:'')?' selected':'')+'>'+x[1]+'</option>'; }).join(''); return '<div class="ip-field"><label for="ip_hausgeld_sel">Hausgeld-Annahme</label><div class="ip-field-row"><select id="ip_hausgeld_sel">'+o+'</select></div><div class="ip-hint">Anteil vom Kaufpreis p.a., Fallback, nur wenn keine Wohnfläche vorliegt (sonst Wohnflächen-Schätzung)</div></div>'; })(),
         field('ip_hausgeld_pct', 'Eigener Hausgeld-Anteil (optional)', (p.hausgeld_pct != null && ['0.5','1.0','1.5','2.0','2.5','3.0','4.0','5.0',''].indexOf(String(p.hausgeld_pct)) < 0) ? p.hausgeld_pct : '', '% vom KP/Jahr', 'übersteuert die Schnellauswahl'),
       '</div>',
 
@@ -335,7 +335,7 @@ window.DealPilotInvestmentProfile = (function() {
       (window.DealPilotBwkProfil ? DealPilotBwkProfil.einstellungenHtml() : ''),
 
       '<h3 class="ip-section">Persönliche Mindest-Schwellen</h3>',
-      '<p class="hint">Diese Werte steuern die Ampeln für DSCR und LTV — Bank-Kacheln, Objektkarte, Cockpit, Bank-Charts, PDF und Quick-Check — sowie „Deine Kaufgrenzen" und die Cashflow-Ampel im Quick-Check. „Grün", wenn dein persönliches Ziel erreicht ist; beim DSCR gelb ab 1,0, beim LTV gelb bis 100 %.</p>',   /* v2240 */
+      '<p class="hint">Diese Werte steuern die Ampeln für DSCR und LTV, Bank-Kacheln, Objektkarte, Cockpit, Bank-Charts, PDF und Quick-Check, sowie „Deine Kaufgrenzen" und die Cashflow-Ampel im Quick-Check. „Grün", wenn dein persönliches Ziel erreicht ist, beim DSCR gelb ab 1,0, beim LTV gelb bis 100 %.</p>',   /* v2240 */
       '<div class="ip-grid">',
         field('ip_min_dscr',            'Mindest-DSCR',           p.min_dscr,            '',      'z.B. 1,20'),
         field('ip_min_cashflow_vor_st', 'Mindest-Cashflow / Monat', p.min_cashflow_vor_st, '€',   'vor Steuer'),
@@ -344,7 +344,7 @@ window.DealPilotInvestmentProfile = (function() {
 
       '<h3 class="ip-section">Steuer</h3>',
       '<div class="ip-grid">',
-        field('ip_grenzsteuersatz', 'Persönlicher Grenzsteuersatz', p.grenzsteuersatz, '%', 'Vorbelegung 40,45 %. Gilt für Objekte im Privatvermögen, solange im Reiter Steuer kein zu versteuerndes Einkommen steht — mit Einkommen rechnet DealPilot den Satz selbst aus.'),
+        field('ip_grenzsteuersatz', 'Persönlicher Grenzsteuersatz', p.grenzsteuersatz, '%', 'Vorbelegung 40,45 %. Gilt für Objekte im Privatvermögen, solange im Reiter Steuer kein zu versteuerndes Einkommen steht, mit Einkommen rechnet DealPilot den Satz selbst aus.'),
         /* v2891: dieselben zwei Angaben wie unter dem zvE im Tab Steuern, derselbe Speicher */
         '<div class="ip-field"><label for="ip_splitting">Veranlagung</label><div class="ip-field-row"><select id="ip_splitting">' +
           '<option value="0"' + ((p.splitting === true || p.splitting === 'true') ? '' : ' selected') + '>Einzelveranlagung</option>' +
@@ -354,7 +354,7 @@ window.DealPilotInvestmentProfile = (function() {
           [['0','keine'],['8','8 % (BY, BW)'],['9','9 % (übrige Länder)']].map(function (o) {
             return '<option value="' + o[0] + '"' + (String(parseInt(p.kirchensteuer, 10) || 0) === o[0] ? ' selected' : '') + '>' + o[1] + '</option>';
           }).join('') + '</select></div>' +
-          '<div class="ip-hint">Soli und Kirchensteuer stehen auf der Einkommensteuer; die Kirchensteuer mindert als Sonderausgabe das zvE.</div></div>',
+          '<div class="ip-hint">Soli und Kirchensteuer stehen auf der Einkommensteuer, die Kirchensteuer mindert als Sonderausgabe das zvE.</div></div>',
       '</div>',
       /* v2211 · Marcel: „wir können ja auch unseren Steuersatz unter Mandanten angeben ... dorthin verlinken".
          Gemessen: Mandanten führt den Satz nur für GESELLSCHAFTEN (effRate: KSt + GewSt);
@@ -377,13 +377,13 @@ window.DealPilotInvestmentProfile = (function() {
          gelten nur als Startwert eines NEUEN Objekts (setDefaults/applyToNewObject,
          GrESt-Rückfall, Makler-Vorgabe) - bestehende Objekte bleiben unberührt. */
       '<h3 class="ip-section">Vorbelegung für neue Objekte</h3>',
-      '<p class="hint">Mit diesen Kaufnebenkosten und diesem Bundesland startet jedes <b>neue</b> Objekt. Am Objekt änderst du sie im Reiter Investition; bereits angelegte Objekte behalten ihre Werte.</p>',
+      '<p class="hint">Mit diesen Kaufnebenkosten und diesem Bundesland startet jedes <b>neue</b> Objekt. Am Objekt änderst du sie im Reiter Investition, bereits angelegte Objekte behalten ihre Werte.</p>',
       '<div class="ip-grid">',
         blEl(),
         field('ip_notar_pct',       'Notar',             get('notar_pct'),       '%', 'inkl. Grundschuld · üblich 0,9–1,2 %'),
         field('ip_grundbuch_pct',   'Grundbuchamt',      get('grundbuch_pct'),   '%', 'vom Kaufpreis'),
-        field('ip_maklerkosten',    'Maklergebühr',      get('maklerkosten'),    '%', 'inkl. MwSt — 0, wenn ohne Makler'),
-        field('ip_sonstige_nk_pct', 'Sonstige Kosten',   get('sonstige_nk_pct'), '%', 'nur wenn du sie ansetzt — Gutachten, Anfahrt'),
+        field('ip_maklerkosten',    'Maklergebühr',      get('maklerkosten'),    '%', 'inkl. MwSt, 0, wenn ohne Makler'),
+        field('ip_sonstige_nk_pct', 'Sonstige Kosten',   get('sonstige_nk_pct'), '%', 'nur wenn du sie ansetzt, Gutachten, Anfahrt'),
       '</div>',
       /* v3088 · Notar und Grundbuch nach Gebuehrenordnung (gnotkg.js) */
       '<label class="ip-check" style="display:flex;gap:9px;align-items:flex-start;margin:6px 0 10px;cursor:pointer;font-size:13px;line-height:1.45">'
@@ -395,11 +395,11 @@ window.DealPilotInvestmentProfile = (function() {
         + '<input type="checkbox" id="ip_grest_auto" style="margin-top:3px"' + (get('grest_auto') === false ? '' : ' checked') + '>'
         + '<span><b>Grunderwerbsteuer automatisch nach Bundesland</b><br><span class="hint" style="color:var(--muted)">'
         + 'DealPilot erkennt das Bundesland an der Postleitzahl des Objekts und setzt den passenden Satz. '
-        + 'Ohne Haken gilt das Bundesland oben — für jedes Objekt, bis du es dort änderst.</span></span></label>',
+        + 'Ohne Haken gilt das Bundesland oben, für jedes Objekt, bis du es dort änderst.</span></span></label>',
 
       /* v2237 · Abschlag auf Angebotspreise: leer = recherchierter Marktdurchschnitt */
       '<h3 class="ip-section">Marktbewertung</h3>',
-      '<p class="hint">Marktwerte aus Inseraten sind <b>Angebotspreise</b> — gezahlt wird meist weniger. DealPilot zieht diesen Abschlag von der Marktbewertung ab, bevor sie ins Urteil geht. ' +
+      '<p class="hint">Marktwerte aus Inseraten sind <b>Angebotspreise</b>, gezahlt wird meist weniger. DealPilot zieht diesen Abschlag von der Marktbewertung ab, bevor sie ins Urteil geht. ' +
         (function () { var m = window.DealPilotConfig && DealPilotConfig.angebotAbschlagMarkt; return m ? 'Leer lassen = aktueller Marktdurchschnitt: <b>' + String(m.pct).replace('.', ',') + ' %</b>.' : '';   /* v2237d: keine Quelle nach außen */ })() + '</p>',
       '<div class="ip-grid">',
         field('ip_angebot_abschlag_pct', 'Abschlag auf Angebotspreise', p.angebot_abschlag_pct, '%',

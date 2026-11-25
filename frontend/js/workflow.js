@@ -226,7 +226,7 @@ window.DealPilotWorkflow = (function() {
           var lbl = (FIELD_GROUPS[k] && FIELD_GROUPS[k].name) || k;
           tab.title = geprueft
             ? lbl + ': alle Pflichtfelder gefüllt und angesehen'
-            : lbl + ': alle Pflichtfelder gefüllt — diesen Bereich hast du noch nicht geöffnet. Manche Felder sind vorbelegt (z. B. der Grenzsteuersatz mit 42 %), andere kommen aus dem Exposé.';
+            : lbl + ': alle Pflichtfelder gefüllt, diesen Bereich hast du noch nicht geöffnet. Manche Felder sind vorbelegt (z. B. der Grenzsteuersatz mit 42 %), andere kommen aus dem Exposé.';
           check.innerHTML = geprueft
             ? '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>'
             : '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="16.5 9 10.5 15.5 7.5 12.5"/></svg>';
@@ -314,7 +314,7 @@ window.DealPilotWorkflow = (function() {
     },
     {
       title: 'Was für ein Objekt ist es?',
-      sub: 'Grunddaten zum Objekt — Wohnfläche, Baujahr, Objektart.',
+      sub: 'Grunddaten zum Objekt, Wohnfläche, Baujahr, Objektart.',
       fields: [
         { id: 'objart', label: 'Objektart', type: 'select', required: true,
           options: ['ETW', 'EFH', 'MFH', 'Gewerbe'] },
@@ -324,7 +324,7 @@ window.DealPilotWorkflow = (function() {
     },
     {
       title: 'Was kostet das Objekt?',
-      sub: 'Kaufpreis und Mieteinnahmen — die wichtigsten Zahlen für die Renditeberechnung.',
+      sub: 'Kaufpreis und Mieteinnahmen, die wichtigsten Zahlen für die Renditeberechnung.',
       fields: [
         { id: 'kp', label: 'Kaufpreis (€)', type: 'number', placeholder: '180000', required: true },
         { id: 'nkm', label: 'Nettokaltmiete / Monat (€)', type: 'number', placeholder: '850', required: true }
@@ -332,7 +332,7 @@ window.DealPilotWorkflow = (function() {
     },
     {
       title: 'Wie wird finanziert?',
-      sub: 'Eigenkapital, Darlehen, Zins, Tilgung — die Bank-Konditionen.',
+      sub: 'Eigenkapital, Darlehen, Zins, Tilgung, die Bank-Konditionen.',
       fields: [
         { id: 'ek', label: 'Eigenkapital (€)', type: 'number', placeholder: '20000', required: true },
         { id: 'd1', label: 'Darlehen (€)', type: 'number', placeholder: '180000', required: true },
@@ -446,7 +446,7 @@ window.DealPilotWorkflow = (function() {
     _saveCurrentStepValues();
     closeWizard();
     if (typeof calc === 'function') calc();
-    if (typeof toast === 'function') toast('✓ Wizard abgeschlossen — alle Werte sind in den Tabs übernommen.');
+    if (typeof toast === 'function') toast('✓ Wizard abgeschlossen, alle Werte sind in den Tabs übernommen.');
     if (typeof switchTab === 'function') switchTab(7); // V63.76: Springe zu Kennzahlen (Tab 7 nach Quick-Check-Refactor)
   }
 

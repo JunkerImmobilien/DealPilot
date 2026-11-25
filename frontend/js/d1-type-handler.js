@@ -47,7 +47,7 @@
         d1tField.style.cursor = 'not-allowed';
       }
       if (d1tHint) d1tHint.style.display = '';
-      if (d1tFieldWrap) d1tFieldWrap.title = 'Tilgung 0% während Sparphase — Ablösung durch Bausparvertrag';
+      if (d1tFieldWrap) d1tFieldWrap.title = 'Tilgung 0% während Sparphase, Ablösung durch Bausparvertrag';
     } else {
       if (bsparCard) bsparCard.style.display = 'none';
       if (d1tField) {
@@ -100,7 +100,7 @@
     if (!vtEl) return;
     if (type === 'tilgungsaussetzung' || d1t <= 0 || d1z <= 0 || d1 <= 0) {
       vtEl.textContent = type === 'tilgungsaussetzung'
-        ? 'Tilgungsaussetzung — Bauspar löst ab'
+        ? 'Tilgungsaussetzung, Bauspar löst ab'
         : '—';
       return;
     }
@@ -278,7 +278,7 @@
       '<div style="background:#fff;border-radius:8px;max-width:900px;width:100%;max-height:88vh;overflow:hidden;box-shadow:0 12px 50px rgba(0,0,0,0.3);display:flex;flex-direction:column">' +
       '  <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 28px;border-bottom:1px solid #E5DEB8;background:#FAF6E8">' +
       '    <div>' +
-      '      <h2 style="margin:0;font-family:\'Cormorant Garamond\',serif;font-size:24px;font-weight:600;color:#2A2727">Tilgungsplan — Darlehen I</h2>' +
+      '      <h2 style="margin:0;font-family:\'Cormorant Garamond\',serif;font-size:24px;font-weight:600;color:#2A2727">Tilgungsplan, Darlehen I</h2>' +
       '      <div style="margin-top:4px;font-size:13px;color:#7A7370">' +
               _fE(d1) + ' · ' + (d1z * 100).toFixed(2).replace('.', ',') + ' % Zins · ' +
               (d1t * 100).toFixed(2).replace('.', ',') + ' % Tilgung · ' +

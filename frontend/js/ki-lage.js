@@ -85,15 +85,15 @@ function _lageVergleichHtml(m, ki) {
       + _escKi(String(g.wert).replace('.', ',') + ' ' + g.einheit) + '</span>' : '<span class="lv-leer">nicht gemessen</span>';
     var kTxt = ki ? (k ? _escKi(_lageOptText(x.id, k)) : '–') : '<span class="lv-leer">läuft …</span>';
     var urteil = (g && k) ? (g.stufe === k ? '<span class="lv-ok" title="Messung und KI stimmen überein">✓</span>'
-      : '<span class="lv-ab" title="Messung und KI weichen ab — übernommen wird die Messung">≠</span>') : '';
+      : '<span class="lv-ab" title="Messung und KI weichen ab, übernommen wird die Messung">≠</span>') : '';
     var tip = g ? (g.quelle + (g.stand ? ' · Stand ' + (typeof g.stand === 'object' ? JSON.stringify(g.stand).replace(/[{}"]/g, '') : g.stand) : '')
-      + (g.zusatz ? ' · ' + g.zusatz : '') + '\nSchwelle (Modellannahme): ' + g.schwelle) : 'Für dieses Merkmal gibt es keine Messung — hier zählt die KI-Einschätzung.';
+      + (g.zusatz ? ' · ' + g.zusatz : '') + '\nSchwelle (Modellannahme): ' + g.schwelle) : 'Für dieses Merkmal gibt es keine Messung, hier zählt die KI-Einschätzung.';
     return '<tr title="' + _escKi(tip) + '"><td>' + x.t + '</td><td>' + gTxt + '</td><td>' + kTxt + '</td><td class="lv-u">' + urteil + '</td></tr>';
   }).join('');
   return '<div class="ki-lage-vergleich">'
     + '<div class="lv-kopf">Gemessen aus unseren Daten · im Vergleich zur KI</div>'
     + '<table class="lv-tab"><thead><tr><th>Merkmal</th><th>Gemessen</th><th>KI</th><th></th></tr></thead><tbody>' + zeilen + '</tbody></table>'
-    + '<div class="lv-fuss">Gemessen: Regionaldatenbank, Zensus 2022, Umfeld-Analyse — Quelle und Schwelle beim Darüberfahren. '
+    + '<div class="lv-fuss">Gemessen: Regionaldatenbank, Zensus 2022, Umfeld-Analyse, Quelle und Schwelle beim Darüberfahren. '
     + 'Beim Übernehmen gilt die Messung, wo es eine gibt.</div></div>';
 }
 function _lageCss() {
@@ -184,7 +184,7 @@ function _lageAbgleichHtml(ctx) {
   _dpLageCtx[key] = { zeilen: zeilen, neu: ctx.neu };
   if (!zeilen.length) return '';
   var AMP = { gleich: ['gleich', 'Ermittelt und Recherche kommen zum selben Ergebnis'],
-              ab: ['weicht ab', 'Ermittelt und Recherche kommen zu verschiedenen Stufen — wählen Sie, was gilt'],
+              ab: ['weicht ab', 'Ermittelt und Recherche kommen zu verschiedenen Stufen, wählen Sie, was gilt'],
               fehlt: ['fehlt', 'Für dieses Merkmal liegt nur eine Seite vor'] };
   var rows = zeilen.map(function (z) {
     var id = z.x.id, nm = 'lvw-' + id;
@@ -229,7 +229,7 @@ function _lageAbgleichHtml(ctx) {
     + '<summary><span class="lv-sk">' + _escKi(ctx.kopf || 'Abgleich mit der Webrecherche') + '</span><span class="lv-sz">' + _escKi(zus) + '</span></summary>'
     + '<table class="lv-tab lv-tab4"><thead><tr><th>Merkmal</th><th>Ermittelt (DealPilot)</th><th>Webrecherche</th><th>Übernehmen</th></tr></thead><tbody>' + rows + '</tbody></table>'
     + '<div class="lv-akt"><button class="btn btn-gold btn-sm" type="button" onclick="_dpLageAuswahlUebernehmen(\'' + _lvAttr(key) + '\')">⤓ Auswahl übernehmen</button>'
-    + '<span class="lv-fuss">' + _escKi(ctx.fuss || 'Ermittelt: Marktbericht bzw. Regionaldatenbank, Zensus 2022, Umfeld-Analyse — Quelle und Schwelle beim Darüberfahren.') + '</span></div>'
+    + '<span class="lv-fuss">' + _escKi(ctx.fuss || 'Ermittelt: Marktbericht bzw. Regionaldatenbank, Zensus 2022, Umfeld-Analyse, Quelle und Schwelle beim Darüberfahren.') + '</span></div>'
     + qHtml + '</details>';
 }
 function _dpLageWahlSetzen(key, id, art) {
@@ -461,7 +461,7 @@ function runKiLage(opts) {
       } catch (e) {}
       window._kiLageErgaenzt = null;
       if (typeof window._kiLageBerichtZeichnen === 'function') window._kiLageBerichtZeichnen();
-      if (typeof toast === 'function') toast('✓ Webrecherche fertig — im Abgleich wählen, welcher Wert gilt');
+      if (typeof toast === 'function') toast('✓ Webrecherche fertig, im Abgleich wählen, welcher Wert gilt');
       return;
     }
     /* v2175: die Messung abwarten (sie ist fast immer schon da), dann beides zeigen */
@@ -581,7 +581,7 @@ function applyKiLageToFields() {
   var d = window._lastKiLageData || {};
   var mg = (window._lastLageMessung && window._lastLageMessung.felder) || {};
   if (!window._lastKiLageData && !Object.keys(mg).length) {
-    if (typeof toast === 'function') toast('⚠ Keine KI-Lage-Daten verfügbar — bitte zuerst "Lage analysieren"');
+    if (typeof toast === 'function') toast('⚠ Keine KI-Lage-Daten verfügbar, bitte zuerst "Lage analysieren"');
     return;
   }
 
@@ -663,17 +663,17 @@ window.runKiLage = runKiLage;
       cls = 'high';
       icon = '✓';
       title = 'Detailanalyse';
-      text = 'Mit Straße + Hausnummer + PLZ/Ort — die KI liefert eine Mikrolagen-Analyse auf Straßenebene.';
+      text = 'Mit Straße + Hausnummer + PLZ/Ort, die KI liefert eine Mikrolagen-Analyse auf Straßenebene.';
     } else if (hasStrasse && hasPlzOrt) {
       cls = 'medium';
       icon = '◐';
       title = 'Detaillierte Analyse';
-      text = 'Mit Straße + PLZ/Ort — die KI bewertet die Straßenebene. Für noch präzisere Ergebnisse die Hausnummer ergänzen.';
+      text = 'Mit Straße + PLZ/Ort, die KI bewertet die Straßenebene. Für noch präzisere Ergebnisse die Hausnummer ergänzen.';
     } else if (hasPlzOrt) {
       cls = 'low';
       icon = 'ℹ';
       title = 'Generelle Lage-Einschätzung';
-      text = 'Nur PLZ + Ort vorhanden — die Analyse ist generisch für das Quartier/die Stadt. Für eine präzisere Mikrolagen-Bewertung Straße und Hausnummer im Tab Objekt ergänzen.';
+      text = 'Nur PLZ + Ort vorhanden, die Analyse ist generisch für das Quartier/die Stadt. Für eine präzisere Mikrolagen-Bewertung Straße und Hausnummer im Tab Objekt ergänzen.';
     } else {
       cls = 'low';
       icon = '⚠';
@@ -717,7 +717,7 @@ window.runKiLage = runKiLage;
         /* v3237 · Marcel 09.11.2026: „kompakter, vor allem wenn noch kein Aufruf passiert ist" -
            eine Zeile, die Box schrumpft dann per CSS (objekt-ansichten.css) auf einen Streifen */
         body.innerHTML = '<div class="ki-lage-empty">' +
-          'Makro- und Mikrolage, Bevölkerung und Nachfrage aus amtlichen Daten, dazu die KI-Einschätzung — ein Klick, sobald die Adresse steht.' +
+          'Makro- und Mikrolage, Bevölkerung und Nachfrage aus amtlichen Daten, dazu die KI-Einschätzung, ein Klick, sobald die Adresse steht.' +
         '</div>';
       }
       if (btn) {
@@ -895,7 +895,7 @@ window._v229ShowPlzError = function(errorBody, targetEl) {
       btn.style.removeProperty('display');
       btn.setAttribute('data-kopf', 'bericht');
       if (btn.getAttribute('onclick') !== 'runKiLage({ergaenzen:true})') btn.setAttribute('onclick', 'runKiLage({ergaenzen:true})');
-      btn.title = 'Wertsteigerung und Entwicklung per Web-Recherche ergänzen — die übrigen Lagewerte kommen aus dem Marktbericht';
+      btn.title = 'Wertsteigerung und Entwicklung per Web-Recherche ergänzen, die übrigen Lagewerte kommen aus dem Marktbericht';
       if (String(btn.textContent || '').trim() !== 'Web-Recherche') btn.textContent = 'Web-Recherche';
     } else if (alt === 'bericht') {
       btn.removeAttribute('data-kopf');
@@ -916,7 +916,7 @@ window._v229ShowPlzError = function(errorBody, targetEl) {
       if (tag) tag.textContent = '4 gemessen · 2 KI';
       if (body.getAttribute('data-aus-bericht')) {
         body.removeAttribute('data-aus-bericht');
-        body.innerHTML = '<div class="ki-lage-empty">Makro- und Mikrolage, Bevölkerung und Nachfrage aus amtlichen Daten, dazu die KI-Einschätzung — ein Klick, sobald die Adresse steht.</div>';
+        body.innerHTML = '<div class="ki-lage-empty">Makro- und Mikrolage, Bevölkerung und Nachfrage aus amtlichen Daten, dazu die KI-Einschätzung, ein Klick, sobald die Adresse steht.</div>';
       }
       return;
     }
@@ -962,9 +962,9 @@ window._v229ShowPlzError = function(errorBody, targetEl) {
       var neu = function () {
         var b = document.getElementById('ki-lage-body'); if (!b) return;
         var h = '<div class="ki-lage-vergleich lv-mark"><div class="lv-kopf">✓ Lage aus dem Marktbericht' + (D.bericht_datum ? ' vom ' + _escKi(D.bericht_datum) : '') + ' übernommen</div>'
-          + '<div class="lv-fuss" style="margin-top:0">Eine erneute Analyse ist nicht nötig. Die Webrecherche steht daneben — Sie wählen je Merkmal, was gilt.</div>'
+          + '<div class="lv-fuss" style="margin-top:0">Eine erneute Analyse ist nicht nötig. Die Webrecherche steht daneben, Sie wählen je Merkmal, was gilt.</div>'
           + _lageAbgleichHtml({ key: kk, erm: erm, ki: KI, neu: neu,
-              fuss: 'Ermittelt: Marktbericht, sonst Regionaldatenbank, Zensus 2022 — Quelle beim Darüberfahren.' })
+              fuss: 'Ermittelt: Marktbericht, sonst Regionaldatenbank, Zensus 2022, Quelle beim Darüberfahren.' })
           + '<div class="ki-lage-actions" style="margin-top:10px"><button class="btn btn-sm" type="button" onclick="runKiLage({ergaenzen:true})">Webrecherche erneuern</button></div></div>';
         if (b._dpLvHtml === h && b.querySelector('.lv-mark')) return;
         b.innerHTML = h; b._dpLvHtml = h;
@@ -980,7 +980,7 @@ window._v229ShowPlzError = function(errorBody, targetEl) {
       var soll = r[2] ? _lageOptText(r[0], r[2]) : null;
       var anders = soll && feld && feld.value && feld.value !== r[2];
       return '<tr><td>' + r[1] + '</td><td><b>' + _escKi(jetzt) + '</b><span class="lv-w">' + _escKi(r[3]) + '</span></td>'
-        + '<td class="lv-u">' + (anders ? '<span class="lv-ab" title="Im Feld steht ein anderer Wert als die Messung des Berichts (' + _escKi(soll) + ') — von Hand geändert?">≠</span>' : '<span class="lv-ok">✓</span>') + '</td></tr>';
+        + '<td class="lv-u">' + (anders ? '<span class="lv-ab" title="Im Feld steht ein anderer Wert als die Messung des Berichts (' + _escKi(soll) + '), von Hand geändert?">≠</span>' : '<span class="lv-ok">✓</span>') + '</td></tr>';
     }).join('');
     var M = (messungen[window._currentObjKey || ''] || {}).felder || {};
     [['makrolage', 'Makrolage', D.macroRaw], ['ds2_bevoelkerung', 'Bevölkerung', D.bevRaw], ['ds2_nachfrage', 'Nachfrage', D.tageRaw]].forEach(function (p) {
@@ -996,7 +996,7 @@ window._v229ShowPlzError = function(errorBody, targetEl) {
     var offen = ['ds2_entwicklung'].concat(D.trendRaw == null ? ['ds2_wertsteigerung'] : []);
     var html = '<div class="ki-lage-vergleich"><div class="lv-kopf">✓ Lage aus dem Marktbericht' + (D.bericht_datum ? ' vom ' + _escKi(D.bericht_datum) : '') + ' übernommen</div>'
       + '<table class="lv-tab"><tbody>' + rows + '</tbody></table>'
-      + '<div class="lv-fuss">Gemessen im Marktbericht — eine erneute Analyse ist nicht nötig. '
+      + '<div class="lv-fuss">Gemessen im Marktbericht, eine erneute Analyse ist nicht nötig. '
       + 'Nicht gemessen werden ' + (offen.length > 1 ? 'Wertsteigerung und Entwicklungsmöglichkeiten' : 'die Entwicklungsmöglichkeiten (B-Plan, Stadtentwicklung)') + '; die ergänzt auf Wunsch eine Web-Recherche.</div>'
       + '<div class="ki-lage-actions" style="margin-top:10px"><button class="btn btn-sm" type="button" onclick="runKiLage({ergaenzen:true})">'
       + (offen.length > 1 ? 'Wertsteigerung & Entwicklung' : 'Entwicklung') + ' per Web-Recherche ergänzen</button></div></div>';

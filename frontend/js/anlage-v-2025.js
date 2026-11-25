@@ -88,15 +88,15 @@ window.AnlageV2025 = {
   /* Die Struktur des Formulars, soweit fuer die Aufstellung gebraucht.
      `kz` ist die amtliche Kennzahl, wo das Formular eine ausweist. */
   zeilen: {
-    10: { text: 'Das Objekt wird ganz oder teilweise als Ferienwohnung genutzt (Kz 61) / kurzfristig vermietet (Kz 63) / an Angehörige zu Wohnzwecken vermietet (Kz 62) — 1 = Ja, 2 = Nein' },
+    10: { text: 'Das Objekt wird ganz oder teilweise als Ferienwohnung genutzt (Kz 61) / kurzfristig vermietet (Kz 63) / an Angehörige zu Wohnzwecken vermietet (Kz 62), 1 = Ja, 2 = Nein' },
     11: { text: 'Gesamtwohnfläche (in m²)', kz: '54' },
     12: { text: 'In Zeile 11 enthaltener eigengenutzter / unentgeltlich an Dritte überlassener Wohnraum (in m²)', kz: '55' },
-    13: { text: 'Mieteinnahmen für Wohnungen (ohne Umlagen / ohne Umsatzsteuer) — Bezeichnung der Wohneinheit, Wohnfläche' },
+    13: { text: 'Mieteinnahmen für Wohnungen (ohne Umlagen / ohne Umsatzsteuer), Bezeichnung der Wohneinheit, Wohnfläche' },
     14: { text: 'Bezeichnung weiterer Wohneinheiten, Wohnfläche' },
     17: { text: 'Bezeichnung weiterer Einheiten, Nutzfläche' },
-    33: { text: 'Absetzung für Abnutzung für Gebäude — durch direkte Zuordnung ermittelt: 1 = linear / 2 = degressiv, %, 1 = wie Vorjahr / 2 = laut Erläuterung' },
+    33: { text: 'Absetzung für Abnutzung für Gebäude, durch direkte Zuordnung ermittelt: 1 = linear / 2 = degressiv, %, 1 = wie Vorjahr / 2 = laut Erläuterung' },
     15: { text: 'Summe der Mieteinnahmen für Wohnungen', kz: '01' },
-    16: { text: 'Einnahmen für andere Räume (ohne Umlagen / ohne Umsatzsteuer) — Bezeichnung der Einheit, Nutzfläche' },
+    16: { text: 'Einnahmen für andere Räume (ohne Umlagen / ohne Umsatzsteuer), Bezeichnung der Einheit, Nutzfläche' },
     18: { text: 'Summe der Einnahmen für andere Räume', kz: '02' },
     19: { text: 'Einnahmen für an Angehörige vermietete Wohnungen (ohne Umlagen / ohne Umsatzsteuer)', kz: '03' },
     20: { text: 'Auf die Zeilen 15 und 18 entfallende laufende Neben- / Betriebskosten', kz: '04' },
@@ -113,29 +113,29 @@ window.AnlageV2025 = {
     31: { text: 'Ergebnis der Zeilen 29 und 30', kz: '08' },
     32: { text: 'Summe der Einnahmen aus den Zeilen 15, 18 bis 28 und 31' },
 
-    35: { text: 'Absetzung für Abnutzung für Gebäude (ohne Beträge in den Zeilen 36 bis 41) — abzugsfähige Werbungskosten', kz: '30' },
-    38: { text: 'Sonderabschreibung für Mietwohnungsneubau nach § 7b EStG — abzugsfähige Werbungskosten', kz: '70' },
-    41: { text: 'Erhöhte Absetzungen nach den §§ 7h, 7i EStG und / oder nach dem Schutzbaugesetz — abzugsfähige Werbungskosten', kz: '31' },
-    45: { text: 'Absetzung für Abnutzung für Wirtschaftsgüter, die keine Gebäude sind (z. B. bewegliche Wirtschaftsgüter) — abzugsfähige Werbungskosten', kz: '60' },
-    48: { text: 'Schuldzinsen (ohne Tilgungsbeträge) — abzugsfähige Werbungskosten', kz: '33' },
-    51: { text: 'Geldbeschaffungskosten (z. B. Schätz-, Notar-, Grundbuchgebühren) — abzugsfähige Werbungskosten', kz: '34' },
-    54: { text: 'Renten, dauernde Lasten — abzugsfähige Werbungskosten', kz: '35' },
-    55: { text: '2025 voll abzuziehende Erhaltungsaufwendungen (einschließlich Entnahmen aus der Erhaltungsrücklage) — durch direkte Zuordnung ermittelt', kz: '36' },
-    56: { text: '2025 voll abzuziehende Erhaltungsaufwendungen — durch verhältnismäßige Zuordnung ermittelt', kz: '37' },
-    57: { text: 'Auf bis zu 5 Jahre zu verteilende Erhaltungsaufwendungen (§§ 11a, 11b EStG, § 82b EStDV) — Gesamtaufwand 2025', kz: '57' },
-    60: { text: 'Auf mehrere Jahre verteilte Erhaltungsaufwendungen aus 2025 — abzugsfähige Werbungskosten', kz: '38' },
-    63: { text: 'Verteilte Erhaltungsaufwendungen aus 2021 — abzugsfähige Werbungskosten', kz: '39' },
-    66: { text: 'Verteilte Erhaltungsaufwendungen aus 2022 — abzugsfähige Werbungskosten', kz: '40' },
-    69: { text: 'Verteilte Erhaltungsaufwendungen aus 2023 — abzugsfähige Werbungskosten', kz: '41' },
-    72: { text: 'Verteilte Erhaltungsaufwendungen aus 2024 — abzugsfähige Werbungskosten', kz: '42' },
-    75: { text: 'Umgelegte Kosten (z. B. Grundsteuer, Straßenreinigung, Müllabfuhr, Wasserversorgung, Entwässerung, Hausbeleuchtung, Heizung, Warmwasser, Schornsteinreinigung, Hausversicherungen, Hauswart, Treppenhausreinigung, Fahrstuhl) — abzugsfähige Werbungskosten', kz: '52' },
-    78: { text: 'Nicht umgelegte Kosten (z. B. Verwaltungskosten, Bank- und Kontoführungsgebühren ohne Erhaltungsrücklage) — abzugsfähige Werbungskosten', kz: '48' },
+    35: { text: 'Absetzung für Abnutzung für Gebäude (ohne Beträge in den Zeilen 36 bis 41), abzugsfähige Werbungskosten', kz: '30' },
+    38: { text: 'Sonderabschreibung für Mietwohnungsneubau nach § 7b EStG, abzugsfähige Werbungskosten', kz: '70' },
+    41: { text: 'Erhöhte Absetzungen nach den §§ 7h, 7i EStG und / oder nach dem Schutzbaugesetz, abzugsfähige Werbungskosten', kz: '31' },
+    45: { text: 'Absetzung für Abnutzung für Wirtschaftsgüter, die keine Gebäude sind (z. B. bewegliche Wirtschaftsgüter), abzugsfähige Werbungskosten', kz: '60' },
+    48: { text: 'Schuldzinsen (ohne Tilgungsbeträge), abzugsfähige Werbungskosten', kz: '33' },
+    51: { text: 'Geldbeschaffungskosten (z. B. Schätz-, Notar-, Grundbuchgebühren), abzugsfähige Werbungskosten', kz: '34' },
+    54: { text: 'Renten, dauernde Lasten, abzugsfähige Werbungskosten', kz: '35' },
+    55: { text: '2025 voll abzuziehende Erhaltungsaufwendungen (einschließlich Entnahmen aus der Erhaltungsrücklage), durch direkte Zuordnung ermittelt', kz: '36' },
+    56: { text: '2025 voll abzuziehende Erhaltungsaufwendungen, durch verhältnismäßige Zuordnung ermittelt', kz: '37' },
+    57: { text: 'Auf bis zu 5 Jahre zu verteilende Erhaltungsaufwendungen (§§ 11a, 11b EStG, § 82b EStDV), Gesamtaufwand 2025', kz: '57' },
+    60: { text: 'Auf mehrere Jahre verteilte Erhaltungsaufwendungen aus 2025, abzugsfähige Werbungskosten', kz: '38' },
+    63: { text: 'Verteilte Erhaltungsaufwendungen aus 2021, abzugsfähige Werbungskosten', kz: '39' },
+    66: { text: 'Verteilte Erhaltungsaufwendungen aus 2022, abzugsfähige Werbungskosten', kz: '40' },
+    69: { text: 'Verteilte Erhaltungsaufwendungen aus 2023, abzugsfähige Werbungskosten', kz: '41' },
+    72: { text: 'Verteilte Erhaltungsaufwendungen aus 2024, abzugsfähige Werbungskosten', kz: '42' },
+    75: { text: 'Umgelegte Kosten (z. B. Grundsteuer, Straßenreinigung, Müllabfuhr, Wasserversorgung, Entwässerung, Hausbeleuchtung, Heizung, Warmwasser, Schornsteinreinigung, Hausversicherungen, Hauswart, Treppenhausreinigung, Fahrstuhl), abzugsfähige Werbungskosten', kz: '52' },
+    78: { text: 'Nicht umgelegte Kosten (z. B. Verwaltungskosten, Bank- und Kontoführungsgebühren ohne Erhaltungsrücklage), abzugsfähige Werbungskosten', kz: '48' },
     79: { text: 'Nur bei umsatzsteuerpflichtiger Vermietung: an das Finanzamt gezahlte und ggf. verrechnete Umsatzsteuer', kz: '58' },
-    82: { text: 'Sonstige Kosten — abzugsfähige Werbungskosten', kz: '49' },
+    82: { text: 'Sonstige Kosten, abzugsfähige Werbungskosten', kz: '49' },
     83: { text: 'Summe der Werbungskosten (Summe der Zeilen 35, 38, 41, 45, 48, 51, 54, 55, 56, 60, 63, 66, 69, 72, 75, 78, 79 und 82)' },
     84: { text: 'Nur bei umsatzsteuerpflichtiger Vermietung: in den Werbungskosten laut Zeile 83 enthaltene abziehbare Vorsteuerbeträge', kz: '59' },
     85: { text: 'Überschuss (Einnahmen laut Zeile 32 abzüglich Werbungskosten laut Zeile 83)' },
-    86: { text: 'Zurechnung des Betrags aus Zeile 85 — Steuerpflichtige Person / Ehemann / Person A, Ehefrau / Person B', kz: '20/21' },
+    86: { text: 'Zurechnung des Betrags aus Zeile 85, Steuerpflichtige Person / Ehemann / Person A, Ehefrau / Person B', kz: '20/21' },
     87: { text: 'Kürzung der Werbungskosten wegen verbilligter Vermietung (in %)', kz: '50' },
     88: { text: 'Betragsmäßige Kürzung der Werbungskosten wegen verbilligter Vermietung eines Teils des Objekts', kz: '51' },
     89: { text: '2025 vereinnahmte oder bewilligte Zuschüsse aus öffentlichen Mitteln zu den Anschaffungs- / Herstellungskosten (laut gesonderter Aufstellung)' }
@@ -180,15 +180,15 @@ window.AnlageV2025 = {
     gericht:          { zeile: 82, art: 'wk', quelle: 'auffang' },
     telefon:          { zeile: 82, art: 'wk', quelle: 'auffang' },
     sonst_kosten:     { zeile: 82, art: 'wk', quelle: 'auffang' },
-    verw_sonst:       { zeile: 78, art: 'wk', quelle: 'auffang', grund: 'Verwaltungskosten — Zeile 78 nennt sie ausdrücklich; „sonstige" bleibt in derselben Gruppe.' },
+    verw_sonst:       { zeile: 78, art: 'wk', quelle: 'auffang', grund: 'Verwaltungskosten, Zeile 78 nennt sie ausdrücklich; „sonstige" bleibt in derselben Gruppe.' },
     betr_sonst:       { zeile: 78, art: 'wk', quelle: 'auffang', grund: 'Was nicht ausdrücklich umgelegt wird, gehört zu den nicht umgelegten Kosten. Wird es umgelegt, gehört es in Zeile 75.' },
 
     /* Sachlogik — mit Begruendung, in der Ansicht gekennzeichnet. */
     bereitstellung:   { zeile: 48, art: 'wk', quelle: 'sachlogik', grund: 'Bereitstellungszinsen sind Zinsen. Die amtliche Anleitung rechnet auch Damnum / Disagio zu den Schuldzinsen.' },
-    vermittlung:      { zeile: 51, art: 'wk', quelle: 'sachlogik', grund: 'Eine Vermittlungsprovision für ein Darlehen gehört zu den Kosten der Geldbeschaffung — dieselbe Gruppe wie Schätz-, Notar- und Grundbuchgebühren.' },
+    vermittlung:      { zeile: 51, art: 'wk', quelle: 'sachlogik', grund: 'Eine Vermittlungsprovision für ein Darlehen gehört zu den Kosten der Geldbeschaffung, dieselbe Gruppe wie Schätz-, Notar- und Grundbuchgebühren.' },
     finanz_sonst:     { zeile: 51, art: 'wk', quelle: 'sachlogik', grund: 'Sonstige Finanzierungsnebenkosten gehören zur Geldbeschaffung. Ist der Aufwand ein Zins, gehört er in Zeile 48.' },
     steuerber:        { zeile: 82, art: 'wk', quelle: 'sachlogik', grund: 'Steuerberatungskosten sind Werbungskosten, soweit sie auf die Ermittlung der Einkünfte entfallen. Der auf den Mantelbogen entfallende Teil ist keine Anlage-V-Position.' },
-    anschaffungsnah:  { zeile: 35, art: 'wk', quelle: 'sachlogik', grund: 'Anschaffungsnahe Herstellungskosten (§ 6 Abs. 1 Nr. 1a EStG) sind nicht sofort abziehbar; sie erhöhen die Bemessungsgrundlage und wirken über die AfA in Zeile 35.' },
+    anschaffungsnah:  { zeile: 35, art: 'wk', quelle: 'sachlogik', grund: 'Anschaffungsnahe Herstellungskosten (§ 6 Abs. 1 Nr. 1a EStG) sind nicht sofort abziehbar, sie erhöhen die Bemessungsgrundlage und wirken über die AfA in Zeile 35.' },
 
     /* Weiterhin offen. */
     /* v1220: Marcel wies auf Zeile 36 hin. Im Formular 2025 ist 36 die
@@ -245,6 +245,6 @@ window.AnlageV2025 = {
   nicht_erfasst: [
     /* v3800b · Ankreuzfelder (10, 24), Einzelangaben (13/14, 16/17), Zuordnungsart (33 ff.) und Zurechnung (86)
        sind seit v3800b eingebbar bzw. werden aus dem Objekt vorgeschlagen. Es bleibt der Hinweis zu Zeile 38. */
-    { zeile: 38, text: 'Sonderabschreibung nach § 7b EStG — DealPilot rechnet sie und weist sie getrennt aus, sobald das Objekt eine Sonderabschreibung führt. Bei älteren gespeicherten Jahreswerten ist die Aufteilung nicht bekannt: steht auf diesem Blatt keine Zeile 38, obwohl die AfA einen § 7b-Anteil enthält, gehört dieser Teil laut Formular nicht in Zeile 35, sondern in Zeile 38.' }
+    { zeile: 38, text: 'Sonderabschreibung nach § 7b EStG, DealPilot rechnet sie und weist sie getrennt aus, sobald das Objekt eine Sonderabschreibung führt. Bei älteren gespeicherten Jahreswerten ist die Aufteilung nicht bekannt: steht auf diesem Blatt keine Zeile 38, obwohl die AfA einen § 7b-Anteil enthält, gehört dieser Teil laut Formular nicht in Zeile 35, sondern in Zeile 38.' }
   ]
 };

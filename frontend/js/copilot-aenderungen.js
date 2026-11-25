@@ -379,7 +379,7 @@
     }
 
     if (konflikte.length) {
-      teile.push('<b>Hier steht schon etwas — was soll gelten?</b>'
+      teile.push('<b>Hier steht schon etwas, was soll gelten?</b>'
         + '<div class="' + MARKE + '-konflikte">'
         + konflikte.map(function (x, i) {
             return '<div class="' + MARKE + '-k" data-i="' + i + '">'
@@ -425,7 +425,7 @@
         return;
       }
       if (ev.target.id === MARKE + '-nein') {
-        box.innerHTML = 'Verworfen — nichts geändert.';
+        box.innerHTML = 'Verworfen, nichts geändert.';
         _vorschlag = null;
       }
     });
@@ -659,12 +659,12 @@
       /* Eindeutig und ein anderes: öffnen. */
       if (fund.art === 'eins') {
         var hin = addMsg('assistant', '');
-        if (hin) hin.innerHTML = 'Das betrifft <b>' + esc(fund.objekt.tip) + '</b> — ich öffne es …';
+        if (hin) hin.innerHTML = 'Das betrifft <b>' + esc(fund.objekt.tip) + '</b>, ich öffne es …';
         objektLaden(fund.objekt.key).then(function (ok) {
           if (hin) {
             hin.innerHTML = ok
               ? 'Objekt: <b>' + esc(fund.objekt.tip) + '</b>'
-              : '⚠ <b>' + esc(fund.objekt.tip) + '</b> ließ sich nicht öffnen — ich ändere nichts.';
+              : '⚠ <b>' + esc(fund.objekt.tip) + '</b> ließ sich nicht öffnen, ich ändere nichts.';
           }
           fertig(ok);
         });
@@ -687,7 +687,7 @@
       var box = addMsg('assistant', '');
       if (!box) { fertig(false); return; }
       box.innerHTML = '<b>' + (fund.art === 'mehrere'
-          ? 'Das passt auf mehrere Objekte — welches meinst du?'
+          ? 'Das passt auf mehrere Objekte, welches meinst du?'
           : 'An welchem Objekt soll ich das ändern?')
         + '</b><div class="' + MARKE + '-konflikte">'
         + wahl.map(function (o) {
@@ -701,12 +701,12 @@
         if (!b) return;
         var key = b.getAttribute('data-key');
         var tip = (b.textContent || '').replace(/\s*\(offen\)$/, '').trim();
-        box.innerHTML = 'Objekt: <b>' + esc(tip) + '</b> — wird geöffnet …';
+        box.innerHTML = 'Objekt: <b>' + esc(tip) + '</b>, wird geöffnet …';
         if (key === geladen) { box.innerHTML = 'Objekt: <b>' + esc(tip) + '</b>'; fertig(true); return; }
         objektLaden(key).then(function (ok) {
           box.innerHTML = ok
             ? 'Objekt: <b>' + esc(tip) + '</b>'
-            : '⚠ <b>' + esc(tip) + '</b> ließ sich nicht öffnen — ich ändere nichts.';
+            : '⚠ <b>' + esc(tip) + '</b> ließ sich nicht öffnen, ich ändere nichts.';
           fertig(ok);
         });
       });
@@ -782,7 +782,7 @@
         addMsg('assistant', 'Die genannten Angaben passen zu keinem Feld, das ich kenne ('
           + esc(unbekannt.join(', ')) + ').');
       } else if (gleich.length) {
-        addMsg('assistant', 'Das steht schon so im Objekt — nichts zu ändern.');
+        addMsg('assistant', 'Das steht schon so im Objekt, nichts zu ändern.');
       }
       return '';
     }
@@ -926,7 +926,7 @@
         return;
       }
       if (ev.target.getAttribute('data-nein')) {
-        box.innerHTML = 'Nicht abgerufen — es wurde nichts verbraucht.';
+        box.innerHTML = 'Nicht abgerufen, es wurde nichts verbraucht.';
       }
     });
     return '';

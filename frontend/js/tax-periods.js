@@ -423,7 +423,7 @@
     const host = document.getElementById('tp-conflict-host');
     if (!host) return;
     let html = '<div style="background:rgba(184,98,92,0.06);border:1.5px solid rgba(184,98,92,0.30);border-radius:10px;padding:14px 16px;margin-top:10px">';
-    html += '<div style="font-weight:600;font-size:13px;color:var(--red,#B8625C);margin-bottom:6px">⚠ Konflikt — überschneidende Zeiträume:</div>';
+    html += '<div style="font-weight:600;font-size:13px;color:var(--red,#B8625C);margin-bottom:6px">⚠ Konflikt, überschneidende Zeiträume:</div>';
     html += '<ul style="font-size:12px;color:var(--ch,#2A2727);margin:6px 0 12px;padding-left:18px">';
     overlapping.forEach(o => {
       html += '<li>' + fmtDate(o.valid_from) + ' bis ' + (o.valid_to ? fmtDate(o.valid_to) : 'laufend') + ' · ' + fmtEUR(o.zve) + (o.reason ? ' (' + o.reason + ')' : '') + '</li>';

@@ -26,7 +26,7 @@
        Auswahl." Entschieden: drei Profile setzen Standardwerte UND die Gewichte des
        Deal Scores (`ds` = Schlüssel in dealscore2.js PRESETS). Lage-, Cashflow-Fokus
        und Sicherheit bleiben im Deal-Score-Reiter als Feinjustierung. */
-    { id: 'dp',  name: 'Ausgewogen', txt: 'DealPilot-Standard — die heutigen Vorbelegungen.', ds: 'balanced',
+    { id: 'dp',  name: 'Ausgewogen', txt: 'DealPilot-Standard, die heutigen Vorbelegungen.', ds: 'balanced',
       werte: { ip_tilgung_default: '1.5', ip_ek_quote_default: '10', ip_mietausfall_pct: '1', ip_min_dscr: '1.2', ip_angebot_abschlag_pct: '' } },
     { id: 'vor', name: 'Vorsichtig', txt: 'Mehr Puffer, strengere Grenzen.', ds: 'conservative',
       werte: { ip_tilgung_default: '2', ip_ek_quote_default: '20', ip_mietausfall_pct: '3', ip_min_dscr: '1.3', ip_angebot_abschlag_pct: '9' } },
@@ -55,20 +55,20 @@
   var KARTEN = [
     { an: 'Finanzierung', txt: 'Startwerte für Darlehen und Eigenkapital.',
       felder: [['_zins', 'Zinssatz', ''], ['ip_tilgung_default', 'Tilgung', ' %'], ['ip_zinsbindung_default', 'Zinsbindung', ''], ['ip_ek_quote_default', 'Eigenkapital', ' % v. KP']] },
-    { an: 'Bewirtschaftung', txt: 'Verwaltung, Instandhaltung und Mietausfall — in Euro je Objektart oder als Prozent der Miete.',
+    { an: 'Bewirtschaftung', txt: 'Verwaltung, Instandhaltung und Mietausfall, in Euro je Objektart oder als Prozent der Miete.',
       felder: [['_bwk', 'Rechenweg', ''], ['bwkp_mfh_verw', 'Verwaltung je Wohnung', ' €/Jahr'], ['bwkp_mfh_inst_qm', 'Instandhaltung', ' €/m² · Jahr'], ['bwkp_etw_hg_qm', 'ETW-Hausgeld', ' €/m² · Monat'], ['ip_mietausfall_pct', 'Mietausfall', ' % der Miete']] },
-    { an: 'Lageklassen', txt: 'Zielrendite brutto je Lage — der Maßstab der Ampel im Quick-Check.', lage: true },
+    { an: 'Lageklassen', txt: 'Zielrendite brutto je Lage, der Maßstab der Ampel im Quick-Check.', lage: true },
     /* v3213 · W-6: Ziellinie der Bruttomietrendite nach Jahren (investment-profile.js) */
-    { an: 'Ziel-Bruttomietrendite', txt: 'Deine Ziellinie über die Jahre nach dem Kauf — ausgewertet im Zielbild jedes Objekts.', zbmr: true },
+    { an: 'Ziel-Bruttomietrendite', txt: 'Deine Ziellinie über die Jahre nach dem Kauf, ausgewertet im Zielbild jedes Objekts.', zbmr: true },
     { an: 'Persönliche Mindest', txt: 'Deine persönlichen Kaufgrenzen.',
       felder: [['ip_min_dscr', 'DSCR', ''], ['ip_min_cashflow_vor_st', 'Cashflow', ' €/Monat'], ['ip_max_ltv', 'max. LTV', ' %']] },
-    { an: 'Marktbewertung', txt: 'Abschlag auf Angebotspreise — so viel unter dem Inseratspreis wird im Schnitt verkauft.',
+    { an: 'Marktbewertung', txt: 'Abschlag auf Angebotspreise, so viel unter dem Inseratspreis wird im Schnitt verkauft.',
       felder: [['ip_angebot_abschlag_pct', 'Angebotsabschlag', ' %']] },
     { an: 'Steuer', txt: 'Dein persönlicher Grenzsteuersatz. Gesellschaften rechnen mit dem Satz aus Mandanten.',
       felder: [['ip_grenzsteuersatz', 'Grenzsteuersatz', ' %']] },
     /* v3213 · W-9 (Entwicklungspartner; Marcel: nicht streichen, umbenennen, eingeklappt):
        bis v3212 „Standort & Nebenkosten" - die Werte sind nur der Start eines NEUEN Objekts. */
-    { an: 'Vorbelegung', txt: 'Bundesland und Kaufnebenkosten, mit denen ein neues Objekt startet. Am Objekt änderst du sie im Reiter Investition; angelegte Objekte behalten ihre Werte.', zu: true,
+    { an: 'Vorbelegung', txt: 'Bundesland und Kaufnebenkosten, mit denen ein neues Objekt startet. Am Objekt änderst du sie im Reiter Investition, angelegte Objekte behalten ihre Werte.', zu: true,
       felder: [['ip_bundesland', 'Bundesland', ''], ['ip_notar_pct', 'Notar', ' %'], ['ip_grundbuch_pct', 'Grundbuch', ' %'], ['ip_sonstige_nk_pct', 'Sonstige', ' %'], ['ip_maklerkosten', 'Makler', ' %']] }
   ];
   /* Welche Felder ein Set setzt - in den Karten als „Set" bzw. „eigen" markiert. */
@@ -100,7 +100,7 @@
     try { localStorage.setItem(LS_EIGEN, JSON.stringify({ werte: werte, ds: ds, am: new Date().toISOString().slice(0, 10) })); } catch (e) { return; }
     setMerken('eigen');
     setsZeichnen(host); karteneZeichnen(host); setMarkieren(host);
-    if (typeof window.toast === 'function') window.toast('✓ Als „Eigenes" gespeichert — die Werte selbst übernimmst du wie immer mit „Speichern"');
+    if (typeof window.toast === 'function') window.toast('✓ Als „Eigenes" gespeichert, die Werte selbst übernimmst du wie immer mit „Speichern"');
   }
 
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
@@ -332,7 +332,7 @@
       var st = setVon(setGemerkt()), eigen = 0;
       Object.keys(SET_FELDER).forEach(function (id) { var e = document.getElementById(id); if (!e) return;
         if (!gleichWert(e.value, st.werte[id])) eigen++; });
-      band.innerHTML = 'Grundlage: <b>' + esc(st.name) + '</b> — die mit <i class="swk-tag">Set</i> markierten Werte kommen aus diesem Set'
+      band.innerHTML = 'Grundlage: <b>' + esc(st.name) + '</b>, die mit <i class="swk-tag">Set</i> markierten Werte kommen aus diesem Set'
         + (eigen ? ', <b>' + eigen + '</b> davon hast du angepasst (<i class="swk-tag eigen">eigen</i>).' : '.')
         + ' Alle anderen Werte gelten für jedes Set.'
         /* v3213 · W-8: die Abweichung als eigenes Set merken */

@@ -137,7 +137,7 @@
           return '<li class="' + (ohne ? '' : ok ? 'ok' : jetzt ? 'jetzt' : '') + '"><span class="p">' + (ohne ? '–' : ok ? '✓' : jetzt ? '●' : '○') + '</span>' + esc(e.t) + (ohne ? ' · nicht im Umfang' : '') + '</li>';
         }).join('') + '</ul>'
       + '<div class="fu">'
-      + (lauf ? '<span class="hi">Du kannst weiterarbeiten — der Bericht wird im Hintergrund fertig, und du bekommst eine Meldung.</span>'
+      + (lauf ? '<span class="hi">Du kannst weiterarbeiten, der Bericht wird im Hintergrund fertig, und du bekommst eine Meldung.</span>'
               + '<button type="button" class="b1" data-mba="hintergrund">Im Hintergrund weiter</button>'
               : '<span class="hi"></span>'
               + (a.status === 'fertig' && !a.angewandt ? '<button type="button" class="b1" data-mba="ansehen">Bericht öffnen</button>' : '')
@@ -172,7 +172,7 @@
     }
     p.innerHTML = zeigen.map(function (a) {
       var t = a.status === 'laeuft' ? '<span class="dreh"></span>Marktbericht in Arbeit · <b>' + esc(a.label) + '</b>'
-        : a.status === 'fertig' ? '✓ Marktbericht fertig · <b>' + esc(a.label) + '</b> — öffnen'
+        : a.status === 'fertig' ? '✓ Marktbericht fertig · <b>' + esc(a.label) + '</b>, öffnen'
         : '⚠ Marktbericht nicht erstellt · <b>' + esc(a.label) + '</b>';
       return '<button type="button" class="' + (a.status === 'laeuft' ? '' : a.status) + '" data-mba-id="' + esc(a.id) + '">' + t + '</button>';
     }).join('');
@@ -224,7 +224,7 @@
     var a = finde(id); if (!a || a.status !== 'laeuft') return;
     msg = String(msg || '');
     var w = msg.match(/^Warteschlange[^\d]*(\d+)/);
-    if (w) a.warte = 'In der Warteschlange — Platz ' + w[1] + '. Gleich geht es los.';
+    if (w) a.warte = 'In der Warteschlange, Platz ' + w[1] + '. Gleich geht es los.';
     /* v2174: im Schnellmodus (Stufe 1) gibt es keine Makrolage - gemessen,
        der Stream meldet sie dort nicht. Sie zaehlt dann als „nicht im Umfang". */
     if (/^SCHNELL-MODUS/.test(msg)) { a.ohne = a.ohne || {}; a.ohne[4] = true; if (a.erledigt.indexOf(4) < 0) a.erledigt.push(4); }

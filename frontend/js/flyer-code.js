@@ -244,7 +244,7 @@
     d.innerHTML =
       '<span class="m">ERSTFLUG</span>' +
       '<span class="t">Dein Rabatt ist aktiviert<b data-prozent></b></span>' +
-      '<span class="f">Der Code ist hinterlegt — du musst nichts eingeben.</span>' +
+      '<span class="f">Der Code ist hinterlegt, du musst nichts eingeben.</span>' +
       '<a class="c" href="' + appAdresse(code) + '">Kostenlos starten →</a>' +
       '<button class="z" type="button" aria-label="Hinweis schließen">×</button>';
     document.body.insertBefore(d, document.body.firstChild);

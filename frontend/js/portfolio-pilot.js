@@ -147,7 +147,7 @@
         '<span class="dp-pp-ic">' + PLANE + '</span>' +
         '<div class="dp-pp-tt">' +
           '<span class="dp-pp-t">Portfolio-Pilot</span>' +
-          '<span class="dp-pp-s">Analyse über alle Objekte — und Fragen zu jedem einzelnen</span>' +
+          '<span class="dp-pp-s">Analyse über alle Objekte, und Fragen zu jedem einzelnen</span>' +
         '</div>' +
         '<label class="dp-pp-web" title="Erlaubt dem Portfolio-Piloten, für aktuelle Marktdaten im Web zu recherchieren">' +
           '<input type="checkbox" id="dp-pp-web"><span>Web-Recherche</span></label>' +
@@ -159,7 +159,7 @@
       '<div class="dp-pp-stand" id="dp-pp-stand" style="display:none"></div>' +
       '<div class="dp-pp-log" id="dp-pp-log">' +
         /* v3321 · kürzer (Marcel 12.11.2026: „generell ist recht viel Text") */
-        '<div class="dp-pp-hint">Frag mich zu deinem Portfolio oder zu einem Objekt – aus der Liste oder frei.</div>' +
+        '<div class="dp-pp-hint">Frag mich zu deinem Portfolio oder zu einem Objekt, aus der Liste oder frei.</div>' +
       '</div>' +
       /* v1705d: Schnellfragen. Ein leeres Eingabefeld ist eine Huerde -
          wer nicht weiss, was das Werkzeug kann, fragt es nicht. Die vier
@@ -466,9 +466,9 @@
     'Schreibe ausführlich: je Abschnitt drei bis fünf Sätze, Beträge mit €, Prozente mit Komma.',
     'Gliedere so:',
     '1. Was verglichen wird - Bestand, Mieterhöhung, Zielbild, und über wie viele Objekte (mit/ohne Zielbild, ohne Angaben). Nenne jedes nicht enthaltene Objekt mit seinem Grund.',
-    '2. Die Miete - von Bestand über Mieterhöhung zum Zielbild, mit den Beträgen und dem Prozentwert; warum die Miete laut Objektdaten (kaltmiete_laut_objektdaten_derselben_objekte) davon abweicht.',
+    '2. Die Miete - von Bestand über Mieterhöhung zum Zielbild, mit den Beträgen und dem Prozentwert, warum die Miete laut Objektdaten (kaltmiete_laut_objektdaten_derselben_objekte) davon abweicht.',
     '3. Maßnahmen und Rendite - Kosten der Maßnahmen und die Bruttomietrendite vorher/nachher.',
-    '4. Der Wert - Ertragswert Bestand, Zielbild, nach Kosten, Wertzuwachs nach Kosten; und wie sich der Ertragswert Bestand zu den Kaufpreisen DERSELBEN Objekte verhält.',
+    '4. Der Wert - Ertragswert Bestand, Zielbild, nach Kosten, Wertzuwachs nach Kosten, und wie sich der Ertragswert Bestand zu den Kaufpreisen DERSELBEN Objekte verhält.',
     '5. Die Objekte einzeln - welches trägt am meisten bei, wo kosten die Maßnahmen mehr, als sie an Wert bringen (mit Namen und Zahlen aus je_objekt).',
     '6. Wie das zur Gesamtinvestition und zur Vermögensbilanz passt - Kaufpreise, Nebenkosten, Gesamtinvestition, Objektwerte, Restschuld, Eigenkapital (gesamtbewertung) - und warum die Mengen verschieden sind.',
     '7. Was ich tun sollte - welche Läufe veraltet sind (laeufe_stand), welche Objekte ergänzt werden sollten, und wie neu gerechnet wird (neu_rechnen).',
@@ -548,7 +548,7 @@
         var b = BETRAG.exec(rest); if (!b) return;
         var v = _betragAus(b);
         if (!B.soll.some(function (x) { return gleich(v, x, /Mio/.test(b[2])); }))
-          out.push('„' + B.name + ' … ' + b[0].trim() + '“ – laut Daten ' + B.soll.filter(function (x) { return x != null; }).slice(0, 1).map(function (x) { return Math.round(x).toLocaleString('de-DE') + ' €'; }).join(''));
+          out.push('„' + B.name + ' … ' + b[0].trim() + '“, laut Daten ' + B.soll.filter(function (x) { return x != null; }).slice(0, 1).map(function (x) { return Math.round(x).toLocaleString('de-DE') + ' €'; }).join(''));
       });
       /* (b) Betrag, dann Prozent */
       var re2 = /([+\u2212\-]?\s?\d{1,3}(?:\.\d{3})*(?:,\d+)?)\s?(?:€|EUR|Euro)[^.%€]{0,25}?(\d+(?:,\d+)?)\s?(?:%|Prozent)/g, m2;
@@ -558,7 +558,7 @@
         var bv = _num(m2[1]), pv = _num(m2[2]);
         var P = paare.filter(function (p) { return gleich(bv, p[0]); });
         if (P.length && !P.some(function (p) { return p[1] != null && Math.abs(Math.abs(p[1]) - pv) <= 0.1; }))
-          out.push('„' + m2[0].trim() + '“ – der Prozentwert gehört nicht zu diesem Betrag (' + P.map(function (p) { return String(p[1]).replace('.', ',') + ' %'; }).join(' / ') + ')');
+          out.push('„' + m2[0].trim() + '“, der Prozentwert gehört nicht zu diesem Betrag (' + P.map(function (p) { return String(p[1]).replace('.', ',') + ' %'; }).join(' / ') + ')');
       }
       /* (c) Richtung */
       var re3 = /(\d+(?:,\d+)?)\s?(?:%|Prozent)\s+(über|unter|höher|niedriger|oberhalb|unterhalb)/gi, m3;
@@ -567,7 +567,7 @@
         var pv3 = _num(m3[1]), oben = /über|höher|oberhalb/i.test(m3[2]);
         var tr = vorz.filter(function (x) { return Math.abs(Math.abs(x) - pv3) <= 0.05; });
         if (tr.length && !tr.some(function (x) { return (x > 0) === oben; }))
-          out.push('„' + m3[0] + '“ – die Richtung stimmt nicht (laut Daten ' + tr.map(function (x) { return (x > 0 ? '+' : '') + String(x).replace('.', ','); }).join(' / ') + ' %)');
+          out.push('„' + m3[0] + '“, die Richtung stimmt nicht (laut Daten ' + tr.map(function (x) { return (x > 0 ? '+' : '') + String(x).replace('.', ','); }).join(' / ') + ' %)');
       }
       /* (e) v2953b · Abstand als Anteil gelesen: „21,8 % der Kaufpreise" bei +21,8 % Abstand,
          dazu „negativ"/„Überbewertung" im selben Satz bei positivem Abstand (zweiter Lauf 25.10.2026) */
@@ -575,7 +575,7 @@
       while ((m4 = re4.exec(satz))) {
         var pv4 = _num(m4[1]);
         var tr4 = vorz.filter(function (x) { return Math.abs(Math.abs(x) - pv4) <= 0.05; });
-        if (tr4.length) out.push('„' + m4[0] + ' …“ – das ist ein Abstand (' + tr4.map(function (x) { return (x > 0 ? '+' : '') + String(x).replace('.', ','); }).join(' / ') + ' %), kein Anteil');
+        if (tr4.length) out.push('„' + m4[0] + ' …“, das ist ein Abstand (' + tr4.map(function (x) { return (x > 0 ? '+' : '') + String(x).replace('.', ','); }).join(' / ') + ' %), kein Anteil');
       }
       vorz.forEach(function (x) {
         var s = String(Math.abs(x)).replace('.', ',');
@@ -589,7 +589,7 @@
         JO.forEach(function (o) {
           var kurz = String(o.name || '').split(/\s+/).slice(0, 2).join(' ');
           if (kurz && satz.indexOf(kurz) >= 0 && teurer.indexOf(o.name) < 0)
-            out.push('„' + kurz + '“ – laut Daten bringen die Maßnahmen dort nicht weniger, als sie kosten');
+            out.push('„' + kurz + '“, laut Daten bringen die Maßnahmen dort nicht weniger, als sie kosten');
         });
       }
     });

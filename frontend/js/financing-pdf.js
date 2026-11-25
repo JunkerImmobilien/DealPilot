@@ -440,7 +440,7 @@
       var _ok = !!(window.DpDarlehenWeitereUi && typeof window.DpDarlehenWeitereUi.uebernehmen === 'function'
         && window.DpDarlehenWeitereUi.uebernehmen(+_body.getAttribute('data-dw'), _w));
       closeFinPdfModal();
-      if (typeof toast === 'function') toast(_ok ? '✓ Werte übernommen' : '⚠ Darlehen nicht gefunden — Werte bitte von Hand eintragen');
+      if (typeof toast === 'function') toast(_ok ? '✓ Werte übernommen' : '⚠ Darlehen nicht gefunden, Werte bitte von Hand eintragen');
       return;
     }
     var inputs = document.querySelectorAll('#finpdf-body input[data-field]');

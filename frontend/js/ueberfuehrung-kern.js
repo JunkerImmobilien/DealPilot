@@ -121,7 +121,7 @@
   function afaSatzGesellschaft(p) {
     var bj = _n(p.baujahr), wohnen = p.wohnzwecke !== false;
     if (!wohnen) return { satzPct: 3.0, grund: '§ 7 Abs. 4 S. 1 Nr. 1 EStG: Betriebsgebäude, nicht Wohnzwecken dienend', sicher: bj != null };
-    if (bj == null) return { satzPct: 2.0, grund: 'Baujahr fehlt — 2 % angenommen (§ 7 Abs. 4 S. 1 Nr. 2 Buchst. b EStG), bitte ergänzen', sicher: false };
+    if (bj == null) return { satzPct: 2.0, grund: 'Baujahr fehlt, 2 % angenommen (§ 7 Abs. 4 S. 1 Nr. 2 Buchst. b EStG), bitte ergänzen', sicher: false };
     if (bj < 1925) return { satzPct: 2.5, grund: '§ 7 Abs. 4 S. 1 Nr. 2 Buchst. c EStG: fertiggestellt vor 1925', sicher: true };
     if (bj >= 2023) return { satzPct: 3.0, grund: '§ 7 Abs. 4 S. 1 Nr. 2 Buchst. a EStG: fertiggestellt nach dem 31.12.2022', sicher: true };
     return { satzPct: 2.0, grund: '§ 7 Abs. 4 S. 1 Nr. 2 Buchst. b EStG: fertiggestellt 1925–2022', sicher: true };
@@ -248,7 +248,7 @@
      bestaetigt. Ein nie gespeicherter Wert gilt als NICHT beantragt —
      ueberall gleich (Anzeige, Rechnung, PDF). */
   var PRUEFPUNKTE = [
-    { k: 'nur_grundbesitz', t: 'Die Gesellschaft verwaltet und nutzt ausschließlich eigenen Grundbesitz (daneben höchstens eigenes Kapitalvermögen) — das ganze Jahr, kein gewerblicher Grundstückshandel.' },
+    { k: 'nur_grundbesitz', t: 'Die Gesellschaft verwaltet und nutzt ausschließlich eigenen Grundbesitz (daneben höchstens eigenes Kapitalvermögen), das ganze Jahr, kein gewerblicher Grundstückshandel.' },
     { k: 'keine_betriebsvorrichtung', t: 'Keine Mitvermietung von Betriebsvorrichtungen, keine hotelähnliche Kurzzeitvermietung; Möblierung allenfalls untergeordnet.' },
     { k: 'kein_gesellschafterbetrieb', t: 'Kein Grundbesitz dient dem Gewerbebetrieb eines Gesellschafters (§ 9 Nr. 1 S. 5 Nr. 1 GewStG).' },
     { k: 'bagatell', t: 'Strom aus PV/Ladesäulen höchstens 20 %, sonstige Leistungen an Mieter höchstens 5 % der Mieteinnahmen (§ 9 Nr. 1 S. 3 Buchst. b, c GewStG).' }
@@ -379,7 +379,7 @@
              gewstFrei: gewFrei, gewstOhneHebesatz: !gewFrei && !(heb > 0), steuerfreiNachFrist: false,
              hinweis: HINWEIS_VERKAUF_GES };
   }
-  var HINWEIS_VERKAUF_GES = 'Veräußerungsgewinn immer steuerpflichtig (KSt; GewSt nur ohne erweiterte Kürzung bzw. bei schädlicher Veräußerung) — die 10-Jahres-Frist gilt nur im Privatvermögen.';
+  var HINWEIS_VERKAUF_GES = 'Veräußerungsgewinn immer steuerpflichtig (KSt; GewSt nur ohne erweiterte Kürzung bzw. bei schädlicher Veräußerung), die 10-Jahres-Frist gilt nur im Privatvermögen.';
 
   function _mindest(erg, vortrag, quote) {
     var grenze = Math.min(erg, 1000000) + Math.max(0, erg - 1000000) * quote;
@@ -550,7 +550,7 @@
     }
     return { anzahl: max, ueberGrenze: max > 3, objekte: fenster.map(function (e) { return e.label || e.key; }),
              kurzGehalten: kurz.length,
-             text: max > 3 ? 'Mehr als drei Objekte innerhalb von fünf Jahren nach Anschaffung übertragen — gewerblicher Grundstückshandel droht (BMF 26.03.2004, Tz. 5 ff.). Vor der Übertragung prüfen lassen.'
+             text: max > 3 ? 'Mehr als drei Objekte innerhalb von fünf Jahren nach Anschaffung übertragen, gewerblicher Grundstückshandel droht (BMF 26.03.2004, Tz. 5 ff.). Vor der Übertragung prüfen lassen.'
                            : (max > 0 ? max + ' von höchstens drei Objekten mit Haltedauer bis fünf Jahre in fünf Jahren übertragen (Drei-Objekt-Grenze, BMF 26.03.2004). Veräußerungen außerhalb von DealPilot zählen mit.' : '') };
   }
   /* Uebersicht der Gruppe: je Jahr Summe § 23 (bekannt/offen), Freigrenze, GrESt. */

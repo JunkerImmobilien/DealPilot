@@ -15,5 +15,5 @@
   'use strict';
   // V176: Disabled. Removed upgrade-pill und upgrade-modal.
   // Plan-Wechsel-Logik ist jetzt im Settings-Modal (settings.js: _renderPlanPane).
-  console.log('[upgrade-cta] V176: deaktiviert — Plan-Wechsel via Settings → Plan-Tab');
+  console.log('[upgrade-cta] V176: deaktiviert, Plan-Wechsel via Settings → Plan-Tab');
 })();

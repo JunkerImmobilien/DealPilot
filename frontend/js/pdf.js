@@ -34,7 +34,7 @@ async function _captureElementAsImage(elemId, opts) {
   var quality = opts.quality != null ? opts.quality : (format === 'jpeg' ? 0.85 : 0.95);
 
   if (typeof window.html2canvas !== 'function') {
-    console.warn('[pdf] html2canvas nicht geladen — Fallback nötig');
+    console.warn('[pdf] html2canvas nicht geladen, Fallback nötig');
     return null;
   }
   var elem = document.getElementById(elemId);
@@ -1258,8 +1258,8 @@ function _renderAiJsonInPdf(doc, a, cy, M, CW, W, C, stripMd, newPage) {
     if (a.kaufpreisniveau) t.push('Kaufpreisniveau: ' + clean(a.kaufpreisniveau));
     if (t.length) block('Lage & Markt', t.join('\n\n'));
   })();
-  if (a.berichts_abgleich) block('Abgleich mit dem Marktbericht', clean(a.berichts_abgleich) + '\n\nSach- und Ertragswert im Bericht sind ein Plausibilitäts-Quercheck nach ImmoWertV-Logik — indikativ, kein Gutachten nach § 194 BauGB.');
-  if (a.optischer_eindruck) block('Optischer Eindruck aus den Fotos', clean(a.optischer_eindruck) + '\n\nEin visueller Eindruck aus den mitgesendeten Bildern — keine Feststellung.');
+  if (a.berichts_abgleich) block('Abgleich mit dem Marktbericht', clean(a.berichts_abgleich) + '\n\nSach- und Ertragswert im Bericht sind ein Plausibilitäts-Quercheck nach ImmoWertV-Logik, indikativ, kein Gutachten nach § 194 BauGB.');
+  if (a.optischer_eindruck) block('Optischer Eindruck aus den Fotos', clean(a.optischer_eindruck) + '\n\nEin visueller Eindruck aus den mitgesendeten Bildern, keine Feststellung.');
   /* v3018d · ohne angelegtes Zielbild kein Baustein „… · Zielbild" (DpPotenzial hat_ziel) */
   var _hatZiel = true;
   try { if (window.DpPotenzial && typeof window.DpPotenzial.modell === 'function') _hatZiel = !!window.DpPotenzial.modell().hat_ziel; } catch (e) { _hatZiel = true; }
@@ -1278,7 +1278,7 @@ function _renderAiJsonInPdf(doc, a, cy, M, CW, W, C, stripMd, newPage) {
     if (t.length) block('Ankauf gegen heute', t.join('\n\n'));
   })();
   /* v3323 · „steuerlich Ankauf gegen heute" gehört zur Steuer (Marcel 12.11.2026) */
-  if (a.steuer_zusammenfassung) block('Steuerliche Zusammenfassung', clean(a.steuer_zusammenfassung) + (a.soll_ist_steuer ? '\n\nAnkauf gegen heute: ' + clean(a.soll_ist_steuer) : '') + '\n\nEine Einordnung aus den Eingaben im Reiter Steuer — keine Steuerberatung.');
+  if (a.steuer_zusammenfassung) block('Steuerliche Zusammenfassung', clean(a.steuer_zusammenfassung) + (a.soll_ist_steuer ? '\n\nAnkauf gegen heute: ' + clean(a.soll_ist_steuer) : '') + '\n\nEine Einordnung aus den Eingaben im Reiter Steuer, keine Steuerberatung.');
   (function () {
     var SV = window.DpSteuerVerlauf, r = null;
     try { r = SV && SV.reihe ? SV.reihe() : null; } catch (e) { r = null; }
@@ -2035,7 +2035,7 @@ async function _exportPDFInner() {
        ein PDF ist das, was beim Kunden und beim Finanzamt landet. */
     ['Pers\u00f6nlicher Grenzsteuersatz',
      pP(v('grenz'), 2) + (v('zve') > 0
-       ? ' \u2014 Vergleichsgr\u00f6\u00dfe; gerechnet wird nach \u00a7 32a EStG'
+       ? ' \u2014 Vergleichsgr\u00f6\u00dfe, gerechnet wird nach \u00a7 32a EStG'
        : '')]
   ];
 
@@ -3322,7 +3322,7 @@ async function _exportPDFInner() {
 
   // V63.92/V63.93/V63.96: Equity-Build + Wasserfall auf EINE Seite (Marcels Wunsch).
   function _drawEquityAndWaterfallCombined() {
-    console.log('[pdf] V63.96 _drawEquityAndWaterfallCombined() AUFGERUFEN — beides auf eine Seite');
+    console.log('[pdf] V63.96 _drawEquityAndWaterfallCombined() AUFGERUFEN, beides auf eine Seite');
     cy = newPage('Vermögensaufbau & Vermögenszuwachs');
     cy += 8;  // V63.96: 2 → 8 (Marcels Wunsch: 2-3 Leerzeilen zwischen Header und Chart-Title)
     var equityData = _readCardDataFromDom('bc-equity');

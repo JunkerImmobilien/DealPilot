@@ -646,7 +646,7 @@
     html += '</tr>';
 
     html += '</tbody></table>' +
-      (J.ok ? '' : '<p class="hint" style="margin-top:10px"><strong>Jacoby nicht anwendbar:</strong> ' + J.grund + '</p>') + '<p class="hint" style="margin-top:10px"><strong>Amtlich</strong> entspricht exakt der BMF-Arbeitshilfe. Jede Abweichung braucht eine Begründung – sie geht in Schritt 5 in den Text für Kaufvertrag und Berater.</p>';
+      (J.ok ? '' : '<p class="hint" style="margin-top:10px"><strong>Jacoby nicht anwendbar:</strong> ' + J.grund + '</p>') + '<p class="hint" style="margin-top:10px"><strong>Amtlich</strong> entspricht exakt der BMF-Arbeitshilfe. Jede Abweichung braucht eine Begründung, sie geht in Schritt 5 in den Text für Kaufvertrag und Berater.</p>';
 
     v292Container.innerHTML = html;
     try { var jzH = document.getElementById('bmfJacobyZeile'); if (jzH) paneAfa.appendChild(jzH); } catch (e) {}
@@ -860,7 +860,7 @@
   window._v292Apply = function(){
     var st = window._v292State;
     if (!st.response || !st.response.ok) {
-      if (typeof toast === 'function') toast('Bitte warten — Pipeline-Berechnung läuft noch');
+      if (typeof toast === 'function') toast('Bitte warten, Pipeline-Berechnung läuft noch');
       return;
     }
 
@@ -915,7 +915,7 @@
 
     // Toast
     if (typeof toast === 'function') {
-      toast('✓ Variante "' + selected + '" übernommen — Gebäudeanteil ' + _fmtPct(v.gebaeude_pct) + ' im Steuermodul');
+      toast('✓ Variante "' + selected + '" übernommen, Gebäudeanteil ' + _fmtPct(v.gebaeude_pct) + ' im Steuermodul');
     }
 
     // Modal schließen
@@ -937,7 +937,7 @@
     btn.style.cssText = 'margin-left:6px;padding:4px 9px;background:transparent;border:1px solid var(--gold,#C9A84C);color:var(--gold-d,#8A7340);border-radius:4px;cursor:pointer;font-size:14px;font-weight:600;line-height:1;vertical-align:middle';
     btn.onclick = function(){
       // Bestätigung
-      if (!confirm('Gebäudeanteil zurücksetzen auf 80 % (Standard)?\nDie BMF-Berechnung bleibt erhalten — du kannst sie wieder übernehmen.')) return;
+      if (!confirm('Gebäudeanteil zurücksetzen auf 80 % (Standard)?\nDie BMF-Berechnung bleibt erhalten, du kannst sie wieder übernehmen.')) return;
       // Wert zurücksetzen
       gebAntEl.value = '80,00';
       gebAntEl.classList.remove('from-bmf-v292');
@@ -1104,6 +1104,6 @@
   // V289.2.5 applyToTax wird durch V292 ersetzt
   window.applyToTax = window._v292Apply;
 
-  console.log('[v292] BMF-Modal-Refactor V292 geladen — Pipeline-basiert, 3 Varianten, Live-Debounced 500ms');
+  console.log('[v292] BMF-Modal-Refactor V292 geladen, Pipeline-basiert, 3 Varianten, Live-Debounced 500ms');
 
 })();

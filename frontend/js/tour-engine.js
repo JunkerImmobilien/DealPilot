@@ -1853,7 +1853,7 @@
       + '</div>'
       + '<div style="padding:20px 22px 18px">'
       +   '<h2 id="dp-tour-offer-h" style="font-family:\'Space Grotesk\',sans-serif;font-size:18px;margin:0 0 7px;color:var(--wl-2a2727,#2A2727)">Soll ich dir kurz zeigen, wo was liegt?</h2>'
-      +   '<p style="margin:0 0 16px;font-size:13.5px;line-height:1.55;color:#5f594f">Ein kurzer Rundgang durch die wichtigsten Funktionen. Du kannst ihn jederzeit abbrechen — und sp&auml;ter unter <b>Aktionen &rsaquo; Rundgang starten</b> wieder aufrufen.</p>'
+      +   '<p style="margin:0 0 16px;font-size:13.5px;line-height:1.55;color:#5f594f">Ein kurzer Rundgang durch die wichtigsten Funktionen. Du kannst ihn jederzeit abbrechen, und sp&auml;ter unter <b>Aktionen &rsaquo; Rundgang starten</b> wieder aufrufen.</p>'
       +   '<label style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:#5f594f;margin-bottom:16px;cursor:pointer">'
       +     '<input type="checkbox" id="dp-tour-offer-nie" style="width:15px;height:15px;cursor:pointer"> Nicht mehr anzeigen'
       +   '</label>'
@@ -1861,7 +1861,7 @@
       +     '<button type="button" id="dp-tour-offer-no" style="padding:9px 16px;border:1px solid #e6e0d3;background:#fff;border-radius:9px;font:inherit;font-size:13.5px;cursor:pointer;color:#5f594f">Sp&auml;ter</button>'
       +     '<button type="button" id="dp-tour-offer-yes" style="padding:9px 18px;border:0;border-radius:9px;font:inherit;font-size:13.5px;font-weight:600;cursor:pointer;color:#2a2205;background:linear-gradient(110deg,var(--wl-e8cc7a,#E8CC7A),var(--wl-c9a84c,#C9A84C) 55%,var(--wl-b8932f,#b8932f))">Rundgang starten</button>'
       +   '</div>'
-      +   (letzte ? '<p style="margin:13px 0 0;font-size:11.5px;color:#8a8378">Das war die letzte Nachfrage — danach meldet sich der Rundgang nicht mehr von allein.</p>' : '')
+      +   (letzte ? '<p style="margin:13px 0 0;font-size:11.5px;color:#8a8378">Das war die letzte Nachfrage, danach meldet sich der Rundgang nicht mehr von allein.</p>' : '')
       + '</div></div>';
     document.body.appendChild(ov);
 

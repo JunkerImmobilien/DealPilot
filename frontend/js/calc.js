@@ -776,7 +776,7 @@ function _progHinweisZeichnen(zveImmo, steuer, grenzSatz, effSatz, zveBasis, _sa
     + 'Dein Steuersatz wurde angepasst</div>'
     + '<p class="hint" style="margin-bottom:8px">'
     + 'Du hast <b>' + _pz(grenzSatz) + '</b> Grenzsteuersatz angegeben. Auf dieses Objekt wirken '
-    + 'tatsächlich <b>' + _pz(effSatz) + '</b> — die ' + _wirkung + ' fällt damit um '
+    + 'tatsächlich <b>' + _pz(effSatz) + '</b>, die ' + _wirkung + ' fällt damit um '
     + '<b>' + _eu(_diff) + '</b> ' + _richtung + ' aus als bei einer Rechnung mit dem festen Satz.'
     + '</p>'
     /* ═══ v1397 · WENN ANDERE OBJEKTE DIE BASIS SCHON VERSCHOBEN HABEN ══
@@ -793,14 +793,14 @@ function _progHinweisZeichnen(zveImmo, steuer, grenzSatz, effSatz, zveBasis, _sa
           + ' deine Ausgangsbasis um <b>' + _eu(_saldo) + '</b> auf <b>' + _eu(zveBasis) + '</b>, '
           + 'bevor dieses Objekt wirkt. '
           + (_saldo < 0
-              ? 'Dieses Objekt spart deshalb weniger, als es allein sparen würde — genau so, wie es in deiner Steuererklärung zusammenläuft.'
+              ? 'Dieses Objekt spart deshalb weniger, als es allein sparen würde, genau so, wie es in deiner Steuererklärung zusammenläuft.'
               : 'Dieses Objekt wirkt deshalb auf ein höheres Einkommen als allein.')
           + '</p>'
         : '')
     + '<details class="dp-erkl">'
     + '<summary>Warum ist das so?</summary>'
     + '<p class="hint" style="margin-top:8px">'
-    + 'Der Grenzsteuersatz gilt für den <b>nächsten</b> Euro deines Einkommens — nicht für jeden. '
+    + 'Der Grenzsteuersatz gilt für den <b>nächsten</b> Euro deines Einkommens, nicht für jeden. '
     + (_verlust ? 'Der steuerliche Verlust dieses Objekts von <b>' + _eu(zveImmo) + '</b> '
                 : 'Der steuerliche Gewinn dieses Objekts von <b>' + _eu(zveImmo) + '</b> ')
     + (_verlust
@@ -814,7 +814,7 @@ function _progHinweisZeichnen(zveImmo, steuer, grenzSatz, effSatz, zveBasis, _sa
     + '<p class="hint" style="margin-top:8px">'
     + 'Gerechnet wird die Steuer deshalb nicht mit einem festen Satz, sondern als Differenz zweier '
     + 'Tarifberechnungen nach <b>§ 32a EStG</b>: einmal mit und einmal ohne das Ergebnis dieses Objekts. '
-    + 'Ab rund 90.000 € zu versteuerndem Einkommen liegst du in der Proportionalzone — dort sind beide '
+    + 'Ab rund 90.000 € zu versteuerndem Einkommen liegst du in der Proportionalzone, dort sind beide '
     + 'Zahlen gleich und dieser Hinweis erscheint nicht.'
     + '</p>'
     /* ═══ v1383 · WAS HIER STEHT UND WAS NICHT ══════════════════════════
@@ -833,7 +833,7 @@ function _progHinweisZeichnen(zveImmo, steuer, grenzSatz, effSatz, zveBasis, _sa
     + 'nichts: solange ein zu versteuerndes Einkommen erfasst ist, rechnet DealPilot über '
     + 'den Tarif, nicht über den eingetragenen Satz. Der Satz bleibt als Vergleichsgröße '
     + 'stehen und erscheint so auch im PDF. Willst du bewusst mit einem festen Satz rechnen, '
-    + 'lösche das zu versteuernde Einkommen — dann greift wieder die einfache Multiplikation.'
+    + 'lösche das zu versteuernde Einkommen, dann greift wieder die einfache Multiplikation.'
     + '</p>'
     + '</details>';
 }
@@ -1177,7 +1177,7 @@ function _calcImmediate(){
          Sanierungsplans zusammen (in der Regel innerhalb von 5 Jahren, BMF-Schreiben vom 18.07.2003 zur Abgrenzung von Anschaffungs-, Herstellungs- und Erhaltungsaufwand) */
       sanStatusEl.innerHTML = '<span class="badge badge-green" title="Erweiterungen und Standardhebungen (§ 255 Abs. 2 HGB) bleiben auch unter der Grenze Herstellungskosten und laufen über die AfA. Achtung, Sanierung auf Raten: Maßnahmen nach einem einheitlichen Plan, in der Regel innerhalb von 5 Jahren, rechnet das Finanzamt auch nach den 3 Jahren zusammen.">✓ Unter Grenze ('+_san15Pct.toFixed(1).replace('.', ',')+' %), Erhaltungsaufwand sofort abziehbar</span>';
     } else {
-      sanStatusEl.innerHTML = '<span class="badge badge-red">⚠ Über 15 % ('+_san15Pct.toFixed(1).replace('.', ',')+' %) – anschaffungsnahe HK ('+_sanNd+' Jahre AfA)</span>';
+      sanStatusEl.innerHTML = '<span class="badge badge-red">⚠ Über 15 % ('+_san15Pct.toFixed(1).replace('.', ',')+' %), anschaffungsnahe HK ('+_sanNd+' Jahre AfA)</span>';
     }
   }
   /* Die USt-Zeilen nur zeigen, wenn brutto gerechnet wird — sonst stünde
@@ -1878,7 +1878,7 @@ function _calcImmediate(){
       _kl.innerHTML = (_fr.programme || []).filter(function (p) { return p.darlehen2; }).map(function (p) {
         return '<li><a href="' + p.url + '" target="_blank" rel="noopener">' + p.name + ' →</a></li>'; }).join('')
         + '<li><a href="' + _fr.konditionen_url + '" target="_blank" rel="noopener">Aktuelle KfW-Zinsen (Konditionenanzeiger) →</a></li>';
-      var _st = el('d2_kfw_stand'); if (_st) _st.textContent = 'Stand ' + String(_fr.stand).split('-').reverse().join('.') + '. Das KfW-Darlehen rechnet hier noch wie ein Annuitätendarlehen — tilgungsfreie Anlaufjahre und Tilgungszuschuss sind noch nicht abgebildet.';
+      var _st = el('d2_kfw_stand'); if (_st) _st.textContent = 'Stand ' + String(_fr.stand).split('-').reverse().join('.') + '. Das KfW-Darlehen rechnet hier noch wie ein Annuitätendarlehen, tilgungsfreie Anlaufjahre und Tilgungszuschuss sind noch nicht abgebildet.';
     }
     if (tadBox) tadBox.style.display = d2_type === 'tilgungsaussetzung' ? '' : 'none';
 
@@ -3541,9 +3541,9 @@ function _calcImmediate(){
           deckEl.className = 'kv-v c-gold';
         } else {
           var statusTxt;
-          if (lc.zuteilStatus === 'before_ezb') statusTxt = '✓ Voll gedeckt — Zuteilung vor Bindungsende';
-          else if (lc.zuteilStatus === 'at_ezb') statusTxt = '✓ Voll gedeckt — Zuteilung exakt zum Bindungsende';
-          else statusTxt = '⚡ Voll gedeckt — Zuteilung nach Bindungsende';
+          if (lc.zuteilStatus === 'before_ezb') statusTxt = '✓ Voll gedeckt, Zuteilung vor Bindungsende';
+          else if (lc.zuteilStatus === 'at_ezb') statusTxt = '✓ Voll gedeckt, Zuteilung exakt zum Bindungsende';
+          else statusTxt = '⚡ Voll gedeckt, Zuteilung nach Bindungsende';
           deckEl.textContent = statusTxt;
           deckEl.className = 'kv-v ' + (lc.zuteilStatus === 'after_ezb' ? 'c-gold' : 'c-green');
         }
@@ -3761,7 +3761,7 @@ function _calcImmediate(){
   if (_mstgHint) {
     _mstgHint.textContent = mstg > 0
       ? '· Mietsteigerung ' + (mstg*100).toFixed(1).replace('.', ',') + ' % p.a. wirkt'
-      : '· ⚠ Mietsteigerung 0 % — NKM bleibt konstant (siehe Tab Miete)';
+      : '· ⚠ Mietsteigerung 0 %, NKM bleibt konstant (siehe Tab Miete)';
     _mstgHint.style.color = mstg > 0 ? 'var(--muted)' : 'var(--gold-d)';
   }
   st('chart-lbl',btj+' Jahre');
@@ -4604,7 +4604,7 @@ function renderProjTable(){
   if (thTilg) {
     if (hasBspar) {
       thTilg.textContent = 'BSV-Rate/J.';
-      thTilg.title = 'Bauspar-Sparrate (statt Tilgung — bei Tilgungsaussetzung)';
+      thTilg.title = 'Bauspar-Sparrate (statt Tilgung, bei Tilgungsaussetzung)';
     } else {
       thTilg.textContent = 'Tilgung/J.';
       thTilg.title = '';
@@ -4902,7 +4902,7 @@ function switchCFMode(mode){
   document.querySelectorAll('.cf-mode-btn').forEach(function(b){b.classList.toggle('active', b.getAttribute('data-mode')===mode);});
   var title = document.getElementById('cr-title');
   if(title) {
-    var titles = { 'heute': 'Cashflow – Heute', 'ezb': 'Cashflow – Ende Zinsbindung', 'anschluss': 'Cashflow – Anschlussfinanzierung' };
+    var titles = { 'heute': 'Cashflow, Heute', 'ezb': 'Cashflow, Ende Zinsbindung', 'anschluss': 'Cashflow, Anschlussfinanzierung' };
     title.textContent = titles[mode] || titles.heute;
   }
   renderCFCalc(mode);
@@ -5002,7 +5002,7 @@ function updateFESH() {
   var hasHuelle = hasFenster || hasDachFassade;
   var hasBader = selected.some(function(s) { return s.area === 'b' || s.area === 's'; });
   var ausl = { energie: hasEnergyMaßnahme, heizung: hasHeating, huelle: hasHuelle, bad: hasBader };
-  var warum = { energie: 'Energetische Bereiche ausgewählt', heizung: 'Heizung ausgewählt', huelle: 'Fenster bzw. Dach/Fassade ausgewählt', bad: 'Bad/Sanitär ausgewählt — wenn barrierereduzierend umgebaut wird' };
+  var warum = { energie: 'Energetische Bereiche ausgewählt', heizung: 'Heizung ausgewählt', huelle: 'Fenster bzw. Dach/Fassade ausgewählt', bad: 'Bad/Sanitär ausgewählt, wenn barrierereduzierend umgebaut wird' };
   (FR && FR.programme || []).forEach(function (pr) {
     var treffer = (pr.ausloeser || []).filter(function (k) { return ausl[k]; });
     if (!treffer.length) return;

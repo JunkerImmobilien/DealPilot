@@ -157,7 +157,7 @@
         '<div class="fb-head hero">' +
           '<div class="hero-cat"><span class="ic"><svg><use href="#i-spark"/></svg></span>Deine Stimme zählt</div>' +
           '<h2 class="hero-h">Feedback &amp; <span class="gold">Support</span></h2>' +
-          '<p class="hero-d">Hilf uns, DealPilot besser zu machen — oder hol dir schnelle Hilfe wenn was nicht läuft.</p>' +
+          '<p class="hero-d">Hilf uns, DealPilot besser zu machen, oder hol dir schnelle Hilfe wenn was nicht läuft.</p>' +
         '</div>' +
 
         // V114: Body-Wrapper (scrollbar) + Toggle-Row + Sections
@@ -241,7 +241,7 @@
 
             '<div class="section fb-section">' +
               '<div class="section-h"><div class="section-h-num">3</div><div class="section-l fb-section-l">Screenshots / Bilder anhängen <span class="fb-section-opt">(optional)</span></div></div>' +
-              '<div class="section-d fb-section-d">Hilft uns enorm beim Nachstellen — Fenster, Fehlermeldung, Auffälligkeiten</div>' +
+              '<div class="section-d fb-section-d">Hilft uns enorm beim Nachstellen, Fenster, Fehlermeldung, Auffälligkeiten</div>' +
               '<div class="fb-attach-row">' +
                 '<input type="file" id="fb-screenshots" multiple accept="image/*" style="display:none" onchange="_fbOnScreenshots(this)">' +
                 '<button type="button" class="fb-attach-btn" onclick="document.getElementById(\'fb-screenshots\').click()">' +
@@ -254,7 +254,7 @@
 
             '<div class="section fb-section">' +
               '<div class="section-h"><div class="section-h-num">4</div><div class="section-l fb-section-l">Aktuelles Objekt anhängen <span class="fb-section-opt">(optional)</span></div></div>' +
-              '<div class="section-d fb-section-d">Schickt deine aktuellen Eingaben als JSON mit — hilft beim Reproduzieren</div>' +
+              '<div class="section-d fb-section-d">Schickt deine aktuellen Eingaben als JSON mit, hilft beim Reproduzieren</div>' +
               '<label class="fb-toggle-row">' +
                 '<input type="checkbox" id="fb-attach-object" class="fb-toggle-cb">' +
                 '<span class="fb-toggle-text" id="fb-attach-object-text">Objekt nicht anhängen</span>' +
@@ -580,7 +580,7 @@
       body += k + ': ' + payload.diagnostics[k] + '\n';
     });
     if ((payload.screenshots || []).length) {
-      body += '\nHinweis: ' + payload.screenshots.length + ' Screenshot(s) waren ausgewählt — bitte manuell anhängen!\n';
+      body += '\nHinweis: ' + payload.screenshots.length + ' Screenshot(s) waren ausgewählt, bitte manuell anhängen!\n';
     }
 
     // V63.77: Adressen typspezifisch — Support an support@, Feedback an dealpilot@
@@ -598,7 +598,7 @@
       '<div class="fb-success">' +
         '<div class="fb-success-icon" style="background:rgba(201,168,76,0.18);color:#E2C97E;">' + _icon('mail', 30) + '</div>' +
         '<h2 class="fb-success-title">E-Mail-Programm öffnen</h2>' +
-        '<p class="fb-success-sub">Der direkte Server-Versand ist gerade nicht verfügbar. Wir öffnen dein E-Mail-Programm mit allen Daten vorbereitet — du musst nur noch auf "Senden" klicken.</p>' +
+        '<p class="fb-success-sub">Der direkte Server-Versand ist gerade nicht verfügbar. Wir öffnen dein E-Mail-Programm mit allen Daten vorbereitet, du musst nur noch auf "Senden" klicken.</p>' +
         '<a class="fb-btn fb-btn-gold" href="' + mailto + '" onclick="setTimeout(closeFeedback,500)">' + _icon('mail', 16) + ' E-Mail öffnen</a>' +
         '<button type="button" class="fb-btn fb-btn-ghost" style="margin-top:8px" onclick="closeFeedback()">Abbrechen</button>' +
       '</div>';

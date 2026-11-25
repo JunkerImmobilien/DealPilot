@@ -433,7 +433,7 @@
     w.className = 'dpl-jahr-frage';
     w.innerHTML =
         '<div class="dpl-jf-box">'
-      +   '<h3>Finanzamt-PDF — welches Jahr?</h3>'
+      +   '<h3>Finanzamt-PDF, welches Jahr?</h3>'
       +   '<p>Anlage V mit den Werbungskosten des gewählten Jahres.</p>'
       +   '<div class="dpl-jf-liste">'
       +     rows.map(function (r, i) {
@@ -441,7 +441,7 @@
           }).join('')
       +     '<button type="button" class="dpl-jf-j dpl-jf-alle" data-wert="all">Alle Jahre</button>'
       +   '</div>'
-      +   (rows.length ? '' : '<p class="dpl-jf-leer">Noch keine Jahre berechnet — erst die Investition ausfüllen.</p>')
+      +   (rows.length ? '' : '<p class="dpl-jf-leer">Noch keine Jahre berechnet, erst die Investition ausfüllen.</p>')
       +   '<button type="button" class="dpl-jf-ab">Abbrechen</button>'
       + '</div>';
     document.body.appendChild(w);
@@ -515,7 +515,7 @@
       if (reps.length) {
         sperre(mbKnopf, false, '');
         var sub = mbKnopf.querySelector('.dpl-ausgabe-sub');
-        if (sub) sub.textContent = reps.length === 1 ? 'Ein Bericht liegt vor' : (reps.length + ' Berichte — der neueste');
+        if (sub) sub.textContent = reps.length === 1 ? 'Ein Bericht liegt vor' : (reps.length + ' Berichte, der neueste');
       } else {
         sperre(mbKnopf, true, 'noch keiner erstellt');
       }
@@ -1645,7 +1645,7 @@
        fuer den, der sie sucht, nicht vorhanden. */
     g.innerHTML = '<h3>Aussehen</h3>'
       + '<p class="dpuv-hint">Wo Menü, Aktionen, Score und Ausgaben liegen. '
-      + 'Die Arbeitsfläche bleibt in allen gleich — es wechselt nur der Rahmen. '
+      + 'Die Arbeitsfläche bleibt in allen gleich, es wechselt nur der Rahmen. '
       + 'Farben, Formen und Schrift stehen darunter und lassen sich frei '
       /* ── v1889 · HIER STAND: „Jede Ansicht ausser ‚Heute' schaltet auf hell." ──
          Das hat der Code zuletzt in v1698 getan. v1699 hat den Hell-Zwang

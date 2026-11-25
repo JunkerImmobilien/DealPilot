@@ -17,23 +17,23 @@
   var PLANS = [
     {
       key: 'free', letter: 'F', label: 'Free', tag: 'Einstieg', title: 'Free',
-      lead: 'Beeindrucken, nicht arbeiten. Lernen Sie DealPilot kennen — mit voller Score-Logik im Hintergrund, aber Wasserzeichen auf den Exporten.',
+      lead: 'Beeindrucken, nicht arbeiten. Lernen Sie DealPilot kennen, mit voller Score-Logik im Hintergrund, aber Wasserzeichen auf den Exporten.',
       price_monthly: 0, price_yearly: 0,
       features: [
         '1 Objekt',
         '4 Wochen voller Pro-Umfang',
         'DealPilot Score (5 Faktoren)',
-        'Investor Deal Score (24 KPIs) — Demo',
+        'Investor Deal Score (24 KPIs), Demo',
         /* v1185: die Testphase steht zuerst, weil sie das ist, was ein
            neues Konto tatsaechlich vorfindet. Die Zeile darunter gilt ab
            Woche fuenf. */
-        '4 Wochen Pro — mit 5 · 3 · 1 Bewertungen',
+        '4 Wochen Pro, mit 5 · 3 · 1 Bewertungen',
         'danach 1 Marktpreisindikation / Monat' /* v1176-kontingent */,
         'Alle PDFs mit Wasserzeichen',
         '10 Co-Pilot-Fragen am Tag'
       ],
       not_included: null,
-      result: 'Sie sehen die volle Tiefe von DealPilot — und entscheiden danach, ob Sie upgraden.',
+      result: 'Sie sehen die volle Tiefe von DealPilot, und entscheiden danach, ob Sie upgraden.',
       ctaText: 'Kostenlos starten',
       /* TR7-trial, v1185: aus sieben Tagen werden vier Wochen, und die
          Testphase traegt jetzt ein eigenes Bewertungspaket. */
@@ -41,7 +41,7 @@
     },
     {
       key: 'starter', letter: 'S', label: 'Starter', tag: 'Privat-Investor', title: 'Starter',
-      lead: 'Fühlt sich vollständig an. Volle PDFs ohne Wasserzeichen, Werbungskosten-Modul, Mietspiegel-Vergleich — für die ersten echten Deals.',
+      lead: 'Fühlt sich vollständig an. Volle PDFs ohne Wasserzeichen, Werbungskosten-Modul, Mietspiegel-Vergleich, für die ersten echten Deals.',
       price_monthly: 19.99, price_yearly: 219,   /* v1246: 1 Freimonat statt 2 */
       features: [
         '5 Objekte',
@@ -61,13 +61,13 @@
         'Live-Marktzinsen',
         'BMF-Rechner & Export'
       ],
-      result: 'Sie liefern professionelle Unterlagen — und sparen sich Excel-Kämpfe.',
+      result: 'Sie liefern professionelle Unterlagen, und sparen sich Excel-Kämpfe.',
       ctaText: 'Starter-Plan starten',
       footnote: 'Bei jährlicher Zahlung sparen Sie 58 € (~17 %)'
     },
     {
       key: 'investor', letter: 'I', label: 'Investor', tag: 'Bestseller', title: 'Investor',
-      lead: 'Der Plan für aktive Investoren. Investor Deal Score mit 24 KPIs, Track-Record-PDF, Bankexport, Live-Marktzinsen und BMF-Rechner — alles, was Sie für ernstgemeinte Investments brauchen.',
+      lead: 'Der Plan für aktive Investoren. Investor Deal Score mit 24 KPIs, Track-Record-PDF, Bankexport, Live-Marktzinsen und BMF-Rechner, alles, was Sie für ernstgemeinte Investments brauchen.',
       price_monthly: 34.99, price_yearly: 384,  /* v1246: Preisrunde 07.09.2026 */
       best: true,
       features: [
@@ -77,14 +77,14 @@
         'Bankexport',
         'Logo & Footer im PDF',
         'Live-Marktzinsen',
-        'Mietspiegel — Auto-Vergleich',
+        'Mietspiegel, Auto-Vergleich',
         'BMF-Rechner & Export',
         'ViVi-Anbindung (Objektverwaltung)',   /* v4350 */
         '5 Marktpreisindikationen + 5 erweiterte / Monat', /* v1176-kontingent */
         '50 Co-Pilot-Fragen am Tag'
       ],
       not_included: null,
-      result: 'Sie investieren wie ein institutioneller Investor — mit allen KPIs, die Banken und Steuerberater erwarten.',
+      result: 'Sie investieren wie ein institutioneller Investor, mit allen KPIs, die Banken und Steuerberater erwarten.',
       ctaText: 'Investor-Plan starten',
       footnote: 'Bei jährlicher Zahlung sparen Sie 118 € (~17 %)'
     },
@@ -103,7 +103,7 @@
         '100 Co-Pilot-Fragen am Tag'
       ],
       not_included: null,
-      result: 'Sie skalieren Ihre Analyse-Kapazität — und können DealPilot direkt im Kundengespräch einsetzen.',
+      result: 'Sie skalieren Ihre Analyse-Kapazität, und können DealPilot direkt im Kundengespräch einsetzen.',
       ctaText: 'Pro-Plan starten',
       footnote: 'Bei jährlicher Zahlung sparen Sie 198 € (~17 %)'
     }
@@ -634,7 +634,7 @@
     var e = P.einzelkauf || [];
     if (!e.length) return '';
     return '<div class="pm-einzel">' +
-      '<div class="pm-einzel-h">Oder einzeln — genau die eine, die gerade fehlt</div>' +
+      '<div class="pm-einzel-h">Oder einzeln, genau die eine, die gerade fehlt</div>' +
       '<div class="pm-einzel-grid">' +
       e.map(function (x) {
         /* v1296: auch hier die Menge. Wer fünf Marktpreisindikationen
@@ -1060,7 +1060,7 @@
         '<p class="dp-feature-table-sub">Klare Gegen\u00fcberstellung aller Features pro Plan.</p>' +
         _cockpitMatrixHtml() +
         '<div class="mx-foot">* Marktdatenfelder in Free &amp; Starter als Vorschau gesperrt, ab Investor freigeschaltet.<br>' +
-        'Jedes neue Konto läuft die ersten vier Wochen als Pro — mit 5 Marktpreisindikationen, 3 erweiterten und 1 Wertermittlung. ' +
+        'Jedes neue Konto läuft die ersten vier Wochen als Pro, mit 5 Marktpreisindikationen, 3 erweiterten und 1 Wertermittlung. ' +
         'Danach automatisch Free, ohne Kündigung. Nicht genutzte Bewertungen aus der Testphase verfallen.</div>' +
       '</div>' +
 
@@ -1156,7 +1156,7 @@
       });
     });
     html += '</tbody></table>' +
-      '<p class="dp-note" style="margin-top:10px;font-size:11.5px">* sichtbar, aber deaktiviert — die Felder zeigen, was im Upgrade steckt.</p>';
+      '<p class="dp-note" style="margin-top:10px;font-size:11.5px">* sichtbar, aber deaktiviert, die Felder zeigen, was im Upgrade steckt.</p>';
     return html;
   }
 
@@ -1180,7 +1180,7 @@
   }
   // Globaler Handler für Service-Anfrage
   window._dpServiceSelect = function(key) {
-    if (typeof toast === 'function') toast('Service "' + key + '" angefragt — Marcel meldet sich.');
+    if (typeof toast === 'function') toast('Service "' + key + '" angefragt, Marcel meldet sich.');
     // V63.82: Bei aktivem Backend-Mailer wäre hier ein POST /service-request möglich.
     // Für jetzt: einfach toasten — Marcel sieht's beim Plan-Wechsel-Workflow.
   };
@@ -1519,7 +1519,7 @@
 
     if (typeof Sub === 'undefined' || typeof Sub.startCheckout !== 'function') {
       console.error('[pricing-modal] Sub-Modul nicht geladen');
-      if (typeof toast === 'function') toast('❌ Stripe-Modul nicht geladen — Seite neu laden');
+      if (typeof toast === 'function') toast('❌ Stripe-Modul nicht geladen, Seite neu laden');
       return;
     }
 
@@ -1532,7 +1532,7 @@
       if (typeof window._v234CheckPlanBeforeCheckout === 'function') {
         var shouldContinue = await window._v234CheckPlanBeforeCheckout(planKey);
         if (!shouldContinue) {
-          console.log('[pricing-modal V234] Checkout abgebrochen — User bereits auf', planKey);
+          console.log('[pricing-modal V234] Checkout abgebrochen, User bereits auf', planKey);
           return;
         }
       }
@@ -1560,7 +1560,7 @@
    */
   function _onCreditsBuy(credits) {
     if (typeof toast === 'function') {
-      toast('💳 Credit-Paket "' + credits + ' Credits" — Stripe-Checkout noch nicht aktiv.');
+      toast('💳 Credit-Paket "' + credits + ' Credits", Stripe-Checkout noch nicht aktiv.');
     }
   }
 

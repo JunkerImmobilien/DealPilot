@@ -72,7 +72,7 @@
     var h = document.createElement('div');
     h.id = 'qc-ortskern-hinweis';
     h.style.cssText = 'font-size:11px;line-height:1.35;color:#665C49;margin-top:4px';
-    h.textContent = 'Inserat ohne Straße — Marktpreis und Bodenrichtwert vom Ortskern ' + wo + '. Straße nachtragen macht es genauer.';
+    h.textContent = 'Inserat ohne Straße, Marktpreis und Bodenrichtwert vom Ortskern ' + wo + '. Straße nachtragen macht es genauer.';
     feld.appendChild(h);
     if (!el._v2199) {
       el._v2199 = 1;

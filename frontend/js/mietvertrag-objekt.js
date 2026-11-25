@@ -95,7 +95,7 @@
         + mit + ' von ' + ges + ' tragen schon eine Vertragsart. Diese Angabe hier '
         + 'gilt für das Haus als Ganzes (etwa bei Vermietung an einen Betreiber).'
       : 'Bei einem Mehrfamilienhaus gehören die Verträge zu den einzelnen '
-        + 'Wohnungen — anzulegen über die Wohnungsliste im Reiter Objekt. Diese '
+        + 'Wohnungen, anzulegen über die Wohnungsliste im Reiter Objekt. Diese '
         + 'Angabe hier gilt für das Haus als Ganzes.';
   }
 
@@ -174,7 +174,7 @@
       if (istMfh && !kn) {
         var h = el('mv-objekt-mfh-hinweis');
         var d = document.createElement('div'); d.id = 'mv-einheiten-erfassen'; d.className = 'hint'; d.style.marginTop = '6px';
-        d.innerHTML = 'Unterschiedliche Verträge? Einheiten erfassen – dann rechnet DealPilot je Wohnung. '
+        d.innerHTML = 'Unterschiedliche Verträge? Einheiten erfassen, dann rechnet DealPilot je Wohnung. '
           + '<button type="button" class="btn btn-outline btn-sm" data-mveu-erfassen="1">Einheiten erfassen</button>';
         (h && h.parentNode ? h.parentNode : karte).appendChild(d);
       } else if (!istMfh && kn) kn.remove();

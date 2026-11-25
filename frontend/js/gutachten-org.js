@@ -75,8 +75,8 @@
       '<div style="background:#fff;border-radius:12px;max-width:560px;width:100%;max-height:92vh;overflow:auto;padding:24px;border:1px solid #E6E0D3;font-family:Inter,sans-serif;color:#2A2727">' +
         '<div style="font:600 11px/1 \'JetBrains Mono\',monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--wl-9a7f33, #9a7f33)">Restnutzungsdauergutachten</div>' +
         '<h3 style="margin:6px 0 4px;font:600 20px/1.3 \'Space Grotesk\',sans-serif">Anfrage an Gutachten.org</h3>' +
-        (alt ? '<div style="margin:6px 0 10px;padding:8px 10px;border-radius:8px;background:#F8F6F1;font-size:12.5px">Bereits angefragt am ' + esc(alt.datum) + ' (' + esc(alt.weg) + ') — Status: <b>' + esc(alt.status) + '</b></div>' : '') +
-        '<p style="margin:0 0 12px;font-size:13px;color:#6B6356;line-height:1.5">Diese Daten gehen an Gutachten.org. DealPilot sendet selbst nichts — du schickst sie über dein Mailprogramm oder trägst sie in deren Formular ein.</p>' +
+        (alt ? '<div style="margin:6px 0 10px;padding:8px 10px;border-radius:8px;background:#F8F6F1;font-size:12.5px">Bereits angefragt am ' + esc(alt.datum) + ' (' + esc(alt.weg) + '), Status: <b>' + esc(alt.status) + '</b></div>' : '') +
+        '<p style="margin:0 0 12px;font-size:13px;color:#6B6356;line-height:1.5">Diese Daten gehen an Gutachten.org. DealPilot sendet selbst nichts, du schickst sie über dein Mailprogramm oder trägst sie in deren Formular ein.</p>' +
         '<table style="width:100%;border-collapse:collapse;font-size:13px">' +
           z.map(function (p) { return '<tr><td style="padding:5px 0;color:#6B6356;border-bottom:1px solid #F0ECE3">' + esc(p[0]) + '</td><td style="padding:5px 0;text-align:right;border-bottom:1px solid #F0ECE3"><b>' + esc(p[1]) + '</b></td></tr>'; }).join('') +
         '</table>' +
@@ -95,14 +95,14 @@
     el('dp-gorg-mail').onclick = function () {
       var s = statusSetzen('E-Mail');
       window.location.href = 'mailto:' + ZIEL + '?subject=' + encodeURIComponent('Anfrage Restnutzungsdauergutachten – ' + (val('ort') || 'Objekt')) + '&body=' + encodeURIComponent(text);
-      if (typeof window.toast === 'function') window.toast('✓ E-Mail vorbereitet — Status: ' + s.status);
+      if (typeof window.toast === 'function') window.toast('✓ E-Mail vorbereitet, Status: ' + s.status);
       schliessen();
     };
     el('dp-gorg-form').onclick = function () {
       try { navigator.clipboard.writeText(text); } catch (e) {}
       var s = statusSetzen('Formular');
       window.open(URL_EINSCH, '_blank', 'noopener');
-      if (typeof window.toast === 'function') window.toast('✓ Daten in der Zwischenablage — im Formular einfügen. Status: ' + s.status);
+      if (typeof window.toast === 'function') window.toast('✓ Daten in der Zwischenablage, im Formular einfügen. Status: ' + s.status);
       schliessen();
     };
   }

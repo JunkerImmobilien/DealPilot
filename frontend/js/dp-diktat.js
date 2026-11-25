@@ -76,7 +76,7 @@
   function schicken(blob, mimeTyp, feldId, knopf) {
     if (!blob || blob.size < 1200) {
       stand(knopf, false);
-      toast('Zu kurz — nichts aufgenommen.');
+      toast('Zu kurz, nichts aufgenommen.');
       return;
     }
     stand(knopf, false, 'Wird ausgewertet …');
@@ -97,7 +97,7 @@
           knopf.classList.remove('dp-dik-wartet');
           stand(knopf, false);
           var t = (data && data.text || '').trim();
-          if (!t) { toast((data && data.warn) || 'Nichts verstanden — nochmal versuchen.'); return; }
+          if (!t) { toast((data && data.warn) || 'Nichts verstanden, nochmal versuchen.'); return; }
           var feld = el(feldId);
           if (!feld) return;
           /* ANHÄNGEN, nicht ersetzen. Wer schon getippt hat und dann

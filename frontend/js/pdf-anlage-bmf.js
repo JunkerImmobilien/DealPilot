@@ -44,7 +44,7 @@ function fmtPct(v, dec){
 
 window.generateBmfPdfAnlage = function(state){
   if(typeof window.jspdf === 'undefined'){
-    alert('PDF-Bibliothek noch nicht geladen — bitte kurz warten und erneut versuchen.');
+    alert('PDF-Bibliothek noch nicht geladen, bitte kurz warten und erneut versuchen.');
     return;
   }
   state = state || {};
@@ -309,7 +309,7 @@ window.generateBmfPdfAnlage = function(state){
 
   // Hinweis-Kasten (Demo-note: heller Kasten mit Gold-Balken links)
   if(y > 238){ doc.addPage(); y = marginT; }
-  var noteTxt = 'Die Aufteilung folgt der amtlichen Arbeitshilfe des Bundesministeriums der Finanzen (Stand März 2026). Die Anschaffungskosten (Bemessungsgrundlage) werden mit dem Geb\u00e4udeanteil multipliziert und ergeben die AfA-Bemessungsgrundlage' + (hk > 0 ? ' \u2014 zuz\u00fcglich Herstellungskosten (\u00a7 255 Abs. 2 HGB), die zu 100 % dem Geb\u00e4ude zugerechnet werden' : '') + '. Alle drei Verfahren werden berechnet; ma\u00dfgebend ist das nach BMF-Logik gew\u00e4hlte (bekannte Miete -> Ertragswert, Vergleichsfaktor -> Vergleichswert, sonst Sachwert). Diese Anlage dient der Nachvollziehbarkeit gegen\u00fcber dem Finanzamt und ersetzt keine steuerliche Beratung.';
+  var noteTxt = 'Die Aufteilung folgt der amtlichen Arbeitshilfe des Bundesministeriums der Finanzen (Stand März 2026). Die Anschaffungskosten (Bemessungsgrundlage) werden mit dem Geb\u00e4udeanteil multipliziert und ergeben die AfA-Bemessungsgrundlage' + (hk > 0 ? ' \u2014 zuz\u00fcglich Herstellungskosten (\u00a7 255 Abs. 2 HGB), die zu 100 % dem Geb\u00e4ude zugerechnet werden' : '') + '. Alle drei Verfahren werden berechnet, ma\u00dfgebend ist das nach BMF-Logik gew\u00e4hlte (bekannte Miete -> Ertragswert, Vergleichsfaktor -> Vergleichswert, sonst Sachwert). Diese Anlage dient der Nachvollziehbarkeit gegen\u00fcber dem Finanzamt und ersetzt keine steuerliche Beratung.';
   var noteLines = doc.splitTextToSize(noteTxt, contentW - 12);
   var nH = noteLines.length * 3.5 + 6;
   doc.setFillColor(250,247,240); doc.rect(marginL, y, contentW, nH, 'F');

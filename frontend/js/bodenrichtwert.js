@@ -327,7 +327,7 @@
     } else if (conf === 'mittel') {
       plausHint = 'Vergleichswerte für das Gebiet vorhanden, aber keine exakte BORIS-Karte. Bitte auf dem BORIS-Portal des Bundeslandes verifizieren.';
     } else {
-      plausHint = 'Nur grobe Schätzung basierend auf Bundesland-Durchschnitt. Echte BORIS-Werte können erheblich abweichen — bitte Portal aufrufen!';
+      plausHint = 'Nur grobe Schätzung basierend auf Bundesland-Durchschnitt. Echte BORIS-Werte können erheblich abweichen, bitte Portal aufrufen!';
     }
     
     var html = '';
@@ -495,12 +495,12 @@
      *
      * Jetzt nennt sie den Grund, der wirklich zutrifft. */
     btn.title = ok
-      ? 'Bodenrichtwert direkt abrufen — gratis (Open Data)' /* v785f-tooltip */
+      ? 'Bodenrichtwert direkt abrufen, gratis (Open Data)' /* v785f-tooltip */
       : (!String(plz || '').trim()
           ? 'Bitte zuerst die Postleitzahl eintragen'
           : (!/^\d{5}$/.test(String(plz).trim())
               ? 'Die Postleitzahl muss fünfstellig sein'
-              : 'Für diese Region ist der Direkt-Abruf gerade nicht freigegeben — BORIS-Portal nutzen'));
+              : 'Für diese Region ist der Direkt-Abruf gerade nicht freigegeben, BORIS-Portal nutzen'));
   }
   /* ═══ v1288 · Der reine Abruf, ohne DOM ══════════════════════════════
      Bis hierher steckte der BORIS-Abruf IN `fetchBoris()`: Adresse aus dem
@@ -521,7 +521,7 @@
     var str = String(adr.str || '').trim();
     if (!borisAvailableForPlz(plz)) {
       return { ok: false, grund: 'nicht_verfuegbar',
-               fehler: 'Direkt-Abruf hier nicht verfügbar — BORIS-Portal nutzen' };
+               fehler: 'Direkt-Abruf hier nicht verfügbar, BORIS-Portal nutzen' };
     }
     var token = _token();
     if (!token) return { ok: false, grund: 'kein_token', fehler: 'Bitte einloggen' };
@@ -622,7 +622,7 @@
        Ausfall seit v2592 ausdrücklich (dienst_ausfall). */
     if (!(bd.available && bd.value_sqm != null && bd.value_sqm > 0) && bd.dienst_ausfall) {
       return { ok: false, grund: 'ausfall',
-               fehler: bd.note || 'Der Bodenrichtwert-Dienst ist derzeit nicht erreichbar — bitte den Wert selbst eintragen.',
+               fehler: bd.note || 'Der Bodenrichtwert-Dienst ist derzeit nicht erreichbar, bitte den Wert selbst eintragen.',
                link: bd.portal_url || null };   /* v3208: Bayern bringt den BayernAtlas-Link auf das Objekt mit */
     }
     if (!(bd.available && bd.value_sqm != null && bd.value_sqm > 0)) {
@@ -692,7 +692,7 @@
     if (passt) return { text: text, warnung: null };
     return { text: text, warnung: 'Diese Zone gilt für ' + text
       + ', das Objekt ist als ' + (istGewerbe ? 'Gewerbe' : 'Wohnen')
-      + ' erfasst — bitte prüfen, ob der Wert passt.' };
+      + ' erfasst, bitte prüfen, ob der Wert passt.' };
   }
 
   async function fetchBoris() {
@@ -735,7 +735,7 @@
             + '<a href="' + _escHtml(r.link) + '" target="_blank" rel="noopener">Im BayernAtlas auf dem Objekt öffnen →</a> (Marker auf dem Objekt, Wert in der Zone ablesen und oben eintragen)';
         }
         if (r.stichtag) { var _stE = _el('brw_stichtag'); if (_stE && !_stE.value && /^d{4}-d{2}-d{2}/.test(String(r.stichtag))) { _stE.value = String(r.stichtag).slice(0, 10); } }
-        if (typeof toast === 'function') toast('Bodenrichtwert bitte aus dem Portal eintragen – Zone und Stichtag stehen unter dem Feld');
+        if (typeof toast === 'function') toast('Bodenrichtwert bitte aus dem Portal eintragen, Zone und Stichtag stehen unter dem Feld');
         return;
       }
       if (!r.ok && r.grund === 'gebuehr') {
@@ -747,7 +747,7 @@
             + '<a href="' + _escHtml(r.link) + '" target="_blank" rel="noopener">Bodenrichtwert dort abrufen →</a>'
             + ' — danach den Wert hier eintragen.';
         }
-        if (typeof toast === 'function') toast('Bodenrichtwert in diesem Land nur gegen Gebühr — Link unter dem Feld');
+        if (typeof toast === 'function') toast('Bodenrichtwert in diesem Land nur gegen Gebühr, Link unter dem Feld');
         return;
       }
       /* v3208 · Ausfall oder kein Wert MIT Weg (Bayern: BayernAtlas auf dem Objekt) -
@@ -759,7 +759,7 @@
           st4.innerHTML = 'ⓘ ' + _escHtml(r.fehler) + ' '
             + '<a href="' + _escHtml(r.link) + '" target="_blank" rel="noopener">Im BayernAtlas auf dem Objekt öffnen →</a> (Wert in der Zone ablesen und oben eintragen)';
         }
-        if (typeof toast === 'function') toast('Kein Bodenrichtwert abrufbar – Link zum Portal unter dem Feld');
+        if (typeof toast === 'function') toast('Kein Bodenrichtwert abrufbar, Link zum Portal unter dem Feld');
         return;
       }
       if (!r.ok) {
@@ -774,7 +774,7 @@
       if (brwEl) { brwEl.value = String(r.wert).replace('.', ','); brwEl.dispatchEvent(new Event('input', { bubbles: true })); }
       var extra = [];
       if (r.stichtag) extra.push('Stichtag ' + String(r.stichtag).replace(/^(\d{4})-(\d{2})-(\d{2})$/, '$3.$2.$1')   /* v2302: deutsches Datum statt ISO (Prüflauf Modul 24) */
-        + (r.roh && r.roh.stichtag_veraltet ? ' (älter als ein Jahr – neueren Wert beim Gutachterausschuss prüfen)' : ''));   /* v2592 */
+        + (r.roh && r.roh.stichtag_veraltet ? ' (älter als ein Jahr, neueren Wert beim Gutachterausschuss prüfen)' : ''));   /* v2592 */
       if (r.zone) extra.push('Zone ' + r.zone);
       /* v1838 · Die Nutzungsart gehört neben den Wert, nicht in die
          Antwort des Servers und von dort in den Papierkorb. */
@@ -879,8 +879,8 @@
     if (!btn) return;
     btn.classList.toggle('brw-veraltet', !!an);
     btn.title = an
-      ? 'Die Adresse hat sich geändert — Bodenrichtwert neu abrufen'
-      : 'Bodenrichtwert direkt abrufen — gratis (Open Data)';
+      ? 'Die Adresse hat sich geändert, Bodenrichtwert neu abrufen'
+      : 'Bodenrichtwert direkt abrufen, gratis (Open Data)';
   }
 
   function _brwAutoPruefen() {

@@ -110,7 +110,7 @@ window.AnlageV2023 = {
     vermittlung: { zeile: 50, art: 'wk', quelle: 'sachlogik', grund: 'Eine Vermittlungsprovision für ein Darlehen gehört zu den Kosten der Geldbeschaffung, dieselbe Gruppe wie Schätz-, Notar- und Grundbuchgebühren.' },
     finanz_sonst: { zeile: 50, art: 'wk', quelle: 'sachlogik', grund: 'Sonstige Finanzierungsnebenkosten gehören zur Geldbeschaffung. Ist der Aufwand ein Zins, gehört er in Zeile 48.' },
     steuerber: { zeile: 81, art: 'wk', quelle: 'sachlogik', grund: 'Steuerberatungskosten sind Werbungskosten, soweit sie auf die Ermittlung der Einkünfte entfallen. Der auf den Mantelbogen entfallende Teil ist keine Anlage-V-Position.' },
-    anschaffungsnah: { zeile: 35, art: 'wk', quelle: 'sachlogik', grund: 'Anschaffungsnahe Herstellungskosten (§ 6 Abs. 1 Nr. 1a EStG) sind nicht sofort abziehbar; sie erhöhen die Bemessungsgrundlage und wirken über die AfA in Zeile 35.' },
+    anschaffungsnah: { zeile: 35, art: 'wk', quelle: 'sachlogik', grund: 'Anschaffungsnahe Herstellungskosten (§ 6 Abs. 1 Nr. 1a EStG) sind nicht sofort abziehbar, sie erhöhen die Bemessungsgrundlage und wirken über die AfA in Zeile 35.' },
     sonst_bewegl_wg: { zeile: 44, art: 'wk', quelle: 'formular' },
     av_andere_raeume: { zeile: 18, art: 'einnahme', quelle: 'formular' },
     av_angehoerige: { zeile: 19, art: 'einnahme', quelle: 'formular' },

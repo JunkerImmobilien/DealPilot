@@ -26,7 +26,7 @@
   if (window.DealPilotZensusInfo) return;
 
   var LIZENZ = 'Quelle: Zensus 2022 (Stichtag 15.05.2022), © Statistische Ämter des Bundes und der Länder, '
-    + 'Datenlizenz Deutschland – Namensnennung – 2.0';
+    + 'Datenlizenz Deutschland, Namensnennung, 2.0';
   var _letzt = '', _timer = null, _daten = null;
 
   /* ══ v2500 · BEIDE KAESTEN IM REITER MIETE ABGESCHALTET (20.10.2026) ═══
@@ -86,7 +86,7 @@
     o += stufe('miete_flaeche', n > 1 ? 'Ø Wohnung' : 'Größe');
     if (!o) return '';
     return '<div class="dp-zi" id="dp-zi-miete"><div class="dp-zi-k">Zensus 2022 · Bestandsmiete</div>' + o
-      + '<div class="dp-zi-f">Durchschnitt aller laufenden Mietverträge am Stichtag — keine Angebots- '
+      + '<div class="dp-zi-f">Durchschnitt aller laufenden Mietverträge am Stichtag, keine Angebots- '
       + 'oder Neuvertragsmiete, liegt daher meist darunter. ' + esc(LIZENZ) + '</div></div>';
   }
 

@@ -149,7 +149,7 @@ var Tax = (function() {
        28.10.2026 aus recht.bund.de/bgbl/1/2024/449/regelungstext.pdf.
        Probe an den Zonengrenzen: stetig wie 2026 (tools/jahreswerte-pruefen.mjs). */
     2025: {
-      quelle: '§ 32a Abs. 1 EStG, Fassung ab VZ 2025 — BGBl. 2024 I Nr. 449, Art. 1 Nr. 2, gelesen 28.10.2026',
+      quelle: '§ 32a Abs. 1 EStG, Fassung ab VZ 2025, BGBl. 2024 I Nr. 449, Art. 1 Nr. 2, gelesen 28.10.2026',
       grundfreibetrag: 12096,
       z2bis: 17443, z2a: 932.30, z2b: 1400,
       z3basis: 17443, z3bis: 68480, z3a: 176.64, z3b: 2397, z3c: 1015.13,
@@ -773,7 +773,7 @@ function renderTaxModule(yearOverride) { /* V270-displayYear */ /* V283-tax-appl
   box.innerHTML =
     '<div class="tax-grid tax-objekt-kopf">' +
       '<div class="tax-item tax-highlight" style="grid-column:auto;flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:4px;padding:12px 16px"><div class="tax-label">Ergebnis V+V dieses Objekts ' + displayYear + '</div><div class="tax-val" style="font-size:20px;color:' + (isProfit ? 'var(--gold-d)' : 'var(--green)') + '">' + fE(totals.ergebnis, 0, true) + '</div>' +
-        '<div class="tax-label" style="font-weight:400;font-size:12px">' + (isProfit ? 'Überschuss — erhöht dein zu versteuerndes Einkommen' : 'Verlust — mindert dein zu versteuerndes Einkommen') + '</div></div>' +
+        '<div class="tax-label" style="font-weight:400;font-size:12px">' + (isProfit ? 'Überschuss, erhöht dein zu versteuerndes Einkommen' : 'Verlust, mindert dein zu versteuerndes Einkommen') + '</div></div>' +
       '<div class="tax-item tax-result" style="grid-column:auto;flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:4px;padding:12px 16px"><div class="tax-label">' + refundLabel + ' durch dieses Objekt</div><div class="tax-val" style="color:' + refundColor + ';font-size:20px">' + (impact.refund >= 0 ? '+' : '') + fE(refundAbs, 0) + '</div>' +
         '<div class="tax-label" style="font-weight:400;font-size:12px">' + (impact.refund >= 0 ? 'so viel weniger Steuer zahlst du mit diesem Objekt' : 'so viel mehr Steuer zahlst du mit diesem Objekt') + '</div></div>' +
     '</div>' +
@@ -781,7 +781,7 @@ function renderTaxModule(yearOverride) { /* V270-displayYear */ /* V283-tax-appl
     (function () { var _f = _dpGbrFeststellung(displayYear, totals.ergebnis); return _f ? '<div class="tax-grid" style="margin-top:10px">' + _dpGbrFeststellungHtml(_f) + '</div>' : ''; })() +
     (function () { var _r = _dpRuecklageHinweis(); return _r ? '<div class="tax-grid" style="margin-top:10px">' + _r + '</div>' : ''; })() +
     '<details class="tax-rechenweg" style="margin-top:12px"' + (_rwOffen ? ' open' : '') + ' ontoggle="try{localStorage.setItem(\'dp_tax_rechenweg\',this.open?\'1\':\'0\')}catch(e){}">' +
-    '<summary style="cursor:pointer;font-size:13px;font-weight:600;padding:6px 0">Rechenweg — mit deinem Einkommen und den vorher gekauften Objekten</summary>' +
+    '<summary style="cursor:pointer;font-size:13px;font-weight:600;padding:6px 0">Rechenweg, mit deinem Einkommen und den vorher gekauften Objekten</summary>' +
     /* V283b: Neues Layout — LINKS=OHNE Immobilie, RECHTS=MIT Immobilie */
     '<div class="tax-grid">' +
       /* ─── LINKS: Ausgangs-zvE ─── */
@@ -816,7 +816,7 @@ function renderTaxModule(yearOverride) { /* V270-displayYear */ /* V283-tax-appl
         if (!_bestandInfo || !_bestandInfo.loaded) {
           return '<div class="tax-item"><div class="tax-label">Überschuss/Verlust V+V (aktueller Bestand) '
                + '<span class="tax-info" title="Die Daten deiner übrigen Objekte werden gerade geladen. '
-               + 'Solange rechnet dieses Objekt für sich allein — die ausgewiesene Ersparnis kann dadurch zu hoch sein. '
+               + 'Solange rechnet dieses Objekt für sich allein, die ausgewiesene Ersparnis kann dadurch zu hoch sein. '
                + 'Bleibt die Anzeige stehen, lade die Seite neu.">ⓘ</span></div>'
                + '<div class="tax-val" style="color:var(--muted)">wird geladen …</div></div>';
         }
@@ -867,7 +867,7 @@ function renderTaxModule(yearOverride) { /* V270-displayYear */ /* V283-tax-appl
              + '</div>';
       })() +
       /* ─── RECHTS: Werbungskosten gesamt ─── */
-      '<div class="tax-item"><div class="tax-label">Werbungskosten gesamt <span class="tax-info" title="Schuldzinsen + Bewirtschaftung + AfA + alle übrigen abziehbaren Kosten. Umlagefähige NK sind Werbungskosten UND Einnahme — sie heben sich auf (durchlaufender Posten) und beeinflussen den Steuer-Effekt nicht.">ⓘ</span></div><div class="tax-val c-red">' + fE(totals.werbungskosten, 0) + '</div></div>' +
+      '<div class="tax-item"><div class="tax-label">Werbungskosten gesamt <span class="tax-info" title="Schuldzinsen + Bewirtschaftung + AfA + alle übrigen abziehbaren Kosten. Umlagefähige NK sind Werbungskosten UND Einnahme, sie heben sich auf (durchlaufender Posten) und beeinflussen den Steuer-Effekt nicht.">ⓘ</span></div><div class="tax-val c-red">' + fE(totals.werbungskosten, 0) + '</div></div>' +
       /* ─── LINKS: Leerer Platzhalter (Symmetrie) ─── */
       '<div class="tax-item" style="opacity:.4;background:transparent;border-color:rgba(201,168,76,0.08)"><div class="tax-label" style="font-style:italic">—</div><div class="tax-val">—</div></div>' +
       /* ─── RECHTS: Überschuss/Verlust V+V (dieses Objekt) ─── */
@@ -925,7 +925,7 @@ function renderTaxModule(yearOverride) { /* V270-displayYear */ /* V283-tax-appl
         '<div class="tax-item" style="grid-column:1/-1;background:#1b1408;border-color:var(--gold-d)"><div class="tax-label" style="color:var(--gold-h)">Halter \u00b7 ' + (_mandName || 'Gesellschaft') + '</div><div class="tax-val" style="color:var(--gold-h)">K\u00f6rperschaftsteuer-Regime \u00b7 ' + _rateTxt + '</div></div>' +
         /* v814-B */ '<div class="tax-item" style="grid-column:1/-1;background:transparent;border-color:rgba(201,168,76,0.15)"><div class="tax-label" style="font-size:12px;color:var(--muted)">Halter wechseln</div><div class="tax-val" style="font-size:12px"><a href="#" onclick="if(typeof showSettings===&quot;function&quot;)showSettings();return false" style="color:var(--gold-d);text-decoration:underline">In den Einstellungen &rarr;</a></div></div>' +
         '<div class="tax-item"><div class="tax-label">Betriebseinnahmen (Miete)</div><div class="tax-val">' + fE(totals.einnahmen, 0) + '</div></div>' +
-        '<div class="tax-item"><div class="tax-label">Betriebsausgaben gesamt <span class="tax-info" title="Dieselben Posten wie die Werbungskosten im Privatvermögen (Zinsen, Bewirtschaftung, Verwaltung, AfA, Erhaltung). Bei einer GmbH/UG heißen sie Betriebsausgaben — Einkünfte aus Gewerbebetrieb, § 8 Abs. 2 KStG.">ⓘ</span></div><div class="tax-val c-red">' + fE(totals.werbungskosten, 0) + '</div></div>' +
+        '<div class="tax-item"><div class="tax-label">Betriebsausgaben gesamt <span class="tax-info" title="Dieselben Posten wie die Werbungskosten im Privatvermögen (Zinsen, Bewirtschaftung, Verwaltung, AfA, Erhaltung). Bei einer GmbH/UG heißen sie Betriebsausgaben, Einkünfte aus Gewerbebetrieb, § 8 Abs. 2 KStG.">ⓘ</span></div><div class="tax-val c-red">' + fE(totals.werbungskosten, 0) + '</div></div>' +
         _dpRuecklageHinweis() +
         /* v3268 · Kosten der GESELLSCHAFT (Buchfuehrung, Abschluss, IHK, Konto …)
            gehoeren nicht dem Objekt: sie stehen am Mandanten und werden unten in
@@ -952,7 +952,7 @@ function renderTaxModule(yearOverride) { /* V270-displayYear */ /* V283-tax-appl
         _gesDetailHtml(_kstJ) +
         /* v3268 · Verkauf aus der Gesellschaft: keine Zehnjahresfrist */
         '<div class="tax-item" style="grid-column:1/-1;opacity:.92"><div class="tax-label">Verkauf</div><div class="tax-val" style="font-size:12px;font-weight:400;line-height:1.45">'
-          + ((window.DealPilotUeberfuehrungKern && DealPilotUeberfuehrungKern.HINWEIS_VERKAUF_GES) || 'Veräußerungsgewinn immer steuerpflichtig — die 10-Jahres-Frist gilt nur im Privatvermögen.')
+          + ((window.DealPilotUeberfuehrungKern && DealPilotUeberfuehrungKern.HINWEIS_VERKAUF_GES) || 'Veräußerungsgewinn immer steuerpflichtig, die 10-Jahres-Frist gilt nur im Privatvermögen.')
           + ' Gewinn = Verkaufspreis − Buchwert (Anschaffungskosten − bisherige AfA) − Verkaufskosten.</div></div>' +
         (_kstJ.genutzt > 0 ? '<div class="tax-item" style="grid-column:1/-1;opacity:.9"><div class="tax-label">Verlustvortrag verrechnet (\u00a7 10d EStG)</div><div class="tax-val" style="color:var(--green)">' + fE(_kstJ.genutzt, 0) + ' aus den Vorjahren \u00b7 Rest ' + fE(_kstJ.vortragNach, 0) + '</div></div>' : '') +
         (function(){  /* v813-3c: echte Mandanten-Steuerakte (KSt ueber alle Objekte der Gesellschaft) */
@@ -2270,8 +2270,8 @@ function _dpGbrFeststellungHtml(f) {
     + '<div class="tax-label">Gesonderte und einheitliche Feststellung (&sect; 180 AO) &middot; ' + String(f.name || 'GbR').replace(/</g, '&lt;') + ' &middot; ' + f.jahr + '</div>'
     + '<div class="tax-val" style="font-size:13px;font-weight:400">Einkünfte der GbR (V+V' + (f.objekte > 1 ? ', ' + f.objekte + ' Objekte' : ', dieses Objekt') + '): <b>' + fE(f.einkuenfte, 0, true) + '</b></div>'
     + '<div class="tax-bestand-list tax-bestand-list-inline">' + rows + '</div>'
-    + '<div class="tax-label" style="font-weight:400;font-size:11.5px;line-height:1.45">In deine Einkommensteuer geht nur <b>dein Anteil</b> (' + fE(f.eigenerBetrag, 0, true) + ') — nicht 100 %. '
-    + (f.vollstaendig ? '' : '<b style="color:var(--red)">Die Anteile ergeben zusammen ' + String(Math.round(f.summePct * 100) / 100).replace('.', ',') + ' % statt 100 % — die weiteren Gesellschafter bitte im Mandanten ergänzen.</b> ')
+    + '<div class="tax-label" style="font-weight:400;font-size:11.5px;line-height:1.45">In deine Einkommensteuer geht nur <b>dein Anteil</b> (' + fE(f.eigenerBetrag, 0, true) + '), nicht 100 %. '
+    + (f.vollstaendig ? '' : '<b style="color:var(--red)">Die Anteile ergeben zusammen ' + String(Math.round(f.summePct * 100) / 100).replace('.', ',') + ' % statt 100 %, die weiteren Gesellschafter bitte im Mandanten ergänzen.</b> ')
     + 'Sonderwerbungskosten und Ergänzungsbilanzen einzelner Gesellschafter sind nicht abgebildet.</div>'
     + '</div>';
 }
@@ -2706,7 +2706,7 @@ function _renderQuickForm(years) {
       _ytfCellComputed(sonst) +
       _ytfCellComputed((v.erhaltungsaufwand || 0) + (v.anschaffungsnah || 0)) +   /* v3074 */
       '<td class="num ytf-result" style="color:' + (totals.ergebnis >= 0 ? 'var(--gold-d)' : 'var(--green)') + '">' +
-        ergSign + Math.round(totals.ergebnis).toLocaleString('de-DE') + ' €</td>' +
+        ergSign + (Math.round(totals.ergebnis) || 0).toLocaleString('de-DE') + ' €</td>' +   /* v4810: kein Minus vor null */
       (function () { var _st = _ytfSteuerAnzeige(y.year, totals);   /* v3691 */
         return '<td class="num ytf-result" style="color:' + _st.color + ';font-weight:700"' + (_st.title ? ' title="' + _st.title + '"' : '') + '>' + _st.text + '</td>'; })() +
       (window.DpJahresbuch ? '<td>' + (y.year <= new Date().getFullYear()
@@ -3280,7 +3280,7 @@ function _grenzErklaeren() {
   if (lbl && lbl.firstChild && lbl.firstChild.nodeType === 3) {
     lbl.firstChild.nodeValue = 'Persönl. Grenzsteuersatz ' + (o.kist > 0 ? 'inkl. Soli und Kirchensteuer' : 'inkl. Soli') + ' (%) ';
   }
-  if (!(zve > 0)) { box.textContent = 'Ohne zvE lässt sich der Satz nicht berechnen – trage ihn selbst ein oder ergänze das zvE.'; return; }
+  if (!(zve > 0)) { box.textContent = 'Ohne zvE lässt sich der Satz nicht berechnen, trage ihn selbst ein oder ergänze das zvE.'; return; }
   var pz = function (x, d) { return (x * 100).toFixed(d == null ? 2 : d).replace('.', ',') + ' %'; };
   var L = Tax.steuerLast(zve, jahr, o);
   var basis = Math.max(0, Math.floor(zve) - Math.floor(L.kist || 0));
@@ -3297,7 +3297,7 @@ function _grenzErklaeren() {
     : 'Von Hand eingetragen. Aus dem zvE ergäben sich ' + pz(gGes, 1) + ' (' + teile.join(' + ') + ').';
   /* v3188 · Steuerzeitraum des laufenden Jahres und Feld widersprechen sich: sagen, was gilt */
   if (zq && zq.quelle === 'steuerzeitraum' && feldZve > 0 && Math.abs(feldZve - zve) >= 1) {
-    t += ' Für ' + jahr + ' ist ein eigener Steuerzeitraum mit ' + Math.round(zve).toLocaleString('de-DE') + ' € hinterlegt – er gilt für dieses Jahr. Das Feld (' + Math.round(feldZve).toLocaleString('de-DE') + ' €) gilt für die folgenden Jahre ohne eigenen Zeitraum.';
+    t += ' Für ' + jahr + ' ist ein eigener Steuerzeitraum mit ' + Math.round(zve).toLocaleString('de-DE') + ' € hinterlegt, er gilt für dieses Jahr. Das Feld (' + Math.round(feldZve).toLocaleString('de-DE') + ' €) gilt für die folgenden Jahre ohne eigenen Zeitraum.';
   }
   /* Wo früher gekaufte Objekte das zvE verschieben, wirkt für DIESES Objekt ein anderer Satz */
   try {
@@ -3950,7 +3950,7 @@ function renderMiete66() {
 
   var q = r.quote, cls, kopf, txt;
   var zahlen = (r.umlagen > 0 ? 'Warmmiete ' : 'Kaltmiete ') + eur(r.ist) + ' / Monat gegen ortsüblich ' + eur(r.markt)
-             + ' / Monat — <b>' + q.toLocaleString('de-DE', { maximumFractionDigits: 1 }) + ' %</b>.'
+             + ' / Monat, <b>' + q.toLocaleString('de-DE', { maximumFractionDigits: 1 }) + ' %</b>.'
              + (r.umlagen > 0 ? ' Verglichen wird mit den umlagefähigen Kosten (' + eur(r.umlagen) + ' / Monat), wie es die Finanzverwaltung tut.'
                               : ' Ohne eingetragene Umlagen kalt verglichen. Die Finanzverwaltung vergleicht mit den umlagefähigen Kosten.');
 
@@ -3966,7 +3966,7 @@ function renderMiete66() {
   } else {
     cls = 'r'; kopf = 'Aufteilung droht';
     txt = 'Die Miete liegt unter 50 % der ortsüblichen Marktmiete. Die Nutzungsüberlassung wird '
-        + 'dann in einen entgeltlichen und einen unentgeltlichen Teil aufgeteilt; die '
+        + 'dann in einen entgeltlichen und einen unentgeltlichen Teil aufgeteilt, die '
         + 'Werbungskosten sind nur <b>anteilig</b> abziehbar. <b>Bitte steuerlich prüfen lassen.</b>';
   }
 
@@ -3976,7 +3976,7 @@ function renderMiete66() {
     +   '<div class="m66-z">' + zahlen + '</div>'
     +   '<div class="m66-t">' + txt + '</div>'
     +   '<div class="m66-f">Orientierung, keine Steuerberatung. Maßgeblich ist die ortsübliche '
-    +     'Marktmiete im Sinne der Rechtsprechung — hier wird der im Tab Bewertung erfasste Wert '
+    +     'Marktmiete im Sinne der Rechtsprechung, hier wird der im Tab Bewertung erfasste Wert '
     +     'verwendet.</div>'
     + '</div>';
 }

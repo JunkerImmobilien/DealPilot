@@ -122,7 +122,7 @@
             '<li>Sterne-Bewertungen, Annotationen, Pilot-Analysen</li>' +
             '<li>Objektfotos (falls in Backup enthalten)</li>' +
           '</ul>' +
-          '<p class="iexp-warn">⚠ Stripe/Plan-Daten sind <em>nicht</em> enthalten — nur Objekte.</p>' +
+          '<p class="iexp-warn">⚠ Stripe/Plan-Daten sind <em>nicht</em> enthalten, nur Objekte.</p>' +
           '<div class="iexp-card-cta">Datei wählen <span>›</span></div>' +
         '</div>' +
 
@@ -194,7 +194,7 @@
             '<li>Pilot-Analysen, Sterne, Bemerkungen</li>' +
             '<li>Objektfotos (Base64 eingebettet)</li>' +
           '</ul>' +
-          '<p class="iexp-warn">⚠ Ohne Verschlüsselung ist die Datei Klartext — sicher aufbewahren.</p>' +
+          '<p class="iexp-warn">⚠ Ohne Verschlüsselung ist die Datei Klartext, sicher aufbewahren.</p>' +
           /* v893t-encbox */
           '<label onclick="event.stopPropagation()" style="display:flex;align-items:center;gap:8px;margin:8px 0 2px;font-size:12.5px;color:#4a4536;cursor:pointer">' +
             '<input type="checkbox" id="iexp-encrypt"' + (window._exportEncrypt ? ' checked' : '') + ' onchange="window._exportEncrypt=this.checked" style="cursor:pointer;flex-shrink:0">' +
@@ -319,7 +319,7 @@
     bodyEl.innerHTML =
       '<div class="iexp-back" onclick="openExportHub()">‹ Zurück</div>' +
       '<h3 class="iexp-stage-title">Welches Objekt soll als PDF exportiert werden?</h3>' +
-      '<p class="iexp-stage-sub">Klicke auf ein Objekt — der PDF-Report wird sofort generiert.</p>' +
+      '<p class="iexp-stage-sub">Klicke auf ein Objekt, der PDF-Report wird sofort generiert.</p>' +
       '<div class="iexp-obj-list">' + listHtml + '</div>';
   };
 
@@ -447,7 +447,7 @@
     bodyEl.innerHTML =
       '<div class="iexp-back" onclick="iexpExportJsonChoose()">‹ Zurück</div>' +
       '<h3 class="iexp-stage-title">Welches Objekt sichern?</h3>' +
-      '<p class="iexp-stage-sub">Klicke auf ein Objekt — die Sicherungs-Datei (.dpkt) wird sofort generiert.</p>' +
+      '<p class="iexp-stage-sub">Klicke auf ein Objekt, die Sicherungs-Datei (.dpkt) wird sofort generiert.</p>' +
       '<div class="iexp-obj-list">' + listHtml + '</div>';
   };
 
@@ -465,7 +465,7 @@
     if (!bodyEl) return;
     bodyEl.innerHTML =
       '<div class="iexp-back" onclick="openExportHub()">‹ Zurück</div>' +
-      '<h3 class="iexp-stage-title">Excel-Export — welche Objekte?</h3>' +
+      '<h3 class="iexp-stage-title">Excel-Export, welche Objekte?</h3>' +
       '<p class="iexp-stage-sub">Wähle, ob du <b>alle Objekte</b> als Tabelle exportieren möchtest oder ein einzelnes.</p>' +
       '<div class="iexp-choice-row">' +
         '<button class="iexp-choice-btn" onclick="iexpDoExportExcelAll()">' +
@@ -546,7 +546,7 @@
     bodyEl.innerHTML =
       '<div class="iexp-back" onclick="iexpExportExcelChoose()">‹ Zurück</div>' +
       '<h3 class="iexp-stage-title">Welches Objekt exportieren?</h3>' +
-      '<p class="iexp-stage-sub">Klicke auf ein Objekt — die Excel-Datei wird sofort generiert.</p>' +
+      '<p class="iexp-stage-sub">Klicke auf ein Objekt, die Excel-Datei wird sofort generiert.</p>' +
       '<div class="iexp-obj-list">' + listHtml + '</div>';
   };
 

@@ -86,7 +86,7 @@
       }).catch(function(err) {
         console.error('[stripe-success V183] Plan-Refresh fehlgeschlagen:', err);
         if (typeof toast === 'function') {
-          toast('⚠ Zahlung empfangen — Plan-Sync läuft im Hintergrund');
+          toast('⚠ Zahlung empfangen, Plan-Sync läuft im Hintergrund');
         }
       });
     }
@@ -95,7 +95,7 @@
   function _onStripeCancel() {
     console.log('[stripe-success V183] Stripe-Checkout abgebrochen');
     if (typeof toast === 'function') {
-      toast('Checkout abgebrochen — kein Plan-Wechsel');
+      toast('Checkout abgebrochen, kein Plan-Wechsel');
     }
   }
 

@@ -389,7 +389,7 @@
     /* v3510/v3511 · nur wenn das Objekt die Kosten als sofort abziehbar fuehrt: eigene Zeile, NICHT in den
        Anschaffungskosten */
     if (KPA.sofort > 0.005) zeile('Gesondert: ' + DpKpaKosten.TEXT_SOFORT, eur(KPA.sofort, 2), { fett: true });
-    einleitung('Die Arbeitshilfe teilt die Anschaffungskosten einschließlich Nebenkosten auf; die Nebenkosten folgen demselben Verhältnis wie der Kaufpreis. Angesetzt sind alle Anschaffungsnebenkosten des Erwerbs: Grunderwerbsteuer, Notar, Grundbuch, Makler und Vermittlung ebenso wie Fahrten zur Besichtigung und zum Notartermin, ein Wertgutachten zur Kaufentscheidung sowie Rechtsberatung des Erwerbs (BFH VIII R 195/77; BFH IX R 20/08)' + (KPA.ank > 0.005 ? ', ebenso ein vor dem Kauf beauftragtes Gutachten zur Kaufpreisaufteilung, deren Ergebnis in den Kaufvertrag eingeht' : '') + '.' + (KPA.sofort > 0.005 ? ' Kosten, die erst nach dem Kauf die Abschreibung ermitteln, stehen gesondert und sind sofort abziehbar.' : ''));
+    einleitung('Die Arbeitshilfe teilt die Anschaffungskosten einschließlich Nebenkosten auf, die Nebenkosten folgen demselben Verhältnis wie der Kaufpreis. Angesetzt sind alle Anschaffungsnebenkosten des Erwerbs: Grunderwerbsteuer, Notar, Grundbuch, Makler und Vermittlung ebenso wie Fahrten zur Besichtigung und zum Notartermin, ein Wertgutachten zur Kaufentscheidung sowie Rechtsberatung des Erwerbs (BFH VIII R 195/77; BFH IX R 20/08)' + (KPA.ank > 0.005 ? ', ebenso ein vor dem Kauf beauftragtes Gutachten zur Kaufpreisaufteilung, deren Ergebnis in den Kaufvertrag eingeht' : '') + '.' + (KPA.sofort > 0.005 ? ' Kosten, die erst nach dem Kauf die Abschreibung ermitteln, stehen gesondert und sind sofort abziehbar.' : ''));
 
     /* ── Herleitung der amtlichen Aufteilung ─────────────────────── */
     /* v3346 · Marcel 12.11.2026: Aufbau 1:1 wie die KPA Rinteln (4 Seiten) - die Herleitung steht
@@ -397,7 +397,7 @@
        rutschte sie auf Seite 1 und das Dokument hatte 3 Seiten mit anderem Seitenbild. */
     neueSeite('Kaufpreisaufteilung', 'Herleitung nach der amtlichen Arbeitshilfe');
     abschnitt('Herleitung der amtlichen Arbeitshilfe');
-    einleitung('Gerechnet hat die Arbeitshilfe des Bundesfinanzministeriums selbst; die Werte stammen aus ihrem Berechnungsblatt. Bei einem Mietwohngrundstück führt sie über das Ertragswertverfahren, sonst über den Sachwert.');
+    einleitung('Gerechnet hat die Arbeitshilfe des Bundesfinanzministeriums selbst, die Werte stammen aus ihrem Berechnungsblatt. Bei einem Mietwohngrundstück führt sie über das Ertragswertverfahren, sonst über den Sachwert.');
     zeile('Bodenwert (Fläche × Bodenrichtwert)', eur(bodenwert));
     if (sachwert) zeile('Sachwert (marktangepasst)', eur(sachwert));
     if (ertrag) zeile('Ertragswert', eur(ertrag));
@@ -431,7 +431,7 @@
         (nkAussen > 0.005 ? zv('zuzüglich weiterer Nebenkosten (Gebäudeanteil)', nkAussen * gebPct / 100, nkAussen * gebPctNeu / 100) : null)
       ].filter(Boolean).concat([
       ]),
-      'Der Kaufpreis bleibt gleich; der Abschlag verschiebt nur, was auf den Boden entfällt. Ohne tragfähige Begründung setzt das Finanzamt die Aufteilung der Arbeitshilfe an.');
+      'Der Kaufpreis bleibt gleich, der Abschlag verschiebt nur, was auf den Boden entfällt. Ohne tragfähige Begründung setzt das Finanzamt die Aufteilung der Arbeitshilfe an.');
 
     /* ── AfA ─────────────────────────────────────────────────────── */
     var rnd = null;

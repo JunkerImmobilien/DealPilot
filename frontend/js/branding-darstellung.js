@@ -109,14 +109,14 @@
       '<div class="dpbe">' +
         '<div class="dpbe-l">' +
           '<div class="dpbe-t">Darstellung</div>' +
-          '<div class="dpbe-s">Änderungen erscheinen sofort — rechts in der Vorschau <b>und</b> in der App dahinter. Erst „Übernehmen" schreibt sie ins Branding.</div>' +
-          '<div class="dpbe-fg"><div class="dpbe-fl">Akzentfarbe — Buttons, Balken, Werte</div>' +
+          '<div class="dpbe-s">Änderungen erscheinen sofort, rechts in der Vorschau <b>und</b> in der App dahinter. Erst „Übernehmen" schreibt sie ins Branding.</div>' +
+          '<div class="dpbe-fg"><div class="dpbe-fl">Akzentfarbe, Buttons, Balken, Werte</div>' +
             '<input type="color" class="dpbe-pick" id="dpbe-acc" value="' + esc(_prev.accent) + '"></div>' +
           '<div class="dpbe-fg"><div class="dpbe-fl">Header &amp; Sidebar-Fläche</div>' +
             '<input type="color" class="dpbe-pick" id="dpbe-obs" value="' + esc(_prev.obsidian) + '"></div>' +
           '<div class="dpbe-fg"><div class="dpbe-fl">Mail-Farbe</div>' +
             '<input type="color" class="dpbe-pick" id="dpbe-mail" value="' + esc(_prev.mail) + '">' +
-            '<div class="dpbe-hint">Bewusst getrennt vom App-Akzent — Mail und App sind verschiedene Bühnen.</div></div>' +
+            '<div class="dpbe-hint">Bewusst getrennt vom App-Akzent, Mail und App sind verschiedene Bühnen.</div></div>' +
           /* W12-editorlight */
           '<div class="dpbe-fg"><div class="dpbe-fl">PDF-Deckblatt</div>' +
             '<label style="display:flex;align-items:center;gap:9px;cursor:pointer;font-size:13px;color:#3a352c">' +

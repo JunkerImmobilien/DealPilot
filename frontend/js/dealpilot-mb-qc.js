@@ -325,7 +325,7 @@ if (!window._wlc) {
           '<button data-k="high"' + (mode === 'high' ? ' class="on"' : '') + '>Oben</button></div></div>' +
           '<button class="dpx-apply" id="dpx-apply"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"/></svg><span id="dpx-applytxt"></span></button>' +
         '</div></div>' +
-        '<div class="dpx-foot"><small>Marktpreisindikation — kein Gutachten n. § 194 BauGB</small><span class="mk"><span class="d">Deal</span><span class="p">Pilot</span></span></div>' +
+        '<div class="dpx-foot"><small>Marktpreisindikation, kein Gutachten n. § 194 BauGB</small><span class="mk"><span class="d">Deal</span><span class="p">Pilot</span></span></div>' +
       '</div></div>';
     gz.mw = $('dpx-g-mw'); gz.mm = $('dpx-g-mm');
     var seg = $('dpx-seg');

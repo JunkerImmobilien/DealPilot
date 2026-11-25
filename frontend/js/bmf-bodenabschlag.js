@@ -151,7 +151,7 @@
     p.innerHTML =
       '<div style="font:600 11px/1 \'JetBrains Mono\',monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--wl-9a7f33, #9a7f33);margin-bottom:6px">BMF-Rechner · Schritt 5 von 5</div>' +
       '<h3 style="margin:0 0 6px;font:600 20px/1.3 \'Space Grotesk\',sans-serif;color:#1a1814">Übersicht und Ausgabe</h3>' +
-      '<p style="margin:0 0 12px;font-size:13px;line-height:1.55;color:#6B6356">Was gewählt ist, wie es begründet wird und was du daraus ausgibst – für Finanzamt, Notar und Steuerberater.</p>' +
+      '<p style="margin:0 0 12px;font-size:13px;line-height:1.55;color:#6B6356">Was gewählt ist, wie es begründet wird und was du daraus ausgibst, für Finanzamt, Notar und Steuerberater.</p>' +
       '<div id="bmf-boden-wahl"></div>' +
       '<div id="bmf-boden-out" style="margin-top:12px"></div>' +
       '<div style="' + zwi + '">Begründung und Restnutzungsdauer</div>' +
@@ -250,7 +250,7 @@
     var out = el('bmf-boden-out'); if (!out) return;
     var B = basis();
     if (!B) {
-      out.innerHTML = '<div class="cf-hint">Zuerst in Schritt 2 die amtliche Berechnung abwarten – diese Übersicht baut darauf auf.</div>';
+      out.innerHTML = '<div class="cf-hint">Zuerst in Schritt 2 die amtliche Berechnung abwarten, diese Übersicht baut darauf auf.</div>';
       ['bmf-boden-klausel', 'bmf-boden-zusatz', 'bmf-boden-wahl'].forEach(function (i) { var k0 = el(i); if (k0) k0.innerHTML = ''; });
       ausgabeZeichnen(false);
       return;
@@ -331,21 +331,21 @@
   function ausgabeZeichnen(bereit) {
     var host = el('bmf-boden-ausgabe'); if (!host) return;
     var K = [
-      ['kpa', 'Kaufpreisaufteilung', 'PDF', 'Herleitung, gewählte Aufteilung und Vertragstext – Anlage für Finanzamt und Berater'],
+      ['kpa', 'Kaufpreisaufteilung', 'PDF', 'Herleitung, gewählte Aufteilung und Vertragstext, Anlage für Finanzamt und Berater'],
       ['ah', 'BMF-Arbeitshilfe', 'PDF', 'Das amtliche Formular, mit den Werten dieses Objekts ausgefüllt'],
       ['xlsx', 'BMF-Original', 'XLSX', 'Die Arbeitshilfe (Stand März 2026) als Excel-Datei'],
       ['berater', 'Text für den Berater', 'Kopieren', 'Kurzfassung mit Zahlen und Begründung für den Steuerberater'],
-      ['vertrag', 'Text für den Kaufvertrag', 'Kopieren', 'Der Satz für die Urkunde – Grund und Boden, Gebäude, Inventar'],
+      ['vertrag', 'Text für den Kaufvertrag', 'Kopieren', 'Der Satz für die Urkunde, Grund und Boden, Gebäude, Inventar'],
       /* v3188 · Marcel: „wenn wir hinten bei der Übersicht … eine Anfrage machen … Gutachten“ - geht mit Objekt,
          Berater-Text und Kaufpreisaufteilung-PDF an DealPilot (deal-action.js openExpert, Leistung kaufpreisaufteilung) */
-      ['gutachten', 'Gutachten anfragen', 'Anfrage', 'Kaufpreisaufteilung durch einen Sachverständigen – Objekt und Berechnung gehen mit']
+      ['gutachten', 'Gutachten anfragen', 'Anfrage', 'Kaufpreisaufteilung durch einen Sachverständigen, Objekt und Berechnung gehen mit']
     ];
     host.innerHTML = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px">' +
       K.map(function (k) {
         return '<button type="button" data-ausgabe="' + k[0] + '"' + (bereit ? '' : ' disabled') + ' style="text-align:left;padding:12px 14px;border:1px solid #E6E0D3;border-radius:12px;background:' + (bereit ? '#FFFFFF' : '#F7F5F0') + ';cursor:' + (bereit ? 'pointer' : 'not-allowed') + ';display:flex;flex-direction:column;gap:4px;min-height:96px">' +
           '<span style="display:flex;justify-content:space-between;align-items:center;gap:8px"><b style="font:600 14px/1.3 Inter,sans-serif;color:#1a1814">' + k[1] + '</b>' +
           '<span style="font:700 10px/1 \'JetBrains Mono\',monospace;letter-spacing:.06em;padding:4px 7px;border-radius:6px;background:' + (bereit ? 'var(--wl-c9a84c, #C9A84C)' : '#E6E0D3') + ';color:#050505">' + k[2] + '</span></span>' +
-          '<span style="font-size:12px;line-height:1.45;color:#6B6356">' + (bereit ? k[3] : 'Fehlen noch Werte – erst Schritt 2 rechnen.') + '</span></button>';
+          '<span style="font-size:12px;line-height:1.45;color:#6B6356">' + (bereit ? k[3] : 'Fehlen noch Werte, erst Schritt 2 rechnen.') + '</span></button>';
       }).join('') + '</div>';
     [].forEach.call(host.querySelectorAll('[data-ausgabe]'), function (b) {
       b.addEventListener('click', function () {
@@ -421,7 +421,7 @@
     } else if (W.ab > 0) {
       P.push('Bodenwertabschlag. Auf den so ermittelten Bodenwert wurde ein Abschlag von ' + pct(W.ab, 0) + ' angesetzt' +
         (grund ? ', begründet mit ' + grund : '') + '. Der Bodenrichtwert gilt für ein Grundstück mit den ' +
-        'Merkmalen des Richtwertgrundstücks; weicht das bewertete Grundstück davon ab, ist der Wert anzupassen ' +
+        'Merkmalen des Richtwertgrundstücks, weicht das bewertete Grundstück davon ab, ist der Wert anzupassen ' +
         /* v3344 · Marcel 12.11.2026: § 15 ImmoWertV regelt die Bodenrichtwertzonen; die Anpassung
            an abweichende Grundstuecksmerkmale steht in § 40 Abs. 2 ImmoWertV (bis v3343 hier § 15). */
         '(§ 196 Abs. 1 Satz 3 BauGB in Verbindung mit § 40 Abs. 2 ImmoWertV).');
@@ -430,7 +430,7 @@
       'die Gerichte (BFH, Urteil vom 21.07.2020, IX R 26/19). Eine vertragliche Aufteilung ist der Besteuerung ' +
       'zugrunde zu legen, solange sie wirtschaftlich vernünftig ist und keine nennenswerten Zweifel an ihrer ' +
       'Angemessenheit bestehen (BFH, Urteil vom 16.09.2015, IX R 12/14). Eine pauschale Aufteilung im ' +
-      'Verhältnis 80/20 wäre im konkreten Fall nicht sachgerecht; eine abweichende Wertfeststellung ' +
+      'Verhältnis 80/20 wäre im konkreten Fall nicht sachgerecht, eine abweichende Wertfeststellung ' +
       /* v3481 · „(vgl. § 199 BewG)“ gestrichen: § 199 BewG regelt den Kapitalisierungsfaktor im vereinfachten
          Ertragswertverfahren fuer Unternehmensanteile (Erbschaft-/Schenkungsteuer) - mit der Kaufpreisaufteilung
          fuer die AfA hat er nichts zu tun. Die Aussage selbst traegt BFH IX R 12/14 (oben). */
@@ -441,7 +441,7 @@
        nachzumessen - ein Rechnerlauf an einem anderen Objekt kam so ebenso durch wie einer ohne Punkte. */
     rnd = rndDiesesObjekts();
     if (rnd) P.push('Restnutzungsdauer. Für das Gebäude wurde eine Restnutzungsdauer von ' + Math.round(rnd) + ' Jahren ' +
-      'ermittelt; die Abschreibung folgt § 7 Abs. 4 Satz 2 EStG. Die Herleitung liegt als gesonderte Berechnung bei.');
+      'ermittelt, die Abschreibung folgt § 7 Abs. 4 Satz 2 EStG. Die Herleitung liegt als gesonderte Berechnung bei.');
     var zusatz = 'Ergänzende Begründung der Aufteilung (auf Anforderung des Finanzamts)\n\n' +
       P.map(function (t, i) { return (i + 1) + '. ' + t; }).join('\n\n') + '\n\n' +
       'Die vollständige Herleitung mit allen Eingangswerten ist der beigefügten Kaufpreisaufteilung zu entnehmen.';
@@ -464,7 +464,7 @@
       '<textarea id="bmf-boden-klausel-text" readonly style="' + ta + ';min-height:120px"></textarea>' +
       '<div id="bmf-boden-hinweis" style="margin-top:6px;font-size:11.5px;color:#6B6356;line-height:1.5"></div>' +
       '<div style="margin-top:6px;display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button type="button" class="btn btn-outline btn-sm" id="bmf-boden-copy">Text kopieren</button>' +
-      (grund || W.id === 'amtlich' ? '' : '<span class="cf-hint">Ohne Begründung bleibt die Abweichung angreifbar – sie gehört in den Text.</span>') + '</div></details>';
+      (grund || W.id === 'amtlich' ? '' : '<span class="cf-hint">Ohne Begründung bleibt die Abweichung angreifbar, sie gehört in den Text.</span>') + '</div></details>';
     el('bmf-boden-klausel-text').value = txt;
     el('bmf-boden-hinweis').textContent = hinweis;
     var zHost = el('bmf-boden-zusatz');
@@ -648,7 +648,7 @@
       sagen('Der Restnutzungsdauer-Rechner ist nicht geladen.'); return;
     }
     var bj = zahl((el('bmf_bj') && el('bmf_bj').value) || (el('baujahr') && el('baujahr').value));
-    if (!bj || bj < 1500) { sagen('Ohne Baujahr geht es nicht — es steht im Reiter Objekt.'); return; }
+    if (!bj || bj < 1500) { sagen('Ohne Baujahr geht es nicht, es steht im Reiter Objekt.'); return; }
 
     /* v1501: Die Gesamtnutzungsdauer kommt aus der Grundstuecksart. Steht
        dort nichts, wird NICHT stillschweigend mit 80 gerechnet - dann fehlt
@@ -854,7 +854,7 @@
     { id: 'amtlich',     name: 'Amtlich (BMF-Arbeitshilfe)', kurz: 'Amtlich',     unter: 'Arbeitshilfe des BMF, Stand März 2026', nachweis: 'keiner nötig' },
     { id: 'konservativ', name: 'Konservativ',  kurz: 'Konservativ', unter: '15 % Abschlag auf den Bodenwert', nachweis: 'kurze Begründung' },
     { id: 'optimiert',   name: 'Optimiert',    kurz: 'Optimiert',   unter: '20 % Abschlag auf den Bodenwert', nachweis: 'Begründung + Belege' },
-    { id: 'jacoby',      name: 'Umgekehrte Ertragswertmethode', kurz: 'Jacoby', unter: 'nach Jacoby, aus dem Ertragswert – nur bei vermieteten Objekten', nachweis: 'Herleitung + Begründung' }
+    { id: 'jacoby',      name: 'Umgekehrte Ertragswertmethode', kurz: 'Jacoby', unter: 'nach Jacoby, aus dem Ertragswert, nur bei vermieteten Objekten', nachweis: 'Herleitung + Begründung' }
   ];
 
   function el(id) { return document.getElementById(id); }
@@ -1034,7 +1034,7 @@
     host.innerHTML =
       '<div style="font:600 11px/1 \'JetBrains Mono\',monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--wl-9a7f33, #9a7f33);margin-bottom:6px">BMF-Rechner · Schritt 4 von 5</div>' +
       '<h3 style="margin:0 0 6px;font:600 20px/1.3 \'Space Grotesk\',sans-serif;color:#1a1814">Welche Aufteilung soll gelten?</h3>' +
-      '<p style="margin:0 0 12px;font-size:13px;line-height:1.55;color:#6B6356">Die amtliche Arbeitshilfe, zwei Abschläge auf den Bodenwert und die umgekehrte Ertragswertmethode nach Jacoby – sie trägt nur bei vermieteten Objekten, sonst ist sie ausgegraut. Eine Zeile wählen – übernommen in den Reiter Steuer wird in Schritt 5.</p>' +
+      '<p style="margin:0 0 12px;font-size:13px;line-height:1.55;color:#6B6356">Die amtliche Arbeitshilfe, zwei Abschläge auf den Bodenwert und die umgekehrte Ertragswertmethode nach Jacoby, sie trägt nur bei vermieteten Objekten, sonst ist sie ausgegraut. Eine Zeile wählen, übernommen in den Reiter Steuer wird in Schritt 5.</p>' +
       '<div style="border:1px solid #E6E0D3;border-radius:12px;overflow:hidden;background:#FFFFFF">' +
         '<div style="overflow-x:auto"><div style="min-width:' + (mitSteuer ? 760 : 600) + 'px">' + kopf + zeilen + '</div></div>' +
       '</div>' +
@@ -1053,7 +1053,7 @@
       '</div>' +
       '<div style="margin-top:10px;font-size:11.5px;line-height:1.55;color:#6B6356">AfA auf die Gebäude-Anschaffungskosten einschließlich anteiliger Nebenkosten, volles Jahr' +
         (mitSteuer ? '; Steuer bei ' + pct(D.grenz, 2) + ' Grenzsteuersatz' : '') +
-        '. Jede Abweichung von der Arbeitshilfe braucht eine Begründung (BFH IX R 26/19; Jacoby: BFH IX R 12/21) – sie wird in Schritt 5 eingetragen, dort stehen auch alle Ausgaben.</div>';
+        '. Jede Abweichung von der Arbeitshilfe braucht eine Begründung (BFH IX R 26/19; Jacoby: BFH IX R 12/21), sie wird in Schritt 5 eingetragen, dort stehen auch alle Ausgaben.</div>';
 
     /* Alles Übrige im Reiter (Varianten-Karten, 15-%-Grenze, Verteilung, alte Klausel, XLSX-Karte) aus:
        die Auswahl ist die Tafel, die Ausgaben stehen in Schritt 5. Nicht entfernt - v292 schreibt weiter hinein. */
@@ -1128,7 +1128,7 @@
       badge.textContent = '🤖 BMF · Jacoby';
     }
     if (typeof window.calc === 'function') { try { window.calc(); } catch (e) {} }
-    toast('✓ Umgekehrte Ertragswertmethode übernommen — Gebäudeanteil ' + pct(p, 2) + ' im Reiter Steuer');
+    toast('✓ Umgekehrte Ertragswertmethode übernommen, Gebäudeanteil ' + pct(p, 2) + ' im Reiter Steuer');
     return true;
   }
 

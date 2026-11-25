@@ -285,7 +285,7 @@
         out.veraeusserung = KK.veraeusserungGesellschaft({ preis: out.marktwert, ak: ak, afaKum: afa || 0, verkaufskosten: 0,
           kstSoliPct: ges.kstSoliPct, kstNachJahr: ges.kstNachJahr, jahr: heute.getFullYear(), hebesatz: ges.hebesatz, erwKuerzung: ges.erwKuerzung });
       }
-      out.hinweis_gesellschaft = (KK && KK.HINWEIS_VERKAUF_GES) || 'Veräußerungsgewinn immer steuerpflichtig — die 10-Jahres-Frist gilt nur im Privatvermögen.';
+      out.hinweis_gesellschaft = (KK && KK.HINWEIS_VERKAUF_GES) || 'Veräußerungsgewinn immer steuerpflichtig, die 10-Jahres-Frist gilt nur im Privatvermögen.';
     }
     return out;
   }
@@ -353,7 +353,7 @@
     var x = exit(), z = [];
     function zeile(w, v) { z.push('<tr><td class="abw-wort">' + w + '</td><td class="abw-zahl">' + v + '</td></tr>'); }
     zeile('Kaufdatum', x.kaufdatum ? datumDe(x.kaufdatum) : '–');
-    if (x.gesellschaft) zeile('Zehnjahresfrist (§ 23 EStG)', '<b>gilt nicht</b> — Objekt im Betriebsvermögen einer GmbH/UG');
+    if (x.gesellschaft) zeile('Zehnjahresfrist (§ 23 EStG)', '<b>gilt nicht</b>, Objekt im Betriebsvermögen einer GmbH/UG');
     else zeile('Ende der Zehnjahresfrist (§ 23 EStG)', x.frist_ende ? '<b>' + datumDe(x.frist_ende) + '</b>' + (x.monate_bis_frist != null ? ' · ' + monateText(x.monate_bis_frist) : '') : '–');
     zeile('Marktpreisindikation' + (x.marktwert_stand ? ' (Marktbericht vom ' + datumDe(x.marktwert_stand) + ')' : ''), eur(x.marktwert));
     zeile('Gesamtinvestition (Kaufpreis ' + eur(x.kaufpreis) + ' + Nebenkosten)', eur(x.gesamtinvestition));
@@ -367,9 +367,9 @@
       zeile('Buchwert (Kaufpreis + Nebenkosten ' + eur(vg.ak) + ' − AfA bis Ende Vorjahr ' + eur(vg.afaKum) + ')', eur(vg.buchwert));
       zeile('<b>Veräußerungsgewinn</b> (Marktpreis − Buchwert, vor Verkaufskosten)', '<b>' + eurVz(vg.gewinn) + '</b>');
       zeile('Körperschaftsteuer + Soli (' + String(Math.round(vg.kstSoliPct * 1000) / 1000).replace('.', ',') + ' %)', eur(vg.kst));
-      zeile('Gewerbesteuer', vg.gewstFrei ? '0 € (erweiterte Kürzung)' : (vg.gewstOhneHebesatz ? 'nicht rechenbar — Hebesatz fehlt' : eur(vg.gewst)));
+      zeile('Gewerbesteuer', vg.gewstFrei ? '0 € (erweiterte Kürzung)' : (vg.gewstOhneHebesatz ? 'nicht rechenbar, Hebesatz fehlt' : eur(vg.gewst)));
     } else if (x.gesellschaft) {
-      zeile('Veräußerungsgewinn', 'nicht rechenbar — Marktpreis oder Anschaffungskosten fehlen');
+      zeile('Veräußerungsgewinn', 'nicht rechenbar, Marktpreis oder Anschaffungskosten fehlen');
     }
     return '<div class="dp-pa-card"><table class="abw-tafel"><tbody>' + z.join('') + '</tbody></table>' + fehltZeile(x.fehlt)
       + (x.gesellschaft
@@ -377,9 +377,9 @@
           + 'isoliert gerechnet, ohne Verlustvortrag und ohne das laufende Ergebnis des Jahres. Schädlich für die erweiterte Kürzung kann z. B. gewerblicher Grundstückshandel '
           + 'oder der Verkauf des letzten Objekts vor Ende des Erhebungszeitraums sein. Keine Steuerberatung: lass es von deinem Steuerberater bestätigen. '
         : '<div class="dp-pa-fuss">Indikativ, vor Verkaufskosten, Vorfälligkeitsentschädigung und Steuer. Verkaufst du vor Ende der Frist, ist der Gewinn als privates '
-      + 'Veräußerungsgeschäft steuerpflichtig; die bisher abgesetzte AfA mindert dabei die Anschaffungskosten. Die Frist läuft ab dem notariellen Kaufvertrag — '
+      + 'Veräußerungsgeschäft steuerpflichtig, die bisher abgesetzte AfA mindert dabei die Anschaffungskosten. Die Frist läuft ab dem notariellen Kaufvertrag — '
       + 'als Stichtag gilt hier das Kaufdatum im Objekt. Keine Steuerberatung: lass es von deinem Steuerberater bestätigen. ')
-      + 'Der Beleihungsspielraum ist rechnerisch; die Bank setzt ihren eigenen Beleihungswert an.</div></div>';
+      + 'Der Beleihungsspielraum ist rechnerisch, die Bank setzt ihren eigenen Beleihungswert an.</div></div>';
   }
 
   /* Fuer das PDF (pdf.js): Klartext, nur WinAnsi-Zeichen (kein U+2212, kein …) */

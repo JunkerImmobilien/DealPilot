@@ -168,7 +168,7 @@
       b.disabled = true; b.textContent = '…';
       api('/' + id, { method: 'PATCH', body: { status: wert('status'), backlog_nr: wert('backlog_nr'), antwort: wert('antwort') } })
         .then(laden)
-        .catch(function (err) { b.disabled = false; b.title = err.message; b.textContent = 'Fehler – nochmal'; });
+        .catch(function (err) { b.disabled = false; b.title = err.message; b.textContent = 'Fehler, nochmal'; });
     });
     setTimeout(function () { var t = hg.querySelector('#dpw-t'); if (t) t.focus(); }, 30);
     laden();

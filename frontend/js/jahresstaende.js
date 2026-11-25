@@ -295,7 +295,7 @@
       if (!f.length && A.ek > 0) {
         h.vielfaches = netto / A.ek;
         if (istZahl(Z.netto) && Z.netto > A.ek) { h.pct = anteil(A.ek, netto, Z.netto); h.zaehlt = true; }
-        else h.ohne_ziel = 'kein Zielwert (Ertragswert des Zielbilds fehlt) — Stand: ' + (Math.round(h.vielfaches * 100) / 100).toLocaleString('de-DE') + '-faches des Eigenkapitals';
+        else h.ohne_ziel = 'kein Zielwert (Ertragswert des Zielbilds fehlt), Stand: ' + (Math.round(h.vielfaches * 100) / 100).toLocaleString('de-DE') + '-faches des Eigenkapitals';
       }
       h.text = 'Nettovermögen (Marktpreis − Restschuld) gegen eingesetztes EK' + (istZahl(Z.netto) ? '; Ziel: Ertragswert Zielbild − Restschuld' : '');
       hebel.push(h);
@@ -308,7 +308,7 @@
       var h = { id: 'plan', wort: 'Plan gegen Ist (Cashflow v. St. ' + (A.plan_jahr || '') + ')', einheit: 'eur', ankauf: null, heute: H.cf_vs, ziel: A.plan_cf, zaehlt: true, fehlt: f };
       if (!f.length) {
         if (A.plan_cf > 0) h.pct = H.cf_vs / A.plan_cf * 100;
-        else { h.zaehlt = false; h.ohne_ziel = 'Plan ≤ 0 — Abweichung ' + (H.cf_vs - A.plan_cf >= 0 ? '+' : '') + Math.round(H.cf_vs - A.plan_cf).toLocaleString('de-DE') + ' €'; }
+        else { h.zaehlt = false; h.ohne_ziel = 'Plan ≤ 0, Abweichung ' + (H.cf_vs - A.plan_cf >= 0 ? '+' : '') + Math.round(H.cf_vs - A.plan_cf).toLocaleString('de-DE') + ' €'; }
       }
       h.text = 'Ist ÷ Plan des Ankaufs für das laufende Jahr';
       hebel.push(h);
@@ -529,7 +529,7 @@
     var kopf = '<div class="dp-ziel-kopf">'
       + '<span class="dp-ziel-zahl" style="color:' + (z.ampel ? z.ampel.farbe : '#6B645A') + '">' + (istZahl(z.gesamt) ? pctTxt(z.gesamt) : '–') + '</span>'
       + '<span class="dp-ziel-satz">' + (z.anzahl
-          ? '<b>Zielerreichung ' + esc(z.ampel.wort) + '</b> — Mittel aus ' + z.anzahl + (z.anzahl === 1 ? ' Hebel' : ' Hebeln') + ' mit Zielwert (' + z.woraus.map(esc).join(', ') + '), je Hebel auf 0–100 % begrenzt.'
+          ? '<b>Zielerreichung ' + esc(z.ampel.wort) + '</b>, Mittel aus ' + z.anzahl + (z.anzahl === 1 ? ' Hebel' : ' Hebeln') + ' mit Zielwert (' + z.woraus.map(esc).join(', ') + '), je Hebel auf 0–100 % begrenzt.'
           : 'Noch keine Gesamtzahl: kein Hebel hat Ankauf, heute und Ziel zugleich.') + '</span></div>';
     var satz = rechenstandSatz({ version: e.ankauf.version });
     var zbW = ''; try { zbW = global.DpZielbildFassungen ? global.DpZielbildFassungen.wechselSatz() : ''; } catch (x) { zbW = ''; }   /* v3361 */
@@ -595,7 +595,7 @@
     }
     var p = Math.max(0, Math.min(100, z.gesamt)), u = 2 * Math.PI * 10, f = z.ampel ? z.ampel.farbe : '#6B645A';
     el.style.display = '';
-    el.title = 'Zielerreichung ' + Math.round(z.gesamt) + ' % aus ' + z.anzahl + (z.anzahl === 1 ? ' Hebel' : ' Hebeln') + ' (' + z.woraus.join(', ') + ') — klicken für Details';
+    el.title = 'Zielerreichung ' + Math.round(z.gesamt) + ' % aus ' + z.anzahl + (z.anzahl === 1 ? ' Hebel' : ' Hebeln') + ' (' + z.woraus.join(', ') + '), klicken für Details';
     el.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="rgba(128,128,128,.3)" stroke-width="3"/>'
       + '<circle cx="12" cy="12" r="10" fill="none" style="stroke:' + f + '" stroke-width="3" stroke-linecap="round" stroke-dasharray="' + (u * p / 100).toFixed(2) + ' ' + u.toFixed(2) + '" transform="rotate(-90 12 12)"/></svg>'
       + '<span>Ziel ' + Math.round(z.gesamt) + ' %</span>';

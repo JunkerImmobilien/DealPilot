@@ -103,9 +103,9 @@
     if (!mitEinheiten()) { if (k) k.remove(); return; }
     if (!k) { k = document.createElement('div'); k.id = 'mff-kasten'; k.className = 'f s2 mff-kasten'; f.parentNode.insertBefore(k, f.nextSibling); }
     var n = L.length;
-    k.innerHTML = '<div class="mff-kopf"><div class="mff-titel">' + (n ? n + ' Einheiten erfasst — diese Felder kommen aus den Einheiten' : 'Mit Einheiten erfasst du jede Wohnung einzeln') + '</div>'
+    k.innerHTML = '<div class="mff-kopf"><div class="mff-titel">' + (n ? n + ' Einheiten erfasst, diese Felder kommen aus den Einheiten' : 'Mit Einheiten erfasst du jede Wohnung einzeln') + '</div>'
       + '<div class="mff-knopf-platz"></div></div>'
-      + '<div class="mff-text">' + (n ? '' : 'Daraus füllen sich ') + '<b>Wohnfläche, Wohneinheiten, Zimmer, Nettokaltmiete, Vermietungsstand</b> und — wo du den Zustand je Einheit angibst — der <b>Zustand des Gebäudes</b>. '
+      + '<div class="mff-text">' + (n ? '' : 'Daraus füllen sich ') + '<b>Wohnfläche, Wohneinheiten, Zimmer, Nettokaltmiete, Vermietungsstand</b> und, wo du den Zustand je Einheit angibst, der <b>Zustand des Gebäudes</b>. '
       + 'Nicht nötig beim ganzen Haus: Etage, Badezimmer, Miteigentumsanteil (100 %).' + '</div>';
     var platz = k.querySelector('.mff-knopf-platz');
     if (ein && platz) platz.appendChild(ein);
