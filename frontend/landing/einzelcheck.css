@@ -203,6 +203,6 @@ html.ec-offen,html.ec-offen body{overflow:hidden}
 .ec-tiefe li i{font-style:normal;font-weight:700;text-align:center;grid-row:span 2}
 .ec-tiefe li b{font-weight:600}
 .ec-tiefe li span{grid-column:2;color:var(--inkm)}
-.ec-tiefe li.ja i{color:var(--grn,#3FA56C)}.ec-tiefe li.teils i{color:#b8932f}.ec-tiefe li.nein i{color:#B8625C}
+.ec-tiefe li.ja i{color:var(--grn,#3FA56C)}.ec-tiefe li.teils i{color:var(--wl-b8932f,#b8932f)}.ec-tiefe li.nein i{color:#B8625C}
 .ec-tiefe-kurz{margin:2px 0 0;font-size:13px;font-weight:600}
 .ec-tiefe li.info{opacity:.7}

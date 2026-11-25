@@ -480,7 +480,9 @@ async function auslesen(dateien, modus) {
   const out = {
     modus: voll ? 'voll' : 'frei', modell: modell,
     zahlen: zahlen,
-    adresse_vorschlag: zh.adresse,   /* einzelcheck-4 · nur Anzeige im Feld, nie gespeichert */
+    /* einzelcheck-4 · nur im FREIEN Lauf, nur zurueck an den Besucher, der die Unterlage selbst hochgeladen hat (Vorschlag
+       fuers Feld). Nie gespeichert, nie im Zahlenstand. Im gekauften Lauf bleibt sie wie bisher nicht aufzaehlbar (_adresse). */
+    adresse_vorschlag: voll ? undefined : zh.adresse,
     herkunft: zh.herkunft,   /* einzelcheck-3 · Feld -> Art der Unterlage, nur zur Anzeige (nicht im Siegel, nicht gespeichert) */
     unterlagen: ergebnisse.map(anzeigeAus),
     nicht_gelesen: alle.slice(max).map(function (f) { return { name: dateiname(f), grund: 'im_bericht' }; })
