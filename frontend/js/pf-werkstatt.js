@@ -656,7 +656,10 @@
       '#dp-pw.pw-klein .pw-vlw{padding:10px 12px}', '#dp-pw.pw-klein .pw-v{width:128px;flex-basis:128px}',
       '#dp-pw.pw-klein .pw-body{display:flex;flex-direction:column;flex:none}',
       '#dp-pw.pw-klein .pw-pal{border-right:0;border-bottom:1px solid ' + G25 + '}', '#dp-pw.pw-klein .pw-pliste{overflow:visible;padding:12px}',
-      '#dp-pw.pw-klein .pw-pl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}',
+      /* Palette am Handy als waagerechter Streifen wie die Vorlagen: sonst steht der Arbeitsbereich erst nach ~1000 px */
+      '#dp-pw.pw-klein .pw-pl,#dp-pw.pw-klein .pw-pl-kz{display:flex !important;flex-direction:row;overflow-x:auto;gap:8px;scroll-snap-type:x proximity;padding-bottom:4px}',
+      '#dp-pw.pw-klein .pw-pi{flex:0 0 148px;width:148px;scroll-snap-align:start}',
+      '#dp-pw.pw-klein .ms-tabs,#dp-pw.pw-klein .pw-pl,#dp-pw.pw-klein .pw-vlw{scrollbar-width:none}', '#dp-pw.pw-klein .ms-tabs::-webkit-scrollbar,#dp-pw.pw-klein .pw-pl::-webkit-scrollbar,#dp-pw.pw-klein .pw-vlw::-webkit-scrollbar{display:none}',
       '#dp-pw.pw-klein .pw-ab{overflow:visible;padding:12px}', '#dp-pw.pw-klein .pw-raster{grid-template-columns:1fr}', '#dp-pw.pw-klein .pw-b.pw-halb{grid-column:1/-1}',
       '#dp-pw.pw-klein .pw-kz{grid-template-columns:repeat(2,minmax(0,1fr))}', '#dp-pw.pw-klein .pw-pop,#dp-pw.pw-klein .pw-geraet,#dp-pw.pw-klein .pw-alt{display:none !important}',
       '#dp-pw.pw-klein .settings-footer{padding:10px 12px !important;gap:8px !important}', '#dp-pw.pw-klein .save-info{display:none !important}',
