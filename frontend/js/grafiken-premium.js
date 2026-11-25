@@ -313,7 +313,7 @@
       var lo = ende ? tx - bw : tx, hi = ende ? tx : tx + bw, z = 0;
       while (mkBel.some(function (b) { return b.z === z && lo < b.hi + 6 && b.lo - 6 < hi; }) && z < 6) z++;
       mkBel.push({ z: z, lo: lo, hi: hi });
-      out.push('<line x1="' + f1(x) + '" x2="' + f1(x) + '" y1="' + m.t + '" y2="' + (H - m.b) + '" style="stroke:' + (mk.farbe || F.gold) + ';stroke-dasharray:3 3;opacity:.8"/><text class="gx-ax" x="' + f1(tx) + '" y="' + (m.t + 22 + z * 16) + '" text-anchor="' + (ende ? 'end' : 'start') + '" style="fill:' + (mk.farbe || F.goldH) + '">' + esc(mk.text) + '</text>'); });
+      out.push('<line x1="' + f1(x) + '" x2="' + f1(x) + '" y1="' + m.t + '" y2="' + (H - m.b) + '" style="stroke:' + (mk.farbe || F.gold) + ';stroke-dasharray:3 3;opacity:.8"/><text class="gx-ax" x="' + f1(tx) + '" y="' + (m.t + 26 + z * 16) + '" text-anchor="' + (ende ? 'end' : 'start') + '" style="fill:' + (mk.farbe || F.goldH) + '">' + esc(mk.text) + '</text>'); });
     /* Treffer je Jahr */
     var dx = (W - m.l - m.r) / Math.max(1, n - 1);
     X.forEach(function (j, i) { if (!d.tip) return; out.push('<rect x="' + f1(xs(j) - dx / 2) + '" y="' + m.t + '" width="' + f1(dx) + '" height="' + (H - m.t - m.b) + '" style="fill:transparent"' + tipA(d.tip(i, j)) + '/>'); });
