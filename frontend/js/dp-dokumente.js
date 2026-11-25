@@ -794,12 +794,15 @@
      abgelehnt: die volle Fassung streicht NICHTS, sie ordnet nur. Erreichbar nur über DpDokumente.dokument('investment_muster' |
      'kurz_muster'), kein Knopf. Erst nach Marcels Freigabe der Muster ersetzt sie die bisherigen Fassungen. */
   function inhaltSeite(c, B, teile) {
+    /* v4790e · Marcel 25.11.2026: „Bitte bei den PDFs das Inhaltsverzeichnis auf eine Seite.“ Ab 12 Einträgen ohne Unterzeile und mit engem
+       Zeilenabstand, dann passen bis 26 Einträge auf eine Seite. Die Seitenzahlen setzt weiter der PDF-Dienst (data-dp-toc). */
+    var eng = teile.length > 11, pad = eng ? 'padding-top:1.6mm;padding-bottom:1.6mm' : '';
     return B.seite(c, 'Inhalt', B.abschnitt('Investment Case', 'Inhalt')
       + '<table class="inhalt"><tbody>' + teile.map(function (t, i) {
         /* v4580g · Marcel: „die PDFs brauchen auch Seitenzahlen im Inhaltsverzeichnis.“ Der PDF-Dienst (pdf-dienst/server.js) zählt je
            Abschnitt (data-dp-abschnitt) die gedruckten Seiten und setzt die Startseite in data-dp-toc. Ohne Dienst bleibt die Spalte leer. */
-        return '<tr><td class="num" style="width:12mm;color:var(--gold-d);font-weight:700">' + (t[2] || (i + 1)) + '</td><td><b>' + B.esc(t[0]) + '</b><div class="det">' + B.esc(t[1]) + '</div></td>'
-          + '<td class="r num" style="width:16mm;vertical-align:top"><span data-dp-toc="' + B.esc(t[3] || '') + '"></span></td></tr>';
+        return '<tr><td class="num" style="width:12mm;color:var(--gold-d);font-weight:700;' + pad + '">' + (t[2] || (i + 1)) + '</td><td style="' + pad + '"><b>' + B.esc(t[0]) + '</b>' + (eng || !t[1] ? '' : '<div class="det">' + B.esc(t[1]) + '</div>') + '</td>'
+          + '<td class="r num" style="width:16mm;vertical-align:top;' + pad + '"><span data-dp-toc="' + B.esc(t[3] || '') + '"></span></td></tr>';
       }).join('') + '</tbody></table>');
   }
   function cfDiagramm(B) {
