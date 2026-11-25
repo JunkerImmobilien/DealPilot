@@ -63,7 +63,7 @@
 (function () {
   'use strict';
   if (window.DpEinzelCheck) return;
-  var VERSION = 'einzelcheck-5';
+  var VERSION = 'einzelcheck-5a';
   var ANSCHLUSS_ZINS = 5.0;     /* v3946 · Marcel 22.11.2026: „Anschlussfinanzierung, die wir einfach auf fünf Prozent rechnen mit derselben Tilgung“ */
   var ABLAGE_STUNDEN = 2;       /* v3946 · Unterlagen im Browser höchstens so lange (die Stripe-Kasse läuft nach 60 Minuten ab) */
   var SPEICHER = 'dp_ec_kauf';
@@ -629,8 +629,9 @@
       + '</ul><p class="ec-fein">Gerechnet wird mit deiner Angabe, bis du übernimmst.</p></div>' : '';
     var kurz = S.grund ? '<div class="ec-grund-kurz"><span class="ec-l">Deine Grundangaben</span><p>' + esc(grundKurz(S.grund)) + '</p><button type="button" class="btn-l ec-grund-aendern">Ändern</button></div>' : '';
     setze('<h3 id="ecTitel">Deine Daten stehen bereit.</h3>' + (hinweis ? meldung(hinweis, 'warn') : '') + abw + kurz + kern
-      + '<div class="ec-zwei"><div><span class="ec-l">Ausgelesen</span><ul class="ec-felder an">' + (gelesen || '<li><span>Keine Kennzahl gefunden</span><b></b></li>') + '</ul></div>'
-      + '<div><span class="ec-l">Unterlagen</span><ul class="ec-dokliste">' + dok + '</ul>' + (risiken ? '<p class="ec-fein">' + risiken + (risiken === 1 ? ' Hinweis' : ' Hinweise') + ' auf Risiken stehen im Bericht.</p>' : '') + '</div></div>'
+      /* einzelcheck-5 · ohne Unterlagen kein leerer Kasten „Ausgelesen: Keine Kennzahl gefunden“ */
+      + (S.ohneUnterlagen && !(S.dateien || []).length ? '' : '<div class="ec-zwei"><div><span class="ec-l">Ausgelesen</span><ul class="ec-felder an">' + (gelesen || '<li><span>Keine Kennzahl gefunden</span><b></b></li>') + '</ul></div>'
+      + '<div><span class="ec-l">Unterlagen</span><ul class="ec-dokliste">' + dok + '</ul>' + (risiken ? '<p class="ec-fein">' + risiken + (risiken === 1 ? ' Hinweis' : ' Hinweise') + ' auf Risiken stehen im Bericht.</p>' : '') + '</div></div>')
       + kaufBox()
       + '<div class="ec-pakete"><span class="ec-l">Oder gleich weitermachen</span><p class="ec-fein">Mit einem Paket legst du das Objekt mit diesen Zahlen in DealPilot an.</p><div class="ec-pk"></div></div>', 'h3');
     paketeEinsetzen($('.ec-pk', inhalt), z, r, null);
@@ -643,7 +644,7 @@
   }
   function kaufBox() {
     if (!(INFO.amount_cents > 0)) return '<div class="ec-weg ec-weg-1"><b>Bericht</b><p>Der Bericht ist gerade nicht kaufbar. Bitte später noch einmal.</p></div>';
-    return '<div class="ec-weg ec-weg-1"><span class="ec-l">Der komplette Bericht</span><b>Alle ' + Math.max(S.dateien.length, 1) + ' Unterlagen, Wertermittlung, Finanzierung und Marktbericht als PDF</b>'
+    return '<div class="ec-weg ec-weg-1"><span class="ec-l">Der komplette Bericht</span><b>' + (S.dateien.length > 1 ? 'Alle ' + S.dateien.length + ' Unterlagen, ' : S.dateien.length === 1 ? 'Deine Unterlage, ' : '') + 'Wertermittlung, Finanzierung und Marktbericht als PDF</b>'   /* einzelcheck-5 · ohne Unterlagen stand „Alle 1 Unterlagen“ */
       + '<p>Bodenrichtwert, Ertrags-, Sach- und Vergleichswert mit dem führenden Verfahren, Finanzierung mit Restschuld und Anschlussfinanzierung, Investor Deal Score, Cashflow und DSCR, Mietpotenzial, Lage und Markt.</p>'
       + '<div class="ec-tiefe" aria-live="polite"></div>'
       + '<div class="ec-preis">' + esc(preisText()) + '<small>einmalig, kein Abo</small></div>'
