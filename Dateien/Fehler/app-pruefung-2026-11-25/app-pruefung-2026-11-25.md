@@ -29,7 +29,7 @@ Objekte Lindenallee/Musterhof bei 820 sind danach neu gemessen, die übrigen Bef
 | 12 | Portfolio-Cockpit › Wertansatz-Tooltip | alle | Datum blieb ISO (2026-11-15) | niedrig | Regex ohne Backslash | js/dashboard.js | behoben |
 | 13 | Finanzierung | alle | Karte hieß noch „Bankargumente“, „Restschuld EZB“ | niedrig | Altbeschriftung | index.html | behoben |
 | 14 | ganze App | alle | 101 Kundentexte mit Gedankenstrich/Semikolon | niedrig | Altbestand | index.html, 12 JS-Dateien | teilweise: index.html bis auf eine Stelle, Spannen mit „bis“ in 8 Dateien |
-| 15 | Einstellungen (Partner, Rechtliches, Hilfe) | 390 | ein Element „Miete“ 11 px über den Kasten (hinter dem Fenster liegende Ansicht) | niedrig | nicht eindeutig zugeordnet | – | offen |
+| 15 | Einstellungen (Partner, Rechtliches, Hilfe) | 390 | ein Element „Miete“ 11 px über den Kasten (hinter dem Fenster liegende Ansicht) | niedrig | NN4: Element der Ansicht hinter dem Einstellungsfenster, nicht sichtbar, kein Fehler. nicht eindeutig zugeordnet | – | offen |
 | 16 | Haus & Unterlagen | 1024 | Knopf „Anlage V 2026“ 28 px über die Zeile | niedrig | Bereich Fork II4 | – | offen, an II4 |
 | 17 | Gold-Audit Staging | – | js/hausverlauf.js 0 → 3 hartes Gold | niedrig | Fork II4 | – | offen, an II4 |
 
@@ -40,3 +40,14 @@ Portfolio-Cockpit bei 390 (0), Einstellungen bei 1024 (0), Quick-Check (0 Layout
 - Gedankenstriche in Messe-Drehbüchern (Videos), im Mietpotenzial-Kern (`text_lang`, Prüfsumme des Kerns) und in
   Hilfetexten (help.js): nicht angefasst.
 - Prod nicht eingeloggt nachgemessen, nur Auslieferung (version 212, app-pruefung.css v4770).
+
+## Nachtrag NN4 (v4810, Prod 1.0.218)
+
+| # | Ansicht | Gerät | Befund | Stand |
+|---|---|---|---|---|
+| 18 | Steuer › Jahresverlauf | alle | Ergebnis 0 als „-0 €“ | behoben (tax.js) |
+| 19 | ganze App | alle | Gedankenstrich/Semikolon in Kundentext, 133 Dateien | behoben (außer Kerne, Portfolio, PDF-Dokumente, Haus & Unterlagen, Score, Messe-Daten, mietpotenzial-kern) |
+| 20 | Partnerfarbe Blau | 1440, 390 | hartes Gold in Reitern | 0 Stellen, kein Befund |
+| 21 | dunkler Skin | 1440 | helle Schrift auf heller Fläche | nur Fehlalarme (Kacheln mit Hintergrundbild), kein Befund |
+| 22 | Kontrast | alle | Status-Grün/Rot und Grautöne als kleine Schrift 3,0 bis 4,4 : 1 | offen, Markenfarben |
+| 23 | Westerfeldstr. 146, Demostraße 5, Hauptstr. 51 | 1440, 1024, 820 | Überlauf, Abschneiden, NaN | kein Befund außerhalb von Scroll-Containern |
