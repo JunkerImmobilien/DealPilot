@@ -45737,3 +45737,10 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** staging `1a110185`, main `0a834f58`. Keine neue Version gestempelt (nur Backend).
 - **Nachweis:** betrieb-pruefen 47/47, printenv im Container, Backend healthy auf beiden, Test-Mail Prod an support@ versendet. Sicherungen `env-vor-v4930-*`, `haupt-/mb-20261125-1257-v4930`.
 - **Rest:** Hauptstr. 51 (Staging) jetzt MFH mit Stufe-3-Bericht 618, Ertragswert 1.265.000 € führend, aber „vorläufig vor BoG“ → Anker bleibt Marktpreisindikation 955.000 € (Entscheidung offen), siehe wissen/2026-11-25.md.
+
+### Rollout 1.0.225 · v4930 Unterlagen mit fremder Objektanschrift abgelehnt (Fork H5, 25.11.2026)
+
+- **Was:** adress-pruefung.js (ein normalisierter Adressvergleich); Sammel-Import, Dokument-Import und Beleg-Leser blocken Unterlagen mit fremder Objektanschrift (kein „trotzdem“), im Bestand keine Objektdaten aus Exposé/Marktbericht; KI-Beleg liefert objekt_anschrift.
+- **Commit:** staging cff53363, main bdaca803 + Version 9b30038b, Merge main→staging 4e569b5e.
+- **Nachweis:** beleg-adresse-pruefen 33/33, buster-ebenen, vorschau, prompt-lecks, ki-deckel, unterlagen-steuer 53/53, beleg-leser, sonderumlage, qc-uebergabe, einzelcheck grün; Staging-Browser Westerfeldstr. 146 + Exposé Musterweg 7 abgelehnt, Datensatz unverändert; Prod-Sicherung haupt-/mb-20261125-1214-v4930 (7,1/31 MB, Kopf gelesen), Backend healthy, gold-audit RC 0.
+- **Rest:** Prod nicht eingeloggt im Objekt gemessen; Schadensliste nur lesend (Prod leer, Staging 2 Testflow-Objekte).
