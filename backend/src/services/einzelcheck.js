@@ -717,10 +717,20 @@ function textAus(md, mitWert) {
     if (art === 'h') t = ueberschrift(t);
     t = _satzzeichen(t);
     if (t.length < 2 || !_ohneQuelle(t) || (!mitWert && _WERT_WORTE.test(t))) return;
-    aus.push({ art: art, text: t.slice(0, 900) }); zeichen += t.length;
+    aus.push({ art: art, text: _satzKurz(t, 1600) }); zeichen += t.length;   /* einzelcheck-6 · nie mitten im Wort (Herford: „Grundstücksmerkma“) */
   });
   /* keine Ueberschrift ohne Inhalt: eine Ueberschrift direkt vor einer anderen oder am Ende faellt weg */
   return aus.filter(function (x, i) { return x.art !== 'h' || (aus[i + 1] && aus[i + 1].art !== 'h'); });
+}
+/* einzelcheck-6 · Kürzen am Satzende: bis zur Grenze den letzten ganzen Satz behalten, gibt es keinen, am letzten
+   Wort mit „…“. Vorher schnitt slice() mitten im Wort, Marcel sah im Herford-Bericht „Grundstücksmerkma“ und „Die Mar“. */
+function _satzKurz(t, n) {
+  const s = String(t == null ? '' : t);
+  if (s.length <= n) return s;
+  const teil = s.slice(0, n);
+  const ende = Math.max(teil.lastIndexOf('. '), teil.lastIndexOf('! '), teil.lastIndexOf('? '));
+  if (ende > n * 0.4) return teil.slice(0, ende + 1);
+  return teil.slice(0, n - 1).replace(/\s+\S*$/, '') + ' …';
 }
 /* v3944 · Vergleichsmiete aus dem mb-Auszug, nur feste Felder. Kein Treffer heisst kein Wert. */
 const VGL_ARTEN = ['mietspiegel', 'amtlich', 'naeherung'];
@@ -780,7 +790,7 @@ function _kunde(t, n) {
   s = s.replace(/dl-de\/(by|zero)-2-0/gi, 'DLDE_$1_20');
   s = _satzzeichen(s).replace(/\s+([,.)])/g, '$1').replace(/\s{2,}/g, ' ').trim().replace(/DLDE_(by|zero)_20/gi, 'dl-de/$1-2-0');
   if (!s || !_ohneQuelle(s)) return null;
-  return s.length > (n || 400) ? s.slice(0, (n || 400) - 1).replace(/\s+\S*$/, '') + ' …' : s;
+  return _satzKurz(s, n || 400);   /* einzelcheck-6 · am Satzende kürzen, nicht mitten im Satz („rechnet der Bericht …“) */
 }
 function _stufe(x) { const s = String(x || '').trim().toUpperCase(); return /^[A-EMN]$/.test(s) ? s : null; }
 function _jahr(x) { const n = _n(x); return n > 0 ? Math.round(n * 10) / 10 : null; }
@@ -992,6 +1002,35 @@ function mailInhalt(o) {
   return { text: zeilen.join('\n'), html: html };
 }
 function _fehlerMit(text, status, code) { const e = new Error(text); e.status = status; e.code = code; return e; }
+/* einzelcheck-6 · Das PDF entsteht beim PDF-Dienst, nicht im Druckfenster des Browsers. Marcels Herford-Bericht trug
+   oben Datum und Titel und unten die Adresse der Seite: das sind die Kopf- und Fusszeilen des Chrome-Druckfensters,
+   die der Bericht nicht abschalten kann. Mail und Herunterladen nehmen jetzt denselben Weg. */
+async function _pdfDrucken(html, t, signal) {
+  const geheim = process.env.PDF_DIENST_SECRET;
+  const url = String(process.env.PDF_DIENST_URL || 'http://dealpilot-pdf:4100').replace(/\/+$/, '') + '/pdf';
+  /* Art html druckt ohne Anmeldung (kein Skript, kein Netz). token/sitzung verlangt der Dienst nur formal. */
+  const r = await deps().pdfFetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Pdf-Geheimnis': geheim },
+    body: JSON.stringify({ art: 'html', html: html, titel: 'DealPilot Einzel-Check ' + t,
+      fuss: ['DealPilot · Einzel-Check', 'Stand ' + new Date().toLocaleDateString('de-DE', { timeZone: 'Europe/Berlin' })],
+      token: 'einzelcheck', sitzung: { mode: 'einzelcheck' } }), signal: signal });
+  if (!r.ok) throw new Error('PDF-Dienst ' + r.status);
+  const pdf = Buffer.from(await r.arrayBuffer());
+  if (pdf.length < 1000 || pdf.slice(0, 4).toString() !== '%PDF') throw new Error('kein PDF');
+  return pdf;
+}
+/* einzelcheck-6 · Herunterladen: nur fuer einen bezahlten, gueltigen Kauf, ohne Mail-Zaehler */
+async function berichtPdf(zeile, html, titel) {
+  if (!zeile) throw _fehlerMit('Der Kauf ist unbekannt.', 403, 'kauf_unbekannt');
+  if (!istGueltig(zeile)) throw _fehlerMit('Der Kauf ist abgelaufen.', 403, 'kauf_abgelaufen');
+  if (zeile.status !== 'bezahlt') throw _fehlerMit('Das PDF braucht einen bezahlten Kauf.', 402, 'nicht_bezahlt');
+  if (typeof html !== 'string' || html.length < 200 || html.length > MAX_MAIL_HTML || !/^<!doctype html>/i.test(html.trim())) throw _fehlerMit('Der Bericht fehlt.', 400, 'html');
+  if (!process.env.PDF_DIENST_SECRET) throw _fehlerMit('Der PDF-Dienst ist hier gerade nicht eingerichtet.', 503, 'kein_dienst');
+  const t = String(titel || 'Einzel-Check').replace(/[\u0000-\u001f]/g, ' ').trim().slice(0, 120) || 'Einzel-Check';
+  const ctrl = new AbortController(); const uhr = setTimeout(function () { ctrl.abort(); }, 120000);
+  try { return { pdf: await _pdfDrucken(html, t, ctrl.signal), titel: t }; }
+  catch (e) { console.warn('[einzelcheck] PDF zum Herunterladen fehlgeschlagen:', e.message); throw _fehlerMit('Das PDF ließ sich gerade nicht erzeugen.', 502, 'pdf'); }
+  finally { clearTimeout(uhr); }
+}
 async function berichtMailen(zeile, email, html, titel) {
   const an = emailForm(email);
   if (!an) throw _fehlerMit('Bitte eine gültige E-Mail-Adresse eintragen.', 400, 'email');
@@ -1006,15 +1045,7 @@ async function berichtMailen(zeile, email, html, titel) {
   const ctrl = new AbortController(); const uhr = setTimeout(function () { ctrl.abort(); }, 120000);
   let pdf;
   try {
-    const url = String(process.env.PDF_DIENST_URL || 'http://dealpilot-pdf:4100').replace(/\/+$/, '') + '/pdf';
-    /* Art html druckt ohne Anmeldung (kein Skript, kein Netz). token/sitzung verlangt der Dienst nur formal. */
-    const r = await deps().pdfFetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Pdf-Geheimnis': geheim },
-      body: JSON.stringify({ art: 'html', html: html, titel: 'DealPilot Einzel-Check ' + t,
-        fuss: ['DealPilot · Einzel-Check', 'Stand ' + new Date().toLocaleDateString('de-DE', { timeZone: 'Europe/Berlin' })],
-        token: 'einzelcheck', sitzung: { mode: 'einzelcheck' } }), signal: ctrl.signal });
-    if (!r.ok) throw new Error('PDF-Dienst ' + r.status);
-    pdf = Buffer.from(await r.arrayBuffer());
-    if (pdf.length < 1000 || pdf.slice(0, 4).toString() !== '%PDF') throw new Error('kein PDF');
+    pdf = await _pdfDrucken(html, t, ctrl.signal);
   } catch (e) {
     console.warn('[einzelcheck] PDF fuer Mail fehlgeschlagen:', e.message);
     await zurueck();
@@ -1068,5 +1099,5 @@ module.exports = {
   handleEinzelcheckPaid, marktAus, vglAus, mbEingabe, strasseAus, markt, textAus, kostenErfassen, adresseAus, aufraeumen, starteTakt, MB_STUFE, OCR_SEITEN, OCR_ZEIT_MS,
   /* v3946 */ grundSauber, grundFehlt, GRUND_FELDER, GRUND_PFLICHT, wertAus, ueberschrift, KAPITEL,
   istExpose, istWertbericht, zahlenUndHerkunft, _setzeDeps, _pdfText,
-  /* einzelcheck-2 */ karteHolen, tiefe, berichtMailen, mailErlaubt, mailInhalt, emailForm, MAX_MAILS
+  /* einzelcheck-2 */ karteHolen, tiefe, berichtMailen, berichtPdf, mailErlaubt, mailInhalt, emailForm, MAX_MAILS
 };

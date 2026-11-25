@@ -66,6 +66,9 @@ const P = {
   mbOrch: path.join(WURZEL, 'marktbericht/backend/src/services/ReportOrchestrator.js'),
   mbGeo: path.join(WURZEL, 'marktbericht/backend/src/services/GeocodingService.js'),
   front: path.join(WURZEL, 'frontend/landing/einzelcheck.js'),
+  qcApp: path.join(WURZEL, 'frontend/quickcheck-app.html'),   /* einzelcheck-6 · Deal Score wie im Quick-Check */
+  qcWeg: path.join(WURZEL, 'frontend/js/qc-score-weg.js'),
+  laden: path.join(WURZEL, 'frontend/landing/dealcheck-laden.js'),
   faecher: path.join(WURZEL, 'frontend/landing/landing-faecher.js'),
   dealcheck: path.join(WURZEL, 'frontend/landing/dp2-dealcheck.js'),
   ocr: path.join(WURZEL, 'backend/src/services/ocr.js'),
@@ -462,7 +465,7 @@ TEILE.K = async function (svc, q) {
   if (/immobilienscout|immo\s*scout|boris|www\.|https?:/i.test(mj)) f.push('Quellenname oder Link nach außen: ' + (mj.match(/.{40}(immobilienscout|boris|www\.|https?:).{20}/i) || [])[0]);
   const front = ohneKommentar(q.front);
   if (/immobilienscout|immo\s*scout|geomap|pricehubble|sprengnetter|boris|bundesbank/i.test(front)) f.push('Quellenname im Frontend');
-  if (!/function wertSeite\(D, m, r\)/.test(front) || !/wertSeite\(D, m, r\)\)\)/.test(front)) f.push('Kapitel Wertermittlung fehlt im Bericht');
+  if (!/function wertSeite\(D, m, r\)/.test(front) || !/var ws = wertSeite\(D, m, r\)/.test(front)) f.push('Kapitel Wertermittlung fehlt im Bericht');   /* einzelcheck-6 · zwei Seiten */
   return f;
 };
 
@@ -747,7 +750,7 @@ TEILE.N = async function (svc, q) {
    Das ECHTE frontend/landing/einzelcheck.js läuft in einer vm-Umgebung mit einem Minimal-DOM, zusammen mit den
    ECHTEN Kernen der App (dscr-engine, darlehen-weitere, deal-kpis, score-tiers, dealscore, mietpotenzial-kern,
    dp-dokument). Gerechnet und gesetzt wird über window.DpEinzelCheck._bericht/_pdf/_fin/_grundFehlt. */
-const KERN_DATEIEN = ['dscr-engine.js', 'darlehen-weitere.js', 'deal-kpis.js', 'score-tiers.js', 'dealscore.js', 'mietpotenzial-kern.js', 'dp-dokument.js'];
+const KERN_DATEIEN = ['dscr-engine.js', 'darlehen-weitere.js', 'deal-kpis.js', 'score-tiers.js', 'dealscore.js', 'qc-score-weg.js', 'mietpotenzial-kern.js', 'dp-dokument.js'];   /* einzelcheck-6 · qc-score-weg.js */
 function frontLaden(frontText, ueber) {
   const leer = () => null;
   const el = () => ({ style: {}, classList: { add() {}, remove() {}, toggle() {} }, setAttribute() {}, appendChild() {}, addEventListener() {} });
@@ -939,6 +942,56 @@ TEILE.T = async function (svc, q) {
   C.DpDealCheck = undefined;
   return f;
 };
+/* U · einzelcheck-6 (Marcel 25.11.2026): „wie im Quick Check bewerten, nicht nochmal was Gesondertes“.
+   1 · Quick-Check und Deal-Check rufen denselben Weg (js/qc-score-weg.js), keiner rechnet daneben selbst.
+   2 · Echter Lauf: Herford (ETW 180.000, 850 + 90 €, 0 € EK, 3,2 %/1,2 %) ergibt im Deal-Check genau, was
+       _dpPilotScore des Quick-Checks mit denselben Eingaben ergibt (der Weg direkt am Kern nachgerechnet).
+   3 · Kein Investor Deal Score mehr im Bericht, das Urteil trennt Objekt und Finanzierung.
+   4 · Kürzen nie mitten im Wort (KI-Text, Verfahrenszeile). */
+TEILE.U = async function (svc, q) {
+  const f = [];
+  const qc = (q.qcApp || '').split(String.fromCharCode(13)).join('');
+  const pil = qc.slice(qc.indexOf('window._dpPilotScore = function(inputs, avm){'), qc.indexOf('  };', qc.indexOf('window._dpPilotScore = function(inputs, avm){')));
+  if (!pil) f.push('_dpPilotScore im Quick-Check nicht gefunden');
+  if (!/window\.DpQcScore\.rechne\(/.test(pil)) f.push('Quick-Check rechnet nicht über DpQcScore.rechne');
+  if (/DealScore\.computeFromKpis\(|DealKpis\.compute\(/.test(pil)) f.push('Quick-Check rechnet den Score wieder selbst');
+  if (!/src="js\/qc-score-weg\.js\?v=/.test(qc)) f.push('Quick-Check lädt qc-score-weg.js nicht');
+  if (!/qc-score-weg\.js\?v=/.test(q.laden || '')) f.push('Landing lädt qc-score-weg.js nicht');
+  const fr = ohneKommentar(q.front);
+  const re = fnAus(fr, 'function rechne(z, opt)') || '';
+  if (!re) f.push('rechne(z, opt) fehlt im Deal-Check');
+  if (!/DpQcScore\.rechne\(/.test(re)) f.push('Deal-Check rechnet nicht über DpQcScore.rechne');
+  if (/DealScore\.computeFromKpis\(|wp_kpi|mstg/.test(re)) f.push('Deal-Check rechnet den Score wieder selbst (Wertpuffer pauschal?)');
+  if (/DpFaecher\.rechne\(|d\.ds2 *=/.test(fr)) f.push('Bericht rechnet wieder den Investor Deal Score');
+  let C; try { C = frontLaden(q.front, q.kerne); } catch (e) { return f.concat(['Frontend lädt nicht: ' + e.message]); }
+  const EC = C.DpEinzelCheck;
+  EC._S.grund = { art: 'ETW', kp: 180000, nkm: 850, ze: 90, wfl: 96, plz: '32052', ort: 'Herford', bj: 1994, ek_eur: 0, nk_pct: 10, zins_pct: 3.2, tilg_pct: 1.2, bindung_j: 10 };
+  const mw = 209000;
+  const d = EC._bericht({ zahlen: { kp: 180000, nkm: 850, ze: 90, wfl: 96, plz: '32052', ort: 'Herford', bj: 1994, unterlagen: 1 }, unterlagen: [], status: {},
+    markt: { verfuegbar: true, stufe: 3, stichtag: '2026-11-25', lage: { mikro: 96, makro: 56, ort: 'Herford', plz: '32052', ags: null, bevoelkerung_trend_pct: -0.01 },
+      markt: { bezeichnung: 'Erweiterte Marktpreisindikation', wert: mw, qm: 2415, miete_qm: 8.45 }, vergleichsmiete: null, wert: { verfuegbar: false, grund: 'nicht_im_umfang' } } }, null);
+  if (!d.r || !d.r.ds) return f.concat(['Deal-Check ohne Score']);
+  /* derselbe Weg wie _dpPilotScore: DealKpis.compute -> computeFromKpis, Wertpuffer = Marktwert - Kaufpreis */
+  const nk = 18000, d1 = 198000, bwkNul = 850 * 12 * 0.17;
+  const k = C.DealKpis.compute({ kp: 180000, nk: nk, san: 0, nkm: 850, ze: 90, leerstand_pct: 0, bwk_ul: 0, bwk_nul: bwkNul, d1: d1, d1z: 3.2, d1t: 1.2, ek: 0, svw: 0, afa: 0, grenz: 0, ekInklNkLtv: false });
+  const mp = d.opt ? d.opt.mietPotPct : null;
+  const soll = C.DealScore.computeFromKpis({ kp: 180000, cf_m: k.cf_m, nmy: k.nmy, ltv: k.ltv, dscr: k.dscr, wp_kpi: mw - 180000, miet_potenzial_pct: mp, zustand: null, san: 0 });
+  if (d.r.ds.score !== soll.score) f.push('Deal-Check ' + d.r.ds.score + ' gegen Quick-Check-Weg ' + soll.score);
+  else if (!(soll.score >= 50)) f.push('Herford unter Solide: ' + soll.score);
+  if (!d.urteil || d.urteil.objekt == null || d.urteil.finanzierung == null || !(d.urteil.objekt > d.urteil.finanzierung)) f.push('Urteil trennt Objekt und Finanzierung nicht: ' + JSON.stringify(d.urteil && { o: d.urteil.objekt, f: d.urteil.finanzierung }));
+  if (!d.urteil || !d.urteil.braucht || !d.urteil.braucht.some((x) => /DSCR 1,2/.test(x))) f.push('kein Eigenkapitalbedarf für DSCR 1,2');
+  const doc = EC._pdf(d);
+  const text = typeof doc === 'string' ? doc.replace(/<style>[\s\S]*?<\/style>/, '').replace(/<[^>]+>/g, ' ') : '';
+  if (/Investor Deal Score/.test(text)) f.push('Bericht nennt noch den Investor Deal Score');
+  if (!/Dieselbe Bewertung wie im Quick-Check/.test(text)) f.push('Bericht sagt nicht, dass er wie der Quick-Check bewertet');
+  if (/−0,0 %/.test(text)) f.push('Bevölkerung „−0,0 %“');
+  if (/[–—;]/.test(text)) f.push('Gedankenstrich oder Semikolon im Bericht');
+  /* Kürzen am Satzende, nie mitten im Wort */
+  const lang = 'Erster Satz ist kurz. '.repeat(90) + 'Grundstücksmerkmale ohne Ende';
+  const tx = svc.textAus ? svc.textAus('Absatz ' + lang, true) : null;
+  if (tx && tx.length && !/[.!?…]$/.test(tx[0].text.trim())) f.push('KI-Text endet mitten im Wort: …' + tx[0].text.slice(-30));
+  return f;
+};
 /* Q · Nach dem Kauf kein zweites Hochladen: selber Tab, Ablage auf dem Gerät, Bericht startet von selbst, Ablage wird gelöscht */
 TEILE.Q = async function (svc, q) {
   const f = [], fr = ohneKommentar(q.front);
@@ -1011,7 +1064,7 @@ function quellen(ueber) {
 const NAMEN = { A: 'Speicher-only', A2: 'pdftotext echt über stdin/stdout', B: 'Schwärzen vor dem KI-Aufruf', C: 'Bremse und Schalter', D: 'kostenlos höchstens 2 Unterlagen',
   E: 'Bericht nur mit gültigem Kauf-Token', F: 'Frist 14 Tage', G: 'Preis aus dem lookup_key', H: 'Webhook', I: 'Zahlen-Weissliste', J: 'Siegel', K: 'Marktbericht Stufe 3 ohne Ablage, Wertermittlung mit Herkunft, keine Quellennamen',
   L: 'gescannte PDFs: Texterkennung nur im Speicher', M: 'Rabatt-Vorrang Anrechnung vor Flyer-Code', N: 'Vergleichsmiete und Obergrenze für Investoren',
-  O: 'Finanzierung wie im Investment-PDF (Kerne)', P: 'Grundangaben Pflicht', Q: 'kein zweites Hochladen nach dem Kauf', R: 'Bericht: Kapitel, Deckblatt, Kundentext', S: 'Bewertungsbericht und Ablauf erst auslesen', T: 'Deal-Check-Werte nur nach echtem Deal-Check-Lauf' };
+  O: 'Finanzierung wie im Investment-PDF (Kerne)', P: 'Grundangaben Pflicht', Q: 'kein zweites Hochladen nach dem Kauf', R: 'Bericht: Kapitel, Deckblatt, Kundentext', S: 'Bewertungsbericht und Ablauf erst auslesen', T: 'Deal-Check-Werte nur nach echtem Deal-Check-Lauf', U: 'Deal Score genau wie im Quick-Check' };
 
 console.log('einzelcheck-pruefen · v3946');
 const svc = require(P.dienst);
@@ -1102,6 +1155,10 @@ const GEGEN = [
   ['T', 'letztes() ohne Lauf-Sperre', { dealcheck: ersetze(q0.dealcheck, 'letztes: function () { return gelaufen ? letztes : null; }', 'letztes: function () { return letztes; }') }],
   ['T', 'Bericht-Knopf rechnet die Karte immer', { dealcheck: ersetze(q0.dealcheck, 'if (gelaufen) { var r = rechnen(); if (r) letztes = r; }', '{ var r = rechnen(); if (r) letztes = r; }') }],
   ['T', 'PLZ, Fläche, Baujahr der Karte ohne Lauf', { front: ersetze(q0.front, '    if (!dc) return g;   /* einzelcheck-5', '    /* einzelcheck-5') }],
+  /* einzelcheck-6 */
+  ['U', 'Deal-Check wieder mit pauschalem Wertpuffer', { front: ersetze(q0.front, 'marktwert: opt.marktwert || 0, miet_potenzial_pct: opt.mietPotPct != null ? opt.mietPotPct : null, zustand: null });\n    if (!W) return null;', 'marktwert: e.kp * 1.05, miet_potenzial_pct: opt.mietPotPct != null ? opt.mietPotPct : null, zustand: null });\n    if (!W) return null;') }],
+  ['U', 'Quick-Check rechnet wieder selbst', { qcApp: ersetze(q0.qcApp, '    var k = W.k, r = W.r;', '    var k = W.k, r = window.DealScore.computeFromKpis(W.K);') }],
+  ['U', 'Bericht ohne Marktwert im Score', { front: ersetze(q0.front, '      var r2 = rechne(z, opt); if (r2 && r2.k) { d.r = r = r2; d.opt = opt; }', '      d.opt = opt;') }],
   ['M', 'mitCode lässt den Flyer-Code stehen', { front: ersetze(q0.front, "    ['code', 'promo', 'rabatt'].forEach(function (k) { u.searchParams.delete(k); });\n", '') }]
 ];
 for (const [teil, was, ueber] of GEGEN) {

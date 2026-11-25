@@ -567,17 +567,26 @@
     var nkPct = z.nk_pct > 0 ? z.nk_pct : (dc && dc.nkPct > 0 ? dc.nkPct : 10);
     return { kp: kp, nkm: nkm, ze: ze, zins: zins, tilg: tilg, bindung: bindung, nkPct: nkPct, herkunft: herkunft, dc: !!dc };
   }
-  function rechne(z) {
-    if (!window.DealKpis || !window.DealScore || !window.ScoreTier) return null;
+  /* einzelcheck-6 · Bewertung GENAU wie im Quick-Check (Marcel 25.11.2026: „wie im Quick Check bewerten. Und nicht
+     nochmal irgendwie was Gesondertes“). Bis hier rechnete der Deal-Check eine eigene Fassung (Wertpuffer pauschal
+     5 % des Kaufpreises, mstg 1,5), und der Bericht zeigte daneben den Investor Deal Score (DealScore2, 12 von 24
+     Kennzahlen, Herford: 43 „So nicht kaufen“). Jetzt derselbe Weg wie _dpPilotScore im Quick-Check über
+     js/qc-score-weg.js: Wertpuffer nur aus der Marktpreisindikation, Mietpotenzial aus der zulässigen Bestandsmiete
+     (§ 558), LTV gegen den Kaufpreis. opt { marktwert, mietPotPct, leerPct } kommen erst mit dem Marktbericht dazu,
+     wie im Quick-Check erst nach dem Abruf. */
+  function rechne(z, opt) {
+    if (!window.DpQcScore || !window.ScoreTier) return null;
+    opt = opt || {};
     var e = eingaben(z || {});
     if (!(e.kp > 0) || !(e.nkm > 0) || !(e.zins > 0)) return { fehlt: !(e.kp > 0) ? 'kp' : (!(e.nkm > 0) ? 'nkm' : 'zins'), e: e };
     var nk = e.kp * e.nkPct / 100, ek = e.grund ? e.ek : Math.round(e.kp * 0.10), d1 = Math.max(0, e.kp + nk - ek);
     var mitBwk = z && z.bwk_nul_jahr != null;
     var bwkNul = mitBwk ? z.bwk_nul_jahr : e.nkm * 12 * 0.17;   /* ohne Wirtschaftsplan: dieselbe Annahme wie der Deal-Check */
-    var k = DealKpis.compute({ kp: e.kp, nk: nk, nkm: e.nkm, ze: e.ze, uf: 0, bwk_ul: 0, bwk_nul: bwkNul, d1: d1, d1z: e.zins, d1t: e.tilg, ek: ek });
-    var ds = DealScore.computeFromKpis({ kp: e.kp, cf_m: k.cf_m, nmy: k.nmy, ltv: k.ltv, dscr: k.dscr, wp_kpi: e.kp * 0.05, mstg: 1.5,
-      darlehen: (k.d_total != null && isFinite(k.d_total)) ? k.d_total : null });
-    return { e: e, k: k, ds: ds, st: ScoreTier.stufe(ds.score), nk: nk, ek: ek, d1: d1, bwkNul: bwkNul, mitBwk: mitBwk };
+    var W = DpQcScore.rechne({ kp: e.kp, nk: nk, san: 0, nkm: e.nkm, ze: e.ze, leerstand_pct: opt.leerPct || 0, bwk_ul: 0, bwk_nul: bwkNul,
+      d1: d1, zins: e.zins, tilg: e.tilg, ek: ek, marktwert: opt.marktwert || 0, miet_potenzial_pct: opt.mietPotPct != null ? opt.mietPotPct : null, zustand: null });
+    if (!W) return null;
+    var k = W.k, ds = W.r;
+    return { e: e, k: k, ds: ds, K: W.K, st: ScoreTier.stufe(ds.score), nk: nk, ek: ek, d1: d1, bwkNul: bwkNul, mitBwk: mitBwk };
   }
   function kundenSatz(t) { return String(t || '').replace(/\s*[—–]\s*/g, ', ').replace(/;/g, ','); }
   function annahmeText(r) {
@@ -645,7 +654,7 @@
   function kaufBox() {
     if (!(INFO.amount_cents > 0)) return '<div class="ec-weg ec-weg-1"><b>Bericht</b><p>Der Bericht ist gerade nicht kaufbar. Bitte später noch einmal.</p></div>';
     return '<div class="ec-weg ec-weg-1"><span class="ec-l">Der komplette Bericht</span><b>' + (S.dateien.length > 1 ? 'Alle ' + S.dateien.length + ' Unterlagen, ' : S.dateien.length === 1 ? 'Deine Unterlage, ' : '') + 'Wertermittlung, Finanzierung und Marktbericht als PDF</b>'   /* einzelcheck-5 · ohne Unterlagen stand „Alle 1 Unterlagen“ */
-      + '<p>Bodenrichtwert, Ertrags-, Sach- und Vergleichswert mit dem führenden Verfahren, Finanzierung mit Restschuld und Anschlussfinanzierung, Investor Deal Score, Cashflow und DSCR, Mietpotenzial, Lage und Markt.</p>'
+      + '<p>Bodenrichtwert, Ertrags-, Sach- und Vergleichswert mit dem führenden Verfahren, Finanzierung mit Restschuld und Anschlussfinanzierung, Deal Score wie im Quick-Check, Cashflow und DSCR, Mietpotenzial, Lage und Markt.</p>'
       + '<div class="ec-tiefe" aria-live="polite"></div>'
       + '<div class="ec-preis">' + esc(preisText()) + '<small>einmalig, kein Abo</small></div>'
       + '<p class="ec-fein">Buchst du innerhalb von ' + INFO.frist_tage + ' Tagen ein Paket, rechnet DealPilot den Betrag an.</p>'
@@ -752,21 +761,71 @@
     var z = j.zahlen || {}, m = j.markt || { verfuegbar: false };
     var r = rechne(z);
     var d = { z: z, m: m, r: r, unterlagen: j.unterlagen || [], aus_zahlenstand: !!j.aus_zahlenstand, status: j.status || {}, stand: datum() };
-    /* Investor Deal Score: dieselbe Abbildung wie die Startbahn der Startseite (landing-faecher.js dealAus/rechne) */
-    if (r && r.k && window.DpFaecher && typeof DpFaecher.rechne === 'function' && window.DealScore2) {
-      var leerPct = (z.einheiten > 0 && z.leer_einheiten != null) ? z.leer_einheiten / z.einheiten * 100 : null;
-      var S2 = { kp: r.e.kp, nk_pct: r.e.nkPct, nkm: r.e.nkm, wfl: z.wfl || null, bwk_nul: r.bwkNul, d1: r.d1, zins: r.e.zins, tilg: r.e.tilg };
-      var vgl = m.vergleichsmiete && m.vergleichsmiete.qm; if (vgl > 0) S2.marktmiete = vgl; else if (m.markt && m.markt.miete_qm > 0) S2.marktmiete = m.markt.miete_qm;
-      if (m.markt && m.markt.wert > 0) S2.marktwert = m.markt.wert;
-      if (z.ek_klasse) S2.energieKlasse = z.ek_klasse;
-      if (leerPct != null) S2.leerstandPct = Math.round(leerPct * 10) / 10;
-      if (z.wfl > 0) { try { d.ds2 = DpFaecher.rechne(S2); } catch (e) { d.ds2 = null; } }
-    }
+    /* einzelcheck-6 · KEIN zweiter Score mehr. Hier stand der Investor Deal Score (DealScore2 über DpFaecher.rechne)
+       als Gesamturteil des Berichts, mit 12 von 24 Kennzahlen und ohne Lage (Herford: Lage 20/100 bei Mikrolage
+       96/100, weil die Lagewerte des Marktberichts nie in diese Abbildung gingen). Marcel 25.11.2026: bewerten wie
+       im Quick-Check. Der Deal Score unten ist derselbe wie dort. */
     /* Mietpotenzial: zulässige Bestandsmiete nach drei Jahren und Obergrenze bei Neuvermietung (js/mietpotenzial-kern.js) */
     if (r && r.k && z.wfl > 0 && window.DpMietpotenzial) d.miete = mietpotenzialAus(window.DpMietpotenzial, kappDaten, r.e.nkm, z.wfl, m);
+    /* Deal Score wie im Quick-Check, jetzt mit dem, was der Quick-Check nach dem Marktbericht-Abruf auch hat:
+       Marktpreisindikation als Marktwert (Wertpuffer) und zulässige Steigerung der Bestandsmiete (Mietpotenzial) */
+    if (r && r.k) {
+      var zul = d.miete && d.miete.zul;
+      var opt = { marktwert: (m.markt && m.markt.wert > 0) ? m.markt.wert : 0,
+        mietPotPct: (zul && zul.grund && zul.grund !== 'keine_miete' && zul.grund !== 'vertrag') ? zul.plus_pct : null,
+        leerPct: (z.einheiten > 0 && z.leer_einheiten != null) ? z.leer_einheiten / z.einheiten * 100 : 0 };
+      var r2 = rechne(z, opt); if (r2 && r2.k) { d.r = r = r2; d.opt = opt; }
+    }
     /* v3946 · Finanzierung wie im Investment-PDF (nur Kerne) */
     if (r && r.k && window.DpDarlehenWeitere && window.Dscr) d.fin = finanzierungAus(r, window.DpDarlehenWeitere, window.DealKpis, window.Dscr, ANSCHLUSS_ZINS);
+    if (r && r.k && r.ds) d.urteil = urteilAus(r, d.opt || {}, d.fin);
     return d;
+  }
+
+  /* ── einzelcheck-6 · URTEIL GETRENNT NACH OBJEKT UND FINANZIERUNG ─────────────────────────────────────────
+     Marcel 25.11.2026: „das Objekt ist ja gut, nur die Finanzierung trägt sich nicht“. Der Deal Score mischt
+     beides. Hier werden die Teilwerte desselben Scores (DealScore.computeFromKpis breakdown) nur sortiert:
+     Objekt = Rendite, Risiko, Potenzial · Finanzierung = Cashflow, Beleihung. Was es bräuchte, rechnet derselbe
+     Weg (DpQcScore.rechne) mit mehr Eigenkapital, nichts wird geschätzt. */
+  function ekFuer(r, opt, test, zinsAnders) {
+    var e = r.e, gi = e.kp + r.nk, lo = r.ek, hi = gi;
+    var lauf = function (ek, zins) {
+      return DpQcScore.rechne({ kp: e.kp, nk: r.nk, san: 0, nkm: e.nkm, ze: e.ze, leerstand_pct: opt.leerPct || 0, bwk_ul: 0, bwk_nul: r.bwkNul,
+        d1: Math.max(0, gi - ek), zins: zins, tilg: e.tilg, ek: ek, marktwert: opt.marktwert || 0, miet_potenzial_pct: opt.mietPotPct, zustand: null });
+    };
+    var z = zinsAnders > 0 ? zinsAnders : e.zins;
+    if (test(lauf(lo, z))) return 0;
+    if (!test(lauf(hi, z))) return null;
+    for (var i = 0; i < 40; i++) { var mid = (lo + hi) / 2; if (test(lauf(mid, z))) hi = mid; else lo = mid; }
+    return Math.ceil((hi - r.ek) / 1000) * 1000;   /* zusätzlich zu heute, auf 1.000 € aufgerundet */
+  }
+  function urteilAus(r, opt, fin) {
+    if (!window.DpQcScore) return null;
+    var b = {}; (r.ds.breakdown || []).forEach(function (c) { if (c.score != null) b[c.key] = Math.round(c.score); });
+    var mittel = function (l) { var x = l.filter(function (k) { return b[k] != null; }); return x.length ? Math.round(x.reduce(function (a, k) { return a + b[k]; }, 0) / x.length) : null; };
+    var objekt = mittel(['rendite', 'risiko', 'potenzial']), finz = mittel(['cashflow', 'ltv']);
+    var k = r.k, e = r.e, o = [], f = [], n = [];
+    if (k.nmy != null) o.push('Nettomietrendite ' + dez(k.nmy, 2) + ' %' + (b.rendite >= 70 ? ', für den Kaufpreis gut' : b.rendite >= 50 ? ', solide' : ', eher niedrig') + '.');
+    if (opt.marktwert > 0) { var ab = abstandPct(e.kp, opt.marktwert); o.push('Kaufpreis ' + dez(Math.abs(ab), 1) + ' % ' + (ab <= 0 ? 'unter' : 'über') + ' der Marktpreisindikation von ' + eur(opt.marktwert) + '.'); }   /* gleiche Rechnung wie „Kurz gesagt“ */
+    if (opt.mietPotPct != null) o.push(opt.mietPotPct > 0.05 ? 'Bestandsmiete darf in drei Jahren um ' + dez(opt.mietPotPct, 1) + ' % steigen.' : 'Die Miete liegt schon an der ortsüblichen Vergleichsmiete, eine Erhöhung ist kaum möglich.');
+    if (k.dscr != null) f.push('DSCR ' + dez(k.dscr, 2) + (k.dscr >= 1.2 ? ', die Miete trägt Zins und Tilgung mit Puffer.' : k.dscr >= 1 ? ', die Miete trägt Zins und Tilgung nur knapp.' : ', die Miete trägt Zins und Tilgung nicht.'));
+    if (k.ltv != null) f.push('Beleihung ' + dez(k.ltv, 0) + ' % des Kaufpreises' + (r.ek > 0 ? ', ' + eur(r.ek) + ' Eigenkapital.' : ', ohne Eigenkapital, auch die Nebenkosten sind finanziert.'));
+    if (fin && fin.anschluss && fin.anschluss.dscr != null) f.push('Im Anschluss bei ' + dez(fin.anschluss.zins, 1) + ' % Zins DSCR ' + dez(fin.anschluss.dscr, 2) + ', Cashflow ' + (fin.anschluss.cf_nach_m >= 0 ? '+' : '−') + eur(Math.abs(fin.anschluss.cf_nach_m)) + ' im Monat.');
+    if (k.dscr != null && k.dscr < 1.2) {
+      var ek12 = ekFuer(r, opt, function (w) { return w && (!(w.k.d_total > 0) || (w.k.dscr != null && w.k.dscr >= 1.2)); });   /* ohne Darlehen gibt es keinen DSCR */
+      if (ek12 != null) n.push('Für DSCR 1,2 heute: ' + eur(ek12) + ' mehr Eigenkapital.');
+    }
+    if (fin && fin.anschluss && fin.anschluss.cf_nach_m < 0) {
+      var ekA = ekFuer(r, opt, function (w) { return w && w.k.cf_m >= 0; }, fin.anschluss.zins);
+      if (ekA != null && ekA > 0) n.push('Damit der Cashflow auch bei ' + dez(fin.anschluss.zins, 1) + ' % Zins nicht negativ wird: ' + eur(ekA) + ' mehr Eigenkapital (gerechnet auf das heutige Darlehen, also vorsichtig).');
+    }
+    var satz = (objekt != null && finz != null)
+      ? (objekt >= 60 && finz < 50 ? 'Das Objekt überzeugt, die Finanzierung trägt es so noch nicht. Mit mehr Eigenkapital trägt sie sich.'
+        : objekt >= 60 && finz >= 50 ? 'Objekt und Finanzierung passen zusammen.'
+        : objekt < 60 && finz >= 50 ? 'Die Finanzierung trägt, das Objekt selbst ist schwächer. Preis und Miete genauer prüfen.'
+        : 'Objekt und Finanzierung sind beide schwach. So nicht kaufen, erst Preis und Finanzierung neu verhandeln.')
+      : '';
+    return { objekt: objekt, finanzierung: finz, b: b, satz: satz, objektPunkte: o, finanzPunkte: f, braucht: n };
   }
 
   /* ── v3946 · FINANZIERUNG WIE IM INVESTMENT-PDF ─────────────────────────────────────────────────────────
@@ -955,10 +1014,10 @@
   function zeigeBericht(d) {
     stufe(4); ++schritt;
     var r = d.r, z = d.z, m = d.m, an = d.status && d.status.anrechnung;
-    var ds2 = d.ds2 && d.ds2.r, g = ds2 && ds2.gesamt;
-    var kopf = (g ? '<div class="ec-urteil" data-farbe="' + esc((window.ScoreTier ? ScoreTier.stufe(g.score).farbe : '')) + '"><div class="ec-ring"><b>' + g.score + '</b><small>/ 100</small></div>'
-        + '<div><span class="ec-l">Investor Deal Score</span><div class="ec-wort">' + esc(g.empfehlung ? g.empfehlung.text : '') + '</div><p>Investment-Score ' + ds2.investment.score + ', Finanzierungs-Score ' + ds2.finanzierung.score + '.</p></div></div>'
-      : (r && r.k ? '<div class="ec-urteil" data-farbe="' + esc(r.st.farbe) + '"><div class="ec-ring"><b>' + r.ds.score + '</b><small>/ 100</small></div><div><span class="ec-l">Deal Score</span><div class="ec-wort">' + esc(r.st.wort) + '</div></div></div>' : ''));
+    /* einzelcheck-6 · ein Score wie im Quick-Check, darunter das Urteil Objekt gegen Finanzierung */
+    var u = d.urteil || {};
+    var kopf = (r && r.k ? '<div class="ec-urteil" data-farbe="' + esc(r.st.farbe) + '"><div class="ec-ring"><b>' + r.ds.score + '</b><small>/ 100</small></div><div><span class="ec-l">Deal Score wie im Quick-Check</span><div class="ec-wort">' + esc(r.st.wort) + '</div>'
+      + (u.objekt != null && u.finanzierung != null ? '<p>Objekt ' + u.objekt + ', Finanzierung ' + u.finanzierung + ' von 100. ' + esc(u.satz || '') + '</p>' : '') + '</div></div>' : '');
     /* v3946 · Wertindikation und Bodenrichtwert schon im Fenster */
     var w = (m && m.wert) || {}, wi = w.wertindikation, bo = w.boden || {};
     var wertZeile = (wi || bo.verfuegbar) ? '<div class="ec-kz">' + (wi ? '<div><span>Wertindikation, ' + esc(VW_KURZ[wi.verfahren] || '') + '</span><b>' + esc(eur(wi.wert_eur)) + '</b></div>' : '')
@@ -974,7 +1033,26 @@
         : '<p class="ec-fein">Das Objekt kommt mit den Zahlen in dein Konto, wenn du über eine der Karten unten startest.</p>')
       + '<div class="ec-pakete"><span class="ec-l">Weiter in DealPilot</span><div class="ec-pk"></div></div>', '.ec-pdf');
     paketeEinsetzen($('.ec-pk', inhalt), z, r, an ? an.code : null);
-    $('.ec-pdf', inhalt).addEventListener('click', function () { pdf(d); });
+    /* einzelcheck-6 · PDF vom PDF-Dienst (ohne Datum, Titel und Adresse des Browser-Druckfensters, Marcel 25.11.2026).
+       Antwortet der Dienst nicht, bleibt der bisherige Weg über das Druckfenster. */
+    $('.ec-pdf', inhalt).addEventListener('click', function () {
+      var knopf = this; if (knopf.disabled) return;
+      if (!tokenLesen()) { pdf(d); return; }
+      knopf.disabled = true; var alt = knopf.textContent; knopf.textContent = 'PDF entsteht …';
+      var fertig = function () { knopf.disabled = false; knopf.textContent = alt; };
+      logoAlsData().then(function () {
+        var doc = pdf(d, true);
+        if (!doc) { fertig(); pdf(d); return; }
+        doc.html = doc.html.split(location.origin + '/fonts/').join(appBasis() + 'fonts/');
+        return fetch(api('/pdf'), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token: tokenLesen(), html: doc.html, titel: doc.titel }) })
+          .then(function (res) { if (!res.ok) throw new Error('pdf ' + res.status); return res.blob(); })
+          .then(function (bl) {
+            var a = document.createElement('a'), url = URL.createObjectURL(bl);
+            a.href = url; a.download = ('DealPilot Einzel-Check ' + doc.titel).replace(/[^\wäöüÄÖÜß .,-]+/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 100) + '.pdf';
+            document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(url); a.remove(); }, 4000); fertig();
+          });
+      }).catch(function () { fertig(); pdf(d); });
+    });
     mailVerdrahten(d);
     fotoWahl(d);
   }
@@ -1229,7 +1307,10 @@
       /* einzelcheck-2 · ein Vergleichswert ohne amtliche Kaufpreisbasis (Stufe M) sagt das im Namen */
       return [v.name + rolle + (v.art === 'vergleichswert' && v.stufe === 'M' ? ', mangels amtlicher Kaufpreise aus Angebotspreisen' : ''), D.eur(v.wert_eur), { det: det, art: v.art === w.fuehrend ? 'ende' : '' }];
     });
-    out += '<div class="block"><h3>Wertermittlung nach ImmoWertV</h3>' + D.liste(zl, ['Verfahren', 'Wert']) + '</div>';
+    var amtlich = wi && (wi.stufe || (wi.verfahren === 'sachwert' ? 'A' : null)) === 'A';   /* einzelcheck-6 · „nach ImmoWertV“ nur mit amtlicher Basis */
+    out += '<div class="block"><h3>' + (amtlich ? 'Wertermittlung nach ImmoWertV' : 'Verfahren der Wertermittlung') + '</h3>' + D.liste(zl, ['Verfahren', 'Wert']) + '</div>';
+    /* einzelcheck-6 · ab hier eigene Seite (Herford: die Seite lief über, Seite 7 trug nur noch den Hinweis) */
+    out += '<!--MPI-->';
     /* einzelcheck-2 (Marcel 24.11.2026: „klar unterscheiden … Marktpreisindikation auf Angebotspreisen und
        Vergleichswertverfahren"): eigener Block, eigene Überschrift, nie in der Verfahrenstabelle */
     if (m.markt && m.markt.wert > 0) out += '<div class="block"><h3>Marktpreisindikation aus Angebotspreisen</h3>'
@@ -1251,6 +1332,7 @@
   function fazit(d) {
     var r = d.r, f = d.fin, w = d.m && d.m.wert, s = [];
     var wi = w && w.wertindikation;
+    if (d.urteil && d.urteil.satz) s.push(d.urteil.satz);   /* einzelcheck-6 · Objekt gegen Finanzierung zuerst */
     if (wi && r && r.e.kp > 0) { var a = abstandPct(r.e.kp, wi.wert_eur); s.push('Der Kaufpreis liegt ' + dez(Math.abs(a), 1) + ' % ' + (a >= 0 ? 'über' : 'unter') + ' der Wertindikation von ' + eur(wi.wert_eur) + ' (' + VW_KURZ[wi.verfahren] + ', indikativ).'); }
     if (r && r.k) s.push('Nach Zins und Tilgung bleiben im Monat ' + eurS(r.k.cf_m) + ' vor Steuern, der DSCR liegt bei ' + dez(r.k.dscr, 2) + '.');
     if (f && f.anschluss) s.push('Nach ' + f.bindung.jahre + ' Jahren sind noch ' + eur(f.bindung.rs) + ' offen. Mit ' + dez(f.anschluss.zins, 1) + ' % im Anschluss ' + (Math.abs(f.anschluss.mehr_m) < 0.5 ? 'bleibt die Rate gleich.' : (f.anschluss.mehr_m > 0 ? 'steigt' : 'sinkt') + ' die Rate um ' + eur(Math.abs(f.anschluss.mehr_m)) + ' im Monat.'));
@@ -1319,18 +1401,30 @@
     }
 
     /* Wertermittlung */
-    seiten.push(D.seite(c, 'Wertermittlung', D.abschnitt('Wertermittlung nach ImmoWertV', 'Bodenrichtwert und Verfahren',
-      'Wertermittlungsstichtag ' + (stichtagText(m.stichtag) || d.stand) + '. Gerechnet mit dem Marktbericht von DealPilot auf Stufe 3, mit amtlichen Werten der Gutachterausschüsse.') + wertSeite(D, m, r)));
+    /* einzelcheck-6 · Kopf nach Datenlage: „nach ImmoWertV“ nur, wenn das führende Verfahren mit amtlichen Daten rechnet
+       (Stufe A). Führt der Vergleichswert aus Angebotspreisen (Stufe M), ist das kein Verfahren nach ImmoWertV. */
+    var wiAmtlich = wi && (wi.stufe || (wi.verfahren === 'sachwert' ? 'A' : null)) === 'A';
+    var ws = wertSeite(D, m, r), wsTeil = ws.split('<!--MPI-->');
+    var wKopf = D.abschnitt(wiAmtlich ? 'Wertermittlung nach ImmoWertV' : 'Wertermittlung, indikativ', 'Bodenrichtwert und Verfahren',
+      'Wertermittlungsstichtag ' + (stichtagText(m.stichtag) || d.stand) + '. Gerechnet mit dem Marktbericht von DealPilot auf Stufe 3, mit den amtlichen Werten der Gutachterausschüsse, soweit es sie gibt.');
+    seiten.push(D.seite(c, 'Wertermittlung', wKopf + wsTeil[0]));
+    if (wsTeil[1] && wsTeil[1].trim()) seiten.push(D.seite(c, 'Marktpreis', D.abschnitt('Wertermittlung', 'Marktpreis und Einordnung', 'Was der Markt gerade anbietet, und welches Verfahren hier führt.') + wsTeil[1]));
 
-    /* Investor Deal Score */
-    if (ds2 && g) {
-      var gruppen = function (t) { return (t.gruppen || []).filter(function (x) { return istZahl(x.score); }).map(function (x) { return [x.name || x.titel || x.key || '', Math.round(x.score) + ' / 100']; }); };
-      seiten.push(D.seite(c, 'Investor Deal Score', D.abschnitt('Gesamturteil', 'Investor Deal Score', 'Gerechnet mit dem Kern der App (Profil Standard) aus deinen Grundangaben und Unterlagen.')
-        + D.scoreRing(g.score, g.empfehlung ? g.empfehlung.text : '')
-        + D.kacheln([{ l: 'Investment-Score', v: ds2.investment.score + ' / 100', s: 'Anteil ' + dez(ds2.investment.anteil, 1) + ' %', art: ds2.investment.score >= 70 ? 'gut' : '' },
-          { l: 'Finanzierungs-Score', v: ds2.finanzierung.score + ' / 100', s: ds2.finanzierung.gedeckelt ? 'begrenzt durch den DSCR' : 'Anteil ' + dez(ds2.finanzierung.anteil, 1) + ' %', art: ds2.finanzierung.score >= 70 ? 'gut' : '' },
-          { l: 'Gesamturteil', v: g.empfehlung ? g.empfehlung.text : 'offen', s: d.ds2.belastbar ? 'belastbar' : 'noch wenige Kennzahlen (' + d.ds2.n + ' von ' + d.ds2.von + ')', art: 'hi' }], true)
-        + '<div class="zwei"><div><h3>Investment</h3>' + D.liste(gruppen(ds2.investment), ['Gruppe', 'Punkte']) + '</div><div><h3>Finanzierung</h3>' + D.liste(gruppen(ds2.finanzierung), ['Gruppe', 'Punkte']) + '</div></div>'));
+    /* einzelcheck-6 · Deal Score wie im Quick-Check (statt Investor Deal Score), dazu das Urteil getrennt nach
+       Objekt und Finanzierung und was es bräuchte (Marcel 25.11.2026) */
+    if (r && r.k && r.ds) {
+      var u = d.urteil || {}, b = u.b || {};
+      var SUB = [['rendite', 'Rendite'], ['risiko', 'Risiko'], ['potenzial', 'Potenzial und Wertpuffer'], ['cashflow', 'Cashflow'], ['ltv', 'Beleihung']];
+      var punkte = function (l) { return l && l.length ? '<ul>' + l.map(function (x) { return '<li>' + D.esc(x) + '</li>'; }).join('') + '</ul>' : ''; };
+      seiten.push(D.seite(c, 'Deal Score', D.abschnitt('Gesamturteil', 'Deal Score', 'Dieselbe Bewertung wie im Quick-Check von DealPilot, aus deinen Grundangaben, Unterlagen und dem Marktbericht.')
+        + D.scoreRing(r.ds.score, r.st.wort)
+        + D.kacheln([{ l: 'Das Objekt', v: u.objekt != null ? u.objekt + ' / 100' : 'offen', s: 'Rendite, Risiko, Potenzial', art: u.objekt >= 60 ? 'gut' : '' },
+          { l: 'Die Finanzierung', v: u.finanzierung != null ? u.finanzierung + ' / 100' : 'offen', s: 'Cashflow und Beleihung', art: u.finanzierung >= 60 ? 'gut' : (u.finanzierung != null && u.finanzierung < 40 ? 'schlecht' : '') },
+          { l: 'Gesamturteil', v: r.st.wort, s: r.ds.deckel ? kundenSatz(typeof r.ds.deckel === 'string' ? r.ds.deckel : (r.ds.deckel.text || r.ds.deckel.grund || '')) : 'Deal Score ' + r.ds.score + ' von 100', art: 'hi' }], true)
+        + (u.satz ? '<p><b>' + D.esc(u.satz) + '</b></p>' : '')
+        + '<div class="zwei"><div><h3>Das Objekt</h3>' + punkte(u.objektPunkte) + '</div><div><h3>Die Finanzierung</h3>' + punkte(u.finanzPunkte) + '</div></div>'
+        + (u.braucht && u.braucht.length ? '<h3>Was es bräuchte</h3>' + punkte(u.braucht) : '')
+        + '<h3>Teilwerte</h3>' + D.liste(SUB.filter(function (x) { return b[x[0]] != null; }).map(function (x) { return [x[1], b[x[0]] + ' / 100']; }), ['Teil', 'Punkte'])));
     }
 
     /* Mietpotenzial */
@@ -1357,7 +1451,8 @@
       if (m.markt && istZahl(m.markt.miete_trend_pct)) trends.push('Angebotsmieten ' + tr(m.markt.miete_trend_pct));
       seiten.push(D.seite(c, 'Lage und Markt', D.abschnitt('Der Standort', 'Lage und Markt', 'Stichtag ' + (stichtagText(m.stichtag) || d.stand) + '. Ermittelt mit dem Marktbericht von DealPilot.')
         + (lz.length ? D.kacheln(lz) : '<p>Für diesen Ort liegen keine Lagekennzahlen vor.</p>')
-        + (istZahl(m.lage.bevoelkerung_trend_pct) ? '<p>Bevölkerung in der Region: ' + (m.lage.bevoelkerung_trend_pct >= 0 ? '+' : '−') + D.zahl(Math.abs(m.lage.bevoelkerung_trend_pct), 1) + ' %.</p>' : '')
+        /* einzelcheck-6 · „−0,0 %“ war unter 0,05 gerundet: das heißt stabil, mit Vorzeichen nur ab 0,1 */
+        + (istZahl(m.lage.bevoelkerung_trend_pct) ? '<p>Bevölkerung in der Region: ' + (Math.abs(m.lage.bevoelkerung_trend_pct) < 0.05 ? 'stabil' : (m.lage.bevoelkerung_trend_pct > 0 ? '+' : '−') + D.zahl(Math.abs(m.lage.bevoelkerung_trend_pct), 1) + ' %') + '.</p>' : '')
         + (trends.length ? '<p>Entwicklung: ' + D.esc(trends.join(', ')) + '.</p>' : '')
         /* einzelcheck-2 · die Marktpreisindikation steht nur noch im Kapitel Wertermittlung (dort getrennt von den Verfahren) */
         + '<div class="hinweis">Indikative Werte, kein Verkehrswertgutachten nach § 194 BauGB. Jede Zahl nennt ihre Herkunft. Fehlt eine Zahl, erfindet DealPilot keine.</div>'));
