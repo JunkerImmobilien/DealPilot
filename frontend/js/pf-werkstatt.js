@@ -468,7 +468,9 @@
     _offen = true; _vorher = document.activeElement; _rueck = []; stil();
     /* v4985 · Runde 4: Aufbau und Klassen wie das Einstellungen-Fenster (settings.js, help.js): global-view-overlay,
        set-modal-v2 set-modal-cream, dp-modal-topband (Markenleiste + goldener Kopf), modal-side mit .ms-tab-Reitern,
-       set-modal-content mit pane-wrap und settings-footer (btn-ghost, btn-gold). Das Raster setzt stil() unter #dp-pw. */
+       set-modal-content mit pane-wrap und settings-footer (btn-ghost, btn-gold). Das Raster setzt stil() unter #dp-pw.
+       Bewusst OHNE .settings-tabs: reseller-portal, mandant-freigaben und netzwerk-einreichung hängen ihre Reiter in die
+       erste .settings-tabs der Seite (gemessen: „Partner-Verwaltung“ erschien hier). */
     var p = document.createElement('div'); p.id = 'dp-pw'; p.className = 'pw global-view-overlay'; p.setAttribute('role', 'dialog'); p.setAttribute('aria-modal', 'true'); p.setAttribute('aria-labelledby', 'pw-t');
     _kzCache = {};
     var X = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>';
@@ -478,7 +480,7 @@
       + '<div class="dp-mtb-hero dp-mtb-hero-titled"><div class="dp-mtb-h-title" id="pw-t">Ansicht anpassen</div>'
       + '<div class="dp-mtb-h-sub">Links eine Gruppe wählen, Bausteine anklicken oder in den Arbeitsbereich ziehen. Alles speichert sofort.</div></div></div>'
       + '<aside class="modal-side"><div class="ms-h"><div class="ms-title"><span class="gold">Bausteine</span></div><div class="ms-sub">Gruppen des Cockpits</div></div>'
-      + '<div class="settings-tabs ms-tabs pw-ptabs" role="tablist" aria-label="Gruppen"></div></aside>'
+      + '<div class="ms-tabs pw-ptabs" role="tablist" aria-label="Gruppen"></div></aside>'
       + '<div class="set-modal-content"><div class="pane-wrap pw-pane">'
       + '<div class="pw-vlw"><span class="pw-h">Vorlagen</span><div class="pw-vl"></div></div>'
       + '<div class="pw-body"><div class="pw-pal" aria-label="Bausteine zum Hinzufügen"><div class="pw-pliste" role="tabpanel"></div></div>'
@@ -575,7 +577,7 @@
       '.pw-v.an{border-color:' + G + ';box-shadow:0 0 0 1.5px ' + G + ' inset;background:' + W4 + '}',
       '.pw-vm{display:block;width:100%;border-radius:6px;background:#fff;border:1px solid ' + G25 + '}',
       /* Echte Mini-Bilder */
-      '.pw-mini{position:relative;overflow:hidden;pointer-events:none}', '.pw-mini-in{transform-origin:0 0;position:absolute;left:0;top:0}',
+      '.pw-mini{position:relative;overflow:hidden;pointer-events:none}', '#dp-pw .pw-mini-in > *,#dp-pw .pw-mini-in > * > *,#dp-pw .pw-mini-in > * > * > *{min-height:0 !important;height:auto !important}',   /* Hülle erbt sonst min-height 100vh: Leerfläche unter dem Score */ '.pw-mini-in{transform-origin:0 0;position:absolute;left:0;top:0}',
       '.pw-body{flex:1;display:grid;grid-template-columns:272px minmax(0,1fr);min-height:0}',
       '.pw-pal{display:flex;flex-direction:column;min-height:0;border-right:1px solid ' + G25 + ';background:#fff}',
       '.pw-pleer{font:400 12px/1.5 Inter,sans-serif;color:' + M + ';margin:4px 2px}',
