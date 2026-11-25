@@ -3879,14 +3879,18 @@
   }
   function applyQcPending(targets) {
     var n = 0, applied = [];
-    var _mitUnterlagen = !!(_qcPendingMerged._dok_auswertung && (!targets || targets._dok_auswertung));
+    /* v4740 · die Auswertung der Unterlagen ist ein Gedächtnis, kein Wert zur Wahl: sie wandert IMMER mit,
+       auch ohne Haken im Übernahme-Fenster (Marcel: nichts darf verloren gehen). Bis v4739 hing daran auch die
+       automatische Pilot-Analyse und lief deshalb nur nach „Alle übernehmen“. */
+    var _mitUnterlagen = !!_qcPendingMerged._dok_auswertung;
     _qcUebergabe = true;
     var _E = window.DpEingang && window.DpEingang.txStart ? window.DpEingang : null, _proItem = [];   /* v4700 */
     try {
     Object.keys(_qcPendingMerged).forEach(function (id) {
-      if (targets && !targets[id]) return;
+      var _immer = (id === '_dok_auswertung');   /* v4740 */
+      if (targets && !targets[id] && !_immer) return;
       var it = _qcPendingMerged[id]; if (!it) return;
-      if (!targets && it._aus) return;   /* v3349 · ohne Auswahl nur, was im Import angehakt war */
+      if (!targets && it._aus && !_immer) return;   /* v3349 · ohne Auswahl nur, was im Import angehakt war */
       if (_E) _E.txStart();
       var _vor = _E ? _E.feldStand(id) : null;
       var _art2 = _wertSchreiben(id, it);

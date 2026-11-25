@@ -304,7 +304,16 @@
     });
     (d.streu || []).forEach(function (q) { if (q.v == null || q.j < X[0] || q.j > X[n - 1]) return; var form = q.raute ? '<path d="M' + f1(xs(q.j)) + ',' + f1(ys(q.v) - 7) + ' L' + f1(xs(q.j) + 7) + ',' + f1(ys(q.v)) + ' L' + f1(xs(q.j)) + ',' + f1(ys(q.v) + 7) + ' L' + f1(xs(q.j) - 7) + ',' + f1(ys(q.v)) + ' Z"' : '<circle cx="' + f1(xs(q.j)) + '" cy="' + f1(ys(q.v)) + '" r="' + (q.r || 6) + '"';
       out.push(form + ' class="gx-fade" style="' + (q.hohl ? 'fill:' + F.karte + ';stroke:' + (q.farbe || F.gold) + ';stroke-width:2' : 'fill:' + (q.farbe || F.gold) + ';stroke:' + F.karte + ';stroke-width:2') + '"/>'); });
-    (d.marken || []).forEach(function (mk) { if (mk.j < X[0] || mk.j > X[n - 1]) return; var x = xs(mk.j); out.push('<line x1="' + f1(x) + '" x2="' + f1(x) + '" y1="' + m.t + '" y2="' + (H - m.b) + '" style="stroke:' + (mk.farbe || F.gold) + ';stroke-dasharray:3 3;opacity:.8"/><text class="gx-ax" x="' + f1(Math.min(x + 5, W - m.r - 4)) + '" y="' + (m.t + 22 + (mk.zeile || 0) * 14) + '" text-anchor="' + (x > W - 140 ? 'end' : 'start') + '" style="fill:' + (mk.farbe || F.goldH) + '">' + esc(mk.text) + '</text>'); });
+    /* v4740 · Markenbeschriftungen kollisionsfrei: jede Marke bekommt die erste Zeile, in der sie keine schon gesetzte
+       überdeckt (Breite geschätzt 6,9 px je Zeichen bei 11 px Mono), Zeilenabstand 16 statt 14. Gemessen bis v4739 bei
+       340 px: „ab hier Steuer“, „nach Steuer im Plus“ und „Ende Zinsbindung“ lagen übereinander (Textbox 15 px hoch). */
+    var mkBel = [];
+    (d.marken || []).forEach(function (mk) { if (mk.j < X[0] || mk.j > X[n - 1]) return; var x = xs(mk.j);
+      var bw = String(mk.text || '').length * 6.9, ende = x > W - 140, tx = ende ? Math.min(x - 5, W - m.r - 4) : Math.min(x + 5, W - m.r - 4 - bw);
+      var lo = ende ? tx - bw : tx, hi = ende ? tx : tx + bw, z = 0;
+      while (mkBel.some(function (b) { return b.z === z && lo < b.hi + 6 && b.lo - 6 < hi; }) && z < 6) z++;
+      mkBel.push({ z: z, lo: lo, hi: hi });
+      out.push('<line x1="' + f1(x) + '" x2="' + f1(x) + '" y1="' + m.t + '" y2="' + (H - m.b) + '" style="stroke:' + (mk.farbe || F.gold) + ';stroke-dasharray:3 3;opacity:.8"/><text class="gx-ax" x="' + f1(tx) + '" y="' + (m.t + 22 + z * 16) + '" text-anchor="' + (ende ? 'end' : 'start') + '" style="fill:' + (mk.farbe || F.goldH) + '">' + esc(mk.text) + '</text>'); });
     /* Treffer je Jahr */
     var dx = (W - m.l - m.r) / Math.max(1, n - 1);
     X.forEach(function (j, i) { if (!d.tip) return; out.push('<rect x="' + f1(xs(j) - dx / 2) + '" y="' + m.t + '" width="' + f1(dx) + '" height="' + (H - m.t - m.b) + '" style="fill:transparent"' + tipA(d.tip(i, j)) + '/>'); });
