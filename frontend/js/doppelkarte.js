@@ -279,6 +279,33 @@
   function dreiAus() {
     document.documentElement.removeAttribute('data-dk-drei');
   }
+  /* v4650 · drei Gestaltungen des Umschalters zur Wahl (Marcel 25.11.2026: „cooler darstellen“).
+     html[data-dk-stil] = pille | reiter | runway. Ohne Attribut gilt die Optik von v4600.
+     Wahl per ?dkstil=pille|reiter|runway|alt (wird gemerkt) oder DpDkStil('…').
+     Standard nur auf Staging-Hosts: pille. Auf Prod bleibt ohne Wahl die bisherige Optik. */
+  var DK_STILE = { pille: 1, reiter: 1, runway: 1, alt: 1 };
+  function dkStil() {
+    var w = null;
+    try { var m = /[?&]dkstil=([a-z]+)/.exec(location.search || ''); if (m && DK_STILE[m[1]]) { w = m[1]; localStorage.setItem('dp_dk_stil', w); } } catch (e) {}
+    if (!w) { try { var g = localStorage.getItem('dp_dk_stil'); if (g && DK_STILE[g]) w = g; } catch (e) {} }
+    if (!w) w = /staging/i.test(String(location.hostname || '')) ? 'pille' : 'alt';
+    if (w === 'alt') document.documentElement.removeAttribute('data-dk-stil');
+    else document.documentElement.setAttribute('data-dk-stil', w);
+    return w;
+  }
+  window.DpDkStil = function (w) {
+    if (!DK_STILE[w]) return dkStil();
+    try { localStorage.setItem('dp_dk_stil', w); } catch (e) {}
+    return dkStil();
+  };
+  function dkIco(art) {
+    var p = art === 'aktionen'
+      ? '<rect x="3.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.6"/><path d="M17 13.5v7M13.5 17h7"/>'
+      : art === 'ankauf'
+        ? '<circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/><path d="M8.5 11.5l2 2 3.5-4"/>'
+        : '<path d="M4 11.2L12 4.5l8 6.7"/><path d="M6.5 9.5V20h11V9.5"/><path d="M10.2 20v-5.2h3.6V20"/>';
+    return '<svg class="dk-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">' + p + '</svg>';
+  }
   function dreiAktivSetzen() {
     var s = el('dk-schalter');
     if (!s || !s.classList.contains('dk-drei')) return;
@@ -470,13 +497,15 @@
       var tipX = 'Aktionen: Ansichten, Anlegen, Ausgeben und System.';
       /* v4650 · Marcel 25.11.2026: „Aktion müsste genau auf die andere Seite, also links hin" */
       var htmlDrei =
-          '<button type="button" data-dk-modus="aktionen" class="dk-seg dk-drei-seg" title="' + tipX + '"><span>Aktionen</span></button>'
-        + '<button type="button" data-dk-modus="ankauf" class="dk-seg dk-drei-seg" title="' + tipA + '"><span>Ankauf</span><b>' + nA + '</b></button>'
-        + '<button type="button" data-dk-modus="bestand" class="dk-seg dk-drei-seg" title="' + tipB + '"><span>Bestand</span><b>' + nB + '</b></button>';
+          '<i class="dk-pille" aria-hidden="true"></i>'
+        + '<button type="button" data-dk-modus="aktionen" class="dk-seg dk-drei-seg" title="' + tipX + '">' + dkIco('aktionen') + '<span>Aktionen</span><b class="dk-ohne">&nbsp;</b></button>'
+        + '<button type="button" data-dk-modus="ankauf" class="dk-seg dk-drei-seg" title="' + tipA + '">' + dkIco('ankauf') + '<span>Ankauf</span><b>' + nA + '</b></button>'
+        + '<button type="button" data-dk-modus="bestand" class="dk-seg dk-drei-seg" title="' + tipB + '">' + dkIco('bestand') + '<span>Bestand</span><b>' + nB + '</b></button>';
       if (s.getAttribute('data-drei-html') !== htmlDrei) {
         s.innerHTML = htmlDrei;
         s.setAttribute('data-drei-html', htmlDrei);
       }
+      dkStil();
       s.classList.add('dk-drei');
       s.setAttribute('role', 'tablist');
       document.documentElement.setAttribute('data-dk-drei', '');
