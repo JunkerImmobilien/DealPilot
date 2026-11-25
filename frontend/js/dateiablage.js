@@ -1,31 +1,35 @@
-/* v3163 · VORERST NICHT EINGEBUNDEN. Marcel 03.11.2026: „lesen wir die nur aus und verwerfen die später … dann haben
-   wir die Mietverträge nicht auf unserem Server“. Datei und Server-Teil (routes/dateien.js) bleiben für den Fall, dass
-   eine Ablage gewünscht wird; index.html lädt die Datei nicht, der Eingang legt nichts ab.
-   dateiablage.js — v3162 · UNTERLAGEN-ABLAGE JE OBJEKT (Ordner mit Unterordnern)
-   ───────────────────────────────────────────────────────────────────────────
-   Marcel 03.11.2026: „auf unserem Server speichern … Struktur Ordner mit Unterordnern möglich?“
-   Backend: routes/dateien.js (verschlüsselt, Grenzen je Plan). Hier:
-     · DpAblage.html()      Karte für Pilot-Analyse › Unterlagen & WEG (füllt sich selbst)
-     · DpAblage.ablegen()   eine Datei in einen Ordner des Objekts (vom Eingang und Beleg-Leser genutzt)
-     · DpAblage.ordnerFuer() Standardordner je Dokumentart
-   Ordner sind Pfade („Rechnungen/2026/Reisekosten“); ein leerer Ordner entsteht, sobald etwas hineinkommt. */
+/* dateiablage.js — v4860 · MEINE DOKUMENTE (Dokumentenablage je Objekt)
+   ─────────────────────────────────────────────────────────────────────────────────────────────────────────
+   Marcel 25.11.2026: „Die Dokumentenablage für den Kunden macht ja schon Sinn … Kann der Kunde dann sehen, welche
+   Belege er da hat und die auch gegebenenfalls pro Jahr dann wieder löschen?“ — freigegeben: „machst du fertig“.
+   Vorlage: design/Vorschläge/dokumentenablage-2026-11-25.md. Server: routes/dateien.js, services/dateiAblage.js
+   (AES-256-GCM, Grenzen je Plan: Free keine Ablage · Starter 500 MB · Investor 1 GB · Pro 3 GB · Business 25 GB ·
+   Partner 5 GB, Datei höchstens 20 MB).
+     · DpAblage.html()          Karte „Meine Dokumente“ in Haus & Unterlagen (füllt sich selbst), je Jahr gruppiert
+     · DpAblage.ablegen()       eine Datei ablegen (vom Eingang und der Quick-Check-Übergabe, Häkchen „Original aufbewahren“)
+     · DpAblage.stand()         Speicherstand (Promise, gemerkt), darf_ablegen = Plan mit Ablage
+     · DpAblage.oeffnen(id)     Original ansehen bzw. herunterladen (aus dem Verlauf „Eingelesen und übernommen“)
+     · DpAblage.loeschenDatei() eine Datei löschen (vom Verlauf, nach Rückfrage)
+     · DpAblage.bestaetigen()   Rückfrage-Fenster: schließt nie per Klick daneben, nur Knopf, × oder Esc
+   v3162 (Ordner, Hochladen) bleibt erhalten. */
 (function () {
   'use strict';
   if (window.DpAblage) return;
 
   var STANDARD = ['Kauf & Objekt', 'Finanzierung', 'Mietverträge', 'WEG', 'Steuer', 'Rechnungen', 'Bewertung', 'Sonstiges'];
-  var _offen = {}, _ziel = '', _scharf = null;
+  var _offen = {}, _ziel = '', _standP = null;
 
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
-  function mb(b) { return b >= 1048576 ? (b / 1048576).toFixed(1).replace('.', ',') + ' MB' : Math.max(1, Math.round(b / 1024)) + ' KB'; }
+  function mb(b) { b = Number(b) || 0; return b >= 1073741824 ? (b / 1073741824).toFixed(1).replace('.', ',') + ' GB' : b >= 1048576 ? (b / 1048576).toFixed(1).replace('.', ',') + ' MB' : Math.max(1, Math.round(b / 1024)) + ' KB'; }
   function obj() { return window._currentObjKey || null; }
   function token() { try { return localStorage.getItem('ji_token') || ''; } catch (e) { return ''; } }
   function basis() { return (typeof window.getApiBase === 'function') ? window.getApiBase() : '/api/v1'; }
+  function datum(d) { try { return new Date(d).toLocaleDateString('de-DE'); } catch (e) { return ''; } }
 
   /** Standardordner je Dokumentart (Eingang): typ = rechnung | expose | market | dokument; label = erkannte Art */
   function ordnerFuer(typ, label, jahr) {
     var l = String(label || '').toLowerCase(), j = jahr ? '/' + jahr : '';
-    if (typ === 'rechnung') return 'Rechnungen' + (jahr ? '/' + jahr : '/ohne Jahr');
+    if (typ === 'rechnung') return 'Rechnungen' + (jahr ? '/' + jahr : '');
     if (typ === 'expose') return 'Kauf & Objekt/Exposé';
     if (typ === 'market') return 'Bewertung';
     if (/mietvertrag|mieterliste|mietaufstellung/.test(l)) return 'Mietverträge';
@@ -35,6 +39,14 @@
     if (/darlehen|finanzierung|bank|grundschuld/.test(l)) return 'Finanzierung';
     if (/steuer|bescheid/.test(l)) return 'Steuer' + j;
     return 'Sonstiges';
+  }
+
+  /** Speicherstand, einmal je Sitzung geholt (neu = true holt frisch) */
+  function stand(neu) {
+    if (_standP && !neu) return _standP;
+    if (!window.Auth || typeof Auth.apiCall !== 'function') return Promise.resolve(null);
+    _standP = Auth.apiCall('/dateien/speicher').then(function (s) { return s || null; }, function () { _standP = null; return null; });
+    return _standP;
   }
 
   /** Eine Datei ablegen. opts = { objekt, ordner, quelle, meta, name } → Antwort des Servers (oder { fehler }) */
@@ -51,135 +63,162 @@
       .then(function (r) { return r.json().then(function (j) { return r.ok ? j : { fehler: (j && j.error) || ('Fehler ' + r.status), status: r.status }; }); })
       .catch(function () { return { fehler: 'Netzwerkfehler' }; });
   }
-  /** mehrere Dateien nacheinander; gibt { ok, doppelt, fehler:[] } zurück */
+  /** mehrere Dateien nacheinander; gibt { ok, doppelt, fehler:[], ids:{name:id} } zurück */
   function ablegenAlle(liste, opts) {
-    var erg = { ok: 0, doppelt: 0, fehler: [] }, i = 0;
+    var erg = { ok: 0, doppelt: 0, fehler: [], ids: {} }, i = 0;
     return new Promise(function (fertig) {
       (function weiter() {
-        if (i >= liste.length) return fertig(erg);
+        if (i >= liste.length) { _standP = null; return fertig(erg); }
         var x = liste[i++];
-        ablegen(x.file, Object.assign({}, opts || {}, { ordner: x.ordner || (opts && opts.ordner) })).then(function (r) {
-          if (r && r.fehler) erg.fehler.push((x.file.name || 'Datei') + ': ' + r.fehler); else if (r && r.doppelt) erg.doppelt++; else erg.ok++;
+        ablegen(x.file, Object.assign({}, opts || {}, { ordner: x.ordner || (opts && opts.ordner), meta: x.meta || (opts && opts.meta) })).then(function (r) {
+          if (r && r.fehler) erg.fehler.push((x.file.name || 'Datei') + ': ' + r.fehler);
+          else { if (r && r.doppelt) erg.doppelt++; else erg.ok++; if (r && r.id) erg.ids[x.name || x.file.name] = r.id; }
           weiter();
         });
       })();
     });
   }
 
-  function baum(dateien) {
-    var wurzel = { kinder: {}, dateien: [] };
-    dateien.forEach(function (d) {
-      var k = wurzel;
-      (d.ordner ? d.ordner.split('/') : []).forEach(function (t) { k = (k.kinder[t] = k.kinder[t] || { kinder: {}, dateien: [] }); });
-      k.dateien.push(d);
+  /* ── Rückfrage-Fenster (Marcel 24.11.: nie per Klick daneben schließen; DealPilot-Design, Whitelabel) ── */
+  function bestaetigen(titel, text, knoepfe) {
+    knoepfe = knoepfe || [{ wert: true, text: 'Löschen', rot: true }, { wert: false, text: 'Abbrechen' }];
+    return new Promise(function (fertig) {
+      var ov = document.createElement('div');
+      ov.className = 'dp-ab-ov';
+      ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-modal', 'true');
+      ov.style.cssText = 'position:fixed;inset:0;z-index:100000;background:rgba(5,5,5,.55);display:flex;align-items:center;justify-content:center;padding:16px';
+      var kn = knoepfe.map(function (k, i) {
+        return '<button type="button" data-ab-wahl="' + i + '" style="font:600 13px/1 inherit;padding:10px 14px;border-radius:8px;cursor:pointer;'
+          + (k.rot ? 'background:#B8625C;color:#fff;border:1px solid #B8625C' : k.haupt ? 'background:var(--wl-c9a84c,#C9A84C);color:#050505;border:1px solid var(--wl-c9a84c,#C9A84C)' : 'background:transparent;color:inherit;border:1px solid rgba(42,39,39,.25)')
+          + '">' + esc(k.text) + '</button>';
+      }).join('');
+      ov.innerHTML = '<div style="background:#FDFCFA;color:#050505;max-width:440px;width:100%;border-radius:14px;border-top:3px solid var(--wl-c9a84c,#C9A84C);box-shadow:0 18px 48px rgba(0,0,0,.35);padding:20px 20px 16px;font-family:Inter,system-ui,sans-serif;position:relative">'
+        + '<button type="button" data-ab-wahl="x" aria-label="Schließen" style="position:absolute;top:10px;right:12px;border:0;background:transparent;font-size:20px;cursor:pointer;color:inherit">×</button>'
+        + '<div style="font:600 16px/1.3 \'Space Grotesk\',Inter,sans-serif;margin:0 24px 8px 0">' + esc(titel) + '</div>'
+        + '<div style="font-size:13.5px;line-height:1.5;margin-bottom:16px">' + text + '</div>'
+        + '<div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end">' + kn + '</div></div>';
+      function zu(w) { document.removeEventListener('keydown', taste, true); try { ov.remove(); } catch (e) {} fertig(w); }
+      function taste(ev) { if (ev.key === 'Escape') { ev.stopPropagation(); zu(false); } }
+      ov.addEventListener('click', function (ev) {
+        var b = ev.target && ev.target.closest ? ev.target.closest('[data-ab-wahl]') : null; if (!b) return;   /* Klick daneben: nichts */
+        var i = b.getAttribute('data-ab-wahl');
+        zu(i === 'x' ? false : knoepfe[Number(i)].wert);
+      });
+      document.addEventListener('keydown', taste, true);
+      document.body.appendChild(ov);
+      var letzter = ov.querySelector('[data-ab-wahl="' + (knoepfe.length - 1) + '"]'); if (letzter) letzter.focus();
     });
-    return wurzel;
   }
-  function alleOrdner(dateien) {
-    var s = {};
-    STANDARD.forEach(function (o) { s[o] = 1; });
-    dateien.forEach(function (d) { var p = ''; (d.ordner ? d.ordner.split('/') : []).forEach(function (t) { p = p ? p + '/' + t : t; s[p] = 1; }); });
-    return Object.keys(s).sort(function (a, b) { return a.localeCompare(b, 'de'); });
+
+  function oeffnen(id, name) {
+    return fetch(basis() + '/dateien/' + id, { headers: { Authorization: 'Bearer ' + token() } }).then(function (r) { return r.ok ? r.blob() : null; }).then(function (b) {
+      if (!b) { try { if (window.toast) window.toast('Die Datei liegt nicht mehr in der Ablage.'); } catch (e) {} return false; }
+      var url = URL.createObjectURL(b);
+      if (/^(application\/pdf|image\/)/.test(b.type)) window.open(url, '_blank', 'noopener');
+      else { var a = document.createElement('a'); a.href = url; a.download = name || 'Datei'; document.body.appendChild(a); a.click(); a.remove(); }
+      setTimeout(function () { URL.revokeObjectURL(url); }, 60000);
+      return true;
+    });
+  }
+  function loeschenDatei(id) {
+    if (!window.Auth) return Promise.resolve(false);
+    return Auth.apiCall('/dateien/' + id, { method: 'DELETE' }).then(function () { _standP = null; return true; }, function () { return false; });
   }
 
   function knopf(t, attr, art) {
-    return '<button type="button" ' + attr + ' style="font:600 11.5px/1 inherit;padding:4px 8px;border-radius:6px;cursor:pointer;margin-left:4px;background:transparent;'
-      + (art === 'rot' ? 'border:1px solid rgba(184,98,92,.55);color:#B8625C' : 'border:1px solid rgba(42,39,39,.25);color:inherit') + '">' + t + '</button>';
+    return '<button type="button" ' + attr + ' style="font:600 11.5px/1 inherit;padding:5px 9px;border-radius:6px;cursor:pointer;margin-left:4px;background:transparent;'
+      + (art === 'rot' ? 'border:1px solid rgba(184,98,92,.55);color:#B8625C' : art === 'gold' ? 'border:1px solid var(--wl-c9a84c,#C9A84C);color:inherit' : 'border:1px solid rgba(42,39,39,.25);color:inherit') + '">' + t + '</button>';
   }
-  function zweigHtml(k, pfad, tiefe) {
-    var h = '';
-    Object.keys(k.kinder).sort(function (a, b) { return a.localeCompare(b, 'de'); }).forEach(function (t) {
-      var p = pfad ? pfad + '/' + t : t, kind = k.kinder[t];
-      var n = (function zaehl(x) { return x.dateien.length + Object.keys(x.kinder).reduce(function (a, c) { return a + zaehl(x.kinder[c]); }, 0); })(kind);
-      h += '<details data-pfad="' + esc(p) + '"' + (_offen[p] ? ' open' : '') + ' style="margin-left:' + (tiefe ? 16 : 0) + 'px">'
-        + '<summary style="cursor:pointer;padding:4px 0;font-weight:600">📁 ' + esc(t) + ' <span style="font-weight:400;opacity:.6">(' + n + ')</span>'
-        + knopf('hierhin hochladen', 'data-ab-ziel="' + esc(p) + '"') + '</summary>' + zweigHtml(kind, p, tiefe + 1) + '</details>';
-    });
-    k.dateien.forEach(function (d) {
-      h += '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-left:' + (tiefe ? 16 : 0) + 'px;padding:3px 0;border-bottom:1px solid rgba(0,0,0,.05)">'
-        + '<span style="flex:1;min-width:160px">📄 ' + esc(d.name) + ' <span style="opacity:.6;font-size:12px">· ' + mb(Number(d.groesse) || 0) + ' · '
-        + esc(new Date(d.created_at).toLocaleDateString('de-DE')) + (d.quelle && d.quelle !== 'upload' ? ' · aus ' + esc(d.quelle === 'eingang' ? 'dem Eingang' : d.quelle === 'beleg' ? 'dem Beleg-Leser' : d.quelle) : '') + '</span></span>'
-        + knopf('Öffnen', 'data-ab-oeffnen="' + esc(d.id) + '" data-ab-name="' + esc(d.name) + '"')
-        + knopf('Verschieben', 'data-ab-schieben="' + esc(d.id) + '"')
-        + knopf(_scharf === d.id ? 'Wirklich löschen?' : 'Löschen', 'data-ab-loeschen="' + esc(d.id) + '"', 'rot') + '</div>';
-    });
-    return h;
+  function artName(d) {
+    var q = d.quelle; if (q === 'eingang') return 'eingelesen'; if (q === 'quickcheck') return 'aus dem Quick-Check'; if (q === 'beleg') return 'Beleg'; return 'hochgeladen';
+  }
+  function zeileHtml(d) {
+    return '<div class="dp-ab-zeile" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:6px 0;border-bottom:1px solid rgba(0,0,0,.06)">'
+      + '<span style="flex:1 1 200px;min-width:0;overflow-wrap:anywhere"><b style="font-weight:600">' + esc(d.name) + '</b>'
+      + '<span style="display:block;opacity:.65;font-size:12px">' + esc(d.ordner || 'Sonstiges') + ' · ' + mb(d.groesse) + ' · ' + esc(datum(d.created_at)) + ' · ' + esc(artName(d)) + '</span></span>'
+      + knopf('Ansehen', 'data-ab-oeffnen="' + esc(d.id) + '" data-ab-name="' + esc(d.name) + '"')
+      + knopf('Verschieben', 'data-ab-schieben="' + esc(d.id) + '"')
+      + knopf('Löschen', 'data-ab-loeschen="' + esc(d.id) + '" data-ab-name="' + esc(d.name) + '"', 'rot') + '</div>';
   }
 
   var _stand = null, _liste = [];
   function fuellen() {
     var host = document.getElementById('dp-ablage'); if (!host) return;
     var o = obj();
-    if (!o) { host.innerHTML = '<p class="dp-pa-p">Erst ein Objekt speichern, dann können Unterlagen abgelegt werden.</p>'; return; }
+    if (!o) { host.innerHTML = '<p class="dp-pa-p">Erst das Objekt speichern, dann können Unterlagen abgelegt werden.</p>'; return; }
     if (!window.Auth || typeof Auth.apiCall !== 'function') return;
-    Promise.all([Auth.apiCall('/dateien?objekt=' + encodeURIComponent(o)), Auth.apiCall('/dateien/speicher')]).then(function (r) {
+    Promise.all([Auth.apiCall('/dateien?objekt=' + encodeURIComponent(o)), stand(true)]).then(function (r) {
       _liste = (r[0] && r[0].dateien) || []; _stand = r[1] || null;
       zeichnen();
-    }, function (e) { host.innerHTML = '<p class="dp-pa-p" style="color:#B8625C">Ablage nicht erreichbar: ' + esc(e && e.message || '') + '</p>'; });
+    }, function () { host.innerHTML = '<p class="dp-pa-p" style="color:#B8625C">Ablage nicht erreichbar.</p>'; });
   }
   function zeichnen() {
     var host = document.getElementById('dp-ablage'); if (!host) return;
-    var s = _stand, pct = s && s.grenze_bytes ? Math.min(100, Math.round(s.belegt_bytes / s.grenze_bytes * 100)) : 0;
-    var ordner = alleOrdner(_liste);
-    var h = '<div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px">'
-      + '<label style="font-size:12.5px">Zielordner <input list="dp-ablage-ordner" data-ab-zielfeld value="' + esc(_ziel) + '" placeholder="z. B. Mietverträge/Whg. 1" style="min-width:220px;padding:5px 7px;border:1px solid #ddd;border-radius:6px"></label>'
-      + '<datalist id="dp-ablage-ordner">' + ordner.map(function (o) { return '<option value="' + esc(o) + '">'; }).join('') + '</datalist>'
-      + knopf('Dateien hochladen', 'data-ab-dateien') + knopf('Ordner hochladen (mit Unterordnern)', 'data-ab-ordner')
-      + '<input type="file" multiple data-ab-input-dateien style="display:none"><input type="file" multiple webkitdirectory directory data-ab-input-ordner style="display:none">'
-      + '</div>'
-      + (s ? '<div style="font-size:12px;opacity:.75;margin-bottom:8px">Belegt ' + mb(s.belegt_bytes) + ' von ' + mb(s.grenze_bytes) + ' (Plan ' + esc(s.plan) + ', ' + pct + ' %) · Dateien höchstens 25 MB · verschlüsselt auf unserem Server in Deutschland</div>'
-          + '<div style="height:5px;background:rgba(0,0,0,.08);border-radius:3px;margin-bottom:10px"><div style="height:5px;width:' + pct + '%;background:' + (pct > 90 ? '#B8625C' : 'var(--wl-c9a84c,#C9A84C)') + ';border-radius:3px"></div></div>' : '')
-      + '<div data-ab-meldung style="font-size:12.5px;margin-bottom:6px"></div>'
-      + (_liste.length ? zweigHtml(baum(_liste), '', 0) : '<p class="dp-pa-p" style="opacity:.75">Noch keine Unterlagen abgelegt. Was über „Belege, Unterlagen & Rechnungen einlesen“ übernommen wird, landet automatisch hier – sortiert in Ordner.</p>');
+    var s = _stand, darf = !!(s && s.darf_ablegen && s.bereit !== false);
+    var pct = s && s.grenze_bytes ? Math.min(100, Math.round(s.belegt_bytes / s.grenze_bytes * 100)) : 0;
+    var jahre = {};
+    _liste.forEach(function (d) { var j = d.jahr || 'ohne Jahr'; (jahre[j] = jahre[j] || []).push(d); });
+    var reihe = Object.keys(jahre).sort(function (a, b) { return String(b).localeCompare(String(a), 'de', { numeric: true }); });
+    var h = '';
+    if (s && !s.darf_ablegen) {
+      h += '<div style="font-size:13px;padding:10px 12px;border-radius:8px;background:rgba(201,168,76,.10);border-left:3px solid var(--wl-c9a84c,#C9A84C);margin-bottom:10px">'
+        + 'Die Dokumentenablage gibt es ab dem Plan Starter. Eingelesene Unterlagen werden ausgelesen, das Original wird nicht gespeichert.'
+        + (_liste.length ? ' Deine vorhandenen Dateien kannst du weiter ansehen und herunterladen' + (s.loeschung_am ? ', bis zum ' + esc(datum(s.loeschung_am)) + '. Danach werden sie gelöscht.' : '.') : '') + '</div>';
+    }
+    if (darf) {
+      h += '<div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:8px">'
+        + '<label style="font-size:12.5px">Ordner <input list="dp-ablage-ordner" data-ab-zielfeld value="' + esc(_ziel) + '" placeholder="z. B. Mietverträge" style="min-width:180px;padding:5px 7px;border:1px solid #ddd;border-radius:6px"></label>'
+        + '<datalist id="dp-ablage-ordner">' + STANDARD.map(function (o) { return '<option value="' + esc(o) + '">'; }).join('') + '</datalist>'
+        + knopf('Dateien hochladen', 'data-ab-dateien', 'gold')
+        + '<input type="file" multiple data-ab-input-dateien style="display:none"></div>';
+    }
+    if (s && s.grenze_bytes) {
+      h += '<div style="font-size:12px;opacity:.8;margin-bottom:4px">Belegt ' + mb(s.belegt_bytes) + ' von ' + mb(s.grenze_bytes) + ' (' + pct + ' %) · je Datei höchstens ' + mb(s.max_datei_bytes) + ' · verschlüsselt auf unserem Server in Deutschland</div>'
+        + '<div style="height:5px;background:rgba(0,0,0,.08);border-radius:3px;margin-bottom:10px"><div style="height:5px;width:' + pct + '%;background:' + (pct > 90 ? '#B8625C' : 'var(--wl-c9a84c,#C9A84C)') + ';border-radius:3px"></div></div>';
+    }
+    h += '<div data-ab-meldung style="font-size:12.5px;margin-bottom:6px"></div>';
+    if (!_liste.length) {
+      h += '<p class="dp-pa-p" style="opacity:.75">' + (darf ? 'Noch keine Unterlagen abgelegt. Beim Einlesen bleibt das Original mit dem Häkchen „Original aufbewahren“ hier liegen.' : 'Keine Dateien abgelegt.') + '</p>';
+    } else {
+      reihe.forEach(function (j) {
+        var l = jahre[j], g = l.reduce(function (a, d) { return a + (Number(d.groesse) || 0); }, 0);
+        var auf = _offen[j] !== undefined ? _offen[j] : j === reihe[0];
+        h += '<details data-ab-jahr="' + esc(j) + '"' + (auf ? ' open' : '') + ' style="border:1px solid rgba(42,39,39,.12);border-radius:10px;padding:6px 10px;margin-bottom:8px">'
+          + '<summary style="cursor:pointer;display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-weight:600;padding:4px 0">'
+          + '<span style="flex:1">' + esc(j) + ' <span style="font-weight:400;opacity:.65">· ' + l.length + (l.length === 1 ? ' Datei' : ' Dateien') + ' · ' + mb(g) + '</span></span>'
+          + (j !== 'ohne Jahr' ? knopf('Jahr löschen', 'data-ab-jahr-loeschen="' + esc(j) + '" data-ab-anzahl="' + l.length + '"', 'rot') : '')
+          + '</summary>' + l.map(zeileHtml).join('') + '</details>';
+      });
+    }
     host.innerHTML = h;
   }
   function meldung(t, rot) { var m = document.querySelector('#dp-ablage [data-ab-meldung]'); if (m) { m.textContent = t; m.style.color = rot ? '#B8625C' : ''; } }
 
-  function hochladenListe(files, mitPfad) {
+  function hochladenListe(files) {
     var ziel = String(_ziel || '').trim() || 'Sonstiges';
-    var liste = [].slice.call(files).map(function (f) {
-      var rel = mitPfad && f.webkitRelativePath ? f.webkitRelativePath.split('/').slice(0, -1).join('/') : '';
-      return { file: f, ordner: rel ? ziel + '/' + rel : ziel };
-    });
+    var liste = [].slice.call(files).map(function (f) { return { file: f, ordner: ziel }; });
     if (!liste.length) return;
-    meldung('Lade ' + liste.length + ' Datei(en) hoch …');
+    meldung('Lade ' + liste.length + (liste.length === 1 ? ' Datei' : ' Dateien') + ' hoch …');
     ablegenAlle(liste, { quelle: 'upload' }).then(function (e) {
-      meldung(e.ok + ' abgelegt' + (e.doppelt ? ', ' + e.doppelt + ' schon vorhanden' : '') + (e.fehler.length ? ' · Fehler: ' + e.fehler.join('; ') : ''), !!e.fehler.length);
+      meldung(e.ok + ' abgelegt' + (e.doppelt ? ', ' + e.doppelt + ' schon vorhanden' : '') + (e.fehler.length ? '. Nicht abgelegt: ' + e.fehler.join(', ') : ''), !!e.fehler.length);
       setTimeout(fuellen, 300);
     });
   }
 
   document.addEventListener('toggle', function (ev) {
-    var d = ev.target; if (!d || !d.matches || !d.matches('#dp-ablage details[data-pfad]')) return;
-    _offen[d.getAttribute('data-pfad')] = d.open;
+    var d = ev.target; if (!d || !d.matches || !d.matches('#dp-ablage details[data-ab-jahr]')) return;
+    _offen[d.getAttribute('data-ab-jahr')] = d.open;
   }, true);
   document.addEventListener('input', function (ev) { if (ev.target && ev.target.hasAttribute && ev.target.hasAttribute('data-ab-zielfeld')) _ziel = ev.target.value; });
   document.addEventListener('change', function (ev) {
     var t = ev.target; if (!t || !t.closest || !t.closest('#dp-ablage')) return;
-    if (t.hasAttribute('data-ab-input-dateien')) { hochladenListe(t.files, false); t.value = ''; }
-    if (t.hasAttribute('data-ab-input-ordner')) { hochladenListe(t.files, true); t.value = ''; }
+    if (t.hasAttribute('data-ab-input-dateien')) { hochladenListe(t.files); t.value = ''; }
   });
   document.addEventListener('click', function (ev) {
     var t = ev.target && ev.target.closest ? ev.target.closest('#dp-ablage button') : null; if (!t) return;
     var host = document.getElementById('dp-ablage');
     if (t.hasAttribute('data-ab-dateien')) { host.querySelector('[data-ab-input-dateien]').click(); return; }
-    if (t.hasAttribute('data-ab-ordner')) { host.querySelector('[data-ab-input-ordner]').click(); return; }
-    if (t.hasAttribute('data-ab-ziel')) {
-      ev.preventDefault(); _ziel = t.getAttribute('data-ab-ziel');
-      var f = host.querySelector('[data-ab-zielfeld]'); if (f) f.value = _ziel;
-      host.querySelector('[data-ab-input-dateien]').click(); return;
-    }
-    if (t.hasAttribute('data-ab-oeffnen')) {
-      var id = t.getAttribute('data-ab-oeffnen'), name = t.getAttribute('data-ab-name');
-      fetch(basis() + '/dateien/' + id, { headers: { Authorization: 'Bearer ' + token() } }).then(function (r) { return r.ok ? r.blob() : null; }).then(function (b) {
-        if (!b) { meldung('Datei konnte nicht geladen werden.', true); return; }
-        var url = URL.createObjectURL(b);
-        if (/^(application\/pdf|image\/)/.test(b.type)) window.open(url, '_blank', 'noopener');
-        else { var a = document.createElement('a'); a.href = url; a.download = name || 'Datei'; document.body.appendChild(a); a.click(); a.remove(); }
-        setTimeout(function () { URL.revokeObjectURL(url); }, 60000);
-      });
-      return;
-    }
+    if (t.hasAttribute('data-ab-oeffnen')) { oeffnen(t.getAttribute('data-ab-oeffnen'), t.getAttribute('data-ab-name')); return; }
     if (t.hasAttribute('data-ab-schieben')) {
       var id2 = t.getAttribute('data-ab-schieben'), zeile = t.parentNode;
       if (zeile.querySelector('[data-ab-neuordner]')) return;
@@ -190,22 +229,33 @@
     }
     if (t.hasAttribute('data-ab-schieben-ok')) {
       var id3 = t.getAttribute('data-ab-schieben-ok'), inp = t.parentNode.querySelector('[data-ab-neuordner]');
-      Auth.apiCall('/dateien/' + id3, { method: 'PATCH', body: { ordner: inp ? inp.value : '' } }).then(function () { _offen[inp ? inp.value : ''] = true; fuellen(); }, function () { meldung('Verschieben fehlgeschlagen.', true); });
+      Auth.apiCall('/dateien/' + id3, { method: 'PATCH', body: { ordner: inp ? inp.value : '' } }).then(fuellen, function () { meldung('Verschieben hat nicht geklappt.', true); });
       return;
     }
     if (t.hasAttribute('data-ab-loeschen')) {
+      ev.preventDefault();
       var id4 = t.getAttribute('data-ab-loeschen');
-      if (_scharf !== id4) { _scharf = id4; t.textContent = 'Wirklich löschen?'; setTimeout(function () { if (_scharf === id4) { _scharf = null; zeichnen(); } }, 6000); return; }
-      _scharf = null;
-      Auth.apiCall('/dateien/' + id4, { method: 'DELETE' }).then(fuellen, function () { meldung('Löschen fehlgeschlagen.', true); });
+      bestaetigen('Datei löschen?', '„' + esc(t.getAttribute('data-ab-name')) + '“ wird endgültig aus der Ablage gelöscht. Werte, die aus der Datei übernommen wurden, bleiben im Objekt stehen.')
+        .then(function (ja) { if (ja) loeschenDatei(id4).then(function (ok) { if (!ok) meldung('Löschen hat nicht geklappt.', true); fuellen(); }); });
+      return;
+    }
+    if (t.hasAttribute('data-ab-jahr-loeschen')) {
+      ev.preventDefault(); ev.stopPropagation();
+      var j = t.getAttribute('data-ab-jahr-loeschen'), n = t.getAttribute('data-ab-anzahl');
+      bestaetigen('Alle Dateien aus ' + j + ' löschen?', n + (n === '1' ? ' Datei wird' : ' Dateien werden') + ' endgültig aus der Ablage dieses Objekts gelöscht. Übernommene Werte bleiben im Objekt stehen.', [{ wert: true, text: 'Jahr löschen', rot: true }, { wert: false, text: 'Abbrechen' }])
+        .then(function (ja) {
+          if (!ja) return;
+          Auth.apiCall('/dateien?objekt=' + encodeURIComponent(obj()) + '&jahr=' + encodeURIComponent(j), { method: 'DELETE' }).then(function (r) { _standP = null; meldung((r && r.geloescht) + ' gelöscht.'); fuellen(); }, function () { meldung('Löschen hat nicht geklappt.', true); });
+        });
     }
   });
 
-  /** Karte für die Pilot-Analyse; füllt sich nach dem Zeichnen selbst */
+  /** Karte „Meine Dokumente“; füllt sich nach dem Zeichnen selbst */
   function html() {
     setTimeout(fuellen, 0);
     return '<div id="dp-ablage"><p class="dp-pa-p" style="opacity:.7">Ablage wird geladen …</p></div>';
   }
 
-  window.DpAblage = { VERSION: 'v3162', html: html, fuellen: fuellen, ablegen: ablegen, ablegenAlle: ablegenAlle, ordnerFuer: ordnerFuer, STANDARD: STANDARD };
+  window.DpAblage = { VERSION: 'v4860', html: html, fuellen: fuellen, ablegen: ablegen, ablegenAlle: ablegenAlle, ordnerFuer: ordnerFuer, stand: stand,
+    oeffnen: oeffnen, loeschenDatei: loeschenDatei, bestaetigen: bestaetigen, STANDARD: STANDARD };
 })();
