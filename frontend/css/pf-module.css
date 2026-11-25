@@ -336,3 +336,6 @@ html[data-gx-stil="dunkel"] .pfm,html[data-gx-stil="dunkel"] .pfm-tip{--surface:
 .pfm-tip .t{font:600 10.5px "JetBrains Mono",monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--wl-b8932f,#b8932f);margin-bottom:3px}
 .pfm-tip .t-k{font:600 10.5px "JetBrains Mono",monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--wl-b8932f,#b8932f)}
 .pfm-tip{border-radius:8px;font:500 12px/1.45 Inter,sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.35)}
+/* v4730 · Kasten wie die übrigen Cockpit-Karten (grafiken-premium.js --gx-*), hell wie dunkel */
+.dp-gp.gp-pfm{background:var(--gx-bg,var(--gx-karte,#FFFFFF))!important;border:1px solid var(--gx-rand,#EFE8DA);border-radius:16px;padding:14px 16px 12px;color:var(--gx-tinte,#2A2727);min-width:0}
+html[data-gx-stil="dunkel"] .dp-gp.gp-pfm{--karte:#0E0D0B;--bg:#070706}
