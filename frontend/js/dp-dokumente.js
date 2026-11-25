@@ -1156,8 +1156,8 @@
     var dl = darlehen();
     var dlT = dl.length ? '<table class="dicht"><thead><tr><th>Darlehen</th><th class="r">Betrag</th><th class="r">Zins</th><th class="r">Tilgung</th><th class="r">Bindung</th><th class="r">Rate / Monat</th></tr></thead><tbody>'
       + dl.map(function (d) { return '<tr><td>' + B.esc(d.name) + '</td><td class="r num">' + B.eur(d.betrag) + '</td><td class="r num">' + B.pct(d.zins, 2) + '</td><td class="r num">' + B.pct(d.tilg, 2) + '</td><td class="r num">' + (d.bind ? B.zahl(d.bind, 0) + ' J.' : '–') + '</td><td class="r num">' + B.eur(d.rate, 0) + '</td></tr>'; }).join('') + '</tbody></table>' : '';
-    add('Finanzierung und Anschluss', 'Darlehen, Rate und Cashflow je Phase', dlT + dreiPhasen(K, B), 1);
-    add('DSCR und LTV im Verlauf', 'Deckung und Beleihung heute, am Ende der Zinsbindung und im Anschluss', cockpitApp() || bankCockpit(B, true), 1);   /* v4790m */
+    var cpA = cockpitApp();   /* v4790n · Bank-Cockpit auf derselben Seite wie die Phasen, es passt darunter */
+    add('Finanzierung und Anschluss', 'Darlehen, Rate und Cashflow je Phase, DSCR und LTV im Verlauf', dlT + dreiPhasen(K, B) + (cpA ? '<h3 style="margin-top:6mm">DSCR und LTV im Verlauf</h3>' + cpA : bankCockpit(B, true)), 1);
     if (bankF) {
       var bc = bankCockpit(B, false), sm = stressMatrix(B), d1 = zahlAus('d1') || K.d_total || 0;
       add('Sicherheiten und Belastungsprobe', 'Objektwert und Beleihung, DSCR je Zins- und Mietszenario', '<h3>Sicherheiten</h3>' + B.liste([['Objektwert, maßgebend', mw ? B.eur(mw.wert) : '–', { det: mw ? mw.det : 'kein Marktbericht, Kaufpreis als Bezug' }], ['Kaufpreis', B.eur(K.kp)], ['Darlehen', B.eur(d1)],
