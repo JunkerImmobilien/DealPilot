@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-11-25T09:34:18.627Z",
+ "erzeugt_am": "2026-11-25T09:43:14.782Z",
  "quellen": {
   "voice-import": "329fd45d5c175a2e",
-  "objektart-felder": "16af21246a92d8f6",
+  "objektart-felder": "f3795cd7fc2b9b70",
   "storage": "2d929d7da83d4809",
-  "index-html": "e72ba68849af005d",
+  "index-html": "2a106a02646ae568",
   "grest": "81f3fb0a4de3a6cf"
  },
  "daten": {
@@ -2677,15 +2677,15 @@
      },
      {
       "wert": "bestand_erstbezug_saniert",
-      "text": "Bestand – Erstbezug nach Sanierung"
+      "text": "Bestand · Erstbezug nach Sanierung"
      },
      {
       "wert": "neubau_erstbezug",
-      "text": "Neubau – Erstbezug"
+      "text": "Neubau · Erstbezug"
      },
      {
       "wert": "neubau_im_bau",
-      "text": "Neubau – im Bau"
+      "text": "Neubau · im Bau"
      },
      {
       "wert": "geplant",
@@ -2886,7 +2886,7 @@
    {
     "id": "garagen_bgf_qm",
     "kind": "text",
-    "label": "Garage / Carport – Bruttogrundfläche (m²)"
+    "label": "Garage / Carport · Bruttogrundfläche (m²)"
    },
    {
     "id": "garagen_stufe",
@@ -2905,12 +2905,12 @@
       "text": "5 · Massiv mit besonderer Ausführung"
      }
     ],
-    "label": "Garage – Standardstufe"
+    "label": "Garage · Standardstufe"
    },
    {
     "id": "garagen_baujahr",
     "kind": "text",
-    "label": "Garage – Baujahr"
+    "label": "Garage · Baujahr"
    },
    {
     "id": "aussenanlagen_pct",
