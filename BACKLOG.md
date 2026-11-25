@@ -8,6 +8,10 @@ Dort **ohne** Nummer: Nummern sind Reihenfolge, kein Name. Die verbleibenden
 Punkte werden fortlaufend neu durchnummeriert. Hängt etwas, kommt `**BLOCKIERT:**` mit einem Satz Begründung
 direkt unter den Punkt — nicht kommentarlos liegenlassen.
 
+## → Offen aus dem 25.11.2026 (Marcel entscheidet)
+
+Einzelheiten: wissen/2026-11-25.md, Abschnitt „Stand 25.11.2026 mittags“. Investment-PDF-Muster, Deal-Score-Grundlage, EK-Rendite-Delta, Tipps Reiter Bank, Portfolio Lagekarte/Vermögenswert, Dokumentenablage, Werbung (Black Week Handy, #dealpilotimmo, LinkedIn, ViVi-OK), Logodateien, Meta-Sprache.
+
 ## → Offen aus dem 24.11.2026 (Marcel entscheidet)
 
 Stand und Einzelheiten: `wissen/2026-11-24.md`, Abschnitt „Abendstand 24.11.2026“. Prod 1.0.190.
