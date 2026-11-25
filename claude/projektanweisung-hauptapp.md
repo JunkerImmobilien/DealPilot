@@ -45693,3 +45693,9 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** staging 799356e2, 8cc64b8d, 3bff6596, Wissen 2e95bfea. Nicht auf Prod.
 - **Nachweis:** Seiten gerendert und angesehen, Zahlen Text gegen Kacheln abgeglichen. Muster `Dateien/Investment-PDF/v4790-neu-2026-11-25/`.
 - **Rest:** Hauptstr. 51 Wertangabe 1.418.000 € ohne Herkunft gegen Marktpreisindikation 1.035.000 € (Daten/Anker-Regel), Prompt nennt die Marktpreisindikation weiter „Marktwert“.
+
+### v4870 · Portfolio-Cockpit Einfach wie Demo 07 · Prod 1.0.221
+- **Was:** Objektkarten und Einfach-Aufbau wie Demo 07 (Prod). Arbeitsbereich-Modal „Ansicht anpassen“ nur Staging (pf-werkstatt.js), wartet auf Marcels Freigabe.
+- **Commit:** staging f64ec255, 5507a1a7, 0cea8ad7, dad17b92 · main 389b2833, Version e8c7e1a2.
+- **Nachweis:** Staging gemessen (Karten, Tabelle, Modal-Bedienung), Prod Auslieferung per curl (Buster v4870, patch 221). buster-ebenen und vorschau sauber.
+- **Rest:** gold-audit auf Prod rot durch js/dateiablage.js (nicht v4870, Fork UU4). 390 px der Einfach-Karten nicht eigens gemessen. Modal auf Prod erst nach Freigabe (Commit 5507a1a7 + v4870a/b per Cherry-Pick).
