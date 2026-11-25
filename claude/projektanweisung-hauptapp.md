@@ -45755,3 +45755,10 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** staging 7d31b610, main 7931e7e3 + 0435e4a9 (Version).
 - **Nachweis:** Staging Box weg, 390 px ohne Querscrollen, Quellen-Fenster 8 Zeilen, Konsole sauber; Prod liefert landing-faecher.*?v=zahlen-raus-1, version 226.
 - **Rest:** keiner.
+
+### Rollout 1.0.227 · v4940 Vorläufiger Ertragswert vor boG maßgebend
+
+- **Was:** Ertragswert „vor besonderen objektspezifischen Grundstücksmerkmalen“ ist maßgebend (Anker, Portfolio, Kacheln, PDF, KI-Begriffe), Zusatz sichtbar. Vorläufiger Sachwert bleibt ausgeschlossen.
+- **Commit:** staging 5ce99f3c · main 0f2ca05e, Version 7dcd73cb.
+- **Nachweis:** Staging Hauptstr. 51 Anker 1.265.000 € vor boG, Westerfeldstr. 146 740.000 € unverändert; Prüfer grün. Prod-Sicherung -1227-v4940, healthy.
+- **Rest:** Anker anderer Objekte mit vorläufigem Ertragswert ändern sich erst beim nächsten Speichern.
