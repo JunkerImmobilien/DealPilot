@@ -45537,3 +45537,10 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** staging cf52bd12, 33358c4d · main 43989821, bf77938b, ab46c4e4, b2406b76.
 - **Nachweis:** einzelcheck-pruefen grün mit Teil T und drei Gegenproben, buster-ebenen sauber, Prod im Browser gemessen bis vor die Zahlung.
 - **Rest:** keine Testzahlung. Black Friday im Browser mit Flyer-Code aus (gewollt).
+
+### Rollout 1.0.203 · v4710 Menü-Umschalter „reiter“, Kacheln A für alle (Fork Z3)
+
+- **Was:** Marcels Wahl umgesetzt, Standard für alle Hosts (`doppelkarte.js` reiter, `dp-kachel.js` a, neue Merker dp_dk_stil2 / dp_kachel2). v4710a: aktiver Reiter bei dunkler Partnerfarbe lesbar (Plakette und Text mit Creme gemischt).
+- **Commit:** staging 89cec68a, f00f1f92 · main R3 v4650a–d (6c9119a5 … d2e62ff4 nach Rebase neu), 15288eee, 0e90f3fe, 19380876, Version fee07cb7.
+- **Nachweis:** Staging Westerfeldstr. 146 alle Reiter gemessen, 390 px, Partnerfarbe Gold/Navy/Blau. Prod curl: Buster v4710, version 203. Sicherung haupt/mb-20261125-0750-v4710.
+- **Rest:** Prod nicht eingeloggt gemessen.
