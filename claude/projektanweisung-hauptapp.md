@@ -45462,3 +45462,10 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** staging 63b81fb1, Merge d5e66417 · main 26714a1d, Version 9735f9d2 (dp-dokumente.js auf main Buster v4610m, Staging v4610).
 - **Nachweis:** Staging Westerfeldstr. 146 33,2 % (operativ 12,2 %), Demostraße 5 11,4 %, Hauptstr. 51 9,3 %, Portfolio 11,3 %. Prüfer grün, Prod-Sicherung 20261125-0621-v4610, Prod liefert ek-rendite.js und calc.js v4610 aus.
 - **Rest:** Prod nicht eingeloggt gemessen; 390 px nicht gemessen (Regel l7 → 2 Spalten unter 640 px); Delta-Definition von Marcel zu bestätigen (wissen/2026-11-25.md).
+
+### Rollout 1.0.192 · v4620 EK-Rendite Hebel und eine Karte mit Stufen (Fork O3)
+
+- **Was:** `ek-rendite.js hebel()` (Gesamtkapitalrendite gegen Zins, Wert −2 %, Kipp-Wert, Anschlusszins, Kipp-Zins), neue `ek-rendite-ui.js`: ein Tooltip an allen EK-Karten, Klick schaltet die vier Stufen (sessionStorage). Prüfer `tools/ek-rendite-pruefen.mjs` 51/51.
+- **Commit:** staging 3e5c5cc9, 51ce52be, 2dc4bf6a, 9c9c6d73, 3e7b0f19 · main 6eabb6ca, 760bbb5a, 5db04c13, 4a1222de, 7960fa99, Version b16e764f. dp-dokumente.js auf main Buster v4620m (Staging v4620, Muster).
+- **Nachweis:** Staging Westerfeldstr. 146, Demostraße 5, Hauptstr. 51, Portfolio; 390-px-Rahmen; buster-ebenen, vorschau, score-ketten 216 grün; Prod-Sicherung haupt/mb-20261125-0653-v4620 (7,0/31 MB, Kopf gelesen), Backend neu gebaut, healthy, gold-audit RC 0, Auslieferung per curl.
+- **Rest:** Prod nicht eingeloggt gemessen.
