@@ -141,7 +141,7 @@
       { l: 'DSCR', v: B.zahl(K.dscr, 2), s: 'Schuldendienstdeckung', art: K.dscr >= 1.2 ? 'gut' : 'schlecht' },
       { l: 'LTV', v: B.pct(K.ltv, 1), s: S.ltv_basis_label ? 'auf ' + S.ltv_basis_label : '' },
       (K.ekr4 && K.ekr4.haupt != null   /* v4610 · Hauptkennzahl, Stufen 1 bis 3 in der Unterzeile */
-        ? { l: 'EK-Rendite', v: B.pct(K.ekr4.haupt, 1), s: 'nach Steuer mit Vermögensdelta · operativ ' + B.pct(K.ekr4.k1, 1) + ', nach Steuer ' + B.pct(K.ekr4.k2, 1) + ', vor Steuer mit Delta ' + B.pct(K.ekr4.k3, 1) }
+        ? { l: 'EK-Rendite', v: B.pct(K.ekr4.haupt, 1), s: 'nach Steuer mit Vermögensdelta · operativ ' + B.pct(K.ekr4.k1, 1) + ', nach Steuer ' + B.pct(K.ekr4.k2, 1) + (K.ekr4.hebel ? ' · Hebel ' + K.ekr4.hebel.richtung + (K.ekr4.hebel.wert_minus2 != null ? ', bei 2 % Wertverlust im Jahr ' + B.pct(K.ekr4.hebel.wert_minus2, 1) : '') : '') + ', vor Steuer mit Delta ' + B.pct(K.ekr4.k3, 1) }
         : { l: 'EK-Rendite', v: B.pct(K.ekr, 2), s: 'p. a. vor Steuern' }),
       { l: 'Interner Zinsfuß', v: da(K.irr) === null ? 'n. b.' : B.pct(K.irr, 2), s: 'IRR' },
       { l: 'Kaltmiete', v: B.eur(da(K.nkm_j) !== null ? K.nkm_j : (rows[1] && rows[1].nkm_y)), s: 'p. a. inkl. Zusatzeinnahmen' },

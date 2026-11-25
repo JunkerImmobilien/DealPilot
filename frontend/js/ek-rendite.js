@@ -1,4 +1,4 @@
-/* v4610 · EK-Rendite in vier Kennzahlen (Marcel 25.11.2026).
+/* v4610 · EK-Rendite in vier Kennzahlen (Marcel 25.11.2026). v4620 · Hebeleffekt hebel().
  *
  * EINE Stelle rechnet alle vier, jede Anzeige liest von hier:
  *   1  operativ                       (Überschuss + Tilgung) / EK
@@ -75,6 +75,60 @@
              haupt: s.b4 / s.ek * 100, mit_delta: s.n3 };
   }
 
+  /* v4620 · Hebeleffekt (Marcel 25.11.2026: „auch wenn das in die andere Richtung geht“).
+     h = { gi, zins_j, darlehen, zins_anschluss }  (zins_anschluss in % p.a., optional)
+     Gesamtkapitalrendite = (Überschuss + Zins + Tilgung/Bausparen + Delta p.a.) / Gesamtinvest,
+     also das, was das Objekt ohne Finanzierung im Jahr erwirtschaftet. Liegt sie über dem
+     Darlehenszins, hebt das Fremdkapital die EK-Rendite (positiv), liegt sie darunter, drückt es sie.
+     Sensitivitäten rechnen NUR über rechne(), nichts doppelt. */
+  function hebel(r, h) {
+    if (!r || !h) return null;
+    var gi = zahl(h.gi), zj = zahl(h.zins_j), dar = zahl(h.darlehen);
+    if (gi == null || gi <= 0 || zj == null || dar == null || dar <= 0) return null;
+    var dpa = r.delta_pa == null ? 0 : r.delta_pa;
+    var gkr = (r.cf_op + zj + r.tilg + r.bspar + dpa) / gi * 100;
+    var fkz = zj / dar * 100;
+    /* Delta je Jahr als Satz auf den Wert: so rechnet rechne() über den Annahme-Weg genau dasselbe Delta */
+    var wstgIst = (r.wert != null && r.wert > 0 && r.delta_pa != null) ? r.delta_pa / r.wert : (r.wstg || 0);
+    function mit(over) {
+      var p = { cf_op: r.cf_op, steuer: r.steuer, tilg: r.tilg, bspar: r.bspar, ek: r.ek, wert: r.wert,
+                darlehen0: r.darlehen0, stichtag: null, wstg: wstgIst }, k;
+      for (k in over) p[k] = over[k];
+      return rechne(p);
+    }
+    var out = {
+      gkr: gkr, fk_zins: fkz, richtung: gkr >= fkz ? 'positiv' : 'negativ',
+      verschuldung: r.ek > 0 ? dar / r.ek : null,
+      kipp_zins: gkr                       /* Darlehenszins, ab dem der Hebel negativ wird */
+    };
+    if (r.wert != null && r.wert > 0) {
+      var s = mit({ wstg: -0.02 });                     /* Wert fällt 2 % im Jahr */
+      out.wert_minus2 = s ? s.k4 : null;
+      out.kipp_wert = -(r.cf_op - r.steuer + r.tilg + r.bspar) / r.wert * 100;   /* Wertänderung p.a., bei der Stufe 4 null wird */
+    }
+    var za = zahl(h.zins_anschluss);
+    if (za != null && za > fkz + 0.05) {
+      var mehr = dar * (za - fkz) / 100;               /* Mehrzins im Jahr, auf das heutige Darlehen gerechnet */
+      var sz = mit({ cf_op: r.cf_op - mehr });
+      out.zins_anschluss = za; out.mehrzins = mehr; out.ekr_anschluss = sz ? (sz.k4 != null ? sz.k4 : sz.k2) : null;
+    }
+    return out;
+  }
+  function hebelZeilen(hb) {
+    if (!hb) return [];
+    var z = [];
+    z.push('Hebel ' + hb.richtung + ': Das Objekt erwirtschaftet ' + fP(hb.gkr) + ' auf das ganze Investment, das Darlehen kostet ' + fP(hb.fk_zins) + '.');
+    z.push(hb.richtung === 'positiv'
+      ? 'Jeder Euro Darlehen bringt mehr, als er kostet. Darum liegt die EK-Rendite über ' + fP(hb.gkr) + '.'
+      : 'Das Darlehen kostet mehr, als das Objekt damit verdient. Darum liegt die EK-Rendite unter ' + fP(hb.gkr) + '.');
+    if (hb.verschuldung != null) z.push('Auf 1 € Eigenkapital kommen ' + hb.verschuldung.toLocaleString('de-DE', { maximumFractionDigits: 1 }) + ' € Darlehen. Der Hebel wirkt in beide Richtungen gleich stark.');
+    if (hb.wert_minus2 != null) z.push('Fällt der Wert 2 % im Jahr, läge die EK-Rendite bei ' + fP(hb.wert_minus2) + '.');
+    if (hb.kipp_wert != null) z.push(hb.kipp_wert < 0 ? 'Negativ wird sie erst, wenn der Wert mehr als ' + fP(-hb.kipp_wert) + ' im Jahr fällt.' : 'Ohne Wertsteigerung von mindestens ' + fP(hb.kipp_wert) + ' im Jahr ist sie negativ.');
+    if (hb.ekr_anschluss != null) z.push('Mit ' + fP(hb.zins_anschluss) + ' Anschlusszins (' + fE(hb.mehrzins) + ' mehr Zins im Jahr, vor Steuerwirkung) läge sie bei ' + fP(hb.ekr_anschluss) + '.');
+    z.push('Der Hebel kippt, wenn der Darlehenszins über ' + fP(hb.kipp_zins) + ' steigt.');
+    return z;
+  }
+
   /* Tooltip-Text (Kundentext: keine Gedankenstriche, keine Semikolons) */
   function fE(x) { return x == null ? 'k. A.' : Math.round(x).toLocaleString('de-DE') + ' €'; }
   function fP(x) { return x == null ? 'k. A.' : x.toLocaleString('de-DE', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + ' %'; }
@@ -92,10 +146,10 @@
       '3 Mit Vermögensdelta ' + fP(r.k3) + ': wie 1 plus ' + (r.delta_pa == null ? 'k. A.' : fE(r.delta_pa)),
       '4 Nach Steuer mit Vermögensdelta ' + fP(r.k4) + ': wie 2 plus ' + (r.delta_pa == null ? 'k. A.' : fE(r.delta_pa)) + ' (Hauptkennzahl)',
       dz
-    ].join('\n');
+    ].concat(hebelZeilen(r.hebel)).join('\n');
   }
 
-  var api = { rechne: rechne, portfolio: portfolio, tooltip: tooltip, version: 'v4610' };
+  var api = { rechne: rechne, portfolio: portfolio, tooltip: tooltip, hebel: hebel, hebelZeilen: hebelZeilen, version: 'v4620' };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   root.DpEkRendite = api;
 })(typeof window !== 'undefined' ? window : globalThis);

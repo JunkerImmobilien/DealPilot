@@ -583,7 +583,7 @@
     },
     'tab8.ek_rendite': {
       title: 'EK-Rendite (Eigenkapital-Rendite)',
-      body: 'Vier Stufen, jeweils im Jahr auf das eingesetzte Eigenkapital. 1 Operativ: Überschuss nach Zins und Tilgung plus Tilgung. 2 Nach Steuer: dazu Steuererstattung oder Nachzahlung. 3 und 4: wie 1 und 2 plus Vermögensdelta, also Bewertung minus Darlehen bei Kauf minus Eigenkapital, je Haltejahr oder im Ankauf aus der Wertsteigerungsannahme. Angezeigt wird Stufe 4, nach Steuer mit Vermögensdelta. Beim Überfahren der Zahl siehst du alle vier mit Rechnung.',   /* v4610 */
+      body: 'Vier Stufen, jeweils im Jahr auf das eingesetzte Eigenkapital. 1 Operativ: Überschuss nach Zins und Tilgung plus Tilgung. 2 Nach Steuer: dazu Steuererstattung oder Nachzahlung. 3 und 4: wie 1 und 2 plus Vermögensdelta, also Bewertung minus Darlehen bei Kauf minus Eigenkapital, je Haltejahr oder im Ankauf aus der Wertsteigerungsannahme. Angezeigt wird Stufe 4, nach Steuer mit Vermögensdelta. Beim Überfahren der Zahl siehst du alle vier mit Rechnung. Hebeleffekt: Verdient das Objekt mehr, als das Darlehen kostet, hebt das Fremdkapital die EK-Rendite über die Rendite des ganzen Objekts. Liegt der Zins darüber oder fällt der Wert, wirkt derselbe Hebel genauso stark nach unten. Die Erklärung zeigt dafür einen Fall mit 2 % Wertverlust im Jahr und, falls eingetragen, mit dem Anschlusszins.',   /* v4610 */
       severity: 'pro'
     },
     'tab8.equity_multiple': {
