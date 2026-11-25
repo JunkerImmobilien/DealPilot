@@ -439,6 +439,81 @@
     o.verlauf.forEach(function (v, i) { if (!v.id) { v.id = 'a' + i + '-' + String(v.am || '').replace(/\D/g, '').slice(0, 14); neu = true; } });
     return neu;
   }
+  /* v4680 · Marcel 25.11.2026: „Eingelesen und übernommen … mehr Information. Wo wurde es denn zugeordnet? Und dass wir
+     dann auch einen Filter haben.“ Je Eintrag steht jetzt, WOHIN die Werte gingen (Anlage V mit Jahr und Posten,
+     Reiter und Feld, Wohnungen, WEG und Protokolle), jeweils mit Sprung dorthin. Darüber Filter nach Art, Jahr,
+     Zuordnung und Stand. Grundlage sind nur die gespeicherten Änderungen (aenderungen), Buchungen und Wertzeilen
+     des Verlaufs, nichts wird neu gerechnet. Der Filter lebt nur in dieser Sitzung (Modulvariable). */
+  var SEC_NAME = { s0: 'Objekt', s1: 'Investition', s2: 'Miete', s3: 'Finanzierung', s4: 'Bewirtschaftung', 's3-tax': 'Steuer', s5: 'Pilot-Analyse', s6: 'Bewertung', s8: 'Deal-Aktion' };
+  var ZU_NAME = { av: 'Anlage V', feld: 'Objektdaten', we: 'Wohnungen', weg: 'WEG und Protokolle', sonst: 'Sonstiges' };
+  var STAND_NAME = { ueb: 'Übernommen', offen: 'Offen', zurueck: 'Zurückgenommen' };
+  var _filt = { art: '', jahr: '', zu: '', stand: '' };
+  function postenName(f) { for (var i = 0; i < POSTEN.length; i++) if (POSTEN[i][0] === f) return POSTEN[i][1]; return f; }
+  function feldSec(id) { var e = el(id), s = e && e.closest ? e.closest('.sec') : null; return s ? s.id : ''; }
+  /** Ziel einer Wertzeile: Anlage V (Jahr, Posten), ein Formularfeld, Wohnungen, WEG/Protokolle oder Sonstiges */
+  function zielVon(z, x) {
+    var t = String(z || ''), m = t.match(/^Steuer (\d{4}) · ([^:]+)/);
+    if (m) return { g: 'av', jahr: +m[1], text: 'Anlage V ' + m[1] + ' · ' + m[2].trim(), hin: 'av:' + m[1] };
+    if (/^(Sonderumlage|Beschluss|Protokoll|WEG-Protokoll|Eigentümerversammlung|Auswertung der Unterlagen)/i.test(t)) return { g: 'weg', text: 'WEG und Protokolle', hin: 'weg' };
+    var A = x.aenderungen || [];
+    for (var i = 0; i < A.length; i++) {
+      var a = A[i];
+      if (a.t === 'feld' && a.label && t.indexOf(a.label) === 0) { var sec = feldSec(a.id); return { g: 'feld', text: (SEC_NAME[sec] || 'Objekt') + ' · ' + a.label, hin: 'feld:' + a.id + ':' + sec }; }
+      if (a.t === 'einheit' && a.label && t.indexOf(a.label) === 0) return { g: 'we', text: 'Wohnungen · ' + a.label, hin: 'we:' + (a.i == null ? '' : a.i) };
+    }
+    if (/^(WE|Wohnung|Einheit|Mietvertrag)\b/i.test(t)) return { g: 'we', text: 'Wohnungen', hin: 'we:' };
+    return { g: 'sonst', text: 'Sonstiges', hin: '' };
+  }
+  /** Alle Ziele eines Eintrags, zusammengefasst je Ziel mit Anzahl */
+  function zieleVon(x) {
+    var L = [], idx = {};
+    function dazu(z) { var k = z.text; if (idx[k] != null) { L[idx[k]].n++; return; } idx[k] = L.length; L.push(Object.assign({ n: 1 }, z)); }
+    (x.uebernommen || []).forEach(function (w) { dazu(zielVon(w, x)); });
+    (x.aenderungen || []).forEach(function (a) {   /* Änderungen ohne passende Wertzeile (z. B. Mietverträge, Steuer aus Belegen) */
+      if (a.t === 'steuer' && a.jahr) { var k = 'Anlage V ' + a.jahr + ' · ' + postenName(a.feld); if (idx[k] == null && !L.some(function (z) { return z.g === 'av' && z.jahr === +a.jahr; })) dazu({ g: 'av', jahr: +a.jahr, text: k, hin: 'av:' + a.jahr }); }
+      if (a.t === 'einheit' && !L.some(function (z) { return z.g === 'we'; })) dazu({ g: 'we', text: 'Wohnungen · ' + (a.label || 'Einheit'), hin: 'we:' + (a.i == null ? '' : a.i) });
+    });
+    return L;
+  }
+  function jahreVon(x, ziele) {
+    var J = {};
+    ziele.forEach(function (z) { if (z.jahr) J[z.jahr] = 1; });
+    (x.aenderungen || []).forEach(function (a) { if (a.t === 'steuer' && a.jahr) J[a.jahr] = 1; });
+    (x.dokumente || []).concat((x.nicht_gelesen || []).map(function (n) { return { name: n }; })).forEach(function (d) { var m = String(d.name || '').match(/\b(20\d\d)\b/); if (m) J[m[1]] = 1; });
+    if (!Object.keys(J).length && x.am) J[String(x.am).slice(0, 4)] = 1;
+    return Object.keys(J).map(Number).sort();
+  }
+  function standVon(x) { return x.zurueck ? 'zurueck' : ((x.uebernommen || []).length && !(x.nicht_gelesen || []).length ? 'ueb' : 'offen'); }
+  /** Sprung zum Ziel. av:<jahr> öffnet „Belege je Jahr“, feld:<id>:<sec> den Reiter mit markiertem Feld,
+      we:<i> die Wohnungen, weg die Protokolle im Reiter Haus & Unterlagen. */
+  function hin(z) {
+    var p = String(z || '').split(':');
+    try {
+      if (p[0] === 'av') { if (p[1]) jahresAnsicht(+p[1]); else oeffnen({ reiter: 'jahre' }); return; }
+      if (p[0] === 'we') {
+        var M = window.DpMfhEinheiten;
+        if (M && p[1] !== '' && p[1] != null && typeof M.einheitOeffnen === 'function') { M.einheitOeffnen(+p[1]); return; }
+        if (M && typeof M.oeffnen === 'function') { M.oeffnen(1); return; }
+        p = ['feld', 'mfh-oeffnen', 's0'];
+      }
+      if (p[0] === 'weg') { var w = document.querySelector('.dp-hv-prots') || document.querySelector('.dp-hv-abs'); if (w) { markieren(w); return; } if (window.toast) window.toast('Die Protokolle stehen im Reiter Haus & Unterlagen.'); return; }
+      if (p[0] === 'feld') {
+        if (p[2] && typeof window._dpReiterZu === 'function') window._dpReiterZu(p[2]);
+        setTimeout(function () { var e = el(p[1]); if (!e) { if (window.toast) window.toast('Das Feld gibt es in diesem Stand nicht.'); return; } markieren(e); }, 300);
+      }
+    } catch (e) {}
+  }
+  function markieren(e) {
+    if (e.offsetParent === null && getComputedStyle(e).position !== 'fixed') { if (window.toast) window.toast('Die Stelle ist in dieser Ansicht ausgeblendet. Im Reiter auf Detail stellen, dann ist sie sichtbar.'); return; }
+    for (var q = e.parentElement; q; q = q.parentElement) { if (q.tagName === 'DETAILS' && !q.open) q.open = true; }
+    try { e.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (x) { e.scrollIntoView(); }
+    var alt = e.style.boxShadow; e.style.transition = 'box-shadow .3s'; e.style.boxShadow = '0 0 0 3px var(--wl-c9a84c, #C9A84C)';
+    setTimeout(function () { e.style.boxShadow = alt; }, 2600);
+  }
+  function filtern(k, v) {
+    if (k === 'alle') _filt = { art: '', jahr: '', zu: '', stand: '' }; else _filt[k] = v || '';
+    var c = el('dp-eg-verlauf'); if (c) { var neu = document.createElement('div'); neu.innerHTML = verlaufHtml(); var n = neu.firstElementChild; if (n) c.replaceWith(n); }
+  }
   function verlaufHtml() {
     var o = lesen();
     if (kennungenNachziehen(o)) { var f0 = el('_dok_eingang'); if (f0) f0.value = JSON.stringify(o); }   /* still, ohne Speicher-Ereignis */
@@ -446,33 +521,66 @@
     if (!v.length && !ae.length) return '';
     var datum = function (s) { try { return new Date(s).toLocaleDateString('de-DE'); } catch (x) { return ''; } };
     _grundCss();
-    /* v4530 · Marcel 24.11.2026: „Tabelle Einlesen und übernommen … professioneller“. Statt einzelner Kästen mit
-       Satz und zugeklappten Einzelheiten eine Liste mit Spalten: Datum, gelesene Unterlagen (als Marken mit Art und
-       Dateiname, sofort sichtbar), übernommene Werte (Zahl, die Werte aufklappbar), Knöpfe. Am Handy untereinander. */
-    var h = '<div class="dp-eg-tab" role="table"><div class="dp-eg-kopf" role="row"><span>Datum</span><span>Gelesen</span><span>Übernommen</span><span></span></div>'
-      + v.map(function (x) {
-        var nu = (x.uebernommen || []).length, docs = x.dokumente || [];
+    /* v4530 · Liste mit Spalten Datum, Gelesen, Übernommen, Knöpfe. v4680: dazu Zuordnung und Filter. */
+    var Buch = Array.isArray(o.buchungen) ? o.buchungen : [];
+    var zeilen = v.map(function (x) {
+      var Z = zieleVon(x);
+      Buch.forEach(function (b) { if (b.eid === x.id && b.jahr) { var k = 'Anlage V ' + b.jahr + ' · ' + postenName(b.feld || ''); if (!Z.some(function (z) { return z.text === k; })) Z.push({ g: 'av', jahr: +b.jahr, text: k, hin: 'av:' + b.jahr, n: 1 }); } });
+      var arten = (x.dokumente || []).map(function (d) { return d.typ || 'Dokument'; });
+      return { x: x, Z: Z, J: jahreVon(x, Z), arten: arten, stand: standVon(x) };
+    });
+    /* Auswahl der Filter aus dem, was im Verlauf vorkommt */
+    var opt = { art: {}, jahr: {}, zu: {}, stand: {} };
+    zeilen.forEach(function (r) { r.arten.forEach(function (a) { opt.art[a] = 1; }); r.J.forEach(function (j) { opt.jahr[j] = 1; }); r.Z.forEach(function (z) { opt.zu[z.g] = 1; }); opt.stand[r.stand] = 1; });
+    var passt = function (r) {
+      return (!_filt.art || r.arten.indexOf(_filt.art) >= 0) && (!_filt.jahr || r.J.indexOf(+_filt.jahr) >= 0)
+        && (!_filt.zu || r.Z.some(function (z) { return z.g === _filt.zu; })) && (!_filt.stand || r.stand === _filt.stand);
+    };
+    var sel = function (k, titel, werte, name) {
+      return '<label class="dp-eg-f"><span>' + titel + '</span><select onchange="DpEingang.filtern(\'' + k + '\',this.value)"><option value="">alle</option>'
+        + werte.map(function (w) { return '<option value="' + esc(w) + '"' + (String(_filt[k]) === String(w) ? ' selected' : '') + '>' + esc(name ? name(w) : w) + '</option>'; }).join('') + '</select></label>';
+    };
+    var sichtbar = zeilen.filter(passt), aktiv = _filt.art || _filt.jahr || _filt.zu || _filt.stand;
+    var filter = zeilen.length > 1 ? '<div class="dp-eg-filter">'
+      + sel('art', 'Art', Object.keys(opt.art).sort())
+      + sel('jahr', 'Jahr', Object.keys(opt.jahr).sort().reverse())
+      + sel('zu', 'Zugeordnet', ['av', 'feld', 'we', 'weg', 'sonst'].filter(function (g) { return opt.zu[g]; }), function (g) { return ZU_NAME[g]; })
+      + sel('stand', 'Stand', ['ueb', 'offen', 'zurueck'].filter(function (s) { return opt.stand[s]; }), function (s) { return STAND_NAME[s]; })
+      + '<span class="dp-eg-fz">' + sichtbar.length + ' von ' + zeilen.length + (aktiv ? ' · <button type="button" class="dp-eg-fx" onclick="DpEingang.filtern(\'alle\')">Filter löschen</button>' : '') + '</span></div>' : '';
+    var h = '<div id="dp-eg-verlauf">' + filter + '<div class="dp-eg-tab" role="table"><div class="dp-eg-kopf" role="row"><span>Datum</span><span>Gelesen</span><span>Zugeordnet</span><span>Übernommen</span><span></span></div>'
+      + (sichtbar.length ? '' : '<div class="dp-eg-z dp-eg-leer" role="row"><span></span><span class="dp-eg-nichts">Kein Eintrag passt zum Filter.</span></div>')
+      + sichtbar.map(function (r) {
+        var x = r.x, nu = (x.uebernommen || []).length, docs = x.dokumente || [];
         var marken = docs.map(function (d) { return '<span class="dp-eg-dok" title="' + esc(d.name) + '">' + (d.typ ? '<i>' + esc(d.typ) + '</i>' : '') + esc(d.name) + '</span>'; }).join('')
           + (x.nicht_gelesen || []).map(function (n) { return '<span class="dp-eg-dok warn" title="Nichts gelesen. Bitte von Hand prüfen.">' + '<i>nichts gelesen</i>' + esc(n) + '</span>'; }).join('');
         var zr = x.zurueck
           ? '<div class="dp-eg-hin">Zurückgenommen am ' + esc(datum(x.zurueck.am)) + ', ' + x.zurueck.anzahl + (x.zurueck.anzahl === 1 ? ' Wert' : ' Werte')
             + (x.zurueck.konflikt && x.zurueck.konflikt.length ? '. Belassen, weil seitdem geändert: ' + x.zurueck.konflikt.map(esc).join(', ') : '')
             + (x.zurueck.nicht && x.zurueck.nicht.length ? '. Nicht automatisch: ' + x.zurueck.nicht.map(esc).join(', ') : '') + '</div>' : '';
+        /* Zugeordnet: je Ziel eine Marke mit Anzahl, Klick springt hin */
+        var grp = {}; r.Z.forEach(function (z) { var k = z.g === 'av' ? 'Anlage V ' + z.jahr : (z.g === 'feld' ? z.text.split(' · ')[0] : ZU_NAME[z.g]); if (!grp[k]) grp[k] = { k: k, n: 0, hin: z.hin, g: z.g }; grp[k].n += z.n; });
+        var zu = Object.keys(grp).map(function (k) { var g = grp[k]; return g.hin
+          ? '<button type="button" class="dp-eg-zu z-' + g.g + '" onclick="DpEingang.hin(\'' + esc(g.hin) + '\')" title="Dorthin springen">' + esc(g.k) + ' <b>' + g.n + '</b></button>'
+          : '<span class="dp-eg-zu z-' + g.g + '">' + esc(g.k) + ' <b>' + g.n + '</b></span>'; }).join('');
         var werte = nu
-          ? '<details class="dp-eg-werte"><summary><b>' + nu + '</b> ' + (nu === 1 ? 'Wert' : 'Werte') + '</summary><ul>' + x.uebernommen.map(function (w) { return '<li>' + esc(w) + '</li>'; }).join('') + '</ul></details>'
+          ? '<details class="dp-eg-werte"><summary><b>' + nu + '</b> ' + (nu === 1 ? 'Wert' : 'Werte') + '</summary><ul>' + x.uebernommen.map(function (w) {
+              var z = zielVon(w, x);
+              return '<li><span>' + esc(w) + '</span>' + (z.hin ? '<button type="button" class="dp-eg-ziel" onclick="DpEingang.hin(\'' + esc(z.hin) + '\')">' + esc(z.text) + '</button>' : '<em class="dp-eg-ziel">' + esc(z.text) + '</em>') + '</li>';
+            }).join('') + '</ul></details>'
           : '<span class="dp-eg-nichts">nichts</span>';
         var kannZurueck = !x.zurueck && (x.aenderungen || []).some(function (a) { return a.t !== 'nicht'; });
         var aktion = (kannZurueck ? '<button type="button" class="dp-eg-k" data-eg-knopf="zurueck:' + esc(x.id) + '" onclick="DpEingang.knopf(\'zurueck\',\'' + esc(x.id) + '\',this)" title="Die übernommenen Werte auf den Stand davor setzen">' + knopfText('zurueck', x.id) + '</button>' : '')
           + '<button type="button" class="dp-eg-k rot" data-eg-knopf="loeschen:' + esc(x.id) + '" onclick="DpEingang.knopf(\'loeschen\',\'' + esc(x.id) + '\',this)" title="Nur den Eintrag entfernen, übernommene Werte bleiben">' + knopfText('loeschen', x.id) + '</button>';
-        return '<div class="dp-eg-z' + (x.zurueck ? ' zurueck' : '') + '" role="row">'
-          + '<span class="dp-eg-dat">' + esc(datum(x.am)) + '</span>'
+        return '<div class="dp-eg-z' + (x.zurueck ? ' zurueck' : '') + '" role="row" data-stand="' + r.stand + '">'
+          + '<span class="dp-eg-dat">' + esc(datum(x.am)) + '<small class="dp-eg-st s-' + r.stand + '">' + STAND_NAME[r.stand] + '</small></span>'
           + '<span class="dp-eg-doks">' + (marken || '<span class="dp-eg-nichts">keine Datei</span>') + zr + '</span>'
+          + '<span class="dp-eg-zus">' + (zu || '<span class="dp-eg-nichts">nichts</span>') + '</span>'
           + '<span class="dp-eg-uw">' + werte + '</span>'
           + '<span class="dp-eg-akt">' + aktion + '</span></div>';
       }).join('') + '</div>'
-      + '<p class="dp-eg-fuss">Zurücknehmen setzt die Werte auf den Stand davor. Löschen entfernt nur den Eintrag.</p>';
+      + '<p class="dp-eg-fuss">Klick auf eine Zuordnung springt dorthin. Zurücknehmen setzt die Werte auf den Stand davor. Löschen entfernt nur den Eintrag.</p>';
     if (ae.length) h += '<p class="dp-eg-fuss"><b>Mietverträge den Einheiten zugeordnet:</b> ' + ae.map(function (a) { return esc(a.einheit) + ' (' + esc(datum(a.am)) + (a.vorher.ist ? ', vorher ' + esc(a.vorher.ist) + ' €' : '') + ')'; }).join(' · ') + '</p>';
-    return h;
+    return h + '</div>';
   }
 
   /* v4530 · Marcel 24.11.2026: „unter Unterlagen hochladen … dass wir dann auch noch sehen, welche wir hochgeladen haben“.
@@ -502,7 +610,7 @@
     var g = 'var(--wl-c9a84c, #C9A84C)';
     s.textContent = '.dp-pa-wrap .dp-gn.dp-gx:empty,.dp-pa-wrap[data-dp-pa-v4] .dp-pa-content .dp-gn.dp-gx:empty{padding:0!important;border:0!important;box-shadow:none!important;margin:0!important;min-height:0!important;background:none!important}'   /* v4520 · nicht display:none: eine leere Karte braucht ihre Breite, sonst zeichnet grafiken-neu zeichnen() nie (w < 120) und alle Premium-Grafiken blieben leer */
       + '.dp-eg-tab{border:1px solid color-mix(in srgb,' + g + ' 22%,transparent);border-radius:10px;overflow:hidden;background:#fff;font-family:Inter,system-ui,sans-serif;color:var(--ch,#2A2727)}'
-      + '.dp-eg-kopf,.dp-eg-z{display:grid;grid-template-columns:92px minmax(0,1fr) 110px 228px;gap:10px;align-items:start;padding:9px 12px}'
+      + '.dp-eg-kopf,.dp-eg-z{display:grid;grid-template-columns:92px minmax(0,1.1fr) minmax(0,1fr) 96px 200px;gap:10px;align-items:start;padding:9px 12px}'
       + '.dp-eg-kopf{background:color-mix(in srgb,' + g + ' 7%,#fff);font:600 10px/1.2 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--muted,#7A7370);padding-top:7px;padding-bottom:7px}'
       + '.dp-eg-z{border-top:1px solid rgba(42,39,39,.07);font-size:12.5px}.dp-eg-z.zurueck{opacity:.6}'
       + '.dp-eg-dat{font:600 12px/1.6 "JetBrains Mono",ui-monospace,monospace;color:#6B645A;font-variant-numeric:tabular-nums}'
@@ -519,6 +627,13 @@
       + '.dp-eg-k{font:600 11.5px/1 Inter,system-ui,sans-serif;padding:7px 10px;border-radius:6px;cursor:pointer;white-space:nowrap;min-height:30px;border:1px solid ' + g + ';background:transparent;color:inherit}'
       + '.dp-eg-k.rot{border-color:rgba(184,98,92,.55);color:#B8625C}'
       + '.dp-eg-fuss{margin:8px 0 0;font-size:11.5px;color:var(--muted,#7A7370)}'
+      /* v4680 · Filter und Zuordnung */
+      + '.dp-eg-filter{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:flex-end;margin:0 0 8px}.dp-eg-f{display:flex;flex-direction:column;gap:3px;min-width:120px}.dp-eg-f span{font:600 9.5px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--muted,#7A7370)}.dp-eg-f select{font:500 12.5px/1.2 Inter,system-ui,sans-serif;padding:6px 8px;border:1px solid rgba(42,39,39,.15);border-radius:6px;background:#fff;color:var(--ch,#2A2727);min-height:32px}'
+      + '.dp-eg-fz{margin-left:auto;font-size:12px;color:var(--muted,#7A7370);align-self:center}.dp-eg-fx{border:0;background:none;color:var(--wl-9a7f33,#9a7f33);font:600 12px Inter,system-ui,sans-serif;cursor:pointer;padding:0;text-decoration:underline}'
+      + '.dp-eg-zus{display:flex;flex-wrap:wrap;gap:5px;min-width:0}.dp-eg-zu{display:inline-flex;align-items:center;gap:5px;border:1px solid color-mix(in srgb,' + g + ' 35%,transparent);background:color-mix(in srgb,' + g + ' 7%,#fff);border-radius:999px;padding:3px 9px;font:500 11.5px/1.3 Inter,system-ui,sans-serif;color:inherit;cursor:pointer;white-space:nowrap}span.dp-eg-zu{cursor:default}.dp-eg-zu b{font-variant-numeric:tabular-nums;color:var(--wl-9a7f33,#9a7f33)}button.dp-eg-zu:hover{border-color:' + g + '}'
+      + '.dp-eg-uw li{display:flex;flex-wrap:wrap;gap:2px 8px;align-items:baseline}.dp-eg-ziel{border:0;background:none;padding:0;font:500 11px/1.4 Inter,system-ui,sans-serif;color:var(--wl-9a7f33,#9a7f33);cursor:pointer;font-style:normal}button.dp-eg-ziel:hover{text-decoration:underline}.dp-eg-ziel::before{content:"\\2192  "}'
+      + '.dp-eg-st{display:block;margin-top:3px;font:600 9px/1 "JetBrains Mono",monospace;letter-spacing:.06em;text-transform:uppercase}.dp-eg-st.s-ueb{color:#3FA56C}.dp-eg-st.s-offen{color:#B8625C}.dp-eg-st.s-zurueck{color:var(--muted,#7A7370)}'
+      + '@media (max-width:700px){.dp-eg-filter .dp-eg-f{flex:1 1 140px}.dp-eg-fz{margin-left:0;flex-basis:100%}}'
       + '.dp-eg-schon{margin-top:12px;border:1px solid color-mix(in srgb,' + g + ' 22%,transparent);border-radius:10px;padding:10px 12px;background:#fff}'
       + '.dp-eg-schon-t{font:600 10.5px/1.2 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--muted,#7A7370);margin-bottom:6px}'
       + '.dp-eg-schon-t b{color:var(--wl-9a7f33,#9a7f33);margin-left:4px}'
@@ -533,7 +648,7 @@
       + '.dp-eg-wohin li{border:1px solid color-mix(in srgb,' + g + ' 22%,transparent);border-radius:8px;padding:8px 10px;background:#fff;font-size:12px;line-height:1.35}'
       + '.dp-eg-wohin b{display:block;font-weight:600;color:var(--ch,#2A2727)}.dp-eg-wohin span{color:var(--muted,#7A7370)}'
       + '@media (max-width:640px){.dp-eg-kopf{display:none}.dp-eg-z{grid-template-columns:minmax(0,1fr) auto}.dp-eg-dat{grid-column:1}.dp-eg-uw{grid-column:2;grid-row:1;text-align:right}'
-      + '.dp-eg-doks{grid-column:1/-1}.dp-eg-akt{grid-column:1/-1;justify-content:flex-start}.dp-eg-schon li{grid-template-columns:minmax(0,1fr) 70px}.dp-eg-schon .t{display:none}}';
+      + '.dp-eg-doks,.dp-eg-zus{grid-column:1/-1}.dp-eg-akt{grid-column:1/-1;justify-content:flex-start}.dp-eg-schon li{grid-template-columns:minmax(0,1fr) 70px}.dp-eg-schon .t{display:none}}';
     document.head.appendChild(s);
   }
 
@@ -778,9 +893,9 @@
   }
 
   try { _grundCss(); } catch (e) {}
-  window.DpEingang = { VERSION: 'v4530g', schonHtml: schonHtml, start: start, jahresAnsicht: jahresAnsicht, jahresInRahmen: jahresInRahmen, oeffnen: oeffnen, istRechnung: istRechnung, belegeAuslesen: belegeAuslesen,
+  window.DpEingang = { VERSION: 'v4680', schonHtml: schonHtml, start: start, jahresAnsicht: jahresAnsicht, jahresInRahmen: jahresInRahmen, oeffnen: oeffnen, istRechnung: istRechnung, belegeAuslesen: belegeAuslesen,
     einheiten: einheiten, mvVorschlag: mvVorschlag, mvOptionen: mvOptionen, mvText: mvText, mvUebernehmen: mvUebernehmen, mvFelder: mvFelder,
-    jahrStand: jahrStand, protokoll: protokoll, verlaufHtml: verlaufHtml, lesen: lesen,
+    jahrStand: jahrStand, protokoll: protokoll, verlaufHtml: verlaufHtml, lesen: lesen, filtern: filtern, hin: hin, zieleVon: zieleVon /* v4680 */,
     /* v3154 */ txStart: txStart, txEnde: txEnde, feldStand: feldStand, feldGeaendert: feldGeaendert,
     zuruecknehmen: zuruecknehmen, eintragLoeschen: eintragLoeschen, knopf: knopf, vorschau: vorschau };
 })();
