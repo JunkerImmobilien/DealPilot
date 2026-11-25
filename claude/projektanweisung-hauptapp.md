@@ -45610,3 +45610,10 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** staging 072f3f51 … 58efff89, v4780g; main 3e9ba09e … 55854236, fad4d1fe, Version 60b33242.
 - **Nachweis:** Staging 2026-1194: Einfach 5 Zeilen, Jahr 2026 zeigt 3 Punkte = Zahl am Knopf, Tooltip ok, Grafik in Kartenbreite. Gegenprobe Löschen Eintrag Mietaufstellung: Risiken 7 → 4 (Hausverlauf und Unterlagen-Teil), Datei als entfernt markiert. Deal-Status: Tafelrahmen 0 px. Prüfer: buster-ebenen SAUBER, vorschau SAUBER, unterlagen-steuer 53/53, sonderumlage 26/26, gold-audit Staging und Prod RC 0. Prod-Sicherung haupt-/mb-20261125-0945-v4780 (7,0/31 MB, Kopf gelesen).
 - **Rest:** Lindenallee 14 über Quick Boarding: genau ein Objekt (2026-1197), Felder siehe wissen; die gemeinsame Unterlagen-Auswertung (Risiken, These, WEG-Protokolle) kommt im Quick-Check-Weg weiter NICHT im Objekt an (dokumente-auswerten 200, aber keine Zeilen _dok_auswertung/risiken/thesis im Übernahme-Fenster) und die Pilot-Analyse startet deshalb nicht. Ursache offen. Zins/Tilgung/Energieklasse aus dem Quick-Check fehlen im Objekt. 2026-1196 (Lauf ohne Auswertung) auf Verloren.
+
+### Rollout 1.0.214 · einzelcheck-8 bis 9e (Fork HH4)
+
+- **Was:** Deal-Check-PDF: Rechenweg Ertrags-/Sachwert, Teilscores auf „Auf einen Blick“, Fazit vor Quellen, keine leere Seite, Herkunftszeilen live, Stichpunkte nur ganze Sätze.
+- **Commit:** staging 8c84e475, dbe57bec, 1491204e, 821efb7d, c3729945, 6eaa6e5f, ee488389 · main 6d16fbca … 162c4efa, Version fd7f512f.
+- **Nachweis:** Muster Dateien/Einzelcheck/Muster-komplett-2026-11-25 (15 Seiten je Objekt), einzelcheck-pruefen grün, buster-ebenen sauber, Prod-Sicherung haupt/mb-20261125-0945-ec9e (7,0/31 MB, Kopf gelesen), Backend neu gebaut, Landing liefert einzelcheck.js?v=einzelcheck-9e, version 214.
+- **Rest:** Abstand nach Mietpotenzial-Tabelle, Anschrift bei Wiederholung, Wohnungszahl für MFH-Sachwert.
