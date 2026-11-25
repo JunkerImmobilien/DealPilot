@@ -56,7 +56,8 @@ import { zensusMieteAmStichtag, nkmIndexAm, NKM_INDEX } from '../lib/zensus_miet
 import { protokolliereMessung as protokolliereAbschlag } from './JahreswerteService.js';   /* v3021 */
 import { stichtagVon, stichtagJahr, stichtagIso } from '../lib/stichtag.js';
 import { vergleichsmieteKontext } from '../lib/mietanker_kontext.js';   /* v3343 · Vergleichsmiete der Wohnung */
-import { vergleichsmieteAuszug } from '../lib/vergleichsmiete_auszug.js';   /* v3944 · Einzel-Check: nur die Vergleichsmiete aus dem Quercheck */
+import { mietpreisbremseFuer as _mpbFuer } from '../lib/kappung.js';   /* einzelcheck-9 */
+import { vergleichsmieteAuszug, zielAusAuszug } from '../lib/vergleichsmiete_auszug.js';   /* v3944 · Einzel-Check: nur die Vergleichsmiete aus dem Quercheck */
 import { regVfEingabe, regVfErgebnis } from '../lib/vergleichsfaktor_eingabe.js';   /* v3200 */   /* v3010 · Wertermittlungsstichtag */
 
 /* v3043 · Fortschreibungsfaktor der Zensus-Miete zum Stichtag an den Zensus-Block haengen */
@@ -1828,6 +1829,8 @@ export const ReportOrchestrator = {
     let _vglAuszug = null;
     if (opts && opts.vergleichsmiete) {
       try { _vglAuszug = vergleichsmieteAuszug(crossCheck); } catch (e) { _vglAuszug = { verfuegbar: false, grund: 'fehler' }; }
+      /* einzelcheck-9 · Obergrenzen der Wohnung wie die App (lib/mietanker.js zielMaximum, Investorensicht) */
+      if (_vglAuszug && _vglAuszug.verfuegbar) { try { _vglAuszug.ziel = zielAusAuszug(_vglAuszug, _mpbFuer(ref.ags), ref.build_year); } catch (e) { _vglAuszug.ziel = null; } }
       step('vergleichsmiete (Auszug): ' + (_vglAuszug.verfuegbar ? _vglAuszug.qm + ' EUR/m2 (' + _vglAuszug.art + ')' : 'keine (' + _vglAuszug.grund + ')'));
     }
     if (_stufe < 3) {

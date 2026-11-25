@@ -740,7 +740,19 @@ function vglAus(v) {
   if (!(qm > 0 && qm < 60)) return null;
   const s = function (x) { const n = _n(x); return n > 0 && n < 60 ? n : null; };
   return { qm: qm, art: v.art, ca: v.art === 'naeherung', unten: s(v.unten), mittel: s(v.mittel), oben: s(v.oben),
-    einordnung: /^(oben|mittel|unten)$/.test(String(v.einordnung || '')) ? v.einordnung : null };
+    einordnung: /^(oben|mittel|unten)$/.test(String(v.einordnung || '')) ? v.einordnung : null,
+    /* einzelcheck-9 · Obergrenzen wie die App (mb lib/mietanker.js zielMaximum ueber zielAusAuszug), nur Zahlen */
+    ziel: zielAus(v.ziel) };
+}
+function zielAus(z) {
+  if (!z || typeof z !== 'object') return null;
+  const s = function (x) { const n = _n(x); return n > 0 && n < 60 ? n : null; };
+  const b = s(z.bestand_max_qm), nm = s(z.neu_max_qm);
+  if (!b || !nm) return null;
+  const f = _n(z.faktor);
+  return { bestand_max_qm: b, neu_max_qm: nm, neu_sicher_qm: s(z.neu_sicher_qm), mittel_qm: s(z.mittel_qm),
+    faktor: (f > 1 && f <= 1.2) ? f : null, bremse_gilt: z.bremse_gilt === true ? true : (z.bremse_gilt === false ? false : null),
+    neubau: z.neubau === true, ca: z.ca === true, bedingung: z.bedingung === true };
 }
 function marktAus(out) {
   const p = (out && out.data) || {};

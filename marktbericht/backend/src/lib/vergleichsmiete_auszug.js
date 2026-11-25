@@ -24,6 +24,8 @@
    Kern ohne Einstellung, Datei oder Datenbank. Pruefer: tools/einzelcheck-pruefen.mjs (Teil N).
    ═══════════════════════════════════════════════════════════════════════ */
 
+import { zielMaximum } from './mietanker.js';   /* einzelcheck-9 · Obergrenze wie die App (Investorensicht) */
+
 export const VGL_STUFEN = ['mietspiegel', 'amtlich', 'naeherung'];
 
 const num = (v) => {
@@ -67,4 +69,24 @@ export function vergleichsmieteAuszug(crossCheck) {
     oben: spanne ? spanne.oben : null,
     einordnung: ein
   };
+}
+
+/* einzelcheck-9 (Marcel 25.11.2026, Investorensicht wie die App, Regel 18.11.2026 / lib/mietanker.js v3343):
+   die Obergrenzen der Wohnung rechnet NICHT der Einzel-Check, sondern zielMaximum() - dieselbe Funktion wie
+   Route /mietspiegel (ziel_maximum) und PotenzialService. Bestand bis zum OBERWERT der Spanne (§ 558 BGB, in
+   Schritten der Kappung), Neuvermietung Oberwert x 1,10 mit oder bei ungeklaerter Mietpreisbremse, ohne Bremse
+   x Faktor ohne Bremse (Vorgabe 1,20, § 5 WiStG; der Einzel-Check kennt keine Kontoeinstellung).
+   auszug: Ergebnis vergleichsmieteAuszug() · bremse: mietpreisbremseFuer(ags) · baujahr: Erstbezug ab 2015 => § 556f.
+   -> null | { bestand_max_qm, neu_max_qm, neu_sicher_qm, mittel_qm, faktor, bremse_gilt, neubau, ca, bedingung } */
+export function zielAusAuszug(auszug, bremse, baujahr) {
+  if (!auszug || auszug.verfuegbar !== true) return null;
+  const mittel = num(auszug.mittel) > 0 ? num(auszug.mittel) : num(auszug.qm);
+  if (!(mittel > 0)) return null;
+  const oben = num(auszug.oben) > 0 ? num(auszug.oben) : mittel;
+  const v = { mittel: mittel, oben: oben, ca: !!auszug.ca, einordnung: { belegt_oben: auszug.einordnung === 'oben' } };
+  const z = zielMaximum(v, bremse || null, Number(baujahr) >= 2015 ? '556f_neubau' : '', undefined);
+  if (!z) return null;
+  return { bestand_max_qm: z.bestand_max_qm, neu_max_qm: z.neu_max_qm, neu_sicher_qm: z.neu_sicher_qm, mittel_qm: r2(mittel),
+    faktor: z.faktor, bremse_gilt: z.bremse_gilt == null ? null : !!z.bremse_gilt, neubau: !!z.neubau, ca: !!z.ca,
+    bedingung: z.bedingung ? true : false };
 }
