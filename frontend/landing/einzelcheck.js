@@ -945,7 +945,7 @@
     if (!mi) return z;
     z.push(['Ist-Miete heute', eur(mi.ist_monat), '', '', { det: qmText(mi.ist_qm) + ' kalt' }]);
     if (mi.bestand) z.push([mi.ziel ? 'Obergrenze im Bestand, in drei Jahren' : 'Bestandsmiete in drei Jahren', eur(mi.bestand.monat), eurS(mi.bestand.plus_monat), eurS(mi.bestand.plus_jahr),
-      { det: qmText(mi.bestand.monat / mi.wfl) + (mi.ziel ? ', bis zum Oberwert der Spanne in Schritten der Kappungsgrenze (§ 558 BGB)' : ', höchstens zulässig bei laufendem Mietvertrag (§ 558 BGB)'), farbe: true }]);
+      { det: qmText(mi.bestand.monat / mi.wfl) + (mi.ziel ? (mi.zul && mi.zul.grund === 'vergleichsmiete_erreicht' ? ', Ist-Miete schon über dem Oberwert ' + qmText(mi.ziel.bestand_max_qm, mi.ziel.ca) + ', keine Erhöhung' : ', bis zum Oberwert der Spanne in Schritten der Kappungsgrenze (§ 558 BGB)') : ', höchstens zulässig bei laufendem Mietvertrag (§ 558 BGB)'), farbe: true }]);
     if (mi.nv && mi.nv.qm > 0) z.push([mi.nv.investor ? (mi.nv.art === 'bremse_pruefen' ? 'Obergrenze bei Neuvermietung (Mietpreisbremse prüfen)' : 'Obergrenze bei Neuvermietung') : (mi.nv.art === 'bremse' ? 'Neuvermietung, Obergrenze' : 'Neuvermietung, Richtwert'), eur(mi.nv.monat), eurS(mi.nv.plus_monat), eurS(mi.nv.plus_jahr),
       { det: qmText(mi.nv.qm, mi.vgl && mi.vgl.ca) + (mi.nv.investor ? ', Oberwert der Spanne mal ' + dez(mi.nv.faktor * 100, 0) + ' %' + (mi.nv.art === 'frei' || mi.nv.art === 'frei_neubau' ? ' (keine Mietpreisbremse, Grenze § 5 WiStG)' : ' (Mietpreisbremse, § 556d BGB)') : (mi.nv.art === 'bremse' ? ', Mietpreisbremse (Vergleichsmiete plus 10 %, § 556d BGB)' : ', ortsübliche Vergleichsmiete')), farbe: true }]);
     return z;
@@ -1519,8 +1519,8 @@
       var mi = d.miete;
       seiten.push(D.seite(c, 'Mietpotenzial', D.abschnitt('Miete', 'Mietpotenzial und Obergrenze', 'Ist-Miete gegen die ortsübliche Vergleichsmiete und das, was aus Investorensicht rechtlich höchstens drin ist.')
         + D.kacheln([{ l: 'Ist-Miete', v: D.zahl(mi.ist_qm, 2) + ' €/m²' },
-          { l: 'Vergleichsmiete', v: mi.vgl_qm ? (mi.vgl && mi.vgl.ca ? 'ca. ' : '') + D.zahl(mi.vgl_qm, 2) + ' €/m²' : 'kein Wert', s: mi.vgl_qm ? mi.vgl_herkunft : 'keine amtlichen Mietdaten für den Ort' },
-          { l: 'Marktdurchschnitt', v: mi.markt_qm ? D.zahl(mi.markt_qm, 2) + ' €/m²' : 'nicht ermittelt', s: 'Angebotsmieten, Neuvermietung' }].concat(mi.ziel ? [{ l: 'Oberwert der Spanne', v: (mi.ziel.ca ? 'ca. ' : '') + D.zahl(mi.ziel.bestand_max_qm, 2) + ' €/m²', s: 'Grenze im Bestand aus Investorensicht' }] : []), true)
+          { l: 'Vergleichsmiete', v: mi.vgl_qm ? (mi.vgl && mi.vgl.ca ? 'ca. ' : '') + D.zahl(mi.vgl_qm, 2) + ' €/m²' : 'kein Wert', s: mi.vgl_qm ? mi.vgl_herkunft + (mi.ziel ? ', Oberwert ' + (mi.ziel.ca ? 'ca. ' : '') + D.zahl(mi.ziel.bestand_max_qm, 2) + ' €/m²' : '') : 'keine amtlichen Mietdaten für den Ort' },
+          { l: 'Marktdurchschnitt', v: mi.markt_qm ? D.zahl(mi.markt_qm, 2) + ' €/m²' : 'nicht ermittelt', s: 'Angebotsmieten, Neuvermietung' }], true)
         + '<h3>Obergrenze für Investoren</h3>' + D.liste(mieteZeilen(mi), ['Miete', 'im Monat', 'Abstand im Monat', 'Abstand im Jahr'])
         + '<ul>' + mieteSaetze(mi).map(function (t) { return '<li>' + D.esc(t) + '</li>'; }).join('') + '</ul>'));
     }
