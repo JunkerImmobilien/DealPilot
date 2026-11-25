@@ -1,4 +1,4 @@
-/* grafiken-portfolio.js · v4180 · Portfolio auf einen Blick (Portfolio-Cockpit, Vorschau grafiken_neu)
+/* grafiken-portfolio.js · v4180 (v4640 Baukasten, Farbe nach Grafik-Stil) · Portfolio auf einen Blick (Portfolio-Cockpit, Vorschau grafiken_neu)
  *
  * Marcel 23.11.2026 zu v4140: „die 12 von 18 Objekte in Gelb, mit den Mieteinnahmen, Cashflow nach Steuer und dem
  * Steuereffekt je Objekt nebeneinander“, „die größte Anschlussfinanzierung haben wir gar nicht optimiert“, „oben die
@@ -233,7 +233,7 @@
       + '<label>Art <select data-gp-f="art">' + opt('all', 'alle', _f.art === 'all') + arten.map(function (a) { return opt(a, a, _f.art === a); }).join('') + '</select></label>'
       + '<label>Objekt <select data-gp-f="obj">' + opt('all', 'alle', _f.obj === 'all') + alle.filter(function (r) { return _f.art === 'all' || r.art === _f.art; }).map(function (r) { return opt(r.id, r.name, _f.obj === r.id); }).join('') + '</select></label>'
       + '<label>Projektion bis <input type="range" data-gp-f="jahr" min="' + (J0 + 1) + '" max="' + JE + '" value="' + _f.jahr + '"> <b>' + _f.jahr + '</b></label>'
-      + '<button type="button" class="gp-zahn" data-gp-a="ansicht" title="Grafiken ein- und ausblenden" aria-haspopup="dialog">⚙ Ansicht anpassen</button></div></div>';   /* v4260 */
+      + '<button type="button" class="gp-zahn" data-gp-a="ansicht" title="Module wählen, sortieren und Vorlagen" aria-haspopup="dialog">⚙ Ansicht anpassen</button></div></div>';   /* v4260 */
 
     var gross = '<div class="gp-gross">'
       + kachel('Vermögen netto', mio(Wert - Rest), 'Wert ' + mio(Wert) + ' minus Restschuld', '', 'Wert heute je Objekt: letzter Marktbericht, sonst Kaufpreis (' + nMb + ' von ' + rows.length + ' mit Marktbericht). Minus Restschuld heute.', true)
@@ -342,81 +342,362 @@
      DealPilotDashboard.vermoegenBlick() (_bilanzHeute und projectAll, dieselben Reihen wie die alten Grafiken in
      buildCharts) und .steuerKetteDaten() (steuerKette). Gezeichnet über window.DpGrafiken (karte, verlauf), die Balken
      lokal als SVG mit denselben Klassen und Farben. Die alten Karten bleiben im DOM und werden nur ausgeblendet. */
+  /* ══ v4640 · Baukasten „Ansicht anpassen“ ════════════════════════════════════════════════════════
+     Marcel 25.11.2026 zu den Demos Runde 3: „Richtig geil mit dem Baukasten. Setz das mal so um.“
+     Jedes vorhandene Cockpit-Modul: an oder aus, Reihenfolge (ziehen oder Pfeile), halbe oder volle Breite.
+     Vorlagen wie in den Demos (Standard = Demo 01). Module einer Vorlage, die es in der App noch nicht gibt,
+     stehen ausgegraut mit „kommt“. Score-Kopf und Kennzahlenleiste stehen fest oben.
+     Gespeichert im Einstellungsspeicher (cockpit_ansicht, v: 2), localStorage nur als schneller Rückfall.
+     Die Grafiken unter „Projektion und Verlauf“ (vb-*) liegen in EINER Karte: sie sortieren sich untereinander,
+     die Gruppe als Ganzes steht im Hauptraster. */
   var ANSICHT = [
-    { k: 'kopf', t: 'Kennzahlen auf einen Blick', g: 'an', fest: true, w: 'Die wichtigsten Zahlen des Portfolios in einer Leiste.' },
-    { k: 'gb', t: 'Vermögen und Gesamtbewertung', g: 'an', fest: true, w: 'Was investiert ist, was dir heute gehört und was es nach Bewertung wert ist.' },
-    { k: 'vb-eq', t: 'Eigenkapital-Entwicklung', g: 'an', w: 'Wie dein Anteil am Portfolio über die Jahre wächst.' },
-    { k: 'vb-bilanz', t: 'Vermögensbilanz heute', g: 'an', w: 'Was du besitzt gegen das, was der Bank gehört.' },
-    { k: 'vb-objekte', t: 'Vermögen nach Objekt und Lage', g: 'an', w: 'Wo dein Vermögen steckt, mit Klumpen nach Ort.' },
-    { k: 'vb-quellen', t: 'Woraus das Vermögen wächst', g: 'aus', w: 'Zuwachs je Jahr aus Tilgung, Wertsteigerung und Überschuss.' },
-    { k: 'vb-cf', t: 'Cashflow vor und nach Steuer im Verlauf', g: 'an', w: 'Wie sich der Cashflow aller Objekte über die Jahre entwickelt und was die Steuer ausmacht.' },   /* v4480 */
-    { k: 'ob', t: 'Cashflow und Steuer je Objekt', g: 'an', w: 'Welches Objekt Geld bringt und welches kostet.' },
-    { k: 'bk', t: 'Finanzierung und Anschluss', g: 'an', w: 'Wann wie viel Restschuld neu finanziert wird.' },
-    { k: 'zielbild', t: 'Bestand und Zielbild', g: 'an', w: 'Was in Mieterhöhung und Maßnahmen steckt.' },
-    { k: 'pp', t: 'Portfolio-Pilot', g: 'an', w: 'Die KI-Einschätzung über alle Objekte.' },
-    { k: 'steuer', t: 'Steuer über alle Objekte', g: 'zu', w: 'Wirkung jedes Objekts auf deine Steuer, Progression und Steuer-Mappe.' },
-    { k: 'gesamtproj', t: 'Gesamt-Projektion als Tabelle', g: 'aus', w: 'Alle Jahre der Modellprojektion in Zahlen.' },
-    { k: 'det', t: 'Objekte im Einzelnen und Rechenprüfung', g: 'zu', w: 'Liste je Objekt mit Hinweisen und die Prüfung der Summen.' }
+    { k: 'kopf', t: 'Kennzahlen auf einen Blick', fest: true, w: 'Die wichtigsten Zahlen des Portfolios in einer Leiste.' },
+    { k: 'gb', t: 'Vermögen und Gesamtbewertung', b: 'ganz', w: 'Was investiert ist, was dir heute gehört und was es nach Bewertung wert ist.' },
+    { k: 'zielbild', t: 'Bestand und Zielbild je Objekt', b: 'ganz', w: 'Die Tabelle wie in der Pilot-Analyse, für alle Objekte. Fahr über ein Objekt für die Details.' },
+    { k: 'ob', t: 'Cashflow und Steuer je Objekt', b: 'halb', w: 'Welches Objekt Geld bringt und welches kostet.' },
+    { k: 'bk', t: 'Finanzierung und Anschluss', b: 'halb', w: 'Wann wie viel Restschuld neu finanziert wird.' },
+    { k: 'projektion', t: 'Projektion und Verlauf', b: 'ganz', gruppe: true, w: 'Die Verlaufsgrafiken in einer Karte.' },
+    { k: 'vb-eq', t: 'Eigenkapital-Entwicklung', b: 'ganz', vb: true, w: 'Wie dein Anteil am Portfolio über die Jahre wächst.' },
+    { k: 'vb-cf', t: 'Cashflow vor und nach Steuer im Verlauf', b: 'ganz', vb: true, w: 'Wie sich der Cashflow aller Objekte entwickelt und was die Steuer ausmacht.' },
+    { k: 'vb-bilanz', t: 'Vermögensbilanz heute', b: 'halb', vb: true, w: 'Was du besitzt gegen das, was der Bank gehört.' },
+    { k: 'vb-objekte', t: 'Vermögen nach Objekt und Lage', b: 'halb', vb: true, w: 'Wo dein Vermögen steckt, mit Klumpen nach Ort.' },
+    { k: 'vb-quellen', t: 'Woraus das Vermögen wächst', b: 'ganz', vb: true, w: 'Zuwachs je Jahr aus Tilgung, Wertsteigerung und Überschuss.' },
+    { k: 'pp', t: 'Portfolio-Pilot', b: 'ganz', w: 'Die KI-Einschätzung über alle Objekte.' },
+    { k: 'steuer', t: 'Steuer über alle Objekte', b: 'ganz', w: 'Wirkung jedes Objekts auf deine Steuer, Progression und Steuer-Mappe.' },
+    { k: 'gesamtproj', t: 'Gesamt-Projektion als Tabelle', b: 'ganz', w: 'Alle Jahre der Modellprojektion in Zahlen.' },
+    { k: 'det', t: 'Objekte im Einzelnen und Rechenprüfung', b: 'ganz', w: 'Liste je Objekt mit Hinweisen und die Prüfung der Summen.' }
   ];
-  var _ans = null, _ansOffen = false, _ansServer = false;
+  function modul(k) { return ANSICHT.filter(function (x) { return x.k === k; })[0] || null; }
+  var TOP = ANSICHT.filter(function (a) { return !a.fest && !a.vb; }).map(function (a) { return a.k; });
+  var VBK = ANSICHT.filter(function (a) { return a.vb; }).map(function (a) { return a.k; });
+  /* Vorlagen nach den Demos (Dateien/Portfolio-Cockpit/Demos-2026-11-25c/baukasten.js). m: [Schlüssel, Breite] in Reihenfolge. */
+  var VORLAGEN = [
+    { k: 'standard', t: 'Standard', u: 'Was ein Bestandshalter jeden Monat sehen will',
+      m: [['zielbild', 'ganz'], ['ob', 'halb'], ['bk', 'halb'], ['vb-eq', 'ganz'], ['vb-cf', 'ganz'], ['gb', 'ganz'], ['pp', 'ganz'], ['det', 'ganz']],
+      kommt: ['Was jetzt zu tun ist', 'EK-Rendite je Objekt', 'Wohin die Miete geht'] },
+    { k: 'risiko', t: 'Risiko', u: 'Wo der Bestand verwundbar ist',
+      m: [['bk', 'ganz'], ['ob', 'ganz'], ['zielbild', 'ganz'], ['det', 'ganz']],
+      kommt: ['Risikomatrix', 'Rendite gegen Tragfähigkeit', 'Deine Ziele', 'Anschlussfinanzierung je Jahr', 'Zinsstress beim Anschluss'] },
+    { k: 'steuer', t: 'Steuer', u: 'Was die Steuer aus dem Cashflow macht',
+      m: [['steuer', 'ganz'], ['ob', 'ganz'], ['vb-cf', 'ganz'], ['zielbild', 'ganz']],
+      kommt: ['Wohin die Miete geht', 'Woher die Rendite kommt'] },
+    { k: 'bank', t: 'Finanzierung · Bank-Mappe', u: 'Für das Gespräch mit der Bank',
+      m: [['bk', 'ganz'], ['gb', 'ganz'], ['vb-bilanz', 'halb'], ['vb-objekte', 'halb'], ['vb-eq', 'ganz'], ['zielbild', 'ganz']],
+      kommt: ['Anschlussfinanzierung je Jahr', 'Was dein Eigenkapital verdient', 'Deine Ziele', 'Zinsstress beim Anschluss'] },
+    { k: 'bericht', t: 'Bericht', u: 'Ruhig, zum Lesen und Weitergeben',
+      m: [['gb', 'ganz'], ['zielbild', 'ganz'], ['vb-eq', 'halb'], ['vb-quellen', 'halb'], ['pp', 'ganz']],
+      kommt: ['Woher die Rendite kommt', 'Deine Objekte mit Bild'] }
+  ];
+  function vorlageVon(k) { return VORLAGEN.filter(function (v) { return v.k === k; })[0] || null; }
+  /* Stand aus einer Vorlage: nur ihre Module an, in ihrer Reihenfolge und Breite, der Rest dahinter und aus */
+  function ausVorlage(v) {
+    var an = {}, br = {}, ord = [], ordVb = [];
+    ANSICHT.forEach(function (a) { if (!a.fest && !a.gruppe) an[a.k] = false; });
+    v.m.forEach(function (x) {
+      an[x[0]] = true; br[x[0]] = x[1];
+      if (VBK.indexOf(x[0]) >= 0) { ordVb.push(x[0]); if (ord.indexOf('projektion') < 0) ord.push('projektion'); }
+      else if (ord.indexOf(x[0]) < 0) ord.push(x[0]);
+    });
+    TOP.forEach(function (k) { if (ord.indexOf(k) < 0) ord.push(k); });
+    VBK.forEach(function (k) { if (ordVb.indexOf(k) < 0) ordVb.push(k); });
+    br.projektion = 'ganz';
+    return { v: 2, an: an, ord: ord, ordVb: ordVb, br: br, vorlage: v.k };
+  }
+  var _ans = null, _ansServer = false, _bkOffen = false, _bkVorher = null, _bkPut = null;
+  /* v1 (v4260) kannte nur an/aus: die Häkchen bleiben, Reihenfolge und Breite kommen aus Standard */
+  function normal(s) {
+    var basis = ausVorlage(VORLAGEN[0]);
+    if (!s || typeof s !== 'object') return basis;
+    var an = s.an && typeof s.an === 'object' ? s.an : (s.v ? {} : s);
+    var out = { v: 2, an: {}, ord: [], ordVb: [], br: {}, vorlage: s.v === 2 ? (s.vorlage || null) : (Object.keys(an).length ? null : 'standard') };
+    Object.keys(basis.an).forEach(function (k) { out.an[k] = Object.prototype.hasOwnProperty.call(an, k) ? !!an[k] : basis.an[k]; });
+    var o = Array.isArray(s.ord) ? s.ord.filter(function (k) { return TOP.indexOf(k) >= 0; }) : [];
+    basis.ord.forEach(function (k) { if (o.indexOf(k) < 0) o.push(k); }); out.ord = o;
+    var ov = Array.isArray(s.ordVb) ? s.ordVb.filter(function (k) { return VBK.indexOf(k) >= 0; }) : [];
+    basis.ordVb.forEach(function (k) { if (ov.indexOf(k) < 0) ov.push(k); }); out.ordVb = ov;
+    ANSICHT.forEach(function (a) { if (a.fest) return; var b = s.br && s.br[a.k]; out.br[a.k] = b === 'halb' || b === 'ganz' ? b : (basis.br[a.k] || a.b || 'ganz'); });
+    return out;
+  }
   function ansLaden() {
     if (_ans) return _ans;
-    _ans = {}; try { _ans = JSON.parse(localStorage.getItem('dp_gp_ansicht') || '{}') || {}; } catch (e) { _ans = {}; }
+    var roh = null; try { roh = JSON.parse(localStorage.getItem('dp_gp_ansicht') || 'null'); } catch (e) { roh = null; }
+    _ans = normal(roh);
     if (!_ansServer) {
       _ansServer = true;
       try { if (window.Auth && Auth.apiCall) Auth.apiCall('/user-settings/cockpit_ansicht').then(function (r) {
-        var w = r && r.wert && r.wert.an; if (!w || typeof w !== 'object') return;
-        _ans = w; try { localStorage.setItem('dp_gp_ansicht', JSON.stringify(w)); } catch (e) {}
-        ansichtAnwenden();
+        var w = r && r.wert; if (!w || typeof w !== 'object') return;
+        _ans = normal(w.v === 2 ? w : (w.an || null));
+        try { localStorage.setItem('dp_gp_ansicht', JSON.stringify(_ans)); } catch (e) {}
+        ansichtAnwenden(); if (_bkOffen) bkListe();
       }).catch(function () {}); } catch (e) {}
     }
     return _ans;
   }
   function ansSpeichern() {
-    try { localStorage.setItem('dp_gp_ansicht', JSON.stringify(_ans || {})); } catch (e) {}
-    try { if (window.Auth && Auth.apiCall) Auth.apiCall('/user-settings/cockpit_ansicht', { method: 'PUT', body: { wert: { v: 1, an: _ans || {} } } }).catch(function () {}); } catch (e) {}
+    try { localStorage.setItem('dp_gp_ansicht', JSON.stringify(_ans)); } catch (e) {}
+    if (_bkPut) clearTimeout(_bkPut);
+    _bkPut = setTimeout(function () {
+      try { if (window.Auth && Auth.apiCall) Auth.apiCall('/user-settings/cockpit_ansicht', { method: 'PUT', body: { wert: _ans } }).catch(function () {}); } catch (e) {}
+    }, 500);
   }
   function sichtbar(k) {
-    var a = ANSICHT.filter(function (x) { return x.k === k; })[0]; if (!a) return true;
-    if (a.fest) return true;
-    var A = ansLaden(); return Object.prototype.hasOwnProperty.call(A, k) ? !!A[k] : a.g !== 'aus';
+    var a = modul(k); if (!a) return true; if (a.fest) return true;
+    var A = ansLaden();
+    if (a.gruppe) return VBK.some(function (x) { return A.an[x]; });
+    return !!A.an[k];
   }
+  function breite(k) { var A = ansLaden(); return (A.br && A.br[k]) || (modul(k) || {}).b || 'ganz'; }
   function ansichtZiele(app) {
     var q = function (s) { return app ? app.querySelector(s) : null; };
     return {
       'vb-eq': q('[data-gp-k="vb-eq"]'), 'vb-bilanz': q('[data-gp-k="vb-bilanz"]'), 'vb-objekte': q('[data-gp-k="vb-objekte"]'), 'vb-quellen': q('[data-gp-k="vb-quellen"]'), 'vb-cf': q('[data-gp-k="vb-cf"]'),
-      ob: q(':scope > [data-dp-gp="ob"]'), bk: q(':scope > [data-dp-gp="bk"]'), det: q(':scope > [data-dp-gp="det"]'),
+      gb: q(':scope > [data-dp-gp="gb"]'), ob: q(':scope > [data-dp-gp="ob"]'), bk: q(':scope > [data-dp-gp="bk"]'), det: q(':scope > [data-dp-gp="det"]'),
       zielbild: q(':scope > .cp-sek[data-sek="zielbild"]'), steuer: q(':scope > .cp-sek[data-sek="steuer"]'),
-      gesamtproj: q(':scope > .cp-sek[data-sek="gesamtproj"]'), pp: q(':scope > #dp-pp-slot')
+      gesamtproj: q(':scope > .cp-sek[data-sek="gesamtproj"]'), pp: q(':scope > #dp-pp-slot'),
+      projektion: q(':scope > .cp-sek[data-sek="projektion"]')
     };
   }
   function ansichtAnwenden() {
     var hero = document.getElementById('dp-pscore-hero'), app = hero && hero.parentNode; if (!app || !AN) return;
-    var Z = ansichtZiele(app);
+    var A = ansLaden(), Z = ansichtZiele(app);
+    app.classList.add('gp-bk-raster');
     Object.keys(Z).forEach(function (k) { if (Z[k]) Z[k].classList.toggle('gp-aus', !sichtbar(k)); });
-    /* Projektion & Verlauf ganz weg, wenn alle vier Karten aus sind */
-    var pr = app.querySelector(':scope > .cp-sek[data-sek="projektion"]');
-    if (pr) pr.classList.toggle('gp-aus', ['vb-eq', 'vb-bilanz', 'vb-objekte', 'vb-quellen', 'vb-cf'].every(function (k) { return !sichtbar(k); }));
+    A.ord.forEach(function (k, i) { var el = Z[k]; if (!el) return; el.style.order = String(10 + i); el.classList.toggle('gp-halb', breite(k) === 'halb'); });
+    A.ordVb.forEach(function (k, i) { var el = Z[k]; if (!el) return; el.style.order = String(i); el.classList.toggle('gp-breit', breite(k) !== 'halb'); });
+    var gb = Z.gb; if (gb) gb.removeAttribute('data-gp-fest');
   }
-  function panelHtml() {
-    if (!_ansOffen) return '';
-    var z = function (a) {
-      var an = sichtbar(a.k);
-      return '<label class="gp-an-z' + (a.fest ? ' gp-an-fest' : '') + '"><input type="checkbox" data-gp-ans="' + a.k + '"' + (an ? ' checked' : '') + (a.fest ? ' disabled' : '') + '>'
-        + '<span><b>' + esc(a.t) + '</b>' + (a.fest ? ' <i>immer</i>' : a.g === 'zu' ? ' <i>eingeklappt</i>' : '') + '<small>' + esc(a.w) + '</small></span></label>';
+
+  /* ── Seitenleiste ── */
+  function bkZeile(k, i, n, inGruppe) {
+    var a = modul(k), A = ansLaden(), an = a.gruppe ? sichtbar(k) : !!A.an[k], br = breite(k);
+    var pfeil = function (r, t, aus) { return '<button type="button" class="gpbk-p" data-bk="' + r + '" data-k="' + k + '" aria-label="' + esc(a.t) + ' ' + t + '"' + (aus ? ' disabled' : '') + '>' + (r === 'hoch' ? '↑' : '↓') + '</button>'; };
+    var wahl = '<span class="gpbk-br" role="group" aria-label="Breite ' + esc(a.t) + '">'
+      + '<button type="button" data-bk="br" data-k="' + k + '" data-w="halb" aria-pressed="' + (br === 'halb') + '">½</button>'
+      + '<button type="button" data-bk="br" data-k="' + k + '" data-w="ganz" aria-pressed="' + (br !== 'halb') + '">ganz</button></span>';
+    var kopf = a.gruppe
+      ? '<span class="gpbk-txt"><b>' + esc(a.t) + '</b><small>' + esc(a.w) + '</small></span>'
+      : '<label class="gpbk-txt"><input type="checkbox" data-bk="an" data-k="' + k + '"' + (an ? ' checked' : '') + '><span><b>' + esc(a.t) + '</b><small>' + esc(a.w) + '</small></span></label>';
+    return '<li class="gpbk-z' + (an ? '' : ' gpbk-aus') + (a.gruppe ? ' gpbk-gr' : '') + '" draggable="true" data-k="' + k + '" data-liste="' + (inGruppe ? 'vb' : 'top') + '">'
+      + '<span class="gpbk-griff" aria-hidden="true">⋮⋮</span>' + kopf + '<span class="gpbk-akt">' + wahl + pfeil('hoch', 'nach oben', i === 0) + pfeil('runter', 'nach unten', i === n - 1) + '</span>'
+      + (a.gruppe ? '<ol class="gpbk-sub">' + A.ordVb.map(function (v, j) { return bkZeile(v, j, A.ordVb.length, true); }).join('') + '</ol>' : '')
+      + '</li>';
+  }
+  function bkListe() {
+    var p = document.getElementById('dp-gp-bk'); if (!p) return;
+    var A = ansLaden(), v = vorlageVon(A.vorlage);
+    var fok = document.activeElement && p.contains(document.activeElement) ? [document.activeElement.getAttribute('data-bk'), document.activeElement.getAttribute('data-k'), document.activeElement.getAttribute('data-w')] : null;
+    p.querySelector('.gpbk-vl').innerHTML = VORLAGEN.map(function (x) {
+      return '<button type="button" class="gpbk-v' + (A.vorlage === x.k ? ' an' : '') + '" data-bk="vorlage" data-k="' + x.k + '" aria-pressed="' + (A.vorlage === x.k) + '"><b>' + esc(x.t) + '</b><small>' + esc(x.u) + '</small></button>';
+    }).join('');
+    p.querySelector('.gpbk-liste').innerHTML = A.ord.map(function (k, i) { return bkZeile(k, i, A.ord.length, false); }).join('');
+    var kommt = v ? v.kommt : [];
+    p.querySelector('.gpbk-kommt-w').innerHTML = kommt.length ? '<div class="gpbk-h">Kommt in dieser Vorlage dazu</div><ul class="gpbk-kommt">'
+      + kommt.map(function (t) { return '<li><span>' + esc(t) + '</span><i>kommt</i></li>'; }).join('') + '</ul>' : '';
+    if (fok && fok[0]) {
+      var sel = '[data-bk="' + fok[0] + '"]' + (fok[1] ? '[data-k="' + fok[1] + '"]' : '') + (fok[2] ? '[data-w="' + fok[2] + '"]' : '');
+      var el = p.querySelector(sel); if (el && !el.disabled) el.focus();
+    }
+  }
+  function bkGeaendert() { var A = ansLaden(); A.vorlage = null; ansSpeichern(); ansichtAnwenden(); bkListe(); }
+  function bkVerschieben(k, r) {
+    var A = ansLaden(), L = VBK.indexOf(k) >= 0 ? A.ordVb : A.ord, i = L.indexOf(k), j = i + r;
+    if (i < 0 || j < 0 || j >= L.length) return;
+    L.splice(i, 1); L.splice(j, 0, k); bkGeaendert();
+  }
+  function bkZu() {
+    var p = document.getElementById('dp-gp-bk'), h = document.getElementById('dp-gp-bk-hg');
+    if (p) p.parentNode.removeChild(p); if (h) h.parentNode.removeChild(h);
+    _bkOffen = false; document.removeEventListener('keydown', bkTaste, true);
+    try { if (_bkVorher && _bkVorher.focus) _bkVorher.focus(); } catch (e) {}
+  }
+  function bkTaste(ev) {
+    var p = document.getElementById('dp-gp-bk'); if (!p) return;
+    if (ev.key === 'Escape') { ev.preventDefault(); ev.stopPropagation(); bkZu(); return; }
+    if (ev.key !== 'Tab') return;
+    var F = [].filter.call(p.querySelectorAll('button,input,[tabindex]'), function (x) { return !x.disabled && x.offsetParent !== null; });
+    if (!F.length) return;
+    var a = F[0], b = F[F.length - 1];
+    if (!p.contains(document.activeElement)) { ev.preventDefault(); a.focus(); return; }
+    if (ev.shiftKey && document.activeElement === a) { ev.preventDefault(); b.focus(); }
+    else if (!ev.shiftKey && document.activeElement === b) { ev.preventDefault(); a.focus(); }
+  }
+  function ansichtOeffnen() {
+    ansLaden(); if (_bkOffen) { bkListe(); return; }
+    _bkOffen = true; _bkVorher = document.activeElement; stil4();
+    /* Hintergrund dunkelt ab, schließt aber NIE per Klick (Marcel 24.11.2026): nur ×, Fertig oder Esc */
+    var hg = document.createElement('div'); hg.id = 'dp-gp-bk-hg'; hg.className = 'gpbk-hg'; hg.setAttribute('aria-hidden', 'true'); document.body.appendChild(hg);
+    var p = document.createElement('div'); p.id = 'dp-gp-bk'; p.className = 'gpbk'; p.setAttribute('role', 'dialog'); p.setAttribute('aria-modal', 'true'); p.setAttribute('aria-labelledby', 'gpbk-t');
+    p.innerHTML = '<div class="gpbk-k"><div><b id="gpbk-t">Ansicht anpassen</b><small>Score und Kennzahlen stehen immer oben. Alles darunter stellst du hier zusammen.</small></div>'
+      + '<button type="button" class="gpbk-x" data-bk="zu" aria-label="Schließen">×</button></div>'
+      + '<div class="gpbk-body"><div class="gpbk-h">Vorlagen</div><div class="gpbk-vl"></div>'
+      + '<div class="gpbk-h">Module <span>ziehen oder mit den Pfeilen sortieren</span></div><ol class="gpbk-liste"></ol><div class="gpbk-kommt-w"></div></div>'
+      + '<div class="gpbk-f"><button type="button" class="gpbk-b" data-bk="reset">Zurücksetzen</button><button type="button" class="gpbk-b gpbk-ok" data-bk="zu">Fertig</button></div>';
+    document.body.appendChild(p);
+    p.addEventListener('click', function (ev) {
+      var b = ev.target && ev.target.closest ? ev.target.closest('button[data-bk]') : null; if (!b || !p.contains(b)) return;
+      var a = b.getAttribute('data-bk'), k = b.getAttribute('data-k'), A = ansLaden();
+      if (a === 'zu') bkZu();
+      else if (a === 'reset') { _ans = ausVorlage(VORLAGEN[0]); ansSpeichern(); ansichtAnwenden(); bkListe(); }
+      else if (a === 'vorlage') { var v = vorlageVon(k); if (v) { _ans = ausVorlage(v); ansSpeichern(); ansichtAnwenden(); bkListe(); } }
+      else if (a === 'hoch' || a === 'runter') bkVerschieben(k, a === 'hoch' ? -1 : 1);
+      else if (a === 'br') { A.br[k] = b.getAttribute('data-w') === 'halb' ? 'halb' : 'ganz'; bkGeaendert(); }
+    });
+    p.addEventListener('change', function (ev) {
+      var t = ev.target; if (!t || t.getAttribute('data-bk') !== 'an') return;
+      ansLaden().an[t.getAttribute('data-k')] = !!t.checked; bkGeaendert();
+    });
+    /* Ziehen: nur innerhalb derselben Liste (Hauptraster oder Projektion und Verlauf) */
+    var zieh = null;
+    p.addEventListener('dragstart', function (ev) { var z = ev.target && ev.target.closest ? ev.target.closest('.gpbk-z') : null; if (!z) return; zieh = z; ev.stopPropagation(); z.classList.add('gpbk-zieht'); try { ev.dataTransfer.effectAllowed = 'move'; ev.dataTransfer.setData('text/plain', z.getAttribute('data-k')); } catch (e) {} });
+    p.addEventListener('dragend', function () { if (zieh) zieh.classList.remove('gpbk-zieht'); zieh = null; [].forEach.call(p.querySelectorAll('.gpbk-ueber'), function (x) { x.classList.remove('gpbk-ueber'); }); });
+    p.addEventListener('dragover', function (ev) {
+      var z = ev.target && ev.target.closest ? ev.target.closest('.gpbk-z') : null;
+      if (!zieh || !z || z === zieh || z.getAttribute('data-liste') !== zieh.getAttribute('data-liste')) return;
+      ev.preventDefault(); [].forEach.call(p.querySelectorAll('.gpbk-ueber'), function (x) { if (x !== z) x.classList.remove('gpbk-ueber'); }); z.classList.add('gpbk-ueber');
+    });
+    p.addEventListener('drop', function (ev) {
+      var z = ev.target && ev.target.closest ? ev.target.closest('.gpbk-z') : null;
+      if (!zieh || !z || z === zieh || z.getAttribute('data-liste') !== zieh.getAttribute('data-liste')) return;
+      ev.preventDefault();
+      var A = ansLaden(), L = zieh.getAttribute('data-liste') === 'vb' ? A.ordVb : A.ord, von = zieh.getAttribute('data-k'), nach = z.getAttribute('data-k');
+      var i = L.indexOf(von), j = L.indexOf(nach); if (i < 0 || j < 0) return;
+      L.splice(i, 1); L.splice(j, 0, von); bkGeaendert();
+    });
+    document.addEventListener('keydown', bkTaste, true);
+    bkListe();
+    try { p.querySelector('.gpbk-x').focus(); } catch (e) {}
+  }
+  function panelNeu() {}   /* v4640 · die Seitenleiste hängt am body, kein Panel mehr im Kopf */
+
+  /* v4640 · Zeile der Tabelle „Bestand und Zielbild je Objekt“: eigener Tooltip statt des Browser-Titels.
+     Bezug zu deinen Zielen NUR, wenn im Investmentprofil eingetragen (wie v4490e in der Pilot-Analyse). */
+  function zielWert(key) {
+    try { var P = window.DealPilotInvestmentProfile, p = P && P.load ? P.load() : null, v = p ? p[key] : null; if (v == null || v === '') return null;
+      if (typeof v !== 'number') { v = String(v).trim(); if (v.indexOf(',') >= 0) v = v.replace(/\./g, '').replace(',', '.'); v = Number(v); }
+      return isFinite(v) ? v : null; } catch (e) { return null; }
+  }
+  function zbTipps(app) {
+    var sek = app && app.querySelector(':scope > .cp-sek[data-sek="zielbild"]'); if (!sek) return;
+    var D = daten(), nachName = {}; (D ? D.rows : []).forEach(function (r) { nachName[String(r.name).trim()] = r; });
+    var zDs = zielWert('min_dscr'), zCf = zielWert('min_cashflow_vor_st');
+    [].forEach.call(sek.querySelectorAll('tr[title], tr[data-gp-zt]'), function (tr) {
+      var th = tr.querySelector('th'); if (!th) return;
+      var basis = tr.getAttribute('title') || tr.getAttribute('data-gp-zt-basis') || '';
+      tr.setAttribute('data-gp-zt-basis', basis); tr.removeAttribute('title');
+      var name = (th.firstChild && th.firstChild.nodeType === 3 ? th.firstChild.nodeValue : th.textContent).trim(), r = nachName[name];
+      var z = ['<b>' + esc(name) + '</b>'].concat(basis.split(' · ').filter(Boolean).map(esc));
+      if (r) {
+        if (r.cfvs != null) z.push('Cashflow vor Steuer ' + eurV(r.cfvs / 12) + ' im Monat' + (zCf != null ? (r.cfvs / 12 >= zCf ? ', dein Ziel ' + eurV(zCf) + ' erreicht' : ', dein Ziel ' + eurV(zCf) + ' nicht erreicht') : ''));
+        if (r.dscr != null) z.push('DSCR ' + nf2.format(r.dscr) + (zDs != null ? (r.dscr >= zDs ? ', dein Ziel ' + nf2.format(zDs) + ' erreicht' : ', dein Ziel ' + nf2.format(zDs) + ' nicht erreicht') : ''));
+        if (r.ekr4 && r.ekr4.haupt != null) z.push('EK-Rendite ' + nf1.format(r.ekr4.haupt) + ' % nach Steuer mit Vermögensdelta');
+      }
+      tr.setAttribute('data-gp-zt', z.join('<br>'));
+    });
+    if (sek._gpZt) return; sek._gpZt = true;
+    var tip = document.createElement('div'); tip.className = 'gp-zt'; tip.setAttribute('role', 'tooltip'); document.body.appendChild(tip);
+    var zeig = function (tr, x, y) {
+      tip.innerHTML = tr.getAttribute('data-gp-zt'); tip.style.display = 'block';
+      var w = tip.offsetWidth, h = tip.offsetHeight, vw = window.innerWidth;
+      var l = Math.min(Math.max(8, x + 14), vw - w - 8), t = y - h - 12; if (t < 8) t = y + 18;
+      tip.style.left = l + 'px'; tip.style.top = t + 'px';
     };
-    var kern = ANSICHT.filter(function (a) { return a.g !== 'aus'; }), opt = ANSICHT.filter(function (a) { return a.g === 'aus'; });
-    return '<div class="gp-an" role="dialog" aria-label="Ansicht anpassen"><div class="gp-an-k"><b>Ansicht anpassen</b><button type="button" class="gp-an-x" data-gp-a="zu" aria-label="Schließen">×</button></div>'
-      + '<div class="gp-an-h">Grundsetup</div>' + kern.map(z).join('')
-      + '<div class="gp-an-h">Optional</div>' + opt.map(z).join('')
-      + '<div class="gp-an-f"><button type="button" class="gp-an-b" data-gp-a="grund">Grundsetup wiederherstellen</button><button type="button" class="gp-an-b gp-an-ok" data-gp-a="zu">Fertig</button></div></div>';
+    sek.addEventListener('mousemove', function (ev) { var tr = ev.target.closest ? ev.target.closest('tr[data-gp-zt]') : null; if (!tr) { tip.style.display = 'none'; return; } zeig(tr, ev.clientX, ev.clientY); });
+    sek.addEventListener('mouseleave', function () { tip.style.display = 'none'; });
+    sek.addEventListener('focusin', function (ev) { var tr = ev.target.closest ? ev.target.closest('tr[data-gp-zt]') : null; if (!tr) return; var b = tr.getBoundingClientRect(); zeig(tr, b.left + 20, b.top); });
+    sek.addEventListener('focusout', function () { tip.style.display = 'none'; });
+    window.addEventListener('scroll', function () { tip.style.display = 'none'; }, true);
   }
-  function panelNeu() {
-    var k = document.querySelector('[data-dp-gp="kopf"] .gp-kopf'); if (!k) return;
-    var alt = k.querySelector('.gp-an'); if (alt) alt.parentNode.removeChild(alt);
-    if (_ansOffen) k.insertAdjacentHTML('beforeend', panelHtml());
+
+  /* v4640 · Farbe wie die Grafiken der Pilot-Analyse (grafiken-premium.js stil(), html[data-gx-stil]): hell heißt hell,
+     dunkel heißt dunkel, auch Score-Kopf, Schalter und die Karten aus dashboard.js. Gold nur über Whitelabel-Token. */
+  function stil4() {
+    if (document.getElementById('dp-gp-stil4')) return;
+    var s = document.createElement('style'); s.id = 'dp-gp-stil4';
+    var G = 'var(--wl-c9a84c, #C9A84C)', A = 'body.dp-gp-an #dp-stage .app.gp-bk-raster', M = 'body.dp-gp-an #dashboard-main';
+    var H = 'html:not([data-gx-stil="dunkel"]) body.dp-gp-an #dp-pscore-hero', DK = 'html[data-gx-stil="dunkel"] body.dp-gp-an #dashboard-main';
+    s.textContent = [
+      /* Raster: volle oder halbe Breite je Modul, Reihenfolge über order (Kopf, Score, Ansicht, Leiste bleiben vorn) */
+      A + '{flex-direction:row !important;flex-wrap:wrap;column-gap:14px;align-items:flex-start}',
+      A + ' > *{flex:0 0 100%;max-width:100%;min-width:0;box-sizing:border-box}',
+      '@media (min-width:1000px){' + A + ' > .gp-halb{flex:0 0 calc(50% - 7px);max-width:calc(50% - 7px)}}',
+      M + ' .gp-vb-raster > .gp-vbk:not(.gp-breit){grid-column:auto}',
+      /* Hell: Score-Kopf hell wie die Grafikkarten (vorher Obsidian-Band) */
+      H + ' .dpz-kopf{background:var(--surface,#F8F6F1);color:#2A2727;border:1px solid color-mix(in srgb,' + G + ' 40%,transparent)}',
+      H + ' .dpz-lbl,' + H + ' .dpz-wie summary,' + H + ' .dpz-eck .k{color:color-mix(in srgb,#2A2727 58%,transparent)}',
+      H + ' .dpz-wort,' + H + ' .dpz-eck .v,' + H + ' .dpz-warum b{color:#2A2727}',
+      H + ' .dpz-wert,' + H + ' .dpz-wie,' + H + ' .dpz-warum{color:color-mix(in srgb,#2A2727 72%,transparent)}',
+      H + ' .dpz-knopf{color:color-mix(in srgb,#2A2727 70%,transparent) !important;border-color:color-mix(in srgb,#2A2727 18%,transparent) !important}',
+      H + ' .dpz-knopf:hover{color:var(--dp-gold-txt,#7d682f) !important;border-color:' + G + ' !important}',
+      H + ' .dpz-empf-halb{color:var(--dp-gold-txt,#7d682f)}' + H + ' .dpz-empf-nein{background:color-mix(in srgb,#B8625C 14%,transparent);color:#B8625C}',
+      /* Hell: Schalter Einfach/Genau und Tabelle/Grafik ohne dunkle Flächen, aktiver Zustand golden */
+      'html:not([data-gx-stil="dunkel"]) ' + M + ' .cp-ans-sw{background:color-mix(in srgb,#2A2727 6%,#fff) !important}',
+      'html:not([data-gx-stil="dunkel"]) ' + M + ' .cp-ans-sw button{color:color-mix(in srgb,#2A2727 70%,transparent) !important}',
+      'html:not([data-gx-stil="dunkel"]) ' + M + ' .cp-ans-sw button.on,html:not([data-gx-stil="dunkel"]) ' + M + ' .pj-sw button.on{background:linear-gradient(110deg,var(--wl-e8cc7a, #E8CC7A),' + G + ' 55%,var(--wl-b8932f, #b8932f)) !important;color:#2c2410 !important}',
+      /* Dunkel: Variablen des Cockpits und die Karten aus dashboard.js */
+      DK + ' .stage.fc,' + DK + '{--c-panel:#0E0D0B;--c-ptext:#E9E3D6;--c-pmut:#B9B2A3;--c-ink:#E9E3D6;--c-mut:#B9B2A3;--c-line:#26231E;--c-front:#0E0D0B;--c-front-tx:#E9E3D6;--c-front-mut:#B9B2A3}',
+      DK + ' .dpz-karte,' + DK + ' .cp-ansicht,' + DK + ' .zb-card,' + DK + ' #dp-pp,' + DK + ' .dp-pp-bar,' + DK + ' #dp-proj-box,' + DK + ' .proj .ph,' + DK + ' .gb-wrap{background:linear-gradient(180deg,#16140F,#0E0D0B) !important;color:#E9E3D6 !important;border-color:#26231E !important}',
+      DK + ' .dp-pp-head,' + DK + ' .zb-wh,' + DK + ' .zb-ot-tab th,' + DK + ' .zb-ot-tab td{background:#16140F !important;color:#E9E3D6;border-color:#26231E !important}',
+      DK + ' .zb-ot-tab small,' + DK + ' .zb-ot-gl,' + DK + ' .dpz-was,' + DK + ' .dpz-anteil,' + DK + ' .dpz-m,' + DK + ' .dpz-summe{color:#B9B2A3 !important}',
+      DK + ' .dpz-n,' + DK + ' .dpz-h3,' + DK + ' .dpz-t,' + DK + ' .dpz-p{color:#E9E3D6 !important}',
+      DK + ' .dpz-bar{background:#26231E !important}' + DK + ' .dpz-o{background:color-mix(in srgb,' + G + ' 14%,#0E0D0B) !important;border-color:#3A352D !important;color:var(--wl-e8cc7a,#E8CC7A) !important}',
+      DK + ' .dpz-kopf{background:linear-gradient(180deg,#16140F,#0E0D0B);border:1px solid #26231E}',
+      DK + ' select,' + DK + ' textarea,' + DK + ' input:not([type=checkbox]):not([type=range]),' + DK + ' .cp-ans-sw button:not(.on),' + DK + ' .pj-sw button:not(.on),' + DK + ' .sl-yrs button:not(.active),' + DK + ' .sl .cp-chev{background:#16140F !important;color:#E9E3D6 !important;border-color:#3A352D !important}',
+      DK + ' .cp-ans-sw{background:#16140F !important}',
+      /* Seitenleiste „Ansicht anpassen“ (am body, nie per Klick daneben zu) */
+      '.gpbk-hg{position:fixed;inset:0;background:rgba(5,5,5,.22);z-index:2147482990}',
+      '.gpbk{position:fixed;top:0;right:0;bottom:0;width:min(420px,100vw);z-index:2147482991;display:flex;flex-direction:column;background:#FDFCFA;color:#2A2727;border-left:1px solid color-mix(in srgb,' + G + ' 45%,transparent);box-shadow:-16px 0 40px rgba(5,5,5,.18);font-family:Inter,system-ui,sans-serif}',
+      '.gpbk-k{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:16px 18px 12px;border-bottom:1px solid color-mix(in srgb,#2A2727 10%,transparent)}',
+      '.gpbk-k::before{content:"";position:absolute;left:0;right:0;top:0;height:3px;background:linear-gradient(110deg,var(--wl-e8cc7a, #E8CC7A),' + G + ' 55%,var(--wl-b8932f, #b8932f))}',
+      '.gpbk-k b{display:block;font:700 18px/1.2 "Space Grotesk",sans-serif}',
+      '.gpbk-k small{display:block;font-size:12px;color:color-mix(in srgb,#2A2727 62%,transparent);margin-top:3px}',
+      '.gpbk-x{border:0;background:none;font-size:24px;line-height:1;cursor:pointer;color:color-mix(in srgb,#2A2727 62%,transparent);padding:2px 6px;border-radius:6px}',
+      '.gpbk-x:hover,.gpbk-x:focus-visible{color:#2A2727;outline:2px solid ' + G + '}',
+      '.gpbk-body{flex:1 1 auto;overflow:auto;padding:4px 18px 14px}',
+      '.gpbk-h{font:600 10.5px/1.2 "JetBrains Mono",monospace;letter-spacing:.07em;text-transform:uppercase;color:color-mix(in srgb,#2A2727 58%,transparent);margin:14px 0 6px}',
+      '.gpbk-h span{text-transform:none;letter-spacing:0;font-family:Inter,sans-serif;font-weight:400}',
+      '.gpbk-vl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}',
+      '.gpbk-v{text-align:left;border:1px solid color-mix(in srgb,#2A2727 12%,transparent);background:#fff;border-radius:10px;padding:8px 10px;cursor:pointer;color:inherit;font:inherit}',
+      '.gpbk-v b{display:block;font:600 13px "Space Grotesk",sans-serif}.gpbk-v small{display:block;font-size:11px;color:color-mix(in srgb,#2A2727 60%,transparent);margin-top:2px}',
+      '.gpbk-v:hover,.gpbk-v:focus-visible{border-color:' + G + ';outline:none}',
+      '.gpbk-v.an{border-color:' + G + ';background:color-mix(in srgb,' + G + ' 12%,#fff)}',
+      '.gpbk-liste,.gpbk-sub{list-style:none;margin:0;padding:0}',
+      '.gpbk-sub{margin:6px 0 2px 18px;padding-left:8px;border-left:2px solid color-mix(in srgb,' + G + ' 35%,transparent)}',
+      '.gpbk-z{display:grid;grid-template-columns:16px minmax(0,1fr) auto;gap:4px 8px;align-items:center;padding:7px 8px;margin:4px 0;border:1px solid color-mix(in srgb,#2A2727 10%,transparent);border-radius:10px;background:#fff}',
+      '.gpbk-z .gpbk-sub{grid-column:1/-1}',
+      '.gpbk-z.gpbk-gr{background:color-mix(in srgb,' + G + ' 5%,#fff)}',
+      '.gpbk-z.gpbk-aus > .gpbk-txt{opacity:.55}',
+      '.gpbk-z.gpbk-zieht{opacity:.45}.gpbk-z.gpbk-ueber{border-color:' + G + ';box-shadow:0 -2px 0 ' + G + ' inset}',
+      '.gpbk-griff{cursor:grab;color:color-mix(in srgb,#2A2727 40%,transparent);font-size:12px;letter-spacing:-2px;user-select:none}',
+      '.gpbk-txt{display:flex;gap:8px;align-items:flex-start;min-width:0;cursor:pointer;font-size:12.5px}',
+      '.gpbk-txt b{font-weight:600}.gpbk-txt small{display:block;font-size:11px;color:color-mix(in srgb,#2A2727 60%,transparent);line-height:1.35}',
+      '.gpbk-txt input{margin-top:2px;accent-color:' + G + ';width:15px;height:15px;flex:0 0 auto}',
+      '.gpbk-akt{display:flex;gap:4px;align-items:center}',
+      '.gpbk-br{display:inline-flex;border:1px solid color-mix(in srgb,#2A2727 14%,transparent);border-radius:7px;overflow:hidden}',
+      '.gpbk-br button{border:0;background:transparent;font:600 11px "JetBrains Mono",monospace;padding:4px 7px;cursor:pointer;color:color-mix(in srgb,#2A2727 70%,transparent);min-height:26px}',
+      '.gpbk-br button[aria-pressed="true"]{background:color-mix(in srgb,' + G + ' 24%,#fff);color:#2A2727}',
+      '.gpbk-p{border:1px solid color-mix(in srgb,#2A2727 14%,transparent);background:#fff;border-radius:7px;width:26px;height:26px;cursor:pointer;color:#2A2727;font-size:13px;line-height:1}',
+      '.gpbk-p:disabled{opacity:.3;cursor:default}',
+      '.gpbk-br button:focus-visible,.gpbk-p:focus-visible,.gpbk-txt input:focus-visible,.gpbk-b:focus-visible{outline:2px solid ' + G + ';outline-offset:1px}',
+      '.gpbk-kommt{list-style:none;margin:0;padding:0}',
+      '.gpbk-kommt li{display:flex;justify-content:space-between;align-items:center;padding:7px 10px;margin:4px 0;border:1px dashed color-mix(in srgb,#2A2727 16%,transparent);border-radius:10px;font-size:12.5px;color:color-mix(in srgb,#2A2727 52%,transparent)}',
+      '.gpbk-kommt i{font-style:normal;font:600 10px "JetBrains Mono",monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--dp-gold-txt,#7d682f);background:color-mix(in srgb,' + G + ' 16%,transparent);border-radius:9px;padding:2px 7px}',
+      '.gpbk-f{display:flex;justify-content:space-between;gap:8px;padding:12px 18px;border-top:1px solid color-mix(in srgb,#2A2727 10%,transparent)}',
+      '.gpbk-b{font:600 12.5px Inter,sans-serif;border:1px solid color-mix(in srgb,#2A2727 16%,transparent);background:#fff;color:#2A2727;border-radius:9px;padding:8px 14px;cursor:pointer;min-height:36px}',
+      '.gpbk-ok{background:linear-gradient(110deg,var(--wl-e8cc7a, #E8CC7A),' + G + ' 55%,var(--wl-b8932f, #b8932f));color:#2c2410;border-color:transparent}',
+      '@media (max-width:640px){.gpbk-vl{grid-template-columns:minmax(0,1fr)}.gpbk-z{grid-template-columns:14px minmax(0,1fr)}.gpbk-akt{grid-column:2;justify-content:flex-start}}',
+      'html[data-gx-stil="dunkel"] .gpbk{background:#0E0D0B;color:#E9E3D6;border-left-color:#3A352D}',
+      'html[data-gx-stil="dunkel"] .gpbk-v,html[data-gx-stil="dunkel"] .gpbk-z,html[data-gx-stil="dunkel"] .gpbk-p,html[data-gx-stil="dunkel"] .gpbk-b:not(.gpbk-ok){background:#16140F;color:#E9E3D6;border-color:#3A352D}',
+      'html[data-gx-stil="dunkel"] .gpbk-z.gpbk-gr,html[data-gx-stil="dunkel"] .gpbk-v.an{background:color-mix(in srgb,' + G + ' 14%,#16140F)}',
+      'html[data-gx-stil="dunkel"] .gpbk-br button[aria-pressed="true"]{background:color-mix(in srgb,' + G + ' 30%,#16140F);color:#E9E3D6}',
+      'html[data-gx-stil="dunkel"] .gpbk small,html[data-gx-stil="dunkel"] .gpbk-h,html[data-gx-stil="dunkel"] .gpbk-br button,html[data-gx-stil="dunkel"] .gpbk-x,html[data-gx-stil="dunkel"] .gpbk-kommt li{color:#B9B2A3}',
+      'html[data-gx-stil="dunkel"] .gpbk-p,html[data-gx-stil="dunkel"] .gpbk-x:hover{color:#E9E3D6}',
+      /* Tooltip der Zielbild-Tabelle */
+      '.gp-zt{position:fixed;z-index:2147482980;display:none;max-width:min(380px,calc(100vw - 16px));background:#050505;color:#FDFCFA;font:12px/1.5 Inter,system-ui,sans-serif;padding:8px 10px;border-radius:8px;box-shadow:0 8px 24px rgba(5,5,5,.25);pointer-events:none}',
+      'html[data-gx-stil="dunkel"] .gp-zt{background:#F3EEE4;color:#0B0A09}',
+      M + ' .cp-sek[data-sek="zielbild"] tr[data-gp-zt]{cursor:default}'
+    ].join('\n');
+    document.head.appendChild(s);
   }
-  function ansichtOeffnen() { _ansOffen = true; ansLaden(); panelNeu(); var k = document.querySelector('[data-dp-gp="kopf"]'); if (k) try { k.scrollIntoView({ block: 'start', behavior: 'smooth' }); } catch (e) {} }
 
   function stil2() {
     if (document.getElementById('dp-gp-stil2')) return;
@@ -669,12 +950,8 @@
       host._gpOn = true;
       host.addEventListener('change', function (ev) { var t = ev.target, f = t && t.getAttribute && t.getAttribute('data-gp-f'); if (!f) return; _f[f] = f === 'jahr' ? +t.value : t.value; if (f === 'art') _f.obj = 'all'; host.removeAttribute('data-gp-sig'); lauf(); });
       host.addEventListener('input', function (ev) { var t = ev.target; if (t && t.getAttribute && t.getAttribute('data-gp-f') === 'jahr') { _f.jahr = +t.value; host.removeAttribute('data-gp-sig'); lauf(); } });
-      /* v4260 · Ansicht anpassen: Häkchen je Grafik, Grundsetup wiederherstellen */
-      host.addEventListener('change', function (ev) { var t = ev.target, k = t && t.getAttribute && t.getAttribute('data-gp-ans'); if (!k) return; ansLaden(); _ans[k] = !!t.checked; ansSpeichern(); ansichtAnwenden(); });
       host.addEventListener('click', function (ev) { var b = ev.target && ev.target.closest ? ev.target.closest('[data-gp-a]') : null; if (!b || !host.contains(b)) return; var a = b.getAttribute('data-gp-a');
-        if (a === 'ansicht') { _ansOffen = !_ansOffen; ansLaden(); panelNeu(); }
-        else if (a === 'zu') { _ansOffen = false; panelNeu(); }
-        else if (a === 'grund') { _ans = {}; ansSpeichern(); ansichtAnwenden(); panelNeu(); } });
+        if (a === 'ansicht') ansichtOeffnen(); });   /* v4640 · Seitenleiste statt Panel */
     }
     /* Vermögen: Überschrift und die Gesamtbewertung aus dashboard.js (Investiert, Bilanz heute, nach Bewertung) hierher */
     if (!hosts.gb.querySelector('.gp-sl')) hosts.gb.insertAdjacentHTML('afterbegin', sl('Vermögen', 'investiert, dir gehört heute, Wert'));
@@ -683,11 +960,12 @@
     try { if (!localStorage.getItem('dp_gp_steuer_zu')) { var stk = app.querySelector(':scope > .cp-sek[data-sek="steuer"]'); if (stk) { stk.classList.add('cp-zu'); var z = {}; try { z = JSON.parse(localStorage.getItem('dp_cockpit_zu') || '{}') || {}; } catch (e) {} z.steuer = 1; localStorage.setItem('dp_cockpit_zu', JSON.stringify(z)); localStorage.setItem('dp_gp_steuer_zu', '1'); } } } catch (e) {}
     var D = null; try { D = window.DealPilotDashboard.blickDaten(); } catch (e) { D = null; }
     var sig = D ? JSON.stringify([D.n, Math.round(D.S.cfNsJ), Math.round(D.S.rest), (D.W || []).map(function (x) { return Math.round(x.wert); }), _f, Math.round(host.getBoundingClientRect().width / 40)]) : '';
-    stil2(); stil3();
+    stil2(); stil3(); stil4();   /* v4640 */
     /* v4260 · die übrigen Cockpit-Grafiken im neuen Stil (zeichnen nur, wenn sich ihre Daten geändert haben) */
     try { vbZeichnen(app); } catch (e) { try { console.warn('[grafiken-portfolio] Vermögen', e); } catch (x) {} }
     try { skZeichnen(app); } catch (e) { try { console.warn('[grafiken-portfolio] Steuer', e); } catch (x) {} }
     try { textPflege(document.getElementById('dp-stage')); } catch (e) {}   /* v4480 */
+    try { zbTipps(app); } catch (e) {}   /* v4640 */
     if (sig && host.getAttribute('data-gp-sig') === sig) { ansichtAnwenden(); return; }
     if (zeichnen(host, hosts)) { host.setAttribute('data-gp-sig', sig); document.body.classList.add('dp-gp-an'); panelNeu(); }
     ansichtAnwenden();

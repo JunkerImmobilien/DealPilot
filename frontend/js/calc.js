@@ -5867,6 +5867,7 @@ window._dpKpisNachziehen = function () {
     o._kpis_dscr_art = 'netto';   /* v3031 */
     o._kpis_ltv   = State.kpis.ltv;
     o._ekr4 = State.kpis.ekr4 || null;   /* v4610 · EK-Rendite in vier Stufen fürs Portfolio-Cockpit */
+    o._hebel_in = (State.kpis.ekr4 && State.kpis.ekr4.hebel_in) || null;   /* v4640 · Gesamtinvest, Zins und Darlehen je Objekt: der Hebel des Bestands rechnet damit echt (DpEkRendite.portfolio) */
     o._wert_anker = (State.wert_anker && State.wert_anker.wert > 0) ? { wert: State.wert_anker.wert, art: State.wert_anker.art || null, datum: State.wert_anker.datum || null } : null;   /* v4420 · maßgebender Objektwert für den Score im Backend (objektRechnung.js) */
   } catch (e) {}
 };
