@@ -304,6 +304,16 @@ function _summe(liste, feld) {
   return (Array.isArray(liste) ? liste : []).reduce(function (a, x) { const n = _zahl(x && x[feld]); return a + (n > 0 ? n : 0); }, 0);
 }
 
+/* einzelcheck-4 · „Musterweg 12, 12345 Musterstadt“ oder „Musterweg 12“ -> „Musterweg 12“. Muss eine Hausnummer
+   tragen, sonst kein Vorschlag (kein Ortsname als Strasse). */
+function strasseAus(t) {
+  if (typeof t !== 'string') return null;
+  const s = t.replace(/[\u0000-\u001f]/g, '\n').split(/[,\n]/)[0].replace(/\b\d{5}\b.*$/, '').replace(/\s+/g, ' ').trim();
+  if (s.length < 4 || s.length > 80) return null;
+  if (!/^[A-Za-zÄÖÜäöüß][A-Za-zÄÖÜäöüß0-9 .\-\/]*\s\d{1,4}\s?[a-zA-Z]?(\s?[-\/]\s?\d{1,4}[a-zA-Z]?)?$/.test(s)) return null;
+  return s;
+}
+
 /** Aus den Antworten der Auslese die Zahlen ziehen. Reihenfolge der Quellen: Mietaufstellung vor Exposé
  *  fuer die Miete (Ist statt Angabe im Inserat), Wirtschaftsplan fuer nicht umlagefaehige Kosten. */
 function zahlenAus(ergebnisse) { return zahlenUndHerkunft(ergebnisse).zahlen; }
@@ -311,6 +321,10 @@ function zahlenAus(ergebnisse) { return zahlenUndHerkunft(ergebnisse).zahlen; }
    zeigen „aus dem Exposé“ / „aus dem Marktbericht“ am Feld, und bei Widerspruch wählt der Käufer. */
 function zahlenUndHerkunft(ergebnisse) {
   const z = {}, her = {}; let risHoch = 0, risMittel = 0; let quelle = null;
+  /* einzelcheck-4 · Strasse und Hausnummer (Marcel 25.11.2026: „die Strasse und die Hausnummer hat er nicht eingetragen“).
+     Nie in die Zahlen (Siegel, Kauf, Speicher), nur als Vorschlag fuer das Feld in der Antwort an den Besucher selbst. */
+  let adr = null;
+  const strasseVon = function (t, q) { if (adr) return; const s0 = strasseAus(t); if (s0) adr = { strasse: s0, herkunft: q }; };
   const setze = function (k, v) { const n = _zahl(v); if (n != null && z[k] == null) { z[k] = n; if (quelle) her[k] = quelle; } };
   const setzeT = function (k, v) { if (v != null && v !== '' && !z[k]) { z[k] = v; if (quelle) her[k] = quelle; } };
   const liste = (Array.isArray(ergebnisse) ? ergebnisse : []).filter(function (e) { return e && e.ok && e.extracted; });
@@ -335,6 +349,7 @@ function zahlenUndHerkunft(ergebnisse) {
     if (ze > 0) setze('ze', ze);
     if (typeof x.plz === 'string') setzeT('plz', x.plz.trim());
     if (typeof x.ort === 'string') setzeT('ort', x.ort.trim());
+    strasseVon(x.strasse || x.adresse, ART_NAME.expose);
     setzeT('art', _artAus(x.objektart));
     if (x.energieklasse) setzeT('ek_klasse', String(x.energieklasse).toUpperCase());
     setzeT('zustand', _zustandAus(x.zustand));
@@ -351,6 +366,7 @@ function zahlenUndHerkunft(ergebnisse) {
     if (/^(vergleichswert|ertragswert|sachwert|marktpreisindikation|verkehrswert)$/.test(vf)) setzeT('wert_verfahren', vf);
     if (typeof x.plz === 'string') setzeT('plz', x.plz.trim());
     if (typeof x.ort === 'string') setzeT('ort', x.ort.trim());
+    strasseVon(x.strasse || x.adresse, ART_NAME.wertbericht);
     setzeT('art', _artAus(x.objektart));
   });
   nach('hausgeld').forEach(function (e) {
@@ -386,7 +402,7 @@ function zahlenUndHerkunft(ergebnisse) {
   z.unterlagen = liste.length;
   const zahlen = zahlenSauber(z), herkunft = {};
   Object.keys(her).forEach(function (k) { if (zahlen[k] != null) herkunft[k] = her[k]; });
-  return { zahlen: zahlen, herkunft: herkunft };
+  return { zahlen: zahlen, herkunft: herkunft, adresse: adr };
 }
 
 /* Was der Bericht aus einer Unterlage zeigen darf: Art, ob gelesen, Risiken als kurze Saetze.
@@ -464,13 +480,14 @@ async function auslesen(dateien, modus) {
   const out = {
     modus: voll ? 'voll' : 'frei', modell: modell,
     zahlen: zahlen,
+    adresse_vorschlag: zh.adresse,   /* einzelcheck-4 · nur Anzeige im Feld, nie gespeichert */
     herkunft: zh.herkunft,   /* einzelcheck-3 · Feld -> Art der Unterlage, nur zur Anzeige (nicht im Siegel, nicht gespeichert) */
     unterlagen: ergebnisse.map(anzeigeAus),
     nicht_gelesen: alle.slice(max).map(function (f) { return { name: dateiname(f), grund: 'im_bericht' }; })
   };
   /* Die Anschrift nur im gekauften Lauf und nur fuer den Marktbericht-Dienst: nicht aufzaehlbar,
      damit sie in keiner JSON-Antwort und in keinem Speicherweg landet. */
-  if (voll) Object.defineProperty(out, '_adresse', { value: adresseAus(ergebnisse), enumerable: false });
+  if (voll) Object.defineProperty(out, '_adresse', { value: adresseAus(ergebnisse) || (zh.adresse ? [zh.adresse.strasse, [zahlen.plz, zahlen.ort].filter(Boolean).join(' ')].filter(Boolean).join(', ') : null), enumerable: false });
   return out;
 }
 
@@ -893,6 +910,28 @@ async function markt(zahlen, adresse) {
   } catch (e) { return { verfuegbar: false, grund: 'dienst' }; }
 }
 
+/* einzelcheck-4 · Tiefe vorab: dieselben Zugaenge wie der Bericht, im mb-Dienst (lib/tiefe_vorab.js). Nur PLZ, Ort,
+   Objektart, Flaeche, Baujahr und ob eine Strasse vorliegt. Antwort nur Ja/Teils/Nein mit Satz je Verfahren. */
+async function tiefe(q) {
+  q = q || {};
+  const plz = String(q.plz || '').replace(/\D/g, '').slice(0, 5);
+  if (!/^\d{5}$/.test(plz)) return { verfuegbar: false, grund: 'ohne_plz' };
+  const ort = String(q.ort || '').replace(/[^A-Za-zÄÖÜäöüß .\-()/]/g, '').slice(0, 60);
+  const art = /^(ETW|EFH|ZFH|DHH|RH|MFH|GEW)$/.test(String(q.art || '')) ? String(q.art) : '';
+  const n = function (v) { const x = _n(v); return x != null && x > 0 && x < 1e6 ? Math.round(x) : ''; };
+  const u = MB_BASE + '/tiefe-vorab?plz=' + plz + '&ort=' + encodeURIComponent(ort) + '&objektart=' + art.toLowerCase()
+    + '&wfl=' + n(q.wfl) + '&baujahr=' + n(q.bj) + '&strasse=' + (q.strasse === '1' ? '1' : '0');
+  try {
+    const r = await deps().mbFetch(u, { method: 'GET' });
+    const j = r && r.ok ? await r.json() : null;
+    if (!j || !j.verfuegbar) return { verfuegbar: false, grund: (j && j.grund) || 'dienst' };
+    return { verfuegbar: true, stufe3_voll: !!j.stufe3_voll, kurz: _kunde(j.kurz, 200), hinweis: _kunde(j.hinweis, 200),
+      punkte: (Array.isArray(j.punkte) ? j.punkte : []).slice(0, 6).map(function (p) {
+        return { id: String(p.id || '').slice(0, 20), name: _kunde(p.name, 40), ok: /^(ja|teils|nein)$/.test(p.ok) ? p.ok : 'nein', text: _kunde(p.text, 260) };
+      }) };
+  } catch (e) { return { verfuegbar: false, grund: 'dienst' }; }
+}
+
 /* einzelcheck-2 · Lagekarte als data:-Bild (Deckblatt des Berichts). Nur Koordinaten gehen an den mb-Dienst. */
 async function karteHolen(adr) {
   const lat = _n(adr && adr.lat), lon = _n(adr && adr.lon);
@@ -900,7 +939,9 @@ async function karteHolen(adr) {
   const genau = !!(adr && typeof adr.street === 'string' && adr.street.trim());
   try {
     const u = MB_BASE + '/static-map?lat=' + lat.toFixed(6) + '&lon=' + lon.toFixed(6) + '&zoom=' + (genau ? 16 : 13)
-      + '&style=dark-matter-yellow-roads&width=1200&height=560&marker=' + (genau ? '1' : '0');
+      /* einzelcheck-4 · Marker immer (Marcel 25.11.2026: „wichtig, dass wir immer zeigen … so eine Stecknadel, wo das
+         Häuschen ist“). Ohne Strasse steht er am Ortsmittelpunkt, der Bericht sagt dann „Lage ungefähr“. */
+      + '&style=dark-matter-yellow-roads&width=1200&height=560&marker=1';
     const r = await deps().mbFetch(u, { method: 'GET' });
     if (!r || !r.ok || typeof r.arrayBuffer !== 'function') return null;
     const typ = String((r.headers && r.headers.get && r.headers.get('content-type')) || 'image/png').split(';')[0];
@@ -1022,8 +1063,8 @@ module.exports = {
   hash, neuesToken, tokenForm, siegel, siegelPruefen, gueltigBis, istGueltig, berichtErlaubt,
   dateiPruefen, dateiname, zahlenSauber, zahlenAus, anzeigeAus, leseEine, auslesen,
   freiMoeglich, tagesverbrauchEur, preis, landingBasis, kaufAnlegen, kaufLesen, statusAus, berichtGezaehlt,
-  handleEinzelcheckPaid, marktAus, vglAus, mbEingabe, markt, textAus, kostenErfassen, adresseAus, aufraeumen, starteTakt, MB_STUFE, OCR_SEITEN, OCR_ZEIT_MS,
+  handleEinzelcheckPaid, marktAus, vglAus, mbEingabe, strasseAus, markt, textAus, kostenErfassen, adresseAus, aufraeumen, starteTakt, MB_STUFE, OCR_SEITEN, OCR_ZEIT_MS,
   /* v3946 */ grundSauber, grundFehlt, GRUND_FELDER, GRUND_PFLICHT, wertAus, ueberschrift, KAPITEL,
   istExpose, istWertbericht, zahlenUndHerkunft, _setzeDeps, _pdfText,
-  /* einzelcheck-2 */ karteHolen, berichtMailen, mailErlaubt, mailInhalt, emailForm, MAX_MAILS
+  /* einzelcheck-2 */ karteHolen, tiefe, berichtMailen, mailErlaubt, mailInhalt, emailForm, MAX_MAILS
 };

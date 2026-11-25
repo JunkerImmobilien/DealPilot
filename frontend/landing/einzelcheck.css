@@ -196,3 +196,12 @@ html.ec-offen,html.ec-offen body{overflow:hidden}
 .ec-wertinfo{margin:12px 0 0;font-size:13px;color:var(--inkm);background:#fff;border:1px dashed var(--cream-line);padding:8px 12px}
 .ec-wertinfo b{display:block;font:600 11px/1.4 var(--mono);letter-spacing:.04em;color:var(--ink)}
 .ec-felder small{font:500 10.5px/1.2 var(--mono);color:var(--mut);margin-left:4px}
+/* einzelcheck-4 · Vorabprüfung der amtlichen Daten vor dem Kauf */
+.ec-tiefe{margin:10px 0 6px;padding:10px 12px;background:#fff;border:1px solid var(--cream-line)}
+.ec-tiefe ul{list-style:none;margin:6px 0 0;padding:0;display:grid;gap:6px}
+.ec-tiefe li{display:grid;grid-template-columns:18px auto;column-gap:8px;align-items:start;font-size:13px;line-height:1.4}
+.ec-tiefe li i{font-style:normal;font-weight:700;text-align:center;grid-row:span 2}
+.ec-tiefe li b{font-weight:600}
+.ec-tiefe li span{grid-column:2;color:var(--inkm)}
+.ec-tiefe li.ja i{color:var(--grn,#3FA56C)}.ec-tiefe li.teils i{color:#b8932f}.ec-tiefe li.nein i{color:#B8625C}
+.ec-tiefe-kurz{margin:2px 0 0;font-size:13px;font-weight:600}

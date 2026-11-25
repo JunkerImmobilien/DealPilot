@@ -185,6 +185,20 @@
     if (/wirtschaftsplan|hausgeld|abrechnung/.test(n)) return 'Wirtschaftsplan';
     return 'Unterlage';
   }
+  /* einzelcheck-4 · „ImmoWertV“ nur, wo es stimmt (Marcel 25.11.2026: „Ist das tatsächlich nach ImmoWertV gerechnet?
+     Dann darf es stehen bleiben, ansonsten nicht“). Ein Vergleichswert aus Angebotspreisen (Stufe M) ist kein Verfahren
+     nach ImmoWertV (§ 25 Abs. 1 verlangt Kaufpreise). Ertragswert mit nicht amtlichem Zins rechnet nach dem Modell,
+     aber nicht mit amtlichen Daten. lang: Satz fürs Deckblatt, sonst kurze Unterzeile der Kachel. */
+  function wiRecht(wi, lang) {
+    if (!wi) return '';
+    var st = wi.stufe || (wi.verfahren === 'sachwert' ? 'A' : null);
+    if (wi.verfahren === 'vergleichswert' && st === 'M') return lang
+      ? 'Vergleichswert aus Angebotspreisen abgeleitet, indikativ. Das ist kein Verfahren nach ImmoWertV, denn die verlangt Kaufpreise (§ 25 Abs. 1). '
+      : 'führend, aus Angebotspreisen, kein Verfahren nach ImmoWertV';
+    if (st === 'A') return lang ? 'Führendes Verfahren nach § 6 ImmoWertV mit amtlichen Daten des Gutachterausschusses, indikativ. ' : 'führendes Verfahren, ImmoWertV, amtliche Daten';
+    var zins = st === 'B' ? 'Liegenschaftszins amtlich, aber regional' : 'Liegenschaftszins nicht amtlich' + (st ? ' (Stufe ' + st + ')' : '');
+    return lang ? 'Führendes Verfahren nach dem Modell der ImmoWertV, ' + zins + ', indikativ. ' : 'führend, Modell ImmoWertV, ' + zins;
+  }
   function mb(b) { return dez(b / 1048576, 1) + ' MB'; }
 
   /* ── Fenster ──────────────────────────────────────────────────────── */
@@ -364,7 +378,10 @@
       + ART_LISTE.map(function (a) { return '<option value="' + a[0] + '"' + (g.art === a[0] ? ' selected' : '') + '>' + a[1] + '</option>'; }).join('') + '</select>' + unter('art') + '</label>';
     var bind = '<label class="ec-f"><span>Zinsbindung</span><select id="ecgBind">' + [5, 10, 15, 20, 25, 30].map(function (j) {
       return '<option value="' + j + '"' + ((g.bindung_j || 10) === j ? ' selected' : '') + '>' + j + ' Jahre</option>'; }).join('') + '</select></label>';
-    var strasse = S.adresse ? String(S.adresse).split(',')[0] : '';
+    /* einzelcheck-4 · Strasse und Hausnummer aus den Unterlagen vorschlagen (Marcel 25.11.2026), eigene Eingabe gewinnt */
+    var adrV = (S.frei && S.frei.adresse_vorschlag && S.frei.adresse_vorschlag.strasse) ? S.frei.adresse_vorschlag : null;
+    var strasse = S.adresse ? String(S.adresse).split(',')[0] : (adrV ? adrV.strasse : '');
+    if (!S.adresse && adrV) { vb.quelle.strasse = adrV.herkunft || 'Unterlagen'; g.strasse = adrV.strasse; }
     /* Kopf: was die Unterlagen gefüllt haben, was fehlt, wo zu wählen ist */
     var ausDok = Object.keys(vb.quelle).filter(function (k) { return vb.quelle[k] !== 'eingabe' && vb.quelle[k] !== 'dealcheck' && vb.quelle[k] !== 'vorgabe' && !vb.konflikt[k]; }).length;
     var fehltJetzt = grundFehlt(g), NAMEN = { kp: 'Kaufpreis', nkm: 'Kaltmiete', wfl: 'Wohnfläche', art: 'Objektart', plz: 'Postleitzahl oder Ort', ek_eur: 'Eigenkapital', zins_pct: 'Sollzins', tilg_pct: 'Tilgung', bindung_j: 'Zinsbindung' };
@@ -627,13 +644,34 @@
     if (!(INFO.amount_cents > 0)) return '<div class="ec-weg ec-weg-1"><b>Bericht</b><p>Der Bericht ist gerade nicht kaufbar. Bitte später noch einmal.</p></div>';
     return '<div class="ec-weg ec-weg-1"><span class="ec-l">Der komplette Bericht</span><b>Alle ' + Math.max(S.dateien.length, 1) + ' Unterlagen, Wertermittlung, Finanzierung und Marktbericht als PDF</b>'
       + '<p>Bodenrichtwert, Ertrags-, Sach- und Vergleichswert mit dem führenden Verfahren, Finanzierung mit Restschuld und Anschlussfinanzierung, Investor Deal Score, Cashflow und DSCR, Mietpotenzial, Lage und Markt.</p>'
+      + '<div class="ec-tiefe" aria-live="polite"></div>'
       + '<div class="ec-preis">' + esc(preisText()) + '<small>einmalig, kein Abo</small></div>'
       + '<p class="ec-fein">Buchst du innerhalb von ' + INFO.frist_tage + ' Tagen ein Paket, rechnet DealPilot den Betrag an.</p>'
       + '<label class="ec-haken"><input type="checkbox" class="ec-widerruf"> <span>Ich verlange ausdrücklich, dass DealPilot den Bericht sofort erstellt. Mir ist bekannt, dass mein Widerrufsrecht damit erlischt (§ 356 Abs. 5 BGB).</span></label>'
       + '<button type="button" class="btn-p ec-kaufen" disabled>Bericht kaufen · ' + esc(preisText()) + '</button>'
       + '<p class="ec-fein">Bezahlt wird bei Stripe. Danach kommst du hierher zurück und dein Bericht entsteht sofort, ohne dass du etwas noch einmal hochlädst.</p></div>';
   }
+  /* einzelcheck-4 · vor dem Kauf zeigen, welche amtlichen Daten es für den Ort gibt (Marcel 25.11.2026: „damit er nicht
+     etwas bezahlt, was er nicht bekommt“). Gefragt wird mit PLZ, Ort, Objektart und ob eine Straße eingetragen ist. */
+  function tiefeLaden() {
+    var box = $('.ec-tiefe', inhalt), g = S.grund || {}; if (!box) return;
+    var plz = String(g.plz || '').replace(/\D/g, '');
+    if (!/^\d{5}$/.test(plz)) { box.innerHTML = '<p class="ec-fein">Mit der Postleitzahl zeigen wir hier vorab, welche amtlichen Daten es für den Ort gibt.</p>'; return; }
+    var nr = schritt;
+    box.innerHTML = '<p class="ec-fein">Wir prüfen, welche amtlichen Daten es für den Ort gibt …</p>';
+    var qs = '?plz=' + plz + '&ort=' + encodeURIComponent(g.ort || '') + '&art=' + encodeURIComponent(g.art || '') + '&wfl=' + (g.wfl || '') + '&bj=' + (g.bj || '')
+      + '&strasse=' + (S.adresse && String(S.adresse).split(',')[0].trim().length >= 4 ? '1' : '0');
+    holeJson(api('/tiefe' + qs)).then(function (t) {
+      if (nr !== schritt || !box.isConnected) return;
+      if (!t || !t.verfuegbar || !Array.isArray(t.punkte)) { box.innerHTML = '<p class="ec-fein">Die Vorabprüfung der amtlichen Daten ist gerade nicht erreichbar. Der Bericht zeigt je Verfahren, womit er rechnet.</p>'; return; }
+      var ZEICHEN = { ja: '✓', teils: '◐', nein: '✕' };
+      box.innerHTML = '<span class="ec-l">Was es für diesen Ort amtlich gibt</span><p class="ec-tiefe-kurz">' + esc(t.kurz || '') + '</p><ul>'
+        + t.punkte.map(function (p) { return '<li class="' + esc(p.ok) + '"><i aria-hidden="true">' + (ZEICHEN[p.ok] || '') + '</i><b>' + esc(p.name) + '</b><span>' + esc(p.text) + '</span></li>'; }).join('')
+        + '</ul>' + (t.hinweis ? '<p class="ec-fein">' + esc(t.hinweis) + '</p>' : '');
+    }, function () { if (box.isConnected) box.innerHTML = ''; });
+  }
   function kaufVerdrahten() {
+    tiefeLaden();
     var h = $('.ec-widerruf', inhalt), b = $('.ec-kaufen', inhalt);
     if (!h || !b) return;
     h.addEventListener('change', function () { b.disabled = !h.checked; });
@@ -945,7 +983,15 @@
   var _fotosGeholt = null;
   function fotosHolen() {
     if (_fotosGeholt) return _fotosGeholt;
-    var dateien = S.dateien.slice().sort(function (a, b) { return (artRaten(b.name) === 'Exposé') - (artRaten(a.name) === 'Exposé'); }).slice(0, 4);
+    /* einzelcheck-4 · Bilder aus einem Marktbericht oder Gutachten sind Karten, Grafiken und Logos, keine Objektfotos
+       (Marcel 25.11.2026: „drei Stück … darfst du aber nicht genommen“). Nur die übrigen Unterlagen liefern Fotos. */
+    var lauf = ((S.bericht && S.bericht.unterlagen) || (S.frei && S.frei.unterlagen) || []);
+    var istWb = function (name) {
+      if (/marktbericht|gutachten|wertermittlung|bewertung/i.test(String(name || ''))) return true;
+      return lauf.some(function (u) { return u && u.name === name && u.typ === 'wertbericht'; });
+    };
+    var dateien = S.dateien.filter(function (f) { return !istWb(f.name); })
+      .sort(function (a, b) { return (artRaten(b.name) === 'Exposé') - (artRaten(a.name) === 'Exposé'); }).slice(0, 4);
     _fotosGeholt = lade('pdfjsLib').then(function (da) {
       var L = window.pdfjsLib; if (!da || !L || !dateien.length) return [];
       try { L.GlobalWorkerOptions.workerSrc = appBasis() + 'vendor/cdn/pdf.js/3.11.174/pdf.worker.min.js'; } catch (e) {}
@@ -1003,7 +1049,7 @@
       var karte = d.m && d.m.karte;
       var kachel = function (src, i, text) { return '<button type="button" class="ec-foto' + ((S.fotoWahl == null ? -1 : S.fotoWahl) === i ? ' an' : '') + '" data-i="' + i + '" aria-pressed="' + ((S.fotoWahl == null ? -1 : S.fotoWahl) === i) + '">'
         + (src ? '<img src="' + src + '" alt="">' : '<span>' + esc(text) + '</span>') + '<small>' + esc(text) + '</small></button>'; };
-      $('.ec-fotos', box).innerHTML = kachel(karte || null, -1, karte ? 'Lagekarte' : 'Ohne Foto') + fotos.map(function (f, i) { return kachel(f, i, 'Foto ' + (i + 1)); }).join('');
+      $('.ec-fotos', box).innerHTML = kachel(karte || null, -1, karte ? (d.m.karte_genau ? 'Lagekarte' : 'Lagekarte, Ort') : 'Ohne Foto') + fotos.map(function (f, i) { return kachel(f, i, 'Foto ' + (i + 1)); }).join('');
       box.hidden = false;
       $('.ec-fotos', box).addEventListener('click', function (e) {
         var b = e.target.closest('.ec-foto'); if (!b) return;
@@ -1231,14 +1277,15 @@
       unter: [wfl ? dez(wfl, 0) + ' m² Wohnfläche' : '', bj ? 'Baujahr ' + Math.round(bj) : '', r && r.e.kp ? 'Kaufpreis ' + eur(r.e.kp) : ''].filter(Boolean).join(' · '),
       wertLabel: wi ? 'Wertindikation · ' + wi.name : (g ? 'Investor Deal Score' : (r && r.k ? 'Deal Score' : null)),
       wert: wi ? eur(wi.wert_eur) : (g ? g.score + ' / 100' : (r && r.k ? r.ds.score + ' / 100' : null)),
-      wertNeben: wi ? D.esc('Führendes Verfahren nach § 6 ImmoWertV, indikativ. ' + (r && r.e.kp ? 'Der Kaufpreis liegt ' + dez(Math.abs(abstandPct(r.e.kp, wi.wert_eur)), 1) + ' % ' + (r.e.kp >= wi.wert_eur ? 'darüber.' : 'darunter.') : ''))
+      wertNeben: wi ? D.esc(wiRecht(wi, true) + (r && r.e.kp ? 'Der Kaufpreis liegt ' + dez(Math.abs(abstandPct(r.e.kp, wi.wert_eur)), 1) + ' % ' + (r.e.kp >= wi.wert_eur ? 'darüber.' : 'darunter.') : ''))
         : (g ? D.esc(g.empfehlung ? g.empfehlung.text : '') : (r && r.k ? D.esc(r.st.wort) : '')),
       kz: [{ l: 'Bodenrichtwert', v: bo.verfuegbar ? dez(bo.brw_qm, 0) + ' €/m²' : 'kein Wert', s: bo.verfuegbar ? 'amtlich, Stichtag ' + stichtagText(bo.stichtag) : (w.grund === 'ohne_anschrift' ? 'ohne Anschrift keine Zone' : 'nicht ermittelt') },
         g ? { l: 'Investor Deal Score', v: g.score + ' / 100', s: g.empfehlung ? g.empfehlung.text : '' } : (r && r.k ? { l: 'Deal Score', v: r.ds.score + ' / 100', s: r.st.wort } : null),
         r && r.k ? { l: 'Cashflow', v: eurS(r.k.cf_m), s: 'im Monat nach Finanzierung', art: r.k.cf_m < 0 ? 'schlecht' : 'gut' } : null,
         r && r.k ? { l: 'DSCR', v: r.k.d_total > 0 ? dez(r.k.dscr, 2) : 'entfällt', s: 'volles Jahr, heutige Eingaben' } : null].filter(Boolean),
       meta: [['Stand', d.stand], ['Unterlagen', (d.unterlagen.filter(function (u) { return u.gelesen; }).length || (z.unterlagen || 0)) + ' gelesen'], ['Bewertungsstichtag', stichtagText(m.stichtag) || d.stand]],
-      hinweisRechts: 'Erstellt am ' + D.esc(d.stand) + '<br>Indikativ, kein Gutachten' }));
+      hinweisRechts: 'Erstellt am ' + D.esc(d.stand) + '<br>Indikativ, kein Gutachten'
+        + (!deckFoto && m.karte ? '<br>Karte' + (m.karte_genau ? '' : ', Lage ungefähr (Ort)') + ': Powered by Geoapify, OpenStreetMap' : '') }));
 
     /* Auf einen Blick */
     var blick = fazit(d);
@@ -1246,7 +1293,7 @@
       /* einzelcheck-2 · Wertindikation des führenden Verfahrens und Marktpreisindikation klar getrennt,
          DSCR mit derselben Wortwahl wie die App („volles Jahr, heutige Eingaben") */
       + D.kacheln([{ l: 'Kaufpreis', v: r && r.e.kp ? eur(r.e.kp) : 'fehlt' },
-        { l: wi ? (VW_LANG[wi.verfahren] || 'Wertindikation') : 'Wertindikation', v: wi ? eur(wi.wert_eur) : 'keine', s: wi ? 'führendes Verfahren, ImmoWertV' + (wi.stufe === 'M' ? ', aus Angebotspreisen abgeleitet' : '') : 'kein führendes Verfahren', art: 'hi' },
+        { l: wi ? (VW_LANG[wi.verfahren] || 'Wertindikation') : 'Wertindikation', v: wi ? eur(wi.wert_eur) : 'keine', s: wi ? wiRecht(wi, false) : 'kein führendes Verfahren', art: 'hi' },
         { l: 'Marktpreisindikation', v: m.markt && m.markt.wert > 0 ? eur(m.markt.wert) : 'keine', s: 'Angebotspreise abzüglich Verhandlungsabschlag, kein Verkehrswert' }, { l: 'Bodenrichtwert', v: bo.verfuegbar ? dez(bo.brw_qm, 0) + ' €/m²' : 'kein Wert' }])
       + (r && r.k ? D.kacheln([{ l: 'Bruttorendite', v: D.pct(r.k.bmy), s: 'Faktor ' + D.zahl(r.k.fak, 1) }, { l: 'Nettorendite', v: D.pct(r.k.nmy) },
         { l: 'Cashflow', v: D.eurS(r.k.cf_m), s: 'im Monat nach Finanzierung', art: r.k.cf_m < 0 ? 'schlecht' : 'gut' }, { l: 'DSCR', v: r.k.d_total > 0 ? D.zahl(r.k.dscr, 2) : 'entfällt', s: 'volles Jahr, heutige Eingaben' }]) : '')

@@ -85,6 +85,13 @@ router.get('/preis', async function (req, res) {
   } catch (e) { fehler(res, e, 'preis'); }
 });
 
+/* einzelcheck-4 · vor dem Kauf: welche amtlichen Daten es fuer den Ort gibt (Marcel 25.11.2026: „damit er nicht
+   etwas bezahlt, was er nicht bekommt“). Nur PLZ, Ort, Objektart und Merker „Strasse vorhanden“, keine Anschrift. */
+const bremseTiefe = bremse(STUNDE, 60, 'Zu viele Abfragen. Bitte einen Moment warten.');
+router.get('/tiefe', bremseTiefe, async function (req, res) {
+  try { res.json(await ec.tiefe(req.query || {})); } catch (e) { fehler(res, e, 'tiefe'); }
+});
+
 router.post('/auslesen', bremseAuslesen, mitDateien, async function (req, res) {
   try {
     const dateien = req.files || [];

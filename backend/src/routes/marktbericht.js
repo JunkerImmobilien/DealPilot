@@ -584,6 +584,7 @@ router.get('/quellen', authenticate, readGet('/quellen'));
    Container-Zugang moeglich - genau das hat gestern gefehlt. */
 router.get('/register/stand', authenticate, readGet('/register/stand'));
 router.get('/register/probe', authenticate, readGet('/register/probe'));
+router.get('/tiefe-vorab', authenticate, readGet('/tiefe-vorab'));   /* v4630 · welche amtlichen Daten der Ort hat, vor dem Abruf */
 router.post('/location-finder', authenticate, async function (req, res) {
   try { const out = await forward('POST', '/location-finder', { body: req.body || {} }); res.status(out.status).json(out.data); }
   catch (e) { res.status(502).json({ error: 'mb_unreachable', message: e.message }); }

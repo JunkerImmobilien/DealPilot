@@ -59,6 +59,7 @@ import { LocationFinderService } from '../services/LocationFinderService.js';
 
 /* v1096-WPRB · Der Aufloeser und der Registerstand fuer die Abnahme. */
 import * as GAA from '../lib/gutachterausschuss.js';
+import { tiefeVorab } from '../lib/tiefe_vorab.js';   /* v4630 */
 import { registerStand } from '../lib/ausschuss_register.js';
 import { mbDatenumfang } from '../lib/datenumfang.js';   /* v3930 · landing-zahlen-live-1 */
 import { beleihungswert as belwCheck, eingabenAusBericht as belwEingaben } from '../lib/beleihungswert.js';   /* v2630 */
@@ -187,6 +188,18 @@ router.post('/register/anfragen/status', async (req, res) => {
        b.notiz == null ? null : String(b.notiz).slice(0, 4000), b.von == null ? null : String(b.von).slice(0, 200)]);
     res.json({ ok: true, status: rows[0] });
   } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+/* v4630 · Welche Tiefe die Wertermittlung fuer einen Ort hat, VOR dem Kauf (lib/tiefe_vorab.js).
+ *   /tiefe-vorab?plz=32052&ort=Herford&objektart=mfh&wfl=420&baujahr=1965&strasse=1
+ * strasse ist nur ein Merker (vorhanden ja/nein), die Anschrift selbst geht nicht mit. Nur lesend. */
+router.get('/tiefe-vorab', async (req, res) => {
+  try {
+    const n = (v) => { const x = Number(v); return Number.isFinite(x) && x > 0 ? x : null; };
+    res.json(await tiefeVorab({ plz: String(req.query.plz || '').slice(0, 5), ort: String(req.query.ort || '').slice(0, 60),
+      objektart: String(req.query.objektart || '').slice(0, 30), wfl: n(req.query.wfl), baujahr: n(req.query.baujahr),
+      anzahl_we: n(req.query.we), strasse: req.query.strasse === '1' ? 'vorhanden' : null }));
+  } catch (e) { res.status(500).json({ error: 'Vorabprüfung nicht möglich' }); console.log('[tiefe-vorab] ' + e.message); }
 });
 
 /**
