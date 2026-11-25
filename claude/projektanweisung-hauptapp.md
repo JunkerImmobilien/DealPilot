@@ -45589,3 +45589,4 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** staging 61e7b6a9 (Buster dealscore2/-ui/voice-import v4760, Landing dealcheck-laden/landing-faecher/einzelcheck v4760).
 - **Nachweis:** 44 Staging-Objekte live, Mittel +0,2, −2 bis +4, kein Stufenwechsel; Prüfer grün (zwei-scores mit angepasstem V1). Doku `Dateien/Score/umstellung-ek-rendite-2026-11-25.md`.
 - **Rest:** Freigabe Marcel, dann Cherry-Pick; `dashboard.js` `_renditeTip` Text „Cash-on-Cash“ beim Rollout umbenennen.
+- **Prod 1.0.210 (Freigabe Marcel 25.11.):** main 4a3aca10, 350374a8 (v4760a `_renditeTip` „EK-Rendite nach Steuer“), f854cd0a. Sicherung haupt-/mb-20261125-0924-v4760, Kopf gelesen. Nur Frontend, kein Rebuild. Nachweis per curl (Buster v4760, Schwellen 2/6/10/15 und `ekr4.k2` in der ausgelieferten Datei, patch 210). Nicht eingeloggt im Objekt gemessen.
