@@ -267,16 +267,24 @@ const K = c.DpMietpotenzial, E = c.DpErhoehungen, JA = c.DpJahresabgleich, HV = 
   ok(J5.aktiverSchritt({ jahr: 2025 }, s1, false) === 'wert', 'A Ablauf startet beim ersten offenen Schritt (Wert)');
   ok(J5.aktiverSchritt({ jahr: 2026 }, s1, true) === 'miete', 'A laufendes Jahr: Leiste beim Schritt Miete (v4150, Knöpfe nur noch dort)');
   ok(J5.aktiverSchritt({ jahr: 2025 }, { miete: 'ok', wert: 'ok', haus: 'ok', steuer: 'ok', fest: {}, nFest: 0 }, false) === null, 'A alles erledigt: kein aktiver Schritt');
+  /* v4670 · Marcel 25.11.2026: je Jahr alle vier Schritte als kurze Liste, genau eine Stelle für die Mieterhöhung */
   const fh = J5.fuehrungHtml({ jahr: 2025, status: 'geplant' }, s1, false, 'wert', true);
-  ok(/Schritt 2 von 4 · Wert · offen/.test(fh) && !/f-zurueck|f-weiter/.test(fh) && /data-ja-aktion="festschreiben" data-ja-schritt-k="wert"/.test(fh) && /data-ja-aktion="wert"/.test(fh), 'A Leiste (v4150): Schritt 2 von 4, Knöpfe des Schritts und Schritt festschreiben, kein Zurück/Weiter');
+  ok((fh.match(/class="dp-ja-td /g) || []).length === 4 && /Zu tun für 2025/.test(fh) && /dp-ja-td dp-ja-td-offen an" data-ja-k="wert"/.test(fh) && !/von 4/.test(fh) && !/f-zurueck|f-weiter/.test(fh), 'A Liste (v4670): vier Schritte je Jahr, gewählter Schritt hervorgehoben, kein „Schritt x von 4“');
+  ok(/data-ja-aktion="festschreiben" data-ja-schritt-k="wert"/.test(fh) && /data-ja-aktion="wert"/.test(fh) && /data-ja-aktion="eintragen"[^>]*>Ist-Miete eintragen|data-ja-aktion="miete"/.test(fh) && /data-ja-aktion="steuer"/.test(fh), 'A Liste: je Schritt ein Knopf und festschreiben');
   { const sk = J5.schritt('miete', 'Miete', { miete: 'offen', fest: {} }, '1 €', 'Plan 1 €', 'Satz.', '<button type="button" data-ja-aktion="miete">X</button>', 2025);
     ok(!/<button/.test(sk) && /data-ja-k="miete"/.test(sk), 'L Karte ohne Knöpfe und ohne festschreiben, anklickbar über data-ja-k (v4150)');
-    const fl = J5.fuehrungHtml({ jahr: 2026, status: 'geplant' }, s1, true, 'miete', true);
-    ok(/data-ja-aktion="miete"/.test(fl) && !/festschreiben/.test(fl) && /läuft noch/.test(fl), 'L laufendes Jahr: Leiste mit den Knöpfen der Karte, ohne Festschreiben'); }
+    const sl = { miete: 'laufend', wert: 'laufend', haus: 'laufend', steuer: 'laufend', fest: {}, nFest: 0 };
+    const fl = J5.fuehrungHtml({ jahr: 2026, status: 'geplant' }, sl, true, 'miete', true);
+    ok((fl.match(/class="dp-ja-td /g) || []).length === 4 && /Schon möglich in 2026/.test(fl) && !/festschreiben/.test(fl) && /data-ja-aktion="(miete|mieterhoehung)"/.test(fl) && /data-ja-aktion="wert"/.test(fl) && /data-ja-aktion="haus"/.test(fl) && /ab Februar 2027/.test(fl), 'L laufendes Jahr (v4670): vier Schritte mit dem, was sich schon vorbereiten lässt, ohne Festschreiben'); }
   { const sf = { miete: 'ok', wert: 'ok', haus: 'teil', steuer: 'offen', fest: { wert: '2026-11-23' }, nFest: 1 };
     const ff = J5.fuehrungHtml({ jahr: 2025, status: 'geplant' }, sf, false, 'wert', true);
-    ok(/data-ja-aktion="freigeben" data-ja-schritt-k="wert"/.test(ff) && !/data-ja-aktion="festschreiben"/.test(ff), 'L festgeschriebener Schritt: nur wieder freigeben'); }
-  ok(!/f-weiter/.test(J5.fuehrungHtml({ jahr: 2025, status: 'geplant' }, s1, false, 'steuer', true)), 'A letzter Schritt ohne weiter');
+    ok(/data-ja-aktion="freigeben" data-ja-schritt-k="wert"/.test(ff) && !/data-ja-aktion="festschreiben" data-ja-schritt-k="wert"/.test(ff) && /Festgeschrieben am 23\.11\.2026/.test(ff), 'L festgeschriebener Schritt: nur wieder freigeben'); }
+  { const ja0 = lies('frontend/js/jahresabgleich.js');
+    ok((ja0.match(/knopf\('mieterhoehung'/g) || []).length === 1 && !/dp-ja-pot-kn">' \+ knopf\('mieterhoehung'/.test(ja0), 'L v4670 „Mieterhöhung vorbereiten“ nur einmal (Liste, nicht mehr in der Kachel Mieterhöhung)');
+    ok(/:has\(#dp-pa-jahr\.active\) \.dp-pa4-seg\{display:none/.test(ja0), 'L v4670 Umschalter Einfach | Detail im Jahresabgleich ausgeblendet'); }
+  { let tt = ''; const sl = { miete: 'laufend', wert: 'laufend', haus: 'laufend', steuer: 'laufend', fest: {}, nFest: 0 };
+    for (const k of ['miete', 'wert', 'haus', 'steuer']) for (const lauf of [true, false]) for (const weg of [true, false]) { const r = J5.todo(k, { jahr: 2025, status: 'geplant' }, lauf ? sl : s1, lauf, weg); tt += r.t + ' ' + r.tip + '\n'; }
+    ok(!/[–—;]/.test(tt), 'A Kundentext der Liste ohne Gedankenstrich und Semikolon'); }
   let texte = '';
   for (const k of ['miete', 'wert', 'haus', 'steuer']) for (const st of ['ok', 'offen']) for (const weg of [true, false]) texte += J5.aufgabe(k, { jahr: 2025, status: 'geplant' }, Object.assign({}, s1, { [k]: st }), weg).t + '\n';
   ok(!/[–—;]/.test(texte), 'A Kundentext des Ablaufs ohne Gedankenstrich und Semikolon');

@@ -48,7 +48,7 @@
 (function (global) {
   'use strict';
   if (global.DpJahresabgleich) return;
-  var VERSION = 'v4500b';
+  var VERSION = 'v4670';
   var GOLD = 'var(--wl-c9a84c, #C9A84C)';
   /* v4090 · Marcel 23.11.2026: „ich würde die Reihenfolge ändern in Miete, Wert, Haus und dann Steuern" (die Steuer braucht die Zahlen der drei davor) */
   var SCHRITTE = [['miete', 'Miete'], ['wert', 'Wert'], ['haus', 'Haus'], ['steuer', 'Steuer']];
@@ -573,6 +573,20 @@
         + '.dp-pa-wrap .dp-ja-schritt button{font-size:12px !important;padding:5px 8px !important}'
         + '.dp-pa-wrap .dp-ja-jahre button{padding:4px 8px !important;gap:5px}.dp-pa-wrap .dp-ja-schritt p{display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}'
         + '.dp-pa-wrap .dp-ja-erg button.dp-ja-fest{margin-left:0}.dp-ja-vivi{padding:10px 12px}.dp-ja-vz{grid-template-columns:auto auto;gap:0 10px}.dp-ja-vz>span:last-child{grid-column:1/-1;margin-bottom:4px}}'
+      ,
+      /* v4670 · Liste der vier Schritte je Jahr, eine Zeile je Schritt */
+      '.dp-ja-fuehrung.dp-ja-todo{display:block;padding:8px 12px}.dp-ja-todo ol{list-style:none;margin:4px 0 0;padding:0;display:grid;gap:2px}',
+      '.dp-ja-td{display:grid;grid-template-columns:20px 58px auto minmax(0,1fr) auto;gap:8px;align-items:center;padding:5px 6px;border-radius:7px;font-size:12.5px}',
+      '.dp-ja-td.an{background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 9%, transparent)}',
+      '.dp-ja-td>i{width:18px;height:18px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font:600 10.5px/1 Inter,system-ui,sans-serif;font-style:normal;background:rgba(184,98,92,.14);color:#B8625C}',
+      '.dp-ja-td-ok>i{background:#3FA56C;color:#fff}.dp-ja-td-teil>i,.dp-ja-td-laufend>i{background:rgba(201,154,46,.16);color:#8a6d1f}',
+      '.dp-ja-td>b{font-weight:600}.dp-ja-td .st{font-size:10.5px;padding:1px 7px;border:1px solid ' + RA + ';border-radius:999px;white-space:nowrap}',
+      '.dp-ja-td .st.dp-ja-st-ok{color:#2f7d52;border-color:rgba(63,165,108,.35)}.dp-ja-td .st.dp-ja-st-teil{color:#8a6d1f;border-color:rgba(201,154,46,.45)}.dp-ja-td .st.dp-ja-st-offen{color:#B8625C;border-color:rgba(184,98,92,.4)}',
+      '.dp-ja-td .t{color:' + M + ';min-width:0}.dp-ja-td .k{display:inline-flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;align-items:center}',
+      '.dp-pa-wrap .dp-ja-td .k button{font-size:12px !important;padding:4px 10px !important}.dp-pa-wrap .dp-ja-td button.dp-ja-fest{padding:4px 7px !important;margin-left:0}',
+      '@media (max-width:760px){.dp-ja-td{grid-template-columns:20px auto 1fr;row-gap:4px}.dp-ja-td .st{justify-self:end}.dp-ja-td .t,.dp-ja-td .k{grid-column:2/-1}.dp-ja-td .k{justify-content:flex-start}}',
+      /* v4670 · der Umschalter Einfach | Detail wirkt im Jahresabgleich nicht (gemessen), dort ausgeblendet */
+      '.dp-pa-wrap:has(#dp-pa-jahr.active) .dp-pa4-seg{display:none !important}'
     ].join('\n');
     d.head.appendChild(s);
   }
@@ -647,8 +661,7 @@
       + kz('ab', abW, '', abTip)
       + '</div>'
       + '<div class="dp-ja-balken" role="img" aria-label="eingetragen ' + quote + ' % der zulässigen Miete"><i style="width:' + quote + '%"></i></div>'
-      + (ungenutzt > 0 && !(festJahr(z.jahr) || {}).miete ? '<span class="dp-ja-pot-kn">' + knopf('mieterhoehung', 'Mieterhöhung vorbereiten', true)
-        + (global.DpViviMieterhoehung && global.DpViviMieterhoehung.verfuegbar() ? ' ' + knopf('vivi-mh', 'In ViVi anlegen', false) : '') + '</span>' : '')
+      /* v4670 · der Knopf „Mieterhöhung vorbereiten“ steht nur noch in der Liste „Schon möglich“ (Schritt Miete) */
       + rot + '</div>';
   }
 
@@ -1037,26 +1050,71 @@
       : { t: (z.status === 'erklaert' ? 'Die Anlage V ' + J + ' ist erklärt. Sobald der Bescheid da ist, setz den Stand auf Bescheid.' : 'Füll die Anlage V ' + J + ' aus und setz danach den Stand auf erklärt oder Bescheid.') + vkT,
           kn: knopf('steuer', 'Anlage V ' + J + ' ' + (z.status === 'geplant' ? 'ausfüllen' : 'ansehen'), true) + ' ' + knopf('eintragen', 'Stand setzen', false, J) + vkK };
   }
+  /* v4670 · Marcel 25.11.2026: „wenn ich auf 2025 klicke, Schritt 1 von 4 … Ist-Miete eintragen, Mieterhöhung eintragen. Und
+     bei 26 nur Mieterhöhung eintragen. Kann ich da denn sonst noch nichts machen?“ Statt einer Leiste mit den Knöpfen EINES
+     Schritts steht je Jahr eine kurze Liste aller vier Schritte: Stand, ein kurzer Satz, was zu tun ist, und ein Knopf
+     (die ganze Erklärung im Überfahren). Im laufenden Jahr sagt die Liste, was sich schon vorbereiten lässt. Die
+     Mieterhöhung steht nur noch hier (der Knopf in der Kachel Mieterhöhung entfällt). */
+  function todo(k, z, s, lauf, weg) {
+    var J = z.jahr, st = s[k], fest = s.fest && s.fest[k], h = s._haus || {}, r = { st: fest ? 'fest' : st, t: '', kn: '', tip: '' };
+    if (fest) { r.t = 'Festgeschrieben am ' + datumText(fest) + '.'; r.tip = 'Zum Ändern erst wieder freigeben.'; return r; }
+    if (lauf) {
+      if (k === 'miete') {
+        var mp = null; try { mp = mpJahr(J); } catch (e) { mp = null; }
+        var luft = !!(mp && mp.n && mp.zul > mp.ist + 0.5);
+        r.t = luft ? 'Luft bis zur zulässigen Miete. Erhöhung vorbereiten.' : 'Erhöhungen eintragen, sobald sie gelten.';
+        r.kn = luft ? knopf('mieterhoehung', 'Mieterhöhung vorbereiten', true) + (global.DpViviMieterhoehung && global.DpViviMieterhoehung.verfuegbar() ? ' ' + knopf('vivi-mh', 'In ViVi anlegen', false) : '') : knopf('miete', 'Erhöhung eintragen', false);
+        r.tip = 'Die Ist-Miete ' + J + ' trägst du nach dem Jahresende ein. Jetzt kannst du Erhöhungen planen oder eintragen.';
+      } else if (k === 'wert') {
+        r.t = z.mb ? 'Marktbericht vom ' + datumText(z.mb.am) + ' liegt vor.' : 'Ein Marktbericht im Jahr reicht.';
+        r.kn = knopf(z.mb ? 'wert-sehen' : 'wert', z.mb ? 'Alle Berichte' : 'Marktbericht abrufen', false);
+        r.tip = 'Ein Bericht zählt für das Jahr seines Wertermittlungsstichtags.';
+      } else if (k === 'haus') {
+        if (weg) { r.t = 'Protokoll und Wirtschaftsplan ' + J + ' hochladen, sobald sie da sind.'; r.kn = knopf('haus', 'Unterlagen hochladen', false); }
+        else r.t = 'Die Hauskosten laufen über die Anlage V.';
+        r.tip = 'DealPilot liest Hausgeld, Rücklage und Beschlüsse aus den Unterlagen.';
+      } else {
+        r.t = 'Belege sammeln. Die Anlage V ' + J + ' folgt ab Februar ' + (J + 1) + '.';
+        r.kn = knopf('haus', 'Belege einlesen', false);
+        r.tip = 'Rechnungen und Belege des Jahres kannst du laufend einlesen. Sie landen in der passenden Zeile der Anlage V.';
+      }
+      return r;
+    }
+    var a = aufgabe(k, z, s, weg); r.tip = a.t;
+    if (k === 'miete') { r.t = st === 'ok' ? 'Ist-Miete ' + J + ' steht.' : 'Ist-Miete ' + J + ' fehlt noch.'; r.kn = st === 'ok' ? knopf('miete', 'Erhöhung eintragen', false) : knopf('eintragen', 'Ist-Miete eintragen', true, J); }
+    else if (k === 'wert') { r.t = z.mb ? 'Marktbericht vom ' + datumText(z.mb.am) + '.' : 'Kein Bericht mit Stichtag in ' + J + '.'; r.kn = z.mb ? knopf('wert-sehen', 'Alle Berichte', false) : knopf('wert', 'Marktbericht abrufen', true); }
+    else if (k === 'haus') {
+      if (!weg) { r.t = 'Läuft über die Anlage V.'; r.kn = ''; }
+      else if (st === 'ok') { r.t = 'Protokoll und Abrechnung sind da.'; r.kn = knopf('haus-sehen', 'Haus ansehen', false); }
+      else {
+        var fe = []; if (!h.protokoll) fe.push('Protokoll'); if (!(h.abrechnung || h.wirtschaftsplan)) fe.push('Abrechnung');
+        r.t = fe.length ? 'Es fehlt: ' + fe.join(', ') + '.' : 'Unterlagen ' + J + ' prüfen.';
+        r.kn = knopf('haus', 'Unterlagen hochladen', true) + (viviVerknuepft() ? ' ' + knopf('vivi-abgleich', 'Mit ViVi abgleichen', false, J) : '');
+      }
+    } else {
+      var vk = null; try { vk = viviKurz(z, viviDaten()); } catch (e) { vk = null; }
+      var vkK = vk && vk.n ? ' ' + knopf('vivi-reiter', vk.n + (vk.n === 1 ? ' Abweichung' : ' Abweichungen') + ' zu ViVi', false, J) : '';
+      if (st === 'ok') { r.t = 'Bescheid liegt vor.'; r.kn = knopf('steuer', 'Anlage V ansehen', false) + vkK; }
+      else if (z.status === 'erklaert') { r.t = 'Erklärt, der Bescheid fehlt.'; r.kn = knopf('eintragen', 'Stand setzen', true, J) + vkK; }
+      else { r.t = 'Anlage V ' + J + ' ausfüllen.'; r.kn = knopf('steuer', 'Anlage V ausfüllen', true) + vkK; }
+    }
+    return r;
+  }
   function fuehrungHtml(z, s, lauf, akt, weg) {
-    var ks = SCHRITTE.map(function (x) { return x[0]; });
-    var punkte = '<ol class="dp-ja-f-p" aria-label="Ablauf ' + z.jahr + '">' + SCHRITTE.map(function (x, i) {
-      var st = s.fest && s.fest[x[0]] ? 'ok' : s[x[0]];
-      return '<li><button type="button" class="btn-clean dp-ja-f-' + (st === 'ok' ? 'ok' : st) + (x[0] === akt ? ' an' : '') + '" data-ja-aktion="f-wahl" data-ja-k="' + x[0] + '" aria-current="' + (x[0] === akt ? 'step' : 'false') + '" title="' + x[1] + ': ' + (st === 'ok' ? 'erledigt' : WORT[st]) + '">'
-        + '<i>' + (st === 'ok' ? '✓' : (i + 1)) + '</i><span class="w">' + x[1] + '</span></button></li>';
-    }).join('') + '</ol>';
-    /* v4560 · die Punkte 1 bis 4 entfallen, die Karten darunter wählen den Schritt. Die Leiste ist eine schmale Zeile mit den Knöpfen, die Aufgabe steht im Überfahren. */
-    if (!akt) return '<div class="dp-ja-fuehrung fertig"><div class="dp-ja-f-t"><span class="dp-ja-eti">' + z.jahr + ' · ' + (s.nFest === 4 ? 'festgeschrieben' : 'alle Schritte erledigt') + '</span></div></div>';
-    var i = ks.indexOf(akt), st = s.fest && s.fest[akt] ? 'ok' : s[akt], fest = s.fest && s.fest[akt];
-    /* v4150 · Marcel 23.11.2026: „in der Strecke ja auch kein Weiter und Zurück, sondern geben dann nur die Buttons an“.
-       Die Punkte und die Karten wählen den Schritt, hier stehen nur seine Knöpfe (dieselben wie bisher in der Karte) und
-       klein „Schritt festschreiben“ bzw. „wieder freigeben“. Laufendes Jahr: Knöpfe der Karte, kein Festschreiben. */
-    var a = lauf ? { t: 'Das Jahr ' + z.jahr + ' läuft noch. Abgleich ab Februar ' + (z.jahr + 1) + '.', kn: _kn[akt] || '' } : aufgabe(akt, z, s, weg);
-    var festK = lauf ? '' : (fest
-      ? '<button type="button" class="btn-clean dp-ja-fest an" data-ja-aktion="freigeben" data-ja-schritt-k="' + akt + '" title="Festgeschrieben am ' + esc(datumText(fest)) + '. Wieder freigeben, um ' + SCHRITTE[i][1] + ' ' + z.jahr + ' zu ändern.">' + SCHLOSS + ' wieder freigeben</button>'
-      : '<button type="button" class="btn-clean dp-ja-fest" data-ja-aktion="festschreiben" data-ja-schritt-k="' + akt + '" title="' + SCHRITTE[i][1] + ' ' + z.jahr + ' abschließen. Danach lässt sich der Schritt nicht mehr ändern, bis er freigegeben ist.">' + SCHLOSS + ' Schritt festschreiben</button>');
-    return '<div class="dp-ja-fuehrung' + (lauf ? ' lauf' : '') + '" title="' + esc(a.t) + '">'
-      + '<div class="dp-ja-f-t"><span class="dp-ja-eti">' + (lauf ? z.jahr + ' · ' + SCHRITTE[i][1] + ' · läuft' : 'Schritt ' + (i + 1) + ' von 4 · ' + SCHRITTE[i][1] + ' · ' + (st === 'ok' ? 'erledigt' : WORT[st])) + '</span></div>'
-      + '<div class="dp-ja-f-k">' + a.kn + festK + '</div></div>';
+    var J = z.jahr;
+    if (!lauf && s.nFest === 4) return '<div class="dp-ja-fuehrung fertig"><div class="dp-ja-f-t"><span class="dp-ja-eti">' + J + ' · festgeschrieben</span></div></div>';
+    var zeilen = SCHRITTE.map(function (x, i) {
+      var k = x[0], r = todo(k, z, s, lauf, weg), fest = s.fest && s.fest[k];
+      var stW = r.st === 'fest' ? 'festgeschrieben' : (WORT[r.st] || r.st);
+      var festK = lauf ? '' : (fest
+        ? '<button type="button" class="btn-clean dp-ja-fest an" data-ja-aktion="freigeben" data-ja-schritt-k="' + k + '" title="Festgeschrieben am ' + esc(datumText(fest)) + '. Wieder freigeben, um ' + x[1] + ' ' + J + ' zu ändern." aria-label="' + x[1] + ' ' + J + ' wieder freigeben">' + SCHLOSS + '</button>'
+        : '<button type="button" class="btn-clean dp-ja-fest" data-ja-aktion="festschreiben" data-ja-schritt-k="' + k + '" title="' + x[1] + ' ' + J + ' festschreiben. Danach lässt sich der Schritt nicht mehr ändern, bis er freigegeben ist." aria-label="' + x[1] + ' ' + J + ' festschreiben">' + SCHLOSS + '</button>');
+      var ok = r.st === 'ok' || r.st === 'fest';
+      return '<li class="dp-ja-td dp-ja-td-' + (ok ? 'ok' : r.st) + (k === akt ? ' an' : '') + '" data-ja-k="' + k + '"' + (r.tip ? ' title="' + esc(r.tip) + '"' : '') + '>'
+        + '<i>' + (ok ? '✓' : (i + 1)) + '</i><b>' + x[1] + '</b><span class="st dp-ja-st-' + (ok ? 'ok' : (r.st === 'laufend' ? 'teil' : r.st)) + '">' + stW + '</span>'
+        + '<span class="t">' + esc(r.t) + '</span><span class="k">' + r.kn + festK + '</span></li>';
+    }).join('');
+    return '<div class="dp-ja-fuehrung dp-ja-todo' + (lauf ? ' lauf' : '') + '"><div class="dp-ja-f-t"><span class="dp-ja-eti">' + (lauf ? 'Schon möglich in ' + J : 'Zu tun für ' + J) + '</span></div><ol>' + zeilen + '</ol></div>';
   }
   /* v4090 · Rückfrage vor dem Freigeben und Protokoll des Jahres */
   /* ── v4100 · Jahr fertig machen ─────────────────────────────────────
@@ -1193,7 +1251,7 @@
   global.DpJahresabgleich = { VERSION: VERSION, stand: stand, hausStand: hausStand, hausJahr: hausJahr, erinnerung: erinnerung, mbAbrufen: mbAbrufen,
     mpRein: mpRein, mpQuellen: mpQuellen, mpJahr: mpJahr, mpUrteil: mpUrteil, html: html, mountAll: mountAll, verfuegbar: verfuegbar, grafikOpt: grafikOpt,
     standText: standText, viviMieteRein: viviMieteRein, viviJahr: viviJahr, viviLuecke: viviLuecke, lueckenText: lueckenText,   /* v4220 */   /* v4016, v4017 */
-    SCHRITTE: SCHRITTE, aktiverSchritt: aktiverSchritt, aufgabe: aufgabe, fuehrungHtml: fuehrungHtml,   /* v4090 · für den Prüfer */
+    SCHRITTE: SCHRITTE, aktiverSchritt: aktiverSchritt, aufgabe: aufgabe, fuehrungHtml: fuehrungHtml, todo: todo,   /* v4090 · für den Prüfer */
     hgViviRein: hgViviRein, hausMitViviRein: hausMitViviRein, offenListe: offenListe, fertigErgebnis: fertigErgebnis,   /* v4100 */
     standFuer: function (j) { var z = zeileJahr(j), w = mitWeg(); return z ? { z: z, s: stand(z, w, hausLesen()), weg: w } : null; },
     viviVerknuepft: viviVerknuepft, viviAbgleichen: viviAbgleichen, viviHgJahr: viviHgJahr, zuMiete: zuMiete, zuReiter: zuReiter, hervorheben: hervorheben,
