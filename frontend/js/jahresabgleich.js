@@ -1084,7 +1084,7 @@
     if (k === 'miete') { r.t = st === 'ok' ? 'Ist-Miete ' + J + ' steht.' : 'Ist-Miete ' + J + ' fehlt noch.'; r.kn = st === 'ok' ? knopf('miete', 'Erhöhung eintragen', false) : knopf('eintragen', 'Ist-Miete eintragen', true, J); }
     else if (k === 'wert') { r.t = z.mb ? 'Marktbericht vom ' + datumText(z.mb.am) + '.' : 'Kein Bericht mit Stichtag in ' + J + '.'; r.kn = z.mb ? knopf('wert-sehen', 'Alle Berichte', false) : knopf('wert', 'Marktbericht abrufen', true); }
     else if (k === 'haus') {
-      if (!weg) { r.t = 'Läuft über die Anlage V.'; r.kn = ''; }
+      if (!weg) { r.t = 'Folgt der Steuer, die Hauskosten stehen in der Anlage V.'; r.kn = ''; }
       else if (st === 'ok') { r.t = 'Protokoll und Abrechnung sind da.'; r.kn = knopf('haus-sehen', 'Haus ansehen', false); }
       else {
         var fe = []; if (!h.protokoll) fe.push('Protokoll'); if (!(h.abrechnung || h.wirtschaftsplan)) fe.push('Abrechnung');
