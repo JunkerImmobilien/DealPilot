@@ -608,7 +608,21 @@
   /* v4610 · Marcel 25.11.2026: EK-Rendite in vier Stufen, Hauptkennzahl nach Steuer mit Vermögensdelta.
      Rechnung nur in ek-rendite.js. Je Objekt der beim Speichern abgelegte Wert (o._ekr4), sonst aus den
      gespeicherten Kernwerten (Cashflow v./n. St., Darlehen, Tilgung, maßgebender Wert). */
-  function _ekr4Obj(o){
+  function _ekr4Obj(o){ return _ekr4Hebel(o, _ekr4Basis(o)); }
+  /* v4620 · Hebel je Objekt aus den gespeicherten Darlehensdaten, wenn der gespeicherte Stand ihn noch nicht trägt
+     (Gesamtinvest hier = Eigenkapital + Darlehen bei Kauf). Rechnung in ek-rendite.js. */
+  function _ekr4Hebel(o, r){
+    if (!r || r.hebel || !window.DpEkRendite || !DpEkRendite.hebel) return r;
+    try {
+      var dw = _dwO(o), d0 = num(o.d1) + num(o.d2) + (dw.betrag || 0);
+      var zj = num(o.d1) * _pct(o.d1z) / 100 + num(o.d2) * _pct(o.d2z) / 100 + (num(dw.zm) * 12 || 0);
+      var hin = { gi: num(o.ek) + d0, zins_j: zj, darlehen: d0, zins_anschluss: _pct(o.anschl_z) > 0 ? _pct(o.anschl_z) : null };
+      var c = {}, k; for (k in r) c[k] = r[k];
+      c.hebel_in = hin; c.hebel = DpEkRendite.hebel(c, hin);
+      return c;
+    } catch (e) { return r; }
+  }
+  function _ekr4Basis(o){
     if (!o || !window.DpEkRendite) return null;
     if (o._ekr4 && o._ekr4.k1 != null) return o._ekr4;
     var cfv = o._kpis_cf_vs != null ? num(o._kpis_cf_vs) : null, cfn = o._kpis_cf_ns != null ? num(o._kpis_cf_ns) : null;
