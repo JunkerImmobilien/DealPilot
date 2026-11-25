@@ -45723,6 +45723,11 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** staging ca5bbef2 … 68652a9a (v4900, a–i).
 - **Nachweis:** iframe-Messung 1440/1280/390, Navy und Blau, Schreibaufrufe abgefangen, kein Querscrollen; vorschau-pruefen, buster-ebenen, gold-audit RC 0. Bilder runde3/.
 - **Rest:** Freigabe Marcel. Nummer v4900 doppelt vergeben (auch C5 „Maßgebender Wert“), hier nur Buster von pf-werkstatt.js. Steuer/Projektion/Verlauf-Bausteine zeigen in der Palette noch das Piktogramm (im Cockpit nicht gezeichnet).
+### v4985–v4985d · Arbeitsbereich „Ansicht anpassen“ Runde 4 (Fork B5, nur Staging, 25.11.2026)
+- **Was:** Gerüst und Klassen des Einstellungen-Fensters (global-view-overlay, set-modal-v2 set-modal-cream, dp-modal-topband, modal-side mit .ms-tab, set-modal-content, settings-footer btn-ghost/btn-gold), Gruppen als echte Reiter, Score-Kopf kompakt wie im Cockpit (Regeln von #dp-pscore-hero auf #dp-pw .pw-psk umgeschrieben), Handy vollflächig mit waagerechten Reitern und Palette als Streifen.
+- **Commit:** staging 4950-Commit (Nummer doppelt, siehe Rest) bis 5bd460b2.
+- **Nachweis:** 17 Messstellen (Rahmen, Leiste, Logo, Tag, ×, Kopf, Seite, Reiter aktiv/inaktiv, Fuß, Knöpfe) per getComputedStyle gleich dem Einstellungen-Fenster; 390 px ohne Querscrollen; Navy; vorschau, buster, gold-audit RC 0. Bilder runde4/ mit vergleich-modal.png.
+- **Rest:** Freigabe Marcel. Erster Commit trug v4950 (vergeben an Drehbuch), umbenannt auf v4985. Navy-Akzente in der dunklen Seitenspalte schwach, das gilt genauso für das Einstellungen-Fenster (gemeinsame Klassen).
 ### Rollout 1.0.223 · v4910 Dokumentenablage scharf, Einstellungen › Dokumente (Fork D5, 25.11.2026)
 - **Was:** Löschfrist/Plattenwarnung scharf (`ABLAGE_FRIST_TAKT=1` Staging+Prod), Einsortieren nach Ordner/Jahr, Belegung in Prozent (Beleg-Dialog, Meine Dokumente), Reiter Einstellungen › Dokumente mit Ordner/Jahr löschen, `DELETE /dateien?objekt&ordner[&jahr]`.
 - **Commit:** staging 31c2ce92 · main 0e965506, 718504ea (1.0.223).
