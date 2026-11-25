@@ -45617,3 +45617,9 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** staging 8c84e475, dbe57bec, 1491204e, 821efb7d, c3729945, 6eaa6e5f, ee488389 · main 6d16fbca … 162c4efa, Version fd7f512f.
 - **Nachweis:** Muster Dateien/Einzelcheck/Muster-komplett-2026-11-25 (15 Seiten je Objekt), einzelcheck-pruefen grün, buster-ebenen sauber, Prod-Sicherung haupt/mb-20261125-0945-ec9e (7,0/31 MB, Kopf gelesen), Backend neu gebaut, Landing liefert einzelcheck.js?v=einzelcheck-9e, version 214.
 - **Rest:** Abstand nach Mietpotenzial-Tabelle, Anschrift bei Wiederholung, Wohnungszahl für MFH-Sachwert.
+
+### v4820 · Quick-Check-Übergabe Lindenallee (Fork OO4)
+
+- **Was:** II4-Befund nachgestellt, keine Regression (Ursachen: zu früher Klick vor v4780f, Messskript mit globalem `var el`). Neuer Prüfer `tools/qc-uebergabe-pruefen.mjs` (Quelltext-Verträge + `--objekt` Datensatz).
+- **Commit:** staging f0231e37, main nur Prüfer. Kein App-Code, keine Version.
+- **Nachweis:** 2026-1198 (Staging) 17/17, Gegenproben rot. 2026-1197 auf Verloren.
