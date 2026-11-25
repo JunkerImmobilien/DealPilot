@@ -3850,7 +3850,7 @@
     reihe.forEach(function (k) {
       var b = B[k]; if (!k && !b.w.length && !b.a.length) return;
       D.protokoll({ quelle: 'Quick-Check', aenderungen: b.a, uebernommen: b.w, nicht_gelesen: [],
-        dokumente: [k ? { name: k, typ: typ[k] || 'Dokument' } : { name: 'alle Unterlagen zusammen', typ: 'Auswertung' }] }); n++;
+        dokumente: [k ? { name: k, typ: typ[k] || 'Dokument', inAuswertung: !b.w.length || undefined } : { name: 'alle Unterlagen zusammen', typ: 'Auswertung' }] }); n++;   /* inAuswertung: Inhalt steckt in der Unterlagen-Auswertung bzw. den Einheiten */
     });
     (E.nicht || []).forEach(function (nm) { D.protokoll({ quelle: 'Quick-Check', aenderungen: [], uebernommen: [], nicht_gelesen: [nm], dokumente: [] }); n++; });
     return n;
