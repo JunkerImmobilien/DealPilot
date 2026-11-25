@@ -45617,3 +45617,10 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** staging 8c84e475, dbe57bec, 1491204e, 821efb7d, c3729945, 6eaa6e5f, ee488389 · main 6d16fbca … 162c4efa, Version fd7f512f.
 - **Nachweis:** Muster Dateien/Einzelcheck/Muster-komplett-2026-11-25 (15 Seiten je Objekt), einzelcheck-pruefen grün, buster-ebenen sauber, Prod-Sicherung haupt/mb-20261125-0945-ec9e (7,0/31 MB, Kopf gelesen), Backend neu gebaut, Landing liefert einzelcheck.js?v=einzelcheck-9e, version 214.
 - **Rest:** Abstand nach Mietpotenzial-Tabelle, Anschrift bei Wiederholung, Wohnungszahl für MFH-Sachwert.
+
+### v4800 · Investor Deal Score immer geteilt (Prod 1.0.215)
+
+- **Was:** Einstellung „Bewertung als“ entfernt, Investor Deal Score überall mit Investment- und Finanzierungs-Score (Übersicht, Kopfleiste, Bewertung, Portfolio, PDFs), kein normaler Deal Score daneben. v4800b Übersicht-Urteil nach Laden neu gerechnet.
+- **Commit:** staging 7fe742db, f21d8a28, Merge 367f54b7 · main 90acdf0f, 3fb7d124, Version 754f22fe.
+- **Nachweis:** Staging Westerfeldstr. 146 Kopfleiste 69 | Investment 64 | Finanzierung 84, Übersicht gleich, Bewertung zwei Karten trotz Merker „eins“; Hauptstr. 51 58 · 57/62; 390 px kein Querscrollen. score-ketten 216 gleich, buster-ebenen, vorschau sauber, gold-audit Prod RC 0. Sicherung haupt-/mb-20261125-0955-v4800 (7,0/31 MB, Kopf gelesen). Prod per curl: Buster v4800/v4800b/v4800m, version 215.
+- **Rest:** Prod nicht eingeloggt gemessen; Laden der Testobjekte hat updated_at gesetzt (Messen speichert doch); Muster v4790 (LL4) noch mit Deal Score + Investor nebeneinander.
