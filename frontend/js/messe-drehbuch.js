@@ -10895,7 +10895,7 @@
     titel: 'Belege und Dokumentenablage', unterzeile: 'Einlesen, prüfen, aufbewahren', objekt: null,
     abspann: [{ ms: 6200, html: ABSPANN_LOGO }],
     aufraeumen: function () {
-      try { document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); } catch (e) {}
+      /* v4950e · kein Esc hier: Esc löst stopp() aus und brach das Aufräumen ab, die Kopie blieb stehen */
       rhAufraeumen();
     },
     szenen: [
