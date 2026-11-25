@@ -10834,7 +10834,7 @@
         await b2oZeile(s, 'Der Zeitstrahl', 'Vom Kauf bis zum Ende der Zinsbindung. Künftige Jahre sind grau, jedes Jahr zeigt, wie weit es fertig ist.');
       },
       async function (s) {   /* 2 · vier Schritte */
-        await zeige(function () { var e = q('#s5 .ja-schritt'); return e && (e.parentNode || e); }, 8);
+        await zeige(function () { var e = rhIm(k5Panel(), /Zu tun für|Schon möglich in/); if (e) { var c = e.closest('section,div[class]'); return (c && c.parentNode && c.parentNode.closest('div[class]')) || c || e; } var j = q('#s5 .ja-schritt'); return j && (j.parentNode || j); }, 8);
         await b2oZeile(s, 'Vier Schritte', 'Miete, Wert, Haus und Steuer. Je Schritt der Stand, ein Satz und ein Knopf.');
       },
       async function (s) {   /* 3 · Tabelle */
