@@ -268,7 +268,7 @@
       mp: function () { return kachel('Marktpreis', nMpi ? (kpMpi ? (mpiS / kpMpi >= 1 ? '+' : '−') + nf1.format(Math.abs(mpiS / kpMpi * 100 - 100)) + ' %' : '') : 'keine Angabe', nMpi ? nMpi + ' von ' + rows.length + ' Obj.' : '', nMpi && kpMpi ? (mpiS >= kpMpi ? 'gp-pos' : 'gp-neg') : '', 'Gesamtbewertung: Marktpreisindikation ' + mio(mpiS) + ' gegen die Kaufpreise derselben Objekte ' + mio(kpMpi) + '.'); }
     };
     /* v4730 · Kennzahl-Karten aus dem Modul-Katalog (pf-katalog.js), Daten aus pf-modell.js (immer über alle Objekte) */
-    try { if (window.DpPfModell) DpPfModell.setze(alle, B); } catch (e) { try { console.warn('[grafiken-portfolio] Module', e); } catch (x) {} }
+    try { if (window.DpPfModell) DpPfModell.setze(alle, B, projektion(alle, J0 + 10)); } catch (e) { try { console.warn('[grafiken-portfolio] Module', e); } catch (x) {} }
     KZDEF.forEach(function (d) { if (d.x && !KZH[d.k]) KZH[d.k] = function () {
       var r = window.DpPfModell ? DpPfModell.kachel(d.x) : null; if (!r) return kachel(d.t, 'keine Angabe', '', '', 'Für diese Kennzahl fehlen Angaben im Bestand.');
       var tip = String(r.tip || '').replace(/<br\s*\/?>|<\/div>|<hr>/g, ' · ').replace(/<[^>]+>/g, '').replace(/(\s*·\s*)+/g, ' · ').replace(/^ · | · $/g, '').trim();
@@ -460,7 +460,7 @@
     { k: 'ew', t: 'Ertragswert gegen Kaufpreis' }, { k: 'mp', t: 'Marktpreis gegen Kaufpreis' }
   ].concat([   /* v4730 · aus dem Modul-Katalog (pf-katalog.js KZ) */
     ['unterziel', 'Unter DSCR-Ziel'], ['zuzahler', 'Zahlen zu'], ['energie', 'Energie F und G'], ['leer', 'Leerstand'], ['vuv', 'Ergebnis Anlage V'],
-    ['stsaldo', 'Steuer-Saldo'], ['grenz', 'Grenzsteuersatz'], ['gmbh', 'Ergebnis Gesellschaft'], ['faellig', 'Bis Ende 2030 fällig'], ['ekein', 'Eigenkapital eingesetzt'],
+    ['stsaldo', 'Steuer-Saldo'], ['grenz', 'Grenzsteuersatz'], ['gmbh', 'Ergebnis Gesellschaft'], ['faellig', 'In fünf Jahren fällig'], ['ekein', 'Eigenkapital eingesetzt'],
     ['ueber', 'Überschuss vor Steuer'], ['tilg', 'Tilgung'], ['stw', 'Steuerwirkung'], ['delta', 'Vermögensdelta'], ['ewheute', 'Ertragswert heute'],
     ['zielnk', 'Zielbild nach Kosten'], ['zuwachs', 'Wertzuwachs'], ['massn', 'Maßnahmen'], ['rendite', 'Rendite heute und Zielbild'], ['mpi', 'Marktpreisindikation'],
     ['mietezb', 'Miete im Zielbild'], ['ohnewechsel', 'Mieterhöhung ohne Wechsel'], ['mitumbau', 'Mit Umbau und Neuvermietung'], ['mietniveau', 'Mietniveau']
@@ -1049,7 +1049,7 @@
      Neu gezeichnet wird, wenn sich der Datenstand (Motor) oder die Ansicht Einfach/Genau ändert. Genau = Detail der Demos. */
   function pfmZeichnen(app) {
     if (!window.DpPfModell || !app) return;
-    var E = DpPfModell.E; if (!E) { try { var Dd = daten(); if (Dd) E = DpPfModell.setze(Dd.rows, Dd.B); } catch (e) { E = null; } } if (!E) return;
+    var E = DpPfModell.E; if (!E) { try { var Dd = daten(); if (Dd) E = DpPfModell.setze(Dd.rows, Dd.B, projektion(Dd.rows, heuteJahr() + 10)); } catch (e) { E = null; } } if (!E) return;
     var genau = false; try { genau = localStorage.getItem('dp_cockpit_ansicht') === 'genau'; } catch (e) {}
     var detailNeu = E.K.detail() !== genau; if (detailNeu) { try { E.K.setDetail(genau); } catch (e) {} }
     ANSICHT.forEach(function (a) {

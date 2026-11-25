@@ -149,7 +149,7 @@ window.DpPfBausteineF = function (K) {
   /* Restschuld, die je Jahr in die Anschlussfinanzierung geht */
   function faelligJeJahr(sel) {
     K.modul(sel, function (w) {
-      var j = []; for (var y = 2027; y <= 2039; y++) j.push(y);
+      var j = []; for (var y = new Date().getFullYear() + 1; y <= new Date().getFullYear() + 13; y++) j.push(y);
       var werte = j.map(function (y) { return K.summe(O.filter(function (o) { return Math.floor(o.zbJahr) === y; }), function (o) { return o.restZb; }); });
       var spitze = j[werte.indexOf(Math.max.apply(null, werte))];
       K.satz(spitze + ' wird mit ' + K.mio(Math.max.apply(null, werte)) + ' am meisten neu finanziert', ['Projektion']); return K.karte('Anschlussfinanzierung je Jahr', 'Restschuld, die zum Ende der Zinsbindung neu finanziert wird. Spitze ' + spitze + ' mit ' + K.mio(Math.max.apply(null, werte)) + '.',

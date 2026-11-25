@@ -39,7 +39,7 @@
     return { M: M, zve: zve, grenz: grenz };
   }
 
-  function modell(rows, B) {
+  function modell(rows, B, P) {
     var D = window.DealPilotDashboard, p = null; try { p = D.portfolioPayload(); } catch (e) { p = null; }
     var po = {}; ((p && p.objekte) || []).forEach(function (o) { po[o.id] = o; });
     var ST = steuerJeObjekt(), H = heute(), S0 = (B && B.S) || {}, A = (B && B.A) || {};
@@ -75,9 +75,10 @@
       if (!x.zb) x.zb = '';
       return x;
     });
-    var proj = ((p && p.projektion) || []).map(function (q) { return { j: z(q.jahr), rest: z(q.restschuld_eur), wert: z(q.objektwert_eur) }; });
+    /* Projektion: dieselbe Rechnung wie die Kachel Vermögen netto in der Projektion (grafiken-portfolio.js projektion(), Basis Wertansatz) */
     var wSum = objekte.reduce(function (s, o) { return s + (o.wert || 0); }, 0);
-    proj.unshift({ j: 0, rest: z(S0.rest), wert: wSum });
+    var proj = (P || []).map(function (q, i) { return { j: i, rest: z(q.rest), wert: z(q.wert) }; });
+    if (!proj.length) proj = [{ j: 0, rest: z(S0.rest), wert: wSum }];
     var ekrP = null; try { ekrP = window.DpEkRendite ? DpEkRendite.portfolio(objekte.map(function (o) { return o.ekr; })) : null; } catch (e) { ekrP = null; }
     var BS = (B && B.BS) || {};
     var D2 = {
@@ -101,11 +102,11 @@
   }
 
   var E = null, sig = null;
-  function setze(rows, B) {
+  function setze(rows, B, P) {
     if (!window.DpPfKit || !window.DpPfBausteineF || !window.DpPfKatalogF || !rows || !rows.length) return null;
     var s = JSON.stringify([rows.map(function (r) { return [r.id, Math.round(r.wert || 0), Math.round(r.cfns || 0), r.ekr4 ? Math.round((r.ekr4.k4 || 0) * 10) : 0]; }), B && B.S ? Math.round(B.S.rest) : 0]);
     if (E && s === sig) return E;
-    var D2 = modell(rows, B);
+    var D2 = modell(rows, B, P);
     DpPfKit.setD(D2);
     if (D2.zieleLeer) DpPfKit.setZiele(false); else DpPfKit.setZiele(true);
     var Bs = DpPfBausteineF(DpPfKit), C = DpPfKatalogF(DpPfKit, Bs);

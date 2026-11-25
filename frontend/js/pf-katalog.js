@@ -7,6 +7,7 @@
 /* v4730 · Katalog der Portfolio-Module (aus Demos-2026-11-25d/cockpit.js): Kennzahl-Karten, Module, Vorlagen. Fabrik: je Datenstand neu. */
 window.DpPfKatalogF = function (K, B) {
   'use strict';
+  var J0 = new Date().getFullYear(), MON = new Date().toLocaleDateString('de-DE', { month: 'long', year: 'numeric' });
   var D = K.D, O = D.objekte, S = D.summe, k = K.kennzahlen(), ZB = D.zielbild;
   function esc(s) { return K.esc(s); }
   function f1(v) { return Math.round(v * 10) / 10; }
@@ -21,7 +22,7 @@ window.DpPfKatalogF = function (K, B) {
   var neg = O.filter(function (o) { return o.cfVs < 0; }), en = O.filter(function (o) { return o.energie === 'F' || o.energie === 'G'; });
   var mitSt = O.filter(function (o) { return o.ergVV != null; }), erg = K.summe(mitSt, function (o) { return o.ergVV; });
   var gm = O.filter(function (o) { return o.halter !== 'Privat'; }), gmV = K.summe(gm, function (o) { return o.ergVV; });
-  var bis2030 = O.filter(function (o) { return o.zbJahr < 2031; }), qm = K.summe(O, function (o) { return o.mieteJ; }) / 12 / k.wfl;
+  var bis2030 = O.filter(function (o) { return o.zbJahr < J0 + 5; }), qm = K.summe(O, function (o) { return o.mieteJ; }) / 12 / k.wfl;
   function sumE(f) { return K.summe(O.filter(function (o) { return o.ekr; }), f); }
   var KZ = {
     wert: { t: 'Wertansatz', f: function () { return { l: 'Wertansatz', v: K.mio(k.wert), s: O.length + ' Objekte · ' + k.we + ' Einheiten', tip: '<div class="t-k">Wertansatz</div>Ertragswert im Bestand, wo gerechnet, sonst Kaufpreis.' }; } },
@@ -42,7 +43,7 @@ window.DpPfKatalogF = function (K, B) {
     grenz: { t: 'Grenzsteuersatz', f: function () { return { l: 'Grenzsteuersatz', v: K.pct(D.steuer.grenz), s: 'zvE ' + K.eur(D.steuer.zvePrivat), tip: '<div class="t-k">Grenzsteuersatz</div>Einkommensteuer plus Soli auf den letzten Euro, aus deinem Investmentprofil.' }; } },
     gmbh: { t: 'Ergebnis GmbH', f: function () { return { l: 'Ergebnis GmbH', v: K.eurV(gmV), s: gm.length + ' Objekte in der GmbH', c: 'warn' }; } },
     rest: { t: 'Restschuld', f: function () { return { l: 'Restschuld', v: K.mio(S.rest), s: 'Darlehen bei Kauf ' + K.mio(S.darl) }; } },
-    faellig: { t: 'Bis Ende 2030 fällig', f: function () { return { l: 'Bis Ende 2030 fällig', v: K.mio(K.summe(bis2030, function (o) { return o.restZb; })), s: bis2030.length + (bis2030.length === 1 ? ' Objekt' : ' Objekte') + ' in der Anschlussfinanzierung', c: 'warn' }; } },
+    faellig: { t: 'In fünf Jahren fällig', f: function () { return { l: 'Bis Ende ' + (J0 + 4) + ' fällig', v: K.mio(K.summe(bis2030, function (o) { return o.restZb; })), s: bis2030.length + (bis2030.length === 1 ? ' Objekt' : ' Objekte') + ' in der Anschlussfinanzierung', c: 'warn' }; } },
     ekein: { t: 'Eigenkapital eingesetzt', f: function () { return { l: 'Eigenkapital eingesetzt', v: K.mio(D.ekrP.ek), s: O.length + ' Objekte' }; } },
     ueber: { t: 'Überschuss vor Steuer', f: function () { var v = sumE(function (o) { return o.ekr.cf_op; }); return { l: 'Überschuss vor Steuer', v: K.kurzEur(v), s: 'im Jahr, nach Zins und Tilgung', c: v >= 0 ? 'ok' : 'nok' }; } },
     tilg: { t: 'Tilgung', f: function () { return { l: 'Tilgung', v: K.kurzEur(sumE(function (o) { return o.ekr.tilg; })), s: 'im Jahr, Vermögensaufbau' }; } },
@@ -165,25 +166,25 @@ window.DpPfKatalogF = function (K, B) {
       return K.karte('Miete je Quadratmeter', 'Heute gegen Zielbild. Unten die günstigsten Objekte.', K.hantel({ w: w, rows: rows, rh: 19, farbe: function () { return 'var(--c-haupt)'; }, fmtWert: function (v) { return K.d2(v) + ' €'; }, fmtAx: function (v) { return K.d2(v); }, aria: 'Miete je Quadratmeter' })); }); } },
     lead: { t: 'Der Monat in fünf Sätzen', b: 12, bau: function (s) { mod(s, function () { var z = K.ziele();
       K.satz('Der Bestand trägt sich, drei Baustellen bestimmen den Monat');
-      return K.karte('November 2026 · ' + O.length + ' Objekte', '', '<ul class="punkte"><li>Nach Steuer bleiben <b>' + K.eurV(S.cfNsJ / 12) + '</b> im Monat. Vor Steuer sind es ' + K.eurV(S.cfVsJ / 12) + '.</li><li>Dein Eigenkapital im Bestand liegt bei <b>' + K.mio(k.ekHeute) + '</b>, eingesetzt hast du ' + K.mio(k.ekEin) + '.</li>' + (z ? '<li><b>' + k.unterZiel.length + ' Objekte</b> liegen unter deinem DSCR-Ziel von ' + K.d2(z.minDscr) + '.</li>' : '') + '<li>Die nächste Zinsbindung endet <b>' + naechste.zb.slice(5, 7) + '/' + naechste.zb.slice(0, 4) + '</b>, ' + esc(naechste.name) + '.</li><li>EK-Rendite <b>' + K.pct(K.ekWert(D.ekrP), 1) + '</b> (' + K.ekStufe().lang + ').</li></ul>'); }); } },
+      return K.karte(MON + ' · ' + O.length + ' Objekte', '', '<ul class="punkte"><li>Nach Steuer bleiben <b>' + K.eurV(S.cfNsJ / 12) + '</b> im Monat. Vor Steuer sind es ' + K.eurV(S.cfVsJ / 12) + '.</li><li>Dein Eigenkapital im Bestand liegt bei <b>' + K.mio(k.ekHeute) + '</b>, eingesetzt hast du ' + K.mio(k.ekEin) + '.</li>' + (z ? '<li><b>' + k.unterZiel.length + ' Objekte</b> liegen unter deinem DSCR-Ziel von ' + K.d2(z.minDscr) + '.</li>' : '') + '<li>Die nächste Zinsbindung endet <b>' + naechste.zb.slice(5, 7) + '/' + naechste.zb.slice(0, 4) + '</b>, ' + esc(naechste.name) + '.</li><li>EK-Rendite <b>' + K.pct(K.ekWert(D.ekrP), 1) + '</b> (' + K.ekStufe().lang + ').</li></ul>'); }); } },
 
     /* ── Neu in Runde d, im Stil von Objekt-Cockpit › Steuer ─────────────────── */
     treppe: { t: 'Zinsbindungs-Treppe', neu: 1, b: 6, w: 'Wie viel Restschuld in welchem Jahr neu verhandelt wird, und wie sich das aufsummiert.', bau: function (s) { mod(s, function (w) {
-      var J = []; for (var y = 2027; y <= 2040; y++) J.push(y);
+      var J = []; for (var y = J0 + 1; y <= J0 + 14; y++) J.push(y);
       var we = J.map(function (y) { return K.summe(O.filter(function (o) { return Math.floor(o.zbJahr) === y; }), function (o) { return o.restZb; }); }), kum = [], a = 0; we.forEach(function (v) { a += v; kum.push(a); });
-      var bis35 = kum[J.indexOf(2035)] / a * 100;
-      K.satz('Bis 2035 wird ' + Math.round(bis35) + ' % der Restschuld neu verhandelt', ['Projektion']);
+      var bis35 = a ? kum[J.indexOf(J0 + 9)] / a * 100 : 0;
+      K.satz('Bis ' + (J0 + 9) + ' wird ' + Math.round(bis35) + ' % der Restschuld neu verhandelt', ['Projektion']);
       return K.karte('Zinsbindungs-Treppe', 'Säulen: Restschuld, die im Jahr aus der Zinsbindung läuft. Linie: aufsummiert. In den nächsten drei Jahren rot.',
-        saeulen({ w: w, h: 230, x: J, werte: we, linie: kum, stufe: true, heute: 2027, farbe: function (v, i) { return J[i] <= 2029 ? F.rot : F.tinte; }, aria: 'Zinsbindungs-Treppe', tip: function (i, y) { var os = O.filter(function (o) { return Math.floor(o.zbJahr) === y; }); return tt(y) + tz('läuft aus', K.eur(we[i])) + tz('aufsummiert', K.eur(kum[i])) + (os.length ? os.map(function (o) { return esc(o.name); }).join(', ') : 'keine Bindung'); } })
+        saeulen({ w: w, h: 230, x: J, werte: we, linie: kum, stufe: true, heute: J0 + 1, farbe: function (v, i) { return J[i] <= J0 + 3 ? F.rot : F.tinte; }, aria: 'Zinsbindungs-Treppe', tip: function (i, y) { var os = O.filter(function (o) { return Math.floor(o.zbJahr) === y; }); return tt(y) + tz('läuft aus', K.eur(we[i])) + tz('aufsummiert', K.eur(kum[i])) + (os.length ? os.map(function (o) { return esc(o.name); }).join(', ') : 'keine Bindung'); } })
         + leg([{ n: 'läuft aus', f: F.tinte }, { n: 'in den nächsten drei Jahren', f: F.rot }, { n: 'aufsummiert', f: F.gold }])); }); } },
     restwert: { t: 'Restschuld und Wert, Portfolio', neu: 1, b: 6, w: 'Wert und Restschuld über zehn Jahre, die Fläche dazwischen ist dein Eigenkapital.', bau: function (s) { mod(s, function (w) {
-      var P = D.projektion, X = [], we = [], re = []; for (var j = 0; j <= 10; j++) { X.push(2026 + j); var a = P.filter(function (p) { return p.j <= j; }).pop(), b = P.filter(function (p) { return p.j >= j; })[0], t = b.j === a.j ? 0 : (j - a.j) / (b.j - a.j); we.push(a.wert + (b.wert - a.wert) * t); re.push(a.rest + (b.rest - a.rest) * t); }
+      var P = D.projektion, X = [], we = [], re = []; for (var j = 0; j <= 10; j++) { X.push(J0 + j); var a = P.filter(function (p) { return p.j <= j; }).pop(), b = P.filter(function (p) { return p.j >= j; })[0], t = b.j === a.j ? 0 : (j - a.j) / (b.j - a.j); we.push(a.wert + (b.wert - a.wert) * t); re.push(a.rest + (b.rest - a.rest) * t); }
       K.satz('In zehn Jahren gehören dir ' + K.mio(we[10] - re[10]) + ' statt ' + K.mio(we[0] - re[0]), ['Projektion']);
-      return K.karte('Restschuld und Wert', 'Wertansatz und Restschuld des ganzen Bestands, rechts von 2026 Projektion der App (Stützjahre 1, 5 und 10, dazwischen gleichmäßig).',
-        verlauf({ x: X, heute: 2026, baender: [{ ohneRand: true, farbe: GRUEN_F, lo: re, hi: we }], reihen: [{ name: 'Wert', werte: we, farbe: F.tinte, dick: 2.6, punkte: true }, { name: 'Restschuld', werte: re, farbe: F.tinte3, dick: 2, gestrichelt: true }],
-          marken: [{ j: 2034, text: 'die meisten Bindungen enden', farbe: F.goldD, zeile: 0 }],
-          tip: function (q, jj) { return tt(jj + (jj > 2026 ? ' · Projektion' : '')) + tz('Wert', K.eur(we[q])) + tz('Restschuld', K.eur(re[q])) + 'Eigenkapital <b>' + K.eur(we[q] - re[q]) + '</b>'; },
-          legende: [{ n: 'Wert', f: F.tinte }, { n: 'Restschuld', f: F.tinte3 }, { n: 'Eigenkapital', f: GRUEN_F }] }, w, 'Restschuld und Wert') + seite([['Heute 2026', K.mio(we[0] - re[0]), 'Eigenkapital im Bestand'], ['In 5 Jahren', K.mio(we[5] - re[5]), 'Restschuld ' + K.mio(re[5])], ['In 10 Jahren', K.mio(we[10] - re[10]), 'Restschuld ' + K.mio(re[10])], ['Tilgung', K.kurzEur(S.tilgJ), 'im Jahr, heute']])); }); } },
+      return K.karte('Restschuld und Wert', 'Wertansatz und Restschuld des ganzen Bestands, rechts von heute Projektion der App (dieselbe Rechnung wie die Kachel Netto in der Projektion, gleichmäßig).',
+        verlauf({ x: X, heute: J0, baender: [{ ohneRand: true, farbe: GRUEN_F, lo: re, hi: we }], reihen: [{ name: 'Wert', werte: we, farbe: F.tinte, dick: 2.6, punkte: true }, { name: 'Restschuld', werte: re, farbe: F.tinte3, dick: 2, gestrichelt: true }],
+          marken: (function () { var c = {}; O.forEach(function (o) { var y = Math.floor(o.zbJahr); if (y > J0 && y <= J0 + 10) c[y] = (c[y] || 0) + 1; }); var b = Object.keys(c).sort(function (x, y) { return c[y] - c[x]; })[0]; return b ? [{ j: Number(b), text: 'die meisten Bindungen enden', farbe: F.goldD, zeile: 0 }] : []; })(),
+          tip: function (q, jj) { return tt(jj + (jj > J0 ? ' · Projektion' : '')) + tz('Wert', K.eur(we[q])) + tz('Restschuld', K.eur(re[q])) + 'Eigenkapital <b>' + K.eur(we[q] - re[q]) + '</b>'; },
+          legende: [{ n: 'Wert', f: F.tinte }, { n: 'Restschuld', f: F.tinte3 }, { n: 'Eigenkapital', f: GRUEN_F }] }, w, 'Restschuld und Wert') + seite([['Heute ' + J0, K.mio(we[0] - re[0]), 'Eigenkapital im Bestand'], ['In 5 Jahren', K.mio(we[5] - re[5]), 'Restschuld ' + K.mio(re[5])], ['In 10 Jahren', K.mio(we[10] - re[10]), 'Restschuld ' + K.mio(re[10])], ['Tilgung', K.kurzEur(S.tilgJ), 'im Jahr, heute']])); }); } },
     mieteist: { t: 'Miete heute, Plan und Zielbild', neu: 1, b: 6, w: 'Je Objekt die Miete heute gegen den Bestand-Plan und das Zielbild, im Monat.', bau: function (s) { mod(s, function (w) {
       var os = O.slice().sort(function (a, b) { return (b.mieteZ - b.mieteJ) - (a.mieteZ - a.mieteJ); }), unter = O.filter(function (o) { return o.mieteJ < o.mieteB - 1; }).length;
       K.satz(nO(unter, 'liegt heute unter dem Plan', 'liegen heute unter dem Plan') + ', das Zielbild hebt alle zusammen um ' + K.eurV((ZB.mieteZ - S.mieteJ) / 12) + ' im Monat', ['Zielbild']);
