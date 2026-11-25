@@ -445,7 +445,7 @@
      Zuordnung und Stand. Grundlage sind nur die gespeicherten Änderungen (aenderungen), Buchungen und Wertzeilen
      des Verlaufs, nichts wird neu gerechnet. Der Filter lebt nur in dieser Sitzung (Modulvariable). */
   var SEC_NAME = { s0: 'Objekt', s1: 'Investition', s2: 'Miete', s3: 'Finanzierung', s4: 'Bewirtschaftung', 's3-tax': 'Steuer', s5: 'Pilot-Analyse', s6: 'Bewertung', s8: 'Deal-Aktion' };
-  var ZU_NAME = { av: 'Anlage V', feld: 'Reiter und Felder', we: 'Wohnungen', weg: 'WEG und Protokolle', sonst: 'Sonstiges' };
+  var ZU_NAME = { av: 'Anlage V', feld: 'Reiter und Felder', we: 'Wohnungen', weg: 'WEG und Protokolle', aw: 'Auswertung', sonst: 'Sonstiges' };
   var STAND_NAME = { ueb: 'Übernommen', offen: 'Offen', zurueck: 'Zurückgenommen' };
   var _filt = { art: '', jahr: '', zu: '', stand: '' }, _auf = {};
   function werteAuf(id) { _auf[id] = !_auf[id]; filtern(); }
@@ -477,6 +477,15 @@
       if (a.t === 'steuer' && a.jahr) { var k = 'Anlage V ' + a.jahr + ' · ' + postenName(a.feld); if (idx[k] == null && !L.some(function (z) { return z.g === 'av' && z.jahr === +a.jahr; })) dazu({ g: 'av', jahr: +a.jahr, text: k, hin: 'av:' + a.jahr }); }
       if (a.t === 'einheit' && !L.some(function (z) { return z.g === 'we'; })) dazu({ g: 'we', text: 'Wohnungen · ' + (a.label || 'Einheit'), hin: 'we:' + (a.i == null ? '' : a.i) });
     });
+    /* v4700 · Quick-Check: eine Unterlage ohne eigene Werte ging in die Auswertung (Mietverträge in die Wohnungen,
+       Protokolle und Wirtschaftsplan in WEG und Protokolle, Grundbuch, Teilungserklärung, Baulast in die Auswertung) */
+    if (!L.length) (x.dokumente || []).forEach(function (d) {
+      if (!d.inAuswertung) return;
+      var t = String(d.typ || '');
+      if (/mietvertrag/i.test(t)) dazu({ g: 'we', text: 'Wohnungen · aus dem Mietvertrag', hin: 'we:' });
+      else if (/protokoll|wirtschaftsplan|abrechnung/i.test(t)) dazu({ g: 'weg', text: 'WEG und Protokolle', hin: 'weg' });
+      else dazu({ g: 'aw', text: 'Auswertung · ' + (t || 'Unterlage'), hin: 'weg' });
+    });
     return L;
   }
   function jahreVon(x, ziele) {
@@ -487,7 +496,7 @@
     if (!Object.keys(J).length && x.am) J[String(x.am).slice(0, 4)] = 1;
     return Object.keys(J).map(Number).sort();
   }
-  function standVon(x) { return x.zurueck ? 'zurueck' : ((x.uebernommen || []).length && !(x.nicht_gelesen || []).length ? 'ueb' : 'offen'); }
+  function standVon(x) { return x.zurueck ? 'zurueck' : (((x.uebernommen || []).length || (x.dokumente || []).some(function (d) { return d.inAuswertung; })) && !(x.nicht_gelesen || []).length ? 'ueb' : 'offen'); }
   /** Sprung zum Ziel. av:<jahr> öffnet „Belege je Jahr“, feld:<id>:<sec> den Reiter mit markiertem Feld,
       we:<i> die Wohnungen, weg die Protokolle im Reiter Haus & Unterlagen. */
   function hin(z) {
@@ -556,7 +565,7 @@
     var filter = zeilen.length > 1 ? '<div class="dp-eg-filter">'
       + sel('art', 'Art', Object.keys(opt.art).sort())
       + sel('jahr', 'Jahr', Object.keys(opt.jahr).sort().reverse())
-      + sel('zu', 'Zugeordnet', ['av', 'feld', 'we', 'weg', 'sonst'].filter(function (g) { return opt.zu[g]; }), function (g) { return ZU_NAME[g]; })
+      + sel('zu', 'Zugeordnet', ['av', 'feld', 'we', 'weg', 'aw', 'sonst'].filter(function (g) { return opt.zu[g]; }), function (g) { return ZU_NAME[g]; })
       + sel('stand', 'Stand', ['ueb', 'offen', 'zurueck'].filter(function (s) { return opt.stand[s]; }), function (s) { return STAND_NAME[s]; })
       + '<span class="dp-eg-fz">' + sichtbar.length + ' von ' + zeilen.length + (aktiv ? ' · <button type="button" class="dp-eg-fx" onclick="DpEingang.filtern(\'alle\')">Filter löschen</button>' : '') + '</span></div>' : '';
     var h = '<div id="dp-eg-verlauf">' + filter + '<div class="dp-eg-tab" role="table"><div class="dp-eg-kopf" role="row"><span>Datum</span><span>Gelesen</span><span>Zugeordnet</span><span>Übernommen</span><span></span></div>'
