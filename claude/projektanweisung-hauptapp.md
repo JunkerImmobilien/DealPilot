@@ -45699,3 +45699,10 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** staging f64ec255, 5507a1a7, 0cea8ad7, dad17b92 · main 389b2833, Version e8c7e1a2.
 - **Nachweis:** Staging gemessen (Karten, Tabelle, Modal-Bedienung), Prod Auslieferung per curl (Buster v4870, patch 221). buster-ebenen und vorschau sauber.
 - **Rest:** gold-audit auf Prod rot durch js/dateiablage.js (nicht v4870, Fork UU4). 390 px der Einfach-Karten nicht eigens gemessen. Modal auf Prod erst nach Freigabe (Commit 5507a1a7 + v4870a/b per Cherry-Pick).
+
+### Rollout 1.0.222 · v4850 Bank-Cockpit-Schrift, Kontrast kleiner Schrift (Fork SS4, 25.11.2026)
+
+- **Was:** DSCR/LTV-Zahl im Bank-Cockpit in Space Grotesk (statt Cormorant-Mediävalziffern), LTV eine Nachkommastelle. kontrast-text.js stuft kleine Status-/Grautexte unter 4,5 : 1 auf feste dunklere/hellere Textvarianten um.
+- **Commit:** staging dd766c25 … ecd0d5bf (v4850–v4850f), main 59656b69 … (Cherry-Pick, Buster v4850m), Version 766a95f0.
+- **Nachweis:** Westerfeldstr. 146 Kontrast 623 → 104 (Status/Grau 0), Hauptstr. 51 nachher 86; Bank-Cockpit vorher/nachher Dateien/Fehler/app-pruefung-2026-11-25/bank-cockpit/. Prod liefert style.css/bank-charts.js/kontrast-text.js ?v=v4850m, version 222. Prod nicht eingeloggt gemessen.
+- **Rest:** Gold als kleine Textfarbe (≈ 80 Stellen, 2,1–2,9 : 1) offen. gold-audit Prod RC 1 durch js/dateiablage.js (v4860, nicht dieses Paket), vorschau-pruefen Staging rot durch pf-werkstatt.js (v4870). v4850e fror Staging-Tabs ~3 min ein.
