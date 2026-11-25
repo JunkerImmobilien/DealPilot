@@ -45484,3 +45484,10 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** staging 04dc3630, ec2ed687, 07198acf, a61bd73c, 2d8351a5 · main 9ca822a0 … 16e8a060, Version 458ea406, 8aa1c0ba. Prod-Sicherung haupt/mb-20261125-0723-v4630 (7,0/31 MB, Kopf gelesen), backend und mb-backend neu gebaut.
 - **Nachweis:** Staging im Browser (Landing-Strecke mit erfundenem Bericht, App-Stufenwahl), Prüfer grün, Prod `/public/einzelcheck/tiefe` und Buster per curl.
 - **Rest:** 390 px offen, Prod ohne Kauf gemessen.
+
+### Rollout 1.0.195 · v4670 Jahresabgleich: Liste der vier Schritte je Jahr (Fork T3, 25.11.2026)
+
+- **Was:** je Jahr Liste Miete/Wert/Haus/Steuer mit Stand, Satz, einem Knopf; laufendes Jahr „Schon möglich“; „Mieterhöhung vorbereiten“ nur noch dort; Einfach|Detail im Jahresabgleich ausgeblendet.
+- **Commit:** staging ac224063, 672d0507, Rückführung a6e60e2e · main e2f8649c, 5106270e, Version cea23ae9.
+- **Nachweis:** Staging Westerfeldstr. 146 gemessen (2025/2026, Umschalter), jahresabgleich-pruefen 177/177, jahresbuch 61/61, buster-ebenen SAUBER. Prod-Sicherung haupt/mb-20261125-0733-v4670, Auslieferung per curl (Buster v4670, version 195).
+- **Rest:** Prod nicht eingeloggt im Objekt gemessen, 390 px nur über Grid-Regel (kein echtes Fenster).
