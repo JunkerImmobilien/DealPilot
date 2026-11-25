@@ -475,8 +475,8 @@
       + '<button type="button" data-bk="br" data-k="' + k + '" data-w="halb" aria-pressed="' + (br === 'halb') + '">½</button>'
       + '<button type="button" data-bk="br" data-k="' + k + '" data-w="ganz" aria-pressed="' + (br !== 'halb') + '">ganz</button></span>';
     var kopf = a.gruppe
-      ? '<span class="gpbk-txt"><b>' + esc(a.t) + '</b><small>' + esc(a.w) + '</small></span>'
-      : '<label class="gpbk-txt"><input type="checkbox" data-bk="an" data-k="' + k + '"' + (an ? ' checked' : '') + '><span><b>' + esc(a.t) + '</b><small>' + esc(a.w) + '</small></span></label>';
+      ? '<span class="gpbk-txt" title="' + esc(a.w) + '"><b>' + esc(a.t) + '</b><small>' + esc(a.w) + '</small></span>'
+      : '<label class="gpbk-txt" title="' + esc(a.w) + '"><input type="checkbox" data-bk="an" data-k="' + k + '"' + (an ? ' checked' : '') + '><span><b>' + esc(a.t) + '</b><small>' + esc(a.w) + '</small></span></label>';
     return '<li class="gpbk-z' + (an ? '' : ' gpbk-aus') + (a.gruppe ? ' gpbk-gr' : '') + '" draggable="true" data-k="' + k + '" data-liste="' + (inGruppe ? 'vb' : 'top') + '">'
       + '<span class="gpbk-griff" aria-hidden="true">⋮⋮</span>' + kopf + '<span class="gpbk-akt">' + wahl + pfeil('hoch', 'nach oben', i === 0) + pfeil('runter', 'nach unten', i === n - 1) + '</span>'
       + (a.gruppe ? '<ol class="gpbk-sub">' + A.ordVb.map(function (v, j) { return bkZeile(v, j, A.ordVb.length, true); }).join('') + '</ol>' : '')
@@ -643,6 +643,9 @@
       DK + ' .dpz-kopf{background:linear-gradient(180deg,#16140F,#0E0D0B);border:1px solid #26231E}',
       DK + ' select,' + DK + ' textarea,' + DK + ' input:not([type=checkbox]):not([type=range]),' + DK + ' .cp-ans-sw button:not(.on),' + DK + ' .pj-sw button:not(.on),' + DK + ' .sl-yrs button:not(.active),' + DK + ' .sl .cp-chev{background:#16140F !important;color:#E9E3D6 !important;border-color:#3A352D !important}',
       DK + ' .cp-ans-sw{background:#16140F !important}',
+      DK + ' #dp-dash-objsel,html[data-gx-stil="dunkel"] body.dp-gp-an #dp-dash-objsel{background:#16140F !important;color:#E9E3D6 !important;border-color:#3A352D !important}',
+      DK + ' .zb-neu-btn,' + DK + ' .zb-btn,' + DK + ' .dp-pp-t,' + DK + ' .dp-pp-a,' + DK + ' .dp-pp-go{color:#E9E3D6 !important}' + DK + ' .dp-pp-s,' + DK + ' .dp-pp-hint,' + DK + ' .dp-pp-web{color:#B9B2A3 !important}',
+      DK + ' .zb-neu-btn,' + DK + ' .zb-btn,' + DK + ' .dp-pp-go,' + DK + ' .dp-pp-a,' + DK + ' .dp-pp-chip{background:#16140F !important;border-color:#3A352D !important}',
       /* Seitenleiste „Ansicht anpassen“ (am body, nie per Klick daneben zu) */
       '.gpbk-hg{position:fixed;inset:0;background:rgba(5,5,5,.22);z-index:2147482990}',
       '.gpbk{position:fixed;top:0;right:0;bottom:0;width:min(420px,100vw);z-index:2147482991;display:flex;flex-direction:column;background:#FDFCFA;color:#2A2727;border-left:1px solid color-mix(in srgb,' + G + ' 45%,transparent);box-shadow:-16px 0 40px rgba(5,5,5,.18);font-family:Inter,system-ui,sans-serif}',
@@ -669,6 +672,7 @@
       '.gpbk-z.gpbk-zieht{opacity:.45}.gpbk-z.gpbk-ueber{border-color:' + G + ';box-shadow:0 -2px 0 ' + G + ' inset}',
       '.gpbk-griff{cursor:grab;color:color-mix(in srgb,#2A2727 40%,transparent);font-size:12px;letter-spacing:-2px;user-select:none}',
       '.gpbk-txt{display:flex;gap:8px;align-items:flex-start;min-width:0;cursor:pointer;font-size:12.5px}',
+      '.gpbk-z .gpbk-txt small{display:none}',
       '.gpbk-txt b{font-weight:600}.gpbk-txt small{display:block;font-size:11px;color:color-mix(in srgb,#2A2727 60%,transparent);line-height:1.35}',
       '.gpbk-txt input{margin-top:2px;accent-color:' + G + ';width:15px;height:15px;flex:0 0 auto}',
       '.gpbk-akt{display:flex;gap:4px;align-items:center}',
