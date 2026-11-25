@@ -45718,6 +45718,11 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** staging 41bb37af, ce72c485, 7b26839e (+ Bilder/Doku).
 - **Nachweis:** iframe-Messung 1440/1280/390 und Navy, Bilder runde2/.
 - **Rest:** Freigabe Marcel, dann pf-werkstatt.js + grafiken-portfolio.js (kzKachel) per Cherry-Pick auf main.
+### v4900–v4900i · Arbeitsbereich „Ansicht anpassen“ Runde 3 (Fork B5, nur Staging, 25.11.2026)
+- **Was:** Vorlagen als echtes verkleinertes Bild (Score-Kopf + erste fünf Bausteine), Palette mit Reitern (Kennzahlen zuerst, Objekte, Finanzierung, Rendite, Steuer, Risiko, Wert), echte Mini-Bilder je Baustein, große Vorschau beim Überfahren, Score-Kopf komplett mit beiden Teilscores, Farben exakt aus BMF-Rechner/Belege einlesen gemessen, Umschalter Bildschirm/Handy, Auto-Scroll beim Ziehen. GP_API.modulHtml für ausgeblendete Bausteine. Bilder werden nachgeladen (Öffnen vorher 20 s blockiert, jetzt sofort).
+- **Commit:** staging ca5bbef2 … 68652a9a (v4900, a–i).
+- **Nachweis:** iframe-Messung 1440/1280/390, Navy und Blau, Schreibaufrufe abgefangen, kein Querscrollen; vorschau-pruefen, buster-ebenen, gold-audit RC 0. Bilder runde3/.
+- **Rest:** Freigabe Marcel. Nummer v4900 doppelt vergeben (auch C5 „Maßgebender Wert“), hier nur Buster von pf-werkstatt.js. Steuer/Projektion/Verlauf-Bausteine zeigen in der Palette noch das Piktogramm (im Cockpit nicht gezeichnet).
 ### Rollout 1.0.223 · v4910 Dokumentenablage scharf, Einstellungen › Dokumente (Fork D5, 25.11.2026)
 - **Was:** Löschfrist/Plattenwarnung scharf (`ABLAGE_FRIST_TAKT=1` Staging+Prod), Einsortieren nach Ordner/Jahr, Belegung in Prozent (Beleg-Dialog, Meine Dokumente), Reiter Einstellungen › Dokumente mit Ordner/Jahr löschen, `DELETE /dateien?objekt&ordner[&jahr]`.
 - **Commit:** staging 31c2ce92 · main 0e965506, 718504ea (1.0.223).
