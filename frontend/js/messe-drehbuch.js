@@ -10789,7 +10789,7 @@
       },
       async function (s) {   /* 2 · Übersicht */
         await r11PaTab(/^Übersicht/);
-        await zeige(k5Karte(/führend/), 8);
+        await zeige(function () { var e = qs('#s5 [data-dp-ekr]'); return (e && e.parentNode) || k5Karte(/führend/)(); }, 8);
         await b2oZeile(s, 'Übersicht', 'Kaufpreis, maßgebender Wert mit führendem Verfahren, DSCR, Cashflow und EK-Rendite auf einen Blick.');
       },
       async function (s) {   /* 3 · Ankauf · Bestand · Zielbild */
