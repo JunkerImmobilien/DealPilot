@@ -438,7 +438,8 @@
       else if (a === 'geraet') {   /* „so sieht es am Handy aus“: Bühne in Handybreite, eine Spalte */
         var hy = k === 'handy'; p.querySelector('.pw-ab').classList.toggle('pw-als-handy', hy);
         [].forEach.call(p.querySelectorAll('[data-pw="geraet"]'), function (x) { var an = x.getAttribute('data-k') === k; x.classList.toggle('an', an); x.setAttribute('aria-pressed', String(an)); });
-        skalieren(); melden(hy ? 'Handy-Ansicht: so stehen die Bausteine untereinander' : 'Bildschirm-Ansicht');
+        skalieren(); setTimeout(skalieren, 320);   /* nach dem Übergang der Bühnenbreite neu messen */
+        melden(hy ? 'Handy-Ansicht: so stehen die Bausteine untereinander' : 'Bildschirm-Ansicht');
       }
     });
     var pal = p.querySelector('.pw-pal');
