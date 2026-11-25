@@ -3690,7 +3690,7 @@
         var p = r11Panel(), t = r6Inner(p);
         var vg = /Von (\d+) vergleichbaren Kennzahlen stehen (\d+) besser und (\d+) schlechter/.exec(t);
         /* GEMESSEN (Aufnahme 14): die erste .dp-pa-card des Panels ist die Analyse-Tafel weiter unten - der Kegel lag dort */
-        await zeige(function () { var x = rhIm(r11Panel(), /Von \d+ vergleichbaren Kennzahlen/); return x && (x.closest('p,div') || x); }, 8);
+        await zeige(function () { var x = rhIm(r11Panel(), /Von \d+ vergleichbaren Kennzahlen/); if (x) return x.closest('p,div') || x; var n = rhIm(r11Panel(), /Nettokaltmiete/); return n && (n.closest('table') || n); }, 8);   /* v4950 · seit v4490 steht nur noch die Tabelle */
         await b2oZeile(s, 'Soll gegen Ist · automatisch', vg ? 'Von <b>' + vg[1] + ' Kennzahlen</b> stehen heute <b>' + vg[2] + ' besser</b> und <b>' + vg[3] + ' schlechter</b> als beim Kauf.' : 'Plan gegen heute, Kennzahl für Kennzahl.');
       },
       async function (s) {   /* 7 · was sich bewegt hat */
@@ -3721,7 +3721,7 @@
         var marke = tab ? r6Text(tab).replace(/^Jahresabgleich\s*/, '') : '';
         var kopf = function () { var p = r11Panel(); return p && (p.querySelector('[data-dp-ja-host] > *') || p.querySelector('[data-dp-ja-host]') || p); };
         await zeige(kopf, 8);
-        await b2oZeile(s, 'Im Bestand: der Jahresabgleich', 'Die Pilot-Analyse beginnt im Bestand mit dem <b>Jahresabgleich</b>' + (marke ? ' (<b>' + marke + '</b>)' : '') + ': je Jahr Plan gegen Ist, Schritt für Schritt — Miete, Hausgeld, Wert und Steuer.', 600);
+        await b2oZeile(s, 'Im Bestand: der Jahresabgleich', 'Im Objekt-Cockpit steht dafür der <b>Jahresabgleich</b>' + (marke ? ' (<b>' + marke + '</b>)' : '') + ': je Jahr Plan gegen Ist, Schritt für Schritt — Miete, Hausgeld, Wert und Steuer.', 600);
       }
     ]
   };
@@ -10755,6 +10755,179 @@
           await zeige(vl, 8);
           await b2oZeile(s, 'Verlauf', 'Jede Fassung bleibt erhalten, so ist belegbar, was wann galt. Trennen kannst du jederzeit unter <b>Verbindung</b>.');
         }
+      }
+    ]
+  };
+
+
+  /* ═══ K5 · NEUE VIDEOS 25.11.2026 (v4950, Plan Dateien/Messe/Videos/plan-2026-11-25.md)
+     Objekt-Cockpit, Jahresabgleich, Portfolio-Cockpit mit Baukasten, Belege und Dokumentenablage, EK-Rendite.
+     Alle an einer KOPIE der Parkstr. 9 (Bestand, behalte: true) bzw. im Cockpit des Kontos; nichts speichert,
+     nichts kostet. Ziele werden über den sichtbaren Text gesucht (rhIm), weil die Reiter seit v4460 neu
+     geordnet sind und die Klassen weiter wandern. Texte ohne Gedankenstriche (Kundentext). */
+  function k5Panel() { return r11Panel() || q('#s5'); }
+  function k5Text(re) { return function () { return rhIm(k5Panel(), re); }; }
+  function k5Karte(re) { return function () { var e = rhIm(k5Panel(), re); return e && (e.closest('.dp-pa-card,.dp-kachel,section,table,div[class]') || e); }; }
+  async function k5Cockpit() {
+    await r6KopieStart(R11_PARK, { behalte: true });
+    await warteAuf(function () { return q('nav.tabs .tab[data-target-sec="s5"]'); }, 8000);
+    if (!q('#s5.active')) { reiter('s5'); await warte(900); }
+    await warteAuf(function () { return q('#ai-content .dp-pa-tab'); }, 10000);
+    await warte(800);
+  }
+  function k5EkrZurueck() { try { sessionStorage.removeItem('dp_ekr_stufe'); } catch (e) {} }
+
+  DREHBUECHER['neu-objekt-cockpit'] = {
+    titel: 'Das Objekt-Cockpit', unterzeile: 'Dein Objekt im Bestand, Reiter für Reiter', objekt: null,
+    abspann: [{ ms: 6200, html: ABSPANN_LOGO }],
+    aufraeumen: function () { k5EkrZurueck(); rhAufraeumen(); },
+    szenen: [
+      async function (s) {   /* 1 · gewonnen öffnet im Cockpit */
+        await k5Cockpit();
+        await zeige(function () { return q('nav.tabs .tab[data-target-sec="s5"]'); }, 8);
+        await b2oZeile(s, 'Gewonnen heißt Bestand', 'Ein gewonnenes Objekt öffnet direkt im <b>Objekt-Cockpit</b>, ganz vorne und in Gold.');
+      },
+      async function (s) {   /* 2 · Übersicht */
+        await r11PaTab(/^Übersicht/);
+        await zeige(k5Karte(/führend/), 8);
+        await b2oZeile(s, 'Übersicht', 'Kaufpreis, maßgebender Wert mit führendem Verfahren, DSCR, Cashflow und EK-Rendite auf einen Blick.');
+      },
+      async function (s) {   /* 3 · Ankauf · Bestand · Zielbild */
+        await r11PaTab(/Ankauf · Bestand/);
+        await zeige(function () { var e = rhIm(k5Panel(), /Nettokaltmiete/); return e && (e.closest('table') || e); }, 8);
+        await b2oZeile(s, 'Ankauf, Bestand, Zielbild', 'Eine Tabelle: der Kauf, heute, nach Mieterhöhung und das Zielbild, Zeile für Zeile.');
+      },
+      async function (s) {   /* 4 · Steuer */
+        await r11PaTab(/^Steuer/);
+        await zeige(k5Karte(/Ergebnis aus Vermietung|Verlauf mit Steuern/), 8);
+        await b2oZeile(s, 'Steuer', 'Die Anlage V Jahr für Jahr. Grün heißt Verlust, die Steuer sinkt. Rot heißt Überschuss.');
+      },
+      async function (s) {   /* 5 · Haus & Unterlagen */
+        await r11PaTab(/^Haus/);
+        await zeige(k5Karte(/Risiken aus den Unterlagen|Hausgeld/), 8);
+        await b2oZeile(s, 'Haus und Unterlagen', 'Oben die Risiken aus Protokollen und Abrechnungen, darunter Hausgeld, Rücklage und deine Dokumente.');
+      }
+    ]
+  };
+
+  DREHBUECHER['neu-jahresabgleich'] = {
+    titel: 'Der Jahresabgleich', unterzeile: 'Plan gegen Ist, Jahr für Jahr', objekt: null,
+    abspann: [{ ms: 6200, html: ABSPANN_LOGO }],
+    aufraeumen: function () { rhAufraeumen(); },
+    szenen: [
+      async function (s) {   /* 1 · Zeitstrahl */
+        await k5Cockpit();
+        await r11PaTab(/^Jahresabgleich/);
+        await warte(900);
+        await zeige(k5Karte(/abschließen|vorbereiten/), 8);
+        await b2oZeile(s, 'Der Zeitstrahl', 'Vom Kauf bis zum Ende der Zinsbindung. Künftige Jahre sind grau, jedes Jahr zeigt, wie weit es fertig ist.');
+      },
+      async function (s) {   /* 2 · vier Schritte */
+        await zeige(function () { var e = q('#s5 .ja-schritt'); return e && (e.parentNode || e); }, 8);
+        await b2oZeile(s, 'Vier Schritte', 'Miete, Wert, Haus und Steuer. Je Schritt der Stand, ein Satz und ein Knopf.');
+      },
+      async function (s) {   /* 3 · Tabelle */
+        await zeige(function () { var e = q('#s5 tr[data-ja-jahr]'); return e && (e.closest('table') || e); }, 8);
+        await b2oZeile(s, 'Plan gegen Ist', 'Kaltmiete geplant und tatsächlich, jede Zahl mit ihrer Herkunft.');
+      },
+      async function (s) {   /* 4 · Mieterhöhung */
+        await zeige(k5Karte(/zulässig/), 8);
+        await b2oZeile(s, 'Mieterhöhung', 'Eingetragen, zulässig nach § 558, Luft und ab wann, Monat für Monat gerechnet.');
+      }
+    ]
+  };
+
+  DREHBUECHER['neu-portfolio-baukasten'] = {
+    titel: 'Portfolio-Cockpit und Baukasten', unterzeile: 'Alle Objekte auf einer Seite, so wie du sie sehen willst', objekt: null,
+    abspann: [{ ms: 6200, html: ABSPANN_LOGO }],
+    /* Arbeitsbereich „Ansicht anpassen“ (pf-werkstatt, v4890) nur auf Staging: AUFNAHME ERST NACH MARCELS FREIGABE */
+    aufraeumen: function () {
+      try { if (window.DpPfWerkstatt && DpPfWerkstatt.zu) DpPfWerkstatt.zu(); } catch (e) {}
+      try { if (window.__k5Ans !== undefined) { if (window.__k5Ans === null) localStorage.removeItem('dp_cockpit_ansicht'); else localStorage.setItem('dp_cockpit_ansicht', window.__k5Ans); window.__k5Ans = undefined; } } catch (e) {}
+      rhAufraeumen();
+    },
+    szenen: [
+      async function (s) {   /* 1 · Score-Kopf */
+        await rhNurStart();
+        try { window.__k5Ans = localStorage.getItem('dp_cockpit_ansicht'); } catch (e) { window.__k5Ans = null; }
+        try { sbActionsAction('cockpit'); } catch (e) {}
+        await warteAuf(function () { return r21('#dp-pscore-hero'); }, 10000);
+        await warte(1200);
+        await zeige(function () { return r21('#dp-pscore-hero'); }, 8);
+        await b2oZeile(s, 'Das Portfolio-Cockpit', 'Oben der Investor Deal Score, geteilt in Investment und Finanzierung.');
+      },
+      async function (s) {   /* 2 · Kennzahlen */
+        await zeige(function () { var e = rhIm(q('#dp-stage') || document.body, /Vermögen netto/); return e && (e.closest('div[class]') && e.closest('div[class]').parentNode || e); }, 8);
+        await b2oZeile(s, 'Deine Kennzahlen', 'Wertansatz, Vermögen netto, Miete, Cashflow, DSCR, Zinsbindung und EK-Rendite. Welche, bestimmst du.');
+      },
+      async function (s) {   /* 3 · Objektmatrix */
+        await zeige(function () { var e = rhIm(q('#dp-stage') || document.body, /EK im Objekt/); return e && (e.closest('[class*="karte"],[class*="card"],div[class]') || e); }, 8);
+        await b2oZeile(s, 'Jedes Objekt als Karte', 'Foto oder Lagekarte, Score und die wichtigsten Zahlen. Ein Klick dreht die Karte um.');
+      },
+      async function (s) {   /* 4 · Ansicht anpassen */
+        var b = function () { return qs('[data-gp-a="ansicht"]'); };
+        await zeige(b, 8);
+        await b2oZeile(s, 'Ansicht anpassen', 'Hier stellst du dein Cockpit zusammen.');
+        var k = b(); if (k) k.click();
+        await warte(1500);
+        await zeige(function () { return qs('[role="dialog"]'); }, 6);
+        await b2oZeile(s, 'Der Baukasten', 'Oben die Vorlagen, links die Bausteine, in der Mitte dein Cockpit. Ziehen, breiter, schmaler, fertig.');
+        try { if (window.DpPfWerkstatt && DpPfWerkstatt.zu) DpPfWerkstatt.zu(); } catch (e) {}
+      }
+    ]
+  };
+
+  DREHBUECHER['neu-belege-ablage'] = {
+    titel: 'Belege und Dokumentenablage', unterzeile: 'Einlesen, prüfen, aufbewahren', objekt: null,
+    abspann: [{ ms: 6200, html: ABSPANN_LOGO }],
+    aufraeumen: function () {
+      try { document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); } catch (e) {}
+      rhAufraeumen();
+    },
+    szenen: [
+      async function (s) {   /* 1 · Meine Dokumente */
+        await k5Cockpit();
+        await r11PaTab(/^Haus/);
+        await zeige(k5Karte(/Meine Dokumente|Eingelesen und übernommen/), 8);
+        await b2oZeile(s, 'Eingelesen und aufbewahrt', 'Jede eingelesene Unterlage mit Zuordnung, die Originale nach Jahr, dazu die Belegung deiner Ablage.');
+      },
+      async function (s) {   /* 2 · Belege einlesen */
+        var k = function () { return rhIm(k5Panel(), /Belege, Unterlagen|Unterlagen einlesen/); };
+        await zeige(k, 8);
+        await b2oZeile(s, 'Ein Fenster für alles', 'Belege, Abrechnungen und Protokolle einlesen. Die Zuordnung zur Anlage V schlägt DealPilot vor.');
+      },
+      async function (s) {   /* 3 · Adressprüfung (nur erklärt, kein Upload) */
+        await b2oZeile(s, 'Falsche Adresse, kein Eintrag', 'Gehört eine Unterlage zu einer anderen Adresse, lehnt DealPilot sie ab. Vorhandene Werte überschreibt nichts still.');
+      }
+    ]
+  };
+
+  DREHBUECHER['neu-ek-rendite'] = {
+    titel: 'EK-Rendite und Hebel', unterzeile: 'Vier Stufen, ein Klick', objekt: null,
+    abspann: [{ ms: 6200, html: ABSPANN_LOGO }],
+    aufraeumen: function () { k5EkrZurueck(); rhAufraeumen(); },
+    szenen: [
+      async function (s) {   /* 1 · die Kachel */
+        await k5Cockpit();
+        await r11PaTab(/^Übersicht/);
+        var k = function () { return qs('#s5 [data-dp-ekr]'); };
+        await zeige(k, 10);
+        await b2oZeile(s, 'Die EK-Rendite', 'Angezeigt wird die Hauptkennzahl: nach Steuer, mit Tilgung und Wertzuwachs.');
+      },
+      async function (s) {   /* 2 · durchklicken */
+        var k = qs('#s5 [data-dp-ekr]');
+        for (var i = 0; i < 3 && k; i++) { k.click(); await warte(1400); k = qs('#s5 [data-dp-ekr]'); }
+        await zeige(function () { return qs('#s5 [data-dp-ekr]'); }, 10);
+        await b2oZeile(s, 'Durchklicken', 'Ein Klick zeigt die nächste Stufe: operativ, nach Steuer, mit Wert.');
+        k = qs('#s5 [data-dp-ekr]'); if (k) k.click();
+        await warte(900);
+      },
+      async function (s) {   /* 3 · der Hebel */
+        var k = qs('#s5 [data-dp-ekr]');
+        if (k) { try { k.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true })); k.dispatchEvent(new MouseEvent('mouseover', { bubbles: true })); } catch (e) {} }
+        await warte(900);
+        await zeige(function () { return qs('#s5 [data-dp-ekr]'); }, 10);
+        await b2oZeile(s, 'Der Hebel', 'Wenig Eigenkapital hebt die Rendite. Fällt der Wert, wirkt derselbe Hebel nach unten. Der Tooltip rechnet beides vor.');
       }
     ]
   };
