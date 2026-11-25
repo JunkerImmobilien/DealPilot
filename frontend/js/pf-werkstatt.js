@@ -246,7 +246,7 @@
         var m = miniHtml(x[0]);
         return '<div style="grid-column:' + (x[1] === 'ganz' ? '1/-1' : 'auto') + ';min-width:0;max-height:420px;overflow:hidden">' + (m ? m.h : '<div style="height:160px;border-radius:10px;background:#EFE9DC"></div>') + '</div>';
       }).join('');
-      _vmini[v.k] = '<span class="pw-vm pw-mini" data-maxh="78" aria-hidden="true" inert><span class="pw-mini-in" data-ew="' + W + '" style="width:' + W + 'px;display:block">' + huelle(s.h + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px">' + mods + '</div>') + '</span></span>';
+      _vmini[v.k] = '<span class="pw-vm pw-mini" data-maxh="56" aria-hidden="true" inert><span class="pw-mini-in" data-ew="' + W + '" style="width:' + W + 'px;display:block">' + huelle(s.h + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px">' + mods + '</div>') + '</span></span>';
     }
     return _vmini[v.k];
   }
@@ -292,8 +292,7 @@
       + '<button type="button" data-pw="weg" data-k="' + k + '" title="Entfernen" aria-label="' + esc(a.t) + ' entfernen">×</button></span></div>'
       + sub + vorschau(a.gruppe ? 'projektion' : k) + '</div>';
   }
-  /* v4985 · Runde 4 (Marcel): Gruppen sind echte Reiter wie im Einstellungen-Fenster (.ms-tab mit Symbol, Titel,
-     Unterzeile). Die Palette zeigt nur die gewählte Gruppe, statt einer langen Liste mit Sprungmarken. */
+  /* v4985 · Runde 4: Gruppen als Reiter wie im Einstellungen-Fenster. v4995 · Runde 5: Gruppen als Symbolleiste über der Palette in der dunklen Spalte (siehe palette()). */
   var _gruppe = 'kz', _tabs = [];
   function gruppenListe() {
     var A = API.stand(), an = {}; aktiv().forEach(function (k) { an[k] = 1; });
@@ -310,29 +309,29 @@
     });
     return out;
   }
+  /* v4995 · Runde 5 (Marcel): „alles, was man reinziehen kann, links im Schwarzen … oben nur Symbole für die Bereiche,
+     dann scrollt er da automatisch hin“. Die dunkle Seitenspalte ist die Palette, alle Gruppen untereinander. */
   function palette() {
     var G = gruppenListe(); _tabs = G;
-    var g = G.filter(function (x) { return x.k === _gruppe; })[0] || G[0]; _gruppe = g.k;
-    var kopf = '<div class="pw-pt">' + esc(g.t) + '</div>';
-    if (!g.L.length) return '<div class="pw-pg" data-g="' + g.k + '">' + kopf + '<p class="pw-pleer">' + (g.k === 'kz' ? 'Alle Kennzahlen stehen schon oben im Cockpit.' : 'Alle Bausteine dieser Gruppe stehen schon im Cockpit.') + '</p></div>';
-    if (g.k === 'kz') return '<div class="pw-pg" data-g="kz">' + kopf + '<div class="pw-pl pw-pl-kz">' + g.L.map(function (k) {
-      var w = kzWert(k);
-      return '<button type="button" class="pw-pi pw-pkz" draggable="true" data-pw="kzhinzu" data-k="' + k + '" title="Ziehen oder klicken: erscheint oben in der Kennzahl-Leiste"><span class="pw-kzl">' + esc(w.l) + '</span><b class="pw-kzv' + (w.c ? ' pw-' + w.c : '') + '">' + esc(w.v || '·') + '</b><i aria-hidden="true">+</i></button>';
-    }).join('') + '</div></div>';
-    /* jeder Baustein mit seinem echten Mini-Bild, beim Überfahren erscheint es groß (pw-pop) */
-    return '<div class="pw-pg" data-g="' + g.k + '">' + kopf + '<div class="pw-pl">' + g.L.map(function (k) {
-      var a = modul(k);
-      return '<button type="button" class="pw-pi pw-pim" draggable="true" data-pw="hinzu" data-k="' + k + '" title="' + esc(a.w || '') + '"><span class="pw-pit"><b>' + esc(a.t) + (a.vb ? '<small>in Projektion und Verlauf</small>' : '') + '</b><i aria-hidden="true">+</i></span>'
-        + miniBox(a.vb ? 'projektion' : k, 'pw-pmini', 88) + '</button>';
-    }).join('') + '</div></div>';
+    return G.map(function (g) {
+      var kopf = '<div class="pw-pt" id="pw-g-' + g.k + '">' + symbol(g.k) + '<span>' + esc(g.t) + '</span><small>' + esc(g.d) + '</small></div>';
+      if (!g.L.length) return '<div class="pw-pg" data-g="' + g.k + '">' + kopf + '<p class="pw-pleer">' + (g.k === 'kz' ? 'Alle Kennzahlen stehen schon oben im Cockpit.' : 'Alle Bausteine dieser Gruppe stehen schon im Cockpit.') + '</p></div>';
+      if (g.k === 'kz') return '<div class="pw-pg" data-g="kz">' + kopf + '<div class="pw-pl pw-pl-kz">' + g.L.map(function (k) {
+        var w = kzWert(k);
+        return '<button type="button" class="pw-pi pw-pkz" draggable="true" data-pw="kzhinzu" data-k="' + k + '" title="Ziehen oder klicken: erscheint oben in der Kennzahl-Leiste"><span class="pw-kzl">' + esc(w.l) + '</span><b class="pw-kzv' + (w.c ? ' pw-' + w.c : '') + '">' + esc(w.v || '·') + '</b><i aria-hidden="true">+</i></button>';
+      }).join('') + '</div></div>';
+      return '<div class="pw-pg" data-g="' + g.k + '">' + kopf + '<div class="pw-pl">' + g.L.map(function (k) {
+        var a = modul(k);
+        return '<button type="button" class="pw-pi pw-pim" draggable="true" data-pw="hinzu" data-k="' + k + '" title="' + esc(a.w || '') + '"><span class="pw-pit"><b>' + esc(a.t) + (a.vb ? '<small>in Projektion und Verlauf</small>' : '') + '</b><i aria-hidden="true">+</i></span>'
+          + miniBox(a.vb ? 'projektion' : k, 'pw-pmini', 88) + '</button>';
+      }).join('') + '</div></div>';
+    }).join('');
   }
   function reiterHtml() {
-    return _tabs.map(function (t) {
-      var an = t.k === _gruppe;
-      return '<button type="button" class="help-sidebar-item st-tab ms-tab' + (an ? ' active' : '') + '" role="tab" aria-selected="' + an + '" data-pw="tab" data-k="' + t.k + '">'
-        + '<div class="help-sidebar-item-row"><span class="help-sidebar-item-icon">' + symbol(t.k) + '</span><span class="help-sidebar-item-title">' + esc(t.t) + '</span></div>'
-        + '<span class="help-sidebar-item-desc">' + esc(t.d) + '</span></button>';
-    }).join('');
+    return (_klein ? '<button type="button" class="pw-lade" data-pw="schublade" aria-expanded="false">Bausteine</button>' : '')
+      + _tabs.map(function (t) {
+        return '<button type="button" class="pw-symk" data-pw="tab" data-k="' + t.k + '" title="' + esc(t.t) + '" aria-label="' + esc(t.t) + '">' + symbol(t.k) + '</button>';
+      }).join('');
   }
   function zeichnen() {
     var p = document.getElementById('dp-pw'); if (!p) return;
@@ -345,6 +344,7 @@
     var pl = p.querySelector('.pw-pliste'), st = pl.scrollTop;
     pl.innerHTML = palette(); pl.scrollTop = st;
     p.querySelector('.pw-ptabs').innerHTML = reiterHtml(); reiterAktiv();
+    if (_klein) schublade(p.classList.contains('pw-lade-auf'));
     var s = scoreHtml();
     p.querySelector('.pw-score').innerHTML = '<div class="pw-mini pw-scorebild" data-maxh="320" aria-hidden="true" inert><div class="pw-mini-in" data-ew="' + s.w + '" style="width:' + s.w + 'px">' + huelle(s.h) + '</div></div>'
       + '<span class="pw-fest" title="Der Score-Kopf steht immer oben">fest' + (s.echt ? '' : ' · Beispielwerte') + '</span>';
@@ -377,14 +377,29 @@
   }
   function reiterAktiv() {
     var p = document.getElementById('dp-pw'); if (!p) return;
-    [].forEach.call(p.querySelectorAll('.pw-ptabs .ms-tab'), function (t) { var an = t.getAttribute('data-k') === _gruppe; t.classList.toggle('active', an); t.setAttribute('aria-selected', String(an)); });
+    var pl = p.querySelector('.pw-pliste'), top = pl.getBoundingClientRect().top, akt = null;
+    [].forEach.call(pl.querySelectorAll('.pw-pg'), function (g) { if (g.getBoundingClientRect().top - top < 48) akt = g.getAttribute('data-g'); });
+    if (pl.scrollTop + pl.clientHeight >= pl.scrollHeight - 4) { var l = pl.querySelectorAll('.pw-pg'); if (l.length) akt = l[l.length - 1].getAttribute('data-g'); }
+    if (_sprungZiel) akt = _sprungZiel;
+    if (!akt) { var f0 = pl.querySelector('.pw-pg'); akt = f0 && f0.getAttribute('data-g'); }
+    _gruppe = akt;
+    [].forEach.call(p.querySelectorAll('.pw-symk'), function (t) { var an = t.getAttribute('data-k') === akt; t.classList.toggle('an', an); if (an) t.setAttribute('aria-current', 'true'); else t.removeAttribute('aria-current'); });
   }
+  var _sprungZiel = null, _sprungUhr = 0;
   function reiterSprung(g) {
     var p = document.getElementById('dp-pw'); if (!p) return;
-    _gruppe = g; popWeg();
-    var pl = p.querySelector('.pw-pliste'); pl.innerHTML = palette(); pl.scrollTop = 0;
-    reiterAktiv(); skalierenIn(pl);
-    if (_klein) { var t = p.querySelector('.pw-ptabs .ms-tab.active'); if (t && t.scrollIntoView) t.scrollIntoView({ block: 'nearest', inline: 'center' }); }
+    popWeg();
+    if (_klein) schublade(true);
+    var pl = p.querySelector('.pw-pliste'), z = pl.querySelector('.pw-pg[data-g="' + g + '"]'); if (!z) return;
+    _sprungZiel = g; clearTimeout(_sprungUhr); _sprungUhr = setTimeout(function () { _sprungZiel = null; reiterAktiv(); }, 700);
+    pl.scrollTo({ top: Math.max(0, z.getBoundingClientRect().top - pl.getBoundingClientRect().top + pl.scrollTop - 6), behavior: 'smooth' });
+    reiterAktiv();
+  }
+  function schublade(auf) {
+    var p = document.getElementById('dp-pw'); if (!p) return;
+    auf = auf == null ? !p.classList.contains('pw-lade-auf') : auf;
+    p.classList.toggle('pw-lade-auf', auf);
+    var b = p.querySelector('.pw-lade'); if (b) { b.setAttribute('aria-expanded', String(auf)); b.textContent = auf ? 'Schließen' : 'Bausteine'; }
   }
   /* Große Live-Vorschau beim Überfahren eines Bausteins in der Palette */
   function popZeigen(btn) {
@@ -392,7 +407,7 @@
     var k = btn.getAttribute('data-k'), a = modul(k); if (!a) return;
     pop.innerHTML = '<div class="pw-pop-k"><b>' + esc(a.t) + '</b><small>' + esc(a.w || 'Klicken oder in den Arbeitsbereich ziehen') + '</small></div>' + miniBox(a.vb ? 'projektion' : k, 'pw-popbild', 340);
     pop.hidden = false; skalieren();
-    var pr = p.getBoundingClientRect(), br = btn.getBoundingClientRect(), pal = p.querySelector('.pw-pal').getBoundingClientRect();
+    var pr = p.getBoundingClientRect(), br = btn.getBoundingClientRect(), pal = p.querySelector('.modal-side').getBoundingClientRect();
     var top = Math.max(pr.top + 120, Math.min(br.top - 20, pr.bottom - pop.offsetHeight - 70));
     pop.style.left = (pal.right - pr.left + 10) + 'px'; pop.style.top = (top - pr.top) + 'px';
   }
@@ -462,12 +477,13 @@
     try { if (_vorher && _vorher.focus) _vorher.focus(); } catch (e) {}
   }
 
+  function vlZu() { try { return localStorage.getItem('dp_pw_vorlagen_zu') === '1'; } catch (e) { return false; } }
   function oeffnen(api) {
     if (window.DpVorschau && !api.__frei) { window.DpVorschau.frei('grafiken_neu').then(function (an) { if (an) { api.__frei = true; oeffnen(api); } }); return; }
     API = api; if (_offen) { zeichnen(); return; }
     _offen = true; _vorher = document.activeElement; _rueck = []; stil();
     /* v4985 · Runde 4: Aufbau und Klassen wie das Einstellungen-Fenster (settings.js, help.js): global-view-overlay,
-       set-modal-v2 set-modal-cream, dp-modal-topband (Markenleiste + goldener Kopf), modal-side mit .ms-tab-Reitern,
+       set-modal-v2 set-modal-cream, dp-modal-topband (Markenleiste + goldener Kopf), modal-side (seit v4995 die Palette mit Symbolleiste),
        set-modal-content mit pane-wrap und settings-footer (btn-ghost, btn-gold). Das Raster setzt stil() unter #dp-pw.
        Bewusst OHNE .settings-tabs: reseller-portal, mandant-freigaben und netzwerk-einreichung hängen ihre Reiter in die
        erste .settings-tabs der Seite (gemessen: „Partner-Verwaltung“ erschien hier). */
@@ -478,12 +494,12 @@
       + '<div class="dp-modal-topband"><div class="dp-mtb-brand"><span class="dp-mtb-logo">Deal<span class="dp-mtb-logo-g">Pilot</span></span><span class="dp-mtb-tag">PORTFOLIO-COCKPIT</span>'
       + '<button type="button" class="set-modal-close dp-band-close pw-x" data-pw="zu" aria-label="Schließen" title="Schließen (ESC)">' + X + '</button></div>'
       + '<div class="dp-mtb-hero dp-mtb-hero-titled"><div class="dp-mtb-h-title" id="pw-t">Ansicht anpassen</div>'
-      + '<div class="dp-mtb-h-sub">Links eine Gruppe wählen, Bausteine anklicken oder in den Arbeitsbereich ziehen. Alles speichert sofort.</div></div></div>'
+      + '<div class="dp-mtb-h-sub">Links Bausteine und Kennzahlen anklicken oder in die Vorschau ziehen, oben springen die Symbole zum Bereich. Alles speichert sofort.</div></div></div>'
       + '<aside class="modal-side"><div class="ms-h"><div class="ms-title"><span class="gold">Bausteine</span></div><div class="ms-sub">Gruppen des Cockpits</div></div>'
-      + '<div class="ms-tabs pw-ptabs" role="tablist" aria-label="Gruppen"></div></aside>'
+      + '<nav class="pw-ptabs pw-symleiste" aria-label="Bereiche"></nav><div class="pw-pliste" aria-label="Bausteine und Kennzahlen zum Hinzufügen"></div></aside>'
       + '<div class="set-modal-content"><div class="pane-wrap pw-pane">'
-      + '<div class="pw-vlw"><span class="pw-h">Vorlagen</span><div class="pw-vl"></div></div>'
-      + '<div class="pw-body"><div class="pw-pal" aria-label="Bausteine zum Hinzufügen"><div class="pw-pliste" role="tabpanel"></div></div>'
+      + '<div class="pw-vlw' + (vlZu() ? ' pw-vl-zu' : '') + '"><button type="button" class="pw-vlk" data-pw="vlzu" aria-expanded="' + !vlZu() + '"><span class="pw-h">Vorlagen</span><i aria-hidden="true">▾</i></button><div class="pw-vl"></div></div>'
+      + '<div class="pw-body">'
       + '<section class="pw-ab" aria-label="Arbeitsbereich"><div class="pw-abk"><span class="pw-h">So sieht dein Cockpit aus</span>'
       + '<span class="pw-geraet" role="group" aria-label="Ansicht"><button type="button" class="an" data-pw="geraet" data-k="pc" aria-pressed="true">Bildschirm</button><button type="button" data-pw="geraet" data-k="handy" aria-pressed="false">Handy</button></span></div>'
       + '<div class="pw-buehne">'
@@ -512,8 +528,14 @@
       else if (a === 'reset') zuruecksetzen();
       else if (a === 'leiste') { zu(); API.seitenleiste(); }
       else if (a === 'vorlage') vorlage(k);
-      else if (a === 'hinzu') hinzu(k, null);
-      else if (a === 'kzhinzu') kzHinzu(k, null);
+      else if (a === 'hinzu') { hinzu(k, null); if (_klein) schublade(false); }
+      else if (a === 'kzhinzu') { kzHinzu(k, null); if (_klein) schublade(false); }
+      else if (a === 'schublade') schublade();
+      else if (a === 'vlzu') {   /* Vorlagen einklappen: mehr Platz für die Vorschau, Merker nur in diesem Browser */
+        var zu2 = !p.querySelector('.pw-vlw').classList.contains('pw-vl-zu'); p.querySelector('.pw-vlw').classList.toggle('pw-vl-zu', zu2); b.setAttribute('aria-expanded', String(!zu2));
+        try { localStorage.setItem('dp_pw_vorlagen_zu', zu2 ? '1' : '0'); } catch (e) {}
+        if (!zu2) skalieren();
+      }
       else if (a === 'weg') weg(k);
       else if (a === 'vbweg') aendern(function (A) { A.an[k] = false; });
       else if (a === 'kzweg') kzWeg(k);
@@ -526,11 +548,11 @@
         melden(hy ? 'Handy-Ansicht: so stehen die Bausteine untereinander' : 'Bildschirm-Ansicht');
       }
     });
-    var pal = p.querySelector('.pw-pal');
+    var pal = p.querySelector('.modal-side');
     pal.addEventListener('mouseover', function (ev) { var b = ev.target.closest && ev.target.closest('.pw-pim'); if (b) popZeigen(b); });
     pal.addEventListener('focusin', function (ev) { var b = ev.target.closest && ev.target.closest('.pw-pim'); if (b) popZeigen(b); });
     pal.addEventListener('mouseleave', popWeg); pal.addEventListener('focusout', function (ev) { if (!pal.contains(ev.relatedTarget)) popWeg(); });
-    p.querySelector('.pw-pliste').addEventListener('scroll', popWeg);
+    var _spy = 0; p.querySelector('.pw-pliste').addEventListener('scroll', function () { popWeg(); if (!_spy) _spy = requestAnimationFrame(function () { _spy = 0; reiterAktiv(); }); });
     p.querySelector('.pw-buehne').addEventListener('transitionend', function (ev) { if (ev.propertyName === 'max-width') skalieren(); });
     ziehenEinrichten(p);
     document.addEventListener('keydown', taste, true); window.addEventListener('resize', zeichnen);
@@ -562,7 +584,7 @@
       '#dp-pw .pw-m{display:grid !important;grid-template-columns:280px minmax(0,1fr) !important;grid-template-rows:auto minmax(0,1fr) !important;grid-template-areas:"band band" "side main" !important;width:100% !important;max-width:1180px !important;height:min(828px,92vh) !important;max-height:92vh !important;padding:0 !important;margin:0 auto;background:#fff !important;border:1px solid color-mix(in srgb, ' + G + ' 30%, transparent) !important;border-radius:14px !important;box-shadow:0 30px 80px rgba(0,0,0,.5),0 0 0 1.5px ' + G + ' !important;overflow:hidden !important;color:' + T + ';font-family:Inter,system-ui,sans-serif}',
       '#dp-pw .dp-modal-topband{grid-area:band !important}',
       '#dp-pw .modal-side{grid-area:side !important;min-height:0;display:flex;flex-direction:column}', '#dp-pw .ms-h{display:none}',
-      '#dp-pw .ms-tabs{flex:1;min-height:0}',
+
       '#dp-pw .help-sidebar-item-icon .pw-sym{width:16px;height:16px;flex:0 0 16px;padding:0;background:none;color:inherit;box-sizing:border-box}',
       '#dp-pw .set-modal-content{grid-area:main !important;display:flex !important;flex-direction:column !important;min-height:0;overflow:hidden !important}',
       '#dp-pw .pw-pane{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;padding:0 !important;overflow:hidden !important;background:#fff}',
@@ -570,17 +592,18 @@
       '#dp-pw .settings-footer .btn:disabled{opacity:.4;cursor:default}',
       '#dp-pw.pw-dunkel .dp-mtb-h-title{color:#fff !important}', '#dp-pw.pw-dunkel .dp-mtb-h-sub{color:rgba(255,255,255,.86) !important}',
       /* Vorlagen: echte verkleinerte Bilder */
-      '.pw-vlw{flex:none;display:flex;gap:12px;align-items:center;padding:12px 24px;border-bottom:1px solid ' + G25 + ';overflow-x:auto;background:#fff}',
+      '.pw-vlw{flex:none;display:flex;gap:10px;align-items:center;padding:8px 20px;border-bottom:1px solid ' + G25 + ';overflow-x:auto;background:#fff}',
+      '.pw-vlk{display:inline-flex;align-items:center;gap:4px;background:none;border:0;padding:4px 2px !important;min-height:0 !important;cursor:pointer;flex:none}', '.pw-vlk i{font-style:normal;color:' + GD + ';transition:transform .2s}', '.pw-vl-zu .pw-vlk i{transform:rotate(-90deg)}',
       '.pw-h{font:700 11px "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:' + GD + ';white-space:nowrap}',
-      '.pw-vl{display:flex;gap:10px}',
-      '.pw-v{display:flex;flex-direction:column;gap:6px;align-items:stretch;width:150px;flex:0 0 150px;padding:6px;background:#fff;border:1px solid ' + G25 + ';border-radius:10px;color:' + T + ';cursor:pointer;text-align:left}',
-      '.pw-v b{font:600 11.5px Inter,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 2px}', '.pw-v:hover{border-color:' + G + '}',
+      '.pw-vl{display:flex;gap:8px}',
+      '.pw-v{display:flex;flex-direction:column;gap:3px;align-items:stretch;width:112px;flex:0 0 112px;padding:4px;background:#fff;border:1px solid ' + G25 + ';border-radius:8px;color:' + T + ';cursor:pointer;text-align:left}',
+      '.pw-v b{font:600 10.5px Inter,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 2px}', '.pw-v:hover{border-color:' + G + '}',
       '.pw-v.an{border-color:' + G + ';box-shadow:0 0 0 1.5px ' + G + ' inset;background:' + W4 + '}',
-      '.pw-vm{display:block;width:100%;border-radius:6px;background:#fff;border:1px solid ' + G25 + '}',
+      '.pw-vm{display:block;width:100%;border-radius:5px;background:#fff;border:1px solid ' + G25 + '}', '.pw-vwartet{height:56px !important}',
+      '.pw-vl-zu .pw-vm{display:none !important}', '.pw-vl-zu .pw-v{width:auto;flex:0 0 auto;padding:5px 10px;border-radius:999px}', '.pw-vl-zu .pw-v b{font-size:11.5px}',
       /* Echte Mini-Bilder */
       '.pw-mini{position:relative;overflow:hidden;pointer-events:none}', '#dp-pw .pw-mini-in > *,#dp-pw .pw-mini-in > * > *,#dp-pw .pw-mini-in > * > * > *{min-height:0 !important;height:auto !important}',   /* Hülle erbt sonst min-height 100vh: Leerfläche unter dem Score */ '.pw-mini-in{transform-origin:0 0;position:absolute;left:0;top:0}',
-      '.pw-body{flex:1;display:grid;grid-template-columns:272px minmax(0,1fr);min-height:0}',
-      '.pw-pal{display:flex;flex-direction:column;min-height:0;border-right:1px solid ' + G25 + ';background:#fff}',
+      '.pw-body{flex:1;display:flex;min-height:0}', '.pw-body > .pw-ab{flex:1;min-width:0}',
       '.pw-pleer{font:400 12px/1.5 Inter,sans-serif;color:' + M + ';margin:4px 2px}',
       '.pw-pliste{flex:1;overflow:auto;padding:16px 16px 24px;position:relative}',
       '.pw-pg{margin-bottom:16px}',
@@ -594,16 +617,36 @@
       '.pw-pi i{font-style:normal;font:700 16px/1 Inter,sans-serif;color:' + GD + '}',
       '.pw-pmini{width:100%;border-radius:6px;background:#fff;border:1px solid ' + G25 + '}', '.pw-pmini-leer{height:44px;display:flex;align-items:center;justify-content:center;background:#fff;border:1px dashed ' + G25 + ';border-radius:6px}',
       '.pw-pkz{min-width:0;overflow-wrap:anywhere;flex-direction:column;align-items:flex-start;gap:1px;padding:7px 22px 7px 9px;border-top:2px solid ' + G + '}', '.pw-pkz i{position:absolute;right:7px;top:6px}',
+      /* v4995 · Palette in der dunklen Seitenspalte. Text #F4EFE3, Nebentext #A39C90, Karten #1C1916 mit Rand weiß 8 %,
+         Gruppentitel und Plus in --wl-e8cc7a (dasselbe Gold wie die aktiven Reiter der Einstellungen). */
+      '#dp-pw .modal-side{min-height:0}',
+      '#dp-pw .pw-symleiste{flex:none;display:flex;gap:2px;padding:10px 10px 9px;border-bottom:1px solid rgba(255,255,255,.08)}',
+      '#dp-pw .pw-symk{width:30px;height:30px;flex:0 0 30px;border-radius:8px;border:1px solid transparent;background:rgba(255,255,255,.04);color:#A39C90;display:inline-flex;align-items:center;justify-content:center;padding:0 !important;min-height:0 !important;cursor:pointer}',
+      '#dp-pw .pw-symk:hover,#dp-pw .pw-symk:focus-visible{color:' + GH + ';border-color:color-mix(in srgb, ' + G + ' 35%, transparent);outline:none}',
+      '#dp-pw .pw-symk.an{background:linear-gradient(135deg, color-mix(in srgb, ' + G + ' 22%, transparent), color-mix(in srgb, ' + G + ' 8%, transparent));border-color:color-mix(in srgb, ' + G + ' 50%, transparent);color:' + GH + '}',
+      '#dp-pw .pw-symk .pw-sym,#dp-pw .modal-side .pw-pt .pw-sym{width:16px;height:16px;flex:0 0 16px;padding:0;background:none;color:inherit;box-sizing:border-box}',
+      '#dp-pw .modal-side .pw-pliste{flex:1;min-height:0;overflow:auto;padding:12px 12px 28px;position:relative;scrollbar-color:#3A342C transparent}',
+      '#dp-pw .modal-side .pw-pg{margin-bottom:18px}',
+      '#dp-pw .modal-side .pw-pt{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;color:' + GH + ';margin:0 2px 8px;font:700 11px "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase}',
+      '#dp-pw .modal-side .pw-pt::after{display:none}', '#dp-pw .modal-side .pw-pt small{flex-basis:100%;font:400 10.5px Inter,sans-serif;letter-spacing:0;text-transform:none;color:#A39C90}',
+      '#dp-pw .modal-side .pw-pi{background:#1C1916;border:1px solid rgba(255,255,255,.08);color:#F4EFE3}',
+      '#dp-pw .modal-side .pw-pi:hover,#dp-pw .modal-side .pw-pi:focus-visible{border-color:' + G + ';box-shadow:0 0 0 1px ' + G + '}',
+      '#dp-pw .modal-side .pw-pkz{border-top:2px solid ' + G + '}',
+      '#dp-pw .modal-side .pw-pit b{color:#F4EFE3}', '#dp-pw .modal-side .pw-pit b small{color:#A39C90}', '#dp-pw .modal-side .pw-pi i{color:' + GH + '}',
+      '#dp-pw .modal-side .pw-kzl{color:#A39C90}', '#dp-pw .modal-side .pw-kzv{color:#F4EFE3}', '#dp-pw .modal-side .pw-kzv.pw-pos{color:#3FA56C}', '#dp-pw .modal-side .pw-kzv.pw-neg{color:#D8564C}',
+      '#dp-pw .modal-side .pw-pmini{border:0;border-radius:6px;background:#fff}',
+      '#dp-pw .modal-side .pw-leer{background:rgba(255,255,255,.04);border:1px dashed rgba(255,255,255,.16)}', '#dp-pw .modal-side .pw-pleer{color:#A39C90}',
+      '#dp-pw .modal-side .pw-pik{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.14)}',
       /* Große Vorschau beim Überfahren */
       '.pw-pop{position:absolute;z-index:3;width:min(560px,52vw);background:#fff;border:1px solid ' + G35 + ';border-radius:12px;box-shadow:0 18px 50px rgba(0,0,0,.25);padding:10px 12px 12px;pointer-events:none}',
       '.pw-pop-k b{display:block;font:600 14px "Space Grotesk",Inter,sans-serif;color:' + T + '}', '.pw-pop-k small{display:block;font:400 12px/1.4 Inter,sans-serif;color:' + M + ';margin:2px 0 8px}',
       '.pw-popbild{border:1px solid ' + G25 + ';border-radius:8px;background:#fff}', '.pw-popbild-leer{height:120px;display:flex;align-items:center;justify-content:center}',
       /* Arbeitsbereich */
-      '.pw-ab{overflow:auto;padding:16px 20px 24px;background:#FAFAF7}',
-      '.pw-abk{display:flex;align-items:center;justify-content:space-between;gap:10px;max-width:780px;margin:0 auto 8px}',
+      '.pw-ab{overflow:auto;padding:14px 24px 24px;background:#FAFAF7}',
+      '.pw-abk{display:flex;align-items:center;justify-content:space-between;gap:10px;max-width:1100px;margin:0 auto 8px}',
       '.pw-geraet{display:inline-flex;border:1px solid ' + G25 + ';border-radius:8px;overflow:hidden;background:#fff}',
       '.pw-geraet button{font:600 11.5px Inter,sans-serif;color:' + T + ';background:#fff;border:0;padding:5px 11px;cursor:pointer;min-height:0 !important}', '.pw-geraet button.an{background:' + G + ';color:#fff}',
-      '.pw-buehne{max-width:780px;margin:0 auto;transition:max-width .25s}',
+      '.pw-buehne{max-width:1100px;margin:0 auto;transition:max-width .25s}',   /* v4995 · Vorschau so groß wie der Platz */
       '.pw-als-handy .pw-buehne,.pw-als-handy .pw-abk{max-width:390px}', '.pw-als-handy .pw-raster{grid-template-columns:1fr}', '.pw-als-handy .pw-b.pw-halb{grid-column:1/-1}', '.pw-als-handy .pw-kz{grid-template-columns:repeat(2,minmax(0,1fr))}',
       '.pw-ab .pw-buehne > .pw-h{margin:14px 0 6px;display:block}',
       '.pw-score{position:relative;border-radius:12px;overflow:hidden}', '.pw-scorebild{border-radius:12px}',
@@ -648,18 +691,15 @@
       '#dp-pw.pw-klein{padding:0 !important}',
       '#dp-pw.pw-klein .pw-m{grid-template-columns:minmax(0,1fr) !important;grid-template-rows:auto auto minmax(0,1fr) !important;grid-template-areas:"band" "side" "main" !important;height:100vh !important;height:100dvh !important;max-height:none !important;max-width:100vw !important;border-radius:0 !important;border:0 !important;box-shadow:none !important}',
       '#dp-pw.pw-klein .dp-mtb-hero{display:none !important}',
-      '#dp-pw.pw-klein .modal-side{flex-direction:row !important;height:auto !important;overflow:hidden !important;border-bottom:1px solid ' + G25 + '}',
-      '#dp-pw.pw-klein .ms-tabs{flex-direction:row !important;overflow-x:auto !important;overflow-y:hidden !important;padding:8px 10px !important;gap:6px !important;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch}',
-      '#dp-pw.pw-klein .ms-tab{flex:0 0 auto !important;width:auto !important;padding:8px 12px !important;scroll-snap-align:start;min-height:40px}',
-      '#dp-pw.pw-klein .ms-tab .help-sidebar-item-desc{display:none !important}',
+      '#dp-pw.pw-klein .modal-side{position:relative;flex-direction:column !important;height:auto !important;overflow:visible !important;z-index:4}',
+      '#dp-pw.pw-klein .pw-symleiste{gap:4px;overflow-x:auto;padding:8px 10px;scrollbar-width:none !important}', '#dp-pw.pw-klein .pw-symleiste::-webkit-scrollbar{display:none}',
+      '#dp-pw.pw-klein .pw-symk{width:40px;height:40px;flex:0 0 40px}',
+      '#dp-pw .pw-lade{flex:0 0 auto;height:40px;padding:0 14px !important;min-height:0 !important;border-radius:8px;border:1px solid color-mix(in srgb, ' + G + ' 50%, transparent);background:linear-gradient(135deg, color-mix(in srgb, ' + G + ' 22%, transparent), color-mix(in srgb, ' + G + ' 8%, transparent));color:' + GH + ';font:600 12.5px Inter,sans-serif;cursor:pointer;margin-right:4px}',
+      '#dp-pw.pw-klein .modal-side .pw-pliste{display:none;position:absolute;left:0;right:0;top:100%;height:min(64vh,560px);background:linear-gradient(#141312,#0A0A0A);box-shadow:0 18px 40px rgba(0,0,0,.45);border-bottom:1px solid color-mix(in srgb, ' + G + ' 35%, transparent)}',
+      '#dp-pw.pw-klein.pw-lade-auf .modal-side .pw-pliste{display:block}',
       '#dp-pw.pw-klein .pw-pane{overflow-y:auto !important;overflow-x:hidden !important}',
-      '#dp-pw.pw-klein .pw-vlw{padding:10px 12px}', '#dp-pw.pw-klein .pw-v{width:128px;flex-basis:128px}',
+      '#dp-pw.pw-klein .pw-vlw{padding:8px 12px;scrollbar-width:none !important}', '#dp-pw.pw-klein .pw-vlw::-webkit-scrollbar{display:none}',
       '#dp-pw.pw-klein .pw-body{display:flex;flex-direction:column;flex:none}',
-      '#dp-pw.pw-klein .pw-pal{border-right:0;border-bottom:1px solid ' + G25 + '}', '#dp-pw.pw-klein .pw-pliste{overflow:visible;padding:12px}',
-      /* Palette am Handy als waagerechter Streifen wie die Vorlagen: sonst steht der Arbeitsbereich erst nach ~1000 px */
-      '#dp-pw.pw-klein .pw-pl,#dp-pw.pw-klein .pw-pl-kz{display:flex !important;flex-direction:row;overflow-x:auto;gap:8px;scroll-snap-type:x proximity;padding-bottom:4px}',
-      '#dp-pw.pw-klein .pw-pi{flex:0 0 148px;width:148px;scroll-snap-align:start}',
-      '#dp-pw.pw-klein .ms-tabs,#dp-pw.pw-klein .pw-pl,#dp-pw.pw-klein .pw-vlw{scrollbar-width:none !important}', '#dp-pw.pw-klein .ms-tabs::-webkit-scrollbar,#dp-pw.pw-klein .pw-pl::-webkit-scrollbar,#dp-pw.pw-klein .pw-vlw::-webkit-scrollbar{display:none}',
       '#dp-pw.pw-klein .pw-ab{overflow:visible;padding:12px}', '#dp-pw.pw-klein .pw-raster{grid-template-columns:1fr}', '#dp-pw.pw-klein .pw-b.pw-halb{grid-column:1/-1}',
       '#dp-pw.pw-klein .pw-kz{grid-template-columns:repeat(2,minmax(0,1fr))}', '#dp-pw.pw-klein .pw-pop,#dp-pw.pw-klein .pw-geraet,#dp-pw.pw-klein .pw-alt{display:none !important}',
       '#dp-pw.pw-klein .settings-footer{padding:10px 12px !important;gap:8px !important}', '#dp-pw.pw-klein .save-info{display:none !important}',
@@ -671,6 +711,6 @@
 
   window.DpPfWerkstatt = {
     aktiv: function () { try { return localStorage.getItem('dp_pf_werkstatt') !== '0'; } catch (e) { return true; } },
-    oeffnen: oeffnen, zu: zu, version: 'v4985'
+    oeffnen: oeffnen, zu: zu, version: 'v4995'
   };
 })();
