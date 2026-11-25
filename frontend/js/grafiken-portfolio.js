@@ -235,30 +235,37 @@
       + '<label>Projektion bis <input type="range" data-gp-f="jahr" min="' + (J0 + 1) + '" max="' + JE + '" value="' + _f.jahr + '"> <b>' + _f.jahr + '</b></label>'
       + '<button type="button" class="gp-zahn" data-gp-a="ansicht" title="Module wählen, sortieren und Vorlagen" aria-haspopup="dialog">⚙ Ansicht anpassen</button></div></div>';   /* v4260 */
 
-    var gross = '<div class="gp-gross">'
-      + kachel('Vermögen netto', mio(Wert - Rest), 'Wert ' + mio(Wert) + ' minus Restschuld', '', 'Wert heute je Objekt: letzter Marktbericht, sonst Kaufpreis (' + nMb + ' von ' + rows.length + ' mit Marktbericht). Minus Restschuld heute.', true)
-      + kachel('Cashflow nach Steuer', eurV(CFns / 12), 'im Monat · ' + eurV(CFns) + ' im Jahr', ton(CFns), 'Summe der Objekte nach Zins, Tilgung, Bewirtschaftung und Steuer. Vor Steuer ' + eurV(CFvs) + ' im Jahr.')
-      + kachel('Mieteinnahmen', eur(MJ / 12), 'im Monat · Rendite ' + (brutto != null ? nf2.format(brutto) + ' %' : 'keine Angabe'), '', 'Nettokaltmiete plus Zusatzeinnahmen. Rendite brutto = Jahresmiete zu Kaufpreisen.')
-      + kachel('Netto ' + _f.jahr, mio(pj.netto), 'Projektion · heute ' + mio(proj[0].netto), 'gp-gold', 'Modell: Wertsteigerung je Objekt (sonst 1,5 % im Jahr), Zins und Rate wie heute. Keine Garantie.')
-      + '</div>';
     var ltv = Wert ? Rest / Wert * 100 : null;
-    var klein = '<div class="gp-klein">'
-      + kachel('Restschuld', mio(Rest), '', '', 'Offener Teil aller Darlehen heute.')
-      + kachel('LTV', ltv != null ? nf1.format(ltv) + ' %' : 'keine Angabe', '', ltv == null ? '' : ltv <= 80 ? 'gp-pos' : 'gp-neg', 'Restschuld zu Wert heute.')
-      + kachel('DSCR', dscr != null ? nf2.format(dscr) : 'keine Angabe', '', dscr == null ? '' : dscr >= 1 ? 'gp-pos' : 'gp-neg', gesamt ? 'Jahresmiete zu Kapitaldienst über alle Objekte, wie bisher in den Kennzahlen.' : 'Für eine Auswahl nur je Objekt.')
-      + kachel('Ø-Zins', B.avgZins != null && gesamt ? nf2.format(B.avgZins) + ' %' : (rows.length === 1 && rows[0].zinsPct != null ? nf2.format(rows[0].zinsPct) + ' %' : 'keine Angabe'), '', '', 'Nach Restschuld gewichtet.')
-      + kachel('Cashflow vor St.', eurV(CFvs / 12), '', ton(CFvs), 'Im Monat. ' + eurV(CFvs) + ' im Jahr.')
-      + (function () {   /* v4610 · Hauptkennzahl nach Steuer mit Vermögensdelta, EK-gewichtet über die gewählten Objekte */
+    /* v4640 · Kennzahl-Leiste als Baukasten-Bereich (Marcel 25.11.2026): jede Kachel an/aus und sortierbar. Die ersten vier
+       gewählten stehen groß, die übrigen klein darunter. Nächste Zinsbindung und Wertansatz kamen aus den Demos dazu. */
+    var Kb = bindKalender(rows), nB = Kb.L.filter(function (x) { return x.jahr >= J0; })[0] || null;
+    var KZH = {
+      wert: function () { return kachel('Wertansatz', mio(Wert), nMb + ' von ' + rows.length + ' mit Marktbericht', '', 'Wert heute je Objekt: letzter Marktbericht, sonst Kaufpreis.'); },
+      zinsb: function () { return kachel('Nächste Zinsbindung', nB ? String(nB.jahr) : 'keine Angabe', nB ? mio(nB.rest) + ' Restschuld · ' + nB.obs.length + ' Obj.' : '', nB && nB.jahr - J0 <= 2 ? 'gp-gold' : '', nB ? 'Bindungsende: ' + nB.obs.map(function (r) { return r.name; }).join(', ') + '. Bei 1 Prozentpunkt mehr Zins rund ' + nf0.format(Math.round(nB.p1)) + ' € mehr im Monat.' : 'Keine Zinsbindung eingetragen.'); },
+      netto: function () { return kachel('Vermögen netto', mio(Wert - Rest), 'Wert ' + mio(Wert) + ' minus Restschuld', '', 'Wert heute je Objekt: letzter Marktbericht, sonst Kaufpreis (' + nMb + ' von ' + rows.length + ' mit Marktbericht). Minus Restschuld heute.'); },
+      cfns: function () { return kachel('Cashflow nach Steuer', eurV(CFns / 12), 'im Monat · ' + eurV(CFns) + ' im Jahr', ton(CFns), 'Summe der Objekte nach Zins, Tilgung, Bewirtschaftung und Steuer. Vor Steuer ' + eurV(CFvs) + ' im Jahr.'); },
+      miete: function () { return kachel('Mieteinnahmen', eur(MJ / 12), 'im Monat · Rendite ' + (brutto != null ? nf2.format(brutto) + ' %' : 'keine Angabe'), '', 'Nettokaltmiete plus Zusatzeinnahmen. Rendite brutto = Jahresmiete zu Kaufpreisen.'); },
+      proj: function () { return kachel('Netto ' + _f.jahr, mio(pj.netto), 'Projektion · heute ' + mio(proj[0].netto), 'gp-gold', 'Modell: Wertsteigerung je Objekt (sonst 1,5 % im Jahr), Zins und Rate wie heute. Keine Garantie.'); },
+      rest: function () { return kachel('Restschuld', mio(Rest), '', '', 'Offener Teil aller Darlehen heute.'); },
+      ltv: function () { return kachel('LTV', ltv != null ? nf1.format(ltv) + ' %' : 'keine Angabe', '', ltv == null ? '' : ltv <= 80 ? 'gp-pos' : 'gp-neg', 'Restschuld zu Wert heute.'); },
+      dscr: function () { return kachel('DSCR', dscr != null ? nf2.format(dscr) : 'keine Angabe', '', dscr == null ? '' : dscr >= 1 ? 'gp-pos' : 'gp-neg', gesamt ? 'Jahresmiete zu Kapitaldienst über alle Objekte, wie bisher in den Kennzahlen.' : 'Für eine Auswahl nur je Objekt.'); },
+      zins: function () { return kachel('Ø-Zins', B.avgZins != null && gesamt ? nf2.format(B.avgZins) + ' %' : (rows.length === 1 && rows[0].zinsPct != null ? nf2.format(rows[0].zinsPct) + ' %' : 'keine Angabe'), '', '', 'Nach Restschuld gewichtet.'); },
+      cfvs: function () { return kachel('Cashflow vor St.', eurV(CFvs / 12), '', ton(CFvs), 'Im Monat. ' + eurV(CFvs) + ' im Jahr.'); },
+      ekr: function () { return (function () {   /* v4610 · Hauptkennzahl nach Steuer mit Vermögensdelta, EK-gewichtet über die gewählten Objekte */
         var E = window.DpEkRendite ? DpEkRendite.portfolio(rows.map(function (r) { return r.ekr4; })) : null;
         if (!E) return kachel('EK-Rendite', 'keine Angabe', '', '', 'Kein Eigenkapital oder kein Cashflow gespeichert.');
         var p = function (x) { return nf1.format(x) + ' %'; };
         if (window.DpEkrUi) return DpEkrUi.einbauen(kachel('EK-Rendite', p(E.haupt), 'nach Steuer mit Vermögensdelta', E.haupt >= 0 ? 'gp-pos' : 'gp-neg', ''), E, 'gp-v', 'gp-s');   /* v4620 */
         return kachel('EK-Rendite', p(E.haupt), 'nach Steuer mit Vermögensdelta', E.haupt >= 0 ? 'gp-pos' : 'gp-neg',
           'EK-Rendite in vier Stufen, nach Eigenkapital gewichtet (' + mio(E.ek) + '). 1 Operativ ' + p(E.k1) + '. 2 Nach Steuer ' + p(E.k2) + '. 3 Vor Steuer mit Vermögensdelta ' + p(E.k3) + '. 4 Nach Steuer mit Vermögensdelta ' + p(E.k4) + ', Hauptkennzahl. Vermögensdelta = Bewertung minus Darlehen bei Kauf minus Eigenkapital, je Haltejahr.');
-      })()
-      + kachel('Ertragswert', nEw ? (kpEw ? (ewS / kpEw >= 1 ? '+' : '−') + nf1.format(Math.abs(ewS / kpEw * 100 - 100)) + ' %' : '') : 'keine Angabe', nEw ? nEw + ' von ' + rows.length + ' Obj.' : '', nEw && kpEw ? (ewS >= kpEw ? 'gp-pos' : 'gp-neg') : '', 'Gesamtbewertung: Summe Ertragswerte ' + mio(ewS) + ' gegen die Kaufpreise derselben Objekte ' + mio(kpEw) + '.')
-      + kachel('Marktpreis', nMpi ? (kpMpi ? (mpiS / kpMpi >= 1 ? '+' : '−') + nf1.format(Math.abs(mpiS / kpMpi * 100 - 100)) + ' %' : '') : 'keine Angabe', nMpi ? nMpi + ' von ' + rows.length + ' Obj.' : '', nMpi && kpMpi ? (mpiS >= kpMpi ? 'gp-pos' : 'gp-neg') : '', 'Gesamtbewertung: Marktpreisindikation ' + mio(mpiS) + ' gegen die Kaufpreise derselben Objekte ' + mio(kpMpi) + '.')
-      + '</div>';
+      })(); },
+      ew: function () { return kachel('Ertragswert', nEw ? (kpEw ? (ewS / kpEw >= 1 ? '+' : '−') + nf1.format(Math.abs(ewS / kpEw * 100 - 100)) + ' %' : '') : 'keine Angabe', nEw ? nEw + ' von ' + rows.length + ' Obj.' : '', nEw && kpEw ? (ewS >= kpEw ? 'gp-pos' : 'gp-neg') : '', 'Gesamtbewertung: Summe Ertragswerte ' + mio(ewS) + ' gegen die Kaufpreise derselben Objekte ' + mio(kpEw) + '.'); },
+      mp: function () { return kachel('Marktpreis', nMpi ? (kpMpi ? (mpiS / kpMpi >= 1 ? '+' : '−') + nf1.format(Math.abs(mpiS / kpMpi * 100 - 100)) + ' %' : '') : 'keine Angabe', nMpi ? nMpi + ' von ' + rows.length + ' Obj.' : '', nMpi && kpMpi ? (mpiS >= kpMpi ? 'gp-pos' : 'gp-neg') : '', 'Gesamtbewertung: Marktpreisindikation ' + mio(mpiS) + ' gegen die Kaufpreise derselben Objekte ' + mio(kpMpi) + '.'); }
+    };
+    var kzAn = kzReihe().filter(function (k) { return KZH[k]; });
+    var kzHtml = kzAn.map(function (k, i) { var h = KZH[k](); return i === 0 ? h.replace(/^<div class="gp-k/, '<div class="gp-k gp-haupt') : h; });
+    var gross = kzHtml.length ? '<div class="gp-gross">' + kzHtml.slice(0, 4).join('') + '</div>' : '';
+    var klein = kzHtml.length > 4 ? '<div class="gp-klein">' + kzHtml.slice(4).join('') + '</div>' : '';
     var ohneEw = rows.filter(function (r) { return r.ew == null; });
     var gb = false ? '<div class="gp-gb"><span>Investiert <b>' + mio(S.gi) + '</b></span><span>Darlehen <b>' + mio(S.darl) + '</b></span><span>Eigenkapital eingesetzt <b>' + mio(S.ek) + '</b></span>'
       + (ohneEw.length ? '<span title="' + esc(ohneEw.map(function (r) { return r.name; }).join(', ')) + '">ohne Ertragswert: ' + ohneEw.length + '</span>' : '') + '</div>' : '';
@@ -325,9 +332,9 @@
        er steht in „Projektion & Verlauf" (Eigenkapital-Entwicklung). */
     var T = {
       kopf: kopf + gross + klein,
-      ob: sl('Cashflow und Steuer', 'je Objekt im Jahr') + '<div class="gp-karte" data-gp-k="ob"><div class="gp-t">' + obT + '</div><div class="gp-u">' + obU + '</div>' + ob + '</div>',
-      bk: sl('Finanzierung', 'Zinsbindung und Anschluss') + '<div class="gp-karte" data-gp-k="bk"><div class="gp-t">' + bkT + '</div><div class="gp-u">' + bkU + '</div>' + bk + bkOhne + '</div>',
-      det: sl('Details', 'je Objekt und Rechenprüfung') + '<div class="gp-karte">' + tab + pruef + '</div>'
+      ob: sl('Cashflow und Steuer', 'je Objekt im Jahr') + '<div class="gp-karte dp-gx dp-gx-frei" data-gp-k="ob"><div class="gx-kopf"><div class="gx-eye">Cashflow · je Objekt</div></div><div class="gx-t gp-t">' + obT + '</div><div class="gx-s gp-u">' + obU + '</div>' + ob + '</div>',
+      bk: sl('Finanzierung', 'Zinsbindung und Anschluss') + '<div class="gp-karte dp-gx dp-gx-frei" data-gp-k="bk"><div class="gx-kopf"><div class="gx-eye">Finanzierung · Anschluss</div></div><div class="gx-t gp-t">' + bkT + '</div><div class="gx-s gp-u">' + bkU + '</div>' + bk + bkOhne + '</div>',
+      det: sl('Details', 'je Objekt und Rechenprüfung') + '<div class="gp-karte dp-gx dp-gx-frei"><div class="gx-kopf"><div class="gx-eye">Details · je Objekt</div></div>' + tab + pruef + '</div>'
     };
     if (hosts) Object.keys(T).forEach(function (k) { if (hosts[k]) hosts[k].innerHTML = T[k]; });
     else host.innerHTML = T.kopf + T.ob + T.bk + T.det;
@@ -372,22 +379,34 @@
   var VBK = ANSICHT.filter(function (a) { return a.vb; }).map(function (a) { return a.k; });
   /* Vorlagen nach den Demos (Dateien/Portfolio-Cockpit/Demos-2026-11-25c/baukasten.js). m: [Schlüssel, Breite] in Reihenfolge. */
   var VORLAGEN = [
-    { k: 'standard', t: 'Standard', u: 'Was ein Bestandshalter jeden Monat sehen will',
-      m: [['zielbild', 'ganz'], ['ob', 'halb'], ['bk', 'halb'], ['vb-eq', 'ganz'], ['vb-cf', 'ganz'], ['gb', 'ganz'], ['pp', 'ganz'], ['det', 'ganz']],
-      kommt: ['Was jetzt zu tun ist', 'EK-Rendite je Objekt', 'Wohin die Miete geht'] },
-    { k: 'risiko', t: 'Risiko', u: 'Wo der Bestand verwundbar ist',
-      m: [['bk', 'ganz'], ['ob', 'ganz'], ['zielbild', 'ganz'], ['det', 'ganz']],
-      kommt: ['Risikomatrix', 'Rendite gegen Tragfähigkeit', 'Deine Ziele', 'Anschlussfinanzierung je Jahr', 'Zinsstress beim Anschluss'] },
-    { k: 'steuer', t: 'Steuer', u: 'Was die Steuer aus dem Cashflow macht',
-      m: [['steuer', 'ganz'], ['ob', 'ganz'], ['vb-cf', 'ganz'], ['zielbild', 'ganz']],
-      kommt: ['Wohin die Miete geht', 'Woher die Rendite kommt'] },
-    { k: 'bank', t: 'Finanzierung · Bank-Mappe', u: 'Für das Gespräch mit der Bank',
-      m: [['bk', 'ganz'], ['gb', 'ganz'], ['vb-bilanz', 'halb'], ['vb-objekte', 'halb'], ['vb-eq', 'ganz'], ['zielbild', 'ganz']],
-      kommt: ['Anschlussfinanzierung je Jahr', 'Was dein Eigenkapital verdient', 'Deine Ziele', 'Zinsstress beim Anschluss'] },
-    { k: 'bericht', t: 'Bericht', u: 'Ruhig, zum Lesen und Weitergeben',
-      m: [['gb', 'ganz'], ['zielbild', 'ganz'], ['vb-eq', 'halb'], ['vb-quellen', 'halb'], ['pp', 'ganz']],
-      kommt: ['Woher die Rendite kommt', 'Deine Objekte mit Bild'] }
+    { k: 'standard', t: 'Asset-Manager-Cockpit', u: 'Standard · was ein Bestandshalter am Montagmorgen sehen will',
+      m: [['zielbild', 'ganz'], ['ob', 'halb'], ['bk', 'halb'], ['vb-eq', 'ganz']], kommt: ['Was jetzt zu tun ist', 'Wohin die Miete geht'] },
+    { k: 'risiko', t: 'Risiko-Radar', u: 'Wo der Bestand verwundbar ist',
+      m: [['bk', 'ganz'], ['zielbild', 'ganz']], kommt: ['Risikomatrix', 'Rendite gegen Tragfähigkeit', 'Zinsstress beim Anschluss'] },
+    { k: 'steuer', t: 'Steuer-Jahr', u: 'Was die Steuer aus dem Cashflow macht',
+      m: [['steuer', 'ganz'], ['ob', 'ganz'], ['zielbild', 'ganz']], kommt: ['Wohin die Miete geht', 'Steuer nach Halter'] },
+    { k: 'bank', t: 'Bank-Mappe', u: 'Der Bestand so, wie ihn eine Bank sieht',
+      m: [['bk', 'ganz'], ['zielbild', 'ganz']], kommt: ['Sicherheiten je Objekt', 'Was für die Finanzierung spricht', 'Zinsstress beim Anschluss'] },
+    { k: 'rendite', t: 'Renditequellen', u: 'Was dein Eigenkapital verdient und woher',
+      m: [['zielbild', 'ganz']], kommt: ['Woher die Rendite kommt', 'EK-Rendite je Objekt', 'Wo dein Kapital arbeitet', 'Kapital umschichten?'] },
+    { k: 'matrix', t: 'Objektmatrix', u: 'Jedes Objekt als kleine Karte',
+      m: [['zielbild', 'ganz']], kommt: ['Objektkarten zum Umdrehen'] },
+    { k: 'wert', t: 'Wert und Zielbild', u: 'Was der Bestand heute wert ist und was der Plan daraus macht',
+      m: [['zielbild', 'ganz'], ['vb-eq', 'ganz']], kommt: ['Wert heute und im Zielbild', 'Miethebel', 'Wo die Miete herkommt'] },
+    { k: 'miete', t: 'Mieten-Hebel', u: 'Wo Miete liegen bleibt',
+      m: [['zielbild', 'ganz']], kommt: ['Miethebel', 'Wo die Miete herkommt', 'Miete je Quadratmeter', 'Was jetzt zu tun ist'] },
+    { k: 'bericht', t: 'Monatsbericht', u: 'Zum Lesen, Drucken und Weitergeben',
+      m: [['zielbild', 'ganz'], ['ob', 'halb'], ['bk', 'halb']], kommt: ['Der Monat in Sätzen', 'Für diesen Monat'] }
   ];
+  /* Kennzahl-Leiste (Marcel 25.11.2026: nicht fest, wählbar und sortierbar). Standard wie die Demos: acht Kacheln. */
+  var KZDEF = [
+    { k: 'wert', t: 'Wertansatz' }, { k: 'netto', t: 'Vermögen netto' }, { k: 'miete', t: 'Mieteinnahmen' }, { k: 'cfvs', t: 'Cashflow vor Steuer' },
+    { k: 'cfns', t: 'Cashflow nach Steuer' }, { k: 'dscr', t: 'DSCR' }, { k: 'zinsb', t: 'Nächste Zinsbindung' }, { k: 'ekr', t: 'EK-Rendite' },
+    { k: 'proj', t: 'Vermögen netto in der Projektion' }, { k: 'rest', t: 'Restschuld' }, { k: 'ltv', t: 'LTV' }, { k: 'zins', t: 'Ø-Zins' },
+    { k: 'ew', t: 'Ertragswert gegen Kaufpreis' }, { k: 'mp', t: 'Marktpreis gegen Kaufpreis' }
+  ];
+  function kzStandard() { return KZDEF.map(function (x, i) { return { k: x.k, an: i < 8 }; }); }
+  function kzReihe() { return (ansLaden().kz || kzStandard()).filter(function (x) { return x.an; }).map(function (x) { return x.k; }); }
   function vorlageVon(k) { return VORLAGEN.filter(function (v) { return v.k === k; })[0] || null; }
   /* Stand aus einer Vorlage: nur ihre Module an, in ihrer Reihenfolge und Breite, der Rest dahinter und aus */
   function ausVorlage(v) {
@@ -401,7 +420,7 @@
     TOP.forEach(function (k) { if (ord.indexOf(k) < 0) ord.push(k); });
     VBK.forEach(function (k) { if (ordVb.indexOf(k) < 0) ordVb.push(k); });
     br.projektion = 'ganz';
-    return { v: 2, an: an, ord: ord, ordVb: ordVb, br: br, vorlage: v.k };
+    return { v: 2, an: an, ord: ord, ordVb: ordVb, br: br, vorlage: v.k, kz: (_ans && _ans.kz) || kzStandard() };
   }
   var _ans = null, _ansServer = false, _bkOffen = false, _bkVorher = null, _bkPut = null;
   /* v1 (v4260) kannte nur an/aus: die Häkchen bleiben, Reihenfolge und Breite kommen aus Standard */
@@ -415,6 +434,8 @@
     basis.ord.forEach(function (k) { if (o.indexOf(k) < 0) o.push(k); }); out.ord = o;
     var ov = Array.isArray(s.ordVb) ? s.ordVb.filter(function (k) { return VBK.indexOf(k) >= 0; }) : [];
     basis.ordVb.forEach(function (k) { if (ov.indexOf(k) < 0) ov.push(k); }); out.ordVb = ov;
+    var kz = Array.isArray(s.kz) ? s.kz.filter(function (x) { return x && KZDEF.some(function (d) { return d.k === x.k; }); }).map(function (x) { return { k: x.k, an: !!x.an }; }) : [];
+    KZDEF.forEach(function (d, i) { if (!kz.some(function (x) { return x.k === d.k; })) kz.push({ k: d.k, an: Array.isArray(s.kz) ? false : i < 8 }); }); out.kz = kz;
     ANSICHT.forEach(function (a) { if (a.fest) return; var b = s.br && s.br[a.k]; out.br[a.k] = b === 'halb' || b === 'ganz' ? b : (basis.br[a.k] || a.b || 'ganz'); });
     return out;
   }
@@ -489,7 +510,15 @@
     p.querySelector('.gpbk-vl').innerHTML = VORLAGEN.map(function (x) {
       return '<button type="button" class="gpbk-v' + (A.vorlage === x.k ? ' an' : '') + '" data-bk="vorlage" data-k="' + x.k + '" aria-pressed="' + (A.vorlage === x.k) + '"><b>' + esc(x.t) + '</b><small>' + esc(x.u) + '</small></button>';
     }).join('');
-    p.querySelector('.gpbk-liste').innerHTML = A.ord.map(function (k, i) { return bkZeile(k, i, A.ord.length, false); }).join('');
+    var KZ = A.kz || kzStandard();
+    p.querySelector('.gpbk-kz').innerHTML = KZ.map(function (x, i) {
+      var d = KZDEF.filter(function (y) { return y.k === x.k; })[0] || { t: x.k };
+      return '<li class="gpbk-z gpbk-kzz' + (x.an ? '' : ' gpbk-aus') + '" draggable="true" data-k="' + x.k + '" data-liste="kz"><span class="gpbk-griff" aria-hidden="true">⋮⋮</span>'
+        + '<label class="gpbk-txt"><input type="checkbox" data-bk="kzan" data-k="' + x.k + '"' + (x.an ? ' checked' : '') + '><span><b>' + esc(d.t) + '</b></span></label><span class="gpbk-akt">'
+        + '<button type="button" class="gpbk-p" data-bk="kzhoch" data-k="' + x.k + '" aria-label="' + esc(d.t) + ' nach oben"' + (i === 0 ? ' disabled' : '') + '>↑</button>'
+        + '<button type="button" class="gpbk-p" data-bk="kzrunter" data-k="' + x.k + '" aria-label="' + esc(d.t) + ' nach unten"' + (i === KZ.length - 1 ? ' disabled' : '') + '>↓</button></span></li>';
+    }).join('');
+    p.querySelector('.gpbk-liste:not(.gpbk-kz)').innerHTML = A.ord.map(function (k, i) { return bkZeile(k, i, A.ord.length, false); }).join('');
     var kommt = v ? v.kommt : [];
     p.querySelector('.gpbk-kommt-w').innerHTML = kommt.length ? '<div class="gpbk-h">Kommt in dieser Vorlage dazu</div><ul class="gpbk-kommt">'
       + kommt.map(function (t) { return '<li><span>' + esc(t) + '</span><i>kommt</i></li>'; }).join('') + '</ul>' : '';
@@ -498,6 +527,7 @@
       var el = p.querySelector(sel); if (el && !el.disabled) el.focus();
     }
   }
+  function kzGeaendert() { ansSpeichern(); ansichtAnwenden(); var h = document.querySelector('[data-dp-gp="kopf"]'); if (h) h.removeAttribute('data-gp-sig'); bkListe(); try { lauf(); } catch (e) {} }
   function bkGeaendert() { var A = ansLaden(); A.vorlage = null; ansSpeichern(); ansichtAnwenden(); bkListe(); }
   function bkVerschieben(k, r) {
     var A = ansLaden(), L = VBK.indexOf(k) >= 0 ? A.ordVb : A.ord, i = L.indexOf(k), j = i + r;
@@ -529,7 +559,8 @@
     var p = document.createElement('div'); p.id = 'dp-gp-bk'; p.className = 'gpbk'; p.setAttribute('role', 'dialog'); p.setAttribute('aria-modal', 'true'); p.setAttribute('aria-labelledby', 'gpbk-t');
     p.innerHTML = '<div class="gpbk-k"><div><b id="gpbk-t">Ansicht anpassen</b><small>Score und Kennzahlen stehen immer oben. Alles darunter stellst du hier zusammen.</small></div>'
       + '<button type="button" class="gpbk-x" data-bk="zu" aria-label="Schließen">×</button></div>'
-      + '<div class="gpbk-body"><div class="gpbk-h">Vorlagen</div><div class="gpbk-vl"></div>'
+      + '<div class="gpbk-body"><div class="gpbk-h">Vorlagen <span>nach den Demos</span></div><div class="gpbk-vl"></div>'
+      + '<div class="gpbk-h">Kennzahlen oben <span>die ersten vier stehen groß</span></div><ol class="gpbk-liste gpbk-kz"></ol>'
       + '<div class="gpbk-h">Module <span>ziehen oder mit den Pfeilen sortieren</span></div><ol class="gpbk-liste"></ol><div class="gpbk-kommt-w"></div></div>'
       + '<div class="gpbk-f"><button type="button" class="gpbk-b" data-bk="reset">Zurücksetzen</button><button type="button" class="gpbk-b gpbk-ok" data-bk="zu">Fertig</button></div>';
     document.body.appendChild(p);
@@ -537,13 +568,15 @@
       var b = ev.target && ev.target.closest ? ev.target.closest('button[data-bk]') : null; if (!b || !p.contains(b)) return;
       var a = b.getAttribute('data-bk'), k = b.getAttribute('data-k'), A = ansLaden();
       if (a === 'zu') bkZu();
-      else if (a === 'reset') { _ans = ausVorlage(VORLAGEN[0]); ansSpeichern(); ansichtAnwenden(); bkListe(); }
+      else if (a === 'reset') { _ans = ausVorlage(VORLAGEN[0]); _ans.kz = kzStandard(); kzGeaendert(); ansichtAnwenden(); bkListe(); }
       else if (a === 'vorlage') { var v = vorlageVon(k); if (v) { _ans = ausVorlage(v); ansSpeichern(); ansichtAnwenden(); bkListe(); } }
       else if (a === 'hoch' || a === 'runter') bkVerschieben(k, a === 'hoch' ? -1 : 1);
+      else if (a === 'kzhoch' || a === 'kzrunter') { var KZ = A.kz, i = KZ.findIndex(function (x) { return x.k === k; }), j = i + (a === 'kzhoch' ? -1 : 1); if (i >= 0 && j >= 0 && j < KZ.length) { var x = KZ.splice(i, 1)[0]; KZ.splice(j, 0, x); kzGeaendert(); } }
       else if (a === 'br') { A.br[k] = b.getAttribute('data-w') === 'halb' ? 'halb' : 'ganz'; bkGeaendert(); }
     });
     p.addEventListener('change', function (ev) {
-      var t = ev.target; if (!t || t.getAttribute('data-bk') !== 'an') return;
+      var t = ev.target; if (t && t.getAttribute('data-bk') === 'kzan') { var x = ansLaden().kz.filter(function (y) { return y.k === t.getAttribute('data-k'); })[0]; if (x) { x.an = !!t.checked; kzGeaendert(); } return; }
+      if (!t || t.getAttribute('data-bk') !== 'an') return;
       ansLaden().an[t.getAttribute('data-k')] = !!t.checked; bkGeaendert();
     });
     /* Ziehen: nur innerhalb derselben Liste (Hauptraster oder Projektion und Verlauf) */
@@ -559,7 +592,9 @@
       var z = ev.target && ev.target.closest ? ev.target.closest('.gpbk-z') : null;
       if (!zieh || !z || z === zieh || z.getAttribute('data-liste') !== zieh.getAttribute('data-liste')) return;
       ev.preventDefault();
-      var A = ansLaden(), L = zieh.getAttribute('data-liste') === 'vb' ? A.ordVb : A.ord, von = zieh.getAttribute('data-k'), nach = z.getAttribute('data-k');
+      var A = ansLaden(), von = zieh.getAttribute('data-k'), nach = z.getAttribute('data-k');
+      if (zieh.getAttribute('data-liste') === 'kz') { var ki = A.kz.findIndex(function (x) { return x.k === von; }), kj = A.kz.findIndex(function (x) { return x.k === nach; }); if (ki < 0 || kj < 0) return; var kx = A.kz.splice(ki, 1)[0]; A.kz.splice(kj, 0, kx); kzGeaendert(); return; }
+      var L = zieh.getAttribute('data-liste') === 'vb' ? A.ordVb : A.ord;
       var i = L.indexOf(von), j = L.indexOf(nach); if (i < 0 || j < 0) return;
       L.splice(i, 1); L.splice(j, 0, von); bkGeaendert();
     });
@@ -614,21 +649,18 @@
     if (document.getElementById('dp-gp-stil4')) return;
     var s = document.createElement('style'); s.id = 'dp-gp-stil4';
     var G = 'var(--wl-c9a84c, #C9A84C)', A = 'body.dp-gp-an #dp-stage .app.gp-bk-raster', M = 'body.dp-gp-an #dashboard-main';
-    var H = 'html:not([data-gx-stil="dunkel"]) body.dp-gp-an #dp-pscore-hero', DK = 'html[data-gx-stil="dunkel"] body.dp-gp-an #dashboard-main';
+    var DK = 'html[data-gx-stil="dunkel"] body.dp-gp-an #dashboard-main';
     s.textContent = [
       /* Raster: volle oder halbe Breite je Modul, Reihenfolge über order (Kopf, Score, Ansicht, Leiste bleiben vorn) */
       A + '{flex-direction:row !important;flex-wrap:wrap;column-gap:14px;align-items:flex-start}',
       A + ' > *{flex:0 0 100%;max-width:100%;min-width:0;box-sizing:border-box}',
       '@media (min-width:1000px){' + A + ' > .gp-halb{flex:0 0 calc(50% - 7px);max-width:calc(50% - 7px)}}',
+      M + ' .dp-gp .gp-klein{grid-template-columns:repeat(auto-fit,minmax(150px,1fr)) !important}',
+      M + ' .dp-gp .gp-karte.dp-gx{margin:0;padding:18px 20px 16px}' + M + ' .dp-gp .gp-karte .gx-t em{font-style:normal;color:var(--dp-gold-txt,#7d682f);background:color-mix(in srgb,' + G + ' 22%,transparent);border-radius:5px;padding:0 5px}',
+      'html[data-gx-stil="dunkel"] ' + M + ' .dp-gp .gp-karte .gx-t em{color:var(--wl-e8cc7a,#E8CC7A)}',
+      '@media (max-width:640px){' + M + ' .dp-gp .gp-klein{grid-template-columns:repeat(2,minmax(0,1fr)) !important}}',
       M + ' .gp-vb-raster > .gp-vbk:not(.gp-breit){grid-column:auto}',
-      /* Hell: Score-Kopf hell wie die Grafikkarten (vorher Obsidian-Band) */
-      H + ' .dpz-kopf{background:var(--surface,#F8F6F1);color:#2A2727;border:1px solid color-mix(in srgb,' + G + ' 40%,transparent)}',
-      H + ' .dpz-lbl,' + H + ' .dpz-wie summary,' + H + ' .dpz-eck .k{color:color-mix(in srgb,#2A2727 58%,transparent)}',
-      H + ' .dpz-wort,' + H + ' .dpz-eck .v,' + H + ' .dpz-warum b{color:#2A2727}',
-      H + ' .dpz-wert,' + H + ' .dpz-wie,' + H + ' .dpz-warum{color:color-mix(in srgb,#2A2727 72%,transparent)}',
-      H + ' .dpz-knopf{color:color-mix(in srgb,#2A2727 70%,transparent) !important;border-color:color-mix(in srgb,#2A2727 18%,transparent) !important}',
-      H + ' .dpz-knopf:hover{color:var(--dp-gold-txt,#7d682f) !important;border-color:' + G + ' !important}',
-      H + ' .dpz-empf-halb{color:var(--dp-gold-txt,#7d682f)}' + H + ' .dpz-empf-nein{background:color-mix(in srgb,#B8625C 14%,transparent);color:#B8625C}',
+      /* Score-Kopf bleibt mit der schwarzen Leiste (Marcel 25.11.2026), auch im hellen Stil */
       /* Hell: Schalter Einfach/Genau und Tabelle/Grafik ohne dunkle Flächen, aktiver Zustand golden */
       'html:not([data-gx-stil="dunkel"]) ' + M + ' .cp-ans-sw{background:color-mix(in srgb,#2A2727 6%,#fff) !important}',
       'html:not([data-gx-stil="dunkel"]) ' + M + ' .cp-ans-sw button{color:color-mix(in srgb,#2A2727 70%,transparent) !important}',
