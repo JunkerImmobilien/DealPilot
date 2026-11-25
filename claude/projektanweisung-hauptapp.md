@@ -45597,3 +45597,9 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** staging a94c2e8e, 075744cf, e272df31, f041d098 · main 0dd4ec34, 8111fea9, 23a0e0a0.
 - **Nachweis:** einzelcheck-pruefen Teil V + 4 Gegenproben, Staging-Dienst liefert ziel fuer Herford, Prod-mb-backend rechnet zielAusAuszug identisch, Landing liefert einzelcheck-9m aus.
 - **Rest:** Kein bezahlter Prod-Bericht nachgemessen (keine Testzahlung). HH4-Muster (Muster-komplett-2026-11-25) vor diesem Stand erzeugt, Seite Mietpotenzial neu erzeugen.
+
+### Rollout 1.0.212 · v4770 App-Gesamtprüfung (Fork GG4)
+- **Was:** Überläufe bei 1024/820/390 px behoben (Cockpit-Raster Musterhof 8, Knöpfe Wertermittlung/Pilot/Jahresabgleich, Badge Investition, Abweichungstafel, Potenzial-Kacheln, Plakette „wichtig“), Schrift 7,5 → 8,5 px, Gedankenstriche in Feldnamen/Spannen, Portfolio-EK-Rendite auf `_wertAnsatz`, Lagekarte statt leerer Fläche in Galerie/Sicherheiten.
+- **Commit:** staging 3d429d21, Merge a43000bb · main ac98c7be, Version d0b84acc, Konstanten deeb0a1b.
+- **Nachweis:** Nachmessung 390 px an Musterhof 8, Westerfeldstr. 146, Hauptstr. 51: 0 Layout-Befunde; buster-ebenen SAUBER, vorschau SAUBER, jahresabgleich 177/177, mietpotenzial 311/311, ek-rendite 51/51, gold-audit Prod RC 0. Sicherung haupt-/mb-20261125-0942-v4770 (7,0/31 MB, Kopf gelesen).
+- **Rest:** Befundliste `Dateien/Fehler/app-pruefung-2026-11-25/`; hausverlauf.js Gold (II4); Prod nicht eingeloggt nachgemessen.
