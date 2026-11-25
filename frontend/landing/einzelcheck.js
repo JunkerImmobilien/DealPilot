@@ -63,7 +63,7 @@
 (function () {
   'use strict';
   if (window.DpEinzelCheck) return;
-  var VERSION = 'einzelcheck-8';
+  var VERSION = 'einzelcheck-8a';
   var ANSCHLUSS_ZINS = 5.0;     /* v3946 · Marcel 22.11.2026: „Anschlussfinanzierung, die wir einfach auf fünf Prozent rechnen mit derselben Tilgung“ */
   var ABLAGE_STUNDEN = 2;       /* v3946 · Unterlagen im Browser höchstens so lange (die Stripe-Kasse läuft nach 60 Minuten ab) */
   var SPEICHER = 'dp_ec_kauf';
@@ -1075,7 +1075,8 @@
       + (d.fin && d.fin.bindung ? '<div><span>Restschuld nach ' + d.fin.bindung.jahre + ' J.</span><b>' + esc(eur(d.fin.bindung.rs)) + '</b></div>' : '')
       + (d.fin && d.fin.anschluss ? '<div><span>Rate im Anschluss</span><b>' + esc(eur(d.fin.anschluss.rate_m)) + '</b></div>' : '') + '</div>' : '';
     setze('<h3 id="ecTitel">Dein Bericht ist fertig.</h3>' + kopf + wertZeile
-      + (d.aus_zahlenstand ? meldung('Gerechnet mit den gespeicherten Zahlen aus dem kostenlosen Teil. Lade alle Unterlagen noch einmal hoch, dann liest der Bericht sie vollständig.', 'warn') : '')
+      /* hh4 · nur wenn es Unterlagen gab: ohne Unterlagen gibt es nichts nachzuladen */
+      + (d.aus_zahlenstand && !S.ohneUnterlagen && ((S.frei && S.frei.unterlagen && S.frei.unterlagen.length) || S.dateien.length) ? meldung('Gerechnet mit den gespeicherten Zahlen aus dem kostenlosen Teil. Lade alle Unterlagen noch einmal hoch, dann liest der Bericht sie vollständig.', 'warn') : '')
       + '<div class="ec-titelbild" hidden><span class="ec-l">Bild oben im Bericht</span><p class="ec-fein">Wähl ein Foto, das das Objekt selbst zeigt. Ohne Wahl steht oben die Lagekarte.</p><div class="ec-fotos"></div></div>'
       + '<div class="ec-knoepfe"><button type="button" class="btn-p ec-pdf">Bericht ansehen und als PDF speichern</button></div>'
       + mailBox(d)
