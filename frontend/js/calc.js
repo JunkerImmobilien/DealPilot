@@ -1379,7 +1379,7 @@ function _calcImmediate(){
        zusätzliche Angabe „Wert nach Aufteilung“ und rechnet nicht mit. v4580/a hatte ihn kurz als Anker (1.0.185). */
     if (_wzW && _ankWahl === 'massgebend' && _wzW.fuehrend) {
       var _fv = _wzW[_wzW.fuehrend];
-      if (_fv && _fv.wert > 0 && !_fv.vorlaeufig) _mbAnker = { wert: Math.max(0, _fv.wert - _erbAbzug), art: _wzW.fuehrend, datum: _wzW.wert_stichtag || _wzW.bericht_datum, erstellt: _wzW.bericht_datum, stichtag_eigen: !!_wzW.wert_stichtag };
+      if (_fv && _fv.wert > 0 && !_fv.vorlaeufig) _mbAnker = { wert: Math.max(0, _fv.wert - _erbAbzug), art: _wzW.fuehrend, vor_bog: !!_fv.vor_bog, datum: _wzW.wert_stichtag || _wzW.bericht_datum, erstellt: _wzW.bericht_datum, stichtag_eigen: !!_wzW.wert_stichtag };
       /* Stufe M: führt der Vergleichswert ohne amtliche Basis, IST er die Marktpreisindikation nach Abschlag */
       else if (_wzW.fuehrend === 'vergleichswert' && !_wzW.vergleichswert && _mpiM > 0) _mbAnker = { wert: Math.max(0, _mpiM - _erbAbzug), art: 'vergleichswert_m', datum: _wzW.wert_stichtag || _wzW.bericht_datum, erstellt: _wzW.bericht_datum, stichtag_eigen: !!_wzW.wert_stichtag };
     }
@@ -1405,12 +1405,12 @@ function _calcImmediate(){
   State.wert_basis_quelle = _wbQuelle;
   /* v4300 · Anker mit Jahr: der Bericht bewertet zu SEINEM Stichtag. Weiter unten (nach wstg) wird auf den Beginn der
      Projektion zurueckgerechnet, damit wert_y im Berichtsjahr den Berichtswert trifft. */
-  State.wert_anker = (_wbQuelle === 'marktbericht' && _mbAnker) ? { wert: _mbAnker.wert, art: _mbAnker.art, datum: _mbAnker.datum || null,
+  State.wert_anker = (_wbQuelle === 'marktbericht' && _mbAnker) ? { wert: _mbAnker.wert, art: _mbAnker.art, vor_bog: !!_mbAnker.vor_bog, datum: _mbAnker.datum || null,
     erstellt: _mbAnker.erstellt || null, stichtag_eigen: !!_mbAnker.stichtag_eigen,   /* v4390 · datum = Wertermittlungsstichtag, erstellt = Berichtsdatum */
     jahr: (function () { var d = _mbAnker.datum ? new Date(_mbAnker.datum) : null; return d && !isNaN(d) ? d.getFullYear() : null; })(),
     monat: (function () { var d = _mbAnker.datum ? new Date(_mbAnker.datum) : null; return d && !isNaN(d) ? d.getMonth() + 1 : null; })() } : null;
   State.wert_basis_text = _wbQuelle === 'verkehrswert' ? (State.svw_label || 'Wertangabe') + ' (Reiter Objekt)'
-    : _wbQuelle === 'marktbericht' ? ({ ertragswert: 'Ertragswert', sachwert: 'Sachwert', vergleichswert: 'Vergleichswert', vergleichswert_m: 'Vergleichswert', mpi_mit: 'Marktpreisindikation nach Abschlag (aus Angebotspreisen, kein Verkehrswert)', mpi_ohne: 'Marktpreisindikation (aus Angebotspreisen, kein Verkehrswert)' }[_mbAnker.art] || 'Wert') + ' aus dem Marktbericht'
+    : _wbQuelle === 'marktbericht' ? ({ ertragswert: 'Ertragswert', sachwert: 'Sachwert', vergleichswert: 'Vergleichswert', vergleichswert_m: 'Vergleichswert', mpi_mit: 'Marktpreisindikation nach Abschlag (aus Angebotspreisen, kein Verkehrswert)', mpi_ohne: 'Marktpreisindikation (aus Angebotspreisen, kein Verkehrswert)' }[_mbAnker.art] || 'Wert') + (_mbAnker.vor_bog ? ' vor besonderen objektspezifischen Grundstücksmerkmalen' : '') + ' aus dem Marktbericht'
     : _wbQuelle === 'bankbewertung' ? 'Bankbewertung' : 'Kaufpreis';
   /* v4900 · Hinweise am Wertanker: Wertangabe ohne Herkunft, und kein gerechneter Verkehrswert */
   try { (function () {
@@ -5901,7 +5901,7 @@ window._dpKpisNachziehen = function () {
     o._kpis_ltv   = State.kpis.ltv;
     o._ekr4 = State.kpis.ekr4 || null;   /* v4610 · EK-Rendite in vier Stufen fürs Portfolio-Cockpit */
     o._hebel_in = (State.kpis.ekr4 && State.kpis.ekr4.hebel_in) || null;   /* v4640 · Gesamtinvest, Zins und Darlehen je Objekt: der Hebel des Bestands rechnet damit echt (DpEkRendite.portfolio) */
-    o._wert_anker = (State.wert_anker && State.wert_anker.wert > 0) ? { wert: State.wert_anker.wert, art: State.wert_anker.art || null, datum: State.wert_anker.datum || null } : null;   /* v4420 · maßgebender Objektwert für den Score im Backend (objektRechnung.js) */
+    o._wert_anker = (State.wert_anker && State.wert_anker.wert > 0) ? { wert: State.wert_anker.wert, art: State.wert_anker.art || null, vor_bog: !!State.wert_anker.vor_bog, datum: State.wert_anker.datum || null } : null;   /* v4420 · maßgebender Objektwert für den Score im Backend (objektRechnung.js) */
   } catch (e) {}
 };
 

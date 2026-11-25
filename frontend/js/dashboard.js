@@ -665,7 +665,7 @@
     /* v4900 · Rangfolge wie calc.js: Gutachten/Bank > maßgebender Wert des Berichts > Marktpreisindikation > Kaufpreis; eine Wertangabe ohne Herkunft nie */
     var _h = String((o && o.svw_herkunft) || ''), _sv = num(o && o.svwert);
     if (_sv > 0 && (_h === 'gutachten' || _h === 'bank')) return { wert: _sv, quelle: 'anker', art: _h, datum: null };
-    if (wa && num(wa.wert) > 0) return { wert: num(wa.wert), quelle: 'anker', art: wa.art || null, datum: wa.datum || null };
+    if (wa && num(wa.wert) > 0) return { wert: num(wa.wert), quelle: 'anker', art: wa.art || null, vor_bog: !!wa.vor_bog, datum: wa.datum || null };
     var h = (k && _mbHist[k]) || null;
     var zz = null; try { zz = window.DpWertZielbild && DpWertZielbild.zielbildFuer ? DpWertZielbild.zielbildFuer(o) : null; } catch (e) { zz = null; }
     if (!h && zz && (num(zz.ewB) > 0 || num(zz.mpiB) > 0)) h = { created_at: zz.stand || null, market_value: zz.mpiB, ertragswert_eur: null };   /* Zielbild-Lauf ohne geladene Berichtsliste */
@@ -677,7 +677,7 @@
       var d = h.created_at ? String(h.created_at).slice(0, 10) : null;
       if (etw && vw) return { wert: vw, quelle: 'mb', art: 'vergleichswert', datum: d };
       if (etw && num(h.market_value) > 0) return { wert: num(h.market_value), quelle: 'mb', art: 'vergleichswert_m', datum: d };
-      if (ew) return { wert: ew, quelle: 'mb', art: 'ertragswert', datum: d };
+      if (ew) return { wert: ew, quelle: 'mb', art: 'ertragswert', vor_bog: /vor besonderen/.test(String(h.ertragswert_bezeichnung || '')), datum: d };
       if (num(h.market_value) > 0) return { wert: num(h.market_value), quelle: 'mb', art: 'mpi_mit', datum: d };   /* v4900 · kein Verfahren: Marktpreisindikation, kein Verkehrswert */
     }
     return { wert: kp, quelle: k && !(k in _mbHist) ? 'laedt' : 'kp', art: null, datum: null };
@@ -688,7 +688,7 @@
     if (x.quelle === 'kp') return 'Kaufpreis (kein Bericht)';
     if (x.quelle === 'laedt') return 'Kaufpreis (Bericht wird geladen …)';
     var d = x.datum && /^\d{4}-\d{2}-\d{2}/.test(x.datum) ? x.datum.slice(8, 10) + '.' + x.datum.slice(5, 7) + '.' + x.datum.slice(0, 4) : (x.datum || '');
-    return (_ART_TXT[x.art] || 'maßgebender Wert') + (d ? ', Stichtag ' + d : '');
+    return (_ART_TXT[x.art] || 'maßgebender Wert') + (x.vor_bog ? ' vor besonderen objektspezifischen Grundstücksmerkmalen' : '') + (d ? ', Stichtag ' + d : '');
   }
   function _wertHeuteJeObjekt(arr){
     return arr.map(function(o){

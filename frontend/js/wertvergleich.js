@@ -140,7 +140,7 @@
     if (mitAb) t += zeile('ohne Abschlag', 'Angebotsniveau, wie es im Markt ausgeschrieben ist', rohLo, roh, rohHi, false);
     if (AUF) t += zeile('Wert nach Aufteilung', 'zusätzliche Angabe · ' + esc(AUF.bezeichnung || 'Vergleichswert') + ' je Wohnung, ' + AUF.n + ' Wohnungen einzeln'
       + (AUF.kosten > 0 ? ', abzüglich Aufteilungskosten ' + eur(AUF.kosten) : '') + (AUF.vollstaendig ? '' : ' · unvollständig'), null, AUF.wert, null, false);
-    if (ew != null) t += zeile(/vorläufig/.test(h.ertragswert_bezeichnung || '') ? 'Ertragswert (vorläufig)' : 'Ertragswert',
+    if (ew != null) t += zeile(/vor besonderen/.test(h.ertragswert_bezeichnung || '') ? 'Ertragswert (vor besonderen objektspezifischen Grundstücksmerkmalen)' : (/vorläufig/.test(h.ertragswert_bezeichnung || '') ? 'Ertragswert (vorläufig)' : 'Ertragswert'),
       (ewV != null ? 'Spanne aus dem Liegenschaftszins' : '') + (AUF ? (ewV != null ? ' · ' : '') + 'Haus als Ganzes' : ''), ewV, ew, ewB, fu === 'ertragswert');
     /* v2979 · Marcel 27.10.2026 (Parkstr. 9, MFH Bj 1905: Sachwert 519.125 € neben Ertragswert 425.000 € und
        Kaufpreis 395.000 €), Variante B: ohne Sachwertfaktor ist der Sachwert eine Herstellungskostenrechnung,

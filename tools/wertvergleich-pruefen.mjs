@@ -3,6 +3,7 @@
    fertiger Satz in beiden Richtungen, falsche Zahl oder falsche Richtung wird korrigiert, richtige bleibt.
    Gegenprobe: ohne Nachprüfung muss der Fehlerfall rot sein. RC 0 = sauber. */
 import fs from 'node:fs';
+import vm from 'node:vm';
 const s = fs.readFileSync(new URL('../backend/src/services/openaiService.js', import.meta.url), 'utf8');
 const a0 = s.indexOf('function _wertVergleich('), a1 = s.indexOf('/* v2264 · Die Offerte liegt nie');
 if (a0 < 0 || a1 < a0) { console.log('ROT: Funktionen nicht gefunden'); process.exit(1); }
@@ -39,5 +40,26 @@ ok(s.includes('BEGRIFFE WERT (verbindlich)'), 'Begriffsregel im Prompt');
 ok(s.includes('_wertBegriffePruefen(_wertVergleichPruefen('), 'Begriffsprüfung hängt in der Antwortkette');
 ok(!s.includes("'- Marktwert laut Karte: '") && !s.includes('Marktwert (Indikation)'), 'keine Marktwert-Etiketten für Indikationen im Prompt');
 ok('Marktwert 860.000 €' !== bg('Marktwert 860.000 €', PW), 'Gegenprobe Begriffe');
+/* v4940 · vorläufiger Ertragswert vor boG ist maßgebend (Hauptstr. 51, Bericht 618: 1.265.000 €), echtes wert-zielbild.js im vm */
+const wzSrc = fs.readFileSync(new URL('../frontend/js/wert-zielbild.js', import.meta.url), 'utf8');
+const wzLade = (src) => { const w = { addEventListener(){}, document: { addEventListener(){}, querySelector(){return null}, querySelectorAll(){return []}, getElementById(){return null} }, localStorage: { getItem(){return null}, setItem(){} } };
+  w.window = w; const c = vm.createContext(Object.assign(w, { console, setTimeout, clearTimeout, Promise, JSON, Math, Date })); vm.runInContext(src, c); return c.DpWertZielbild; };
+const WZ = wzLade(wzSrc);
+const bh = (b) => ({ fuehrend: 'ertragswert', ertragswert_eur: 1265000, ertragswert_bezeichnung: b, market_value: 955000, lzs_pct: 3.5 });
+const vb = WZ._wertDaten(bh('vorläufiger Ertragswert vor besonderen objektspezifischen Grundstücksmerkmalen')).ertragswert;
+ok(vb.vor_bog === true && vb.vorlaeufig === false, 'Hauptstr. 51: Ertragswert vor boG gilt als maßgebend (nicht vorläufig), mit vor_bog');
+ok(WZ._wertDaten(bh('vorläufiger Ertragswert vor besonderen objektspezifischen Grundstücksmerkmalen')).verfahren.some((v) => v.name === 'Ertragswert (vor besonderen objektspezifischen Grundstücksmerkmalen)'), 'Beschriftung mit Zusatz');
+const nb = WZ._wertDaten(bh('Ertragswert')).ertragswert;
+ok(nb.vor_bog === false && nb.vorlaeufig === false, 'Westerfeldstr. 146: Ertragswert nach boG bzw. ohne boG unverändert maßgebend');
+const swv = WZ._wertDaten({ fuehrend: 'sachwert', sachwert_eur: 300000, sachwert_vorlaeufig: true, market_value: 280000 }).sachwert;
+ok(swv.vorlaeufig === true, 'vorläufiger Sachwert ohne Sachwertfaktor bleibt vorläufig (nie Anker)');
+const cS = fs.readFileSync(new URL('../frontend/js/calc.js', import.meta.url), 'utf8');
+ok(cS.includes('if (_fv && _fv.wert > 0 && !_fv.vorlaeufig) _mbAnker = { wert: Math.max(0, _fv.wert - _erbAbzug), art: _wzW.fuehrend, vor_bog: !!_fv.vor_bog,'),'calc.js nimmt nicht vorläufige Verfahren als Anker und trägt vor_bog');
+/* Gegenprobe: alte Regel (jedes „vorläufig“ im Namen) macht den Hauptstr.-51-Wert wieder vorläufig */
+const NEU = "vorlaeufig: /vorläufig/.test(String(h.ertragswert_bezeichnung || '')) && !/vor besonderen/.test(String(h.ertragswert_bezeichnung || ''))";
+ok(wzSrc.includes(NEU), 'wert-zielbild.js trägt die neue Regel');
+const alt = wzLade(wzSrc.split(NEU).join("vorlaeufig: /vorläufig/.test(String(h.ertragswert_bezeichnung || ''))"));
+ok(alt._wertDaten(bh('vorläufiger Ertragswert vor besonderen objektspezifischen Grundstücksmerkmalen')).ertragswert.vorlaeufig === true, 'Gegenprobe: alte Regel wäre vorläufig (rot ohne v4940)');
+ok(s.includes('vorläufiger Ertragswert vor besonderen objektspezifischen Grundstücksmerkmalen" ist der Ertragswert'), 'KI-Begriffsregel zum vorläufigen Ertragswert');
 console.log(rot ? 'ROT: ' + rot + ' von ' + n : 'SAUBER · ' + n + ' Prüfpunkte grün');
 process.exit(rot ? 1 : 0);
