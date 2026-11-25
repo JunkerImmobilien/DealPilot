@@ -56,13 +56,28 @@ def lies(p):
             if len(t) == 2 and t[1].strip().lstrip('-').isdigit(): d[t[0]] = int(t[1])
     except Exception: pass
     return d
+import re
+def neu_seit(datei):
+    # Tabellen, die eine NACH der Sicherung eingespielte Migration anlegt, fehlen in der Sicherung zu Recht.
+    if not datei or not os.path.exists(datei): return set()
+    seit = datetime.datetime.fromtimestamp(os.path.getmtime(datei), datetime.timezone.utc).strftime('%Y-%m-%d %H:%M:%S+00')
+    r = subprocess.run(['docker', 'exec', 'dealpilot-postgres', 'psql', '-U', 'dealpilot', '-d', 'dealpilot_db', '-tAc',
+                        "SELECT filename FROM schema_migrations WHERE applied_at > '%s'" % seit], capture_output=True, text=True)
+    namen = set()
+    for f in r.stdout.split():
+        try: sql = open('/opt/dealpilot/backend/migrations/' + os.path.basename(f)).read()
+        except Exception: continue
+        for m in re.finditer(r'CREATE TABLE (?:IF NOT EXISTS )?([a-z_][a-z0-9_.]*)', sql, re.I):
+            n = m.group(1).lower(); namen.add(n if '.' in n else 'public.' + n)
+    return namen
 def teil(name, datei, ok):
     pr, li = lies('/tmp/%s-probe.txt' % name), lies('/tmp/%s-live.txt' % name)
     fehler = ''
     try: fehler = open('/tmp/%s-restore.err' % name).read()
     except Exception: pass
-    fehlende = sorted([t for t in li if t not in pr])
-    leer = sorted([t for t in li if li[t] > 0 and pr.get(t, 0) == 0])
+    neu = neu_seit(datei) if name == 'haupt' else set()
+    fehlende = sorted([t for t in li if t not in pr and t not in neu])
+    leer = sorted([t for t in li if li[t] > 0 and pr.get(t, 0) == 0 and t not in neu])
     zl, zp = sum(li.values()), sum(pr.values())
     # Die Sicherung ist von 03:00, die Live-DB von jetzt: kleine Abweichungen sind normal.
     abw = round(abs(zl - zp) * 100.0 / zl, 2) if zl else None
@@ -73,6 +88,7 @@ def teil(name, datei, ok):
             'groesse': os.path.getsize(datei) if datei and os.path.exists(datei) else None,
             'tabellen_probe': len(pr), 'tabellen_live': len(li), 'zeilen_probe': zp, 'zeilen_live': zl,
             'abweichung_pct': abw, 'fehlende_tabellen': fehlende[:20], 'leer_statt_gefuellt': leer[:20],
+            'neu_seit_sicherung': sorted([t for t in neu if t in li])[:20],
             'restore_meldungen': len([z for z in fehler.splitlines() if 'error' in z.lower()]),
             'restore_s': dauer, 'bestanden': bool(bestanden)}
 erg = {'version': 'v4880', 'server': server, 'zeit': datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None).isoformat() + 'Z',
