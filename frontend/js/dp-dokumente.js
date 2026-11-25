@@ -1129,12 +1129,11 @@
     var dl = darlehen();
     var dlT = dl.length ? '<table class="dicht"><thead><tr><th>Darlehen</th><th class="r">Betrag</th><th class="r">Zins</th><th class="r">Tilgung</th><th class="r">Bindung</th><th class="r">Rate / Monat</th></tr></thead><tbody>'
       + dl.map(function (d) { return '<tr><td>' + B.esc(d.name) + '</td><td class="r num">' + B.eur(d.betrag) + '</td><td class="r num">' + B.pct(d.zins, 2) + '</td><td class="r num">' + B.pct(d.tilg, 2) + '</td><td class="r num">' + (d.bind ? B.zahl(d.bind, 0) + ' J.' : '–') + '</td><td class="r num">' + B.eur(d.rate, 0) + '</td></tr>'; }).join('') + '</tbody></table>' : '';
-    add('Finanzierung und Anschluss', 'Darlehen, Rate und Cashflow je Phase, DSCR und LTV im Verlauf', dlT + dreiPhasen(K, B) + bankCockpit(B, true), 1);
+    add('Finanzierung und Anschluss', 'Darlehen, Rate und Cashflow je Phase' + (bankF ? '' : ', DSCR und LTV im Verlauf'), dlT + dreiPhasen(K, B) + (bankF ? '' : bankCockpit(B, true)), 1);
     if (bankF) {
       var bc = bankCockpit(B, false), sm = stressMatrix(B), d1 = zahlAus('d1') || K.d_total || 0;
-      add('Kapitaldienst und Belastungsprobe', 'DSCR und LTV im Verlauf, Zins- und Mietstress', (bc || '') + (sm || ''), 1);
-      add('Sicherheiten', 'Objektwert, Darlehen, Beleihung', B.liste([['Objektwert, maßgebend', mw ? B.eur(mw.wert) : '–', { det: mw ? mw.det : 'kein Marktbericht, Kaufpreis als Bezug' }], ['Kaufpreis', B.eur(K.kp)], ['Darlehen', B.eur(d1)],
-        ['Beleihung auf den Objektwert', mw && mw.wert > 0 && d1 ? B.pct(d1 / mw.wert * 100, 1) : '–'], ['Beleihung laut Kalkulation', B.pct(K.ltv, 1), { det: S0.ltv_basis_label ? 'auf ' + S0.ltv_basis_label : '', art: 'ende' }]]), 1);
+      add('Sicherheiten, Kapitaldienst und Belastungsprobe', 'Objektwert und Beleihung, DSCR und LTV im Verlauf, Zins- und Mietstress', '<h3>Sicherheiten</h3>' + B.liste([['Objektwert, maßgebend', mw ? B.eur(mw.wert) : '–', { det: mw ? mw.det : 'kein Marktbericht, Kaufpreis als Bezug' }], ['Kaufpreis', B.eur(K.kp)], ['Darlehen', B.eur(d1)],
+        ['Beleihung auf den Objektwert', mw && mw.wert > 0 && d1 ? B.pct(d1 / mw.wert * 100, 1) : '–'], ['Beleihung laut Kalkulation', B.pct(K.ltv, 1), { det: S0.ltv_basis_label ? 'auf ' + S0.ltv_basis_label : '', art: 'ende' }]]) + (bc || '') + (sm || ''), 1);
     }
 
     /* 5 · Wert und Rechenweg */
