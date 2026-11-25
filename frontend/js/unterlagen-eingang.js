@@ -509,7 +509,7 @@
         if (M && typeof M.oeffnen === 'function') { M.oeffnen(1); return; }
         p = ['feld', 'mfh-oeffnen', 's0'];
       }
-      if (p[0] === 'weg') { var w = document.querySelector('.dp-hv-prots') || document.querySelector('.dp-hv-abs'); if (w) { markieren(w); return; } if (window.toast) window.toast('Die Protokolle stehen im Reiter Haus & Unterlagen.'); return; }
+      if (p[0] === 'weg') { wegZiel(); return; }
       if (p[0] === 'lab') {   /* Feld über seine Beschriftung finden, Reiter wechseln, markieren */
         var lab = p.slice(1).join(':').toLowerCase(), treffer = null;
         [].some.call(document.querySelectorAll('.sec label, .sec h4'), function (L) { var tx = (L.textContent || '').trim().toLowerCase(); if (tx.indexOf(lab) === 0) { treffer = L; return true; } return false; });
@@ -523,6 +523,26 @@
         setTimeout(function () { var e = el(p[1]); if (!e) { if (window.toast) window.toast('Das Feld gibt es in diesem Stand nicht.'); return; } markieren(e); }, 300);
       }
     } catch (e) {}
+  }
+  /* v4740 · Sprung „WEG und Protokolle“: zuerst der Unterreiter Haus & Unterlagen der Pilot-Analyse bzw. des Cockpits
+     (dort stehen „Protokolle im Einzelnen“), dann die sichtbare Protokoll-Liste. Bis v4739 nahm der Sprung den ersten
+     Treffer im ganzen Dokument oder fiel auf einen Hinweis zurück - Marcel landete in der Bewirtschaftung. */
+  function wegZiel() {
+    function sichtbar(sel) { return [].filter.call(document.querySelectorAll(sel), function (x) { return x.offsetParent !== null; })[0] || null; }
+    function protZiel() {
+      var p = sichtbar('.dp-hv-prots');
+      if (p) { var k = p.previousElementSibling; return (k && /dp-hv-abs/.test(k.className)) ? k : p; }
+      return null;
+    }
+    var z = protZiel();
+    if (z) { markieren(z); return; }
+    var knopf = [].filter.call(document.querySelectorAll('button,[role=tab],a'), function (b) { return /^\s*Haus\s*&\s*Unterlagen\s*$/.test(b.textContent || '') && b.offsetParent !== null; })[0];
+    if (knopf) { try { knopf.click(); } catch (e) {} }
+    setTimeout(function () {
+      var z2 = protZiel();
+      if (z2) { markieren(z2); return; }
+      if (window.toast) window.toast('Zu diesem Objekt liegt noch keine Auswertung der Protokolle vor. Protokolle einlesen, dann stehen sie unter Haus & Unterlagen.');
+    }, 450);
   }
   function markieren(e) {
     if (e.offsetParent === null && getComputedStyle(e).position !== 'fixed') { if (window.toast) window.toast('Die Stelle ist in dieser Ansicht ausgeblendet. Im Reiter auf Detail stellen, dann ist sie sichtbar.'); return; }
