@@ -699,6 +699,17 @@
   }
   /* Der Marktbericht (DpWertZielbild) lädt oft erst nach dem Zeichnen - dann die Kacheln neu */
   function kzNeu() {
+    /* v4800 · der Score im Urteil rechts wird beim ersten Zeichnen oft mit halb geladenem Stand gerechnet
+       (gemessen Westerfeldstr. 146: 68 / Finanzierung 81 statt 69 / 84). Mit den Kacheln neu setzen. */
+    try {
+      var sc = sichtbarerScore();
+      Array.prototype.forEach.call(document.querySelectorAll('.dp-pa4-urteil'), function (u) {
+        if (!sc) return; var z = u.querySelector('.z'), x = u.querySelector('.u'); if (!z || !x) return;
+        var stufe = window.ScoreTier && window.ScoreTier.stufe ? window.ScoreTier.stufe(sc.wert).wort : '';
+        z.textContent = sc.wert;
+        x.innerHTML = (stufe ? '<b>' + esc(stufe) + '</b>' : '') + esc(sc.name) + (sc.name === 'Investor Deal Score' && teileText() ? '<i class="dp-pa4-teile" style="display:block;font-style:normal;font-size:11px;opacity:.8;margin-top:2px">' + esc(teileText()) + '</i>' : '');
+      });
+    } catch (e0) {}
     Array.prototype.forEach.call(document.querySelectorAll('[data-dp-pa4-kz]'), function (h) {
       try { var a = h.getAttribute('data-dp-pa4-kz') || '', t = document.createElement('div'); t.innerHTML = kennzahlen(a.charAt(0) === 'b', a.indexOf('4') > 0); if (t.firstChild) h.parentNode.replaceChild(t.firstChild, h); } catch (e) {}
     });
