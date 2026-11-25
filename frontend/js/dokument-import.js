@@ -578,6 +578,9 @@
     return { str: g('str'), hnr: g('hnr'), plz: g('plz'), ort: g('ort') };
   }
   function adresseAbweichung(ext) {
+    /* v4930 · gemeinsamer, normalisierter Vergleich (Str./Straße, Umlaute, Hausnummernbereiche) */
+    if (window.DpAdressPruefung) { var AP = window.DpAdressPruefung, da = AP.ausAuslese(ext), oa = AP.objekt(); if (!da || !oa) return null;
+      var r = AP.pruefen(da, oa); return r.urteil === 'anders' ? { dok: r.dokText, obj: r.objText, meldung: AP.meldung(r) } : null; }
     var d = _adresseDok(ext); if (!d) return null;
     var o = _adresseObjekt(); if (!o.str) return null;
     var n = function (x) { return String(x || '').toLowerCase().replace(/stra(ss|ß)e/g, 'str').replace(/str\./g, 'str').replace(/[^a-z0-9äöüß]/g, ''); };
@@ -634,13 +637,11 @@
     });
 
     var html = '';
-    var _adr = adresseAbweichung(ext), _adrOffen = !!(_adr && !_adrBestaetigt[_adr.dok]);
+    var _adr = adresseAbweichung(ext), _adrOffen = !!_adr;   /* v4930 · Marcel 25.11.: fremde Adresse wird abgelehnt, kein „trotzdem“ */
     if (_adrOffen) {
       html += '<div class="dpdi-warn" id="dpdi-adr" style="border-color:#B8625C"><strong>\u26A0 Andere Adresse als im Objekt</strong><br>'
         + 'Im Objekt: <b>' + _esc(_adr.obj) + '</b><br>Im Dokument: <b>' + _esc(_adr.dok) + '</b><br>'
-        + 'Gehört das Dokument zu diesem Objekt? Bis du antwortest, ist nichts angehakt.'
-        + '<div style="margin-top:8px"><button type="button" class="dpdi-btn dpdi-btn-sec" id="dpdi-adr-nein">Nein, abbrechen</button> '
-        + '<button type="button" class="dpdi-btn" id="dpdi-adr-ja">Ja, trotzdem übernehmen</button></div></div>';
+        + _esc(_adr.meldung || 'Diese Unterlage gehört nicht zu diesem Objekt. Nicht übernommen.') + ' Lies sie im passenden Objekt ein.</div>';
     }
 
     if (!a.rechenbar && (a.fehlende_pflichtfelder || []).length) {
@@ -718,7 +719,6 @@
       Array.prototype.forEach.call(res.querySelectorAll('#dpdi-abgleich input[type="checkbox"]'), function (cb) { cb.checked = false; });
       if (ub) ub.disabled = true;
       var _aj = document.getElementById('dpdi-adr-ja'), _an = document.getElementById('dpdi-adr-nein');
-      if (_aj) _aj.addEventListener('click', function () { _adrBestaetigt[_adr.dok] = 1; _zeigeErgebnis(a, file); });
       if (_an) _an.addEventListener('click', function () { res.innerHTML = ''; res.hidden = true; _status('Abgebrochen: das Dokument gehört nicht zu diesem Objekt. Nichts übernommen.', 'warn'); });
     }
     if (ub) ub.addEventListener('click', function () {
