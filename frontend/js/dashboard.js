@@ -614,6 +614,9 @@
   function _ekr4Hebel(o, r){
     if (!r || r.hebel || !window.DpEkRendite || !DpEkRendite.hebel) return r;
     try {
+      /* v4640 · gespeicherte Eingaben aus calc.js zuerst (echter Gesamtinvest mit Nebenkosten), sonst aus den Darlehensfeldern */
+      var hs = o._hebel_in || (o._ekr4 && o._ekr4.hebel_in) || null;
+      if (hs && hs.gi > 0 && hs.darlehen > 0 && hs.zins_j != null) { var c0 = {}, k0; for (k0 in r) c0[k0] = r[k0]; c0.hebel_in = hs; c0.hebel = DpEkRendite.hebel(c0, hs); return c0; }
       var dw = _dwO(o), d0 = num(o.d1) + num(o.d2) + (dw.betrag || 0);
       var zj = num(o.d1) * _pct(o.d1z) / 100 + num(o.d2) * _pct(o.d2z) / 100 + (num(dw.zm) * 12 || 0);
       var hin = { gi: num(o.ek) + d0, zins_j: zj, darlehen: d0, zins_anschluss: _pct(o.anschl_z) > 0 ? _pct(o.anschl_z) : null };
