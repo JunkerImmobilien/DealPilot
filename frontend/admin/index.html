@@ -70,6 +70,7 @@
         <a href="#" data-view="register" class="nav-link">Register &amp; Ernte</a>
         <span class="nav-grp">System</span>
         <a href="#" data-view="vorschau" class="nav-link">Vorschau</a><!-- v3600 · was in der App noch ausgeblendet ist -->
+        <a href="#" data-view="betrieb" class="nav-link">Betrieb</a><!-- v4880 · Server, Sicherheit, Sicherungen -->
       </nav>
     </div>
     <div class="topbar-right">
@@ -399,6 +400,12 @@
     </section>
     <!-- WADM-7 -->
     <!-- v3600 · Vorschau-Funktionen: gebaut, aber noch nicht für Kunden freigegeben (admin-vorschau.js) -->
+    <!-- v4880 · Betrieb: Zustand der Server, Sicherheit, Sicherungen, Wiederherstellungsprobe (admin-betrieb.js) -->
+    <section id="view-betrieb" class="view" style="display:none;">
+      <h2 style="margin:0 0 12px">Betrieb</h2>
+      <div id="betrieb-inhalt"></div>
+    </section>
+
     <section id="view-vorschau" class="view" style="display:none;">
       <div class="view-header"><h2>Vorschau – derzeit ausgeblendet</h2></div>
       <div id="vs-body"><p style="color:#7a7468">…</p></div>
@@ -558,6 +565,7 @@
   <script src="js/admin-register.js?v=v3000"></script>
   <script src="js/admin-anfragen.js?v=v3020"></script>
   <script src="js/admin-jahreswerte.js?v=v3021"></script>
+  <script src="js/admin-betrieb.js?v=v4880"></script>
   <script src="js/admin-security.js?v=v1369c"></script>
 </body>
 </html>
