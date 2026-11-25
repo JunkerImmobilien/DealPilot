@@ -96,6 +96,7 @@ export async function tiefeVorab({ plz, ort, objektart, wfl = null, baujahr = nu
       text: (l.lage === 'amtlich' || l.lage === 'vorhanden') ? 'Mit amtlichem Vergleichsfaktor aus Kaufpreisen.'
         : nrwEtw ? 'Über den Immobilienrichtwert, wenn er für die Anschrift veröffentlicht ist. Sonst aus Angebotspreisen, indikativ.'
         : l.lage === 'gesperrt' ? 'Der Vergleichsfaktor ist ' + l.grund + '. Ohne ihn nur aus Angebotspreisen, indikativ und kein Verfahren nach ImmoWertV.'
+        : (a.haus || a.mfh || a.objart === 'GEW') ? 'Kein amtlicher Vergleichsfaktor für diesen Ort.'
         : 'Kein amtlicher Vergleichsfaktor für diesen Ort. Bei Wohnungen deshalb nur aus Angebotspreisen, indikativ und kein Verfahren nach ImmoWertV.' });
   }
 
