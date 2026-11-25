@@ -9856,3 +9856,8 @@ html[data-dk-drei][data-dk-stil="runway"] .dk-schalter.dk-drei{ padding:6px 4px 
 html[data-dk-drei][data-dk-stil="runway"] .dk-schalter.dk-drei .dk-seg{ min-height:56px !important; padding:4px 2px !important; }
 html[data-dk-drei][data-dk-stil="runway"] .dk-schalter.dk-drei::after{ bottom:5px; }
 html[data-dk-drei][data-dk-stil="runway"] .dk-schalter.dk-drei .dk-seg.aktiv::after{ bottom:-9px; }
+/* v4650d · Handy: die v4600-Regel gab dem Schalter einen hellen Rand (gemessen rgb(230,225,214)); in den neuen Stilen leise, bei Reiter ohne */
+@media (max-width: 900px){
+  html[data-dk-drei][data-dk-stil][data-dp-layout] body aside#sidebar.sidebar .dk-schalter.dk-drei{ border-color:rgba(233,227,214,.16) !important; }
+  html[data-dk-drei][data-dk-stil="reiter"][data-dp-layout] body aside#sidebar.sidebar .dk-schalter.dk-drei{ border:0 !important; background:transparent !important; }
+}
