@@ -615,13 +615,13 @@ if (!window._wlc) {
     var ltvQuoteText;
     // v2240: ≤60 sehr sicher, ≤ max_ltv solide, ≤100 erhöht, >100 kritisch (max_ltv aus den Einstellungen)
     if (ltvToday > _s.ltvRot) {
-      ltvQuoteText = '<strong>Übersichert (' + _fmtPct(ltvToday, 0) + '):</strong> Restschuld höher als Wert, kritisch. Sinkt durch Tilgung &amp; Wertsteigerung in ' + bindj + ' Jahren auf ' + _fmtPct(ltvEzb, 0) + '.';
+      ltvQuoteText = '<strong>Übersichert (' + _fmtPct(ltvToday, 1) + '):</strong> Restschuld höher als Wert, kritisch. Sinkt durch Tilgung &amp; Wertsteigerung in ' + bindj + ' Jahren auf ' + _fmtPct(ltvEzb, 1) + '.';
     } else if (ltvToday > _s.ltvGruen) {
-      ltvQuoteText = '<strong>Erhöhter Start-LTV (' + _fmtPct(ltvToday, 0) + '):</strong> Über ' + _lG + '% Beleihung, Zinsaufschläge wahrscheinlich. Sinkt in ' + bindj + ' Jahren auf ' + _fmtPct(ltvEzb, 0) + '.';
+      ltvQuoteText = '<strong>Erhöhter Start-LTV (' + _fmtPct(ltvToday, 1) + '):</strong> Über ' + _lG + '% Beleihung, Zinsaufschläge wahrscheinlich. Sinkt in ' + bindj + ' Jahren auf ' + _fmtPct(ltvEzb, 1) + '.';
     } else if (ltvToday > Math.min(60, _s.ltvGruen)) {
-      ltvQuoteText = '<strong>Solider Start-LTV (' + _fmtPct(ltvToday, 0) + '):</strong> Klassische Bank-Finanzierung, verhandelbare Konditionen.';
+      ltvQuoteText = '<strong>Solider Start-LTV (' + _fmtPct(ltvToday, 1) + '):</strong> Klassische Bank-Finanzierung, verhandelbare Konditionen.';
     } else {
-      ltvQuoteText = '<strong>Sehr sicher (' + _fmtPct(ltvToday, 0) + '):</strong> Hoher EK-Anteil, beste Konditionen, niedriges Risiko.';
+      ltvQuoteText = '<strong>Sehr sicher (' + _fmtPct(ltvToday, 1) + '):</strong> Hoher EK-Anteil, beste Konditionen, niedriges Risiko.';
     }
     var ltvQuoteCls = ltvToday > _s.ltvGruen ? 'bc-bank-tag-warn' : '';
 
@@ -677,12 +677,12 @@ if (!window._wlc) {
           '<div class="bc-side">' +
             '<div class="bc-kpi-label">LTV · Beleihungsauslauf</div>' +
             '<div class="bc-kpi-headline">' +
-              '<span class="bc-kpi-headline-num ' + (ltvCls === 'good' ? 'green' : ltvCls === 'ok' ? 'green' : ltvCls === 'warn' ? 'gold' : 'red') + '">' + _fmtPct(ltvToday, 0) + '</span>' +
+              '<span class="bc-kpi-headline-num ' + (ltvCls === 'good' ? 'green' : ltvCls === 'ok' ? 'green' : ltvCls === 'warn' ? 'gold' : 'red') + '">' + _fmtPct(ltvToday, 1) + '</span>' +
               '<span class="bc-kpi-status bc-kpi-status-' + (ltvCls === 'ok' ? 'good' : ltvCls === 'warn' ? 'warn' : ltvCls === 'bad' ? 'bad' : 'good') + '">' + ltvLab + '</span>' +
             '</div>' +
             '<div class="bc-kpi-track">' +
               '<div class="bc-kpi-track-bar bc-kpi-track-bar-ltv"></div>' +
-              '<div class="bc-kpi-track-marker" data-val="' + _fmtPct(ltvToday, 0) + '" style="left: ' + ltvTrackPct.toFixed(1) + '%;"></div>' +
+              '<div class="bc-kpi-track-marker" data-val="' + _fmtPct(ltvToday, 1) + '" style="left: ' + ltvTrackPct.toFixed(1) + '%;"></div>' +
               '<div class="bc-kpi-track-scale"><span>0%</span><span>60%</span><span>' + _lG + '%</span><span>100%+</span></div>' +
             '</div>' +
             '<div class="bc-kpi-trend">' +
@@ -699,9 +699,9 @@ if (!window._wlc) {
                 thresholdLine2: { value: 60, color: window._wlc('#C9A84C'), label: 'LTV 60%' }
               }) +
               '<div class="bc-kpi-trend-bench">' +
-                '<div class="bc-kpi-trend-bench-cell"><span class="bc-kpi-trend-bench-label">Heute</span><span class="bc-kpi-trend-bench-val ' + (ltvToday > 100 ? 'red' : '') + '">' + _fmtPct(ltvToday, 0) + '</span></div>' +
-                '<div class="bc-kpi-trend-bench-cell"><span class="bc-kpi-trend-bench-label">Ende EZB</span><span class="bc-kpi-trend-bench-val">' + _fmtPct(ltvEzb, 0) + '</span></div>' +
-                '<div class="bc-kpi-trend-bench-cell"><span class="bc-kpi-trend-bench-label">Anschluss</span><span class="bc-kpi-trend-bench-val end">' + _fmtPct(ltvEnd, 0) + '</span></div>' +
+                '<div class="bc-kpi-trend-bench-cell"><span class="bc-kpi-trend-bench-label">Heute</span><span class="bc-kpi-trend-bench-val ' + (ltvToday > 100 ? 'red' : '') + '">' + _fmtPct(ltvToday, 1) + '</span></div>' +
+                '<div class="bc-kpi-trend-bench-cell"><span class="bc-kpi-trend-bench-label">Ende EZB</span><span class="bc-kpi-trend-bench-val">' + _fmtPct(ltvEzb, 1) + '</span></div>' +
+                '<div class="bc-kpi-trend-bench-cell"><span class="bc-kpi-trend-bench-label">Anschluss</span><span class="bc-kpi-trend-bench-val end">' + _fmtPct(ltvEnd, 1) + '</span></div>' +
               '</div>' +
             '</div>' +
             '<div class="bc-bank-tag ' + ltvQuoteCls + '">' +

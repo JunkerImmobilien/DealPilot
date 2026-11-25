@@ -18502,11 +18502,11 @@ html body .body {
   margin-bottom: 4px;
 }
 .bc-kpi-headline-num {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 44px;
+  font-family: 'Space Grotesk', Inter, sans-serif;
+  font-size: 40px;
   font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -0.02em;
+  font-variant-numeric: lining-nums tabular-nums;
+  letter-spacing: -0.01em;
   line-height: 1;
 }
 .bc-kpi-headline-num.green { color: #2D7B4F; }
@@ -42038,3 +42038,16 @@ html body #sb-actions-accordion .sb-act-item.sb-act-pilot { display: none !impor
   html body #sidebar .sb-act-item.sb-act-pilot,
   html body #sb-actions-accordion .sb-act-item.sb-act-pilot { display: flex !important; }
 }
+
+/* v4850 · Bank-Cockpit: Zahlen in der Zahlschrift der Kacheln (Space Grotesk, Versalziffern) statt Cormorant mit Mediävalziffern, Marcel 25.11.2026: „1,0378 sieht komisch aus“ */
+.bc-kpi-trend-bench-val, .bc-kpi-track-marker::after { font-family: "Space Grotesk", Inter, sans-serif; font-variant-numeric: lining-nums tabular-nums; }
+.bc-kpi-track-scale, .bc-kpi-trend-bench-label, .bc-kpi-trend-label, .bc-kpi-label { font-family: Inter, system-ui, sans-serif; font-variant-numeric: lining-nums tabular-nums; }
+
+/* v4850 · Kontrast kleiner Schrift (js/kontrast-text.js setzt die Klassen): feste Textvarianten der Statusfarben,
+   keine Whitelabel-Tokens. Hell: >= 4,85 : 1 auf Weiss, Creme, Karte, Hellgrau. Dunkel: >= 6,5 : 1 auf Obsidian/#2A2727. */
+.dp-kt-gruen { color: #27704A !important; }
+.dp-kt-rot   { color: #9E4943 !important; }
+.dp-kt-grau  { color: #6B655C !important; }
+.dp-kt-gruen-d { color: #6FCF97 !important; }
+.dp-kt-rot-d   { color: #EE9A93 !important; }
+.dp-kt-grau-d  { color: #B3ACA2 !important; }
