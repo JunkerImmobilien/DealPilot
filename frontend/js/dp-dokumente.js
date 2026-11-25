@@ -1094,7 +1094,7 @@
     var kat = ds2 && (ds2.categories || ds2.kategorien), teil = [];
     if (kat && typeof kat === 'object') teil = (Array.isArray(kat) ? kat : Object.keys(kat).map(function (k) { var x = kat[k] || {}; return { name: x.label || x.name || k, score: x.score }; }))
       .map(function (x) { var n = String(x.name || x.label || ''); return { l: GN[n] || n, v: da(x.score) === null ? '–' : B.zahl(x.score, 0), s: 'von 100' }; });
-    var scoreBlock = IG ? '<div class="zwei"><div>' + B.scoreRing(IG.score, (IG.empfehlung && IG.empfehlung.text) || IG.stufe) + '<p class="det">Investor Deal Score: das Objekt aus Sicht des Investmentprofils, in zwei Scores. Rendite mit der EK-Rendite nach Steuer.</p></div><div>'
+    var scoreBlock = IG ? '<div class="zwei"><div>' + B.scoreRing(IG.score, (IG.empfehlung && IG.empfehlung.text) || IG.stufe, 'Investor Deal Score von 100') + '<p class="det">Investor Deal Score: das Objekt aus Sicht des Investmentprofils, in zwei Scores. Rendite mit der EK-Rendite nach Steuer.</p></div><div>'
       + B.kacheln([{ l: 'Investment-Score', v: B.zahl(II.score, 0) + ' / 100', s: (II.stufe || '') + (II.anteil != null ? ' · Anteil ' + B.pct(II.anteil, 1) : '') },
         { l: 'Finanzierungs-Score', v: B.zahl(IF.score, 0) + ' / 100', s: (IF.stufe || '') + (IF.gedeckelt && IF.deckel ? ' · gedeckelt: ' + IF.deckel : '') }]).replace('class="kz"', 'class="kz" style="grid-template-columns:1fr 1fr"')
       + '</div></div>' + (teil.length ? '<h3>Gruppen des Investor Deal Score</h3>' + B.kacheln(teil, true) : '') : B.scoreRing(SC.score, SC.label);
@@ -1129,17 +1129,16 @@
     var dl = darlehen();
     var dlT = dl.length ? '<table class="dicht"><thead><tr><th>Darlehen</th><th class="r">Betrag</th><th class="r">Zins</th><th class="r">Tilgung</th><th class="r">Bindung</th><th class="r">Rate / Monat</th></tr></thead><tbody>'
       + dl.map(function (d) { return '<tr><td>' + B.esc(d.name) + '</td><td class="r num">' + B.eur(d.betrag) + '</td><td class="r num">' + B.pct(d.zins, 2) + '</td><td class="r num">' + B.pct(d.tilg, 2) + '</td><td class="r num">' + (d.bind ? B.zahl(d.bind, 0) + ' J.' : '–') + '</td><td class="r num">' + B.eur(d.rate, 0) + '</td></tr>'; }).join('') + '</tbody></table>' : '';
-    add('Finanzierung und Anschluss', 'Darlehen, Rate und Cashflow je Phase' + (bankF ? '' : ', DSCR und LTV im Verlauf'), dlT + dreiPhasen(K, B) + (bankF ? '' : bankCockpit(B, true)), 1);
+    add('Finanzierung und Anschluss', 'Darlehen, Rate und Cashflow je Phase, DSCR und LTV im Verlauf', dlT + dreiPhasen(K, B) + bankCockpit(B, true), 1);
     if (bankF) {
       var bc = bankCockpit(B, false), sm = stressMatrix(B), d1 = zahlAus('d1') || K.d_total || 0;
-      add('Sicherheiten, Kapitaldienst und Belastungsprobe', 'Objektwert und Beleihung, DSCR und LTV im Verlauf, Zins- und Mietstress', '<h3>Sicherheiten</h3>' + B.liste([['Objektwert, maßgebend', mw ? B.eur(mw.wert) : '–', { det: mw ? mw.det : 'kein Marktbericht, Kaufpreis als Bezug' }], ['Kaufpreis', B.eur(K.kp)], ['Darlehen', B.eur(d1)],
-        ['Beleihung auf den Objektwert', mw && mw.wert > 0 && d1 ? B.pct(d1 / mw.wert * 100, 1) : '–'], ['Beleihung laut Kalkulation', B.pct(K.ltv, 1), { det: S0.ltv_basis_label ? 'auf ' + S0.ltv_basis_label : '', art: 'ende' }]]) + (bc || '') + (sm || ''), 1);
+      add('Sicherheiten und Belastungsprobe', 'Objektwert und Beleihung, DSCR je Zins- und Mietszenario', '<h3>Sicherheiten</h3>' + B.liste([['Objektwert, maßgebend', mw ? B.eur(mw.wert) : '–', { det: mw ? mw.det : 'kein Marktbericht, Kaufpreis als Bezug' }], ['Kaufpreis', B.eur(K.kp)], ['Darlehen', B.eur(d1)],
+        ['Beleihung auf den Objektwert', mw && mw.wert > 0 && d1 ? B.pct(d1 / mw.wert * 100, 1) : '–'], ['Beleihung laut Kalkulation', B.pct(K.ltv, 1), { det: S0.ltv_basis_label ? 'auf ' + S0.ltv_basis_label : '', art: 'ende' }]]) + (sm || ''), 1);
     }
 
     /* 5 · Wert und Rechenweg */
     _knapp = true;
-    try { add('Wert und Verfahren', 'Werte je Verfahren, führend und stützend, Wert je Stufe', wertZielbild(K, B, WZo, PD, true, bankF), 1); } finally { _knapp = false; }
-    add('Rechenweg', kombi ? 'Bodenwert, Ertrags- und Sachwert mit Erläuterung je Zeile' : 'Bodenwert, Ertrags- und Sachwert Zeile für Zeile', rechenweg(B, P3, !kombi), 1);
+    try { var rw = rechenweg(B, P3, !kombi); add('Wert, Verfahren und Rechenweg', 'Werte je Verfahren, Wert je Stufe, Ertrags- und Sachwert Zeile für Zeile', wertZielbild(K, B, WZo, PD, true, bankF) + (rw ? '<h3 style="margin-top:5mm">Rechenweg</h3>' + rw : ''), 1); } finally { _knapp = false; }
 
     /* 6 · Rendite und Steuer (nicht in der Bankfassung) */
     if (!bankF) add('EK-Rendite und Hebel', 'Vier Stufen, Hebel in beide Richtungen', ekRenditeSeite(B, K), 1);
@@ -1149,13 +1148,13 @@
     if (kombi) {
       _knapp = true;
       try {
-        add('Investition und Finanzierung im Detail', 'Investition, Darlehen, Phasen im Einzelnen', finanzierungVoll(K, B, false) + '<h3>Phasen im Einzelnen</h3>' + phasenVoll(K, B), 2);
-        add('Ertrag und Kennzahlen', 'Von der Warmmiete zum Cashflow, Bewirtschaftung, alle Kennzahlen', ertragKette(K, B) + bewirtschaftungDetail(K, B) + '<h3>Alle Kennzahlen</h3>' + kennzahlen12(K, B, SC), 2);
-        add('Cashflow je Jahr', (St().cfRows || []).length + ' Jahre als Tabelle', cfJahre(B), 2);
+        var smK = stressMatrix(B);
+        add('Investition, Finanzierung und Belastungsprobe', 'Investition, Darlehen, Phasen im Einzelnen, DSCR je Zins- und Mietszenario', finanzierungVoll(K, B, false) + '<h3>Phasen im Einzelnen</h3>' + phasenVoll(K, B) + (smK || ''), 2);
+        var kz12 = kennzahlen12(K, B, SC).replace(/<div class="hi"><div class="l">Deal Score<\/div><div class="v">[^<]*<\/div>(<div class="s">[^<]*<\/div>)?<\/div>/, '');
+        add('Ertrag, Kennzahlen und Cashflow je Jahr', 'Von der Warmmiete zum Cashflow, Bewirtschaftung, alle Kennzahlen, ' + (St().cfRows || []).length + ' Jahre als Tabelle', ertragKette(K, B) + bewirtschaftungDetail(K, B) + '<h3>Alle Kennzahlen</h3>' + kz12 + '<h3>Cashflow je Jahr</h3>' + cfJahre(B), 2);
         add('Projektion und Vermögen', 'Wert, Restschuld, Eigenkapital, Zuwachs, Exit', vermoegenVoll(K, B), 2);
-        var bc2 = bankCockpit(B, false), sm2 = stressMatrix(B);
-        add('Bank-Cockpit und Belastungsprobe', 'DSCR und LTV im Verlauf, Zins- und Mietstress', (bc2 || '') + (sm2 || ''), 2);
-        add('Wert und Zielbild im Detail', 'Wert je Wohnung, Wertüberleitung, Kennzahlen je Stufe', wertZielbild(K, B, WZo, PD, false, false), 2);
+        /* Wertüberleitung ohne erzwungenen Seitenumbruch, damit „Wert je Wohnung“ nicht allein auf einer Seite steht */
+        add('Wert und Zielbild im Detail', 'Wert je Wohnung, Wertüberleitung, Kennzahlen je Stufe', wertZielbild(K, B, WZo, PD, false, false).replace('<h3 style="break-before:page;page-break-before:always">Wertüberleitung', '<h3 style="break-inside:avoid;margin-top:6mm">Wertüberleitung'), 2);
       } finally { _knapp = false; }
     }
 
