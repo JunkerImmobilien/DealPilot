@@ -45712,3 +45712,9 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Nachweis:** Prod-Sicherung haupt-/mb-20261125-1105-v4880 (7,0 / 31 MB, Kopf gelesen); Migration 133 eingespielt, backend healthy, `version.json` 220; Messung + Audit geschrieben; Probe bestanden (109/43 Tabellen, 0,62 % / 0,0 % Zeilenabweichung, 53 s, keine Probe-Container übrig).
 - **Host:** crontab Prod +3, Staging +2 Zeilen (alte crontab gesichert unter /root/backups/crontab-vor-v4880-*), `.env` Prod `BETRIEB_MAIL=1` (gesichert env-vor-v4880-*).
 - **Rest:** eine irrtümliche Rot-Mail (erste Probe vor v4880b); Admin-Ansicht nicht im echten Browser angemeldet geprüft (Passwort/TOTP), nur DOM-Probe und Backend-Auswertung im Container; Staging ohne Nachtsicherung; Vorschläge in wissen/2026-11-25.md.
+
+### v4890 · Arbeitsbereich „Ansicht anpassen“ Runde 2 (nur Staging, 25.11.2026)
+- **Was:** DealPilot-Fensterstil wie modal-boarding-skin, Gruppensymbole, Kennzahlen mit echten Werten (GP_API.kzKachel), maßstäbliche Vorschau, heller Kopftext bei dunkler Partnerfarbe.
+- **Commit:** staging 41bb37af, ce72c485, 7b26839e (+ Bilder/Doku).
+- **Nachweis:** iframe-Messung 1440/1280/390 und Navy, Bilder runde2/.
+- **Rest:** Freigabe Marcel, dann pf-werkstatt.js + grafiken-portfolio.js (kzKachel) per Cherry-Pick auf main.
