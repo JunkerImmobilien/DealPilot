@@ -6317,7 +6317,11 @@
     deal.bruttorendite = K.bmy;
     deal.nettorendite  = K.nmy;
     deal.cashflowMonatlich = K.cf_m;
-    deal.cashOnCash = (Z.ek > 0 && K.cf_ns != null) ? (K.cf_ns / Z.ek) * 100
+    /* v4760: wie dealscore2-ui - EK-Rendite Stufe 2 aus DpEkRendite (nach Steuer, mit Tilgung) */
+    var _e2 = (Z.ek > 0 && window.DpEkRendite && K.cf_op != null && K.cf_ns != null)
+      ? DpEkRendite.rechne({ cf_op: K.cf_op, steuer: K.cf_op - K.cf_ns, tilg: K.tilg_j || 0, bspar: K.bspar_y || 0, ek: Z.ek }) : null;
+    deal.cashOnCash = (_e2 && _e2.k2 != null && isFinite(_e2.k2)) ? _e2.k2
+                    : (Z.ek > 0 && K.cf_ns != null) ? (K.cf_ns / Z.ek) * 100
                     : (K.cf_ns > 0 ? 999 : (K.cf_ns < 0 ? -50 : 0));
     deal.dscr = K.dscr;
     deal.ltv  = K.ltv;

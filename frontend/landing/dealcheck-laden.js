@@ -21,7 +21,8 @@
 (function () {
   var h = location.hostname, app = /(^|\.)staging\.dealpilot\.immo$/.test(h) ? 'https://app.staging.dealpilot.immo/' : 'https://app.dealpilot.immo/';
   var liste = ['js/dscr-engine.js?v=v4440', 'js/deal-kpis.js?v=v3215', 'js/score-tiers.js?v=v3254', 'js/dealscore.js?v=v3289', 'js/qc-score-weg.js?v=v4720', 'js/indicative-zins.js?v=v3256'];
-  if (document.getElementById('einlesen')) liste.push('js/dealscore2.js?v=v3254');
+  /* v4760 · Investor Deal Score rechnet mit EK-Rendite Stufe 2 (DpEkRendite), deshalb ek-rendite.js vorher */
+  if (document.getElementById('einlesen')) { liste.push('js/ek-rendite.js?v=v4620a'); liste.push('js/dealscore2.js?v=v4760'); }
   liste.push('dp2-dealcheck.js?v=einzelcheck-5');   /* landing-faecher-2 · zwei Wege, Miete kurz, Pakete */
   liste.forEach(function (s) { var e = document.createElement('script'); e.src = (s.indexOf('js/') === 0 ? app : '') + s; e.async = false; document.body.appendChild(e); });
 })();
