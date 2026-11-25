@@ -520,14 +520,16 @@
         + (x.beschreibung ? '<p>' + esc(x.beschreibung) + '</p>' : '')
         + '<div class="hv-f">' + (x.quelle ? '<small>Quelle: ' + esc(x.quelle) + '</small>' : '<small>aus der Gesamtauswertung</small>') + risSprunge(x) + '</div></div>';
     };
-    var einfach = r.filter(function (x) { return sw(x) !== 'niedrig'; });
-    if (!einfach.length) einfach = r.slice();
+    /* Einfach zeigt in „Alle“ höchstens fünf kritische/Handlungsbedarf-Punkte; die übrigen (und „beobachten“) erscheinen,
+       sobald ein Jahr gewählt ist - die Zahl am Jahresknopf stimmt dann mit der Liste überein */
+    var nN = 0, einfach = r.map(function (x) { var ueber = sw(x) === 'niedrig' || nN >= 5; if (!ueber) nN++; return { x: x, ueber: ueber }; });
+    if (!nN) einfach.forEach(function (e, i) { e.ueber = i >= 5; });
     var kopf = [n.hoch ? n.hoch + ' kritisch' : '', n.mittel ? n.mittel + ' Handlungsbedarf' : '', n.niedrig ? n.niedrig + ' beobachten' : ''].filter(Boolean).join(' · ');
     return '<div class="dp-hv-ris" data-dp-hv-ris="1" data-filter="alle">'
       + abschnitt('Risiken aus den Unterlagen', kopf)
       + chips
-      + '<div class="dp-pa-e dp-hv-rl">' + einfach.map(function (x, i) { return zeile(x).replace('class="dp-hv-rk ', 'class="dp-hv-rk' + (i >= 5 ? ' ueber' : '') + ' '); }).join('')
-      + (einfach.length < r.length || einfach.length > 5 ? '<p class="dp-hv-rm">Alle ' + r.length + ' Punkte mit Beschreibung und Quelle unter Detail.</p>' : '') + '</div>'
+      + '<div class="dp-pa-e dp-hv-rl">' + einfach.map(function (e) { return zeile(e.x).replace('class="dp-hv-rk ', 'class="dp-hv-rk' + (e.ueber ? ' ueber' : '') + ' '); }).join('')
+      + (einfach.some(function (e) { return e.ueber; }) ? '<p class="dp-hv-rm">' + einfach.filter(function (e) { return e.ueber; }).length + ' weitere Punkte unter einem Jahr oder unter Detail.</p>' : '') + '</div>'
       + '<div class="dp-pa-d dp-hv-rd">' + r.map(karte).join('') + '</div>'
       + '<p class="dp-hv-rleer" hidden>Für dieses Jahr nennen die Unterlagen kein Risiko.</p></div>';
   }
