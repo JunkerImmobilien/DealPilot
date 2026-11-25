@@ -161,7 +161,7 @@ window.DpPfBausteineF = function (K) {
   function zinsStress(sel) {
     K.modul(sel, function (w) {
       var os = O.filter(function (o) { return o.zbRest <= 8; }).sort(function (a, b) { return a.zbJahr - b.zbJahr; });
-      var h = '<div class="tab-wrap"><table class="tab"><thead><tr><th>Objekt</th><th>Ende</th><th>Restschuld</th><th>heute</th><th>bei 4,5 %</th><th>bei 5,5 %</th><th>DSCR bei 5,5 %</th></tr></thead><tbody>';
+      var h = '<div class="tab-wrap"><table class="pf-tab"><thead><tr><th>Objekt</th><th>Ende</th><th>Restschuld</th><th>heute</th><th>bei 4,5 %</th><th>bei 5,5 %</th><th>DSCR bei 5,5 %</th></tr></thead><tbody>';
       os.forEach(function (o) {
         var mehr45 = o.restZb * Math.max(0, 4.5 - o.zins) / 100, mehr55 = o.restZb * Math.max(0, 5.5 - o.zins) / 100;
         var noi = o.dscr * (o.zinsJ + o.tilgJ), d55 = noi / (o.zinsJ + o.tilgJ + mehr55);

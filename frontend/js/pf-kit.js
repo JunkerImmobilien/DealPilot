@@ -402,7 +402,7 @@ window.DpPfKit = (function () {
     var os = D.objekte.slice().sort(function (a, b) { return (b.zuwachs == null ? -1e9 : b.zuwachs) - (a.zuwachs == null ? -1e9 : a.zuwachs); });
     if (opt.top) os = os.slice(0, opt.top);
     var maxMehr = Math.max.apply(null, D.objekte.map(function (o) { return o.mehrMiete / o.mieteB; }));
-    var h = '<div class="tab-wrap"><table class="tab"><thead>';
+    var h = '<div class="tab-wrap"><table class="pf-tab"><thead>';
     var det = detailAn && !opt.schmal;
     h += '<tr class="gruppe"><th></th><th colspan="3">Kaltmiete im Jahr</th><th colspan="2">Ertragswert</th><th colspan="' + (opt.schmal ? 2 : 4) + '"></th>' + (det ? '<th colspan="2">EK-Rendite</th>' : '') + '</tr>';
     h += '<tr><th>Objekt</th><th>Bestand</th><th>Zielbild</th><th>Hebel</th><th>Bestand</th><th>Zielbild</th><th>Maßnahmen</th><th>Zuwachs nach Kosten</th>' + (opt.schmal ? '' : '<th>DSCR</th><th>Stand</th>') + (det ? '<th>' + esc(ekStufe().kurz) + '</th><th>Eigenkapital</th>' : '') + '</tr></thead><tbody>';
