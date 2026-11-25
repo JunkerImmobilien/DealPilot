@@ -8050,6 +8050,7 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
   <script src="js/modernisierung-herkunft.js?v=v3660f"></script>
   <script src="js/qc-zustand-bilder.js?v=v3660f"></script><!-- v3660f · Zustand aus den Fotos, Hinweis unter dem Feld Zustand -->
   <script src="js/dealscore.js?v=v3289"></script>
+  <script src="js/qc-score-weg.js?v=v4720"></script><!-- v4720 · ein Weg zum Deal Score für Quick-Check und Deal-Check -->
   <!-- v3075 · die zulaessige Miete (Kappung, Vergleichsmiete, Sperrfrist) - derselbe Kern wie potenzial.js -->
   <script src="js/mietpotenzial-kern.js?v=v4220"></script>
   <script src="js/avm-section.js?v=v3023a"></script>
@@ -8614,22 +8615,18 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
        Score 72, das daraus gespeicherte Objekt (und sein Bank-PDF) 1,21 / 5,37 % / 73. Dieselbe Vorgabe
        wie ein neues Objekt, derselbe Kern (DealKpis.compute leerstand_pct). */
     var leerPct = window._qcLeerstandPct ? window._qcLeerstandPct() : 0;
-    var k = window.DealKpis.compute({ kp:kp, nk:kp*knk, san:san, nkm:nkm, ze:0, leerstand_pct:leerPct,
-      bwk_ul:hgY*(1-split), bwk_nul:hgY*split, d1:darlehen, d1z:(n(i.zins)||3.8), d1t:(n(i.tilg)||1.5),
-      ek:ek, svw:0, afa:0, grenz:0,
-      /* qc-v2546a: LTV wieder gegen den KAUFPREIS (deal-kpis.js: ekInklNkLtv false
-         und svw 0 -> ltv_basis = kp) - dieselbe Basis wie die Beleihungsknoepfe
-         (Marcel 21.10.2026: „100 % sind nicht 0, weil die Kaufnebenkosten ja
-         reingehen"). svw nur fuer den LTV gelesen (deal-kpis.js Z. 124-127);
-         der Marktwert geht ueber wp_kpi unten in den Score. */
-      ekInklNkLtv:false });
     var mw = (avm&&avm.marktwert)||0;
-    /* v3075 · statt `mstg: 1.5` (der Bonus verlangt > 1,5 und kam nie) die rechtlich zulaessige
-       Steigerung der Bestandsmiete in 3 Jahren; dazu Zustand und Sanierung fuer die Grenze im Kern. */
-    var K = { kp:kp, cf_m:k.cf_m, nmy:k.nmy, ltv:k.ltv, dscr:k.dscr, wp_kpi:(mw>kp?mw-kp:0),
+    /* v4720 · Die Abbildung Objekt -> DealKpis -> DealScore.computeFromKpis steht jetzt an EINER Stelle
+       (js/qc-score-weg.js), damit der Deal-Check der Landing genau so bewertet (Marcel 25.11.2026: „wie im
+       Quick Check bewerten, nicht nochmal was Gesondertes"). Inhalt unverändert: LTV gegen den Kaufpreis
+       (qc-v2546a), Wertpuffer nur mit Marktwert, zulässige Steigerung der Bestandsmiete statt mstg (v3075). */
+    var W = (window.DpQcScore && window.DpQcScore.rechne) ? window.DpQcScore.rechne({ kp:kp, nk:kp*knk, san:san, nkm:nkm, ze:0,
+      leerstand_pct:leerPct, bwk_ul:hgY*(1-split), bwk_nul:hgY*split, d1:darlehen, zins:(n(i.zins)||3.8), tilg:(n(i.tilg)||1.5), ek:ek,
+      marktwert:mw,
       miet_potenzial_pct:(mp && mp.zul && mp.zul.grund && mp.zul.grund!=='keine_miete' && mp.zul.grund!=='vertrag') ? mp.zul.plus_pct : null,
-      zustand:(i.zustand||null), san:san };
-    var r = window.DealScore.computeFromKpis(K);
+      zustand:(i.zustand||null) }) : null;
+    if (!W) return null;
+    var k = W.k, r = W.r;
     var sub = {}; (r.breakdown||[]).forEach(function(c){ sub[c.key] = (c.score!=null)?Math.round(c.score):null; });
     var bwkPct = (k.nkm_j>0)?(k.bwk/k.nkm_j*100):null;
     /* v1233b · gesamt/ek/darlehen/knk werden hier oben laengst gerechnet, sind aber

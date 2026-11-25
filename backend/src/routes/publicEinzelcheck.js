@@ -171,5 +171,23 @@ router.post('/mail', bremseMail, express.json({ limit: '13mb' }), async function
   }
 });
 
+/* einzelcheck-6 · PDF zum Herunterladen vom PDF-Dienst (ohne Kopf- und Fusszeilen des Browser-Druckfensters).
+   Gleiche Pruefung wie die Mail (bezahlter, gueltiger Kauf), aber ohne Mail-Zaehler. */
+const bremsePdf = bremse(STUNDE, 12, 'Zu viele PDFs in kurzer Zeit. Bitte später noch einmal.');
+router.post('/pdf', bremsePdf, express.json({ limit: '13mb' }), async function (req, res) {
+  try {
+    const b = req.body || {};
+    const z = await ec.kaufLesen(String(b.token || ''));
+    const erg = await ec.berichtPdf(z, b.html, b.titel);
+    const name = ('DealPilot Einzel-Check ' + erg.titel).replace(/[^\wäöüÄÖÜß .,-]+/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 100) + '.pdf';
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'attachment; filename="' + name.replace(/[^\x20-\x7e]/g, '_') + '"; filename*=UTF-8\'\'' + encodeURIComponent(name));
+    res.send(erg.pdf);
+  } catch (e) {
+    if (e && e.status && e.code) return res.status(e.status).json({ error: e.message, code: e.code });
+    fehler(res, e, 'pdf');
+  }
+});
+
 module.exports = router;
 module.exports._bremsen = { bremseAuslesen, bremseKaufen, bremseStatus, bremseBericht };
