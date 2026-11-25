@@ -45636,3 +45636,9 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** staging fb141830 … 55d8b1d1 (v4790–v4790h, Buster zuletzt `dp-dokumente.js?v=v4800a1` wegen paralleler v4800), Wissen 6694c73e.
 - **Nachweis:** Muster `Dateien/Investment-PDF/v4790/*-v4790b.pdf`, jede Seite gerendert und angesehen (A 13/12, B 32/28, C 14/13 Seiten).
 - **Rest:** nicht auf Prod; KI-Texte älter als die Zahlen bis zum nächsten Abruf; drei dünne Fortsetzungsseiten in der Kombi.
+
+### Rollout 1.0.216 · einzelcheck-10/10a (Fork PP4)
+- **Was:** Einzel-Check-PDF: `DpDokument.dokument()` nimmt `opt.css` (fiel bisher still weg, daher kein Abstand nach der Mietpotenzial-Tabelle). Grundangaben MFH: Anzahl Wohnungen + Ausstattung (Sachwert braucht NHK-Typ und Standardstufe). Anschrift nur im Browser-Tab (sessionStorage), Hinweisfeld im Notweg.
+- **Commit:** staging 6d9a89e7, 11483e54, 1dfba881 · main a4f00529, 3b41faea, ab5dd6d2.
+- **Nachweis:** einzelcheck-pruefen grün (Teil W mit Gegenprobe), buster-ebenen sauber, Muster Herford ETW/MFH -10 (15 Seiten, Abstand sichtbar), Prod healthy, Landing einzelcheck-10a, version 216, Sicherung 20261125-1003-ec10.
+- **Rest:** Anschrift-Rückweg nicht im Browser geklickt. Herford-MFH ohne Sachwert (kein Sachwertfaktor, modellkonform).
