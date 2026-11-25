@@ -10801,22 +10801,22 @@
         await b2oZeile(s, 'Gewonnen heißt Bestand', 'Ein gewonnenes Objekt öffnet direkt im <b>Objekt-Cockpit</b>, ganz vorne und in Gold.');
       },
       async function (s) {   /* 2 · Übersicht */
-        await k5Tab(/^Übersicht/);
+        await l6Tab(/^Übersicht/);
         await zeige(function () { var e = qs('#s5 [data-dp-ekr]'); return (e && e.parentNode) || k5Karte(/führend/)(); }, 8);
         await b2oZeile(s, 'Übersicht', 'Kaufpreis, maßgebender Wert mit führendem Verfahren, DSCR, Cashflow und EK-Rendite auf einen Blick.');
       },
       async function (s) {   /* 3 · Ankauf · Bestand · Zielbild */
-        await k5Tab(/Ankauf · Bestand/);
-        await zeige(function () { var e = rhIm(k5Panel(), /Nettokaltmiete/); return e && (e.closest('table') || e); }, 8);
+        await l6Tab(/Ankauf · Bestand/);
+        await zeige(function () { var p = k5Panel(); return p && p.querySelector('table'); }, 8);
         await b2oZeile(s, 'Ankauf, Bestand, Zielbild', 'Eine Tabelle: der Kauf, heute, nach Mieterhöhung und das Zielbild, Zeile für Zeile.');
       },
       async function (s) {   /* 4 · Steuer */
-        await k5Tab(/^Steuer/);
+        await l6Tab(/^Steuer/);
         await zeige(k5Karte(/Ergebnis aus Vermietung|Verlauf mit Steuern/), 8);
         await b2oZeile(s, 'Steuer', 'Die Anlage V Jahr für Jahr. Grün heißt Verlust, die Steuer sinkt. Rot heißt Überschuss.');
       },
       async function (s) {   /* 5 · Haus & Unterlagen */
-        await k5Tab(/^Haus/);
+        await l6Tab(/^Haus/);
         await zeige(k5Karte(/Risiken aus den Unterlagen|Hausgeld/), 8);
         await b2oZeile(s, 'Haus und Unterlagen', 'Oben die Risiken aus Protokollen und Abrechnungen, darunter Hausgeld, Rücklage und deine Dokumente.');
       }
@@ -10966,6 +10966,13 @@
     await warteAuf(function () { return q('#ai-content .dp-pa-tab'); }, 10000);
     await warte(800);
   }
+  /* am echten Objekt rendert ein Unterreiter spürbar nach (Trockenlauf 25.11.: Szene Wert zeigte noch Steuer,
+     Steuer kurz leer). Erst wechseln, dann warten, bis das Panel Inhalt hat. */
+  async function l6Tab(re) {
+    await k5Tab(re);
+    await warteAuf(function () { var p = k5Panel(); return p && p.offsetHeight > 200 && r6Text(p).length > 300; }, 8000);
+    await warte(900);
+  }
   function l6OriginalZu() {
     try { if (window.__l6Save) { window.saveObj = window.__l6Save; window.__l6Save = null; } } catch (e) {}
     var v = window.__l6Vorher; window.__l6Vorher = null;
@@ -11006,32 +11013,33 @@
     szenen: [
       async function (s) {   /* 1 · Übersicht */
         await l6Original(R11_WESTERFELD);   /* echte Westerfeldstr. 140 mit Stufe-3-Bericht */
-        await k5Tab(/^Übersicht/);
+        l6Modus(/^Einfach$/); await warte(700);
+        await l6Tab(/^Übersicht/);
         await zeige(function () { var e = qs('#s5 [data-dp-ekr]'); return (e && k5Eng(e, 260)) || l6Karte(/führend|Kaufpreis/)(); }, 8);
         await b2oZeile(s, 'Die Übersicht', 'Kaufpreis, maßgebender Wert mit führendem Verfahren, DSCR, Cashflow und EK-Rendite. Dazu der Investor Deal Score in zwei Teilen.');
       },
       async function (s) {   /* 2 · Ankauf · Soll · Zielbild */
-        await k5Tab(/Ankauf · Soll|Ankauf · Bestand/);
-        await zeige(function () { var e = rhIm(k5Panel(), /Nettokaltmiete/); return e && (e.closest('table') || e); }, 8);
+        await l6Tab(/Ankauf · Soll|Ankauf · Bestand/);
+        await zeige(function () { var p = k5Panel(); return p && p.querySelector('table'); }, 8);
         await b2oZeile(s, 'Ankauf, Soll, Zielbild', 'Eine Tabelle: der Kauf, nach Mieterhöhung und das Zielbild. Gerechnet mit dem, was rechtlich höchstens geht.');
       },
       async function (s) {   /* 3 · Wert & Lage */
-        await k5Tab(/^Wert/);
+        await l6Tab(/^Wert/);
         await zeige(l6Karte(/führend|Ertragswert|Marktpreisindikation/), 8);
         await b2oZeile(s, 'Wert und Lage', 'Führendes und stützendes Verfahren als Kacheln. Die Marktpreisindikation kommt aus Angeboten und ist kein Verkehrswert.');
       },
       async function (s) {   /* 4 · Steuer */
-        await k5Tab(/^Steuer/);
+        await l6Tab(/^Steuer/);
         await zeige(l6Karte(/Ergebnis aus Vermietung|Verlauf mit Steuern|AfA/), 8);
         await b2oZeile(s, 'Steuer', 'AfA, Gebäudeanteil und Grenzsteuersatz als Kacheln, darunter das Ergebnis aus Vermietung Jahr für Jahr.');
       },
       async function (s) {   /* 5 · Haus & Unterlagen */
-        await k5Tab(/^Haus/);
+        await l6Tab(/^Haus/);
         await zeige(l6Karte(/Risiken aus den Unterlagen|Unterlagen einlesen|Belege, Unterlagen/), 8);
         await b2oZeile(s, 'Haus und Unterlagen', 'Mietverträge, Protokolle und Wirtschaftsplan einlesen. Die Risiken stehen oben.');
       },
       async function (s) {   /* 6 · Potenzial & Risiken */
-        await k5Tab(/^Potenzial/);
+        await l6Tab(/^Potenzial/);
         await zeige(l6Karte(/Hebel|rechtlich/), 8);
         await b2oZeile(s, 'Potenzial und Risiken', 'Deine Hebel und was rechtlich gilt, als kurze Karten.');
       },
@@ -11141,7 +11149,7 @@
     szenen: [
       async function (s) {   /* 1 · Tabelle (Westerfeldstr., Bestand) */
         await l6Original(R11_WESTERFELD);
-        await k5Tab(/Ankauf · Bestand/);
+        await l6Tab(/Ankauf · Bestand/);
         await zeige(function () { var p = k5Panel(); return p && p.querySelector('table'); }, 8);
         await b2oZeile(s, 'Eine Tabelle', 'Ankauf, heute, nach Mieterhöhung und Zielbild. Abweichungen sind markiert, Texte darunter gibt es nicht mehr.');
       },
@@ -11156,12 +11164,12 @@
         }
       },
       async function (s) {   /* 4 · Potenzial & Exit */
-        await k5Tab(/^Potenzial/);
+        await l6Tab(/^Potenzial/);
         await zeige(l6Karte(/rechtlich|Hebel/), 8);
         await b2oZeile(s, 'Was rechtlich gilt', 'Kappungsgrenze, Sperrfrist und Mietpreisbremse als kurze Karten. Der Rechenweg steht im Detail.');
       },
       async function (s) {   /* 5 · Jahresabgleich */
-        await k5Tab(/^Jahresabgleich/);
+        await l6Tab(/^Jahresabgleich/);
         await zeige(function () { var e = rhIm(k5Panel(), /Luft/); return e && k5Eng(e, 260); }, 8);
         await b2oZeile(s, 'Im Jahresabgleich', 'Eingetragen, zulässig, Luft und ab wann. Jede Erhöhung wird an ihrem eigenen Tag geprüft.');
       }
