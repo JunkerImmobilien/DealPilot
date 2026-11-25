@@ -60,9 +60,19 @@ function _buildDeal2FromState() {
       deal.cashOnCash = 0;
       deal._cocReason = 'vollfinanzierung_neutral';
     }
+  } else if (k.ekr4 && k.ekr4.k2 != null && isFinite(k.ekr4.k2) && ekV108 > 0) {
+    /* v4760 (Marcel 25.11.2026): Rendite-Grundlage des Investor Deal Score ist
+       die EK-Rendite Stufe 2 „nach Steuer" aus DpEkRendite (Überschuss nach
+       Steuer + Tilgung, durch EK), nicht mehr Cash-on-Cash vor Steuer. Das
+       Vermögensdelta (Stufe 3/4) zählt in keinem Score: es ist eine Annahme
+       und steckt über den Wertpuffer schon im Score. Schlüssel bleibt
+       „cashOnCash", damit gespeicherte Gewichte gelten. */
+    deal.cashOnCash = k.ekr4.k2;
+    deal._cocStufe = 'k2';
   } else if (k.ekr != null && isFinite(k.ekr) && ekV108 > 0) {
-    // Normalfall: aus State.kpis.ekr (= cf_op / ek * 100, VOR Steuern seit v1442)
+    // Rückfall ohne Stufenrechnung: State.kpis.ekr (= cf_op / ek * 100, VOR Steuern seit v1442)
     deal.cashOnCash = k.ekr;
+    deal._cocStufe = 'coc';
   } else {
     // Fallback: aus CF und EK selbst rechnen
     if (jahresCfV108 != null && ekV108 != null && ekV108 > 0) {
@@ -897,7 +907,7 @@ function _ds2Label(k) {
     rendite: 'Rendite', finanzierung: 'Finanzierung', risiko: 'Risiko', lage: 'Lage & Markt',
     upside: 'Upside / Potenzial',
     bruttorendite: 'Bruttorendite', nettorendite: 'Nettorendite', cashflow: 'Cashflow',
-    cashOnCash: 'Cash-on-Cash', dscr: 'DSCR', ltv: 'LTV', zins: 'Zinssatz', tilgung: 'Tilgung',
+    cashOnCash: 'EK-Rendite n. St.', dscr: 'DSCR', ltv: 'LTV', zins: 'Zinssatz', tilgung: 'Tilgung',
     eigenkapitalbedarf: 'EK-Bedarf', leerstand: 'Leerstand', instandhaltung: 'Instandhaltung',
     baujahr: 'Baujahr/Zustand', energie: 'Energie', mietausfall: 'Mietausfall',
     marktVsIst: 'Markt vs. Ist', mietwachstum: 'Mietwachstum', bevoelkerung: 'Bevölkerung',

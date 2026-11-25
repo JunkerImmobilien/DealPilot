@@ -17,7 +17,10 @@
  *
  * VERTRÄGE (jeder Bruch = RC 1):
  *   V1  `score` ist bitgleich mit dem Stand vor v3076 (git f376887a),
- *       in allen sechs Profilen — sofern git erreichbar ist.
+ *       in allen sechs Profilen — sofern git erreichbar ist. Seit v4760
+ *       (Rendite-Grundlage EK-Rendite Stufe 2) bekommt der alte Stand dabei
+ *       die NEUEN cashOnCash-Schwellen: V1 prüft also, dass sich außer dieser
+ *       einen, gewollten Schwelle nichts verschoben hat.
  *   V2  Sind alle vier Rendite-Kennzahlen da, ist das gewichtete Mittel aus
  *       Investment und Finanzierung (vor der Grenze) der bisherige Score
  *       ohne Grenze (±1 Rundung). Die zwei Scores teilen nur auf.
@@ -55,7 +58,7 @@ function kontext(quellen) {
   return ctx;
 }
 const lies = (d) => fs.readFileSync(path.join(JS, d), 'utf8');
-const BASIS = ['score-tiers.js', 'dscr-engine.js', 'deal-kpis.js'].map((d) => [d, lies(d)]);
+const BASIS = ['score-tiers.js', 'dscr-engine.js', 'deal-kpis.js', 'ek-rendite.js'].map((d) => [d, lies(d)]);
 const neu = kontext([...BASIS, ['dealscore2.js', lies('dealscore2.js')]]);
 
 let alt = null;
@@ -64,7 +67,7 @@ try {
   alt = kontext([...BASIS, ['dealscore2-alt.js', text]]);
 } catch (e) { alt = null; }
 
-const { DealKpis, DealScore2, ScoreTier } = neu;
+const { DealKpis, DealScore2, ScoreTier, DpEkRendite } = neu;
 
 /* Eckdaten Abschnitt 3 (vgl = ortsübliche Vergleichsmiete, angebot = Angebotsmiete, €/m²) */
 const FAELLE = [
@@ -93,7 +96,8 @@ function dealFuer(c, miete, opt = {}) {
     k,
     deal: {
       bruttorendite: k.bmy, nettorendite: k.nmy, cashflowMonatlich: k.cf_m,
-      cashOnCash: ek > 0 ? k.ekr : (k.cf_ns > 0 ? 999 : -50), darlehen: k.d_total,
+      /* v4760 · EK-Rendite Stufe 2 wie dealscore2-ui.js (grenz 0 → Steuer 0) */
+      cashOnCash: ek > 0 ? DpEkRendite.rechne({ cf_op: k.cf_op, steuer: 0, tilg: k.tilg_j || 0, bspar: 0, ek }).k2 : (k.cf_ns > 0 ? 999 : -50), darlehen: k.d_total,
       dscr: k.dscr, ltv: k.ltv, zinsSatz: 3.8, tilgung: 2, eigenkapitalQuote: ek / k.gi * 100,
       zustand: c.zustand, energieKlasse: c.energie, mietausfallRisiko: c.mietausfall,
       istMieteEurQm: c.nkm / c.wfl, marktmieteEurQm: c[miete], mietwachstumPct: 1.5,
@@ -119,7 +123,9 @@ for (const preset of PRESETS) {
       const r = DealScore2.compute(JSON.parse(JSON.stringify(deal)), cfg);
       const tag = `${c.id}/${preset}/${miete}`;
       if (alt) {
-        const ra = alt.DealScore2.compute(JSON.parse(JSON.stringify(deal)), alt.DealScore2.getPresetConfig(preset));
+        const cfgAlt = alt.DealScore2.getPresetConfig(preset);
+        cfgAlt.thresholds.cashOnCash = JSON.parse(JSON.stringify(cfg.thresholds.cashOnCash));   /* v4760 · die eine gewollte Änderung */
+        const ra = alt.DealScore2.compute(JSON.parse(JSON.stringify(deal)), cfgAlt);
         pruef(ra.score === r.score && ra.label === r.label && ra.score_ohne_deckel === r.score_ohne_deckel, `V1 ${tag}: score ${ra.score} → ${r.score}`);
         v1++;
       }

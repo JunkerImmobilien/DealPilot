@@ -179,7 +179,9 @@
     d.bruttorendite = k.bmy;
     if (S.bwk_nul != null) d.nettorendite = k.nmy;
     if (fin) {
-      d.cashflowMonatlich = k.cf_m; d.cashOnCash = k.ekr; d.darlehen = k.d_total; d.dscr = k.dscr; d.ltv = k.ltv;
+      /* v4760 · EK-Rendite Stufe 2 wie die App (dealscore2-ui.js); ohne Steuerangaben ist steuer 0 */
+      var e2 = (window.DpEkRendite && ek > 0) ? DpEkRendite.rechne({ cf_op: k.cf_op, steuer: 0, tilg: k.tilg_j || 0, bspar: 0, ek: ek }) : null;
+      d.cashflowMonatlich = k.cf_m; d.cashOnCash = (e2 && e2.k2 != null && isFinite(e2.k2)) ? e2.k2 : k.ekr; d.darlehen = k.d_total; d.dscr = k.dscr; d.ltv = k.ltv;
       d.zinsSatz = S.zins; d.tilgung = S.tilg; d.eigenkapitalQuote = ek / k.gi * 100;
     }
     d.istMieteEurQm = S.nkm / S.wfl; d.eigenerFaktor = S.kp / (S.nkm * 12);
@@ -964,7 +966,7 @@
     /* v3940 · echter Ablauf statt Demo (einzelcheck.js/.css, Backend routes/publicEinzelcheck.js) */
     /* v3946 · Grundangaben, Bezahlen im selben Tab, Stufe 3, Finanzierung: beide Buster neu */
     var l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'einzelcheck.css?v=einzelcheck-4c'; document.head.appendChild(l);
-    var s = document.createElement('script'); s.src = 'einzelcheck.js?v=einzelcheck-7'; s.async = true;
+    var s = document.createElement('script'); s.src = 'einzelcheck.js?v=v4760'; s.async = true;
     /* landing-faecher-2 · der Deal-Check zeigt den zweiten Weg „Bericht holen“ erst, wenn der Einzel-Check da ist */
     s.onload = function () { try { document.dispatchEvent(new CustomEvent('dp:einzelcheck-bereit')); } catch (e) {} };
     document.body.appendChild(s);

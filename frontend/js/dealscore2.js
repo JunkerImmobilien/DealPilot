@@ -94,7 +94,11 @@ window.DealScore2 = (function() {
       bruttorendite:    [[4, 20], [5, 50], [7, 80], [9, 100]],
       nettorendite:     [[2.5, 20], [3.5, 50], [5, 80], [6.5, 100]],
       cashflow:         [[-300, 0], [-100, 30], [0, 60], [200, 85], [500, 100]],
-      cashOnCash:       [[0, 0], [3, 40], [6, 70], [10, 100]],
+      /* v4760: EK-Rendite Stufe 2 (nach Steuer, mit Tilgung) statt Cash-on-Cash.
+         War [[0,0],[3,40],[6,70],[10,100]]. Um rund 2 bis 5 Punkte verschoben,
+         weil Tilgung und Steuerwirkung jetzt mitzählen; an 44 Staging-Objekten
+         gemessen: Gesamtscore im Mittel +0,5, Median 0 (Dateien/Score/umstellung-ek-rendite-2026-11-25.md). */
+      cashOnCash:       [[2, 0], [6, 40], [10, 70], [15, 100]],
       dscr:             [[0.9, 0], [1.0, 40], [1.1, 60], [1.2, 80], [1.3, 100]],
       // LTV: investorfreundlich — Range-Buckets
       ltvBuckets: [
@@ -207,7 +211,7 @@ window.DealScore2 = (function() {
           nettorendite:   [[3.5, 20], [4.5, 50], [6, 80], [7.5, 100]],
           // Cashflow strenger — negativer CF bestraft härter
           cashflow:       [[-200, 0], [0, 30], [150, 60], [400, 85], [700, 100]],
-          cashOnCash:     [[0, 0], [4, 40], [8, 70], [12, 100]],
+          cashOnCash:     [[3, 0], [7, 40], [12, 70], [16, 100]],   // v4760 Stufe 2, war [[0,0],[4,40],[8,70],[12,100]]
           // DSCR strenger — 1.2 erst 70 Punkte (war 80), 1.3 nur 90
           dscr:           [[1.0, 0], [1.1, 30], [1.2, 60], [1.3, 85], [1.4, 100]],
           // LTV strenger — schon ab 80% volle Punkte verlieren
@@ -253,7 +257,7 @@ window.DealScore2 = (function() {
           bruttorendite:  [[3, 30], [4, 60], [6, 85], [8, 100]],     // war [4,20][5,50][7,80][9,100]
           nettorendite:   [[2, 30], [3, 60], [4.5, 85], [6, 100]],
           cashflow:       [[-400, 0], [-150, 40], [0, 70], [150, 90], [400, 100]],
-          cashOnCash:     [[-2, 0], [2, 50], [5, 80], [9, 100]],
+          cashOnCash:     [[0, 0], [5, 50], [9, 80], [13, 100]],    // v4760 Stufe 2, war [[-2,0],[2,50],[5,80],[9,100]]
           dscr:           [[0.85, 0], [0.95, 40], [1.05, 65], [1.15, 85], [1.25, 100]],
           // LTV lockerer — auch hohe LTV bekommt noch ordentliche Punkte (Hebel-Strategie)
           ltvBuckets: [
@@ -381,7 +385,7 @@ window.DealScore2 = (function() {
 
     var coc = num(deal.cashOnCash);
     bd.push({
-      key: 'cashOnCash', name: 'Cash-on-Cash',
+      key: 'cashOnCash', name: 'EK-Rendite nach Steuer',
       value: coc, unit: '%',
       points: coc !== null ? interpolate(coc, t.cashOnCash) : null,
       weight: w.cashOnCash
