@@ -14,7 +14,7 @@
     document.body.setAttribute('data-eg-var', 'a');
     var um = document.createElement('div'); um.className = 'eg-umsch'; um.setAttribute('role', 'tablist');
     um.innerHTML = '<button type="button" class="an" role="tab" aria-selected="true">Zum Vermieten</button>'
-      + '<a role="tab" aria-selected="false" href="haus-check.html#dealcheck" style="display:flex;align-items:center;justify-content:center;text-decoration:none;color:inherit;font:inherit;letter-spacing:inherit;text-transform:inherit;padding:13px 10px;border-radius:12px 12px 0 0">Selbst nutzen</a>';
+      + '<a role="tab" aria-selected="false" href="haus-check.html#dealcheck" style="display:flex;align-items:center;justify-content:center;text-decoration:none;color:rgba(236,230,214,.62);font:600 12px/1 var(--mono,JetBrains Mono,monospace);letter-spacing:.1em;text-transform:uppercase;padding:13px 10px;border-radius:12px 12px 0 0;min-height:40px">Selbst nutzen</a>';
     szene.insertBefore(um, szene.firstChild);
   }
 })();
