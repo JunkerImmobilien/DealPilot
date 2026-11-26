@@ -1,0 +1,1652 @@
+{
+ "ags": "09662000",
+ "gemeinde": "Schweinfurt",
+ "art": "einfach",
+ "stand": "2025-02-01",
+ "erhebungsstichtag": null,
+ "gueltig_ab": "2025-02-01",
+ "gueltig_bis": null,
+ "naechste_ausgabe": "2027-02-01",
+ "quelle": {
+  "url": "https://www.schweinfurt.de/media/www.schweinfurt.de/org/med_6487/47489_mietspiegel_2025.pdf",
+  "dokument": "Mietspiegel der Stadt Schweinfurt, Stand 01.02.2025 (einfacher Mietspiegel), ausgearbeitet von der Stadt Schweinfurt, Amt für soziale Leistungen, unter Mitwirkung und mit Anerkennung des Mietervereins und des Haus- und Grundbesitzervereins Schweinfurt",
+  "seite": "S. 2 (Tabelle „Ortsübliche Vergleichsmieten in € / m²“, PDF-S. 3), S. 3 (Punktesystem Wohnungsqualität), S. 4–5 (Geltung, Abschlag 20 %, nicht qualifiziert)",
+  "lizenz": "kein Rechtevorbehalt und kein Speicherverbot im Dokument (alle Textseiten gelesen), geprüft am 2026-11-26; Stadt Schweinfurt",
+  "abgerufen": "2026-11-26"
+ },
+ "einheit": "eur_qm_nettokalt",
+ "form": "tabelle",
+ "rundung": 2,
+ "hinweis": "Einfacher Mietspiegel (S. 5: „erfüllt nicht die Voraussetzungen … qualifizierten“), nur Wohnungen in Mehrfamilienhäusern, nur freifinanziert. Die Tabelle nennt nur Spannen (von–bis); `mittel` ist die von DealPilot gerechnete Mitte der Spanne, kaufmännisch gerundet — kein Wert des Dokuments. Achse Ausstattung = Wohnungsqualität (einfach/mittel/gut/sehr gut aus dem Punktesystem S. 3: ≤ 1 Punkt einfach, 2–4 mittel, 5–7 gut, ≥ 8 sehr gut) × Grundausstattung („WC Bad/Dusche oder Zentralheizung“ / „… und Zentralheizung“). Ohne Angabe nimmt DealPilot „mittel, Bad und Zentralheizung“ an — Annahme. Die Punktevergabe selbst rechnet der Kern nicht; die Merkmale stehen unter `punkte_qualitaet`. Leere Tabellenfelder (z. B. ab 1985 ohne Zentralheizung, „einfach“ ab 1967, „sehr gut“ bis 1996) nicht eingetragen. „Bei sehr guter Ausstattung von Mietwohnhäusern bis Baujahr 1996 erhöhen sich die jeweiligen Tabellenwerte um 5 %“ (S. 2) als Zuschlag `sehr_gut_bis_1996`. „Für Wohnungen, die weder … Bad/Dusche noch … Zentralheizung verfügen, kann ein Abschlag von 20 % des jeweiligen Tabellensatzes vorgenommen werden“ (S. 5) als Zuschlag `weder_bad_noch_zentralheizung` (mit der Spalte „oder“ verwenden). Bei umfassender Modernisierung tritt das Modernisierungsjahr an die Stelle des Baujahrs (S. 5). Mietspiegel gilt „bis auf Weiteres“ (S. 4); laut Stadtseite Fortschreibung im Zwei-Jahres-Turnus zum 01.02. ungerader Jahre. Textschicht in den unteren Zeilen verschoben — alle Werte am Druckbild abgelesen.",
+ "haus": {
+  "regel": "ausgeschlossen",
+  "beleg": "S. 2 Tabellenkopf: „für Wohnungen in Mehrfamilienhäusern“"
+ },
+ "tabelle": {
+  "achsen": {
+   "baujahr": [
+    {
+     "von": null,
+     "bis": 1948,
+     "label": "vor 1949"
+    },
+    {
+     "von": 1949,
+     "bis": 1955,
+     "label": "1949–1955"
+    },
+    {
+     "von": 1956,
+     "bis": 1966,
+     "label": "1956–1966"
+    },
+    {
+     "von": 1967,
+     "bis": 1975,
+     "label": "1967–1975"
+    },
+    {
+     "von": 1976,
+     "bis": 1984,
+     "label": "1976–1984"
+    },
+    {
+     "von": 1985,
+     "bis": 1992,
+     "label": "1985–1992"
+    },
+    {
+     "von": 1993,
+     "bis": 1996,
+     "label": "1993–1996"
+    },
+    {
+     "von": 1997,
+     "bis": 2003,
+     "label": "1997–2003"
+    },
+    {
+     "von": 2004,
+     "bis": 2009,
+     "label": "2004–2009"
+    },
+    {
+     "von": 2010,
+     "bis": 2013,
+     "label": "2010–2013"
+    },
+    {
+     "von": 2014,
+     "bis": 2017,
+     "label": "2014–2017"
+    },
+    {
+     "von": 2018,
+     "bis": 2021,
+     "label": "2018–2021"
+    },
+    {
+     "von": 2022,
+     "bis": 2024,
+     "label": "2022–2024"
+    },
+    {
+     "von": 2025,
+     "bis": null,
+     "label": "ab 2025"
+    }
+   ],
+   "wfl": [
+    {
+     "von": null,
+     "bis": 50,
+     "bis_inkl": false,
+     "label": "unter 50 m²"
+    },
+    {
+     "von": 50,
+     "bis": 80,
+     "label": "50–80 m²"
+    },
+    {
+     "von": 80,
+     "von_inkl": false,
+     "bis": null,
+     "label": "über 80 m²"
+    }
+   ],
+   "ausstattung": [
+    {
+     "schluessel": "einfach_oder",
+     "label": "Wohnungsqualität einfach, WC und Bad/Dusche oder Zentralheizung"
+    },
+    {
+     "schluessel": "einfach_und",
+     "label": "Wohnungsqualität einfach, WC und Bad/Dusche und Zentralheizung"
+    },
+    {
+     "schluessel": "mittel_oder",
+     "label": "Wohnungsqualität mittel, WC und Bad/Dusche oder Zentralheizung"
+    },
+    {
+     "schluessel": "mittel_und",
+     "label": "Wohnungsqualität mittel, WC und Bad/Dusche und Zentralheizung",
+     "standard": true
+    },
+    {
+     "schluessel": "gut_oder",
+     "label": "Wohnungsqualität gut, WC und Bad/Dusche oder Zentralheizung"
+    },
+    {
+     "schluessel": "gut_und",
+     "label": "Wohnungsqualität gut, WC und Bad/Dusche und Zentralheizung"
+    },
+    {
+     "schluessel": "sehr_gut_und",
+     "label": "Wohnungsqualität sehr gut, WC und Bad/Dusche und Zentralheizung"
+    }
+   ]
+  },
+  "zellen": [
+   {
+    "baujahr": 0,
+    "wfl": 0,
+    "ausstattung": "einfach_oder",
+    "unten": 3.84,
+    "mittel": 4.17,
+    "oben": 4.49,
+    "seite": "2"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 0,
+    "ausstattung": "einfach_und",
+    "unten": 4.42,
+    "mittel": 4.71,
+    "oben": 5,
+    "seite": "2"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 1,
+    "ausstattung": "einfach_oder",
+    "unten": 3.86,
+    "mittel": 4.06,
+    "oben": 4.26,
+    "seite": "2"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 1,
+    "ausstattung": "einfach_und",
+    "unten": 4.2,
+    "mittel": 4.52,
+    "oben": 4.84,
+    "seite": "2"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 2,
+    "ausstattung": "einfach_oder",
+    "unten": 3.54,
+    "mittel": 3.83,
+    "oben": 4.11,
+    "seite": "2"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 2,
+    "ausstattung": "einfach_und",
+    "unten": 4.2,
+    "mittel": 4.44,
+    "oben": 4.67,
+    "seite": "2"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 0,
+    "ausstattung": "mittel_oder",
+    "unten": 3.96,
+    "mittel": 4.28,
+    "oben": 4.6,
+    "seite": "2"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 0,
+    "ausstattung": "mittel_und",
+    "unten": 4.84,
+    "mittel": 5.07,
+    "oben": 5.3,
+    "seite": "2"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 1,
+    "ausstattung": "mittel_oder",
+    "unten": 3.96,
+    "mittel": 4.23,
+    "oben": 4.49,
+    "seite": "2"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 1,
+    "ausstattung": "mittel_und",
+    "unten": 4.36,
+    "mittel": 4.68,
+    "oben": 5,
+    "seite": "2"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 2,
+    "ausstattung": "mittel_oder",
+    "unten": 3.78,
+    "mittel": 3.99,
+    "oben": 4.2,
+    "seite": "2"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 2,
+    "ausstattung": "mittel_und",
+    "unten": 4.36,
+    "mittel": 4.64,
+    "oben": 4.91,
+    "seite": "2"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 0,
+    "ausstattung": "gut_oder",
+    "unten": 4.03,
+    "mittel": 4.4,
+    "oben": 4.77,
+    "seite": "2"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 0,
+    "ausstattung": "gut_und",
+    "unten": 5,
+    "mittel": 5.21,
+    "oben": 5.41,
+    "seite": "2"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 1,
+    "ausstattung": "gut_oder",
+    "unten": 4.01,
+    "mittel": 4.36,
+    "oben": 4.71,
+    "seite": "2"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 1,
+    "ausstattung": "gut_und",
+    "unten": 4.91,
+    "mittel": 5.11,
+    "oben": 5.3,
+    "seite": "2"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 2,
+    "ausstattung": "gut_oder",
+    "unten": 3.96,
+    "mittel": 4.23,
+    "oben": 4.49,
+    "seite": "2"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 2,
+    "ausstattung": "gut_und",
+    "unten": 4.84,
+    "mittel": 5.04,
+    "oben": 5.24,
+    "seite": "2"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 0,
+    "ausstattung": "einfach_oder",
+    "unten": 4.77,
+    "mittel": 4.97,
+    "oben": 5.16,
+    "seite": "2"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 0,
+    "ausstattung": "einfach_und",
+    "unten": 5.24,
+    "mittel": 5.52,
+    "oben": 5.8,
+    "seite": "2"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 1,
+    "ausstattung": "einfach_oder",
+    "unten": 4.67,
+    "mittel": 4.84,
+    "oben": 5,
+    "seite": "2"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 1,
+    "ausstattung": "einfach_und",
+    "unten": 4.84,
+    "mittel": 5.04,
+    "oben": 5.24,
+    "seite": "2"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 2,
+    "ausstattung": "einfach_oder",
+    "unten": 4.49,
+    "mittel": 4.67,
+    "oben": 4.84,
+    "seite": "2"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 2,
+    "ausstattung": "einfach_und",
+    "unten": 4.77,
+    "mittel": 4.97,
+    "oben": 5.16,
+    "seite": "2"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 0,
+    "ausstattung": "mittel_oder",
+    "unten": 4.91,
+    "mittel": 5.11,
+    "oben": 5.3,
+    "seite": "2"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 0,
+    "ausstattung": "mittel_und",
+    "unten": 5.57,
+    "mittel": 5.85,
+    "oben": 6.13,
+    "seite": "2"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 1,
+    "ausstattung": "mittel_oder",
+    "unten": 4.84,
+    "mittel": 5,
+    "oben": 5.16,
+    "seite": "2"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 1,
+    "ausstattung": "mittel_und",
+    "unten": 5.24,
+    "mittel": 5.48,
+    "oben": 5.72,
+    "seite": "2"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 2,
+    "ausstattung": "mittel_oder",
+    "unten": 4.67,
+    "mittel": 4.87,
+    "oben": 5.07,
+    "seite": "2"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 2,
+    "ausstattung": "mittel_und",
+    "unten": 4.91,
+    "mittel": 5.16,
+    "oben": 5.41,
+    "seite": "2"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 0,
+    "ausstattung": "gut_oder",
+    "unten": 5.41,
+    "mittel": 5.77,
+    "oben": 6.13,
+    "seite": "2"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 0,
+    "ausstattung": "gut_und",
+    "unten": 5.88,
+    "mittel": 6.16,
+    "oben": 6.44,
+    "seite": "2"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 1,
+    "ausstattung": "gut_oder",
+    "unten": 5.16,
+    "mittel": 5.4,
+    "oben": 5.64,
+    "seite": "2"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 1,
+    "ausstattung": "gut_und",
+    "unten": 5.48,
+    "mittel": 5.72,
+    "oben": 5.95,
+    "seite": "2"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 2,
+    "ausstattung": "gut_oder",
+    "unten": 4.77,
+    "mittel": 4.97,
+    "oben": 5.16,
+    "seite": "2"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 2,
+    "ausstattung": "gut_und",
+    "unten": 5.24,
+    "mittel": 5.52,
+    "oben": 5.8,
+    "seite": "2"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 0,
+    "ausstattung": "einfach_oder",
+    "unten": 5.16,
+    "mittel": 5.37,
+    "oben": 5.58,
+    "seite": "2"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 0,
+    "ausstattung": "einfach_und",
+    "unten": 5.65,
+    "mittel": 5.96,
+    "oben": 6.27,
+    "seite": "2"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 1,
+    "ausstattung": "einfach_oder",
+    "unten": 5.05,
+    "mittel": 5.23,
+    "oben": 5.41,
+    "seite": "2"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 1,
+    "ausstattung": "einfach_und",
+    "unten": 5.24,
+    "mittel": 5.44,
+    "oben": 5.64,
+    "seite": "2"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 2,
+    "ausstattung": "einfach_oder",
+    "unten": 4.86,
+    "mittel": 5.05,
+    "oben": 5.24,
+    "seite": "2"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 2,
+    "ausstattung": "einfach_und",
+    "unten": 5.16,
+    "mittel": 5.37,
+    "oben": 5.57,
+    "seite": "2"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 0,
+    "ausstattung": "mittel_oder",
+    "unten": 5.41,
+    "mittel": 5.72,
+    "oben": 6.03,
+    "seite": "2"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 0,
+    "ausstattung": "mittel_und",
+    "unten": 6.03,
+    "mittel": 6.28,
+    "oben": 6.53,
+    "seite": "2"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 1,
+    "ausstattung": "mittel_oder",
+    "unten": 5.16,
+    "mittel": 5.48,
+    "oben": 5.8,
+    "seite": "2"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 1,
+    "ausstattung": "mittel_und",
+    "unten": 5.8,
+    "mittel": 5.97,
+    "oben": 6.13,
+    "seite": "2"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 2,
+    "ausstattung": "mittel_oder",
+    "unten": 5.16,
+    "mittel": 5.4,
+    "oben": 5.64,
+    "seite": "2"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 2,
+    "ausstattung": "mittel_und",
+    "unten": 5.57,
+    "mittel": 5.8,
+    "oben": 6.03,
+    "seite": "2"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 0,
+    "ausstattung": "gut_oder",
+    "unten": 5.95,
+    "mittel": 6.16,
+    "oben": 6.37,
+    "seite": "2"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 0,
+    "ausstattung": "gut_und",
+    "unten": 6.13,
+    "mittel": 6.36,
+    "oben": 6.59,
+    "seite": "2"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 1,
+    "ausstattung": "gut_oder",
+    "unten": 5.8,
+    "mittel": 5.97,
+    "oben": 6.13,
+    "seite": "2"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 1,
+    "ausstattung": "gut_und",
+    "unten": 5.88,
+    "mittel": 6.16,
+    "oben": 6.44,
+    "seite": "2"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 2,
+    "ausstattung": "gut_oder",
+    "unten": 5.48,
+    "mittel": 5.64,
+    "oben": 5.8,
+    "seite": "2"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 2,
+    "ausstattung": "gut_und",
+    "unten": 5.64,
+    "mittel": 5.96,
+    "oben": 6.27,
+    "seite": "2"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 0,
+    "ausstattung": "mittel_oder",
+    "unten": 5.38,
+    "mittel": 5.65,
+    "oben": 5.92,
+    "seite": "2"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 0,
+    "ausstattung": "mittel_und",
+    "unten": 5.92,
+    "mittel": 6.11,
+    "oben": 6.3,
+    "seite": "2"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 1,
+    "ausstattung": "mittel_oder",
+    "unten": 5.22,
+    "mittel": 5.46,
+    "oben": 5.69,
+    "seite": "2"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 1,
+    "ausstattung": "mittel_und",
+    "unten": 5.75,
+    "mittel": 5.88,
+    "oben": 6,
+    "seite": "2"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 2,
+    "ausstattung": "mittel_oder",
+    "unten": 5.05,
+    "mittel": 5.29,
+    "oben": 5.52,
+    "seite": "2"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 2,
+    "ausstattung": "mittel_und",
+    "unten": 5.38,
+    "mittel": 5.65,
+    "oben": 5.92,
+    "seite": "2"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 0,
+    "ausstattung": "gut_oder",
+    "unten": 5.82,
+    "mittel": 6.02,
+    "oben": 6.21,
+    "seite": "2"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 0,
+    "ausstattung": "gut_und",
+    "unten": 6,
+    "mittel": 6.19,
+    "oben": 6.38,
+    "seite": "2"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 1,
+    "ausstattung": "gut_oder",
+    "unten": 5.6,
+    "mittel": 5.8,
+    "oben": 6,
+    "seite": "2"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 1,
+    "ausstattung": "gut_und",
+    "unten": 5.92,
+    "mittel": 6.15,
+    "oben": 6.38,
+    "seite": "2"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 2,
+    "ausstattung": "gut_oder",
+    "unten": 5.38,
+    "mittel": 5.54,
+    "oben": 5.69,
+    "seite": "2"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 2,
+    "ausstattung": "gut_und",
+    "unten": 5.6,
+    "mittel": 5.91,
+    "oben": 6.21,
+    "seite": "2"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 0,
+    "ausstattung": "mittel_oder",
+    "unten": 5.6,
+    "mittel": 5.8,
+    "oben": 6,
+    "seite": "2"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 0,
+    "ausstattung": "mittel_und",
+    "unten": 6,
+    "mittel": 6.23,
+    "oben": 6.45,
+    "seite": "2"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 1,
+    "ausstattung": "mittel_oder",
+    "unten": 5.29,
+    "mittel": 5.52,
+    "oben": 5.75,
+    "seite": "2"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 1,
+    "ausstattung": "mittel_und",
+    "unten": 5.82,
+    "mittel": 6.02,
+    "oben": 6.21,
+    "seite": "2"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 2,
+    "ausstattung": "mittel_oder",
+    "unten": 5.12,
+    "mittel": 5.36,
+    "oben": 5.6,
+    "seite": "2"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 2,
+    "ausstattung": "mittel_und",
+    "unten": 5.52,
+    "mittel": 5.79,
+    "oben": 6.06,
+    "seite": "2"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 0,
+    "ausstattung": "gut_oder",
+    "unten": 5.92,
+    "mittel": 6.15,
+    "oben": 6.38,
+    "seite": "2"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 0,
+    "ausstattung": "gut_und",
+    "unten": 6.38,
+    "mittel": 6.69,
+    "oben": 6.99,
+    "seite": "2"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 1,
+    "ausstattung": "gut_oder",
+    "unten": 5.69,
+    "mittel": 5.88,
+    "oben": 6.06,
+    "seite": "2"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 1,
+    "ausstattung": "gut_und",
+    "unten": 6.07,
+    "mittel": 6.38,
+    "oben": 6.69,
+    "seite": "2"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 2,
+    "ausstattung": "gut_oder",
+    "unten": 5.69,
+    "mittel": 5.85,
+    "oben": 6,
+    "seite": "2"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 2,
+    "ausstattung": "gut_und",
+    "unten": 6,
+    "mittel": 6.31,
+    "oben": 6.62,
+    "seite": "2"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 0,
+    "ausstattung": "mittel_und",
+    "unten": 6.53,
+    "mittel": 6.88,
+    "oben": 7.22,
+    "seite": "2"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 1,
+    "ausstattung": "mittel_und",
+    "unten": 6.38,
+    "mittel": 6.69,
+    "oben": 6.99,
+    "seite": "2"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 2,
+    "ausstattung": "mittel_oder",
+    "unten": 5.6,
+    "mittel": 5.85,
+    "oben": 6.1,
+    "seite": "2"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 2,
+    "ausstattung": "mittel_und",
+    "unten": 5.92,
+    "mittel": 6.35,
+    "oben": 6.77,
+    "seite": "2"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 0,
+    "ausstattung": "gut_und",
+    "unten": 6.77,
+    "mittel": 7.08,
+    "oben": 7.39,
+    "seite": "2"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 1,
+    "ausstattung": "gut_und",
+    "unten": 6.51,
+    "mittel": 6.83,
+    "oben": 7.14,
+    "seite": "2"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 2,
+    "ausstattung": "gut_und",
+    "unten": 6.45,
+    "mittel": 6.69,
+    "oben": 6.92,
+    "seite": "2"
+   },
+   {
+    "baujahr": 6,
+    "wfl": 0,
+    "ausstattung": "mittel_und",
+    "unten": 6.97,
+    "mittel": 7.4,
+    "oben": 7.83,
+    "seite": "2"
+   },
+   {
+    "baujahr": 6,
+    "wfl": 1,
+    "ausstattung": "mittel_und",
+    "unten": 6.81,
+    "mittel": 7.17,
+    "oben": 7.53,
+    "seite": "2"
+   },
+   {
+    "baujahr": 6,
+    "wfl": 2,
+    "ausstattung": "mittel_und",
+    "unten": 6.66,
+    "mittel": 7.06,
+    "oben": 7.45,
+    "seite": "2"
+   },
+   {
+    "baujahr": 6,
+    "wfl": 0,
+    "ausstattung": "gut_und",
+    "unten": 7.35,
+    "mittel": 7.76,
+    "oben": 8.17,
+    "seite": "2"
+   },
+   {
+    "baujahr": 6,
+    "wfl": 1,
+    "ausstattung": "gut_und",
+    "unten": 7.45,
+    "mittel": 7.72,
+    "oben": 7.99,
+    "seite": "2"
+   },
+   {
+    "baujahr": 6,
+    "wfl": 2,
+    "ausstattung": "gut_und",
+    "unten": 7.28,
+    "mittel": 7.6,
+    "oben": 7.91,
+    "seite": "2"
+   },
+   {
+    "baujahr": 7,
+    "wfl": 0,
+    "ausstattung": "mittel_und",
+    "unten": 7.45,
+    "mittel": 7.86,
+    "oben": 8.27,
+    "seite": "2"
+   },
+   {
+    "baujahr": 7,
+    "wfl": 1,
+    "ausstattung": "mittel_und",
+    "unten": 7.06,
+    "mittel": 7.37,
+    "oben": 7.68,
+    "seite": "2"
+   },
+   {
+    "baujahr": 7,
+    "wfl": 2,
+    "ausstattung": "mittel_und",
+    "unten": 7,
+    "mittel": 7.24,
+    "oben": 7.48,
+    "seite": "2"
+   },
+   {
+    "baujahr": 7,
+    "wfl": 0,
+    "ausstattung": "gut_und",
+    "unten": 7.83,
+    "mittel": 8.34,
+    "oben": 8.85,
+    "seite": "2"
+   },
+   {
+    "baujahr": 7,
+    "wfl": 1,
+    "ausstattung": "gut_und",
+    "unten": 7.3,
+    "mittel": 7.69,
+    "oben": 8.08,
+    "seite": "2"
+   },
+   {
+    "baujahr": 7,
+    "wfl": 2,
+    "ausstattung": "gut_und",
+    "unten": 7.21,
+    "mittel": 7.62,
+    "oben": 8.02,
+    "seite": "2"
+   },
+   {
+    "baujahr": 7,
+    "wfl": 0,
+    "ausstattung": "sehr_gut_und",
+    "unten": 8.22,
+    "mittel": 8.76,
+    "oben": 9.3,
+    "seite": "2"
+   },
+   {
+    "baujahr": 7,
+    "wfl": 1,
+    "ausstattung": "sehr_gut_und",
+    "unten": 7.67,
+    "mittel": 8.08,
+    "oben": 8.48,
+    "seite": "2"
+   },
+   {
+    "baujahr": 7,
+    "wfl": 2,
+    "ausstattung": "sehr_gut_und",
+    "unten": 7.57,
+    "mittel": 8,
+    "oben": 8.42,
+    "seite": "2"
+   },
+   {
+    "baujahr": 8,
+    "wfl": 0,
+    "ausstattung": "mittel_und",
+    "unten": 7.72,
+    "mittel": 8.2,
+    "oben": 8.68,
+    "seite": "2"
+   },
+   {
+    "baujahr": 8,
+    "wfl": 1,
+    "ausstattung": "mittel_und",
+    "unten": 7.19,
+    "mittel": 7.52,
+    "oben": 7.85,
+    "seite": "2"
+   },
+   {
+    "baujahr": 8,
+    "wfl": 2,
+    "ausstattung": "mittel_und",
+    "unten": 7.12,
+    "mittel": 7.42,
+    "oben": 7.72,
+    "seite": "2"
+   },
+   {
+    "baujahr": 8,
+    "wfl": 0,
+    "ausstattung": "gut_und",
+    "unten": 8.13,
+    "mittel": 8.54,
+    "oben": 8.95,
+    "seite": "2"
+   },
+   {
+    "baujahr": 8,
+    "wfl": 1,
+    "ausstattung": "gut_und",
+    "unten": 7.6,
+    "mittel": 7.94,
+    "oben": 8.27,
+    "seite": "2"
+   },
+   {
+    "baujahr": 8,
+    "wfl": 2,
+    "ausstattung": "gut_und",
+    "unten": 7.45,
+    "mittel": 7.79,
+    "oben": 8.13,
+    "seite": "2"
+   },
+   {
+    "baujahr": 8,
+    "wfl": 0,
+    "ausstattung": "sehr_gut_und",
+    "unten": 8.54,
+    "mittel": 8.97,
+    "oben": 9.39,
+    "seite": "2"
+   },
+   {
+    "baujahr": 8,
+    "wfl": 1,
+    "ausstattung": "sehr_gut_und",
+    "unten": 7.98,
+    "mittel": 8.33,
+    "oben": 8.68,
+    "seite": "2"
+   },
+   {
+    "baujahr": 8,
+    "wfl": 2,
+    "ausstattung": "sehr_gut_und",
+    "unten": 7.82,
+    "mittel": 8.18,
+    "oben": 8.54,
+    "seite": "2"
+   },
+   {
+    "baujahr": 9,
+    "wfl": 0,
+    "ausstattung": "mittel_und",
+    "unten": 7.81,
+    "mittel": 8.28,
+    "oben": 8.74,
+    "seite": "2"
+   },
+   {
+    "baujahr": 9,
+    "wfl": 1,
+    "ausstattung": "mittel_und",
+    "unten": 7.25,
+    "mittel": 7.6,
+    "oben": 7.95,
+    "seite": "2"
+   },
+   {
+    "baujahr": 9,
+    "wfl": 2,
+    "ausstattung": "mittel_und",
+    "unten": 7.2,
+    "mittel": 7.51,
+    "oben": 7.81,
+    "seite": "2"
+   },
+   {
+    "baujahr": 9,
+    "wfl": 0,
+    "ausstattung": "gut_und",
+    "unten": 8.21,
+    "mittel": 8.62,
+    "oben": 9.03,
+    "seite": "2"
+   },
+   {
+    "baujahr": 9,
+    "wfl": 1,
+    "ausstattung": "gut_und",
+    "unten": 7.66,
+    "mittel": 8,
+    "oben": 8.34,
+    "seite": "2"
+   },
+   {
+    "baujahr": 9,
+    "wfl": 2,
+    "ausstattung": "gut_und",
+    "unten": 7.54,
+    "mittel": 7.88,
+    "oben": 8.21,
+    "seite": "2"
+   },
+   {
+    "baujahr": 9,
+    "wfl": 0,
+    "ausstattung": "sehr_gut_und",
+    "unten": 8.62,
+    "mittel": 9.05,
+    "oben": 9.47,
+    "seite": "2"
+   },
+   {
+    "baujahr": 9,
+    "wfl": 1,
+    "ausstattung": "sehr_gut_und",
+    "unten": 8.06,
+    "mittel": 8.42,
+    "oben": 8.77,
+    "seite": "2"
+   },
+   {
+    "baujahr": 9,
+    "wfl": 2,
+    "ausstattung": "sehr_gut_und",
+    "unten": 7.93,
+    "mittel": 8.28,
+    "oben": 8.62,
+    "seite": "2"
+   },
+   {
+    "baujahr": 10,
+    "wfl": 0,
+    "ausstattung": "mittel_und",
+    "unten": 8.31,
+    "mittel": 8.82,
+    "oben": 9.32,
+    "seite": "2"
+   },
+   {
+    "baujahr": 10,
+    "wfl": 1,
+    "ausstattung": "mittel_und",
+    "unten": 7.74,
+    "mittel": 8.1,
+    "oben": 8.45,
+    "seite": "2"
+   },
+   {
+    "baujahr": 10,
+    "wfl": 2,
+    "ausstattung": "mittel_und",
+    "unten": 7.68,
+    "mittel": 8,
+    "oben": 8.31,
+    "seite": "2"
+   },
+   {
+    "baujahr": 10,
+    "wfl": 0,
+    "ausstattung": "gut_und",
+    "unten": 8.75,
+    "mittel": 9.18,
+    "oben": 9.61,
+    "seite": "2"
+   },
+   {
+    "baujahr": 10,
+    "wfl": 1,
+    "ausstattung": "gut_und",
+    "unten": 8.17,
+    "mittel": 8.54,
+    "oben": 8.9,
+    "seite": "2"
+   },
+   {
+    "baujahr": 10,
+    "wfl": 2,
+    "ausstattung": "gut_und",
+    "unten": 8.04,
+    "mittel": 8.4,
+    "oben": 8.75,
+    "seite": "2"
+   },
+   {
+    "baujahr": 10,
+    "wfl": 0,
+    "ausstattung": "sehr_gut_und",
+    "unten": 9.18,
+    "mittel": 9.64,
+    "oben": 10.09,
+    "seite": "2"
+   },
+   {
+    "baujahr": 10,
+    "wfl": 1,
+    "ausstattung": "sehr_gut_und",
+    "unten": 8.57,
+    "mittel": 8.95,
+    "oben": 9.33,
+    "seite": "2"
+   },
+   {
+    "baujahr": 10,
+    "wfl": 2,
+    "ausstattung": "sehr_gut_und",
+    "unten": 8.43,
+    "mittel": 8.81,
+    "oben": 9.18,
+    "seite": "2"
+   },
+   {
+    "baujahr": 11,
+    "wfl": 0,
+    "ausstattung": "mittel_und",
+    "unten": 8.61,
+    "mittel": 9.13,
+    "oben": 9.65,
+    "seite": "2"
+   },
+   {
+    "baujahr": 11,
+    "wfl": 1,
+    "ausstattung": "mittel_und",
+    "unten": 8.01,
+    "mittel": 8.39,
+    "oben": 8.77,
+    "seite": "2"
+   },
+   {
+    "baujahr": 11,
+    "wfl": 2,
+    "ausstattung": "mittel_und",
+    "unten": 7.95,
+    "mittel": 8.28,
+    "oben": 8.61,
+    "seite": "2"
+   },
+   {
+    "baujahr": 11,
+    "wfl": 0,
+    "ausstattung": "gut_und",
+    "unten": 9.06,
+    "mittel": 9.51,
+    "oben": 9.96,
+    "seite": "2"
+   },
+   {
+    "baujahr": 11,
+    "wfl": 1,
+    "ausstattung": "gut_und",
+    "unten": 8.46,
+    "mittel": 8.83,
+    "oben": 9.2,
+    "seite": "2"
+   },
+   {
+    "baujahr": 11,
+    "wfl": 2,
+    "ausstattung": "gut_und",
+    "unten": 8.32,
+    "mittel": 8.69,
+    "oben": 9.06,
+    "seite": "2"
+   },
+   {
+    "baujahr": 11,
+    "wfl": 0,
+    "ausstattung": "sehr_gut_und",
+    "unten": 9.5,
+    "mittel": 9.97,
+    "oben": 10.44,
+    "seite": "2"
+   },
+   {
+    "baujahr": 11,
+    "wfl": 1,
+    "ausstattung": "sehr_gut_und",
+    "unten": 8.9,
+    "mittel": 9.28,
+    "oben": 9.66,
+    "seite": "2"
+   },
+   {
+    "baujahr": 11,
+    "wfl": 2,
+    "ausstattung": "sehr_gut_und",
+    "unten": 8.75,
+    "mittel": 9.13,
+    "oben": 9.5,
+    "seite": "2"
+   },
+   {
+    "baujahr": 12,
+    "wfl": 0,
+    "ausstattung": "mittel_und",
+    "unten": 8.78,
+    "mittel": 9.3,
+    "oben": 9.81,
+    "seite": "2"
+   },
+   {
+    "baujahr": 12,
+    "wfl": 1,
+    "ausstattung": "mittel_und",
+    "unten": 8.18,
+    "mittel": 8.56,
+    "oben": 8.93,
+    "seite": "2"
+   },
+   {
+    "baujahr": 12,
+    "wfl": 2,
+    "ausstattung": "mittel_und",
+    "unten": 8.12,
+    "mittel": 8.45,
+    "oben": 8.78,
+    "seite": "2"
+   },
+   {
+    "baujahr": 12,
+    "wfl": 0,
+    "ausstattung": "gut_und",
+    "unten": 9.22,
+    "mittel": 9.67,
+    "oben": 10.11,
+    "seite": "2"
+   },
+   {
+    "baujahr": 12,
+    "wfl": 1,
+    "ausstattung": "gut_und",
+    "unten": 8.64,
+    "mittel": 9,
+    "oben": 9.36,
+    "seite": "2"
+   },
+   {
+    "baujahr": 12,
+    "wfl": 2,
+    "ausstattung": "gut_und",
+    "unten": 8.49,
+    "mittel": 8.86,
+    "oben": 9.22,
+    "seite": "2"
+   },
+   {
+    "baujahr": 12,
+    "wfl": 0,
+    "ausstattung": "sehr_gut_und",
+    "unten": 9.69,
+    "mittel": 10.16,
+    "oben": 10.62,
+    "seite": "2"
+   },
+   {
+    "baujahr": 12,
+    "wfl": 1,
+    "ausstattung": "sehr_gut_und",
+    "unten": 9.07,
+    "mittel": 9.45,
+    "oben": 9.83,
+    "seite": "2"
+   },
+   {
+    "baujahr": 12,
+    "wfl": 2,
+    "ausstattung": "sehr_gut_und",
+    "unten": 8.92,
+    "mittel": 9.31,
+    "oben": 9.69,
+    "seite": "2"
+   },
+   {
+    "baujahr": 13,
+    "wfl": 0,
+    "ausstattung": "mittel_und",
+    "unten": 9.08,
+    "mittel": 9.61,
+    "oben": 10.14,
+    "seite": "2"
+   },
+   {
+    "baujahr": 13,
+    "wfl": 1,
+    "ausstattung": "mittel_und",
+    "unten": 8.45,
+    "mittel": 8.84,
+    "oben": 9.23,
+    "seite": "2"
+   },
+   {
+    "baujahr": 13,
+    "wfl": 2,
+    "ausstattung": "mittel_und",
+    "unten": 8.39,
+    "mittel": 8.74,
+    "oben": 9.08,
+    "seite": "2"
+   },
+   {
+    "baujahr": 13,
+    "wfl": 0,
+    "ausstattung": "gut_und",
+    "unten": 9.53,
+    "mittel": 9.99,
+    "oben": 10.45,
+    "seite": "2"
+   },
+   {
+    "baujahr": 13,
+    "wfl": 1,
+    "ausstattung": "gut_und",
+    "unten": 8.93,
+    "mittel": 9.3,
+    "oben": 9.67,
+    "seite": "2"
+   },
+   {
+    "baujahr": 13,
+    "wfl": 2,
+    "ausstattung": "gut_und",
+    "unten": 8.78,
+    "mittel": 9.16,
+    "oben": 9.53,
+    "seite": "2"
+   },
+   {
+    "baujahr": 13,
+    "wfl": 0,
+    "ausstattung": "sehr_gut_und",
+    "unten": 10.02,
+    "mittel": 10.5,
+    "oben": 10.98,
+    "seite": "2"
+   },
+   {
+    "baujahr": 13,
+    "wfl": 1,
+    "ausstattung": "sehr_gut_und",
+    "unten": 9.37,
+    "mittel": 9.77,
+    "oben": 10.16,
+    "seite": "2"
+   },
+   {
+    "baujahr": 13,
+    "wfl": 2,
+    "ausstattung": "sehr_gut_und",
+    "unten": 9.22,
+    "mittel": 9.62,
+    "oben": 10.02,
+    "seite": "2"
+   }
+  ],
+  "zuschlaege": [
+   {
+    "merkmal": "sehr_gut_bis_1996",
+    "label": "sehr gute Ausstattung bei Baujahr bis 1996",
+    "art": "pct",
+    "wert": 5,
+    "bedingung": {
+     "baujahr_bis": 1996
+    },
+    "beleg": "S. 2 unter der Tabelle"
+   },
+   {
+    "merkmal": "weder_bad_noch_zentralheizung",
+    "label": "weder Bad/Dusche noch Zentralheizung („kann“-Abschlag)",
+    "art": "pct",
+    "wert": -20,
+    "beleg": "S. 5"
+   }
+  ]
+ },
+ "punkte_qualitaet": {
+  "beleg": "S. 3 Punktesystem zur Bestimmung der Wohnungsqualität",
+  "plus": {
+   "heizung_modernisiert_ab_2020": 1,
+   "isolierverglasung": 2,
+   "waermeverbundsystem": 2,
+   "energieausweis_A+": 7,
+   "energieausweis_A": 6,
+   "energieausweis_B": 5,
+   "energieausweis_C": 4,
+   "energieausweis_D": 3,
+   "energieausweis_E": 2,
+   "balkon_terrasse": 1,
+   "zusaetzliches_wc": 1,
+   "gemeinschaftsraum": 1,
+   "ruhige_lage": 1,
+   "sehr_ruhige_lage_aufgelockert": 2
+  },
+  "plus_hinweis": "Wärmeverbundsystem „oder“ Energieausweis-Punkte (alternativ)",
+  "minus": {
+   "nicht_abgeschlossen": 1,
+   "ungünstiger_grundriss": 1,
+   "raumhoehe_unter_2_30": 1,
+   "weder_keller_noch_dachboden_5qm": 1,
+   "kein_aufzug_ab_3_og": 1,
+   "laerm_umwelteinfluesse": 1
+  },
+  "stufen": {
+   "einfach": "1 Punkt oder weniger",
+   "mittel": "2 bis 4",
+   "gut": "5 bis 7",
+   "sehr_gut": "8 oder mehr"
+  }
+ },
+ "pruefbeispiele": [
+  {
+   "eingabe": {
+    "baujahr": 1965,
+    "wfl": 70,
+    "ausstattung": "mittel_und"
+   },
+   "erwartet": {
+    "unten": 5.8,
+    "mittel": 5.97,
+    "oben": 6.13
+   },
+   "seite": "2",
+   "art": "tabellenzelle",
+   "anmerkung": "Mitte 5,965 → 5,97 (gerechnet)"
+  },
+  {
+   "eingabe": {
+    "baujahr": 1990,
+    "wfl": 90
+   },
+   "erwartet": {
+    "unten": 5.92,
+    "mittel": 6.35,
+    "oben": 6.77
+   },
+   "seite": "2",
+   "art": "tabellenzelle",
+   "anmerkung": "Standard mittel/und"
+  },
+  {
+   "eingabe": {
+    "baujahr": 1990,
+    "wfl": 60,
+    "ausstattung": "mittel_oder"
+   },
+   "erwartet": null,
+   "seite": "2",
+   "art": "tabellenzelle",
+   "anmerkung": "leeres Feld"
+  },
+  {
+   "eingabe": {
+    "baujahr": 1980,
+    "wfl": 45,
+    "ausstattung": "gut_und",
+    "merkmale": {
+     "sehr_gut_bis_1996": true
+    }
+   },
+   "erwartet": {
+    "unten": 6.7,
+    "mittel": 7.02,
+    "oben": 7.34
+   },
+   "seite": "2",
+   "art": "rechenweg",
+   "anmerkung": "6,38–6,99 (Mitte 6,685 → 6,69) × 1,05: 6,699 / 7,0245 / 7,3395"
+  }
+ ]
+}
