@@ -2570,9 +2570,10 @@
    "quelle_geprueft_am": "2026-11-26",
    "beleg": "https://www.mieterbundrbl.de/wp-content/uploads/2025/01/Mietspiegel_2025.pdf (Titel: \"Mietspiegel für Solingen 2025, vereinbart zwischen Mieterbund Rheinisch-Bergisches Land e.V., Haus- und Grundeigentümerverein Solingen e.V., Haus- und Grundeigentümerverein Solingen-Ohligs e.V.\"; Vorwort: \"Der veröffentlichte Mietspiegel 2025 ist in den Werten identisch mit dem Mietspiegel 2024. Dessen Dokumentation gilt unverändert fort\"; Dokumentation Abschnitt 1: \"Der vorliegende einfache Mietspiegel 2024 (§ 558 c BGB, § 1 MsV) ... am 4.3.2024 vom Arbeitskreis Mietspiegel einvernehmlich beschlossen\"; Abschnitt 5: Mietwertspannen, Fortschreibung des Mietspiegels 2023 inflationsbedingt nach § 558c Abs. 3 BGB). PDF liegt auf der Seite des Miterstellers Mieterbund RBL (https://www.mieterbundrbl.de/)",
    "hinweis": "Einstufung „verboten“: das Dokument verbietet die Vervielfältigung über elektronische Medien ausdrücklich (gleichwertig einem Speicherverbot). Keine Ausgabe 2026 gefunden.",
-   "werte_nutzung": "verboten",
-   "werte_nutzung_grund": "Vervielfältigung über Druckerzeugnisse oder elektronische Medien wird zivil- und strafrechtlich verfolgt; Veröffentlichung nur mit Zustimmung der drei Vereine",
-   "werte_nutzung_beleg": "„Vervielfältigung über Druckerzeugnisse oder elektronische Medien, auch auszugsweise, wird zivil- und strafrechtlich verfolgt.“ (Mietspiegel_2025.pdf, Seite 20) sowie „Veröffentlichungen oder Vervielfältigungen des Mietpreisspiegels sind nur nach Zustimmung durch die genannten drei Vereine zulässig.“ (Seite 10)"
+   "werte_nutzung": "vorbehalt",
+   "werte_nutzung_grund": "Rechtevorbehalt des Herausgebers (Marcel 26.11.2026: Vorbehalt, kein Verbot)",
+   "werte_nutzung_beleg": "„Vervielfältigung über Druckerzeugnisse oder elektronische Medien, auch auszugsweise, wird zivil- und strafrechtlich verfolgt.“ (Mietspiegel_2025.pdf, Seite 20) sowie „Veröffentlichungen oder Vervielfältigungen des Mietpreisspiegels sind nur nach Zustimmung durch die genannten drei Vereine zulässig.“ (Seite 10) Entscheidung Marcel 26.11.2026: Vorbehalt. Wertedatei werte/05122000.json mit freigabe gesperrt folgt (Ernte NRW).",
+   "werte_datei_ausstehend": true
   },
   {
    "ags": "05774032",
@@ -3313,9 +3314,10 @@
    "quelle_geprueft_am": "2026-11-26",
    "beleg": "https://web.rheinische-immobilienboerse.de/upload/2024_Dokumentation_Kerpen_1604.pdf — Abschnitt I. Allgemeines: 'Der Mietspiegel (Stand November 2024) ist eine Übersicht über die ortsübliche Vergleichsmiete gemäß § 558c BGB (einfacher Mietspiegel) für das Stadtgebiet Kerpen …'; 'am 5. November 2024 im Arbeitskreis Mietspiegel beraten und einstimmig beschlossen'; Beteiligte ebd. Mietspiegel selbst https://web.rheinische-immobilienboerse.de/upload/Kerpen_2024_1571.pdf, Kopf: 'Stand 01.11.2024', 'Zusammengestellt bei der Rheinische Immobilienbörse e.V.'. Übersicht https://web.rheinische-immobilienboerse.de/Mietspiegel_Kerpen_2024.AxCMS. Stadtseite https://www.stadt-kerpen.de/vv/produkte/mietspiegel.php ('Richtlinie … (§ 558 BGB)', 'i.d.R. alle 2 Jahre aktualisiert').",
    "hinweis": "Einfacher Mietspiegel (§ 558c), Tabelle Baualtersgruppe × Wohnungsgröße × Wohnlage. Stadtseite nennt noch eine Schutzgebühr von 3,50 € bei der Rheinischen Immobilienbörse; das PDF war am 09.11.2026 dort ohne Anmeldung frei abrufbar. Laut Stadtseite läuft die Datenerhebung für eine Neuausgabe; im Archiv der Rheinischen Immobilienbörse ist für Kerpen noch keine Ausgabe 2026 gelistet (Bergheim und Hürth dort mit Stand 05.2026). Neue Ausgabe „Stand 11.2026“ (Rheinische Immobilienbörse, Seite Mietspiegel_Kerpen_2026.AxCMS) ersetzt Stand 01.11.2024; § 558c BGB im Text (S. 1). Gültig-ab/-bis nicht genannt.",
-   "werte_nutzung": "verboten",
-   "werte_nutzung_grund": "Nachdruck und Wiedergabe im Internet und anderen Kommunikationsmitteln nur mit vorheriger Genehmigung (wie Köln, gleicher Herausgeber)",
-   "werte_nutzung_beleg": "„Nachdruck und/oder Wiedergabe im Internet und anderen Kommunikationsmitteln nur mit vorheriger Genehmigung“ (Seite 2, Fußzeile unter der Tabelle)"
+   "werte_nutzung": "vorbehalt",
+   "werte_nutzung_grund": "Rechtevorbehalt des Herausgebers (Marcel 26.11.2026: Vorbehalt, kein Verbot)",
+   "werte_nutzung_beleg": "„Nachdruck und/oder Wiedergabe im Internet und anderen Kommunikationsmitteln nur mit vorheriger Genehmigung“ (Seite 2, Fußzeile unter der Tabelle) Entscheidung Marcel 26.11.2026: Vorbehalt. Wertedatei werte/05362032.json mit freigabe gesperrt folgt (Ernte NRW).",
+   "werte_datei_ausstehend": true
   },
   {
    "ags": "05162008",
@@ -3385,9 +3387,10 @@
    "quelle_geprueft_am": "2026-11-26",
    "beleg": "https://web.rheinische-immobilienboerse.de/upload/2026_Dokumentation_Hu_rth_1737.pdf — Abschnitt I. Allgemeines: 'Der Mietspiegel (Stand Mai 2026) ist eine Übersicht über die ortsübliche Vergleichsmiete gemäß § 558c BGB (einfacher Mietspiegel) für nicht preisgebundenen Wohnraum für das Stadtgebiet Hürth'; 'am 21. Mai 2026 im Arbeitskreis Mietspiegel beraten und einstimmig beschlossen und wird im Einvernehmen mit der Stadt Hürth veröffentlicht'; Fragebogenrücklauf bis 28.02.2026. Mietspiegel https://web.rheinische-immobilienboerse.de/upload/Huerth_2026_1736.pdf (Kopf 'Stand 05.2026'). Übersicht https://web.rheinische-immobilienboerse.de/Mietspiegel_Huerth_2026.AxCMS",
    "hinweis": "Einfacher Mietspiegel (§ 558c), Tabelle Baualtersgruppe × Wohnungsgröße × Wohnlage mit Spannen. Auf huerth.de selbst kein Mietspiegel gefunden; Dokument liegt bei der Rheinischen Immobilienbörse (Miterstellerin), frei abrufbar. Gültigkeitsende nicht genannt. Stand 05.2026 bestätigt (S. 1 Kopf); „§ 558c BGB“ S. 1; Schutzgebühr 3,50 € bei Abholung (S. 2).",
-   "werte_nutzung": "verboten",
-   "werte_nutzung_grund": "Nachdruck und Wiedergabe im Internet und anderen Kommunikationsmitteln nur mit vorheriger Genehmigung (wie Köln, gleicher Herausgeber)",
-   "werte_nutzung_beleg": "„Nachdruck und/oder Wiedergabe im Internet und anderen Kommunikationsmitteln nur mit vorheriger Genehmigung“ (Seite 2, Fußzeile unter der Tabelle)"
+   "werte_nutzung": "vorbehalt",
+   "werte_nutzung_grund": "Rechtevorbehalt des Herausgebers (Marcel 26.11.2026: Vorbehalt, kein Verbot)",
+   "werte_nutzung_beleg": "„Nachdruck und/oder Wiedergabe im Internet und anderen Kommunikationsmitteln nur mit vorheriger Genehmigung“ (Seite 2, Fußzeile unter der Tabelle) Entscheidung Marcel 26.11.2026: Vorbehalt. Wertedatei werte/05362028.json mit freigabe gesperrt folgt (Ernte NRW).",
+   "werte_datei_ausstehend": true
   },
   {
    "ags": "05362008",
@@ -3410,9 +3413,10 @@
    "quelle_geprueft_am": "2026-11-26",
    "beleg": "https://web.rheinische-immobilienboerse.de/upload/2026_Dokumentation_Bergheim_1731.pdf — Abschnitt I. Allgemeines: 'Der Mietspiegel (Stand Mai 2026) ist eine Übersicht über die ortsübliche Vergleichsmiete gemäß § 558c BGB (einfacher Mietspiegel) … für das Stadtgebiet Bergheim'; 'am 21. Mai 2026 im Arbeitskreis Mietspiegel beraten und einstimmig beschlossen'. Mietspiegel https://web.rheinische-immobilienboerse.de/upload/Bergheim_2026_1721.pdf (Kopf 'Stand 05.2026', 'Richtlinie … (§ 558c BGB)'). Stadtseite https://www.bergheim.de/vv/produkte/mietspiegel.php: 'Die Veröffentlichung des aktuellen Mietspiegels erfolgte im Mai 2026. Er löst damit den bisher gültigen Mietspiegel Stand 04/2024 ab. Er wird alle zwei Jahre aktualisiert.'; Download im Portal der Rheinischen Immobilienbörse, kein Postversand mehr.",
    "hinweis": "Einfacher Mietspiegel (§ 558c), Tabelle Baualtersgruppe × Wohnungsgröße × Wohnlage mit Spannen. Die für April 2026 angekündigte Ausgabe ist im Mai 2026 erschienen; Aktualisierung laut Stadt alle zwei Jahre (kein Datum genannt). Vorgänger Stand 04/2024. Stand 05.2026 bestätigt; „§ 558c BGB“ S. 1.",
-   "werte_nutzung": "verboten",
-   "werte_nutzung_grund": "Nachdruck und Wiedergabe im Internet und anderen Kommunikationsmitteln nur mit vorheriger Genehmigung (wie Köln, gleicher Herausgeber)",
-   "werte_nutzung_beleg": "„Nachdruck und/oder Wiedergabe im Internet und anderen Kommunikationsmitteln nur mit vorheriger Genehmigung“ (Seite 2, Fußzeile unter der Tabelle)"
+   "werte_nutzung": "vorbehalt",
+   "werte_nutzung_grund": "Rechtevorbehalt des Herausgebers (Marcel 26.11.2026: Vorbehalt, kein Verbot)",
+   "werte_nutzung_beleg": "„Nachdruck und/oder Wiedergabe im Internet und anderen Kommunikationsmitteln nur mit vorheriger Genehmigung“ (Seite 2, Fußzeile unter der Tabelle) Entscheidung Marcel 26.11.2026: Vorbehalt. Wertedatei werte/05362008.json mit freigabe gesperrt folgt (Ernte NRW).",
+   "werte_datei_ausstehend": true
   },
   {
    "ags": "05562020",
@@ -3643,9 +3647,10 @@
    "quelle_geprueft_am": "2026-11-26",
    "beleg": "https://www.pulheim.de/aktuelles/meldungen-2026/mietspiegel-datenerhebung.php (Pressemitteilung der Stadt 09.07.2026: 'Der derzeitige Mietspiegel wurde im April 2024 veröffentlicht'; Rheinische Immobilienbörse mit Erhebung eines aktuellen Mietspiegels beauftragt, Online-Umfrage bis Ende September 2026; 'Der Mietspiegel Pulheim 2024 ist kostenfrei abrufbar unter www.rheinische-immobilienboerse.de'); Seite des Miterstellers https://www.rheinische-immobilienboerse.de/Mietspiegel_Pulheim_2024.AxCMS ('Aktueller Stand: April 2024 … Aktualisierung: alle zwei Jahre', Preis 0,00 €); Dokumentation https://www.rheinische-immobilienboerse.de/upload/2024_Dokumentation_Pulheim_1533.pdf, Abschnitt I. Allgemeines: 'Der Mietspiegel (Stand April 2024) ist eine Übersicht über die ortsübliche Vergleichsmiete gemäß § 558c BGB (einfacher Mietspiegel) … Er wurde am 19. März 2024 im Arbeitskreis Mietspiegel beraten und einstimmig beschlossen und wird im Einvernehmen mit der Stadt Pulheim veröffentlicht.'; Mietspiegel-PDF https://www.rheinische-immobilienboerse.de/upload/Pulheim_2024_1502.pdf",
    "hinweis": "Einfacher Mietspiegel (§ 558c BGB), Stand April 2024, Beschluss im Arbeitskreis 19.03.2024. Tabelle mit Mietpreisspannen; Abschläge um 10 % u. a. für einfache Lagen/Wohnungen ohne Heizung oder Bad genannt. Neue Ausgabe 2026 in Arbeit (Datenerhebung bis Ende September 2026). Neue Ausgabe „Stand 11.2026“ (Seite Mietspiegel_Pulheim_2026.AxCMS) ersetzt Stand 04.2024; „§ 558 c BGB“ S. 1.",
-   "werte_nutzung": "verboten",
-   "werte_nutzung_grund": "Nachdruck und Wiedergabe im Internet und anderen Kommunikationsmitteln nur mit vorheriger Genehmigung (wie Köln, gleicher Herausgeber)",
-   "werte_nutzung_beleg": "„Nachdruck und/oder Wiedergabe im Internet und anderen Kommunikationsmitteln nur mit ausdrücklicher Genehmigung“ (Seite 2, Fußzeile unter der Tabelle)"
+   "werte_nutzung": "vorbehalt",
+   "werte_nutzung_grund": "Rechtevorbehalt des Herausgebers (Marcel 26.11.2026: Vorbehalt, kein Verbot)",
+   "werte_nutzung_beleg": "„Nachdruck und/oder Wiedergabe im Internet und anderen Kommunikationsmitteln nur mit ausdrücklicher Genehmigung“ (Seite 2, Fußzeile unter der Tabelle) Entscheidung Marcel 26.11.2026: Vorbehalt. Wertedatei werte/05362036.json mit freigabe gesperrt folgt (Ernte NRW).",
+   "werte_datei_ausstehend": true
   },
   {
    "ags": "05158016",
@@ -3784,9 +3789,10 @@
    "quelle_geprueft_am": "2026-11-26",
    "beleg": "Seite des Miterstellers https://www.rheinische-immobilienboerse.de/Mietspiegel_Frechen_2024.AxCMS ('Mietspiegel für frei finanzierte Wohnungen im Stadtgebiet Frechen, Aktueller Stand: November 2024 … Aktualisierung: alle zwei Jahre', Mitersteller u. a. Stadt Frechen, Preis 0,00 €); Dokumentation https://www.rheinische-immobilienboerse.de/upload/2024_Dokumentation_Frechen_1602.pdf, Abschnitt I. Allgemeines: 'Der Mietspiegel (Stand November 2024) ist eine Übersicht über die ortsübliche Vergleichsmiete gemäß § 558c BGB (einfacher Mietspiegel) für das Stadtgebiet Frechen … Er wurde am 5. November 2024 im Arbeitskreis Mietspiegel beraten und einstimmig beschlossen'; Mietspiegel-PDF https://www.rheinische-immobilienboerse.de/upload/Frechen_2024_1591.pdf ('Mietspiegel Stand 01.11.2024', Baualtersgruppen bis 1960 / 1961–1975 / 1976–1989 / 1990–2004 / …)",
    "hinweis": "Einfacher Mietspiegel (§ 558c BGB) des Arbeitskreises bei der Rheinischen Immobilienbörse mit der Stadt Frechen; Tabelle nach Baualtersgruppen mit Spannen. Aktualisierung alle zwei Jahre – eine Ausgabe 2026 war am 09.11.2026 bei der Rheinischen Immobilienbörse nicht auffindbar. Die Stadtseite stadt-frechen.de war maschinell nicht abrufbar. Neue Ausgabe „Stand 11.2026“ (Seite Mietspiegel_Frechen_2026.AxCMS) ersetzt Stand 01.11.2024; „§ 558 c BGB“ S. 1.",
-   "werte_nutzung": "verboten",
-   "werte_nutzung_grund": "Nachdruck und Wiedergabe im Internet und anderen Kommunikationsmitteln nur mit vorheriger Genehmigung (wie Köln, gleicher Herausgeber)",
-   "werte_nutzung_beleg": "„Nachdruck und/oder Wiedergabe im Internet und anderen Kommunikationsmitteln nur mit vorheriger Genehmigung“ (Seite 2, Fußzeile unter der Tabelle)"
+   "werte_nutzung": "vorbehalt",
+   "werte_nutzung_grund": "Rechtevorbehalt des Herausgebers (Marcel 26.11.2026: Vorbehalt, kein Verbot)",
+   "werte_nutzung_beleg": "„Nachdruck und/oder Wiedergabe im Internet und anderen Kommunikationsmitteln nur mit vorheriger Genehmigung“ (Seite 2, Fußzeile unter der Tabelle) Entscheidung Marcel 26.11.2026: Vorbehalt. Wertedatei werte/05362024.json mit freigabe gesperrt folgt (Ernte NRW).",
+   "werte_datei_ausstehend": true
   },
   {
    "ags": "05962040",
