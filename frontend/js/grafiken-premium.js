@@ -891,7 +891,10 @@
     if (zb && P.bindEnde > P.heute) marken.push({ j: P.bindEnde, text: 'Ende Zinsbindung', farbe: F.goldD, zeile: 2 });
     var frei23 = (opt.voll && P.privat && P.kaufJ) ? P.kaufJ + 10 : null;
     if (frei23 && frei23 >= X[0] && frei23 <= X[X.length - 1]) marken.push({ j: frei23, text: 'Verkauf steuerfrei ab ' + String(P.kaufM || 1).padStart(2, '0') + '/' + frei23, farbe: F.tinte3, zeile: 3 });
-    var wirk = J.map(function (r) { return (r.cfns != null && r.cfop != null) ? r.cfns - r.cfop : null; });
+    /* Steuerwirkung je Jahr: im Reiter Steuer aus derselben Quelle wie die Jahreskarten und das Steuerformular
+       (_computeYearTotal, refund), sonst cfns minus cfop. Gemessen Westerfeld 140, Erstattungen 2025 bis 2040: Karten 55.919 €, cfns minus cfop 60.653 €. */
+    var refJ = {}; if (opt.voll && typeof window._computeYearTotal === 'function' && window.State && Array.isArray(State.cfRows)) { try { State.cfRows.forEach(function (r, q) { var t = window._computeYearTotal(r.cal, q) || {}; if (isFinite(Number(t.refund))) refJ[+r.cal] = Number(t.refund); }); } catch (eRf) { refJ = {}; } }
+    var wirk = J.map(function (r) { if (refJ[r.j] != null) return refJ[r.j]; return (r.cfns != null && r.cfop != null) ? r.cfns - r.cfop : null; });
     verlauf(ziel, { x: X, heute: P.heute, saeulen: opt.voll ? { werte: wirk, farbe: function (v) { return v >= 0 ? F.gruen : F.rot; } } : null,
       /* v4310 · Marcel 24.11.2026: Farbschema wie Bewertung. Steuerwirkung grün, wo die Steuer Geld bringt, rot, wo sie Geld kostet */
       baender: [{ ohneRand: true, farbe: 'color-mix(in srgb,' + F.gruen + ' 16%,transparent)', lo: J.map(function (r) { return r.cfns >= r.cfop ? r.cfop : null; }), hi: J.map(function (r) { return r.cfns >= r.cfop ? r.cfns : null; }) },
