@@ -696,7 +696,7 @@
           await warte(900);
           await zeige(function () { return qcEl('oab-results'); }, 6);
           var mw = _mbAkt.mw, mm = _mbAkt.mm;
-          s.zeile('Marktwertindikation', 'Die Wohnung ist leer, DealPilot schätzt den Markt: Marktwert <b>' + eur(mw.low) + ' – ' + eur(mw.high) + '</b>, Miete <b>' + eur(mm.low) + ' – ' + eur(mm.high) + '</b> kalt.');
+          s.zeile('Marktpreisindikation', 'Die Wohnung ist leer, DealPilot schätzt den Markt: Marktpreisindikation <b>' + eur(mw.low) + ' – ' + eur(mw.high) + '</b>, Miete <b>' + eur(mm.low) + ' – ' + eur(mm.high) + '</b> kalt.');
           await warte(5200);
         },
         async function (s) {   /* 5 · Spanne Unten -> sofort eine Einschätzung */
@@ -871,7 +871,7 @@
           try { qcWin()._oabFeedTrigger(); } catch (e) {}
           await warte(900);
           await zeige(function () { return qcEl('oab-results'); }, 6);
-          s.zeile('Marktbewertung', 'DealPilot schätzt das Haus: Marktwert <b>' + eur(IMO_KARTE.mw.low) + ' – ' + eur(IMO_KARTE.mw.high) + '</b>, Miete <b>' + eur(IMO_KARTE.mm.low) + ' – ' + eur(IMO_KARTE.mm.high) + '</b> im Monat.');
+          s.zeile('Marktbewertung', 'DealPilot schätzt das Haus: Marktpreisindikation <b>' + eur(IMO_KARTE.mw.low) + ' – ' + eur(IMO_KARTE.mw.high) + '</b>, Miete <b>' + eur(IMO_KARTE.mm.low) + ' – ' + eur(IMO_KARTE.mm.high) + '</b> im Monat.');
           await warte(5400);
         },
         async function (s) {   /* 5 · Spanne: Unten, Ø, Oben */
@@ -984,7 +984,7 @@
           try { qcWin()._oabFeedTrigger(); } catch (e) {}
           await warte(900);
           await zeige(function () { return qcEl('oab-results'); }, 6);
-          s.zeile('Marktbewertung', 'Marktwert <b>' + eur(SPR_KARTE.mw.low) + ' – ' + eur(SPR_KARTE.mw.high) + '</b>, der Kaufpreis liegt darunter. Marktmiete <b>' + eur(SPR_KARTE.mm.low) + ' – ' + eur(SPR_KARTE.mm.high) + '</b>.');
+          s.zeile('Marktbewertung', 'Marktpreisindikation <b>' + eur(SPR_KARTE.mw.low) + ' – ' + eur(SPR_KARTE.mw.high) + '</b>, der Kaufpreis liegt darunter. Marktmiete <b>' + eur(SPR_KARTE.mm.low) + ' – ' + eur(SPR_KARTE.mm.high) + '</b>.');
           await warte(5600);
         },
         async function (s) {   /* 5 · Spanne Ø und Oben */
@@ -1393,7 +1393,7 @@
         try { qcWin()._oabFeedTrigger(); } catch (e) {}
         await warte(900);
         await zeige(function () { return qcEl('oab-results'); }, 6);
-        await b2oZeile(s, 'Der Markt schätzt mit', 'DealPilot-Marktbewertung: Marktwert <b>' + eur(k.mw.med) + '</b> (Spanne ' + eur(k.mw.low) + ' – ' + eur(k.mw.high) + '), Marktmiete <b>' + eur(k.mm.med) + '</b> kalt.');
+        await b2oZeile(s, 'Der Markt schätzt mit', 'DealPilot-Marktbewertung: Marktpreisindikation <b>' + eur(k.mw.med) + '</b> (Spanne ' + eur(k.mw.low) + ' – ' + eur(k.mw.high) + '), Marktmiete <b>' + eur(k.mm.med) + '</b> kalt.');
       },
       async function (s) {   /* 6 · Als Objekt speichern -> Übernahme-Fenster */
         await zeige(function () { var b = qcEl('save-btn'); return b && b.getBoundingClientRect().width ? b : null; }, 12);
@@ -1404,7 +1404,7 @@
         await warte(700);
         await zeige(function () { return q('#qcpm-ov #qcpm-secs') || q('#qcpm-ov .qcpm-box'); }, 8);
         var mw = (q('#qcpm-ov span.v[data-k="mw"]') || {}).textContent, mm = (q('#qcpm-ov span.v[data-k="mm"]') || {}).textContent;
-        await b2oZeile(s, 'Was mitkommt', 'Aus der Marktbewertung: Marktwert <b>' + (mw || '–') + '</b> und Marktmiete <b>' + (mm || '–') + '</b>, angehakt, die Spanne wählst du hier.');
+        await b2oZeile(s, 'Was mitkommt', 'Aus der Marktbewertung: Marktpreisindikation <b>' + (mw || '–') + '</b> und Marktmiete <b>' + (mm || '–') + '</b>, angehakt, die Spanne wählst du hier.');
       },
       async function (s) {   /* 7 · Ausgelesene Daten, dann speichern */
         var tab = q('#qcpm-ov .qcpm-tab[data-tab="src"]'); if (tab) tab.click();
@@ -9155,7 +9155,7 @@
         var kk = null; try { kk = JSON.parse(st.value).card; } catch (e) {}
         await warte(700);
         await qcHole(ob()); await zeige(ob, 8);
-        if (kk && kk.mw) await b2oZeile(s, 'Marktbewertung', 'Marktwert <b>' + eur(kk.mw.med) + '</b>, Spanne ' + eur(kk.mw.low) + ' – ' + eur(kk.mw.high) + '.');
+        if (kk && kk.mw) await b2oZeile(s, 'Marktbewertung', 'Marktpreisindikation <b>' + eur(kk.mw.med) + '</b>, Spanne ' + eur(kk.mw.low) + ' – ' + eur(kk.mw.high) + '.');
         DPM_QG.zeiten.push({ szene: 'A2', ms: Date.now() - t1 });
       },
       /* ── A3 · Beleihung 80 %, Score ── */
