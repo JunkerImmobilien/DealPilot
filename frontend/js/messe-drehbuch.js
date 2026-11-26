@@ -1950,6 +1950,8 @@
         await b2oZeile(s, 'Weg 2 · ' + rhNameKachel('voice'), 'Einfach erzählen. Die Mitschrift läuft mit, erkannte Angaben werden grün.');
         await warteAuf(function () { return _rh && _rh.spr >= 2 && /Obergeschoss/.test((q('#vi-live') || {}).value || ''); }, 20000);
         await warte(2600);
+        /* V1 27.11.2026 · unter Last kam die Live-Erkennung erst nach der Bauchbinde (Video zeigte 0 von 34): auf den ersten Treffer warten */
+        await warteAuf(function () { var e = rhIm('#oabi-ov', /\d+\s*von\s*\d+\s*Angaben/i), x = e && /(\d+)\s*von/.exec(e.textContent); return x && +x[1] > 0; }, 12000);
         var z = rhIm('#oabi-ov', /\d+\s*von\s*\d+\s*Angaben/i), m = z && /(\d+)\s*von\s*(\d+)\s*Angaben/i.exec(z.textContent);
         await zeige(function () { return q('#oabi-ov details.vi-transcript') || q('#oabi-ov .oabi-modal'); }, 6);
         await b2oZeile(s, 'Weg 2 · ' + rhNameKachel('voice'), 'Zwei Sätze gesprochen' + (m ? ', <b>' + m[1] + ' von ' + m[2] + '</b> Angaben schon erkannt' : '') + '. Das ganze Beispiel zeigt Modul 05.');
