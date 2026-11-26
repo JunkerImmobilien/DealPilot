@@ -35,17 +35,25 @@
     var str = ($('egStr') || {}).value || '';
     return { kp: zahl('egKp'), wfl: zahl('egWfl'), gsfl: zahl('egGsfl'), bj: zahl('egBj'), ek: zahl('egEk'), netto: zahl('egNetto'),
       plz: (($('egPlz') || {}).value || '').trim(), objektart: ($('egArt') || {}).value || 'efh', str: str.trim(),
-      keller: ($('egKeller') || {}).value || 'ja', geschosse: ($('egGeschosse') || {}).value || '2', dach: ($('egDach') || {}).value || '1', ausst: ($('egAusst') || {}).value || 'normal' };
+      keller: ($('egKeller') || {}).value || 'ja', geschosse: ($('egGeschosse') || {}).value || '2', dach: ($('egDach') || {}).value || '1', ausst: ($('egAusst') || {}).value || 'normal',
+      /* pp6 · Zustand, Heizung, Energieklasse, Zinsbindung, eigener Zins, Tilgung */
+      zstufe: ($('egZustand') || {}).value || '', hzbj: zahl('egHzBj') || null, ekl: ($('egEkl') || {}).value || '', bindung: Number(($('egBindung') || {}).value) || 10,
+      zins_eigen: dez('egZins'), tilgung: dez('egTilg') };
   }
   /* Gebäudetyp nach NHK 2010 wie im Objekt-Formular der App (nhk_haus, nhk_geschosse, nhk_dach), Standardstufe über ausst */
+  function dez(id) { var v = String((($(id) || {}).value) || '').trim().replace(',', '.'); var n = parseFloat(v); return v && isFinite(n) ? n : null; }
+  function zusatzNhk(e) { var Z = (window.DpEigennutzerKern && DpEigennutzerKern.ZSTUFE) || {}, o = {}; if (e.zstufe && Z[e.zstufe]) o.mod = Z[e.zstufe].punkte; if (e.ekl) o.ekl = e.ekl; return o; }
   function nhkAus(e) {
     var haus = e.objektart === 'dhh' ? '2' : (e.objektart === 'rh' ? '3' : '1');
+    /* pp6 · NHK 2010 kennt für Ein- und Zweifamilienhäuser höchstens Erd- und Obergeschoss (Typen x.01 bis x.33). Bei drei und mehr
+       Vollgeschossen gibt es keinen passenden Typ: dann kein Gebäudetyp, der Sachwert rechnet nicht halb (Bericht sagt warum). */
+    if (String(e.geschosse) === '3' || String(e.geschosse) === '4') return Object.assign({ haus: haus, dach: String(e.dach || '1'), ausst: e.ausst || 'normal' }, zusatzNhk(e));
     var og = String(e.geschosse) === '2';
     var g = e.keller === 'nein' ? (og ? '3' : '2') : (og ? '1' : '0');
-    return { haus: haus, geschosse: g, dach: String(e.dach || '1'), ausst: e.ausst || 'normal' };
+    return Object.assign({ haus: haus, geschosse: g, dach: String(e.dach || '1'), ausst: e.ausst || 'normal' }, zusatzNhk(e));
   }
   function setzeFelder(e) {
-    var map = { egKeller: e.keller, egGeschosse: e.geschosse, egDach: e.dach, egAusst: e.ausst, egKp: e.kp, egWfl: e.wfl, egGsfl: e.gsfl, egBj: e.bj, egEk: e.ek, egNetto: e.netto, egPlz: e.plz, egArt: e.objektart, egStr: e.str };
+    var map = { egZustand: e.zstufe, egHzBj: e.hzbj, egEkl: e.ekl, egBindung: e.bindung, egZins: e.zins_eigen, egTilg: e.tilgung, egKeller: e.keller, egGeschosse: e.geschosse, egDach: e.dach, egAusst: e.ausst, egKp: e.kp, egWfl: e.wfl, egGsfl: e.gsfl, egBj: e.bj, egEk: e.ek, egNetto: e.netto, egPlz: e.plz, egArt: e.objektart, egStr: e.str };
     Object.keys(map).forEach(function (id) { var el = $(id); if (el && map[id] != null && map[id] !== '') el.value = (typeof map[id] === 'number' && id !== 'egBj') ? map[id].toLocaleString('de-DE') : String(map[id]);   /* Baujahr nie mit Tausenderpunkt */ });
   }
 
@@ -122,10 +130,11 @@
     var d = null, html = null, htmlServer = null;
     warteBezahlt(t, 10).then(function () {
       meldung('Bezahlt. Wert, Beleihungswert und Umfeld werden gerechnet, das dauert bis zu einer Minute …');
-      return E.daten(e.plz, e.bj, e.wfl);
+      var Z = E.ZSTUFE || {};
+      return E.daten(e.plz, e.bj, e.wfl, { mod_punkte: e.zstufe && Z[e.zstufe] ? Z[e.zstufe].punkte : null });
     }).then(function (dd) {
       d = dd;
-      var vor = E.rechne({ kp: e.kp, wfl: e.wfl, bj: e.bj, ek: e.ek, netto: e.netto, plz: e.plz, objektart: e.objektart }, d);
+      var vor = E.rechne({ kp: e.kp, wfl: e.wfl, bj: e.bj, ek: e.ek, netto: e.netto, plz: e.plz, objektart: e.objektart, bindung: e.bindung, zins_eigen: e.zins_eigen, tilgung: e.tilgung }, d);
       var adresse = (e.str ? e.str + ', ' : '') + e.plz + ' ' + String(d.gebiet || '').replace(/,.*$/, '');
       return post('/bericht', { token: t, adresse: adresse, darlehen: vor && vor.darlehen, nhk: e.objektart === 'etw' ? null : nhkAus(e) }).then(function (b) {
         if (!b || b._status >= 400) throw new Error((b && b.error) || 'Der Bericht ging gerade nicht.');
@@ -134,7 +143,8 @@
              die Fassung für den Druck auf dem Server rechnet ohne Netto (netto 0) und nennt das nötige Netto für grün/gelb. */
           var o = { d: d, bericht: b, adresse: adresse, anrechnung: st && st.anrechnung };
           /* pp6 · Grundangaben für den Bericht (Grundstück, Haustyp, Ausstattung, Straße) gehen mit, das Netto nur in die lokale Fassung */
-          var basis = { kp: e.kp, wfl: e.wfl, bj: e.bj, ek: e.ek, plz: e.plz, objektart: e.objektart, gsfl: e.gsfl, keller: e.keller, geschosse: e.geschosse, dach: e.dach, ausst: e.ausst, str: e.str };
+          var basis = { kp: e.kp, wfl: e.wfl, bj: e.bj, ek: e.ek, plz: e.plz, objektart: e.objektart, gsfl: e.gsfl, keller: e.keller, geschosse: e.geschosse, dach: e.dach, ausst: e.ausst, str: e.str,
+            zustand: { stufe: e.zstufe || null, heizung_baujahr: e.hzbj || null, energieklasse: e.ekl || null }, bindung: e.bindung, zins_eigen: e.zins_eigen, tilgung: e.tilgung };
           var mit = A.html(Object.assign({ e: Object.assign({}, basis, { netto: e.netto }) }, o));
           var ohne = A.html(Object.assign({ e: Object.assign({}, basis, { netto: 0 }) }, o));
           return Promise.all([mit, ohne]).then(function (z) { z[0].htmlServer = z[1].html; return z[0]; });

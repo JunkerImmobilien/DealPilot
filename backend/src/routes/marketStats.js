@@ -51,10 +51,15 @@ function kachelAusFeld(f) {
   return { wert: Number(f.wert), einheit: f.einheit || null, wort: f.wort || null, ton: f.ton || null,
     stand: f.stand == null ? null : (typeof f.stand === 'object' ? (f.stand.bevoelkerung || null) : f.stand), ebene: f.ebene || null };
 }
-function vglAus(ms, bj, wfl) {
+function vglAus(ms, bj, wfl, modP) {
   if (!ms) return null;
   const objekt = { baujahr: bj || 1975, wfl: wfl || 70, norm: !bj || !wfl };
   const w = ms.werte;
+  /* pp6 · mit Modernisierungspunkten (Haus-Check, Zustand) die Einordnung in die Spanne aus lib/mietanker.js (dieselbe Rechnung wie im
+     Wertkern): modernisiert rückt in Richtung Oberwert, unsaniert in Richtung Unterwert. Ohne Punkte bleibt es der Mittelwert. */
+  const vw = ms.vergleich_wohnung;
+  if (modP != null && w && Number(w.mittel) > 0 && vw && Number(vw.qm) > 0) return { qm: Number(vw.qm), unten: Number(w.unten) || null, oben: Number(w.oben) || null, einordnung: vw.einordnung || null,
+    quelle: 'mietspiegel', art: ms.art || w.art || null, gemeinde: w.gemeinde || ms.gemeinde || null, stand: w.stand || ms.stand || null, zelle: w.zelle || null, objekt, mod_punkte: modP };
   if (w && Number(w.mittel) > 0) return { qm: Number(w.mittel), unten: Number(w.unten) || null, oben: Number(w.oben) || null,
     quelle: 'mietspiegel', art: ms.art || w.art || null, gemeinde: w.gemeinde || ms.gemeinde || null, stand: w.stand || ms.stand || null, zelle: w.zelle || null, objekt };
   const n = ms.naeherung;
@@ -96,8 +101,9 @@ router.get('/schnellcheck', schnellLimit, async (req, res) => {
   /* v5080 · wie der Proxy (routes/marktbericht.js v3260): ausserhalb von Staging nur freie Mietspiegel-Werte, gesperrte
      (Rechtevorbehalt) rechnen dort nie, dann rechnet die DealPilot-Naeherung. */
   const _staging = /staging|localhost|127\.0\.0\.1/i.test(String(process.env.APP_URL || '') + ' ' + String(process.env.APP_DOMAIN || ''));
-  const msQ = '&baujahr=' + (bj || 1975) + '&wfl=' + (wfl || 70) + (_staging ? '' : '&nur_frei=1');
-  const key = plz + '|' + ort.toLowerCase() + '|' + (bj || '') + '|' + (wfl || '');
+  const modIn = parseInt(String(req.query.mod_punkte || ''), 10), modP = modIn >= 0 && modIn <= 20 ? modIn : null;   /* pp6 · Anlage 2, 0 bis 20 */
+  const msQ = '&baujahr=' + (bj || 1975) + '&wfl=' + (wfl || 70) + (modP != null ? '&mod_punkte=' + modP : '') + (_staging ? '' : '&nur_frei=1');
+  const key = plz + '|' + ort.toLowerCase() + '|' + (bj || '') + '|' + (wfl || '') + '|' + (modP == null ? '' : modP);
   const alt = schnellSpeicher.get(key);
   if (alt && Date.now() - alt.t < SCHNELL_TTL) return res.set('Cache-Control', 'public, max-age=3600').json(alt.d);
   const q = '?plz=' + plz + (ort ? '&ort=' + encodeURIComponent(ort) : '');
@@ -115,7 +121,7 @@ router.get('/schnellcheck', schnellLimit, async (req, res) => {
     bevoelkerung: kachelAusFeld(fe.ds2_bevoelkerung),
     leerstand: kachelAusFeld(fe.ds2_mietausfall),
     miete: miete && miete.available && miete.qm > 0 ? { qm: miete.qm, ebene: miete.ebene || null, monat: miete.fortgeschrieben_auf || null } : null,
-    vergleichsmiete: vglAus(ms, bj, wfl),
+    vergleichsmiete: vglAus(ms, bj, wfl, modP),
     einwohner: ort2 && ort2.einwohner ? ort2.einwohner : null,
     nebenkosten: nk && nk.summe_qm > 0 ? { qm: nk.summe_qm, ortsgenau: (nk.posten || []).filter((p) => p.herkunft === 'gemeinde').map((p) => p.id), posten: (nk.posten || []).map((p) => ({ id: p.id, name: p.name, qm: p.qm_monat, herkunft: p.herkunft })) } : null,
     kappung: ort2 && ort2.kappung ? { pct: ort2.kappung.pct, verordnung: ort2.kappung.herkunft === 'verordnung', pruefen: ort2.kappung.pruefen, text: ort2.kappung.text } : null,

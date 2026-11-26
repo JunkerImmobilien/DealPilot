@@ -116,6 +116,14 @@
   }
 
   /* ── Zustand nach Baujahr (gekürzt aus besichtigung.js) + Merkmale ─ */
+  /* pp6 · Zustand als Stufe wie im Deal-Check, mit Punkten nach Anlage 2 ImmoWertV (Modernisierungsgrad):
+     nicht modernisiert ≤ 1, mittel 6 bis 10, überwiegend 11 bis 17, umfassend ≥ 18 (Mitte je Band, wie modernisierung-herkunft.js). */
+  var ZSTUFE = {
+    unsaniert:    { punkte: 0,  text: 'unsaniert', wort: 'nicht modernisiert' },
+    teilweise:    { punkte: 8,  text: 'teilweise modernisiert', wort: 'mittlerer Modernisierungsgrad' },
+    ueberwiegend: { punkte: 14, text: 'überwiegend modernisiert', wort: 'überwiegend modernisiert' },
+    kernsaniert:  { punkte: 19, text: 'kernsaniert', wort: 'umfassend modernisiert' }
+  };
   function zustand(bj, z, objektart, weg) {
     var s, punkte;
     if (bj >= 2010) { s = 90; punkte = ['Gewährleistung und Bauabnahme prüfen', 'Lüftungsanlage und Wartung', 'Energieausweis mit Bedarfswerten']; }
@@ -125,6 +133,13 @@
     else { s = 42; punkte = ['Holzbalkendecken und Feuchte', 'Elektrik erneuern', 'Denkmalschutz prüfen']; }
     var hinweise = [];
     z = z || {};
+    var zs = z.stufe && ZSTUFE[z.stufe] ? ZSTUFE[z.stufe] : null;
+    if (zs) {
+      /* Modernisierung hebt den Zustand auf das Niveau ihres Bandes (40 + 2,5 je Punkt), unsaniert senkt ihn bei älteren Häusern */
+      var sMod = 40 + zs.punkte * 2.5;
+      if (zs.punkte >= 8) s = Math.max(s, sMod); else if (bj < 2010) s -= bj < 1995 ? 8 : 4;
+      hinweise.push('Zustand ' + zs.text + ' (deine Angabe), nach Anlage 2 ImmoWertV ' + zs.punkte + ' Punkte, ' + zs.wort + '.');
+    }
     var ek = z.energieklasse ? String(z.energieklasse).toUpperCase() : null;
     if (ek) {
       var ekAdj = { 'A+': 10, A: 8, B: 5, C: 2, D: 0, E: -4, F: -8, G: -12, H: -15 }[ek];
@@ -140,7 +155,7 @@
       if (rq != null && rq < 10) { s -= 8; hinweise.push('Rücklage nur ' + komma(rq) + ' €/m², eher knapp.'); }
       if (weg.sanierung_beschlossen) { s -= 5; hinweise.push('Beschlossene Sanierung in der Gemeinschaft: ' + String(weg.sanierung_beschlossen) + '.'); }
     }
-    return { score: r0(klemm(s)), punkte: punkte, hinweise: hinweise };
+    return { score: r0(klemm(s)), punkte: punkte, hinweise: hinweise, mod_punkte: zs ? zs.punkte : null, stufe: zs ? z.stufe : null };
   }
 
   /* ── Preis: Kaufpreis gegen Wert und gegen ersparte Miete ─────────── */
@@ -169,7 +184,8 @@
     var darlehen = Math.max(0, kp + nk.summe - ek);
     nk = nebenkosten(kp, darlehen, e.grest_pct, e.makler_pct);
     darlehen = Math.max(0, kp + nk.summe - ek);
-    var rate = darlehen * (zins + A.tilgung_pct) / 100 / 12;
+    var tilg = num(e.tilgung_pct); if (tilg == null || tilg < 0.5 || tilg > 10) tilg = A.tilgung_pct;   /* pp6 · eigene Tilgung, sonst 2 % */
+    var rate = darlehen * (zins + tilg) / 100 / 12;
     var bewirt = wfl * A.bewirt_qm;
     if (art === 'etw' && e.weg && num(e.weg.hausgeld_nicht_umlagefaehig) != null) bewirt = num(e.weg.hausgeld_nicht_umlagefaehig);
     /* Betriebskosten: Heizung + übrige. Vorrang Unterlagen (Exposé: heizkosten_monat, betriebskosten_monat. ETW: umlagefähiges
@@ -266,7 +282,7 @@
       leistbarkeit: { quote: quote != null ? r2(quote) : null, ampel: ampel, wohnkosten: r0(wohnkosten), netto: netto, aufstellung: aufstellung,
         grenzen: { gruen: A.ampel_gruen_pct, gelb: A.ampel_gelb_pct }, betriebskosten: r0(heizMonat + uebrig),
         heizung: { kwh_qm: heiz.kwh_qm, traeger: heiz.traeger, ct: heiz.ct, herkunft: heizHerkunft } },
-      finanzierung: { zins_pct: zins, tilgung_pct: A.tilgung_pct, darlehen: r0(darlehen), rate: r0(rate), ltv_pct: r2(darlehen / kp * 100), bewirt: r0(bewirt) },
+      finanzierung: { zins_pct: zins, tilgung_pct: tilg, bindung_jahre: num(e.bindung_jahre) || 10, zins_herkunft: e.zins_herkunft || null, darlehen: r0(darlehen), rate: r0(rate), ltv_pct: r2(darlehen / kp * 100), bewirt: r0(bewirt) },
       nebenkosten: nk,
       miete: { vergleich_qm: vm, hauszuschlag_pct: zuschlag, qm: mieteQm != null ? r2(mieteQm) : null, monat: miete != null ? r0(miete) : null,
         faktor: faktor != null ? r2(faktor) : null, basis: 'Mittelwert der Vergleichsmiete' },
@@ -288,10 +304,12 @@
     e = e || {}; d = d || {};
     var kp = num(e.kp), ek = num(e.ek) || 0;
     var ltv0 = kp > 0 ? Math.max(0, kp * 1.1 - ek) / kp * 100 : 80;
-    var zins = typeof d.zinsFn === 'function' ? d.zinsFn(ltv0) : num(d.zins);
+    var bindung = [5, 10, 15, 20].indexOf(Number(e.bindung)) >= 0 ? Number(e.bindung) : 10;
+    var zins = typeof d.zinsFn === 'function' ? d.zinsFn(ltv0, bindung) : num(d.zins), zinsHer = d.zinsLive ? 'tagesaktuell' : 'Durchschnitt, nicht tagesaktuell';
+    if (num(e.zins_eigen) != null && num(e.zins_eigen) > 0 && num(e.zins_eigen) < 15) { zins = num(e.zins_eigen); zinsHer = 'deine Angabe'; }
     var art = String(e.objektart || 'efh').toLowerCase();
     var r = rechne({ kaufpreis: kp, wfl: e.wfl, baujahr: e.bj, objektart: art, ek: ek, netto: e.netto,
-      zins_pct: zins, grest_pct: e.grest_pct, vergleichsmiete_qm: d.mieteQm,
+      zins_pct: zins, tilgung_pct: e.tilgung, bindung_jahre: bindung, zins_herkunft: zinsHer, grest_pct: e.grest_pct, vergleichsmiete_qm: d.mieteQm,
       hauszuschlag_pct: e.hauszuschlag_pct != null ? e.hauszuschlag_pct : (art === 'etw' ? 0 : 15),
       lage_score: lageAusMarkt(d), zustand: e.zustand, weg: e.weg, wert: e.wert,
       /* nn6 · ortsgenaue Nebenkosten (ohne Heizung), Rückfall bleibt die Pauschale im Kern */
@@ -317,19 +335,21 @@
 
   /* ── Datenholer der Demo (Browser, öffentliche Endpunkte). Kein Rechenteil. ── */
   var RUECK = { zins: 4.09, miete: 7.87, makro: 51, leer: 'gut', bev: 0.13, gebiet: 'Bielefeld, Stadt', quelle: 'Rückfall' };
-  function daten(plz, bj, wfl) {
+  function daten(plz, bj, wfl, opt) {
+    opt = opt || {};
     var d = { zinsFn: function () { return RUECK.zins; }, mieteQm: RUECK.miete, makro: RUECK.makro, leer: RUECK.leer, bev: RUECK.bev, gebiet: RUECK.gebiet, quelle: RUECK.quelle };
     if (typeof fetch !== 'function' || typeof location === 'undefined') return Promise.resolve(d);
     /* App-Domain: dort liegt /api/v1. Auf der Landing (dealpilot.immo, staging.dealpilot.immo) die passende App-Domain. */
     var h = location.hostname, API = (/^app\./.test(h) || /localhost|127\.0\.0\.1/.test(h) ? (location.origin || '')
       : /staging/.test(h) ? 'https://app.staging.dealpilot.immo' : 'https://app.dealpilot.immo') + '/api/v1';
     var z = fetch(API + '/market-rates/bauzins').then(function (r) { return r.json(); }).then(function (j) {
-      var ir = j.indicativeRates && j.indicativeRates['10'], st = j.stufen_ltv || { premium: 60, standard: 80, schwach: 90, voll: 100 };
-      if (ir) d.zinsFn = function (ltv) { var k = ltv <= st.premium ? 'premium' : ltv <= st.standard ? 'standard' : ltv <= st.schwach ? 'schwach' : 'voll'; return ir[k]; };
+      var IR = j.indicativeRates || {}, st = j.stufen_ltv || { premium: 60, standard: 80, schwach: 90, voll: 100 };
+      /* pp6 · Zins zur gewählten Zinsbindung (5, 10, 15, 20 Jahre), Beleihungsstufe aus dem Auslauf */
+      if (IR['10']) { d.zinsLive = j.quelle === 'live'; d.zinsFn = function (ltv, bindung) { var ir = IR[String(bindung || 10)] || IR['10']; var k = ltv <= st.premium ? 'premium' : ltv <= st.standard ? 'standard' : ltv <= st.schwach ? 'schwach' : 'voll'; return ir[k]; }; }
     }).catch(function () {});
-    var m = fetch(API + '/market-stats/schnellcheck?plz=' + encodeURIComponent(plz) + '&baujahr=' + bj + '&wfl=' + wfl)
+    var m = fetch(API + '/market-stats/schnellcheck?plz=' + encodeURIComponent(plz) + '&baujahr=' + bj + '&wfl=' + wfl + (num(opt.mod_punkte) != null ? '&mod_punkte=' + num(opt.mod_punkte) : ''))
       .then(function (r) { return r.json(); }).then(function (j) {
-        if (j.vergleichsmiete && j.vergleichsmiete.qm) { d.mieteQm = j.vergleichsmiete.qm; d.quelle = j.vergleichsmiete.quelle === 'mietspiegel' ? 'Mietspiegel' : 'DealPilot-Näherung'; }
+        if (j.vergleichsmiete && j.vergleichsmiete.qm) { d.mieteQm = j.vergleichsmiete.qm; d.mieteEinordnung = j.vergleichsmiete.einordnung || null; d.quelle = j.vergleichsmiete.quelle === 'mietspiegel' ? 'Mietspiegel' : 'DealPilot-Näherung'; }
         if (j.makrolage && j.makrolage.wert != null) d.makro = j.makrolage.wert;
         if (j.leerstand && j.leerstand.ton) d.leer = j.leerstand.ton;
         if (j.bevoelkerung && j.bevoelkerung.wert != null) d.bev = j.bevoelkerung.wert;
@@ -349,7 +369,7 @@
   }
 
   var api = { rechne: function (e, d) { return arguments.length >= 2 || (e && e.kp != null) ? rechneDemo(e, d) : rechne(e); },
-    kern: rechne, rechneDemo: rechneDemo, daten: daten, umfeld: umfeld, nebenkosten: nebenkosten, eur: eur, stufe: stufe,
+    kern: rechne, rechneDemo: rechneDemo, daten: daten, ZSTUFE: ZSTUFE, umfeld: umfeld, nebenkosten: nebenkosten, eur: eur, stufe: stufe,
     GEWICHT: GEWICHT, STANDARD: STANDARD, ARTEN: ARTEN, MFH_HINWEIS: MFH_HINWEIS, version: 'v5140nn6' };
   root.DpEigennutzerKern = api;
   root.DpEigennutzer = api;

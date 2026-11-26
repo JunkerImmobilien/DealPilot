@@ -225,6 +225,9 @@ function nhkSauber(n) {
   if (/^[0-3]$/.test(String(n.geschosse))) o.nhk_geschosse = String(n.geschosse);
   if (/^[123]$/.test(String(n.dach))) o.nhk_dach = String(n.dach);
   if (/^(einfach|normal|gehoben|luxus)$/.test(String(n.ausst))) o.ausst = String(n.ausst);
+  /* pp6 · Modernisierungspunkte nach Anlage 2 ImmoWertV aus der Zustandsstufe (0 bis 20), für Restnutzungsdauer und Sachwert */
+  if (/^(d|1d|20)$/.test(String(n.mod))) o.mod_punkte = Number(n.mod);
+  if (/^(A+|[A-H])$/.test(String(n.ekl || ''))) o.energieklasse = String(n.ekl);
   return o;
 }
 /* pp6 (26.11.2026) · Marktdaten am Ort für den Bericht (Marcel: „das sah gut aus mit den GeoMap-Sachen“), nur Weißliste:
