@@ -392,3 +392,12 @@ img{max-width:100%;display:block}
 .footer-grid{grid-template-columns:1.4fr .9fr .9fr 1fr .9fr .9fr}
 @media(max-width:1080px){.footer-grid{grid-template-columns:1fr 1fr 1fr}}
 @media(max-width:700px){.footer-grid{grid-template-columns:1fr 1fr;gap:22px 18px}.footer-grid > div:first-child{grid-column:1 / -1}}
+
+/* aa6 (26.11.2026) · Menuepunkt Ratgeber dazu: am Desktop schnitt sonst der Knopf "Kostenlos starten" rechts ab (gemessen 1440 px). Abstaende enger statt Punkt weglassen. */
+@media(min-width:1081px){
+.nav .wrap{gap:16px}
+.nav ul li > a{padding:10px 8px}
+.nav ul li > a::after{left:8px;right:8px}
+.nav ul li:hover > a::after,.nav ul li > a.hier::after{width:calc(100% - 16px)}
+}
+@media(min-width:1081px) and (max-width:1279px){.nav ul li > a{font-size:13.5px;padding:10px 6px}.nav ul li > a::after{left:6px;right:6px}.nav ul li:hover > a::after,.nav ul li > a.hier::after{width:calc(100% - 12px)}}
