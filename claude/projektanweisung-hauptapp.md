@@ -45264,3 +45264,9 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Rest:**
   - Ein Prüfkonto auf Prod anzulegen hat die Rechteprüfung abgelehnt. Leerzustände und Checkliste sind deshalb nur auf Staging mit Testkonten gemessen, auf Prod nur ihre Auslieferung.
   - Offerte-PDF mit Checkliste und Marcels Fragen offen: Finanzamt-PDF im Ankauf, Track Record erst mit Bestand.
+
+### Rollout 1.0.233 · 26.11.2026 · Ernte 26.11. und DealPilot-Formeln (UU5, Marcel: „ja“)
+- **Was:** Register-Ernte BY/SL/HB/SH (Ingolstadt 4 Vergleichsfaktoren, rund 70 Sperren neu bzw. mit `zugang`), MV-Lizenz (6 Sachwertfaktoren Seenplatte GMB 2024 und Vorpommern-Rügen GMB 2019 von Wert zu Sperre `genehmigungspflichtig`, Impressum), Braunschweig-Wolfsburg einheitlich; LZS-Formel neu gelernt (1.060 Sätze, LOAO 0,575 → 0,540 PP, Einsatz BB BW HE NW RP SN, neu mindestens 8 Sätze je Land, Landesmittel 9 Zellen), WGFZ-Formel neu (b 0,494 unverändert). UK-Flächen-Formel bewusst NICHT neu (Neulauf schlechter). Landing-Datenumfang gegen Prod gemessen. Ohne v5080 (VV5).
+- **Commit:** main 7e537102 (Cherry-pick staging 7217dfd2 + e0cbc3f9), dazu Landing-Zahlen und Version.
+- **Nachweis:** Sicherung beider DBs `/root/backups/haupt-vor-uu5-20261126-1113.sql.gz` (7,1 MB, 111 Tabellen) und `mb-vor-uu5-20261126-1113.sql.gz` (31 MB, 42 Tabellen), Köpfe gelesen. mb-backend neu gebaut, `register-saat.mjs --aufraeumen`: 6 verwaiste Zeilen gelöscht, SOLL = IST 6.133. `mb.param_modell` SWF 853 → 847, VGF 1.301 → 1.305, Rest gleich. saat-pruefen, uk-flaeche, uk-wgfz, wertermittlung-pruefen RC 0 (Ebene C ohne Verschiebung). App 200, `/public/datenumfang` 200.
+- **Rest:** Ursache, warum der UK-Flächen-Ableiter 29 Tabellen weniger liest (Stadt 53 → 23); Genehmigungsanfragen an Ausschüsse und Kauf Landesbericht Saarland / Bremen bei Marcel.
