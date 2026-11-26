@@ -1,0 +1,364 @@
+{
+ "ags": "05978016",
+ "gemeinde": "Holzwickede",
+ "haus": {
+  "regel": "zuschlag",
+  "merkmal": "haus_efh",
+  "gilt_fuer": [
+   "efh",
+   "dhh",
+   "rh"
+  ],
+  "hinweis": "Einfamilienhaus (inklusive Gartennutzung) + 0,55 €/m²; Anbauweise (freistehend/Doppelhaushälfte/Reihenhaus) ohne eindeutigen Einfluss",
+  "beleg": "S. 7 (PDF-S. 8) Weitere Zu- und Abschläge und Liste der untersuchten Merkmale ohne Einfluss",
+  "gilt_fuer_herkunft": "rechtslage",
+  "gilt_fuer_begruendung": "Rechtslage: „Einfamilienhaus“ ohne „freistehend“ umfasst Doppelhaushälfte und Reihenhaus (§ 181 Abs. 2 BewG: Wohngrundstück mit bis zu zwei Wohnungen; AG Hanau: Doppelhaushälfte ist Einfamilienhaus im Sinne des Mietspiegels). Zweifamilienhaus nur, wo genannt."
+ },
+ "art": "qualifiziert",
+ "stand": "2026-01-01",
+ "erhebungsstichtag": "2025-07",
+ "gueltig_ab": "2026-01-01",
+ "gueltig_bis": "2027-12-31",
+ "quelle": {
+  "url": "https://www.gars.nrw/images/user/GA_Kreis_Unna/Mietspiegel/Mietspiegel_2026_Holzwickede.pdf",
+  "dokument": "Mietspiegel 2026 für nicht preisgebundene Wohnungen in der Gemeinde Holzwickede (erstellt durch die Geschäftsstelle des Gutachterausschusses für Grundstückswerte im Kreis Unna, herausgegeben von der Gemeinde Holzwickede; mitgewirkt Mieterverein Kreis Unna e.V., Haus & Grund Unna e.V.)",
+  "seite": "gedruckte Seitenzahlen (PDF-Seite = +1): S. 1 Vorwort (qualifiziert § 558d Abs. 1, Stand Juli 2025, in Kraft 01.01.2026), S. 2 (20–180 m²), S. 3 Mietwerttabelle, S. 4 Wohnlage und Wohnungsgröße, S. 5 Modernisierung, S. 6 Ausstattung/Energie, S. 7 weitere Zu-/Abschläge, S. 8 Laufzeit",
+  "lizenz": "kein Rechtevorbehalt im Dokument (kein Nachdruck- oder Speicherverbot, kein Urheberrechtsvermerk), geprüft am 2026-11-26",
+  "abgerufen": "2026-11-26"
+ },
+ "einheit": "eur_qm_nettokalt",
+ "form": "tabelle",
+ "rundung": 2,
+ "hinweis": "Gemeinsamer qualifizierter Mietspiegel des Gutachterausschusses im Kreis Unna für acht Kommunen, je Kommune ein eigenes Dokument; diese Datei ist das der Gemeinde Holzwickede. Zu- und Abschläge (Wohnungsgröße, Modernisierung, Ausstattung, Energie, weitere Merkmale, Einfamilienhaus) am Text wortgleich mit dem Dokument der Kreisstadt Unna verglichen (26.11.2026), nur Tabelle und Wohnlagen weichen ab; Tabelle am Druckbild geprüft. Tabelle Baualtersklasse (Jahr der Bezugsfertigkeit) mit Mittelwert und Spanne; Zu-/Abschläge in €/m² auf Mittelwert UND Spannengrenzen (S. 4). Nur unmöblierte Wohnungen 20–180 m² (S. 2); Wohnungsgröße „120 m² bis unter 180 m²“ hier bis einschließlich 180. Wohnlage: laut S. 4 ist eine Aufteilung des Gebiets in mehrere Wohnlagen nicht möglich, keine Lagezuschläge. Modernisierung über Punkte (S. 5) → Stufe: 0–5 Punkte standard, 6–13 Punkte + 0,30, 14–20 Punkte + 1,35 €/m²; als Merkmale modernisierung_mittel / modernisierung_ueberwiegend abgebildet, die Punkte selbst rechnet der Kern nicht. Zu-/Abschläge nur, wenn vom Vermieter eingebracht (S. 4). Kern-/Komplettsanierung kann in die Baualtersklasse des Jahres der Maßnahme führen (S. 3). Kein Anwendungsbeispiel mit Zahlen im Dokument.",
+ "tabelle": {
+  "achsen": {
+   "baujahr": [
+    {
+     "von": null,
+     "bis": 1949,
+     "label": "bis 1949"
+    },
+    {
+     "von": 1950,
+     "bis": 1977,
+     "label": "1950 bis 1977"
+    },
+    {
+     "von": 1978,
+     "bis": 1994,
+     "label": "1978 bis 1994"
+    },
+    {
+     "von": 1995,
+     "bis": 2004,
+     "label": "1995 bis 2004"
+    },
+    {
+     "von": 2005,
+     "bis": 2014,
+     "label": "2005 bis 2014"
+    },
+    {
+     "von": 2015,
+     "bis": null,
+     "label": "ab 2015"
+    }
+   ]
+  },
+  "geltung": {
+   "baujahr_von": null,
+   "baujahr_bis": null,
+   "wfl_von": 20,
+   "wfl_bis": 180
+  },
+  "zellen": [
+   {
+    "baujahr": 0,
+    "unten": 4.81,
+    "mittel": 5.76,
+    "oben": 6.94,
+    "seite": "3"
+   },
+   {
+    "baujahr": 1,
+    "unten": 5.07,
+    "mittel": 6.08,
+    "oben": 7.33,
+    "seite": "3"
+   },
+   {
+    "baujahr": 2,
+    "unten": 5.23,
+    "mittel": 6.27,
+    "oben": 7.55,
+    "seite": "3"
+   },
+   {
+    "baujahr": 3,
+    "unten": 5.74,
+    "mittel": 6.87,
+    "oben": 8.29,
+    "seite": "3"
+   },
+   {
+    "baujahr": 4,
+    "unten": 5.91,
+    "mittel": 7.08,
+    "oben": 8.54,
+    "seite": "3"
+   },
+   {
+    "baujahr": 5,
+    "unten": 7.01,
+    "mittel": 8.4,
+    "oben": 10.13,
+    "seite": "3"
+   }
+  ],
+  "zuschlaege": [
+   {
+    "merkmal": "wohnungsgroesse",
+    "label": "Wohnungsgröße",
+    "art": "eur_qm",
+    "beleg": "S. 4 Wohnungsgröße",
+    "wfl_klassen": [
+     {
+      "von": 20,
+      "bis": 45,
+      "bis_inkl": false,
+      "wert": 0.75
+     },
+     {
+      "von": 45,
+      "bis": 65,
+      "bis_inkl": false,
+      "wert": 0.3
+     },
+     {
+      "von": 65,
+      "bis": 95,
+      "bis_inkl": false,
+      "wert": 0
+     },
+     {
+      "von": 95,
+      "bis": 120,
+      "bis_inkl": false,
+      "wert": -0.15
+     },
+     {
+      "von": 120,
+      "bis": 180,
+      "wert": -0.3
+     }
+    ]
+   },
+   {
+    "merkmal": "modernisierung_mittel",
+    "art": "eur_qm",
+    "wert": 0.3,
+    "label": "mittlerer Modernisierungsgrad (6–13 Punkte)",
+    "beleg": "S. 5"
+   },
+   {
+    "merkmal": "modernisierung_ueberwiegend",
+    "art": "eur_qm",
+    "wert": 1.35,
+    "label": "überwiegend modernisiert (14–20 Punkte)",
+    "beleg": "S. 5"
+   },
+   {
+    "merkmal": "waermepumpe",
+    "art": "eur_qm",
+    "wert": 0.45,
+    "label": "Energieträger gehoben (z. B. Wärmepumpe)",
+    "beleg": "S. 6 Energieträger"
+   },
+   {
+    "merkmal": "fernwaerme",
+    "art": "eur_qm",
+    "wert": -0.2,
+    "label": "Fernwärme",
+    "beleg": "S. 6 Energieträger"
+   },
+   {
+    "merkmal": "heizungsunterstuetzung",
+    "art": "eur_qm",
+    "wert": 0.25,
+    "label": "zusätzliche Heizungsunterstützung (z. B. Solaranlage für Warmwasser)",
+    "beleg": "S. 6 Energieträger"
+   },
+   {
+    "merkmal": "energieausweis_unter_50",
+    "art": "eur_qm",
+    "wert": 0.3,
+    "label": "Energieausweis unter 50 kWh",
+    "beleg": "S. 6 Energieträger"
+   },
+   {
+    "merkmal": "energieausweis_50_100",
+    "art": "eur_qm",
+    "wert": 0.1,
+    "label": "Energieausweis zwischen 50 und 100 kWh",
+    "beleg": "S. 6 Energieträger"
+   },
+   {
+    "merkmal": "gaeste_wc",
+    "art": "eur_qm",
+    "wert": 0.15,
+    "label": "Gäste-WC oder 2. Bad",
+    "beleg": "S. 6 Weitere Ausstattungsmerkmale"
+   },
+   {
+    "merkmal": "offener_grundriss",
+    "art": "eur_qm",
+    "wert": 0.2,
+    "label": "offene Grundrissgestaltung",
+    "beleg": "S. 6 Weitere Ausstattungsmerkmale"
+   },
+   {
+    "merkmal": "kein_bodenbelag",
+    "art": "eur_qm",
+    "wert": -0.25,
+    "label": "kein Fußbodenbelag",
+    "beleg": "S. 6 Weitere Ausstattungsmerkmale"
+   },
+   {
+    "merkmal": "gehobener_boden",
+    "art": "eur_qm",
+    "wert": 0.15,
+    "label": "gehobener Fußbodenbelag (z. B. Parkett)",
+    "beleg": "S. 6 Weitere Ausstattungsmerkmale"
+   },
+   {
+    "merkmal": "elektrische_rolllaeden",
+    "art": "eur_qm",
+    "wert": 0.1,
+    "label": "elektr. Rollläden in allen Räumen",
+    "beleg": "S. 6 Weitere Ausstattungsmerkmale"
+   },
+   {
+    "merkmal": "einbaukueche",
+    "art": "eur_qm",
+    "wert": 0.3,
+    "label": "Einbauküche",
+    "beleg": "S. 6 Weitere Ausstattungsmerkmale"
+   },
+   {
+    "merkmal": "kein_balkon",
+    "art": "eur_qm",
+    "wert": -0.05,
+    "label": "fehlende Terrasse/Balkon (oder kleiner 3 m²)",
+    "beleg": "S. 7 weitere Merkmale"
+   },
+   {
+    "merkmal": "balkon_gross",
+    "art": "eur_qm",
+    "wert": 0.2,
+    "label": "Balkon/Terrasse > 10 m²",
+    "beleg": "S. 7 weitere Merkmale"
+   },
+   {
+    "merkmal": "souterrain",
+    "art": "eur_qm",
+    "wert": -0.7,
+    "label": "Wohnung befindet sich im Souterrain",
+    "beleg": "S. 7 weitere Merkmale"
+   },
+   {
+    "merkmal": "ab_4_og",
+    "art": "eur_qm",
+    "wert": -0.2,
+    "label": "Wohnung befindet sich im 4. OG oder höher",
+    "beleg": "S. 7 weitere Merkmale"
+   },
+   {
+    "merkmal": "dachgeschoss",
+    "art": "eur_qm",
+    "wert": -0.1,
+    "label": "Wohnung befindet sich im DG",
+    "beleg": "S. 7 weitere Merkmale"
+   },
+   {
+    "merkmal": "maisonette",
+    "art": "eur_qm",
+    "wert": 0.15,
+    "label": "Maisonettewohnung",
+    "beleg": "S. 7 weitere Merkmale"
+   },
+   {
+    "merkmal": "aufzug",
+    "art": "eur_qm",
+    "wert": 0.35,
+    "label": "Wohnung über Aufzug erreichbar",
+    "beleg": "S. 7 weitere Merkmale"
+   },
+   {
+    "merkmal": "garten",
+    "art": "eur_qm",
+    "wert": 0.15,
+    "label": "alleinige Gartennutzung",
+    "beleg": "S. 7 weitere Merkmale"
+   },
+   {
+    "merkmal": "barrierearm",
+    "art": "eur_qm",
+    "wert": 0.2,
+    "label": "barrierearme Ausstattung",
+    "beleg": "S. 7 weitere Merkmale"
+   },
+   {
+    "merkmal": "mehr_als_10_we",
+    "art": "eur_qm",
+    "wert": -0.15,
+    "label": "Gebäude mit mehr als 10 Wohneinheiten",
+    "beleg": "S. 7 weitere Merkmale"
+   },
+   {
+    "merkmal": "haus_efh",
+    "art": "eur_qm",
+    "wert": 0.55,
+    "label": "Einfamilienhaus (inklusive Gartennutzung)",
+    "beleg": "S. 7 weitere Merkmale"
+   }
+  ]
+ },
+ "pruefbeispiele": [
+  {
+   "eingabe": {
+    "baujahr": 1960,
+    "wfl": 70
+   },
+   "erwartet": {
+    "unten": 5.07,
+    "mittel": 6.08,
+    "oben": 7.33
+   },
+   "seite": "3",
+   "art": "tabellenzelle"
+  },
+  {
+   "eingabe": {
+    "baujahr": 1960,
+    "wfl": 50
+   },
+   "erwartet": {
+    "unten": 5.37,
+    "mittel": 6.38,
+    "oben": 7.63
+   },
+   "seite": "3, 4",
+   "art": "tabellenzelle",
+   "anmerkung": "+ 0,30 (45 bis unter 65 m²)"
+  },
+  {
+   "eingabe": {
+    "baujahr": 2018,
+    "wfl": 200
+   },
+   "erwartet": null,
+   "seite": "2",
+   "art": "tabellenzelle"
+  }
+ ]
+}
