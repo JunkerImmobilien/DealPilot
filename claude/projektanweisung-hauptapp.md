@@ -45808,6 +45808,12 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** staging `988e8440`, main `34f026ff` + `a74d10f6` (1.0.232), Rückmerge `59b8e940`.
 - **Nachweis:** Headless-Chrome mit Testkonto menue-pruefer (eigenes Profil, nicht Marcels Chrome). Schublade 390 px: 359 → 280 px (92 → 72 vw); 360: 331 → 274; 430: 360 → 280; 820: 360 → 280. Reiter 113×32 einzeilig → 84×44 in Spalten. Schreibtisch 1440 vorher/nachher gleich (Schalter 231×56, Reiter 73×56). Kein Überlauf, keine waagerechte Scrollleiste. gold-audit Staging und Prod RC 0, buster-ebenen und vorschau-pruefen sauber. Prod: ausgelieferte CSS trägt v5070, index.html Buster v5070m, version.json patch 232.
 - **Rest:** Prod nicht angemeldet nachgemessen (kein Konto). Senkrechte Laufnummer der einzeiligen Objektkarte bleibt „2026-0…“ (schon vorher so).
+### Rollout 1.0.237 · 26.11.2026 · v5100bb6/v5100abb6 (BB6)
+- Was: Kundentext „Marktwertindikation“ → „Marktpreisindikation“ (App, Profi-Bericht, Marktbericht-App, mb KI-Abschnitt K, Quellenzeile); Verkehrswert bleibt (Marcel). Befund Spot Quittengarten: kein Rechenfehler, einmalige Neuberechnung durch neuen Potenzial-Hash nach v5080 (nur Staging).
+- Commit: main a7d1f390, 69fdd38b, be17cb17 · staging ac703024, 24c323e6, Merge c00954a5
+- Nachweis: Prod liefert v5100bb6m (objekt-reiter 7×, profi 8× Marktpreisindikation), mb-Image mit neuer Quellenzeile, gold-audit RC 0, buster-ebenen sauber.
+- Rest: ki_text_pruefung.js Anweisung „Marktwert-Indikation dieses Berichts ist der Ertragswert“ offen (Frage an Marcel).
+
 ### Rollout 1.0.233 · 26.11.2026 · Ernte 26.11. und DealPilot-Formeln (UU5, Marcel: „ja“)
 - **Was:** Register-Ernte BY/SL/HB/SH (Ingolstadt 4 Vergleichsfaktoren, rund 70 Sperren neu bzw. mit `zugang`), MV-Lizenz (6 Sachwertfaktoren Seenplatte GMB 2024 und Vorpommern-Rügen GMB 2019 von Wert zu Sperre `genehmigungspflichtig`, Impressum), Braunschweig-Wolfsburg einheitlich; LZS-Formel neu gelernt (1.060 Sätze, LOAO 0,575 → 0,540 PP, Einsatz BB BW HE NW RP SN, neu mindestens 8 Sätze je Land, Landesmittel 9 Zellen), WGFZ-Formel neu (b 0,494 unverändert). UK-Flächen-Formel bewusst NICHT neu (Neulauf schlechter). Landing-Datenumfang gegen Prod gemessen. Ohne v5080 (VV5).
 - **Commit:** main 7e537102 (Cherry-pick staging 7217dfd2 + e0cbc3f9), dazu Landing-Zahlen und Version.
