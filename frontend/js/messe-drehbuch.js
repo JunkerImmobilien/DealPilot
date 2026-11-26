@@ -6452,31 +6452,63 @@
     await warte(900);
     var m = q('.main-col'); if (m) m.scrollTop = 0;
   }
-  function r27Host() { var h = q('#tax-verlauf-chart'); if (!(h && h.offsetWidth)) return null;
+  /* V1 26.11.2026 · Seit v5120 zeigt der Reiter Steuer EINE Grafik (#tax-gx-verlauf, grafiken-premium.js) und der alte
+     Steuerverlauf (#tax-verlauf-chart) bleibt leer. Die Helfer greifen zuerst die neue Grafik: Säulen und Tooltip je Jahr
+     (rect[data-gx-tip]), Kacheln (.gx-seite), Marken (gestrichelte Linie + Text). Die Pilot-Analyse (eigener host) bleibt alt. */
+  function r27Gx() { var h = q('#tax-gx-verlauf'); return h && h.offsetWidth && h.querySelector('svg') ? h : null; }
+  var R27_GX_SEL = { '.dp-stv-tip': '.gx-tip', '.dp-stv-ch svg': 'svg', '.dp-stv-leg': '.gx-leg', '.dp-stv-fuss': '.gx-s', '.dp-stv-satz': '.gx-s' };
+  var R27_GX_KACHEL = [/^Steuer ab/, /^Erstattungen/, /^Steuern ab/];
+  function r27GxMarke(re) {
+    var h = r27Gx(); if (!h) return null;
+    var tx = [].filter.call(h.querySelectorAll('svg text'), function (t) { return re.test(r6Text(t)); })[0]; if (!tx) return null;
+    var x = parseFloat(tx.getAttribute('x')), best = null, bd = 1e9;
+    [].forEach.call(h.querySelectorAll('svg line'), function (l) { if (l.getAttribute('x1') !== l.getAttribute('x2') || !/dasharray/.test(l.getAttribute('style') || '')) return; var d = Math.abs(parseFloat(l.getAttribute('x1')) - x); if (d < bd) { bd = d; best = l; } });
+    return { text: tx, linie: best || tx };
+  }
+  function r27GxJahr(r) { var m = /<div class="t">(\d{4})/.exec(r.getAttribute('data-gx-tip') || ''); return m ? +m[1] : null; }
+  function r27Host() { var g = r27Gx(); if (g) return g; var h = q('#tax-verlauf-chart'); if (!(h && h.offsetWidth)) return null;
     /* v3257 · das Diagramm im Reiter Steuer ist standardmäßig eingeklappt - für die Aufnahme
        nur in dieser Sitzung aufklappen (merken=false), die Wahl des Nutzers bleibt unberührt */
     try { if (h.querySelector('.dp-stv-zu') && window.DpSteuerVerlauf && DpSteuerVerlauf.klappen) DpSteuerVerlauf.klappen(h, true, false); } catch (e) {}
     return h; }
   function r27PaHost() { var p = r11Panel(); var h = p && p.querySelector('[data-dp-steuerverlauf]'); return h && h.offsetWidth ? h : null; }
-  function r27Zahl(i, host) { return function () { var h = (host || r27Host)(); var z = h && h.querySelectorAll('.dp-stv-z'); return z && z[i] || null; }; }
-  function r27ZahlW(i, host) { var z = r27Zahl(i, host)(); return z ? { t: r6Text(z.querySelector('span')), w: r6Text(z.querySelector('b')), u: r6Text(z.querySelector('em')) } : { t: '', w: '–', u: '' }; }
-  function r27Sel(sel, host) { return function () { var h = (host || r27Host)(); return h ? h.querySelector(sel) : null; }; }
+  function r27Zahl(i, host) { return function () { var h = (host || r27Host)(); if (!h) return null;
+    if (h.id === 'tax-gx-verlauf') return [].filter.call(h.querySelectorAll('.gx-seite > div'), function (d) { return R27_GX_KACHEL[i].test(r6Text(d.querySelector('span'))); })[0] || null;
+    var z = h.querySelectorAll('.dp-stv-z'); return z && z[i] || null; }; }
+  function r27ZahlW(i, host) { var z = r27Zahl(i, host)(); return z ? { t: r6Text(z.querySelector('span')), w: r6Text(z.querySelector('b')), u: r6Text(z.querySelector('em') || z.querySelector('small')) } : { t: '', w: '–', u: '' }; }
+  function r27Sel(sel, host) { return function () { var h = (host || r27Host)(); if (!h) return null;
+    if (h.id === 'tax-gx-verlauf') { if (sel === 'text.wpt' || sel === 'line.wp') { var mk = r27GxMarke(/ab hier Steuer/); return mk ? (sel === 'text.wpt' ? mk.text : mk.linie) : null; } sel = R27_GX_SEL[sel] || sel; }
+    return h.querySelector(sel); }; }
   function r27Reihe() { try { return window.DpSteuerVerlauf ? DpSteuerVerlauf.reihe() : null; } catch (e) { return null; } }
   function r27Idx(jahr) { var R = r27Reihe() || []; for (var i = 0; i < R.length; i++) if (R[i].jahr === jahr) return i; return -1; }
-  function r27Hit(jahr, host) { return function () { var h = (host || r27Host)(); var i = r27Idx(jahr); return h && i >= 0 ? h.querySelector('.hit[data-i="' + i + '"]') : null; }; }
+  function r27Hit(jahr, host) { return function () { var h = (host || r27Host)(); if (h && h.id === 'tax-gx-verlauf') return [].filter.call(h.querySelectorAll('rect[data-gx-tip]'), function (r) { return r27GxJahr(r) === jahr; })[0] || null;
+    var i = r27Idx(jahr); return h && i >= 0 ? h.querySelector('.hit[data-i="' + i + '"]') : null; }; }
   /* Tooltip wie mit der Maus: mousemove auf die Trefferfläche des Jahres (steuer-verlauf.js hört darauf) */
   function r27Zeigen(jahr, host) {
     var t = r27Hit(jahr, host)(); if (!t) return null;
     var b = t.getBoundingClientRect();
     t.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, clientX: b.left + b.width / 2, clientY: b.top + b.height * 0.3 }));
-    var tip = (host || r27Host)().querySelector('.dp-stv-tip');
-    var o = {}; if (tip) [].forEach.call(tip.querySelectorAll('div'), function (d) { var s = d.querySelectorAll('span'); if (s.length === 2) o[r6Text(s[0])] = r6Text(s[1]); });
+    var hh = (host || r27Host)(), o = {};
+    if (hh && hh.id === 'tax-gx-verlauf') {
+      var gt = hh.querySelector('.gx-tip');
+      if (gt) String(gt.innerHTML).replace(/<div class="t">[^<]*<\/div>/, '').split(/<br\s*\/?>/).forEach(function (z) { var m = /^\s*([^<]+?)\s*<b>([^<]*)<\/b>/.exec(z); if (m) o[m[1]] = m[2]; });
+      return o;
+    }
+    var tip = hh && hh.querySelector('.dp-stv-tip');
+    if (tip) [].forEach.call(tip.querySelectorAll('div'), function (d) { var s = d.querySelectorAll('span'); if (s.length === 2) o[r6Text(s[0])] = r6Text(s[1]); });
     return o;
   }
-  function r27TipWeg() { [].forEach.call(document.querySelectorAll('.dp-stv-tip'), function (t) { t.style.display = 'none'; }); }
+  function r27TipWeg() { [].forEach.call(document.querySelectorAll('.dp-stv-tip,.gx-tip'), function (t) { t.style.display = 'none'; }); }
   /* Ereignislinien: Jahr über die Lage der Linie (x1 = linke Kante der Trefferfläche dieses Jahres) */
   function r27Ereignisse(host) {
     var h = (host || r27Host)(), R = r27Reihe() || []; if (!h) return [];
+    if (h.id === 'tax-gx-verlauf') {
+      var kj = parseInt(String(wert('kaufdat')).slice(0, 4), 10), bj = parseInt(wert('d1_bindj'), 10);
+      return [[/Ende Zinsbindung/, kj && bj ? kj + bj : null], [/steuerfrei/, null]].map(function (p) {
+        var mk = r27GxMarke(p[0]); if (!mk) return null; var t = r6Text(mk.text), jm = /(\d{4})\s*$/.exec(t);
+        return { jahr: p[1] || (jm ? +jm[1] : null), text: /steuerfrei/.test(t) ? '§ 23 ' + t : t, linie: mk.linie, beschr: mk.text };
+      }).filter(Boolean);
+    }
     var hits = [].slice.call(h.querySelectorAll('.hit')), txt = h.querySelectorAll('text.evt');
     return [].map.call(h.querySelectorAll('line.ev'), function (l, k) {
       var x = parseFloat(l.getAttribute('x1')), i = -1;
@@ -6508,15 +6540,17 @@
       async function (s) {   /* 2 · Reiter Steuer: die Grafik, was V+V heißt */
         reiter('s3-tax'); await warte(1500);
         await warteAuf(r27Host, 6000);
-        r27Oben(q('#tax-timeline-header'), 90); await warte(500);
-        await zeige(function () { var k = q('#tax-timeline-header'); return k; }, 8);
-        await b2oZeile(s, 'Steuerverlauf', 'Neu im Reiter Steuer: <b>' + r6Text(q('#tax-timeline-header')).replace(/^\s*/, '') + '</b>.');
+        r27Oben(r27Host(), 90); await warte(500);
+        var gt = r27Gx() ? r27Sel('.gx-t') : function () { return q('#tax-timeline-header'); };
+        await zeige(gt, 8);
+        await b2oZeile(s, 'Verlauf mit Steuern', 'Im Reiter Steuer eine Grafik: <b>' + r6Text(gt()).replace(/^\s*/, '') + '</b>.');
         await zeige(r27Sel('.dp-stv-fuss'), 8);
         await b2oZeile(s, 'Was ist das Ergebnis aus V+V?', 'Einnahmen aus Vermietung minus Werbungskosten: Zinsen, Abschreibung, Bewirtschaftung, Erhaltung. Negativ senkt es deine Steuer, positiv zahlst du darauf.', 1500);
         var R = r27Reihe() || [];
         r27Oben(r27Sel('.dp-stv-leg')(), 90); await warte(400);
         await zeige(r27Sel('.dp-stv-ch svg'), 6);
-        await b2oZeile(s, 'Ein Balken je Jahr', (R.length ? '<b>' + R[0].jahr + ' bis ' + R[R.length - 1].jahr + '</b>, die ganze Haltedauer. ' : '') + 'Grün: Verlust, das Finanzamt erstattet. Rot: Überschuss, Steuer fällig. Die Linie: Cashflow nach Steuern.', 1000);
+        var gj = r27Gx() ? [].map.call(r27Gx().querySelectorAll('rect[data-gx-tip]'), r27GxJahr).filter(Boolean) : R.map(function (r) { return r.jahr; });
+        await b2oZeile(s, 'Eine Säule je Jahr', (gj.length ? '<b>' + gj[0] + ' bis ' + gj[gj.length - 1] + '</b>, die ganze Haltedauer. ' : '') + 'Grün: das Objekt senkt deine Steuer. Rot: es kostet Steuer. Die Linien zeigen den Cashflow vor und nach Steuer, die Fläche dazwischen ist die Steuerwirkung.', 1000);
       },
       async function (s) {   /* 3 · der Wendepunkt */
         var R = r27Reihe() || [], A = window.DpSteuerVerlauf ? DpSteuerVerlauf.auswerten(R) : {};
@@ -6524,9 +6558,11 @@
         r27Oben(r27Host(), 110); await warte(400);
         var z0 = r27ZahlW(0);
         await zeige(r27Zahl(0), 8);
-        await b2oZeile(s, z0.t.charAt(0) + z0.t.slice(1).toLowerCase() + ' ' + z0.w, 'Erst ' + z0.u + ' dreht das Ergebnis ins Plus. Ab hier zahlst du auf dieses Objekt Steuern.');
+        if (r27Gx()) await b2oZeile(s, 'Steuer ab ' + z0.w, 'Erst ' + z0.w + ' dreht das Ergebnis aus Vermietung ins Plus (' + z0.u.replace(/^Ergebnis aus Vermietung\s*/, '') + '). Ab hier zahlst du auf dieses Objekt Steuern.');
+        else await b2oZeile(s, z0.t.charAt(0) + z0.t.slice(1).toLowerCase() + ' ' + z0.w, 'Erst ' + z0.u + ' dreht das Ergebnis ins Plus. Ab hier zahlst du auf dieses Objekt Steuern.');
         await zeigeGruppe(r27Sel('text.wpt'), r27Sel('line.wp'), 8);
-        await b2oZeile(s, 'Die Linie', '„' + r6Text(r27Sel('text.wpt')()) + '“, gestrichelt im Bild, links grün, rechts rot.');
+        await b2oZeile(s, 'Die Linie', '„' + r6Text(r27Sel('text.wpt')()) + '“, gestrichelt im Bild. Links senken grüne Säulen die Steuer, rechts kosten rote Säulen Steuer.');
+        var gw = r27Gx() ? parseInt(z0.w, 10) : null; if (gw > 0) { var wi = r27Idx(gw); if (wi > 0) A.wende = wi; }
         if (A.wende > 0) {
           await zeigeGruppe(r27Hit(R[0].jahr), r27Hit(R[A.wende - 1].jahr), 4);
           var j1 = R[A.wende - 1].jahr, rz = r15Zellen(j1);
@@ -6536,6 +6572,21 @@
       },
       async function (s) {   /* 4 · Tooltip je Jahr */
         var R = r27Reihe() || [], A = DpSteuerVerlauf.auswerten(R);
+        if (r27Gx()) { var gw4 = parseInt(r27ZahlW(0).w, 10), wi4 = gw4 > 0 ? r27Idx(gw4) : -1; if (wi4 > 0) A.wende = wi4;
+          if (A.wende > 0) {
+            var gv = R[A.wende - 1].jahr, gn = R[A.wende].jahr;
+            var tv1 = r27Zeigen(gv); await warte(300);
+            await zeige(r27Sel('.dp-stv-tip'), 8);
+            DPM_REIHE.r27tip = { vor: tv1 };
+            await b2oZeile(s, 'Je Jahr der Tooltip · ' + gv, 'Ergebnis aus Vermietung <b>' + (tv1['Ergebnis aus Vermietung'] || '–') + '</b>, Cashflow vor Steuer <b>' + (tv1['vor Steuer'] || '–') + '</b>, Steuerwirkung <b>' + (tv1['Steuer'] || '–') + '</b>, nach Steuer <b>' + (tv1['nach Steuer'] || '–') + '</b>.', 1000);
+            var tw1 = r27Zeigen(gn); await warte(300);
+            await zeige(r27Sel('.dp-stv-tip'), 8);
+            DPM_REIHE.r27tip.wende = tw1;
+            await b2oZeile(s, gn + ' · der Wendepunkt', 'Ergebnis aus Vermietung <b>' + (tw1['Ergebnis aus Vermietung'] || '–') + '</b>, jetzt kostet das Objekt Steuer: <b>' + (tw1['Steuer'] || '–') + '</b>, nach Steuer <b>' + (tw1['nach Steuer'] || '–') + '</b>.', 1000);
+            r27TipWeg();
+          }
+          return;
+        }
         if (A.wende > 0) {
           var jv = R[A.wende - 1].jahr, jw = R[A.wende].jahr;
           var tv = r27Zeigen(jv); await warte(300);
@@ -6553,11 +6604,13 @@
         r27Oben(r27Host(), 110); await warte(400);
         var z1 = r27ZahlW(1), z2 = r27ZahlW(2);
         await zeige(r27Zahl(1), 8);
-        await b2oZeile(s, 'Erstattungen bis dahin', /Erstattung/.test(z1.u) ? 'Bis zum Wendepunkt unterm Strich <b>' + z1.w + '</b>: ' + z1.u.replace(/\s*·\s*/g, ', ') + '.' : '<b>' + z1.w + '</b> in den Jahren ' + z1.u.replace('–', ' bis ') + ', so viel hat das Haus deine Steuer gesenkt.');   /* M11: Kachel zeigt seit v4570 Saldo mit Erstattung und Steuer */
+        if (r27Gx()) await b2oZeile(s, 'Erstattungen bis dahin', '<b>' + z1.w + '</b> ' + z1.t.replace(/^Erstattungen\s*/i, '').toLowerCase() + ': so viel Steuer spart dir das Objekt.');
+        else await b2oZeile(s, 'Erstattungen bis dahin', /Erstattung/.test(z1.u) ? 'Bis zum Wendepunkt unterm Strich <b>' + z1.w + '</b>: ' + z1.u.replace(/\s*·\s*/g, ', ') + '.' : '<b>' + z1.w + '</b> in den Jahren ' + z1.u.replace('–', ' bis ') + ', so viel hat das Haus deine Steuer gesenkt.');   /* M11: Kachel zeigt seit v4570 Saldo mit Erstattung und Steuer */
         await zeige(r27Zahl(2), 8);
-        await b2oZeile(s, 'Steuern ab dem Wendepunkt', '<b>' + z2.w + '</b> von ' + z2.u.replace('–', ' bis ') + ', mit deinem Grenzsteuersatz gerechnet.');
+        if (r27Gx()) await b2oZeile(s, 'Steuern ab dem Wendepunkt', '<b>' + z2.w + '</b> ' + z2.t.replace(/^Steuern\s*/i, '') + ' ' + z2.u + ', mit deinem Grenzsteuersatz gerechnet.');
+        else await b2oZeile(s, 'Steuern ab dem Wendepunkt', '<b>' + z2.w + '</b> von ' + z2.u.replace('–', ' bis ') + ', mit deinem Grenzsteuersatz gerechnet.');
         await zeige(r27Sel('.dp-stv-satz'), 8);
-        await b2oZeile(s, 'Der Satz dazu', 'DealPilot fasst das Bild in Worte: wie lange das Haus deine Steuer senkt, und ab wann du darauf zahlst.', 800);
+        await b2oZeile(s, 'Der Satz dazu', 'Über der Grafik fasst DealPilot das Bild in Worte: wie lange das Haus deine Steuer senkt, und ab wann du darauf zahlst.', 800);
       },
       async function (s) {   /* 6 · Erklärkarte: der Zeitpunkt fürs nächste Investment */
         await zeigeGruppe(r27Sel('text.wpt'), r27Sel('line.wp'), 8);
@@ -6572,7 +6625,7 @@
           var a = r15Zellen(zb.jahr - 1), b = r15Zellen(zb.jahr);
           DPM_REIHE.r27zins = { vor: a, nach: b };
           var zv = a[2], zn = b[2], mehr = (function () { var p = function (x) { return parseFloat(String(x || '').replace(/[^\d,-]/g, '').replace(/\./g, '').replace(',', '.')); }; return p(zn) > p(zv); })();
-          await b2oZeile(s, 'Zinsbindung endet ' + zb.jahr, 'Kauf ' + String(wert('kaufdat')).slice(0, 4) + ' plus ' + wert('d1_bindj') + ' Jahre Zinsbindung.' + (mehr ? ' Danach rechnet DealPilot mit dem Anschlusszins: Zinsen ' + (zb.jahr - 1) + ' <b>' + zv + '</b>, ' + zb.jahr + ' <b>' + zn + '</b>, der Balken wird kleiner.' : ''));
+          await b2oZeile(s, 'Zinsbindung endet ' + zb.jahr, 'Kauf ' + String(wert('kaufdat')).slice(0, 4) + ' plus ' + wert('d1_bindj') + ' Jahre Zinsbindung.' + (mehr ? ' Danach rechnet DealPilot mit dem Anschlusszins: Zinsen ' + (zb.jahr - 1) + ' <b>' + zv + '</b>, ' + zb.jahr + ' <b>' + zn + '</b>, die Säule wird kleiner.' : ''));
         }
         if (st) {
           await zeigeGruppe(function () { return st.beschr; }, function () { return st.linie; }, 8);
@@ -6619,7 +6672,7 @@
         if (wk && sum()) {
           r15Oben(sum(), 260); await warte(400);
           await zeige(sum, 8);
-          await b2oZeile(s, 'Das Jahr ' + J + ' in Summe', 'Werbungskosten <b>' + wk + '</b>, Einnahmen <b>' + ein + '</b>, Ergebnis <b>' + erg + '</b>, Steuer-Effekt <b>' + eff + '</b>: genau der Balken ' + J + '.', 800);
+          await b2oZeile(s, 'Das Jahr ' + J + ' in Summe', 'Werbungskosten <b>' + wk + '</b>, Einnahmen <b>' + ein + '</b>, Ergebnis <b>' + erg + '</b>, Steuer-Effekt <b>' + eff + '</b>: genau die Säule ' + J + '.', 800);
           await b2oZeile(s, 'Eine Rechnung', 'Was hier steht, rechnet die Grafik mit, dieselben Jahreswerte wie das Steuerformular, kein zweiter Weg.');
         }
         r15Modus(0); await warte(600);
@@ -6648,7 +6701,8 @@
         var R = r27Reihe() || [], A = DpSteuerVerlauf.auswerten(R), z0 = r27ZahlW(0);
         await zeige(r27Zahl(0), 8);
         /* v3503 · gemessen 16.11.: die Westerfeldstr. trägt heute 7 Verlustjahre - „Nach 7 Verlustjahren: kein Verlustjahr“ widersprach sich. Nur ohne Verlustjahr den Zusatz. */
-        await b2oZeile(s, 'Positiv ab ' + z0.w, z0.u.charAt(0).toUpperCase() + z0.u.slice(1) + (/verlust/i.test(z0.u) ? '' : ': kein Verlustjahr') + (R[0] && R[0].steuer < 0 ? ', Steuer ' + R[0].jahr + ' <b>' + eur(-R[0].steuer) + '</b>' : '') + '.');
+        if (r27Gx()) await b2oZeile(s, 'Steuer ab ' + z0.w, z0.u.replace(/^Ergebnis aus Vermietung\s*/, 'Ergebnis aus Vermietung <b>') + '</b>' + (R[0] && R[0].steuer < 0 ? ', Steuer ' + R[0].jahr + ' <b>' + eur(-R[0].steuer) + '</b>' : '') + '.');
+        else await b2oZeile(s, 'Positiv ab ' + z0.w, z0.u.charAt(0).toUpperCase() + z0.u.slice(1) + (/verlust/i.test(z0.u) ? '' : ': kein Verlustjahr') + (R[0] && R[0].steuer < 0 ? ', Steuer ' + R[0].jahr + ' <b>' + eur(-R[0].steuer) + '</b>' : '') + '.');
         /* der Knick: Jahre NACH dem Wendepunkt, in denen erstattet wird (zusammenhängend, das erste Band) */
         var k0 = -1, k1 = -1;
         for (var i = Math.max(A.wende, 0) + 1; i < R.length; i++) { if (R[i].steuer > 0) { if (k0 < 0) k0 = i; k1 = i; } else if (k0 >= 0) break; }
@@ -6659,7 +6713,8 @@
           await b2oZeile(s, 'Der gesteuerte Knick', R[k0].jahr + (k1 > k0 ? ' bis ' + R[k1].jahr : '') + ' werden zur Erstattung: <b>' + bs.join(' · ') + '</b>.', 800);
           var tk = r27Zeigen(R[k0].jahr); await warte(300);
           await zeige(r27Sel('.dp-stv-tip'), 8);
-          await b2oZeile(s, R[k0].jahr + ' im Tooltip', 'Werbungskosten <b>' + (tk['Werbungskosten'] || '–') + '</b>, Ergebnis <b>' + (tk['Ergebnis V+V'] || '–') + '</b>, Erstattung <b>' + (tk['Erstattung'] || '–') + '</b>.');
+          if (r27Gx()) await b2oZeile(s, R[k0].jahr + ' im Tooltip', 'Ergebnis aus Vermietung <b>' + (tk['Ergebnis aus Vermietung'] || '–') + '</b>, Steuerwirkung <b>' + (tk['Steuer'] || '–') + '</b>, nach Steuer <b>' + (tk['nach Steuer'] || '–') + '</b>.');
+          else await b2oZeile(s, R[k0].jahr + ' im Tooltip', 'Werbungskosten <b>' + (tk['Werbungskosten'] || '–') + '</b>, Ergebnis <b>' + (tk['Ergebnis V+V'] || '–') + '</b>, Erstattung <b>' + (tk['Erstattung'] || '–') + '</b>.');
           r27TipWeg();
           /* woher: Erhaltungsaufwand im Detail dieses Jahres, mit Bemerkung */
           r15Modus(1); await warte(900); await r15Jahr(R[k0].jahr);
@@ -6676,7 +6731,7 @@
           r27Oben(r27Host(), 110); await warte(400);
           if (k1 + 1 < R.length && R[k1 + 1].steuer < 0) {
             await zeige(r27Hit(R[k1 + 1].jahr), 4);
-            await b2oZeile(s, 'Ab ' + R[k1 + 1].jahr + ' wieder Steuer', 'Steuer <b>' + eur(-R[k1 + 1].steuer) + '</b> im Jahr ' + R[k1 + 1].jahr + ', der Balken ist wieder rot.');
+            await b2oZeile(s, 'Ab ' + R[k1 + 1].jahr + ' wieder Steuer', 'Steuer <b>' + eur(-R[k1 + 1].steuer) + '</b> im Jahr ' + R[k1 + 1].jahr + ', die Säule ist wieder rot.');
           }
           await zeigeGruppe(r27Hit(R[k0].jahr), r27Hit(R[k1].jahr), 4);
           await b2oZeile(s, 'Geplant, nicht zufällig', 'Die Maßnahmen liegen in den Jahren mit Steuerlast, nach der Drei-Jahres-Frist, sonst griffe die 15-%-Grenze. Die Grafik zeigt, wo eine Maßnahme die Kurve dreht.', 1500);
