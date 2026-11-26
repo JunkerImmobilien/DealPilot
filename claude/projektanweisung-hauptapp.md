@@ -45251,3 +45251,16 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** main 70df7756 (staging cf58ab8e).
 - **Nachweis:** Staging headless (v5060-Dateien per Fetch eingespielt, Speichern blockiert, Objekt-Hash vorher = nachher) an Westerfeldstr. 146: Kurz 14 S., Kombi 29 S., Bank 14 S., Inhaltsverzeichnis je eine Seite, alle Eintraege auf der richtigen Seite, Seitenzahl im Fuss auf jeder Seite, kein „Muster“, keine Selbstauskunft, kein NaN; App-Pfad des PDF-Dienstes (puppeteer 25, dok-pdf trackrecord) 200 und PDF. Prod: Dateien mit v5060m ausgeliefert, Fenster mit drei Karten, Kombi vorausgewaehlt, bleibt bei Klick daneben offen; pdf-dienst mit v4580g; Gold-Audit RC 0; buster-ebenen und vorschau sauber; Sicherung `haupt-vor-v5060m-*.sql.gz`.
 - **Rest:** PDF-Erzeugung auf Prod nicht selbst ausgeloest (kein Token fuer ein echtes Konto erzeugt), Marcel bitte einmal je Fassung ausprobieren · gold-audit meldet 2 Dateien unter der Basislinie (nachziehen) · Muster-Schluessel iv_*_muster bleiben intern.
+
+## Rollout-Journal 26.11.2026 — 1.0.231 v5020m/v5050m: Leerzustände und Besichtigungs-Checkliste (Fork QQ5)
+
+- **Was:** Ohne Objekt fallen Track Record, Bankexport und Export im Menü weg, die leere Objektliste zeigt „Erstes Objekt anlegen“ und „Quick Boarding“. Track Record erscheint erst mit einem gewonnenen Objekt. Im Ankauf fallen im Reiter Steuer der Tipp „Jahresende“ und Finanzamt-PDF/Anlage V weg, dafür steht ein Satz da. Neu ist die Besichtigungs-Checkliste (`js/besichtigung.js`) im Reiter „Kaufpreis & Offerte“ der Pilot-Analyse im Ankauf, ohne Analyse unter dem Leersatz. Sie hat Haken und Notiz je Punkt im Feld `_besichtigung`, kann gedruckt werden und wird aus Unterlagen, Objektdaten, Objektart und Baualtersklasse abgeleitet.
+- **Fehler und Fix:** v5020 setzte `data-dp-bestand` am `<html>`. `DpBestand.mountAll()` füllte jedes Element mit diesem Attribut per innerHTML und überschrieb bei jeder Bestands-Pilot-Analyse das ganze Dokument (Staging). M9 hat das gefunden, behoben ist es in staging bb2d93f9 (v5050): `data-dp-lz-bestand`, mountAll nur noch auf `div[data-dp-bestand="exit|anschluss"]`. Auf Prod kam v5020 nur zusammen mit dem Fix.
+- **Commit:** main c921ca6a (Cherry-Pick staging a29e2cdc, 68c150e2), 9c2bbf77 (bb2d93f9). Buster v5020m/v5050m, version.json 1.0.231.
+- **Nachweis:**
+  - buster-ebenen sauber, vorschau-pruefen sauber, gold-audit Prod RC=0.
+  - Staging headless: Bestands-Pilot-Analyse Westerfeldstr. 140 nach 30 s mit 119 Stylesheets, Platzhalter Anschluss und Exit gefüllt. Das Objekt wurde dabei gespeichert und danach aus der Sicherung `/root/backups/qq5-ae155d38-vor-pruefung-20261126.tsv` zurückgesetzt, Daten-md5 wieder gleich.
+  - Prod headless ohne Anmeldung, 1440 und 390 px: `DpLeerzustand`, `DpBesichtigung`, `_sbLeer` und das Feld `_besichtigung` sind da, keine Skriptfehler, kein Attribut `data-dp-bestand` am `<html>`, keine horizontale Scrollleiste.
+- **Rest:**
+  - Ein Prüfkonto auf Prod anzulegen hat die Rechteprüfung abgelehnt. Leerzustände und Checkliste sind deshalb nur auf Staging mit Testkonten gemessen, auf Prod nur ihre Auslieferung.
+  - Offerte-PDF mit Checkliste und Marcels Fragen offen: Finanzamt-PDF im Ankauf, Track Record erst mit Bestand.
