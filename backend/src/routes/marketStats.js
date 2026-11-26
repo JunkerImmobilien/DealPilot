@@ -104,8 +104,10 @@ router.get('/schnellcheck', schnellLimit, async (req, res) => {
   const [lage, miete] = await Promise.all([mbJson('/lage/gemessen' + q, 8000), mbJson('/zensus/fortgeschrieben' + q, 6000)]);
   const gem = lage && lage.gebiet && lage.gebiet.gemeinde_ags;
   /* landing-dealcheck-5: Einwohnerzahl, Kappungsgrenze, Mietpreisbremse (mb /schnell/ort, nur eigene Daten) */
-  const [ms, ort2] = gem ? await Promise.all([mbJson('/mietspiegel?ags=' + encodeURIComponent(gem) + msQ, 4000),
-    mbJson('/schnell/ort?ags=' + encodeURIComponent(gem), 4000)]) : [null, null];
+  /* nn6 · laufende Wohnnebenkosten je Gemeinde (mb /nebenkosten, eigene Datei, ohne Heizung) für den Haus-Check */
+  const [ms, ort2, nk] = gem ? await Promise.all([mbJson('/mietspiegel?ags=' + encodeURIComponent(gem) + msQ, 4000),
+    mbJson('/schnell/ort?ags=' + encodeURIComponent(gem), 4000),
+    mbJson('/nebenkosten?ags=' + encodeURIComponent(gem) + (wfl ? '&wfl=' + wfl : ''), 3000)]) : [null, null, null];
   const fe = (lage && lage.felder) || {};
   const d = {
     plz, gebiet: (miete && miete.available && miete.gebiet) || null, gemeinde_eindeutig: !!gem,
@@ -115,6 +117,7 @@ router.get('/schnellcheck', schnellLimit, async (req, res) => {
     miete: miete && miete.available && miete.qm > 0 ? { qm: miete.qm, ebene: miete.ebene || null, monat: miete.fortgeschrieben_auf || null } : null,
     vergleichsmiete: vglAus(ms, bj, wfl),
     einwohner: ort2 && ort2.einwohner ? ort2.einwohner : null,
+    nebenkosten: nk && nk.summe_qm > 0 ? { qm: nk.summe_qm, ortsgenau: (nk.posten || []).filter((p) => p.herkunft === 'gemeinde').map((p) => p.id), posten: (nk.posten || []).map((p) => ({ id: p.id, name: p.name, qm: p.qm_monat, herkunft: p.herkunft })) } : null,
     kappung: ort2 && ort2.kappung ? { pct: ort2.kappung.pct, verordnung: ort2.kappung.herkunft === 'verordnung', pruefen: ort2.kappung.pruefen, text: ort2.kappung.text } : null,
     mietpreisbremse: ort2 && ort2.mietpreisbremse ? { gilt: ort2.mietpreisbremse.gilt, bis: ort2.mietpreisbremse.bis, pruefen: ort2.mietpreisbremse.pruefen, text: ort2.mietpreisbremse.text } : null,
     mietspiegel: ms && ms.art ? { art: ms.art, gemeinde: ms.gemeinde || null, stand: ms.stand || null } : (ms ? { art: null } : null),
