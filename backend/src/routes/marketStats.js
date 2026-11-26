@@ -61,6 +61,30 @@ function vglAus(ms, bj, wfl) {
   if (n && Number(n.qm) > 0) return { qm: Number(n.qm), unten: null, oben: null, quelle: 'naeherung', abweichung_pct: n.mape_pct || null, objekt };
   return null;
 }
+/* v5130 · KK6 · GET /api/v1/market-stats/umfeld?lat=&lon=  oder  ?adresse=  — oeffentlich fuer den Eigennutzer-Check
+   (Marcel 26.11.2026: „was so in der Naehe ist, also wie Supermarkt etc.“). Quelle OpenStreetMap (Overpass, im mb-Backend
+   30 Tage gespeichert). Mit adresse einmal Geocoding ueber das mb-Backend (Kontingent) - deshalb eng begrenzt:
+   je IP 10 Abrufe in 10 Minuten. Ergebnis 7 Tage hier im Speicher je gerundeter Koordinate. */
+const umfeldLimit = rateLimit({ windowMs: 10 * 60 * 1000, max: 10, standardHeaders: true, legacyHeaders: false,
+  message: { error: 'zu_viele_abrufe', hinweis: 'Bitte in ein paar Minuten noch einmal.' } });
+const umfeldSpeicher = new Map();
+router.get('/umfeld', umfeldLimit, async (req, res) => {
+  let lat = parseFloat(req.query.lat), lon = parseFloat(req.query.lon);
+  const adr = String(req.query.adresse || '').replace(/[<>"]/g, '').trim().slice(0, 140);
+  if ((!isFinite(lat) || !isFinite(lon)) && adr.length >= 6) {
+    const g = await mbJson('/geocode?address=' + encodeURIComponent(adr), 8000);
+    if (g && isFinite(Number(g.lat)) && isFinite(Number(g.lon))) { lat = Number(g.lat); lon = Number(g.lon); }
+  }
+  if (!isFinite(lat) || !isFinite(lon)) return res.status(400).json({ error: 'ort_fehlt', hinweis: 'Adresse mit Straße, PLZ und Ort angeben.' });
+  const key = lat.toFixed(3) + '|' + lon.toFixed(3), c = umfeldSpeicher.get(key);
+  if (c && Date.now() - c.t < 7 * 24 * 3600 * 1000) return res.json(c.d);
+  const d = await mbJson('/umfeld?lat=' + lat + '&lon=' + lon, 25000);
+  if (!d || !d.ok) return res.status(502).json({ error: 'umfeld_nicht_verfuegbar' });
+  umfeldSpeicher.set(key, { t: Date.now(), d });
+  if (umfeldSpeicher.size > 5000) umfeldSpeicher.delete(umfeldSpeicher.keys().next().value);
+  res.json(d);
+});
+
 router.get('/schnellcheck', schnellLimit, async (req, res) => {
   const plz = String(req.query.plz || '').trim();
   if (!/^\d{5}$/.test(plz)) return res.status(400).json({ error: 'plz_fehlt' });
