@@ -1,0 +1,237 @@
+{
+ "ags": "05770028",
+ "gemeinde": "Petershagen",
+ "art": "einfach",
+ "stand": "2026-05",
+ "erhebungsstichtag": null,
+ "gueltig_ab": "2026-04-01",
+ "gueltig_bis": null,
+ "quelle": {
+  "url": "https://serviceportal.petershagen.de/detail/-/vr-bis-detail/dokument/37493/download",
+  "dokument": "Mietspiegel 2026/2027 für freifinanzierte Alt- und Neubauwohnungen, Herausgeber Stadt Petershagen, Bauverwaltung (© Stadt Petershagen, Mai 2026)",
+  "seite": "S. 1 (Allgemeine Erläuterungen „Dieser einfache Mietspiegel …“, Modernisierung), S. 2 (Tabelle Baujahr × Lage, Lageeinteilung nach Ortschaften, „ab dem 01.04.2026 gültig“)",
+  "lizenz": "kein Rechtevorbehalt im Dokument (kein Nachdruck- oder Speicherverbot, kein Urheberrechtsvermerk), geprüft am 2026-11-26",
+  "abgerufen": "2026-11-26"
+ },
+ "einheit": "eur_qm_nettokalt",
+ "form": "tabelle",
+ "rundung": 2,
+ "hinweis": "Einfacher Mietspiegel der Stadt (S. 1 „Dieser einfache Mietspiegel ist eine Orientierungshilfe …“), gültig ab 01.04.2026. Tabelle (S. 2) Baujahr × Lage einfach (A) / mittel (B) / gut (C) mit Spanne und Mittelwert, ohne Größenachse; Textschicht verschiebt die Zeilen — am Druckbild (200 dpi, Ausschnitt) abgelesen. Spannen sehr breit (teils unter 3 €/m² bzw. bis 14,74 €/m²), so im Dokument. Lage nach Ortschaft (S. 2): einfach = Buchholz, Großenheerse, Hävern, Heimsen, Ilse, Ilserheide, Ilvese, Maaslingen, Meßlingen, Raderhorst, Rosenhagen, Seelenfeld, Südfelde; mittel = Bierde, Döhren, Eldagsen, Friedewalde, Frille, Gorspen-Vahlsen, Ortsteil Heisterholz, Jössen, Neuenknick, Ovenstädt, Quetzen, Schlüsselburg, Wasserstraße, Wietersheim, Windheim; gut = Lahde und Petershagen. Ohne Ortsangabe nimmt DealPilot mittel an (keine Dokumentangabe). Umfassende Modernisierung (mind. drei Elemente) kann die Baualtersklasse ändern (S. 1) — die Rechnung nimmt das übergebene Baujahr. Zu Häusern sagt das Dokument nichts.",
+ "tabelle": {
+  "achsen": {
+   "baujahr": [
+    {
+     "von": null,
+     "bis": 1960,
+     "label": "bis 1960"
+    },
+    {
+     "von": 1961,
+     "bis": 1980,
+     "label": "1961 bis 1980"
+    },
+    {
+     "von": 1981,
+     "bis": 2000,
+     "label": "1981 bis 2000"
+    },
+    {
+     "von": 2001,
+     "bis": 2025,
+     "label": "2001 bis 2025"
+    }
+   ],
+   "lage": [
+    {
+     "schluessel": "einfach",
+     "label": "einfache Lage (A)",
+     "aliase": [
+      "buchholz",
+      "großenheerse",
+      "hävern",
+      "heimsen",
+      "ilse",
+      "ilserheide",
+      "ilvese",
+      "maaslingen",
+      "meßlingen",
+      "raderhorst",
+      "rosenhagen",
+      "seelenfeld",
+      "südfelde"
+     ]
+    },
+    {
+     "schluessel": "mittel",
+     "label": "mittlere Lage (B)",
+     "standard": true,
+     "aliase": [
+      "normal",
+      "bierde",
+      "döhren",
+      "eldagsen",
+      "friedewalde",
+      "frille",
+      "gorspen-vahlsen",
+      "heisterholz",
+      "jössen",
+      "neuenknick",
+      "ovenstädt",
+      "quetzen",
+      "schlüsselburg",
+      "wasserstraße",
+      "wietersheim",
+      "windheim"
+     ]
+    },
+    {
+     "schluessel": "gut",
+     "label": "gute Lage (C)",
+     "aliase": [
+      "lahde",
+      "petershagen"
+     ]
+    }
+   ]
+  },
+  "zellen": [
+   {
+    "baujahr": 0,
+    "lage": "einfach",
+    "unten": 2.74,
+    "mittel": 4.56,
+    "oben": 6.6,
+    "seite": "2"
+   },
+   {
+    "baujahr": 0,
+    "lage": "mittel",
+    "unten": 3.3,
+    "mittel": 5.28,
+    "oben": 10.95,
+    "seite": "2"
+   },
+   {
+    "baujahr": 0,
+    "lage": "gut",
+    "unten": 3.08,
+    "mittel": 6.38,
+    "oben": 14.74,
+    "seite": "2"
+   },
+   {
+    "baujahr": 1,
+    "lage": "einfach",
+    "unten": 4.58,
+    "mittel": 5.6,
+    "oben": 7.08,
+    "seite": "2"
+   },
+   {
+    "baujahr": 1,
+    "lage": "mittel",
+    "unten": 3.24,
+    "mittel": 5.39,
+    "oben": 7.93,
+    "seite": "2"
+   },
+   {
+    "baujahr": 1,
+    "lage": "gut",
+    "unten": 3.71,
+    "mittel": 5.97,
+    "oben": 7.63,
+    "seite": "2"
+   },
+   {
+    "baujahr": 2,
+    "lage": "einfach",
+    "unten": 3.59,
+    "mittel": 5.4,
+    "oben": 7.58,
+    "seite": "2"
+   },
+   {
+    "baujahr": 2,
+    "lage": "mittel",
+    "unten": 2.7,
+    "mittel": 5.54,
+    "oben": 9.27,
+    "seite": "2"
+   },
+   {
+    "baujahr": 2,
+    "lage": "gut",
+    "unten": 3.08,
+    "mittel": 6.3,
+    "oben": 11.09,
+    "seite": "2"
+   },
+   {
+    "baujahr": 3,
+    "lage": "einfach",
+    "unten": 3.17,
+    "mittel": 5.44,
+    "oben": 8.29,
+    "seite": "2"
+   },
+   {
+    "baujahr": 3,
+    "lage": "mittel",
+    "unten": 2.58,
+    "mittel": 5.71,
+    "oben": 8.19,
+    "seite": "2"
+   },
+   {
+    "baujahr": 3,
+    "lage": "gut",
+    "unten": 4.11,
+    "mittel": 7.62,
+    "oben": 13.76,
+    "seite": "2"
+   }
+  ]
+ },
+ "pruefbeispiele": [
+  {
+   "eingabe": {
+    "baujahr": 1970,
+    "wfl": 70,
+    "lage": "mittel"
+   },
+   "erwartet": {
+    "unten": 3.24,
+    "mittel": 5.39,
+    "oben": 7.93
+   },
+   "seite": "2",
+   "art": "tabellenzelle"
+  },
+  {
+   "eingabe": {
+    "baujahr": 2010,
+    "wfl": 70,
+    "lage": "lahde"
+   },
+   "erwartet": {
+    "unten": 4.11,
+    "mittel": 7.62,
+    "oben": 13.76
+   },
+   "seite": "2",
+   "art": "tabellenzelle",
+   "anmerkung": "Lahde = gute Lage"
+  },
+  {
+   "eingabe": {
+    "baujahr": 2026,
+    "wfl": 70
+   },
+   "erwartet": null,
+   "seite": "2",
+   "art": "tabellenzelle",
+   "anmerkung": "Baujahr nach 2025 nicht in der Tabelle"
+  }
+ ]
+}
