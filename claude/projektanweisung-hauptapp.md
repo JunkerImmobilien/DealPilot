@@ -45790,6 +45790,18 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** staging 65800543 · main cfc0903c, f414b3eb (Version).
 - **Nachweis:** Prod curl `pilot-analyse-v4.js?v=v5050ss5m` mit dem Zusatz, version.json patch 229, gold-audit Prod RC 0, buster-ebenen, vorschau-pruefen grün.
 - **Rest:** keiner.
+## Rollout-Journal 26.11.2026 — 1.0.231 v5020m/v5050m: Leerzustände und Besichtigungs-Checkliste (Fork QQ5)
+
+- **Was:** Ohne Objekt fallen Track Record, Bankexport und Export im Menü weg, die leere Objektliste zeigt „Erstes Objekt anlegen“ und „Quick Boarding“. Track Record erscheint erst mit einem gewonnenen Objekt. Im Ankauf fallen im Reiter Steuer der Tipp „Jahresende“ und Finanzamt-PDF/Anlage V weg, dafür steht ein Satz da. Neu ist die Besichtigungs-Checkliste (`js/besichtigung.js`) im Reiter „Kaufpreis & Offerte“ der Pilot-Analyse im Ankauf, ohne Analyse unter dem Leersatz. Sie hat Haken und Notiz je Punkt im Feld `_besichtigung`, kann gedruckt werden und wird aus Unterlagen, Objektdaten, Objektart und Baualtersklasse abgeleitet.
+- **Fehler und Fix:** v5020 setzte `data-dp-bestand` am `<html>`. `DpBestand.mountAll()` füllte jedes Element mit diesem Attribut per innerHTML und überschrieb bei jeder Bestands-Pilot-Analyse das ganze Dokument (Staging). M9 hat das gefunden, behoben ist es in staging bb2d93f9 (v5050): `data-dp-lz-bestand`, mountAll nur noch auf `div[data-dp-bestand="exit|anschluss"]`. Auf Prod kam v5020 nur zusammen mit dem Fix.
+- **Commit:** main c921ca6a (Cherry-Pick staging a29e2cdc, 68c150e2), 9c2bbf77 (bb2d93f9). Buster v5020m/v5050m, version.json 1.0.231.
+- **Nachweis:**
+  - buster-ebenen sauber, vorschau-pruefen sauber, gold-audit Prod RC=0.
+  - Staging headless: Bestands-Pilot-Analyse Westerfeldstr. 140 nach 30 s mit 119 Stylesheets, Platzhalter Anschluss und Exit gefüllt. Das Objekt wurde dabei gespeichert und danach aus der Sicherung `/root/backups/qq5-ae155d38-vor-pruefung-20261126.tsv` zurückgesetzt, Daten-md5 wieder gleich.
+  - Prod headless ohne Anmeldung, 1440 und 390 px: `DpLeerzustand`, `DpBesichtigung`, `_sbLeer` und das Feld `_besichtigung` sind da, keine Skriptfehler, kein Attribut `data-dp-bestand` am `<html>`, keine horizontale Scrollleiste.
+- **Rest:**
+  - Ein Prüfkonto auf Prod anzulegen hat die Rechteprüfung abgelehnt. Leerzustände und Checkliste sind deshalb nur auf Staging mit Testkonten gemessen, auf Prod nur ihre Auslieferung.
+  - Offerte-PDF mit Checkliste und Marcels Fragen offen: Finanzamt-PDF im Ankauf, Track Record erst mit Bestand.
 
 ### Rollout 1.0.232 · 26.11.2026 · v5070 (TT5)
 - **Was:** Handy-Menü. Marcel 26.11.: das einzeilige Band aus v5000 „sieht nicht mehr so aus wie jetzt“, die aufgeklappte Leiste „mega breit“. Umschalter Aktionen · Ankauf · Bestand unter 900 px wieder als drei Reiter-Karten wie am Schreibtisch (Symbol über Wort, Zahl als Plakette oben rechts, Space Grotesk), 44 px hoch. Schublade `min(280px,76vw)` statt `min(90vw,380px)`. Objektkarten in der Schublade: Knöpfe ohne Score an den Rand, Anschrift zweizeilig mit Abstand zu Knöpfen und Score (Selektor braucht `#sidebar #sb-list`, sonst gewinnt die nowrap-Regel aus layout-varianten.css Z. ~7896).
