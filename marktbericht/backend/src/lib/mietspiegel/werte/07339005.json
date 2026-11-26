@@ -1,0 +1,555 @@
+{
+ "ags": "07339005",
+ "gemeinde": "Bingen am Rhein",
+ "art": "einfach",
+ "stand": "2025-01-01",
+ "erhebungsstichtag": null,
+ "gueltig_ab": "2025-01-01",
+ "gueltig_bis": null,
+ "naechste_ausgabe": null,
+ "quelle": {
+  "url": "https://www.bingen.de/media/5670c130-d1d6-46f1-8b73-02d24f6a7a27/bvutOg/.Neue%20Webseite%202020/4_Leben/5_Wohnen%20und%20Bauen%20in%20Bingen/7_Mietspiegel/2025-03-31%20Deckblatt_Mietspiegel_01012025.pdf",
+  "dokument": "Mietspiegel für nicht preisgebundene Wohnungen im Gebiet der Stadt Bingen, 12. Fortschreibung 01.01.2025 (Deckblatt/Erläuterungen) mit Mietpreistabellen Gruppe I bis V (je eigene PDF auf https://www.bingen.de/leben/wohnen-in-bingen/mietspiegel)",
+  "seite": "Deckblatt S. 1–4; Mietpreistabellen Gruppe I–V je S. 1",
+  "lizenz": "kein Rechtevorbehalt und kein Speicherverbot in Deckblatt und Tabellen (geprüft am 26.11.2026)",
+  "abgerufen": "2026-11-26"
+ },
+ "einheit": "eur_qm_nettokalt",
+ "form": "tabelle",
+ "rundung": 2,
+ "hinweis": "Einfacher Mietspiegel (§ 558c, Haus und Grund Bingen, Mieterschutzverein Mainz, Stadtverwaltung; Deckblatt S. 2). Spannen von/bis, „mittel“ = Mitte der Spanne (DealPilot-Rechnung). Gruppen nach Bezugsfertigkeit: I bis 1970, II ab 1970 bis 1990, IV ab 1990 bis 2015, V ab 2015; die Grenzjahre stehen im Dokument doppelt, DealPilot ordnet sie der älteren Gruppe zu. Gruppe III gilt für umfassend renovierten Altbau (Renovierung ab 1990) und ist hier als Ausstattung „renovierter_altbau“ der Gruppe I abgelegt. Gruppe I unterscheidet keine Lage; II bis V „einfach und mittel“ gegen „gut“. Wohnlagen ohne Karte oder Straßenliste (Deckblatt S. 3–4), ohne Angabe mittlere Lage. Wohnflächenklassen bis 60, 60–80, über 80 qm (Gruppe V „bis 80“).",
+ "tabelle": {
+  "achsen": {
+   "baujahr": [
+    {
+     "von": null,
+     "bis": 1970,
+     "label": "Gruppe I: bezugsfertig bis 1970"
+    },
+    {
+     "von": 1970,
+     "bis": 1990,
+     "label": "Gruppe II: bezugsfertig ab 1970 bis 1990"
+    },
+    {
+     "von": 1990,
+     "bis": 2015,
+     "label": "Gruppe IV: bezugsfertig ab 1990 bis 2015"
+    },
+    {
+     "von": 2015,
+     "bis": null,
+     "label": "Gruppe V: bezugsfertig ab 2015"
+    }
+   ],
+   "wfl": [
+    {
+     "von": null,
+     "bis": 60,
+     "label": "bis 60 qm"
+    },
+    {
+     "von": 60,
+     "bis": 80,
+     "label": "über 60 bis 80 qm",
+     "von_inkl": false
+    },
+    {
+     "von": 80,
+     "von_inkl": false,
+     "bis": null,
+     "label": "über 80 qm"
+    }
+   ],
+   "lage": [
+    {
+     "schluessel": "einfach",
+     "label": "einfache Wohnlage"
+    },
+    {
+     "schluessel": "mittel",
+     "label": "mittlere Wohnlage",
+     "standard": true
+    },
+    {
+     "schluessel": "gut",
+     "label": "gute Wohnlage"
+    }
+   ],
+   "ausstattung": [
+    {
+     "schluessel": "bad_oder_heizung",
+     "label": "mit Bad oder Sammelheizung (nur Gruppe I)"
+    },
+    {
+     "schluessel": "bad_und_heizung",
+     "label": "mit Bad und Sammelheizung/Heizung",
+     "standard": true
+    },
+    {
+     "schluessel": "renovierter_altbau",
+     "label": "umfassend renovierter Altbau, Renovierung ab 1990 (Gruppe III; Doppelverglasung, renoviertes Bad, Etagen- oder Sammelheizung)"
+    }
+   ]
+  },
+  "zellen": [
+   {
+    "baujahr": 0,
+    "wfl": 0,
+    "ausstattung": "bad_oder_heizung",
+    "unten": 5.0,
+    "mittel": 5.5,
+    "oben": 6.0,
+    "seite": "Gruppe I"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 1,
+    "ausstattung": "bad_oder_heizung",
+    "unten": 5.0,
+    "mittel": 5.5,
+    "oben": 6.0,
+    "seite": "Gruppe I"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 2,
+    "ausstattung": "bad_oder_heizung",
+    "unten": 5.0,
+    "mittel": 5.5,
+    "oben": 6.0,
+    "seite": "Gruppe I"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 0,
+    "ausstattung": "bad_und_heizung",
+    "unten": 6.0,
+    "mittel": 6.5,
+    "oben": 7.0,
+    "seite": "Gruppe I"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 1,
+    "ausstattung": "bad_und_heizung",
+    "unten": 6.0,
+    "mittel": 6.5,
+    "oben": 7.0,
+    "seite": "Gruppe I"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 2,
+    "ausstattung": "bad_und_heizung",
+    "unten": 5.6,
+    "mittel": 6.05,
+    "oben": 6.5,
+    "seite": "Gruppe I"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 0,
+    "ausstattung": "renovierter_altbau",
+    "unten": 7.0,
+    "mittel": 7.75,
+    "oben": 8.5,
+    "seite": "Gruppe III",
+    "lage": "einfach"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 0,
+    "ausstattung": "renovierter_altbau",
+    "unten": 7.0,
+    "mittel": 7.75,
+    "oben": 8.5,
+    "seite": "Gruppe III",
+    "lage": "mittel"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 1,
+    "ausstattung": "renovierter_altbau",
+    "unten": 7.0,
+    "mittel": 7.75,
+    "oben": 8.5,
+    "seite": "Gruppe III",
+    "lage": "einfach"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 1,
+    "ausstattung": "renovierter_altbau",
+    "unten": 7.0,
+    "mittel": 7.75,
+    "oben": 8.5,
+    "seite": "Gruppe III",
+    "lage": "mittel"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 2,
+    "ausstattung": "renovierter_altbau",
+    "unten": 7.0,
+    "mittel": 7.65,
+    "oben": 8.3,
+    "seite": "Gruppe III",
+    "lage": "einfach"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 2,
+    "ausstattung": "renovierter_altbau",
+    "unten": 7.0,
+    "mittel": 7.65,
+    "oben": 8.3,
+    "seite": "Gruppe III",
+    "lage": "mittel"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 0,
+    "ausstattung": "renovierter_altbau",
+    "unten": 7.5,
+    "mittel": 8.0,
+    "oben": 8.5,
+    "seite": "Gruppe III",
+    "lage": "gut"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 1,
+    "ausstattung": "renovierter_altbau",
+    "unten": 7.5,
+    "mittel": 8.0,
+    "oben": 8.5,
+    "seite": "Gruppe III",
+    "lage": "gut"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 2,
+    "ausstattung": "renovierter_altbau",
+    "unten": 7.5,
+    "mittel": 7.9,
+    "oben": 8.3,
+    "seite": "Gruppe III",
+    "lage": "gut"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 0,
+    "ausstattung": "bad_und_heizung",
+    "unten": 6.5,
+    "mittel": 7.0,
+    "oben": 7.5,
+    "seite": "Gruppe II",
+    "lage": "einfach"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 0,
+    "ausstattung": "bad_und_heizung",
+    "unten": 6.5,
+    "mittel": 7.0,
+    "oben": 7.5,
+    "seite": "Gruppe II",
+    "lage": "mittel"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 1,
+    "ausstattung": "bad_und_heizung",
+    "unten": 6.5,
+    "mittel": 7.0,
+    "oben": 7.5,
+    "seite": "Gruppe II",
+    "lage": "einfach"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 1,
+    "ausstattung": "bad_und_heizung",
+    "unten": 6.5,
+    "mittel": 7.0,
+    "oben": 7.5,
+    "seite": "Gruppe II",
+    "lage": "mittel"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 2,
+    "ausstattung": "bad_und_heizung",
+    "unten": 6.5,
+    "mittel": 7.0,
+    "oben": 7.5,
+    "seite": "Gruppe II",
+    "lage": "einfach"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 2,
+    "ausstattung": "bad_und_heizung",
+    "unten": 6.5,
+    "mittel": 7.0,
+    "oben": 7.5,
+    "seite": "Gruppe II",
+    "lage": "mittel"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 0,
+    "ausstattung": "bad_und_heizung",
+    "unten": 7.0,
+    "mittel": 7.5,
+    "oben": 8.0,
+    "seite": "Gruppe II",
+    "lage": "gut"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 1,
+    "ausstattung": "bad_und_heizung",
+    "unten": 7.0,
+    "mittel": 7.5,
+    "oben": 8.0,
+    "seite": "Gruppe II",
+    "lage": "gut"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 2,
+    "ausstattung": "bad_und_heizung",
+    "unten": 7.0,
+    "mittel": 7.5,
+    "oben": 8.0,
+    "seite": "Gruppe II",
+    "lage": "gut"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 0,
+    "ausstattung": "bad_und_heizung",
+    "unten": 8.0,
+    "mittel": 8.75,
+    "oben": 9.5,
+    "seite": "Gruppe IV",
+    "lage": "einfach"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 0,
+    "ausstattung": "bad_und_heizung",
+    "unten": 8.0,
+    "mittel": 8.75,
+    "oben": 9.5,
+    "seite": "Gruppe IV",
+    "lage": "mittel"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 1,
+    "ausstattung": "bad_und_heizung",
+    "unten": 8.0,
+    "mittel": 8.75,
+    "oben": 9.5,
+    "seite": "Gruppe IV",
+    "lage": "einfach"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 1,
+    "ausstattung": "bad_und_heizung",
+    "unten": 8.0,
+    "mittel": 8.75,
+    "oben": 9.5,
+    "seite": "Gruppe IV",
+    "lage": "mittel"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 2,
+    "ausstattung": "bad_und_heizung",
+    "unten": 8.0,
+    "mittel": 8.65,
+    "oben": 9.3,
+    "seite": "Gruppe IV",
+    "lage": "einfach"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 2,
+    "ausstattung": "bad_und_heizung",
+    "unten": 8.0,
+    "mittel": 8.65,
+    "oben": 9.3,
+    "seite": "Gruppe IV",
+    "lage": "mittel"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 0,
+    "ausstattung": "bad_und_heizung",
+    "unten": 8.0,
+    "mittel": 8.75,
+    "oben": 9.5,
+    "seite": "Gruppe IV",
+    "lage": "gut"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 1,
+    "ausstattung": "bad_und_heizung",
+    "unten": 8.0,
+    "mittel": 8.75,
+    "oben": 9.5,
+    "seite": "Gruppe IV",
+    "lage": "gut"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 2,
+    "ausstattung": "bad_und_heizung",
+    "unten": 8.0,
+    "mittel": 8.65,
+    "oben": 9.3,
+    "seite": "Gruppe IV",
+    "lage": "gut"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 0,
+    "ausstattung": "bad_und_heizung",
+    "unten": 9.0,
+    "mittel": 9.5,
+    "oben": 10.0,
+    "seite": "Gruppe V",
+    "lage": "einfach"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 0,
+    "ausstattung": "bad_und_heizung",
+    "unten": 9.0,
+    "mittel": 9.5,
+    "oben": 10.0,
+    "seite": "Gruppe V",
+    "lage": "mittel"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 1,
+    "ausstattung": "bad_und_heizung",
+    "unten": 9.0,
+    "mittel": 9.5,
+    "oben": 10.0,
+    "seite": "Gruppe V",
+    "lage": "einfach"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 1,
+    "ausstattung": "bad_und_heizung",
+    "unten": 9.0,
+    "mittel": 9.5,
+    "oben": 10.0,
+    "seite": "Gruppe V",
+    "lage": "mittel"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 2,
+    "ausstattung": "bad_und_heizung",
+    "unten": 9.0,
+    "mittel": 9.5,
+    "oben": 10.0,
+    "seite": "Gruppe V",
+    "lage": "einfach"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 2,
+    "ausstattung": "bad_und_heizung",
+    "unten": 9.0,
+    "mittel": 9.5,
+    "oben": 10.0,
+    "seite": "Gruppe V",
+    "lage": "mittel"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 0,
+    "ausstattung": "bad_und_heizung",
+    "unten": 9.0,
+    "mittel": 10.5,
+    "oben": 12.0,
+    "seite": "Gruppe V",
+    "lage": "gut"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 1,
+    "ausstattung": "bad_und_heizung",
+    "unten": 9.0,
+    "mittel": 10.5,
+    "oben": 12.0,
+    "seite": "Gruppe V",
+    "lage": "gut"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 2,
+    "ausstattung": "bad_und_heizung",
+    "unten": 9.0,
+    "mittel": 10.5,
+    "oben": 12.0,
+    "seite": "Gruppe V",
+    "lage": "gut"
+   }
+  ]
+ },
+ "pruefbeispiele": [
+  {
+   "eingabe": {
+    "baujahr": 1985,
+    "wfl": 70,
+    "lage": "gut"
+   },
+   "erwartet": {
+    "unten": 7.0,
+    "mittel": 7.5,
+    "oben": 8.0
+   },
+   "seite": "Gruppe II",
+   "art": "tabellenzelle"
+  },
+  {
+   "eingabe": {
+    "baujahr": 1960,
+    "wfl": 90
+   },
+   "erwartet": {
+    "unten": 5.6,
+    "mittel": 6.05,
+    "oben": 6.5
+   },
+   "seite": "Gruppe I",
+   "art": "tabellenzelle"
+  },
+  {
+   "eingabe": {
+    "baujahr": 2018,
+    "wfl": 50,
+    "lage": "einfach"
+   },
+   "erwartet": {
+    "unten": 9.0,
+    "mittel": 9.5,
+    "oben": 10.0
+   },
+   "seite": "Gruppe V",
+   "art": "tabellenzelle"
+  }
+ ]
+}
