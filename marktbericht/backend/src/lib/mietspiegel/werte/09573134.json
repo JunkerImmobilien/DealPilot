@@ -1,0 +1,1105 @@
+{
+ "ags": "09573134",
+ "gemeinde": "Zirndorf",
+ "art": "einfach",
+ "stand": "2024-07-01",
+ "erhebungsstichtag": null,
+ "gueltig_ab": "2024-07-01",
+ "gueltig_bis": null,
+ "naechste_ausgabe": null,
+ "quelle": {
+  "url": "https://www.zirndorf.de/fileadmin/Dateien/01Website/Dateien/Mietspiegel/Zirndorfer_Mietspiegel_2024.pdf",
+  "dokument": "Zirndorfer Mietspiegel 2024 für Altbauwohnungen und freifinanzierte Neubauwohnungen, Stand 01.07.2024 (Stadtbauamt Zirndorf im Einvernehmen mit Haus & Grund Fürth und Mieterverein Fürth)",
+  "seite": "1–4",
+  "lizenz": "kein Rechtevorbehalt und kein Speicherverbot im Dokument (geprüft am 26.11.2026)",
+  "abgerufen": "2026-11-26"
+ },
+ "einheit": "eur_qm_nettokalt",
+ "form": "tabelle",
+ "rundung": 2,
+ "hinweis": "Einfacher Mietspiegel, ausdrücklich „keinen qualifizierten Mietspiegel gemäß § 558 d BGB“ (S. 4). Tabelle (S. 2, am Druckbild gelesen) nach Baujahr × Grundausstattung × Wohnungsqualität × Haustyp, ohne Wohnflächenklassen; nur von/bis, „mittel“ = Mitte der Spanne (das Dokument sagt: „Grundsätzlich ist aus den jeweiligen Preisspannen der mittlere Bereich anzusetzen“, S. 4). Die drei Merkmale Haustyp (MFH / Ein- und Zweifamilienhaus mit Präfix efh_), Grundausstattung und Wohnungsqualität sind als EINE Ausstattungsachse kombiniert, ohne Angabe: MFH, Bad und Heizung, mittel. Wohnungsqualität per Punktesystem (S. 3): gut ab 4 Punkten, mittel 0 bis unter 4, einfach unter 0; Plus: hochwertiger Fußboden +1, Isolierverglasung +2, Abstellraum > 1 qm +1, Balkon/Loggia bis 8 qm +1, über 8 qm +2, Aufzug +1, Bad/WC getrennt +1, aufgelockerte Bauweise mit Grünflächen +1 oder Villenviertel +2, Sondermerkmale je +1 (max. 4); Minus: Toilette außerhalb −3, ungünstiger Grundriss −1, Umwelteinflüsse −1, keine Schallschutzfenster an lärmbelasteten Straßen (ab 75 dBA) −1, Einfachverglasung −2, weder Keller noch Boden noch Abstellraum −2, Sondermerkmale je −1 (max. 4). Ortsteile Anwanden, Banderbach, Bronnamberg, Leichendorf, Lind, Weinzierlein, Wintersdorf: 5 % Abschlag (S. 1). Leere Felder („-“) haben keinen Wert. Baujahr 1918 und 1948 stehen in zwei Klassen; DealPilot nimmt die ältere.",
+ "tabelle": {
+  "achsen": {
+   "baujahr": [
+    {
+     "von": null,
+     "bis": 1918,
+     "label": "bis 1918"
+    },
+    {
+     "von": 1918,
+     "bis": 1948,
+     "label": "1918 bis 20.06.1948"
+    },
+    {
+     "von": 1948,
+     "bis": 1955,
+     "label": "21.6.1948 bis 1955"
+    },
+    {
+     "von": 1956,
+     "bis": 1966,
+     "label": "1956 bis 1966"
+    },
+    {
+     "von": 1967,
+     "bis": 1969,
+     "label": "1967 bis 1969"
+    },
+    {
+     "von": 1970,
+     "bis": 1974,
+     "label": "1970 bis 1974"
+    },
+    {
+     "von": 1975,
+     "bis": 1976,
+     "label": "1975 bis 1976"
+    },
+    {
+     "von": 1977,
+     "bis": 1979,
+     "label": "1977 bis 1979"
+    },
+    {
+     "von": 1980,
+     "bis": 1982,
+     "label": "1980 bis 1982"
+    },
+    {
+     "von": 1983,
+     "bis": 1985,
+     "label": "1983 bis 1985"
+    },
+    {
+     "von": 1986,
+     "bis": 1990,
+     "label": "1986 bis 1990"
+    },
+    {
+     "von": 1991,
+     "bis": 1994,
+     "label": "1991 bis 1994"
+    },
+    {
+     "von": 1995,
+     "bis": 2000,
+     "label": "1995 bis 2000"
+    },
+    {
+     "von": 2001,
+     "bis": 2010,
+     "label": "2001 bis 2010"
+    },
+    {
+     "von": 2011,
+     "bis": 2017,
+     "label": "2011 bis 2017"
+    },
+    {
+     "von": 2018,
+     "bis": null,
+     "label": "ab 2018"
+    }
+   ],
+   "wfl": [
+    {
+     "von": null,
+     "bis": null,
+     "label": "alle Wohnflächen"
+    }
+   ],
+   "ausstattung": [
+    {
+     "schluessel": "ohne_bad_ohne_heizung_einfach",
+     "label": "Mehrfamilienhaus, ohne Bad/Dusche, ohne Zentral- oder ähnliche Heizung, Wohnungsqualität einfach"
+    },
+    {
+     "schluessel": "ohne_bad_ohne_heizung_mittel",
+     "label": "Mehrfamilienhaus, ohne Bad/Dusche, ohne Zentral- oder ähnliche Heizung, Wohnungsqualität mittel"
+    },
+    {
+     "schluessel": "ohne_bad_ohne_heizung_gut",
+     "label": "Mehrfamilienhaus, ohne Bad/Dusche, ohne Zentral- oder ähnliche Heizung, Wohnungsqualität gut"
+    },
+    {
+     "schluessel": "bad_oder_heizung_einfach",
+     "label": "Mehrfamilienhaus, Bad/Dusche oder Zentral- oder ähnliche Heizung, Wohnungsqualität einfach"
+    },
+    {
+     "schluessel": "bad_oder_heizung_mittel",
+     "label": "Mehrfamilienhaus, Bad/Dusche oder Zentral- oder ähnliche Heizung, Wohnungsqualität mittel"
+    },
+    {
+     "schluessel": "bad_oder_heizung_gut",
+     "label": "Mehrfamilienhaus, Bad/Dusche oder Zentral- oder ähnliche Heizung, Wohnungsqualität gut"
+    },
+    {
+     "schluessel": "bad_und_heizung_einfach",
+     "label": "Mehrfamilienhaus, Bad/Dusche und Zentral- oder ähnliche Heizung, Wohnungsqualität einfach"
+    },
+    {
+     "schluessel": "bad_und_heizung_mittel",
+     "label": "Mehrfamilienhaus, Bad/Dusche und Zentral- oder ähnliche Heizung, Wohnungsqualität mittel",
+     "standard": true
+    },
+    {
+     "schluessel": "bad_und_heizung_gut",
+     "label": "Mehrfamilienhaus, Bad/Dusche und Zentral- oder ähnliche Heizung, Wohnungsqualität gut"
+    },
+    {
+     "schluessel": "efh_ohne_bad_ohne_heizung_einfach",
+     "label": "Ein- und Zweifamilienhaus, ohne Bad/Dusche, ohne Zentral- oder ähnliche Heizung, Wohnungsqualität einfach"
+    },
+    {
+     "schluessel": "efh_ohne_bad_ohne_heizung_mittel",
+     "label": "Ein- und Zweifamilienhaus, ohne Bad/Dusche, ohne Zentral- oder ähnliche Heizung, Wohnungsqualität mittel"
+    },
+    {
+     "schluessel": "efh_ohne_bad_ohne_heizung_gut",
+     "label": "Ein- und Zweifamilienhaus, ohne Bad/Dusche, ohne Zentral- oder ähnliche Heizung, Wohnungsqualität gut"
+    },
+    {
+     "schluessel": "efh_bad_oder_heizung_einfach",
+     "label": "Ein- und Zweifamilienhaus, Bad/Dusche oder Zentral- oder ähnliche Heizung, Wohnungsqualität einfach"
+    },
+    {
+     "schluessel": "efh_bad_oder_heizung_mittel",
+     "label": "Ein- und Zweifamilienhaus, Bad/Dusche oder Zentral- oder ähnliche Heizung, Wohnungsqualität mittel"
+    },
+    {
+     "schluessel": "efh_bad_oder_heizung_gut",
+     "label": "Ein- und Zweifamilienhaus, Bad/Dusche oder Zentral- oder ähnliche Heizung, Wohnungsqualität gut"
+    },
+    {
+     "schluessel": "efh_bad_und_heizung_einfach",
+     "label": "Ein- und Zweifamilienhaus, Bad/Dusche und Zentral- oder ähnliche Heizung, Wohnungsqualität einfach"
+    },
+    {
+     "schluessel": "efh_bad_und_heizung_mittel",
+     "label": "Ein- und Zweifamilienhaus, Bad/Dusche und Zentral- oder ähnliche Heizung, Wohnungsqualität mittel"
+    },
+    {
+     "schluessel": "efh_bad_und_heizung_gut",
+     "label": "Ein- und Zweifamilienhaus, Bad/Dusche und Zentral- oder ähnliche Heizung, Wohnungsqualität gut"
+    }
+   ]
+  },
+  "zellen": [
+   {
+    "baujahr": 0,
+    "ausstattung": "ohne_bad_ohne_heizung_einfach",
+    "unten": 1.64,
+    "mittel": 2.15,
+    "oben": 2.66,
+    "seite": "2"
+   },
+   {
+    "baujahr": 0,
+    "ausstattung": "bad_oder_heizung_einfach",
+    "unten": 2.22,
+    "mittel": 2.6,
+    "oben": 2.98,
+    "seite": "2"
+   },
+   {
+    "baujahr": 0,
+    "ausstattung": "bad_und_heizung_einfach",
+    "unten": 2.93,
+    "mittel": 3.5,
+    "oben": 4.06,
+    "seite": "2"
+   },
+   {
+    "baujahr": 0,
+    "ausstattung": "efh_ohne_bad_ohne_heizung_einfach",
+    "unten": 1.91,
+    "mittel": 2.35,
+    "oben": 2.79,
+    "seite": "2"
+   },
+   {
+    "baujahr": 0,
+    "ausstattung": "efh_bad_oder_heizung_einfach",
+    "unten": 2.47,
+    "mittel": 2.82,
+    "oben": 3.17,
+    "seite": "2"
+   },
+   {
+    "baujahr": 0,
+    "ausstattung": "efh_bad_und_heizung_einfach",
+    "unten": 2.85,
+    "mittel": 3.4,
+    "oben": 3.94,
+    "seite": "2"
+   },
+   {
+    "baujahr": 0,
+    "ausstattung": "ohne_bad_ohne_heizung_mittel",
+    "unten": 2.66,
+    "mittel": 2.92,
+    "oben": 3.17,
+    "seite": "2"
+   },
+   {
+    "baujahr": 0,
+    "ausstattung": "bad_oder_heizung_mittel",
+    "unten": 2.98,
+    "mittel": 3.55,
+    "oben": 4.12,
+    "seite": "2"
+   },
+   {
+    "baujahr": 0,
+    "ausstattung": "bad_und_heizung_mittel",
+    "unten": 4.37,
+    "mittel": 4.47,
+    "oben": 4.57,
+    "seite": "2"
+   },
+   {
+    "baujahr": 0,
+    "ausstattung": "efh_ohne_bad_ohne_heizung_mittel",
+    "unten": 2.66,
+    "mittel": 3.01,
+    "oben": 3.36,
+    "seite": "2"
+   },
+   {
+    "baujahr": 0,
+    "ausstattung": "efh_bad_oder_heizung_mittel",
+    "unten": 3.17,
+    "mittel": 3.68,
+    "oben": 4.19,
+    "seite": "2"
+   },
+   {
+    "baujahr": 0,
+    "ausstattung": "efh_bad_und_heizung_mittel",
+    "unten": 3.94,
+    "mittel": 4.26,
+    "oben": 4.57,
+    "seite": "2"
+   },
+   {
+    "baujahr": 0,
+    "ausstattung": "ohne_bad_ohne_heizung_gut",
+    "unten": 3.17,
+    "mittel": 3.71,
+    "oben": 4.25,
+    "seite": "2"
+   },
+   {
+    "baujahr": 0,
+    "ausstattung": "bad_oder_heizung_gut",
+    "unten": 4.12,
+    "mittel": 4.37,
+    "oben": 4.62,
+    "seite": "2"
+   },
+   {
+    "baujahr": 0,
+    "ausstattung": "bad_und_heizung_gut",
+    "unten": 4.44,
+    "mittel": 4.82,
+    "oben": 5.19,
+    "seite": "2"
+   },
+   {
+    "baujahr": 0,
+    "ausstattung": "efh_ohne_bad_ohne_heizung_gut",
+    "unten": 3.36,
+    "mittel": 3.81,
+    "oben": 4.25,
+    "seite": "2"
+   },
+   {
+    "baujahr": 0,
+    "ausstattung": "efh_bad_oder_heizung_gut",
+    "unten": 4.12,
+    "mittel": 4.37,
+    "oben": 4.62,
+    "seite": "2"
+   },
+   {
+    "baujahr": 0,
+    "ausstattung": "efh_bad_und_heizung_gut",
+    "unten": 4.57,
+    "mittel": 4.92,
+    "oben": 5.27,
+    "seite": "2"
+   },
+   {
+    "baujahr": 1,
+    "ausstattung": "ohne_bad_ohne_heizung_einfach",
+    "unten": 1.96,
+    "mittel": 2.38,
+    "oben": 2.79,
+    "seite": "2"
+   },
+   {
+    "baujahr": 1,
+    "ausstattung": "bad_oder_heizung_einfach",
+    "unten": 2.85,
+    "mittel": 3.11,
+    "oben": 3.36,
+    "seite": "2"
+   },
+   {
+    "baujahr": 1,
+    "ausstattung": "bad_und_heizung_einfach",
+    "unten": 3.36,
+    "mittel": 3.78,
+    "oben": 4.19,
+    "seite": "2"
+   },
+   {
+    "baujahr": 1,
+    "ausstattung": "efh_ohne_bad_ohne_heizung_einfach",
+    "unten": 2.1,
+    "mittel": 2.45,
+    "oben": 2.79,
+    "seite": "2"
+   },
+   {
+    "baujahr": 1,
+    "ausstattung": "efh_bad_oder_heizung_einfach",
+    "unten": 2.98,
+    "mittel": 3.59,
+    "oben": 4.19,
+    "seite": "2"
+   },
+   {
+    "baujahr": 1,
+    "ausstattung": "efh_bad_und_heizung_einfach",
+    "unten": 3.36,
+    "mittel": 3.81,
+    "oben": 4.25,
+    "seite": "2"
+   },
+   {
+    "baujahr": 1,
+    "ausstattung": "ohne_bad_ohne_heizung_mittel",
+    "unten": 2.79,
+    "mittel": 3.08,
+    "oben": 3.36,
+    "seite": "2"
+   },
+   {
+    "baujahr": 1,
+    "ausstattung": "bad_oder_heizung_mittel",
+    "unten": 3.36,
+    "mittel": 3.78,
+    "oben": 4.19,
+    "seite": "2"
+   },
+   {
+    "baujahr": 1,
+    "ausstattung": "bad_und_heizung_mittel",
+    "unten": 4.19,
+    "mittel": 4.41,
+    "oben": 4.62,
+    "seite": "2"
+   },
+   {
+    "baujahr": 1,
+    "ausstattung": "efh_ohne_bad_ohne_heizung_mittel",
+    "unten": 2.66,
+    "mittel": 3.01,
+    "oben": 3.36,
+    "seite": "2"
+   },
+   {
+    "baujahr": 1,
+    "ausstattung": "efh_bad_oder_heizung_mittel",
+    "unten": 3.36,
+    "mittel": 3.9,
+    "oben": 4.44,
+    "seite": "2"
+   },
+   {
+    "baujahr": 1,
+    "ausstattung": "efh_bad_und_heizung_mittel",
+    "unten": 4.31,
+    "mittel": 4.5,
+    "oben": 4.69,
+    "seite": "2"
+   },
+   {
+    "baujahr": 1,
+    "ausstattung": "ohne_bad_ohne_heizung_gut",
+    "unten": 3.36,
+    "mittel": 3.84,
+    "oben": 4.31,
+    "seite": "2"
+   },
+   {
+    "baujahr": 1,
+    "ausstattung": "bad_oder_heizung_gut",
+    "unten": 4.19,
+    "mittel": 4.41,
+    "oben": 4.62,
+    "seite": "2"
+   },
+   {
+    "baujahr": 1,
+    "ausstattung": "bad_und_heizung_gut",
+    "unten": 4.62,
+    "mittel": 4.72,
+    "oben": 4.82,
+    "seite": "2"
+   },
+   {
+    "baujahr": 1,
+    "ausstattung": "efh_ohne_bad_ohne_heizung_gut",
+    "unten": 3.36,
+    "mittel": 3.84,
+    "oben": 4.31,
+    "seite": "2"
+   },
+   {
+    "baujahr": 1,
+    "ausstattung": "efh_bad_oder_heizung_gut",
+    "unten": 4.19,
+    "mittel": 4.51,
+    "oben": 4.82,
+    "seite": "2"
+   },
+   {
+    "baujahr": 1,
+    "ausstattung": "efh_bad_und_heizung_gut",
+    "unten": 4.69,
+    "mittel": 4.98,
+    "oben": 5.27,
+    "seite": "2"
+   },
+   {
+    "baujahr": 2,
+    "ausstattung": "ohne_bad_ohne_heizung_einfach",
+    "unten": 2.52,
+    "mittel": 2.81,
+    "oben": 3.1,
+    "seite": "2"
+   },
+   {
+    "baujahr": 2,
+    "ausstattung": "bad_oder_heizung_einfach",
+    "unten": 3.1,
+    "mittel": 3.25,
+    "oben": 3.4,
+    "seite": "2"
+   },
+   {
+    "baujahr": 2,
+    "ausstattung": "bad_und_heizung_einfach",
+    "unten": 3.34,
+    "mittel": 3.72,
+    "oben": 4.09,
+    "seite": "2"
+   },
+   {
+    "baujahr": 2,
+    "ausstattung": "efh_bad_oder_heizung_einfach",
+    "unten": 3.1,
+    "mittel": 3.25,
+    "oben": 3.4,
+    "seite": "2"
+   },
+   {
+    "baujahr": 2,
+    "ausstattung": "efh_bad_und_heizung_einfach",
+    "unten": 3.28,
+    "mittel": 3.73,
+    "oben": 4.18,
+    "seite": "2"
+   },
+   {
+    "baujahr": 2,
+    "ausstattung": "ohne_bad_ohne_heizung_mittel",
+    "unten": 3.1,
+    "mittel": 3.41,
+    "oben": 3.72,
+    "seite": "2"
+   },
+   {
+    "baujahr": 2,
+    "ausstattung": "bad_oder_heizung_mittel",
+    "unten": 3.4,
+    "mittel": 3.75,
+    "oben": 4.09,
+    "seite": "2"
+   },
+   {
+    "baujahr": 2,
+    "ausstattung": "bad_und_heizung_mittel",
+    "unten": 4.09,
+    "mittel": 4.25,
+    "oben": 4.41,
+    "seite": "2"
+   },
+   {
+    "baujahr": 2,
+    "ausstattung": "efh_bad_oder_heizung_mittel",
+    "unten": 3.4,
+    "mittel": 3.75,
+    "oben": 4.09,
+    "seite": "2"
+   },
+   {
+    "baujahr": 2,
+    "ausstattung": "efh_bad_und_heizung_mittel",
+    "unten": 4.18,
+    "mittel": 4.55,
+    "oben": 4.92,
+    "seite": "2"
+   },
+   {
+    "baujahr": 2,
+    "ausstattung": "ohne_bad_ohne_heizung_gut",
+    "unten": 3.72,
+    "mittel": 4.04,
+    "oben": 4.36,
+    "seite": "2"
+   },
+   {
+    "baujahr": 2,
+    "ausstattung": "bad_oder_heizung_gut",
+    "unten": 4.09,
+    "mittel": 4.38,
+    "oben": 4.66,
+    "seite": "2"
+   },
+   {
+    "baujahr": 2,
+    "ausstattung": "bad_und_heizung_gut",
+    "unten": 4.41,
+    "mittel": 4.58,
+    "oben": 4.74,
+    "seite": "2"
+   },
+   {
+    "baujahr": 2,
+    "ausstattung": "efh_bad_oder_heizung_gut",
+    "unten": 4.09,
+    "mittel": 4.42,
+    "oben": 4.74,
+    "seite": "2"
+   },
+   {
+    "baujahr": 2,
+    "ausstattung": "efh_bad_und_heizung_gut",
+    "unten": 4.92,
+    "mittel": 5.11,
+    "oben": 5.3,
+    "seite": "2"
+   },
+   {
+    "baujahr": 3,
+    "ausstattung": "ohne_bad_ohne_heizung_einfach",
+    "unten": 2.59,
+    "mittel": 3.0,
+    "oben": 3.4,
+    "seite": "2"
+   },
+   {
+    "baujahr": 3,
+    "ausstattung": "bad_oder_heizung_einfach",
+    "unten": 3.28,
+    "mittel": 3.6,
+    "oben": 3.91,
+    "seite": "2"
+   },
+   {
+    "baujahr": 3,
+    "ausstattung": "bad_und_heizung_einfach",
+    "unten": 3.91,
+    "mittel": 4.14,
+    "oben": 4.36,
+    "seite": "2"
+   },
+   {
+    "baujahr": 3,
+    "ausstattung": "efh_bad_oder_heizung_einfach",
+    "unten": 3.28,
+    "mittel": 3.6,
+    "oben": 3.91,
+    "seite": "2"
+   },
+   {
+    "baujahr": 3,
+    "ausstattung": "efh_bad_und_heizung_einfach",
+    "unten": 3.91,
+    "mittel": 4.14,
+    "oben": 4.36,
+    "seite": "2"
+   },
+   {
+    "baujahr": 3,
+    "ausstattung": "ohne_bad_ohne_heizung_mittel",
+    "unten": 3.4,
+    "mittel": 3.66,
+    "oben": 3.91,
+    "seite": "2"
+   },
+   {
+    "baujahr": 3,
+    "ausstattung": "bad_oder_heizung_mittel",
+    "unten": 3.91,
+    "mittel": 4.1,
+    "oben": 4.28,
+    "seite": "2"
+   },
+   {
+    "baujahr": 3,
+    "ausstattung": "bad_und_heizung_mittel",
+    "unten": 4.36,
+    "mittel": 4.58,
+    "oben": 4.79,
+    "seite": "2"
+   },
+   {
+    "baujahr": 3,
+    "ausstattung": "efh_bad_oder_heizung_mittel",
+    "unten": 3.91,
+    "mittel": 4.1,
+    "oben": 4.28,
+    "seite": "2"
+   },
+   {
+    "baujahr": 3,
+    "ausstattung": "efh_bad_und_heizung_mittel",
+    "unten": 4.41,
+    "mittel": 4.67,
+    "oben": 4.92,
+    "seite": "2"
+   },
+   {
+    "baujahr": 3,
+    "ausstattung": "ohne_bad_ohne_heizung_gut",
+    "unten": 3.91,
+    "mittel": 4.23,
+    "oben": 4.55,
+    "seite": "2"
+   },
+   {
+    "baujahr": 3,
+    "ausstattung": "bad_oder_heizung_gut",
+    "unten": 4.28,
+    "mittel": 4.54,
+    "oben": 4.79,
+    "seite": "2"
+   },
+   {
+    "baujahr": 3,
+    "ausstattung": "bad_und_heizung_gut",
+    "unten": 4.79,
+    "mittel": 5.08,
+    "oben": 5.36,
+    "seite": "2"
+   },
+   {
+    "baujahr": 3,
+    "ausstattung": "efh_bad_oder_heizung_gut",
+    "unten": 4.28,
+    "mittel": 4.54,
+    "oben": 4.79,
+    "seite": "2"
+   },
+   {
+    "baujahr": 3,
+    "ausstattung": "efh_bad_und_heizung_gut",
+    "unten": 4.92,
+    "mittel": 5.17,
+    "oben": 5.42,
+    "seite": "2"
+   },
+   {
+    "baujahr": 4,
+    "ausstattung": "bad_oder_heizung_einfach",
+    "unten": 3.72,
+    "mittel": 4.1,
+    "oben": 4.47,
+    "seite": "2"
+   },
+   {
+    "baujahr": 4,
+    "ausstattung": "bad_und_heizung_einfach",
+    "unten": 4.04,
+    "mittel": 4.35,
+    "oben": 4.66,
+    "seite": "2"
+   },
+   {
+    "baujahr": 4,
+    "ausstattung": "efh_bad_und_heizung_einfach",
+    "unten": 4.09,
+    "mittel": 4.44,
+    "oben": 4.79,
+    "seite": "2"
+   },
+   {
+    "baujahr": 4,
+    "ausstattung": "bad_oder_heizung_mittel",
+    "unten": 4.47,
+    "mittel": 4.86,
+    "oben": 5.24,
+    "seite": "2"
+   },
+   {
+    "baujahr": 4,
+    "ausstattung": "bad_und_heizung_mittel",
+    "unten": 4.66,
+    "mittel": 4.98,
+    "oben": 5.3,
+    "seite": "2"
+   },
+   {
+    "baujahr": 4,
+    "ausstattung": "efh_bad_und_heizung_mittel",
+    "unten": 4.79,
+    "mittel": 5.17,
+    "oben": 5.55,
+    "seite": "2"
+   },
+   {
+    "baujahr": 4,
+    "ausstattung": "bad_oder_heizung_gut",
+    "unten": 5.24,
+    "mittel": 5.52,
+    "oben": 5.8,
+    "seite": "2"
+   },
+   {
+    "baujahr": 4,
+    "ausstattung": "bad_und_heizung_gut",
+    "unten": 5.3,
+    "mittel": 5.62,
+    "oben": 5.93,
+    "seite": "2"
+   },
+   {
+    "baujahr": 4,
+    "ausstattung": "efh_bad_und_heizung_gut",
+    "unten": 5.48,
+    "mittel": 5.74,
+    "oben": 5.99,
+    "seite": "2"
+   },
+   {
+    "baujahr": 5,
+    "ausstattung": "bad_oder_heizung_einfach",
+    "unten": 4.36,
+    "mittel": 4.58,
+    "oben": 4.79,
+    "seite": "2"
+   },
+   {
+    "baujahr": 5,
+    "ausstattung": "bad_und_heizung_einfach",
+    "unten": 4.47,
+    "mittel": 4.95,
+    "oben": 5.42,
+    "seite": "2"
+   },
+   {
+    "baujahr": 5,
+    "ausstattung": "efh_bad_und_heizung_einfach",
+    "unten": 4.55,
+    "mittel": 4.99,
+    "oben": 5.42,
+    "seite": "2"
+   },
+   {
+    "baujahr": 5,
+    "ausstattung": "bad_oder_heizung_mittel",
+    "unten": 4.79,
+    "mittel": 5.11,
+    "oben": 5.42,
+    "seite": "2"
+   },
+   {
+    "baujahr": 5,
+    "ausstattung": "bad_und_heizung_mittel",
+    "unten": 5.42,
+    "mittel": 5.86,
+    "oben": 6.3,
+    "seite": "2"
+   },
+   {
+    "baujahr": 5,
+    "ausstattung": "efh_bad_und_heizung_mittel",
+    "unten": 5.55,
+    "mittel": 5.99,
+    "oben": 6.43,
+    "seite": "2"
+   },
+   {
+    "baujahr": 5,
+    "ausstattung": "bad_oder_heizung_gut",
+    "unten": 5.42,
+    "mittel": 5.93,
+    "oben": 6.43,
+    "seite": "2"
+   },
+   {
+    "baujahr": 5,
+    "ausstattung": "bad_und_heizung_gut",
+    "unten": 6.3,
+    "mittel": 6.56,
+    "oben": 6.81,
+    "seite": "2"
+   },
+   {
+    "baujahr": 5,
+    "ausstattung": "efh_bad_und_heizung_gut",
+    "unten": 6.43,
+    "mittel": 6.69,
+    "oben": 6.94,
+    "seite": "2"
+   },
+   {
+    "baujahr": 6,
+    "ausstattung": "bad_und_heizung_mittel",
+    "unten": 6.44,
+    "mittel": 6.85,
+    "oben": 7.25,
+    "seite": "2"
+   },
+   {
+    "baujahr": 6,
+    "ausstattung": "efh_bad_und_heizung_mittel",
+    "unten": 6.62,
+    "mittel": 6.96,
+    "oben": 7.3,
+    "seite": "2"
+   },
+   {
+    "baujahr": 6,
+    "ausstattung": "bad_und_heizung_gut",
+    "unten": 7.25,
+    "mittel": 7.53,
+    "oben": 7.8,
+    "seite": "2"
+   },
+   {
+    "baujahr": 6,
+    "ausstattung": "efh_bad_und_heizung_gut",
+    "unten": 7.3,
+    "mittel": 7.55,
+    "oben": 7.8,
+    "seite": "2"
+   },
+   {
+    "baujahr": 7,
+    "ausstattung": "bad_und_heizung_mittel",
+    "unten": 7.25,
+    "mittel": 7.68,
+    "oben": 8.11,
+    "seite": "2"
+   },
+   {
+    "baujahr": 7,
+    "ausstattung": "efh_bad_und_heizung_mittel",
+    "unten": 7.3,
+    "mittel": 7.71,
+    "oben": 8.11,
+    "seite": "2"
+   },
+   {
+    "baujahr": 7,
+    "ausstattung": "bad_und_heizung_gut",
+    "unten": 7.43,
+    "mittel": 7.96,
+    "oben": 8.48,
+    "seite": "2"
+   },
+   {
+    "baujahr": 7,
+    "ausstattung": "efh_bad_und_heizung_gut",
+    "unten": 7.43,
+    "mittel": 7.96,
+    "oben": 8.48,
+    "seite": "2"
+   },
+   {
+    "baujahr": 8,
+    "ausstattung": "bad_und_heizung_gut",
+    "unten": 7.43,
+    "mittel": 8.05,
+    "oben": 8.66,
+    "seite": "2"
+   },
+   {
+    "baujahr": 8,
+    "ausstattung": "efh_bad_und_heizung_gut",
+    "unten": 7.56,
+    "mittel": 8.18,
+    "oben": 8.79,
+    "seite": "2"
+   },
+   {
+    "baujahr": 9,
+    "ausstattung": "bad_und_heizung_gut",
+    "unten": 7.74,
+    "mittel": 8.36,
+    "oben": 8.98,
+    "seite": "2"
+   },
+   {
+    "baujahr": 9,
+    "ausstattung": "efh_bad_und_heizung_gut",
+    "unten": 7.92,
+    "mittel": 8.51,
+    "oben": 9.1,
+    "seite": "2"
+   },
+   {
+    "baujahr": 10,
+    "ausstattung": "bad_und_heizung_gut",
+    "unten": 8.04,
+    "mittel": 8.7,
+    "oben": 9.35,
+    "seite": "2"
+   },
+   {
+    "baujahr": 10,
+    "ausstattung": "efh_bad_und_heizung_gut",
+    "unten": 8.24,
+    "mittel": 8.85,
+    "oben": 9.46,
+    "seite": "2"
+   },
+   {
+    "baujahr": 11,
+    "ausstattung": "bad_und_heizung_gut",
+    "unten": 8.27,
+    "mittel": 9.05,
+    "oben": 9.82,
+    "seite": "2"
+   },
+   {
+    "baujahr": 11,
+    "ausstattung": "efh_bad_und_heizung_gut",
+    "unten": 8.7,
+    "mittel": 9.26,
+    "oben": 9.82,
+    "seite": "2"
+   },
+   {
+    "baujahr": 12,
+    "ausstattung": "bad_und_heizung_gut",
+    "unten": 8.94,
+    "mittel": 9.5,
+    "oben": 10.05,
+    "seite": "2"
+   },
+   {
+    "baujahr": 12,
+    "ausstattung": "efh_bad_und_heizung_gut",
+    "unten": 8.94,
+    "mittel": 9.5,
+    "oben": 10.05,
+    "seite": "2"
+   },
+   {
+    "baujahr": 13,
+    "ausstattung": "bad_und_heizung_gut",
+    "unten": 9.32,
+    "mittel": 10.18,
+    "oben": 11.03,
+    "seite": "2"
+   },
+   {
+    "baujahr": 13,
+    "ausstattung": "efh_bad_und_heizung_gut",
+    "unten": 9.32,
+    "mittel": 10.18,
+    "oben": 11.03,
+    "seite": "2"
+   },
+   {
+    "baujahr": 14,
+    "ausstattung": "bad_und_heizung_gut",
+    "unten": 9.33,
+    "mittel": 10.56,
+    "oben": 11.79,
+    "seite": "2"
+   },
+   {
+    "baujahr": 14,
+    "ausstattung": "efh_bad_und_heizung_gut",
+    "unten": 9.33,
+    "mittel": 10.56,
+    "oben": 11.79,
+    "seite": "2"
+   },
+   {
+    "baujahr": 15,
+    "ausstattung": "bad_und_heizung_gut",
+    "unten": 9.56,
+    "mittel": 10.89,
+    "oben": 12.21,
+    "seite": "2"
+   },
+   {
+    "baujahr": 15,
+    "ausstattung": "efh_bad_und_heizung_gut",
+    "unten": 9.56,
+    "mittel": 10.89,
+    "oben": 12.21,
+    "seite": "2"
+   }
+  ],
+  "zuschlaege": [
+   {
+    "merkmal": "ortsteil_abschlag",
+    "art": "pct",
+    "wert": -5,
+    "label": "Ortsteile Anwanden, Banderbach, Bronnamberg, Leichendorf, Lind, Weinzierlein, Wintersdorf",
+    "beleg": "S. 1"
+   }
+  ]
+ },
+ "pruefbeispiele": [
+  {
+   "eingabe": {
+    "baujahr": 1972,
+    "wfl": 70
+   },
+   "erwartet": {
+    "unten": 5.42,
+    "mittel": 5.86,
+    "oben": 6.3
+   },
+   "seite": "2",
+   "art": "tabellenzelle",
+   "anmerkung": "1970–1974, MFH, Bad und Heizung, mittel: 5,42 – 6,30"
+  },
+  {
+   "eingabe": {
+    "baujahr": 2020,
+    "wfl": 90,
+    "ausstattung": "efh_bad_und_heizung_gut"
+   },
+   "erwartet": {
+    "unten": 9.56,
+    "mittel": 10.89,
+    "oben": 12.21
+   },
+   "seite": "2",
+   "art": "tabellenzelle"
+  },
+  {
+   "eingabe": {
+    "baujahr": 1972,
+    "wfl": 70,
+    "ausstattung": "ohne_bad_ohne_heizung_mittel"
+   },
+   "erwartet": null,
+   "seite": "2",
+   "art": "tabellenzelle",
+   "anmerkung": "Feld „-“"
+  }
+ ]
+}
