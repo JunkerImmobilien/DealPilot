@@ -2113,8 +2113,12 @@
 
   /* ── Einstieg ────────────────────────────────────────────────────── */
   var TYPEN = {
-    investment: function () { return investment('voll'); }, investment_muster: function () { return investmentMuster('voll'); }, kurz_muster: function () { return investmentMuster('kurz'); }, iv_a_muster: function () { return investmentNeu('a'); }, iv_b_muster: function () { return investmentNeu('b'); }, iv_c_muster: function () { return investmentNeu('c'); },   /* v4790 · Muster, kein Knopf */   /* v4580 · Muster, kein Knopf */
-    bank: function () { return investment('bank'); }, kurz: function () { return investment('kurz'); },
+    /* v5060 · Marcel 26.11.2026: die drei neuen Fassungen gehen live, alle drei zur Auswahl (Kombi Standard). Die bisherigen
+       Schluessel liefern jetzt die neuen Fassungen (auch Telegram-Bot und PDF-Dienst: investment = Kombi, bank = Bankfassung,
+       kurz = Kurzfassung); die alten Fassungen bleiben als *_alt fuer einen Rueckweg ohne Knopf. */
+    investment: function () { return investmentNeu('b'); }, investment_alt: function () { return investment('voll'); }, investment_muster: function () { return investmentMuster('voll'); }, kurz_muster: function () { return investmentMuster('kurz'); }, iv_a_muster: function () { return investmentNeu('a'); }, iv_b_muster: function () { return investmentNeu('b'); }, iv_c_muster: function () { return investmentNeu('c'); },   /* v4790 · Muster, kein Knopf */   /* v4580 · Muster, kein Knopf */
+    bank: function () { return investmentNeu('c'); }, kurz: function () { return investmentNeu('a'); },
+    bank_alt: function () { return investment('bank'); }, kurz_alt: function () { return investment('kurz'); },
     kaufpreisaufteilung: kaufpreisaufteilung, finanzamt: function (o) { return finanzamt(3, false, o); }, finanzamt_anlagev: function (o) { return finanzamt(3, true, o); }, trackrecord: trackRecord, bankexport: bankexport, selbstauskunft: selbstauskunft,
     steuermappe: steuermappe,   /* v3471 · Steuer-Mappe im einheitlichen Design */
     jahresabschluss: jahresabschluss,   /* v3480 · Jahresabschluss der Gesellschaft */
