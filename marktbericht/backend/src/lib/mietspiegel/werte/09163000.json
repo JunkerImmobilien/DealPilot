@@ -1,0 +1,1001 @@
+{
+ "ags": "09163000",
+ "gemeinde": "Rosenheim",
+ "art": "qualifiziert",
+ "stand": "2025-08",
+ "erhebungsstichtag": "2025-01-01",
+ "gueltig_ab": "2025-08-01",
+ "gueltig_bis": null,
+ "quelle": {
+  "url": "https://www.rosenheim.de/fileadmin/Buergerservice/Planen_und_Bauen/Mietspiegel/Mietspiegeldokumentation_Rosenheim_2025.pdf",
+  "dokument": "Dokumentation zum Mietspiegel Rosenheim 2025 (Fortschreibung des qualifizierten Mietspiegels 2023 per Stichprobe), ALP Institut für Wohnen und Stadtentwicklung im Auftrag der Stadt Rosenheim",
+  "seite": "Druckseiten 14 (Tab. 3 Basis-Nettokaltmiete), 15–16 (Tab. 4 Zu-/Abschläge), 16 (Tab. 5/6 Sanitär), 17 (Wohnlagen A–D, Tab. 7 Spannengrenzen), 18 (Anerkennung 10.07.2025, gilt ab 1. August 2025); Erhebungsstichtag S. 7",
+  "lizenz": "kein Rechtevorbehalt und kein Speicherverbot in der Dokumentation (ganz gelesen), geprüft am 2026-11-26; Stadt Rosenheim",
+  "abgerufen": "2026-11-26"
+ },
+ "einheit": "eur_qm_nettokalt",
+ "form": "regression",
+ "rundung": 2,
+ "hinweis": "Quelle ist die Dokumentation; die Broschüre mit Anwendungsbeispiel war auf rosenheim.de am 26.11.2026 nicht auffindbar. Qualifiziert ab 01.08.2025 „für zwei Jahre“ (Stadtseite), kein Enddatum im Dokument. Basis je vollem m² 25–150 m² (kaufmännische Rundung), alle Zu-/Abschläge in €/m² additiv. Die Textschicht der Tabellen 3 (Spalte 121–150), 4 und 7 ist gegen das Druckbild verschoben — alle Werte am Druckbild S. 14–17 abgelesen. Baujahr: Tab. 4 führt Zuschläge erst ab 1984; Baujahre bis 1983 sind die Referenz des Regressionsmodells (± 0) — im Dokument nicht als eigene Zeile genannt. Baujahr nach 2022 liegt außerhalb. Lage: fortgeschriebene Wohnlagen A +0,43 / B +0,24 / C −0,48 / D −0,24 €/m² (S. 17) nach dem adressscharfen Wohnlageverzeichnis des Mietspiegels 2023; ohne Angabe nimmt DealPilot „keine Wohnlage A–D“ (± 0) an — Annahme, nicht Aussage des Dokuments. Die Einzel-Lagevariablen der Tab. 4 (Innenstadt ≤ 200 m, Nahversorgung ≤ 400 m, Innenstadt ≥ 2.000 m) stecken in A–D und sind deshalb nicht zusätzlich als Schalter abgebildet; die Straßenlage (Anliegerstraße/Hof) ist ein eigener Schalter. Sanitärausstattung als Punktzahl −5 bis +8 (Tab. 5: kein Fenster −3, keine Heizmöglichkeit −2, bodengleiche Dusche +1, zwei Waschbecken +1, Handtuchheizkörper +1, Lüftungsanlage +2, Fußbodenheizung +3). SPANNE: das Dokument gibt sie als Betrag je Wohnflächenklasse (Tab. 7); der Rechenkern kennt nur Spannen je Baualter — deshalb nur Mittelwert, die Klassen stehen unter regression.spanne_wfl_klassen (nicht gerechnet).",
+ "regression": {
+  "wfl_runden": 0,
+  "basis": {
+   "typ": "wfl_tabelle",
+   "werte": [
+    {
+     "von": 25,
+     "bis": 25,
+     "eur_qm": 11.54
+    },
+    {
+     "von": 26,
+     "bis": 26,
+     "eur_qm": 11.46
+    },
+    {
+     "von": 27,
+     "bis": 27,
+     "eur_qm": 11.37
+    },
+    {
+     "von": 28,
+     "bis": 28,
+     "eur_qm": 11.29
+    },
+    {
+     "von": 29,
+     "bis": 29,
+     "eur_qm": 11.2
+    },
+    {
+     "von": 30,
+     "bis": 30,
+     "eur_qm": 11.13
+    },
+    {
+     "von": 31,
+     "bis": 31,
+     "eur_qm": 11.05
+    },
+    {
+     "von": 32,
+     "bis": 32,
+     "eur_qm": 10.97
+    },
+    {
+     "von": 33,
+     "bis": 33,
+     "eur_qm": 10.9
+    },
+    {
+     "von": 34,
+     "bis": 34,
+     "eur_qm": 10.82
+    },
+    {
+     "von": 35,
+     "bis": 35,
+     "eur_qm": 10.75
+    },
+    {
+     "von": 36,
+     "bis": 36,
+     "eur_qm": 10.69
+    },
+    {
+     "von": 37,
+     "bis": 37,
+     "eur_qm": 10.62
+    },
+    {
+     "von": 38,
+     "bis": 38,
+     "eur_qm": 10.55
+    },
+    {
+     "von": 39,
+     "bis": 39,
+     "eur_qm": 10.49
+    },
+    {
+     "von": 40,
+     "bis": 40,
+     "eur_qm": 10.43
+    },
+    {
+     "von": 41,
+     "bis": 41,
+     "eur_qm": 10.37
+    },
+    {
+     "von": 42,
+     "bis": 42,
+     "eur_qm": 10.31
+    },
+    {
+     "von": 43,
+     "bis": 43,
+     "eur_qm": 10.26
+    },
+    {
+     "von": 44,
+     "bis": 44,
+     "eur_qm": 10.2
+    },
+    {
+     "von": 45,
+     "bis": 45,
+     "eur_qm": 10.15
+    },
+    {
+     "von": 46,
+     "bis": 46,
+     "eur_qm": 10.1
+    },
+    {
+     "von": 47,
+     "bis": 47,
+     "eur_qm": 10.04
+    },
+    {
+     "von": 48,
+     "bis": 48,
+     "eur_qm": 9.99
+    },
+    {
+     "von": 49,
+     "bis": 49,
+     "eur_qm": 9.95
+    },
+    {
+     "von": 50,
+     "bis": 50,
+     "eur_qm": 9.91
+    },
+    {
+     "von": 51,
+     "bis": 51,
+     "eur_qm": 9.85
+    },
+    {
+     "von": 52,
+     "bis": 52,
+     "eur_qm": 9.81
+    },
+    {
+     "von": 53,
+     "bis": 53,
+     "eur_qm": 9.77
+    },
+    {
+     "von": 54,
+     "bis": 54,
+     "eur_qm": 9.73
+    },
+    {
+     "von": 55,
+     "bis": 55,
+     "eur_qm": 9.7
+    },
+    {
+     "von": 56,
+     "bis": 56,
+     "eur_qm": 9.65
+    },
+    {
+     "von": 57,
+     "bis": 57,
+     "eur_qm": 9.62
+    },
+    {
+     "von": 58,
+     "bis": 58,
+     "eur_qm": 9.58
+    },
+    {
+     "von": 59,
+     "bis": 59,
+     "eur_qm": 9.55
+    },
+    {
+     "von": 60,
+     "bis": 60,
+     "eur_qm": 9.52
+    },
+    {
+     "von": 61,
+     "bis": 61,
+     "eur_qm": 9.49
+    },
+    {
+     "von": 62,
+     "bis": 62,
+     "eur_qm": 9.45
+    },
+    {
+     "von": 63,
+     "bis": 63,
+     "eur_qm": 9.42
+    },
+    {
+     "von": 64,
+     "bis": 64,
+     "eur_qm": 9.39
+    },
+    {
+     "von": 65,
+     "bis": 65,
+     "eur_qm": 9.37
+    },
+    {
+     "von": 66,
+     "bis": 66,
+     "eur_qm": 9.34
+    },
+    {
+     "von": 67,
+     "bis": 67,
+     "eur_qm": 9.32
+    },
+    {
+     "von": 68,
+     "bis": 68,
+     "eur_qm": 9.3
+    },
+    {
+     "von": 69,
+     "bis": 69,
+     "eur_qm": 9.26
+    },
+    {
+     "von": 70,
+     "bis": 70,
+     "eur_qm": 9.24
+    },
+    {
+     "von": 71,
+     "bis": 71,
+     "eur_qm": 9.22
+    },
+    {
+     "von": 72,
+     "bis": 72,
+     "eur_qm": 9.2
+    },
+    {
+     "von": 73,
+     "bis": 73,
+     "eur_qm": 9.18
+    },
+    {
+     "von": 74,
+     "bis": 74,
+     "eur_qm": 9.16
+    },
+    {
+     "von": 75,
+     "bis": 75,
+     "eur_qm": 9.15
+    },
+    {
+     "von": 76,
+     "bis": 76,
+     "eur_qm": 9.13
+    },
+    {
+     "von": 77,
+     "bis": 77,
+     "eur_qm": 9.11
+    },
+    {
+     "von": 78,
+     "bis": 78,
+     "eur_qm": 9.1
+    },
+    {
+     "von": 79,
+     "bis": 79,
+     "eur_qm": 9.07
+    },
+    {
+     "von": 80,
+     "bis": 80,
+     "eur_qm": 9.06
+    },
+    {
+     "von": 81,
+     "bis": 81,
+     "eur_qm": 9.05
+    },
+    {
+     "von": 82,
+     "bis": 82,
+     "eur_qm": 9.03
+    },
+    {
+     "von": 83,
+     "bis": 83,
+     "eur_qm": 9.02
+    },
+    {
+     "von": 84,
+     "bis": 84,
+     "eur_qm": 9.01
+    },
+    {
+     "von": 85,
+     "bis": 85,
+     "eur_qm": 9
+    },
+    {
+     "von": 86,
+     "bis": 86,
+     "eur_qm": 8.99
+    },
+    {
+     "von": 87,
+     "bis": 87,
+     "eur_qm": 8.98
+    },
+    {
+     "von": 88,
+     "bis": 88,
+     "eur_qm": 8.96
+    },
+    {
+     "von": 89,
+     "bis": 89,
+     "eur_qm": 8.95
+    },
+    {
+     "von": 90,
+     "bis": 90,
+     "eur_qm": 8.95
+    },
+    {
+     "von": 91,
+     "bis": 91,
+     "eur_qm": 8.94
+    },
+    {
+     "von": 92,
+     "bis": 92,
+     "eur_qm": 8.93
+    },
+    {
+     "von": 93,
+     "bis": 93,
+     "eur_qm": 8.92
+    },
+    {
+     "von": 94,
+     "bis": 94,
+     "eur_qm": 8.91
+    },
+    {
+     "von": 95,
+     "bis": 95,
+     "eur_qm": 8.9
+    },
+    {
+     "von": 96,
+     "bis": 96,
+     "eur_qm": 8.89
+    },
+    {
+     "von": 97,
+     "bis": 97,
+     "eur_qm": 8.89
+    },
+    {
+     "von": 98,
+     "bis": 98,
+     "eur_qm": 8.87
+    },
+    {
+     "von": 99,
+     "bis": 99,
+     "eur_qm": 8.86
+    },
+    {
+     "von": 100,
+     "bis": 100,
+     "eur_qm": 8.85
+    },
+    {
+     "von": 101,
+     "bis": 101,
+     "eur_qm": 8.85
+    },
+    {
+     "von": 102,
+     "bis": 102,
+     "eur_qm": 8.84
+    },
+    {
+     "von": 103,
+     "bis": 103,
+     "eur_qm": 8.83
+    },
+    {
+     "von": 104,
+     "bis": 104,
+     "eur_qm": 8.83
+    },
+    {
+     "von": 105,
+     "bis": 105,
+     "eur_qm": 8.82
+    },
+    {
+     "von": 106,
+     "bis": 106,
+     "eur_qm": 8.81
+    },
+    {
+     "von": 107,
+     "bis": 107,
+     "eur_qm": 8.81
+    },
+    {
+     "von": 108,
+     "bis": 108,
+     "eur_qm": 8.8
+    },
+    {
+     "von": 109,
+     "bis": 109,
+     "eur_qm": 8.79
+    },
+    {
+     "von": 110,
+     "bis": 110,
+     "eur_qm": 8.78
+    },
+    {
+     "von": 111,
+     "bis": 111,
+     "eur_qm": 8.78
+    },
+    {
+     "von": 112,
+     "bis": 112,
+     "eur_qm": 8.77
+    },
+    {
+     "von": 113,
+     "bis": 113,
+     "eur_qm": 8.76
+    },
+    {
+     "von": 114,
+     "bis": 114,
+     "eur_qm": 8.75
+    },
+    {
+     "von": 115,
+     "bis": 115,
+     "eur_qm": 8.74
+    },
+    {
+     "von": 116,
+     "bis": 116,
+     "eur_qm": 8.73
+    },
+    {
+     "von": 117,
+     "bis": 117,
+     "eur_qm": 8.72
+    },
+    {
+     "von": 118,
+     "bis": 118,
+     "eur_qm": 8.71
+    },
+    {
+     "von": 119,
+     "bis": 119,
+     "eur_qm": 8.7
+    },
+    {
+     "von": 120,
+     "bis": 120,
+     "eur_qm": 8.68
+    },
+    {
+     "von": 121,
+     "bis": 121,
+     "eur_qm": 8.67
+    },
+    {
+     "von": 122,
+     "bis": 122,
+     "eur_qm": 8.66
+    },
+    {
+     "von": 123,
+     "bis": 123,
+     "eur_qm": 8.65
+    },
+    {
+     "von": 124,
+     "bis": 124,
+     "eur_qm": 8.64
+    },
+    {
+     "von": 125,
+     "bis": 125,
+     "eur_qm": 8.63
+    },
+    {
+     "von": 126,
+     "bis": 126,
+     "eur_qm": 8.61
+    },
+    {
+     "von": 127,
+     "bis": 127,
+     "eur_qm": 8.6
+    },
+    {
+     "von": 128,
+     "bis": 128,
+     "eur_qm": 8.58
+    },
+    {
+     "von": 129,
+     "bis": 129,
+     "eur_qm": 8.57
+    },
+    {
+     "von": 130,
+     "bis": 130,
+     "eur_qm": 8.55
+    },
+    {
+     "von": 131,
+     "bis": 131,
+     "eur_qm": 8.54
+    },
+    {
+     "von": 132,
+     "bis": 132,
+     "eur_qm": 8.52
+    },
+    {
+     "von": 133,
+     "bis": 133,
+     "eur_qm": 8.5
+    },
+    {
+     "von": 134,
+     "bis": 134,
+     "eur_qm": 8.47
+    },
+    {
+     "von": 135,
+     "bis": 135,
+     "eur_qm": 8.45
+    },
+    {
+     "von": 136,
+     "bis": 136,
+     "eur_qm": 8.43
+    },
+    {
+     "von": 137,
+     "bis": 137,
+     "eur_qm": 8.41
+    },
+    {
+     "von": 138,
+     "bis": 138,
+     "eur_qm": 8.39
+    },
+    {
+     "von": 139,
+     "bis": 139,
+     "eur_qm": 8.37
+    },
+    {
+     "von": 140,
+     "bis": 140,
+     "eur_qm": 8.34
+    },
+    {
+     "von": 141,
+     "bis": 141,
+     "eur_qm": 8.32
+    },
+    {
+     "von": 142,
+     "bis": 142,
+     "eur_qm": 8.28
+    },
+    {
+     "von": 143,
+     "bis": 143,
+     "eur_qm": 8.26
+    },
+    {
+     "von": 144,
+     "bis": 144,
+     "eur_qm": 8.23
+    },
+    {
+     "von": 145,
+     "bis": 145,
+     "eur_qm": 8.2
+    },
+    {
+     "von": 146,
+     "bis": 146,
+     "eur_qm": 8.17
+    },
+    {
+     "von": 147,
+     "bis": 147,
+     "eur_qm": 8.14
+    },
+    {
+     "von": 148,
+     "bis": 148,
+     "eur_qm": 8.11
+    },
+    {
+     "von": 149,
+     "bis": 149,
+     "eur_qm": 8.07
+    },
+    {
+     "von": 150,
+     "bis": 150,
+     "eur_qm": 8.03
+    }
+   ],
+   "beleg": "S. 14 Tab. 3: Monatliche Basis-Nettokaltmiete in Abhängigkeit von der Wohnfläche"
+  },
+  "verknuepfung": "summe",
+  "faktoren": [
+   {
+    "merkmal": "baujahr",
+    "label": "Baujahr",
+    "typ": "baujahr_klasse",
+    "art": "eur_qm",
+    "beleg": "S. 15 Tab. 4",
+    "werte": [
+     {
+      "von": null,
+      "bis": 1983,
+      "wert": 0,
+      "label": "bis 1983 (Referenz)"
+     },
+     {
+      "von": 1984,
+      "bis": 1994,
+      "wert": 0.31,
+      "label": "1984 bis 1994"
+     },
+     {
+      "von": 1995,
+      "bis": 2001,
+      "wert": 0.43,
+      "label": "1995 bis 2001"
+     },
+     {
+      "von": 2002,
+      "bis": 2009,
+      "wert": 0.66,
+      "label": "2002 bis 2009"
+     },
+     {
+      "von": 2010,
+      "bis": 2015,
+      "wert": 0.82,
+      "label": "2010 bis 2015"
+     },
+     {
+      "von": 2016,
+      "bis": 2022,
+      "wert": 2.06,
+      "label": "2016 bis 2022"
+     }
+    ]
+   },
+   {
+    "merkmal": "lage",
+    "label": "Wohnlage",
+    "typ": "lage",
+    "art": "eur_qm",
+    "beleg": "S. 17 Wohnlagen A–D",
+    "werte": {
+     "A": 0.43,
+     "B": 0.24,
+     "C": -0.48,
+     "D": -0.24,
+     "keine": 0
+    },
+    "aliase": {
+     "keine": [
+      "mittel",
+      "normal"
+     ]
+    },
+    "standard": "keine",
+    "standard_label": "keine Wohnlage A–D (± 0,00 €)"
+   },
+   {
+    "merkmal": "ruhige_lage",
+    "label": "Anliegerstraße, Spielstraße/verkehrsberuhigt oder nicht zur Straße",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.22,
+    "beleg": "S. 15 Tab. 4"
+   },
+   {
+    "merkmal": "einliegerwohnung",
+    "label": "Einliegerwohnung (nachrangig zur Hauptwohnung)",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": -1.04,
+    "beleg": "S. 15 Tab. 4"
+   },
+   {
+    "merkmal": "dachschraegen",
+    "label": "Dachgeschosswohnung mit Dachschrägen",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": -0.42,
+    "beleg": "S. 15 Tab. 4"
+   },
+   {
+    "merkmal": "souterrain",
+    "label": "Wohnung im Keller/Souterrain/Untergeschoss",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": -1.49,
+    "beleg": "S. 15 Tab. 4"
+   },
+   {
+    "merkmal": "einbaukueche",
+    "label": "Einbauküche (mind. Herd, Spüle, Schränke, Kühlschrank)",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.28,
+    "beleg": "S. 15 Tab. 4"
+   },
+   {
+    "merkmal": "einbaukueche_ab_2010",
+    "label": "Einbauküche ab 2010 eingebaut",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.28,
+    "beleg": "S. 15 Tab. 4"
+   },
+   {
+    "merkmal": "gaeste_wc",
+    "label": "zweites WC (Gäste-WC)",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.23,
+    "beleg": "S. 15 Tab. 4"
+   },
+   {
+    "merkmal": "stufenfrei",
+    "label": "Wohnung stufenfrei erreichbar",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.23,
+    "beleg": "S. 15 Tab. 4"
+   },
+   {
+    "merkmal": "garten_allein",
+    "label": "Garten zur alleinigen Nutzung",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.54,
+    "beleg": "S. 15 Tab. 4"
+   },
+   {
+    "merkmal": "zimmer_ohne_heizung",
+    "label": "mindestens ein Zimmer ohne fest installierte Heizung",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": -0.4,
+    "beleg": "S. 15 Tab. 4"
+   },
+   {
+    "merkmal": "gefangener_raum",
+    "label": "gefangener Raum",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": -0.27,
+    "beleg": "S. 16 Tab. 4"
+   },
+   {
+    "merkmal": "kein_balkon",
+    "label": "kein Balkon/(Dach-)Terrasse/Loggia",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": -0.45,
+    "beleg": "S. 16 Tab. 4"
+   },
+   {
+    "merkmal": "keine_zentral_etagenheizung",
+    "label": "keine Zentral- und keine Etagenheizung",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": -0.79,
+    "beleg": "S. 16 Tab. 4"
+   },
+   {
+    "merkmal": "elektro_ab_2010",
+    "label": "Elektroinstallation ab 2010 erneuert",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.36,
+    "beleg": "S. 16 Tab. 4"
+   },
+   {
+    "merkmal": "sanitaer_punkte",
+    "label": "Sanitärausstattung (Punktzahl)",
+    "typ": "auswahl",
+    "art": "eur_qm",
+    "beleg": "S. 16 Tab. 5 und 6",
+    "werte": {
+     "0": 0,
+     "1": 0.15,
+     "2": 0.31,
+     "3": 0.45,
+     "4": 0.61,
+     "5": 0.76,
+     "6": 0.92,
+     "7": 1.06,
+     "8": 1.22,
+     "-5": -0.76,
+     "-4": -0.61,
+     "-3": -0.45,
+     "-2": -0.31,
+     "-1": -0.15
+    }
+   }
+  ],
+  "spanne_wfl_klassen": {
+   "beleg": "S. 17 Tab. 7 (Betrag in €/m² auf die durchschnittliche Vergleichsmiete), vom Rechenkern noch nicht ausgewertet",
+   "klassen": [
+    {
+     "von": 25,
+     "bis": 40,
+     "bis_inkl": false,
+     "unten_abs": -1.63,
+     "oben_abs": 1.55
+    },
+    {
+     "von": 40,
+     "bis": 50,
+     "bis_inkl": false,
+     "unten_abs": -1.41,
+     "oben_abs": 0.94
+    },
+    {
+     "von": 50,
+     "bis": 60,
+     "bis_inkl": false,
+     "unten_abs": -1.18,
+     "oben_abs": 1.25
+    },
+    {
+     "von": 60,
+     "bis": 70,
+     "bis_inkl": false,
+     "unten_abs": -1.1,
+     "oben_abs": 1.01
+    },
+    {
+     "von": 70,
+     "bis": 80,
+     "bis_inkl": false,
+     "unten_abs": -1.2,
+     "oben_abs": 1.23
+    },
+    {
+     "von": 80,
+     "bis": 90,
+     "bis_inkl": false,
+     "unten_abs": -1.29,
+     "oben_abs": 1.11
+    },
+    {
+     "von": 90,
+     "bis": 100,
+     "bis_inkl": false,
+     "unten_abs": -1.25,
+     "oben_abs": 1.59
+    },
+    {
+     "von": 100,
+     "bis": 110,
+     "bis_inkl": false,
+     "unten_abs": -1.26,
+     "oben_abs": 1.32
+    },
+    {
+     "von": 110,
+     "bis": 120,
+     "bis_inkl": false,
+     "unten_abs": -1.53,
+     "oben_abs": 0.93
+    },
+    {
+     "von": 120,
+     "bis": 130,
+     "bis_inkl": false,
+     "unten_abs": -1.54,
+     "oben_abs": 1.7
+    },
+    {
+     "von": 130,
+     "bis": 140,
+     "bis_inkl": false,
+     "unten_abs": -1.04,
+     "oben_abs": 1.33
+    },
+    {
+     "von": 140,
+     "bis": 150,
+     "bis_inkl": false,
+     "unten_abs": -1.06,
+     "oben_abs": 0.94
+    }
+   ]
+  },
+  "geltung": {
+   "baujahr_von": null,
+   "baujahr_bis": 2022,
+   "wfl_von": 25,
+   "wfl_bis": 150
+  },
+  "beleg": "S. 14–17"
+ },
+ "pruefbeispiele": [
+  {
+   "eingabe": {
+    "baujahr": 1970,
+    "wfl": 70
+   },
+   "erwartet": {
+    "mittel": 9.24
+   },
+   "seite": "14",
+   "art": "tabellenzelle",
+   "anmerkung": "Basis 70 m², Referenzbaujahr, keine Wohnlage A–D"
+  },
+  {
+   "eingabe": {
+    "baujahr": 2005,
+    "wfl": 64.5,
+    "lage": "A",
+    "merkmale": {
+     "einbaukueche": true,
+     "kein_balkon": true,
+     "sanitaer_punkte": "2"
+    }
+   },
+   "erwartet": {
+    "mittel": 10.6
+   },
+   "seite": "14–17",
+   "art": "rechenweg",
+   "anmerkung": "kein Zahlenbeispiel in der Dokumentation: 65 m² 9,37 + 0,66 + 0,43 + 0,28 − 0,45 + 0,31 = 10,60 (ohne Spanne, siehe hinweis)"
+  },
+  {
+   "eingabe": {
+    "baujahr": 2023,
+    "wfl": 70
+   },
+   "erwartet": null,
+   "seite": "15",
+   "art": "tabellenzelle"
+  }
+ ]
+}
