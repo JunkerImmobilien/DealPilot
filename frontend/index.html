@@ -1088,7 +1088,7 @@ label.dp-required.qc-required::after {
   <input type="hidden" id="dp_stufe" value="">  <!-- v3073: Detailgrad JE OBJEKT (js/detailgrad.js): 1 Einsteiger · 2 Fortgeschritten · 3 Experte; leer bei einem Bestandsobjekt = Experte -->
   <input type="hidden" id="_mb_state" value="">  <!-- v540: DealPilot-Marktbewertung Snapshot -->
   <input type="hidden" id="_vivi" value="">  <!-- v3950: ViVi-Verknuepfung im Objekt (js/vivi-felder.js), JSON: verknuepft, stand, felder (Anzeige-Spiegel), eigen (lokal ueberschriebene Werte). Massgeblich bleibt vivi_werte im Backend -->
-  <input type="hidden" id="_besichtigung" value="">  <!-- v5020: Checkliste der Besichtigung (js/besichtigung.js), JSON: Haken und Notizen je Punkt -->
+  <input type="hidden" id="_besichtigung" value="">  <input type="hidden" id="_nutzung" value="">  <!-- v5120ii6: Demo Eigennutzer, '' = vermieten, 'eigen' = selbst nutzen -->  <!-- v5020: Checkliste der Besichtigung (js/besichtigung.js), JSON: Haken und Notizen je Punkt -->
   <input type="hidden" id="_dok_eingang" value="">  <!-- v3120: Herkunft der Steuerposten und Verlauf des Eingangs (unterlagen-eingang.js), JSON -->
   <input type="hidden" id="_dok_auswertung" value="">  <!-- v3016: Auswertung der Unterlagen (WEG, Grundbuch, Teilung), JSON - unterlagen.js -->
   <input type="hidden" id="_lage_herkunft" value="">  <!-- v2515: Herkunft je Lage-Feld (gemessen | ki | eigen), JSON -->
@@ -4796,5 +4796,7 @@ document.addEventListener('DOMContentLoaded', function(){
     <script src="js/neues-objekt-quellen.js?v=v4810"></script>
     -->
 <script src="js/kontrast-text.js?v=v4850m"></script>
+<script src="js/eigennutzer-kern.js?v=v5120ii6"></script>
+<script src="js/eigennutzer-app-demo.js?v=v5120ii6"></script>
 </body>
 </html>
