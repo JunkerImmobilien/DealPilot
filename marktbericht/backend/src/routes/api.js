@@ -1152,7 +1152,7 @@ router.get('/mietspiegel', async (req, res) => {
         const v = vergleichsmieteWohnung(k, req.query.wfl);
         if (v) {
           const br = mietpreisbremseFuer(ags);
-          satz.vergleich_wohnung = { quelle: v.quelle, unten: v.unten, mittel: v.mittel, oben: v.oben, ca: v.ca, qm: v.qm,
+          satz.vergleich_wohnung = { quelle: v.quelle, genauigkeit: v.genauigkeit || null, unten: v.unten, mittel: v.mittel, oben: v.oben, ca: v.ca, qm: v.qm,
             einordnung: v.einordnung, etikett: v.etikett, herkunft: v.herkunft };
           satz.ziel_maximum = zielMaximum(v, br, (req.query.ausnahme || (Number(req.query.baujahr) >= 2015 ? '556f_neubau' : '')), req.query.faktor_ohne);
           const zj = Number(req.query.zieljahr);

@@ -149,7 +149,7 @@ export function vergleichsmieteWohnung(k, wfl) {
     const qm = e.wahl === 'oben' ? oben : e.wahl === 'unten' ? unten : n.qm;
     return { quelle: 'naeherung', unten, mittel: n.qm, oben, ca: true, einordnung: e, qm,
       etikett: 'Vergleichsmiete der Wohnung (DealPilot-Näherung)',
-      herkunft: n.text, rechnung: n.rechnung, hinweise: n.hinweise || [] };
+      herkunft: n.text, genauigkeit: n.genauigkeit_text || null, rechnung: n.rechnung, hinweise: n.hinweise || [] };
   }
   return null;
 }
@@ -158,7 +158,7 @@ export function vergleichsmieteWohnung(k, wfl) {
 export function bandWohnung(v) {
   if (!v || !(v.qm > 0)) return null;
   const a = v.qm;
-  return { anker_qm: r2(a), anker_stufe: v.quelle, anker_etikett: v.etikett, anker_quelle: v.herkunft,
+  return { anker_qm: r2(a), anker_stufe: v.quelle, anker_etikett: v.etikett, anker_quelle: v.herkunft, anker_genauigkeit: v.genauigkeit || null,   /* v5080 */
     unten_qm: r2(Math.min(v.unten > 0 ? v.unten : a, a * (1 - MIETBAND_PCT / 100))),
     oben_qm: r2(Math.max(v.oben > 0 ? v.oben : a, a * (1 + MIETBAND_PCT / 100))),
     band_pct: MIETBAND_PCT, spanne: { unten: v.unten, mittel: v.mittel, oben: v.oben, ca: !!v.ca },

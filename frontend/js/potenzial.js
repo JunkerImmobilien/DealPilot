@@ -3476,6 +3476,8 @@
     /* v3840 · die Hinweise der Quelle (Oberwert, Vermutungswirkung, Lage) stehen in der Karte „Mietrecht an dieser Adresse".
        Hier nur, womit gerechnet wird. Die Hinweise bleiben als Tooltip (Marcel 19.11.2026: Dopplungen raus). */
     h.innerHTML = rz + '<span' + ((vg.hinweise || []).length ? ' title="' + esc(kurzSaetze(vg.hinweise.join(' · '))) + '"' : '') + '>Gerechnet wird mit <b>' + esc(eur2(vg.qm)) + '/m²</b>. Quelle: ' + esc(kurzSaetze(vg.herkunft)) + '</span>'
+      /* v5080 · Genauigkeit der Näherung nur im Tooltip (Marcel 26.11.2026), am Handy per Antippen des ⓘ */
+      + (vg.naeherung && vg.naeherung.genauigkeit_text ? ' <span class="dp-ms-tip" tabindex="0" role="note" title="' + esc(vg.naeherung.genauigkeit_text) + '" aria-label="' + esc(vg.naeherung.genauigkeit_text) + '" onclick="var t=this.lastChild;t.style.display=(t.style.display==&quot;none&quot;)?&quot;inline&quot;:&quot;none&quot;" style="cursor:help">ⓘ<span class="dp-ms-tip-t" style="display:none"> ' + esc(vg.naeherung.genauigkeit_text) + '</span></span>' : '')
       + (vg.quelle_art === 'eigen' && mietspiegelObjekt() ? '<br>Die eigene Vergleichsmiete geht dem Mietspiegel vor.' : '');
   }
   /* v3840 · Marcel 19.11.2026: „Mietspiegel, Art des Mietspiegels … unverständlich, was einzutragen ist. Automatisch

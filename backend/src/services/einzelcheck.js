@@ -744,6 +744,7 @@ function vglAus(v) {
   const s = function (x) { const n = _n(x); return n > 0 && n < 60 ? n : null; };
   return { qm: qm, art: v.art, ca: v.art === 'naeherung', unten: s(v.unten), mittel: s(v.mittel), oben: s(v.oben),
     einordnung: /^(oben|mittel|unten)$/.test(String(v.einordnung || '')) ? v.einordnung : null,
+    genauigkeit: v.art === 'naeherung' && /^im Mittel ±\d+,\d % zum Mietspiegel( der Stadt)?$/.test(String(v.genauigkeit || '')) ? v.genauigkeit : null,   /* v5080 */
     /* einzelcheck-9 · Obergrenzen wie die App (mb lib/mietanker.js zielMaximum ueber zielAusAuszug), nur Zahlen */
     ziel: zielAus(v.ziel) };
 }
