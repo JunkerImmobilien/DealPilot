@@ -1,0 +1,437 @@
+{
+ "ags": "05754028",
+ "gemeinde": "Rheda-Wiedenbrück",
+ "art": "qualifiziert",
+ "stand": "2026-01",
+ "erhebungsstichtag": "2024-01-01",
+ "gueltig_ab": null,
+ "gueltig_bis": null,
+ "naechste_ausgabe": "2028",
+ "quelle": {
+  "url": "https://www.borgholzhausen.de/soziales-bildung-sport/soziale-angelegenheiten/wohnen/mietspiegel/mietspiegeldokumentation-2026.pdf?cid=3d7",
+  "dokument": "Dokumentation „Qualifizierte Mietspiegel 2026 der 13 Städte und Gemeinden im Kreis Gütersloh“ (IGES Mobility GmbH, Hamburg, Mai 2026, im Auftrag des Kreises Gütersloh und des Arbeitskreises Mietspiegel), Tabelle 8 „Mietspiegeltabelle Rheda-Wiedenbrück 2026“",
+  "seite": "Dokumentation S. 18 (Tabelle 8), S. 5–6 (Vorbemerkungen: qualifiziert § 558d, VPI-Fortschreibung, anerkannt 28.04.2026)",
+  "lizenz": "kein Rechtevorbehalt im Dokument (kein Nachdruck- oder Speicherverbot, kein Urheberrechtsvermerk), geprüft am 2026-11-26",
+  "abgerufen": "2026-11-26"
+ },
+ "einheit": "eur_qm_nettokalt",
+ "form": "tabelle",
+ "rundung": 2,
+ "hinweis": "Qualifizierter Mietspiegel 2026 (§ 558d BGB), einer von 13 gemeinsam erstellten Mietspiegeln im Kreis Gütersloh (Arbeitskreis Mietspiegel, anerkannt 28.04.2026, IGES Mobility); Fortschreibung des Mietspiegels 2024 per VPI, Erhebungsstichtag 1. Januar 2024, Werte-Stichtag 1. Januar 2026; Inkrafttreten im Dokument nicht genannt (die übrigen Kommunen des Kreises: 1. Juli 2026). Kein Stadt-PDF abrufbar gefunden: Tabelle aus der Dokumentation des Kreises (Koordinaten der Textschicht; das Verfahren gibt für Gütersloh, Rietberg, Versmold, Borgholzhausen und Langenberg alle 40 Felder gleich mit den Stadt-PDFs wieder). 2 Feld(er) leer im Dokument (keine Zelle, am Druckbild bestätigt). Mittelwert und 2/3-Spanne je Feld; gilt für Standardwohnungen mit Bad, WC und Sammelheizung in mittlerer Wohnlage; gute Wohnlage und weitere Merkmale nur INNERHALB der Spanne (keine bezifferten Zu-/Abschläge). Baualter bis 2023. Graue Felder (10–29 Fälle) eingeschränkt aussagekräftig — nur an der Farbe erkennbar. Einbezogen sind auch Mietwohnungen aus Ein- und Zweifamilienhäusern (Stadt-PDFs, Abschnitt Wohnungsart); zu ganzen vermieteten Häusern sagt das Dokument nichts.",
+ "tabelle": {
+  "achsen": {
+   "baujahr": [
+    {
+     "von": null,
+     "bis": 1960,
+     "label": "bis 1960"
+    },
+    {
+     "von": 1961,
+     "bis": 1967,
+     "label": "1961 bis 1967"
+    },
+    {
+     "von": 1968,
+     "bis": 1977,
+     "label": "1968 bis 1977"
+    },
+    {
+     "von": 1978,
+     "bis": 1994,
+     "label": "1978 bis 1994"
+    },
+    {
+     "von": 1995,
+     "bis": 2002,
+     "label": "1995 bis 2002"
+    },
+    {
+     "von": 2003,
+     "bis": 2012,
+     "label": "2003 bis 2012"
+    },
+    {
+     "von": 2013,
+     "bis": 2019,
+     "label": "2013 bis 2019"
+    },
+    {
+     "von": 2020,
+     "bis": 2023,
+     "label": "2020 bis 2023"
+    }
+   ],
+   "wfl": [
+    {
+     "von": 25,
+     "bis": 50,
+     "label": "25 m² bis 50 m²"
+    },
+    {
+     "von": 50,
+     "von_inkl": false,
+     "bis": 65,
+     "label": "über 50 m² bis 65 m²"
+    },
+    {
+     "von": 65,
+     "von_inkl": false,
+     "bis": 80,
+     "label": "über 65 m² bis 80 m²"
+    },
+    {
+     "von": 80,
+     "von_inkl": false,
+     "bis": 95,
+     "label": "über 80 m² bis 95 m²"
+    },
+    {
+     "von": 95,
+     "von_inkl": false,
+     "bis": null,
+     "label": "über 95 m²"
+    }
+   ]
+  },
+  "zellen": [
+   {
+    "baujahr": 0,
+    "wfl": 0,
+    "unten": 5.89,
+    "mittel": 7.41,
+    "oben": 8.61,
+    "seite": "Dokumentation S. 18 Tabelle 8"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 0,
+    "unten": 7.31,
+    "mittel": 7.6,
+    "oben": 8.98,
+    "seite": "Dokumentation S. 18 Tabelle 8"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 0,
+    "unten": 6.68,
+    "mittel": 7.81,
+    "oben": 9.26,
+    "seite": "Dokumentation S. 18 Tabelle 8"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 0,
+    "unten": 6.68,
+    "mittel": 7.79,
+    "oben": 9.29,
+    "seite": "Dokumentation S. 18 Tabelle 8"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 0,
+    "unten": 7.23,
+    "mittel": 8.33,
+    "oben": 9.68,
+    "seite": "Dokumentation S. 18 Tabelle 8"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 0,
+    "unten": 6.6,
+    "mittel": 7.16,
+    "oben": 7.42,
+    "seite": "Dokumentation S. 18 Tabelle 8"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 1,
+    "unten": 5.94,
+    "mittel": 7.16,
+    "oben": 8.42,
+    "seite": "Dokumentation S. 18 Tabelle 8"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 1,
+    "unten": 4.8,
+    "mittel": 6.6,
+    "oben": 8.06,
+    "seite": "Dokumentation S. 18 Tabelle 8"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 1,
+    "unten": 5.9,
+    "mittel": 7.28,
+    "oben": 8.81,
+    "seite": "Dokumentation S. 18 Tabelle 8"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 1,
+    "unten": 6.55,
+    "mittel": 7.35,
+    "oben": 8.35,
+    "seite": "Dokumentation S. 18 Tabelle 8"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 1,
+    "unten": 6.74,
+    "mittel": 7.64,
+    "oben": 8.8,
+    "seite": "Dokumentation S. 18 Tabelle 8"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 1,
+    "unten": 6.84,
+    "mittel": 8.1,
+    "oben": 9.1,
+    "seite": "Dokumentation S. 18 Tabelle 8"
+   },
+   {
+    "baujahr": 6,
+    "wfl": 1,
+    "unten": 8.36,
+    "mittel": 9.48,
+    "oben": 10.44,
+    "seite": "Dokumentation S. 18 Tabelle 8"
+   },
+   {
+    "baujahr": 7,
+    "wfl": 1,
+    "unten": 9.4,
+    "mittel": 10.33,
+    "oben": 11.67,
+    "seite": "Dokumentation S. 18 Tabelle 8"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 2,
+    "unten": 5.29,
+    "mittel": 6.41,
+    "oben": 7.77,
+    "seite": "Dokumentation S. 18 Tabelle 8"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 2,
+    "unten": 5.88,
+    "mittel": 6.65,
+    "oben": 7.83,
+    "seite": "Dokumentation S. 18 Tabelle 8"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 2,
+    "unten": 5.95,
+    "mittel": 7.14,
+    "oben": 8.68,
+    "seite": "Dokumentation S. 18 Tabelle 8"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 2,
+    "unten": 6.53,
+    "mittel": 7.5,
+    "oben": 8.35,
+    "seite": "Dokumentation S. 18 Tabelle 8"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 2,
+    "unten": 6.42,
+    "mittel": 7.35,
+    "oben": 8.09,
+    "seite": "Dokumentation S. 18 Tabelle 8"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 2,
+    "unten": 7.83,
+    "mittel": 8.36,
+    "oben": 9.24,
+    "seite": "Dokumentation S. 18 Tabelle 8"
+   },
+   {
+    "baujahr": 6,
+    "wfl": 2,
+    "unten": 8.45,
+    "mittel": 9.45,
+    "oben": 10.42,
+    "seite": "Dokumentation S. 18 Tabelle 8"
+   },
+   {
+    "baujahr": 7,
+    "wfl": 2,
+    "unten": 8.88,
+    "mittel": 10.02,
+    "oben": 11.06,
+    "seite": "Dokumentation S. 18 Tabelle 8"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 3,
+    "unten": 5.45,
+    "mittel": 6.69,
+    "oben": 8.12,
+    "seite": "Dokumentation S. 18 Tabelle 8"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 3,
+    "unten": 5.73,
+    "mittel": 6.66,
+    "oben": 7.86,
+    "seite": "Dokumentation S. 18 Tabelle 8"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 3,
+    "unten": 5.57,
+    "mittel": 6.74,
+    "oben": 8.12,
+    "seite": "Dokumentation S. 18 Tabelle 8"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 3,
+    "unten": 6.37,
+    "mittel": 7.25,
+    "oben": 8.18,
+    "seite": "Dokumentation S. 18 Tabelle 8"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 3,
+    "unten": 6.45,
+    "mittel": 7.46,
+    "oben": 8.5,
+    "seite": "Dokumentation S. 18 Tabelle 8"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 3,
+    "unten": 6.6,
+    "mittel": 7.42,
+    "oben": 8.02,
+    "seite": "Dokumentation S. 18 Tabelle 8"
+   },
+   {
+    "baujahr": 6,
+    "wfl": 3,
+    "unten": 8.3,
+    "mittel": 9.57,
+    "oben": 11.33,
+    "seite": "Dokumentation S. 18 Tabelle 8"
+   },
+   {
+    "baujahr": 7,
+    "wfl": 3,
+    "unten": 8.88,
+    "mittel": 10,
+    "oben": 11.13,
+    "seite": "Dokumentation S. 18 Tabelle 8"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 4,
+    "unten": 4.31,
+    "mittel": 6.03,
+    "oben": 7.37,
+    "seite": "Dokumentation S. 18 Tabelle 8"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 4,
+    "unten": 4.96,
+    "mittel": 6.84,
+    "oben": 8.75,
+    "seite": "Dokumentation S. 18 Tabelle 8"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 4,
+    "unten": 5.72,
+    "mittel": 6.87,
+    "oben": 8.11,
+    "seite": "Dokumentation S. 18 Tabelle 8"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 4,
+    "unten": 5.78,
+    "mittel": 7.18,
+    "oben": 8.27,
+    "seite": "Dokumentation S. 18 Tabelle 8"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 4,
+    "unten": 6.21,
+    "mittel": 7.34,
+    "oben": 8.37,
+    "seite": "Dokumentation S. 18 Tabelle 8"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 4,
+    "unten": 6.58,
+    "mittel": 7.88,
+    "oben": 9.92,
+    "seite": "Dokumentation S. 18 Tabelle 8"
+   },
+   {
+    "baujahr": 6,
+    "wfl": 4,
+    "unten": 8.23,
+    "mittel": 9.26,
+    "oben": 10.44,
+    "seite": "Dokumentation S. 18 Tabelle 8"
+   },
+   {
+    "baujahr": 7,
+    "wfl": 4,
+    "unten": 9.29,
+    "mittel": 10.32,
+    "oben": 11.5,
+    "seite": "Dokumentation S. 18 Tabelle 8"
+   }
+  ]
+ },
+ "pruefbeispiele": [
+  {
+   "eingabe": {
+    "baujahr": 1985,
+    "wfl": 70
+   },
+   "erwartet": {
+    "unten": 6.53,
+    "mittel": 7.5,
+    "oben": 8.35
+   },
+   "art": "tabellenzelle",
+   "seite": "Dokumentation S. 18 Tabelle 8, Feld 1978 bis 1994 / über 65 m² bis 80 m²"
+  },
+  {
+   "eingabe": {
+    "baujahr": 2024,
+    "wfl": 70
+   },
+   "erwartet": null,
+   "art": "tabellenzelle",
+   "seite": "nach 2023 bezugsfertig: keine Tabellenspalte"
+  },
+  {
+   "eingabe": {
+    "baujahr": 2015,
+    "wfl": 40
+   },
+   "erwartet": null,
+   "art": "tabellenzelle",
+   "seite": "Dokumentation S. 18: Feld 2013 bis 2019 / 25 bis 50 m² leer"
+  }
+ ]
+}
