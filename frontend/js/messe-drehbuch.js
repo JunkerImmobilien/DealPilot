@@ -9453,7 +9453,7 @@
      Ertragswert je Stufe (POST /marktbericht/potenzial, ohne Kontingent, aber Bewertungsdienst) ist
      EINMAL echt erzeugt (?qgbmit, 13.11.2026) und liegt in js/messe-quittengarten-bestand-daten.js;
      Schlüssel = varianten des Auftrags. Fehlt ein Schlüssel, sperrt RH_SPERRE (503, DPM_QGB.fehlt). */
-  var QGB_BUSTER = 'v3348a', QGB_KOSTEN = '100000';
+  var QGB_BUSTER = 'v5140m12', QGB_KOSTEN = '100000';
   window.DPM_QGB = window.DPM_QGB || {};
   function qgbSpot() { return _aktiv === DREHBUECHER['spot-quittengarten-bestand']; }
   function qgbLaden() {
