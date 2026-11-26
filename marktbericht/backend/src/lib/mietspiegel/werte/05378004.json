@@ -19,10 +19,7 @@
  "form": "tabelle",
  "rundung": 2,
  "hinweis": "Einfacher Mietspiegel (§ 558c BGB, Dokumentation S. 2), im Arbeitskreis am 18.11.2025 beschlossen, „im Einvernehmen mit der Stadt Bergisch Gladbach veröffentlicht“; Fragebogenrücklauf bis 31.10.2025. Bild-PDF ohne Textschicht: Werte am Druckbild S. 3 (300 dpi) abgelesen. Tabelle nur mit Spannen, kein Mittelwert im Dokument: mittel = Mitte der Spanne (DealPilot-Rechnung). Größenklassen heißen „um 40 / 60 / 80 / 100 / 120 m² Größe“ ohne Grenzen; die Zuordnung zur nächstgelegenen Bezugsgröße (bis 50, über 50–70, über 70–90, über 90–110, über 110–150 m²) ist eine Lesart von DealPilot, nicht des Dokuments; über 150 m² „vom Mietspiegel nicht erfasst“ (S. 2). Gruppen nach Bezugsfertigkeit: I bis 1960, II 1961–1976, III 1977–1989, IV 1990–2004, V 2005–2017, VI ab 01.01.2018. Ausstattung 1 = mit Heizung, Bad/WC (Standard), 2 = mit besonderer Ausstattung (mehrere Merkmale: Schallschutzverglasung nur Gruppe I–II, besonderer Fußboden, separates WC/Zweitbad, Einbauschränke, Einbauküche, großer Balkon/Terrasse/Garten, barrierearm nur Gruppe I–III; S. 2 Nr. 3). Lage: nur mittlere und gute Wohnlage ausgewiesen; für einfache Wohnlagen „soll der Mittelwert der mittleren Wohnlage nicht überschritten werden“ (S. 2) — Obergrenze, kein Wert → Lage einfach ergibt keinen Wert. Modernisierte Wohnungen orientieren sich an Gruppe III (Arbeiten bis 1989) bzw. IV (alle Maßnahmen nach 1990), sanierte Gebäude nach Jahr der Sanierung (S. 2 Nr. 4) — nicht abgebildet, die Rechnung nimmt das übergebene Baujahr. Gilt „uneingeschränkt auch für Odenthal, Overath und Rösrath“, für Kürten mit 10 % Abschlag (S. 2 Nr. 6, Dokumentation S. 2). Wohnungen in Ein- und Zweifamilienhäusern, Reihenhäusern und Doppelhaushälften gehen nicht in die Erhebung ein (Dokumentation S. 2). Ausschlüsse: möbliert, ohne eigenes Bad mit WC, preisgebunden, Heime.",
- "haus": {
-  "regel": "ausgeschlossen",
-  "beleg": "Dokumentation S. 2 Geltungsbereich: „Nicht in die Erhebung gehen ein: Wohnungen in Ein- und Zweifamilienhäusern, Reihenhäusern, Doppelhaushälften“"
- },
+ "haus": {"regel":"ausgeschlossen","beleg":"Dokumentation S. 2 Geltungsbereich: „Nicht in die Erhebung gehen ein: Wohnungen in Ein- und Zweifamilienhäusern, Reihenhäusern, Doppelhaushälften“"},
  "tabelle": {
   "achsen": {
    "baujahr": [

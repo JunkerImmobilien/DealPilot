@@ -19,14 +19,7 @@
  "form": "regression",
  "rundung": 2,
  "hinweis": "Additives Modell (S. 23 Tabelle 3): Basis-Netto-Miete nach Wohnfläche (Tabelle 1, je volle m² 16–234, am Druckbild S. 11 geprüft) + Summe der Zu-/Abschläge in €/m² (Tabelle 2) = Mittelwert. Zwischenwerte nach S. 10 linear interpolieren („Differenz … mit den Nachkommastellen der Wohnfläche multiplizieren … vom Wert der nächstkleineren Quadratmeterzahl abziehen“, Beispiel 20,4 m² = 15,07 €). Der Kern kennt keine Interpolation, deshalb ist jede Klasse genau ein ganzer m²: ganzzahlige Wohnflächen rechnen exakt, gebrochene geben null. Lage-Kategorie 1–10 je Adresse (Wohnlagenverzeichnis/Geoportal, S. 22), ohne Lage kein Wert. Baualter nur bis 2017 und 2018–2025 (Neubau +1,25 €); Baujahr ab 2026 nicht erfasst (S. 13). „Gedämmtes Dach oder Baualter ab 1978“ +0,24 €: ab Baujahr 1978 automatisch, davor über Merkmal gedaemmtes_dach. Hochwertiger Altbau nur bis Baujahr 1918 (S. 17) und „Besonders hochwertiger Fußboden“ ist dann nicht anwendbar (S. 16). Spanne: Spannenzu-/-abschlag darf insgesamt 16 % nicht über-/unterschreiten (S. 23), als ±16 % auf den Mittelwert abgebildet. Nicht unmittelbar anwendbar: unter 16 / über 234 m², Service-Wohnen, unvollständige oder nicht abgeschlossene Wohnungen; nicht anwendbar auf geförderte Wohnungen, Wohnheime (S. 5–6). Freistehendes Einfamilienhaus +2,22 € (S. 14), DHH und Reihenhäuser ausdrücklich nicht. Stellplatz-Zuschläge (S. 8) nur nachrichtlich, nicht abgebildet. Kein Anwendungsbeispiel im Dokument, Prüfbeispiele nach Tabelle 3 gerechnet.",
- "haus": {
-  "regel": "zuschlag",
-  "merkmal": "einfamilienhaus",
-  "fuer": [
-   "efh"
-  ],
-  "beleg": "S. 14 „Freistehendes Einfamilienhaus Zuschlag: + 2,22 Euro … Doppelhaushälften oder einseitig angebaute Einfamilienhäuser sowie Reihenmittelhäuser und Reihenendhäuser zählen nicht dazu.“"
- },
+ "haus": {"regel":"zuschlag","merkmal":"einfamilienhaus","gilt_fuer":["efh"],"beleg":"S. 14 „Freistehendes Einfamilienhaus Zuschlag: + 2,22 Euro … Doppelhaushälften oder einseitig angebaute Einfamilienhäuser sowie Reihenmittelhäuser und Reihenendhäuser zählen nicht dazu.“","gilt_fuer_herkunft":"wortlaut"},
  "regression": {
   "basis": {
    "typ": "wfl_tabelle",

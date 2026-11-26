@@ -41,7 +41,7 @@ sonst eine eindeutig ablesbare Tabellenzelle (`tabellenzelle`). Eine Grenze mit 
 
 **7 · Häuser (`haus`).** Was sagt das Dokument zu Ein-, Zweifamilien-, Reihen- und Doppelhäusern?
 `zuschlag` (mit `merkmal` aus den Zuschlägen, ggf. `{ efh, zfh, dhh, rh }`), `gilt`, `orientierung`,
-`oberer_spannenwert` oder `ausgeschlossen` („gilt nur für Wohnungen in Mehrfamilienhäusern“). `fuer` begrenzt auf
+`oberer_spannenwert` oder `ausgeschlossen` („gilt nur für Wohnungen in Mehrfamilienhäusern“). `gilt_fuer` begrenzt auf
 Bauformen, `beleg` mit Seite. Sagt das Dokument nichts: Feld weglassen.
 
 **8 · Danach immer:** `node tools/mietspiegel-werte-pruefen.mjs` (RC 0), `node tools/mietspiegel-verzeichnis-pruefen.mjs`
@@ -53,3 +53,8 @@ Commit neu von staging holen und mergen.
 
 **9 · Gemeinden unter 50.000 Einwohnern** mit eigenem Mietspiegel stehen noch nicht im Verzeichnis. Wer einen findet
 (z. B. Kreis-Mietspiegel), legt zuerst den Verzeichnis-Satz an (Felder siehe README), dann die Wertedatei.
+
+**Hausregel und Bauformen (v5080, Marcel 26.11.2026 „recherchieren, was richtig ist“):** `haus.gilt_fuer` nach dem
+Wortlaut des Dokuments, `gilt_fuer_herkunft: "wortlaut"`. Ist er unklar (nur „Einfamilienhaus“), gilt die Rechtslage:
+ohne „freistehend“ umfasst das Einfamilienhaus auch Doppelhaushälfte und Reihenhaus (§ 181 Abs. 2 BewG, AG Hanau),
+Zweifamilienhaus nur, wo genannt; dann `gilt_fuer_herkunft: "rechtslage"` mit `gilt_fuer_begruendung`.

@@ -1,7 +1,7 @@
 {
  "ags": "01056015",
  "gemeinde": "Elmshorn",
- "haus": {"regel":"zuschlag","merkmal":"efh_dhh_rh","fuer":["efh","dhh","rh"],"beleg":"laut Dokument, siehe Zuschlag bzw. Geltungsbereich in dieser Datei"},
+ "haus": {"regel":"zuschlag","merkmal":"efh_dhh_rh","gilt_fuer":["efh","dhh","rh"],"beleg":"laut Dokument, siehe Zuschlag bzw. Geltungsbereich in dieser Datei","gilt_fuer_herkunft":"wortlaut"},
  "art": "qualifiziert",
  "stand": "2026-08-01",
  "erhebungsstichtag": "2024-01-01",

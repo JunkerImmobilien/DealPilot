@@ -3,7 +3,7 @@
  "freigabe": "gesperrt",
  "freigabe_grund": "© Stadt Detmold — auf Prod gesperrt bis zur Klärung (Marcel, 09.11.2026)",
  "gemeinde": "Detmold",
- "haus": {"regel":"zuschlag","merkmal":"einfamilienhaus","fuer":["efh","dhh","rh"],"beleg":"laut Dokument, siehe Zuschlag bzw. Geltungsbereich in dieser Datei"},
+ "haus": {"regel":"zuschlag","merkmal":"einfamilienhaus","gilt_fuer":["efh","dhh","rh"],"beleg":"laut Dokument, siehe Zuschlag bzw. Geltungsbereich in dieser Datei","gilt_fuer_herkunft":"rechtslage","gilt_fuer_begruendung":"Rechtslage: „Einfamilienhaus“ ohne „freistehend“ umfasst Doppelhaushälfte und Reihenhaus (§ 181 Abs. 2 BewG: Wohngrundstück mit bis zu zwei Wohnungen; AG Hanau: Doppelhaushälfte ist Einfamilienhaus im Sinne des Mietspiegels). Zweifamilienhaus nur, wo genannt."},
  "art": "qualifiziert",
  "stand": "2025-04-04",
  "erhebungsstichtag": "2024-10-01",

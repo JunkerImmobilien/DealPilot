@@ -1,7 +1,7 @@
 {
  "ags": "05382056",
  "gemeinde": "Sankt Augustin",
- "haus": {"regel":"zuschlag","merkmal":"efh_dhh_zfh_rh","fuer":["efh","zfh","dhh","rh"],"beleg":"laut Dokument, siehe Zuschlag bzw. Geltungsbereich in dieser Datei"},
+ "haus": {"regel":"zuschlag","merkmal":"efh_dhh_zfh_rh","gilt_fuer":["efh","zfh","dhh","rh"],"beleg":"laut Dokument, siehe Zuschlag bzw. Geltungsbereich in dieser Datei","gilt_fuer_herkunft":"wortlaut"},
  "art": "qualifiziert",
  "stand": "2026-01-01",
  "erhebungsstichtag": "2025-04-01",

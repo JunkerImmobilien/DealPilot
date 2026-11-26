@@ -335,7 +335,7 @@ Mehrfamilienhäuser". Ein Mietspiegel gilt für **Wohnungen**. Was er zu vermiet
 | `oberer_spannenwert` | Mittelwert = oberer Spannenwert (Krefeld) |
 | `ausgeschlossen` | keine Werte, `werte_verfuegbar: false`, `haus_ausgeschlossen: true`, die Route rechnet die DealPilot-Näherung („Mietspiegel gilt nicht für Häuser, Näherung“) |
 
-`fuer` begrenzt die Regel auf Bauformen (`efh`, `zfh`, `dhh`, `rh`), sonst gilt sie für alle. Die Objektart kommt als
+`gilt_fuer` begrenzt die Regel auf Bauformen (`efh`, `zfh`, `dhh`, `rh`), sonst gilt sie für alle. Die Objektart kommt als
 `&objektart=EFH|ZFH|DHH|RH|…` an die Route (App: `objart`). **Spannen-Zuschläge** („EFH 10 bis 35 %“) stehen als Mitte
 der Spanne mit Seite im `beleg` (Kleve, Moers, Neuss, Recklinghausen, am PDF geprüft 26.11.2026). Ohne Feld `haus`: Hinweis
 „Der Mietspiegel sagt nichts zu Häusern“, gerechnet wie eine Wohnung. Prüfer: `mietspiegel-werte-pruefen.mjs`, Abschnitt Häuser.

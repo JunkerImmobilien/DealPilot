@@ -3,15 +3,7 @@
  "freigabe": "gesperrt",
  "freigabe_grund": "„Vervielfältigungen zum Verkauf sind gemäß Urheberrechtsgesetz untersagt.“ (PDF-S. 2) — Rechtevorbehalt ohne ausdrückliches Speicherverbot; auf Prod gesperrt bis zur Klärung",
  "gemeinde": "Dorsten",
- "haus": {
-  "regel": "zuschlag",
-  "merkmal": "haus_efh",
-  "fuer": [
-   "efh"
-  ],
-  "hinweis": "Sonderform Einfamilienhaus (inkl. Garten) Faktor 1,15; Zweifamilienhäuser ohne nachweisbaren Einfluss",
-  "beleg": "PDF-S. 5 (Sonderform EFH; Zweifamilienhäuser ohne statistische Relevanz), PDF-S. 6 (Faktor 1,15)"
- },
+ "haus": {"regel":"zuschlag","merkmal":"haus_efh","gilt_fuer":["efh","dhh","rh"],"hinweis":"Sonderform Einfamilienhaus (inkl. Garten) Faktor 1,15; Zweifamilienhäuser ohne nachweisbaren Einfluss","beleg":"PDF-S. 5 (Sonderform EFH; Zweifamilienhäuser ohne statistische Relevanz), PDF-S. 6 (Faktor 1,15)","gilt_fuer_herkunft":"rechtslage","gilt_fuer_begruendung":"Rechtslage: „Einfamilienhaus“ ohne „freistehend“ umfasst Doppelhaushälfte und Reihenhaus (§ 181 Abs. 2 BewG: Wohngrundstück mit bis zu zwei Wohnungen; AG Hanau: Doppelhaushälfte ist Einfamilienhaus im Sinne des Mietspiegels). Zweifamilienhaus nur, wo genannt."},
  "art": "einfach",
  "stand": "2025-07-01",
  "erhebungsstichtag": null,

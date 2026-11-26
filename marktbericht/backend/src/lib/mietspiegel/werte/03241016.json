@@ -1,10 +1,7 @@
 {
  "ags": "03241016",
  "gemeinde": "Sehnde",
- "haus": {
-  "regel": "ausgeschlossen",
-  "beleg": "S. 4 Nr. 2 Geltungsbereich: ausgenommen „Wohnungen in Ein- und Zweifamilienhäusern“"
- },
+ "haus": {"regel":"ausgeschlossen","beleg":"S. 4 Nr. 2 Geltungsbereich: ausgenommen „Wohnungen in Ein- und Zweifamilienhäusern“"},
  "art": "qualifiziert",
  "stand": "2025-04-01",
  "erhebungsstichtag": "2025-04-01",

@@ -1,7 +1,7 @@
 {
  "ags": "04011000",
  "gemeinde": "Bremen",
- "haus": {"regel":"zuschlag","merkmal":"efh_zfh","fuer":["efh","zfh"],"beleg":"laut Dokument, siehe Zuschlag bzw. Geltungsbereich in dieser Datei"},
+ "haus": {"regel":"zuschlag","merkmal":"efh_zfh","gilt_fuer":["efh","zfh"],"beleg":"laut Dokument, siehe Zuschlag bzw. Geltungsbereich in dieser Datei","gilt_fuer_herkunft":"wortlaut"},
  "art": "qualifiziert",
  "stand": "2026-01-01",
  "erhebungsstichtag": "2023-03-01",

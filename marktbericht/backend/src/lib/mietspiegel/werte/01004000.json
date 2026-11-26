@@ -1,17 +1,7 @@
 {
  "ags": "01004000",
  "gemeinde": "Neumünster",
- "haus": {
-  "regel": "zuschlag",
-  "merkmal": "einfamilien_reihenhaus",
-  "fuer": [
-   "efh",
-   "dhh",
-   "rh"
-  ],
-  "hinweis": "Mietspiegel nennt „einem Zuschlag bis zu 10 % - 20 %“ für allein bewohnte Einfamilien- und Reihenhäuser; DealPilot setzt die Mitte 15 %",
-  "beleg": "S. 6 Nr. 5: „Allein bewohnte Einfamilien- und Reihenhäuser haben ebenfalls einen höheren Wohnwert als Wohnungen in Häusern mit mehreren Mietparteien. Für die Festsetzung der Miete gilt der Mietspiegel mit einem Zuschlag bis zu 10 % - 20 % oder die Wirtschaftlichkeitsberechnung zur Ermittlung der Kostenmiete. In besonderen Einzelfällen kann ein höherer Zuschlag erhoben werden.“"
- },
+ "haus": {"regel":"zuschlag","merkmal":"einfamilien_reihenhaus","gilt_fuer":["efh","dhh","rh"],"hinweis":"Mietspiegel nennt „einem Zuschlag bis zu 10 % - 20 %“ für allein bewohnte Einfamilien- und Reihenhäuser; DealPilot setzt die Mitte 15 %","beleg":"S. 6 Nr. 5: „Allein bewohnte Einfamilien- und Reihenhäuser haben ebenfalls einen höheren Wohnwert als Wohnungen in Häusern mit mehreren Mietparteien. Für die Festsetzung der Miete gilt der Mietspiegel mit einem Zuschlag bis zu 10 % - 20 % oder die Wirtschaftlichkeitsberechnung zur Ermittlung der Kostenmiete. In besonderen Einzelfällen kann ein höherer Zuschlag erhoben werden.“","gilt_fuer_herkunft":"rechtslage","gilt_fuer_begruendung":"Rechtslage: „Einfamilienhaus“ ohne „freistehend“ umfasst Doppelhaushälfte und Reihenhaus (§ 181 Abs. 2 BewG: Wohngrundstück mit bis zu zwei Wohnungen; AG Hanau: Doppelhaushälfte ist Einfamilienhaus im Sinne des Mietspiegels). Zweifamilienhaus nur, wo genannt."},
  "art": "einfach",
  "stand": "2026-06-01",
  "erhebungsstichtag": "2026-05-31",

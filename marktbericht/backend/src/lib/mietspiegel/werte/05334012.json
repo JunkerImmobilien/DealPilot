@@ -1,13 +1,7 @@
 {
  "ags": "05334012",
  "gemeinde": "Eschweiler",
- "haus": {
-  "regel": "gilt",
-  "fuer": [
-   "efh"
-  ],
-  "beleg": "S. 3 Wohnungsgrößen: „Für vermietete Einfamilienhäuser gelten die Werte des Mietspiegels sinngemäß, wobei die Besonderheiten des Einzelfalls zu berücksichtigen sind.“"
- },
+ "haus": {"regel":"gilt","gilt_fuer":["efh"],"beleg":"S. 3 Wohnungsgrößen: „Für vermietete Einfamilienhäuser gelten die Werte des Mietspiegels sinngemäß, wobei die Besonderheiten des Einzelfalls zu berücksichtigen sind.“","gilt_fuer_herkunft":"wortlaut"},
  "art": "einfach",
  "stand": "2025-12-18",
  "erhebungsstichtag": null,

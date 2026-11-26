@@ -1,17 +1,7 @@
 {
  "ags": "16051000",
  "gemeinde": "Erfurt",
- "haus": {
-  "regel": "orientierung",
-  "fuer": [
-   "efh",
-   "zfh",
-   "dhh",
-   "rh"
-  ],
-  "hinweis": "gilt für Ein- und Zweifamilienhäuser als geeigneter Anhaltspunkt",
-  "beleg": "S. 6 „Art“"
- },
+ "haus": {"regel":"orientierung","gilt_fuer":["efh","zfh","dhh","rh"],"hinweis":"gilt für Ein- und Zweifamilienhäuser als geeigneter Anhaltspunkt","beleg":"S. 6 „Art“","gilt_fuer_herkunft":"wortlaut"},
  "art": "einfach",
  "stand": "2025",
  "erhebungsstichtag": null,

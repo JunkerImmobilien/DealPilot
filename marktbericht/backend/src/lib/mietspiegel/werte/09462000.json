@@ -17,10 +17,7 @@
  "form": "regression",
  "rundung": 2,
  "hinweis": "Quelle ist die Dokumentation (die Broschüre unter https://www.bayreuth.de/wp-content/uploads/2026/04/Bayreuther-Mietspiegelbroschuere-2026.pdf liefert am 26.11.2026 „Seite nicht gefunden“; gültig bis 30.04.2028 laut Verzeichnis aus dem Broschürentitel). Basis je vollem m² 20–150 m² (kaufmännische Rundung), Zu-/Abschläge in ganzen Prozent auf die Basis; dass die Prozente addiert werden, folgt aus dem Regressionsmodell und der Anwendungsbeschreibung S. 31, ein Rechenbeispiel steht nur in der nicht abrufbaren Broschüre. Spanne −19 %/+20 % auf die durchschnittliche ortsübliche Vergleichsmiete (S. 28). Baujahr 1984–2015 = Referenz (± 0). Wohnlage nach Stadtbezirk (Tab. 6, adressscharfes Verzeichnis im Anhang); nicht genannte Stadtbezirke ± 0 — ohne Angabe nimmt DealPilot „übrige Stadtbezirke“ an. „Ausstattung der Wohnung“ als Punktzahl −3 bis +4 (Tab. 7: +1 je bodentiefe Fenster, Einbauschränke außerhalb der Küche, stufenfrei erreichbar, elektrische Außenverschattung an mind. der Hälfte der Fenster; −1 je kein hochwertiger Bodenbelag, Zimmer ohne Heizung, kein Balkon). Einbauküche +9 %, zusätzlich +11 % wenn 10 Jahre oder jünger (beide gemeinsam anwendbar, S. 25). Modernisierungen/energetische Maßnahmen ab 2020 nur bei Baujahr vor 2002 (Tab. 8). Ausgeschlossen: Wohnungen ohne Bad, WC oder vermieterseitige Heizung (S. 24). Textschicht der Tabellen 5–8 gegen das Druckbild geprüft (erste Zeile Tab. 5 nur im Druckbild sauber).",
- "haus": {
-  "regel": "gilt",
-  "beleg": "Dokumentation S. 23 (7.5.2): „Für weitere Merkmale der Art, z. B. für Ein- und Zweifamilienhäuser ergaben sich keine statistisch signifikanten Einflüsse.“ — kein Zu- oder Abschlag"
- },
+ "haus": {"regel":"gilt","beleg":"Dokumentation S. 23 (7.5.2): „Für weitere Merkmale der Art, z. B. für Ein- und Zweifamilienhäuser ergaben sich keine statistisch signifikanten Einflüsse.“ — kein Zu- oder Abschlag"},
  "regression": {
   "wfl_runden": 0,
   "basis": {

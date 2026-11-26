@@ -3,21 +3,7 @@
  "freigabe": "gesperrt",
  "freigabe_grund": "„Nachdruck oder Vervielfältigung, auch auszugsweise, nur mit Genehmigung des Herausgebers“ (Impressum, PDF-S. 1) — Rechtevorbehalt ohne ausdrückliches Speicherverbot; auf Prod gesperrt bis zur Klärung",
  "gemeinde": "Viersen",
- "haus": {
-  "regel": "zuschlag",
-  "merkmal": {
-   "efh": "haus_efh",
-   "dhh": "haus_dhh_rh",
-   "rh": "haus_dhh_rh"
-  },
-  "fuer": [
-   "efh",
-   "dhh",
-   "rh"
-  ],
-  "hinweis": "Mitte der Spanne des Mietspiegels („bis 25 %“ bzw. „bis 20 %“); Wohnungen in Zweifamilienhäusern (Vollgeschoss): „in der Regel vom oberen Richtwert der Tabelle auszugehen“ — nicht abgebildet",
-  "beleg": "S. 10 Nr. II.1 g) (freistehendes Einfamilienhaus bis 25 %, Doppelhaushälfte/Reihenmittelhaus bis 20 %), S. 16 (Zweifamilienhäuser oberer Richtwert); gedruckte Seitenzahlen"
- },
+ "haus": {"regel":"zuschlag","merkmal":{"efh":"haus_efh","dhh":"haus_dhh_rh","rh":"haus_dhh_rh"},"gilt_fuer":["efh","dhh","rh"],"hinweis":"Mitte der Spanne des Mietspiegels („bis 25 %“ bzw. „bis 20 %“); Wohnungen in Zweifamilienhäusern (Vollgeschoss): „in der Regel vom oberen Richtwert der Tabelle auszugehen“ — nicht abgebildet","beleg":"S. 10 Nr. II.1 g) (freistehendes Einfamilienhaus bis 25 %, Doppelhaushälfte/Reihenmittelhaus bis 20 %), S. 16 (Zweifamilienhäuser oberer Richtwert); gedruckte Seitenzahlen","gilt_fuer_herkunft":"wortlaut"},
  "art": "einfach",
  "stand": "2025-01",
  "erhebungsstichtag": null,

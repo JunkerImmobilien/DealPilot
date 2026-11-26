@@ -17,13 +17,7 @@
  "form": "tabelle",
  "rundung": 2,
  "hinweis": "Tabelle Wohnungsgröße × Baujahr mit Mietpreisspanne und Basiswert (= gewichteter Mittelwert, S. 12); mittel = Basiswert des Dokuments. Einordnung in die Spanne über Punktzahl A (je Punkt ein Zehntel der Differenz Basiswert–Spannengrenze, Grenze ab ±10 Punkten) und Punktzahl B (Wohnlage, je Kriterium ±0,10 €/m²) laut S. 9–11 — vom Rechenkern nicht abgebildet, der Kern liefert Spanne und Basiswert. Zusätzlich darf für besonders wohnwerterhöhende Merkmale ein Aufschlag von insgesamt höchstens 40 % verlangt werden (S. 7) — nicht abgebildet. Felder mit * (< 50 Mietwerte) und ** (< 100) übernommen; Feld ab 2022 / < 45 m² ist 12,00–12,00. Nicht anwendbar u. a. auf Wohnungen in Einfamilienhäusern, Wohnungen ohne Bad oder Innen-WC, möblierten Wohnraum, Staffel-/Indexmieten (S. 5). Baujahr = Bezugsfertigkeit des Hauses, Sanierung ändert es nicht (S. 7).",
- "haus": {
-  "regel": "ausgeschlossen",
-  "fuer": [
-   "efh"
-  ],
-  "beleg": "S. 5 Anwendungsbereich: „Der Mietspiegel findet keine Anwendung auf: … Wohnungen in Einfamilienhäusern“"
- },
+ "haus": {"regel":"ausgeschlossen","gilt_fuer":["efh"],"beleg":"S. 5 Anwendungsbereich: „Der Mietspiegel findet keine Anwendung auf: … Wohnungen in Einfamilienhäusern“","gilt_fuer_herkunft":"wortlaut"},
  "tabelle": {
   "achsen": {
    "baujahr": [

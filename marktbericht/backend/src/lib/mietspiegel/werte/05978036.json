@@ -1,17 +1,7 @@
 {
  "ags": "05978036",
  "gemeinde": "Unna",
- "haus": {
-  "regel": "zuschlag",
-  "merkmal": "haus_efh",
-  "fuer": [
-   "efh",
-   "dhh",
-   "rh"
-  ],
-  "hinweis": "Einfamilienhaus (inklusive Gartennutzung) + 0,55 €/m²; Anbauweise (freistehend/Doppelhaushälfte/Reihenhaus) ohne eindeutigen Einfluss",
-  "beleg": "S. 7 (PDF-S. 8) Weitere Zu- und Abschläge und Liste der untersuchten Merkmale ohne Einfluss"
- },
+ "haus": {"regel":"zuschlag","merkmal":"haus_efh","gilt_fuer":["efh","dhh","rh"],"hinweis":"Einfamilienhaus (inklusive Gartennutzung) + 0,55 €/m²; Anbauweise (freistehend/Doppelhaushälfte/Reihenhaus) ohne eindeutigen Einfluss","beleg":"S. 7 (PDF-S. 8) Weitere Zu- und Abschläge und Liste der untersuchten Merkmale ohne Einfluss","gilt_fuer_herkunft":"rechtslage","gilt_fuer_begruendung":"Rechtslage: „Einfamilienhaus“ ohne „freistehend“ umfasst Doppelhaushälfte und Reihenhaus (§ 181 Abs. 2 BewG: Wohngrundstück mit bis zu zwei Wohnungen; AG Hanau: Doppelhaushälfte ist Einfamilienhaus im Sinne des Mietspiegels). Zweifamilienhaus nur, wo genannt."},
  "art": "qualifiziert",
  "stand": "2026-01-01",
  "erhebungsstichtag": "2025-07",
