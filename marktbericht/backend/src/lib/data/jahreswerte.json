@@ -529,6 +529,25 @@
       "hinweis": "Nach dem Neuholen node tools/nebenkosten-pruefen.mjs. mb-backend braucht Rebuild (Datei im Image)."
     },
     {
+      "id": "nebenkosten_trinkwasser",
+      "name": "Trinkwasserentgelt privater Haushalte je Gemeinde für den Haus-Check (€/m³ und Grundentgelt, Faktor auf den Bundesschnitt Wasser und Abwasser)",
+      "gruppe": "finanzierung",
+      "stand": "Regionaldatenbank Stichtag 01.01.2025, abgerufen 26.11.2026, pp6",
+      "erwartet": "2025",
+      "quelle": "Regionaldatenbank 32271-01-01-5 (dl-de/by-2-0, Statistische Ämter des Bundes und der Länder); tools/nebenkosten-trinkwasser-holen.mjs + -aufbereiten.mjs",
+      "turnus": "Erhebung alle drei Jahre (Stichtag 01.01.); jährlich nachsehen, ob ein neuer Stichtag in 32271-01-01-5 steht",
+      "faellig_am": "2027-09-30",
+      "verfahren": "agent",
+      "orte": [
+        {
+          "datei": "marktbericht/backend/src/lib/nebenkosten/trinkwasser-gemeinden.json",
+          "bezeichner": "jahr",
+          "muster": "\"jahr\":(\\d{4})"
+        }
+      ],
+      "hinweis": "Abwasser führt die Regionaldatenbank nicht regional (gemessen 26.11.2026). Nach dem Neuholen node tools/nebenkosten-pruefen.mjs. mb-backend braucht Rebuild (Datei im Image)."
+    },
+    {
       "id": "nebenkosten_bund",
       "name": "Bundesdurchschnitte der laufenden Wohnnebenkosten (Wasser, Müll, Versicherung, Schornsteinfeger, Straßenreinigung, Strom Allgemein, Grundsteuer-Kalibrierung)",
       "gruppe": "finanzierung",

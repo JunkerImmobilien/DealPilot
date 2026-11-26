@@ -68,7 +68,10 @@
     var h = '<div class="eg-amp"><i style="background:' + (a ? a[0] : 'rgba(255,255,255,.2)') + '"></i><b>Passt es zu mir?</b> '
       + (a ? 'Wohnkosten ' + Math.round(r.quote) + ' % vom Netto, ' + a[1] + '.' : 'Netto-Einkommen eintragen, dann zeigen wir die Belastung.') + '</div>';
     var AU = r.kern && r.kern.leistbarkeit && r.kern.leistbarkeit.aufstellung;
-    if (AU && AU.length) h += '<div class="eg-nk"><b>Im Monat</b><br>' + AU.map(function (x) { return (x.summe ? '<b>' : '') + x.l.replace(/ \(.*\)$/, '') + ' ' + E.eur(x.eur) + (x.summe ? '</b>' : ''); }).join('<br>')
+    if (AU && AU.length) h += '<div class="eg-nk"><b>Im Monat</b><br>' + AU.map(function (x) {
+        /* pp6 · Posten der übrigen Nebenkosten eingerückt, klein, mit Herkunft */
+        if (x.teil) return '<span style="display:block;padding-left:14px;font-size:.88em;opacity:.8">' + x.l + ' ' + E.eur(x.eur) + ' · ' + x.herkunft + '</span>';
+        return (x.summe ? '<b>' : '') + x.l.replace(/ \(.*\)$/, '') + ' ' + E.eur(x.eur) + (x.summe ? '</b>' : ''); }).join('<br>').replace(/<br><span/g, '<span')
       + (r.quote != null ? '<br>Anteil vom Netto ' + Math.round(r.quote) + ' %' : '') + '</div>';
     if (r.urteil && r.urteil.length) h += '<ul class="eg-urt">' + r.urteil.slice(1, 6).map(function (t) { return '<li>' + t + '</li>'; }).join('') + '</ul>';
     if (r.nebenkosten) h += '<div class="eg-nk">Kaufnebenkosten ' + E.eur(r.nebenkosten.summe) + ' (' + String(r.nebenkosten.pct).replace('.', ',') + ' %): Grunderwerbsteuer ' + E.eur(r.nebenkosten.grest) + ', Notar ' + E.eur(r.nebenkosten.notar) + ', Grundbuch ' + E.eur(r.nebenkosten.grundbuch) + ', Makler ' + E.eur(r.nebenkosten.makler) + '.</div>';

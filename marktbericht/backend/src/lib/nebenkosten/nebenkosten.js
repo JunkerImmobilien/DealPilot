@@ -47,6 +47,36 @@ export function daten() {
 const r2 = (x) => Math.round(x * 100) / 100;
 const komma = (x, n = 2) => Number(x).toFixed(n).replace('.', ',');
 
+/* pp6 (26.11.2026) · Wasser und Abwasser am Ort.
+   Die Regionaldatenbank führt das Trinkwasserentgelt privater Haushalte je Gemeinde (32271-01-01-5, Stichtag 01.01.,
+   verbrauchsabhängig €/m³ + haushaltsübliches Grundentgelt €/Jahr, dl-de/by-2-0). Abwasserentgelte führt sie NICHT
+   regional (Katalog 3227/3228, gemessen 26.11.2026). Darum: Bundesdurchschnitt Wasser und Abwasser × Verhältnis
+   Trinkwasserkosten der Gemeinde zu Trinkwasserkosten der mittleren Gemeinde (Median), begrenzt auf 0,6 bis 1,8.
+   Annahme: Trink- und Abwasserpreise hängen am Ort an derselben Infrastruktur (Dichte, Topografie). Die mittlere
+   Gemeinde bleibt beim Bundesdurchschnitt. Verbrauch 0,93 m³ je m² Wohnfläche und Jahr (122 l je Person und Tag,
+   rund 48 m² Wohnfläche je Person, beides amtlich, intern belegt). */
+const DATEI_TW = path.join(DIR, 'trinkwasser-gemeinden.json');
+export const VERBRAUCH_M3_JE_M2 = 0.93;
+let _tw = null;
+export function trinkwasserDaten() {
+  if (_tw) return _tw;
+  _tw = existsSync(DATEI_TW) ? JSON.parse(readFileSync(DATEI_TW, 'utf8')) : { gemeinden: {}, kreise: {}, median: null };
+  return _tw;
+}
+const twKosten = (s, wfl) => (s.eur_m3 * VERBRAUCH_M3_JE_M2 * wfl + (s.grund_jahr || 0)) / 12 / wfl;   /* €/m²·Monat */
+/** Wasserfaktor der Gemeinde (oder ihres Kreises) gegen die mittlere Gemeinde, oder null. */
+export function wasserFaktor(ags, wfl) {
+  const T = trinkwasserDaten(), a = String(ags || '');
+  if (!T.median || !(T.median.eur_m3 > 0)) return null;
+  let s = T.gemeinden && T.gemeinden[a], ebene = 'gemeinde';
+  if (!s && T.kreise) { s = T.kreise[a.slice(0, 5)]; ebene = 'kreis'; }
+  if (!s && T.laender) { s = T.laender[a.slice(0, 2)]; ebene = 'land'; }
+  if (!s || !(s.eur_m3 > 0)) return null;
+  const w = wfl > 0 ? wfl : 100;
+  const f = Math.min(1.8, Math.max(0.6, twKosten(s, w) / twKosten(T.median, w)));
+  return { faktor: f, ebene, jahr: T.jahr, eur_m3: s.eur_m3, grund_jahr: s.grund_jahr };
+}
+
 /** Grundsteuer €/m²·Monat der Gemeinde (Durchschnitt) oder null. */
 export function grundsteuerQm(ags) {
   const D = daten(), g = D.gemeinden && D.gemeinden[String(ags || '')];
@@ -63,12 +93,18 @@ export function grundsteuerQm(ags) {
 export function nebenkostenFuer(ags, o = {}) {
   const wfl = Number(o.wfl) > 0 ? Number(o.wfl) : null;
   const gs = grundsteuerQm(ags);
+  const wf = wasserFaktor(ags, wfl);
   const posten = [];
   for (const id of Object.keys(NAMEN)) {
     let qm = BUND[id], herkunft = 'bund', text = 'Bundesdurchschnitt';
     if (id === 'grundsteuer' && gs) {
       qm = gs.qm; herkunft = 'gemeinde';
       text = 'Durchschnitt der Gemeinde, aus dem Grundsteueraufkommen ' + gs.jahr + ' je m² Wohnfläche abgeleitet';
+    }
+    if (id === 'wasser' && wf) {
+      qm = BUND.wasser * wf.faktor; herkunft = wf.ebene;
+      text = 'Durchschnitt, angepasst an das Trinkwasserentgelt ' + (wf.ebene === 'kreis' ? 'des Kreises' : wf.ebene === 'land' ? 'im Landesmittel' : 'der Gemeinde') + ' ' + wf.jahr
+        + ' (' + komma(wf.eur_m3) + ' €/m³' + (wf.grund_jahr ? ' und ' + Math.round(wf.grund_jahr) + ' € Grundentgelt im Jahr' : '') + ')';
     }
     posten.push({ id, name: NAMEN[id], qm_monat: r2(qm), eur_monat: wfl ? Math.round(qm * wfl) : null, herkunft, text });
   }
@@ -77,7 +113,7 @@ export function nebenkostenFuer(ags, o = {}) {
     ags: String(ags || ''), gemeinde: gs ? gs.name : null,
     posten, summe_qm: r2(summe), summe_monat: wfl ? Math.round(summe * wfl) : null,
     herkunft_text: (gs ? 'Grundsteuer als Durchschnitt der Gemeinde' : 'Grundsteuer als Bundesdurchschnitt')
-      + ', übrige Posten als Bundesdurchschnitt, zusammen ' + komma(summe) + ' €/m² im Monat',
+      + (wf ? ', Wasser und Abwasser nach dem Trinkwasserentgelt ' + (wf.ebene === 'land' ? 'im Land' : 'am Ort') : '') + ', übrige Posten als Bundesdurchschnitt, zusammen ' + komma(summe) + ' €/m² im Monat',
     hinweis: 'Durchschnittswerte, kein Bescheid. Grundsteuerbescheid, Abfallgebühren und Versicherungsangebot des Objekts sind genauer.',
     grundsteuer_hebesatz_b_vor_reform: gs ? gs.hebesatz_b : null,
   };

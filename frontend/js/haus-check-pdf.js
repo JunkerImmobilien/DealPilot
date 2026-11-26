@@ -100,10 +100,11 @@
     /* v5130j · Haushaltsrechnung: Rate, Eigentümerkosten, Heizung, übrige Nebenkosten, Summe und Anteil vom Netto */
     var AU = H.leistbarkeit.aufstellung || [];
     if (AU.length) {
-      var zeilen = AU.map(function (x) { return [x.l + (x.herkunft ? ' (' + x.herkunft + ')' : ''), B.eur(x.eur), x.summe ? { art: 'summe' } : null].filter(function (y) { return y !== null; }); });
+      /* pp6 · Posten der übrigen Nebenkosten eingerückt mit Herkunft (je Gemeinde, Landesmittel, Bundesschnitt) */
+      var zeilen = AU.map(function (x) { return [(x.teil ? ' ' : '') + x.l + (x.herkunft ? ' (' + x.herkunft + ')' : ''), B.eur(x.eur), x.summe ? { art: 'summe' } : null].filter(function (y) { return y !== null; }); });
       zeilen.push(['Anteil vom Netto-Einkommen', H.leistbarkeit.quote == null ? 'ohne Einkommen' : B.pct(H.leistbarkeit.quote, 0) + ' von ' + B.eur(H.leistbarkeit.netto)]);
       bank += '<div class="block"><h3>Haushaltsrechnung</h3>' + B.liste(zeilen)
-        + '<p class="det">Grün bis ' + H.leistbarkeit.grenzen.gruen + ' %, gelb bis ' + H.leistbarkeit.grenzen.gelb + ' % vom Netto. Banken rechnen meist nur die Rate gegen höchstens 40 % vom Netto, die Nebenkosten kommen hier dazu. Heizung aus dem Energieausweis bzw. der Annahme, übrige Nebenkosten aus den Unterlagen oder pauschal.</p></div>';
+        + '<p class="det">Grün bis ' + H.leistbarkeit.grenzen.gruen + ' %, gelb bis ' + H.leistbarkeit.grenzen.gelb + ' % vom Netto. Banken rechnen meist nur die Rate gegen höchstens 40 % vom Netto, die Nebenkosten kommen hier dazu. Heizung aus dem Energieausweis bzw. der Annahme, übrige Nebenkosten aus den Unterlagen, sonst Grundsteuer und Trinkwasser je Gemeinde und die übrigen Posten als Durchschnitt.</p></div>';
     }
     if (L && L.verfuegbar !== false && L.beleihungswert) {
       bank += '<div class="block"><h3>Indikativer Beleihungswert</h3>' + B.liste([
