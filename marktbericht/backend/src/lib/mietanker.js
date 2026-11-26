@@ -142,7 +142,7 @@ export function vergleichsmieteWohnung(k, wfl) {
       rechnung: r.rechnung || null, hinweise: r.hinweise || [], url: r.url || null };
   }
   if (k.naeherung_param && Array.isArray(k.zensus_zeilen) && k.zensus_zeilen.length) {
-    const n = naeherungFuer(k.naeherung_param, k.zensus_zeilen, { baujahr: k.baujahr, wfl: fl, marktlage: k.marktlage || null });
+    const n = naeherungFuer(k.naeherung_param, k.zensus_zeilen, { baujahr: k.baujahr, wfl: fl, marktlage: k.marktlage || null, ags: k.ags || null });
     if (!(n && n.qm > 0)) return null;
     const e = einordnung(k.signale, {});
     const unten = r2(n.qm * NAEHERUNG_UNTEN), oben = r2(n.qm * NAEHERUNG_OBEN);

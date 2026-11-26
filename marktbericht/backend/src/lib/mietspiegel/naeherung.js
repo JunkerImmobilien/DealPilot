@@ -87,12 +87,30 @@ function faktorFuer(param, marktlage) {
   return { f: num(param.faktor), je: null };
 }
 
-/** Wortlaut der Herkunft (eine Stelle — Frontend und Bericht übernehmen ihn) */
-export function naeherungText(param) {
-  const p = param || {}, g = p.guete || {};
-  return 'DealPilot-Näherung der ortsüblichen Vergleichsmiete (aus der Zensus-Bestandsmiete, kalibriert an '
-    + (p.n_staedte || '–') + ' freien Mietspiegeln, mittlere Abweichung ' + dez(num(g.mape_pct), 1) + ' %), nicht der Mietspiegel. '
-    + 'Für das Erhöhungsverlangen mit dem Mietspiegel, drei Vergleichswohnungen oder Gutachten belegen';
+/** Genauigkeit für eine Gemeinde (v5080, Marcel 26.11.2026 „die genaue Abweichung … immer kurz und knapp“):
+    eigener Wert der Stadt aus dem Leave-one-Stadt-out (guete_stadt, nur eine Prozentzahl), sonst der Region, sonst
+    gesamt. → { pct, ebene: 'stadt' | 'region' | 'gesamt' } */
+export const REGION_JE_LAND = { '01': 'Nord', '02': 'Nord', '03': 'Nord', '04': 'Nord', '13': 'Nord', '05': 'West', '06': 'Mitte', '07': 'Mitte',
+  '10': 'Mitte', '08': 'Süd', '09': 'Süd', '11': 'Ost', '12': 'Ost', '14': 'Ost', '15': 'Ost', '16': 'Ost' };
+export function genauigkeit(param, ags) {
+  const p = param || {}, a = String(ags == null ? '' : ags);
+  const st = p.guete_stadt && p.guete_stadt[a];
+  if (num(st) > 0) return { pct: num(st), ebene: 'stadt' };
+  const r = REGION_JE_LAND[a.slice(0, 2)], gr = r && p.guete_region && p.guete_region[r];
+  if (gr && num(gr.mape_pct) > 0 && (num(gr.staedte) || 0) >= 5) return { pct: num(gr.mape_pct), ebene: 'region', region: r };
+  return { pct: num((p.guete || {}).mape_pct), ebene: 'gesamt' };
+}
+/** Kundentext: eine Zeile, Punkt und Komma (v5080). Die Herleitung steht in textDetail (Tooltip). */
+export function naeherungText(param, ags) {
+  const g = genauigkeit(param, ags);
+  return 'DealPilot-Näherung, im Mittel ±' + dez(g.pct, 1) + ' % zum Mietspiegel' + (g.ebene === 'stadt' ? ' der Stadt' : '');
+}
+export function naeherungTextDetail(param, ags) {
+  const p = param || {}, g = genauigkeit(param, ags);
+  return 'Aus der Zensus-Bestandsmiete der Gemeinde nach Baujahr und Wohnungsgröße, kalibriert an ' + (p.n_staedte || '–')
+    + ' Mietspiegeln. Gemessene mittlere Abweichung ' + dez(g.pct, 1) + ' %'
+    + (g.ebene === 'stadt' ? ' zum Mietspiegel dieser Stadt' : g.ebene === 'region' ? ' in der Region ' + g.region : '')
+    + ', jeweils ohne den eigenen Mietspiegel gerechnet. Kein Mietspiegel und nicht amtlich. Für ein Erhöhungsverlangen mit dem Mietspiegel, drei Vergleichswohnungen oder einem Gutachten belegen.';
 }
 
 /**
@@ -126,10 +144,10 @@ export function naeherungFuer(param, zeilen, objekt) {
   const rechnung = teile.join(' · ') + (p.modell === 'klassen_faktor' ? ' → ' + dez(basis) + ' €/m²' : '')
     + ' × Kalibrierfaktor ' + dez(ff.f, 3) + (ff.je ? ' (Marktlage ' + ff.je + ')' : '') + ' = ' + dez(qm) + ' €/m²';
   return {
-    qm, quelle_art: 'dealpilot_naeherung', text: naeherungText(p), rechnung, hinweise,
+    qm, quelle_art: 'dealpilot_naeherung', text: naeherungText(p, o.ags), text_detail: naeherungTextDetail(p, o.ags), rechnung, hinweise,
     faktor: ff.f, basis: runden(basis, 2), marktlage: ff.je,
     zensus: { gemeinde: b.name, gesamt: b.gesamt, baujahr: b.baujahr, flaeche: b.flaeche, stichtag: '2022-05-15' },
-    n_staedte: p.n_staedte || null, mape_pct: (p.guete && num(p.guete.mape_pct)) || null, stand: p.stand || null,
+    n_staedte: p.n_staedte || null, mape_pct: genauigkeit(p, o.ags).pct || null, genauigkeit_ebene: genauigkeit(p, o.ags).ebene, stand: p.stand || null,
     lizenz: ZENSUS_LIZENZ
   };
 }
@@ -159,6 +177,6 @@ export async function mietspiegelMitNaeherung(satz, q, holeZeilen, param) {
   if (!satz.naeherung_verfuegbar || !(q.baujahr || q.wfl) || typeof holeZeilen !== 'function') return satz;
   let zeilen = null;
   try { zeilen = await holeZeilen(satz.ags); } catch (e) { zeilen = null; }
-  satz.naeherung = naeherungFuer(p, zeilen, { baujahr: q.baujahr, wfl: q.wfl, marktlage: q.marktlage || null });
+  satz.naeherung = naeherungFuer(p, zeilen, { baujahr: q.baujahr, wfl: q.wfl, marktlage: q.marktlage || null, ags: satz.ags });
   return satz;
 }

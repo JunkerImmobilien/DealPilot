@@ -1145,7 +1145,7 @@ router.get('/mietspiegel', async (req, res) => {
         const merk = {};
         String(req.query.merkmale || '').split(',').map((x) => x.trim()).filter(Boolean).forEach((x) => { const i = x.indexOf(':'); if (i > 0) merk[x.slice(0, i).trim()] = x.slice(i + 1).trim(); else merk[x] = true; });
         if (w) msHausAnwenden(w, req.query.objektart, merk);   /* v5080 · Hauszuschlag auch in der Vergleichsmiete der Wohnung */
-        const k = { werte: w, naeherung_param: w ? null : msNaeherungParameter(), zensus_zeilen: zeilen, baujahr: req.query.baujahr,
+        const k = { ags, werte: w, naeherung_param: w ? null : msNaeherungParameter(), zensus_zeilen: zeilen, baujahr: req.query.baujahr,
           lage: req.query.lage || null, ausstattung: req.query.ausstattung || null, merkmale: merk,
           signale: signaleAus({ standardstufe: req.query.standardstufe, mikrolage: req.query.mikrolage, mod_punkte: req.query.mod_punkte,
             baujahr: req.query.baujahr, zustand: req.query.zustand }, jahr) };

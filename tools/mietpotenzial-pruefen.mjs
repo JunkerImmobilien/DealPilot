@@ -732,8 +732,8 @@ const EINH = [{ nr: '1', wfl: '60', ist: '480', status: 'vermietet' }, { nr: '2'
   gleich('N1 Route Speicherverbot (Stuttgart): keine Werte, Näherung = Faktor × 9 × 11 / 10', [a.werte_verfuegbar, a.naeherung_verfuegbar, a.werte_nutzung, a.naeherung.qm, a.naeherung.quelle_art],
     [false, true, 'verboten', soll, 'dealpilot_naeherung']);
   wahr('N1 Rechenweg nennt Zensus, Klassen und Faktor', /Zensus 2022 Bestandsmiete der Gemeinde 10,00/.test(a.naeherung.rechnung) && /1970 - 1979: 9,00/.test(a.naeherung.rechnung) && /Kalibrierfaktor/.test(a.naeherung.rechnung));
-  gleich('N1 Wortlaut der Herkunft', a.naeherung.text, 'DealPilot-Näherung der ortsüblichen Vergleichsmiete (aus der Zensus-Bestandsmiete, kalibriert an ' + P0.n_staedte
-    + ' freien Mietspiegeln, mittlere Abweichung ' + P0.guete.mape_pct.toFixed(1).replace('.', ',') + ' %), nicht der Mietspiegel. Für das Erhöhungsverlangen mit dem Mietspiegel, drei Vergleichswohnungen oder Gutachten belegen');
+  gleich('N1 Wortlaut der Herkunft (v5080: eine Zeile mit Genauigkeit der Region)', a.naeherung.text, naeherungText(P0, '08111000'));
+  wahr('N1 Wortlaut knapp, ohne Gedankenstrich und Semikolon', /^DealPilot-Näherung, im Mittel ±\d+,\d % zum Mietspiegel( der Stadt)?$/.test(a.naeherung.text) && !/—|;/.test(a.naeherung.text_detail || ''));
   wahr('N1 ohne Portal- oder Anbieternamen', !/Scout|Immowelt|immonet|PriceHubble|Sprengnetter|BBSR/i.test(JSON.stringify(a.naeherung)));
   a = await route({ ags: '05711000', baujahr: '2030', wfl: '70' });   /* Bielefeld: freie Werte, Baujahr außerhalb */
   gleich('N2 freie Werte (Bielefeld), auch außerhalb der Tabelle: nie Näherung', [a.werte_verfuegbar, a.naeherung_verfuegbar, a.naeherung], [true, false, undefined]);
@@ -774,14 +774,14 @@ const EINH = [{ nr: '1', wfl: '60', ist: '480', status: 'vermietet' }, { nr: '2'
   P.modell(); await warte(); await warte();
   let m = P.modell({ einheiten: EIN1 });
   gleich('N5 Rangfolge: ohne Mietspiegel-Werte rechnet die Näherung (vor der Schätzung aus Angebotsmieten)', [m.vgl.qm, m.vgl.quelle_art, m.vgl.marktmiete, P.vglKurz(m.vgl)], [soll, 'dealpilot_naeherung', undefined, 'DealPilot-Näherung']);
-  gleich('N5 Herkunft = Wortlaut der Route', m.vgl.herkunft, naeherungText(P0));
+  wahr('N5 Herkunft = Wortlaut der Route (eine Zeile)', /^DealPilot-Näherung, im Mittel ±\d+,\d % zum Mietspiegel/.test(m.vgl.herkunft));
   wahr('N5 Abruf mit Baujahr und Fläche über den Proxy', rufe.some((u) => /^\/marktbericht\/mietspiegel\?ags=08111000&baujahr=1975&wfl=70$/.test(u)));
   P.msHinweis();
   const txt = String((P._el['ms-hinweis'] || {}).innerHTML || '').replace(/<[^>]+>/g, '').replace(/&nbsp;| /g, ' ');
   wahr('N6 #ms-hinweis bei Speicherverbot (v5080): amtlicher Mietspiegel, Link, Näherung, § 558a Abs. 3, ohne Werte „laut Mietspiegel“',
     /^Mietspiegel der Gemeinde: qualifiziert \(§ 558d BGB\)\. Stand 04\/2024\. Gilt bis 31\.12\.2026\. Mietspiegel öffnen Für diese Gemeinde gibt es einen amtlichen Mietspiegel\. Seine Werte darf DealPilot nicht speichern \(Speicherung nur mit Genehmigung des Herausgebers\)\. Gerechnet wird mit der DealPilot-Näherung\. Die genaue Spanne steht im Mietspiegel der Stadt und kann eingetragen werden\. Ein Erhöhungsverlangen muss die Werte des qualifizierten Mietspiegels nennen \(§ 558a Abs\. 3 BGB\)\./.test(txt) && !/—|;/.test(txt.split('Mietspiegel öffnen')[1] || ''));
   /* v3840 · Kundentext nur Punkt und Komma: „Gerechnet wird mit X/m². Quelle: DealPilot-Näherung …“ */
-  wahr('N6 darunter: „Gerechnet wird mit …. Quelle: DealPilot-Näherung …“', /Gerechnet wird mit .*\/m²\. Quelle: DealPilot-Näherung der ortsüblichen Vergleichsmiete/.test(txt));
+  wahr('N6 darunter: „Gerechnet wird mit …. Quelle: DealPilot-Näherung …“', /Gerechnet wird mit .*\/m²\. Quelle: DealPilot-Näherung, im Mittel ±/.test(txt));
   gleich('N6 Felder unten/mittel/oben: Platzhalter und Fokus-Hinweis', [P._el.ms_oben.placeholder, /^Für diese Gemeinde gibt es einen amtlichen Mietspiegel\. Seine Werte darf DealPilot nicht speichern/.test(P._el.ms_oben.title || '')], ['bitte aus dem Mietspiegel eintragen', true]);
   P = await lauf({ plz: '70173', baujahr: '1975', wfl: '70', ds2_marktmiete: '14', ms_oben: '9,80' }, '08111000');
   P.modell(); await warte(); await warte();
