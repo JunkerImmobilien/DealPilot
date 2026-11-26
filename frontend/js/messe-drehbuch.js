@@ -194,8 +194,12 @@
   function zeileMerken(kick, text, i) {
     try { var j = Date.now(); (window.DPM_ZEILEN = window.DPM_ZEILEN || []).push({ t_ms: _zt0 ? j - _zt0 : null, t_abs: j, szene: i + 1, kick: nurText(kick), text: nurText(text) }); } catch (e) {}
   }
+  /* V1 26.11.2026 · Kapitelnummer laufend vergeben: nach Szenen ohne Bauchbinde sprang die Zahl (2 auf 4, 7 auf 9). */
+  var _nrFuer = null, _nrMap = {}, _nrN = 0;
+  function kapNr(i) { if (_nrFuer !== _aktiv) { _nrFuer = _aktiv; _nrMap = {}; _nrN = 0; } if (!(i in _nrMap)) _nrMap[i] = _nrN++; return _nrMap[i]; }
   function zeile(kick, text, i, n) {
     zeileMerken(kick, text, i);
+    i = kapNr(i);
     if (STUDIO) { anStudio({ type: 'kapitel', kick: (_aktiv && _aktiv.titel) || 'DealPilot', titel: kick, text: text, i: i, n: n }); return; }
     var z = el('dpm-zeile');
     z.innerHTML = '<div class="k">' + kick + '</div><div class="t">' + text + '</div><div class="p">'
