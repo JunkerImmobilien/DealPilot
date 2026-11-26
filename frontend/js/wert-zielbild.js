@@ -905,6 +905,21 @@
     if (PZ && PZ.tafelHtml) Array.prototype.forEach.call(document.querySelectorAll('[data-dp-pot-wirt]'), function (w) { try { w.innerHTML = PZ.tafelHtml(); } catch (e) {} });
   }, 0); });
   global.addEventListener('dp:potenzial-markt', function () { karteBald(false); einfachNeu(); });
+  /* v5160v1 · Nach einem Abruf (dealpilot-mb.js dp:mb-ready) blieb der hier gemerkte Bericht der alte: _hist wurde nur
+     bei dp:object-ready geleert. calc() (Wertanker, Hinweis „Kein Verkehrswert gerechnet“) und die Pilot-Analyse
+     („Noch kein Marktbericht zu diesem Objekt“) lesen bericht(), also den Stand VOR dem Abruf, während der Reiter Objekt
+     den Verlauf frisch holte (Video M04/M30: 218.000 € übernehmbar, daneben „Kein Verkehrswert gerechnet“).
+     Jetzt neu laden, danach rechnen und den Hinweis der Analyse neu setzen. */
+  global.addEventListener('dp:mb-ready', function () {
+    setTimeout(function () {
+      _hist.key = null; _hist.eintrag = null; _hist.laedt = null;
+      laden().then(function () {
+        try { if (typeof global.calc === 'function') global.calc(); } catch (e) {}
+        try { if (global.DpPilotV4 && global.DpPilotV4.mbHinweis) global.DpPilotV4.mbHinweis(); } catch (e) {}
+        try { karte(); } catch (e) {}
+      });
+    }, 800);
+  });
 
   /* v2900 · der geladene Bericht selbst - das PDF nimmt seine Erklaertexte daraus
      statt aus einem zweiten Abruf (pdf-wert-zielbild.js daten()) */
