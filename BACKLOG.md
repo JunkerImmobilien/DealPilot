@@ -22,6 +22,8 @@ direkt unter den Punkt — nicht kommentarlos liegenlassen.
 
 ## → Offen aus dem 26.11.2026 (Weitermachen + Marcel entscheidet)
 
+- **MM6 v5130 Modernisierung in der Mietnäherung:** Prod nach Marcels OK. Faktor Neuvermietung je Kreis: `node tools/neuvermietung-faktor-ableiten.mjs --prod` monatlich, ab 20 Messungen je Kreis Schreibweg bauen (Untergrenze 1,20). Modernisierungs-Zuschlag mit mehr Mietspiegeln nachmessen (bisher nur Kreise Unna und Herford).
+
 **GeoMap (v5090, XX5):** Mit GeoMap im Dezember 2026 schriftlich bestätigen lassen: KI-Nutzung, eigene Statistik aus API-Abrufen, kein Konkurrenzprodukt (AGB Stand 28.11.2025, Ziff. 7.2a/7.3a KI nur mit Zustimmung, Ziff. 7 d kein Konkurrenzprodukt). Pflichtvermerk „© by RealEstatePilot“ steht seit v5090a im Quellennachweis. Zusammengefasste Angebotsmieten je Marktbericht (mb.angebot_miete_messung, Admin › Register & Ernte › Jahreswerte) gehen erst in die Mietspiegel-Näherung, wenn je Kreis und Klasse mindestens 20 Messungen vorliegen und die Bestätigung da ist.
 
 **Stand Prod 1.0.232.** Live seit 25.11.: Handy-Menüband wie Desktop, Leiste 280 px (1.0.232), Leerzustände + Besichtigungs-Checkliste (1.0.231), Investment-PDF Kombi/Kurz/Bank (1.0.230), Hinweis Marktpreisindikation Zielbild (1.0.229), Feld-Tipps + Portfolio-Cockpit Handy (1.0.228), npm-Sicherheit (bcrypt 6, zod 4, nodemailer 10, puppeteer 25).
