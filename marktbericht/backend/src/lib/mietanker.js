@@ -45,7 +45,7 @@
    Prüfer: tools/mietanker-pruefen.mjs.
    ═══════════════════════════════════════════════════════════════════════ */
 import { mietspiegelWerteFuer } from './mietspiegel/werte.js';
-import { naeherungFuer } from './mietspiegel/naeherung.js';
+import { naeherungFuer, marktmieteFuer, marktmieteParameter } from './mietspiegel/naeherung.js';
 
 export const MIETBAND_PCT = 20;                 /* = CrossCheckService MIETBAND.pct (E11) */
 export const NAEHERUNG_OBEN = 1.14;             /* Median Oberwert/Mittel, 477 Rasterpunkte, 12.11.2026 */
@@ -142,10 +142,12 @@ export function vergleichsmieteWohnung(k, wfl) {
       rechnung: r.rechnung || null, hinweise: r.hinweise || [], url: r.url || null };
   }
   if (k.naeherung_param && Array.isArray(k.zensus_zeilen) && k.zensus_zeilen.length) {
-    const n = naeherungFuer(k.naeherung_param, k.zensus_zeilen, { baujahr: k.baujahr, wfl: fl, marktlage: k.marktlage || null, ags: k.ags || null });
+    const n = naeherungFuer(k.naeherung_param, k.zensus_zeilen, { baujahr: k.baujahr, wfl: fl, marktlage: k.marktlage || null, ags: k.ags || null,
+      marktmiete: k.ags ? marktmieteFuer(marktmieteParameter(), k.ags) : null });   /* v5110 · amtliche Marktmiete wie in der Route */
     if (!(n && n.qm > 0)) return null;
     const e = einordnung(k.signale, {});
-    const unten = r2(n.qm * NAEHERUNG_UNTEN), oben = r2(n.qm * NAEHERUNG_OBEN);
+    /* v5110 · Spanne aus naeherung.json (dieselbe wie die Route /mietspiegel), sonst die Konstanten */
+    const unten = n.unten > 0 ? n.unten : r2(n.qm * NAEHERUNG_UNTEN), oben = n.oben > 0 ? n.oben : r2(n.qm * NAEHERUNG_OBEN);
     const qm = e.wahl === 'oben' ? oben : e.wahl === 'unten' ? unten : n.qm;
     return { quelle: 'naeherung', unten, mittel: n.qm, oben, ca: true, einordnung: e, qm,
       etikett: 'Vergleichsmiete der Wohnung (DealPilot-Näherung)',

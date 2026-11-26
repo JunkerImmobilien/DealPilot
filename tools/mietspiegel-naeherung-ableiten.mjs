@@ -75,11 +75,11 @@ const zeilenFuer = (ags) => { const g = ZS.gemeinden[ags]; return g ? g.zeilen.m
 const BJ = [1955, 1965, 1975, 1985, 1995, 2005], WFL = [50, 70, 90];
 function mittelwert(w, bj, wfl) {
   let r = mietspiegelWerteFuer(w, { baujahr: bj, wfl });
-  if (r.mittel > 0) return { ms: r.mittel, lage: null };
+  if (r.mittel > 0) return { ms: r.mittel, lage: null, ob: r.oben > 0 ? r.oben : null, un: r.unten > 0 ? r.unten : null };
   /* ohne Standard im Dokument: nur die ausdrücklich mittlere Lage, nie ein selbst gebildetes Mittel */
   for (const l of ['normal', 'mittel']) {
     r = mietspiegelWerteFuer(w, { baujahr: bj, wfl, lage: l });
-    if (r.mittel > 0) return { ms: r.mittel, lage: l };
+    if (r.mittel > 0) return { ms: r.mittel, lage: l, ob: r.oben > 0 ? r.oben : null, un: r.unten > 0 ? r.unten : null };
   }
   return null;
 }
@@ -88,12 +88,17 @@ for (const [ags, w] of frei) {
   const zeilen = zeilenFuer(ags);
   const ges = zeilen && zensusBlock(zeilen).gesamt;
   const punkte = [];
-  for (const bj of BJ) for (const wfl of WFL) { const m = mittelwert(w, bj, wfl); if (m) punkte.push({ bj, wfl, ms: m.ms, lage: m.lage }); }
+  for (const bj of BJ) for (const wfl of WFL) { const m = mittelwert(w, bj, wfl); if (m) punkte.push({ bj, wfl, ms: m.ms, lage: m.lage, ob: m.ob, un: m.un }); }
   const vz = VZ.find((v) => v.ags === ags) || {};
   if (!punkte.length || !(ges > 0)) { ohne.push(w.gemeinde + (ges > 0 ? '' : ' (kein Zensus)')); continue; }
   staedte.push({ ags, gemeinde: w.gemeinde, land: vz.land || null, stand: w.stand || null, lage: marktlage(ags), zeilen, punkte,
     lage_angenommen: punkte.some((p) => p.lage) ? punkte.find((p) => p.lage).lage : null });
 }
+
+/* v5110 · amtliche Marktmieten der Gutachterausschüsse (tools/marktmiete-amtlich-ableiten.mjs) als örtliches Niveau */
+const MMJ = (() => { try { return JSON.parse(fs.readFileSync(path.join(MS, 'marktmiete-amtlich.json'), 'utf8')); } catch (e) { return null; } })();
+const { marktmieteFuer } = await imp(path.join(MS, 'naeherung.js'));
+for (const s of staedte) { s.mm = marktmieteFuer(MMJ, s.ags); s.zges = zensusBlock(s.zeilen).gesamt; }
 
 /* ── Formen ───────────────────────────────────────────────────────────── */
 const med = (a) => { const b = a.filter((x) => isFinite(x)).sort((x, y) => x - y), n = b.length; return n ? (n % 2 ? b[(n - 1) / 2] : (b[n / 2 - 1] + b[n / 2]) / 2) : NaN; };
@@ -166,6 +171,54 @@ for (const s of staedte) {
 }
 const guete_region = Object.fromEntries(Object.entries(jeRegion).sort().map(([r, e]) => [r, Object.assign({ staedte: e.staedte }, guete(e.punkte))]));
 console.log('Je Region (LOO, ' + wahl + '): ' + Object.entries(guete_region).map(([r, g]) => r + ' ' + String(g.mape_pct).replace('.', ',') + ' % (n ' + g.staedte + ')').join(' · '));
+
+/* ── v5110 · Erweiterung amtliche Marktmiete und Spanne (EE6, Marcel 26.11.2026 „nicht zu niedrig") ─────────────────────
+   Vorhersage mit Marktmiete: (1 − a) × Klassen × f + a × Klassen / Zensus gesamt × Marktmiete × g, a je Ebene (Gemeinde/Kreis),
+   f und g jeweils OHNE die geprüfte Stadt. Übernommen nur, wenn die mittlere Abweichung nicht schlechter wird. */
+const KLB = (s, p) => basisVon.klassen_faktor(s, p);
+const fOhne = new Map(), gOhne = new Map();
+const fV = (s) => { if (!fOhne.has(s)) fOhne.set(s, faktor(wahl, staedte.filter((o) => o !== s), s.lage)); return fOhne.get(s); };
+const gV = (s) => { if (!gOhne.has(s)) gOhne.set(s, med(staedte.filter((o) => o !== s && o.mm).flatMap((o) => o.punkte.map((p) => p.ms / (KLB(o, p) / o.zges * o.mm.qm))))); return gOhne.get(s); };
+const vorher = (s, p) => basisVon[wahl](s, p) * fV(s);
+function mitMM(s, p, ag, ak) {
+  const a = s.mm ? (s.mm.ebene === 'gemeinde' ? ag : ak) : 0;
+  const v0 = vorher(s, p); if (!(a > 0)) return v0;
+  return (1 - a) * v0 + a * KLB(s, p) / s.zges * s.mm.qm * gV(s);
+}
+const ergMM = (ag, ak) => staedte.flatMap((s) => s.punkte.map((p) => ({ ist: p.ms, p: mitMM(s, p, ag, ak), s, pt: p })));
+let besteMM = { ag: 0, ak: 0, mape: guete(ergMM(0, 0)).mape_pct };
+const mapeBasis = besteMM.mape;
+if (MMJ && (wahl === 'klassen_faktor' || wahl === 'klassen_faktor_marktlage')) for (const ag of [0, 0.25, 0.5, 0.75]) for (const ak of [0, 0.25, 0.5]) {
+  const m = guete(ergMM(ag, ak)).mape_pct; if (m < besteMM.mape - 1e-9) besteMM = { ag, ak, mape: m };
+}
+const mmAktiv = besteMM.ag > 0 || besteMM.ak > 0;
+const endP = (s, p) => mmAktiv ? mitMM(s, p, besteMM.ag, besteMM.ak) : vorher(s, p);
+/* Spanne: oben/unten zum Mittelwert der freien Mietspiegel (Rasterpunkte mit Spanne) — die App rechnet wie beim Mietspiegel mit dem OBEREN Wert */
+const qOb = med(staedte.flatMap((s) => s.punkte.filter((p) => p.ob > 0).map((p) => p.ob / p.ms)));
+const qUn = med(staedte.flatMap((s) => s.punkte.filter((p) => p.un > 0).map((p) => p.un / p.ms)));
+const nSp = staedte.reduce((a, s) => a + s.punkte.filter((p) => p.ob > 0).length, 0);
+const verz = (f) => { const v = staedte.flatMap((s) => s.punkte.map((p) => f(s, p))).filter((x) => isFinite(x)); return Math.round(med(v) * 1000) / 10; };
+const verzerrung = {
+  mittel_vorher_median_pct: verz((s, p) => vorher(s, p) / p.ms - 1),
+  mittel_nachher_median_pct: verz((s, p) => endP(s, p) / p.ms - 1),
+  oben_vorher_median_pct: verz((s, p) => p.ob > 0 ? vorher(s, p) / p.ob - 1 : NaN),
+  oben_nachher_median_pct: verz((s, p) => p.ob > 0 ? endP(s, p) * qOb / p.ob - 1 : NaN),
+  anteil_unter_oben_vorher_pct: (() => { const v = staedte.flatMap((s) => s.punkte.filter((p) => p.ob > 0).map((p) => vorher(s, p) < p.ob)); return Math.round(v.filter(Boolean).length / v.length * 100); })(),
+  anteil_unter_oben_nachher_pct: (() => { const v = staedte.flatMap((s) => s.punkte.filter((p) => p.ob > 0).map((p) => endP(s, p) * qOb < p.ob)); return Math.round(v.filter(Boolean).length / v.length * 100); })(),
+  hinweis: 'vorher rechnete die App mit dem Mittelwert der Näherung (oben fehlte), nachher mit Näherung × Spanne oben, wie beim Mietspiegel'
+};
+console.log('Marktmiete: Gewicht Gemeinde ' + besteMM.ag + ', Kreis ' + besteMM.ak + ' · MAPE ' + String(mapeBasis).replace('.', ',') + ' → ' + String(besteMM.mape).replace('.', ',') + ' %'
+  + (mmAktiv ? '' : ' (nicht übernommen)'));
+console.log('Spanne oben ×' + r3(qOb) + ', unten ×' + r3(qUn) + ' (n ' + nSp + ') · Verzerrung ' + JSON.stringify(verzerrung));
+if (mmAktiv) {
+  const raster = [], norm = []; const jr = {};
+  for (const s of staedte) { const r = REGION_JE_LAND[s.ags.slice(0, 2)] || 'unbekannt'; const e = jr[r] = jr[r] || { punkte: [], staedte: 0 }; e.staedte++;
+    for (const p of s.punkte) { const x = { ist: p.ms, p: endP(s, p) }; raster.push(x); e.punkte.push(x); if (p.bj === 1975 && p.wfl === 70) norm.push(x); } }
+  ergebnis[wahl] = { raster: guete(raster), normwohnung: guete(norm) };
+  for (const k of Object.keys(guete_region)) delete guete_region[k];
+  Object.assign(guete_region, Object.fromEntries(Object.entries(jr).sort().map(([r, e]) => [r, Object.assign({ staedte: e.staedte }, guete(e.punkte))])));
+  console.log('Je Region mit Marktmiete: ' + Object.entries(guete_region).map(([r, g]) => r + ' ' + String(g.mape_pct).replace('.', ',') + ' %').join(' · '));
+}
 const param = {
   titel: 'DealPilot-Näherung der ortsüblichen Vergleichsmiete (nie amtlich, nicht der Mietspiegel)',
   version: 'v3266',
@@ -180,6 +233,10 @@ const param = {
   guete: Object.assign({ verfahren: 'Leave-one-Stadt-out über das Raster (Baujahr 1955–2005 × 50/70/90 m²)' }, ergebnis[wahl].raster),
   guete_normwohnung: Object.assign({ objekt: 'Baujahr 1975, 70 m²' }, ergebnis[wahl].normwohnung),
   guete_region,   /* v5080 · Kundentext nimmt die Region ab 5 Städten (naeherung.js genauigkeit) */
+  ...(mmAktiv ? { marktmiete: { gewicht_gemeinde: besteMM.ag, gewicht_kreis: besteMM.ak, g: r3(med(staedte.filter((o) => o.mm).flatMap((o) => o.punkte.map((p) => p.ms / (KLB(o, p) / o.zges * o.mm.qm))))),
+    datei: 'marktmiete-amtlich.json', staedte_mit_wert: staedte.filter((s) => s.mm).length, mape_ohne_pct: mapeBasis, mape_mit_pct: besteMM.mape } } : {}),
+  spanne: { oben: r3(qOb), unten: r3(qUn), n: nSp, verfahren: 'Median oben/Mittel bzw. unten/Mittel der freien Mietspiegel über das Raster' },
+  verzerrung,
   vergleich: Object.assign(Object.fromEntries(Object.entries(ergebnis).map(([f, e]) => [f, { raster_mape_pct: e.raster.mape_pct, raster_10_pct: e.raster.anteil_10_pct, norm_mape_pct: e.normwohnung.mape_pct }])),
     { rueckfall_angebot_abschlag: 'nicht messbar: DealPilot führt keine Angebotsmiete je Gemeinde (sie kommt je Objekt von außen)' }),
   vpi_fortschreibung_faktor: r3(NKM_F), vpi_monat: nkmLetzt,

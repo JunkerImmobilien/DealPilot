@@ -10,28 +10,28 @@
  "n_punkte": 3619,
  "guete": {
   "verfahren": "Leave-one-Stadt-out über das Raster (Baujahr 1955–2005 × 50/70/90 m²)",
-  "mape_pct": 8.5,
-  "mae_eur": 0.6,
-  "anteil_5_pct": 37,
-  "anteil_10_pct": 67,
-  "median_pct": 6.8,
+  "mape_pct": 8.4,
+  "mae_eur": 0.59,
+  "anteil_5_pct": 38,
+  "anteil_10_pct": 68,
+  "median_pct": 6.7,
   "n": 3619
  },
  "guete_normwohnung": {
   "objekt": "Baujahr 1975, 70 m²",
-  "mape_pct": 6.5,
-  "mae_eur": 0.45,
-  "anteil_5_pct": 46,
-  "anteil_10_pct": 78,
-  "median_pct": 5.6,
+  "mape_pct": 6.4,
+  "mae_eur": 0.44,
+  "anteil_5_pct": 50,
+  "anteil_10_pct": 79,
+  "median_pct": 5,
   "n": 202
  },
  "guete_region": {
   "Mitte": {
    "staedte": 26,
-   "mape_pct": 8.7,
-   "mae_eur": 0.73,
-   "anteil_5_pct": 37,
+   "mape_pct": 8.6,
+   "mae_eur": 0.72,
+   "anteil_5_pct": 38,
    "anteil_10_pct": 65,
    "median_pct": 7.2,
    "n": 467
@@ -65,13 +65,37 @@
   },
   "West": {
    "staedte": 119,
-   "mape_pct": 7.9,
-   "mae_eur": 0.51,
-   "anteil_5_pct": 40,
-   "anteil_10_pct": 71,
-   "median_pct": 6.3,
+   "mape_pct": 7.8,
+   "mae_eur": 0.5,
+   "anteil_5_pct": 41,
+   "anteil_10_pct": 72,
+   "median_pct": 6.2,
    "n": 2142
   }
+ },
+ "marktmiete": {
+  "gewicht_gemeinde": 0.25,
+  "gewicht_kreis": 0.25,
+  "g": 0.964,
+  "datei": "marktmiete-amtlich.json",
+  "staedte_mit_wert": 123,
+  "mape_ohne_pct": 8.5,
+  "mape_mit_pct": 8.4
+ },
+ "spanne": {
+  "oben": 1.132,
+  "unten": 0.871,
+  "n": 3313,
+  "verfahren": "Median oben/Mittel bzw. unten/Mittel der freien Mietspiegel über das Raster"
+ },
+ "verzerrung": {
+  "mittel_vorher_median_pct": 0,
+  "mittel_nachher_median_pct": -0.1,
+  "oben_vorher_median_pct": -12.1,
+  "oben_nachher_median_pct": -0.2,
+  "anteil_unter_oben_vorher_pct": 82,
+  "anteil_unter_oben_nachher_pct": 51,
+  "hinweis": "vorher rechnete die App mit dem Mittelwert der Näherung (oben fehlte), nachher mit Näherung × Spanne oben, wie beim Mietspiegel"
  },
  "vergleich": {
   "zensus_roh": {
@@ -85,9 +109,9 @@
    "norm_mape_pct": 8.6
   },
   "klassen_faktor": {
-   "raster_mape_pct": 8.5,
-   "raster_10_pct": 67,
-   "norm_mape_pct": 6.5
+   "raster_mape_pct": 8.4,
+   "raster_10_pct": 68,
+   "norm_mape_pct": 6.4
   },
   "klassen_faktor_marktlage": {
    "raster_mape_pct": 8.6,

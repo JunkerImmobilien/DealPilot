@@ -1,0 +1,2218 @@
+{
+ "titel": "Amtliche Marktmieten der Gutachterausschüsse für Wohnungen (€/m² Wohnfläche, monatlich, netto kalt)",
+ "version": "v5110",
+ "stand": "2026-11-26",
+ "erzeugt_von": "tools/marktmiete-amtlich-ableiten.mjs",
+ "verwendung": "nur intern als örtliches Niveau der DealPilot-Näherung (lib/mietspiegel/naeherung.js); Kundentext „amtliche Marktmiete\", nie der Name einer Quelle",
+ "speicherrecht": "Register: Lizenz je Satz (meist dl-de/zero-2-0 bzw. dl-de/by-2-0); Grundstücksmarktdaten NRW: dl-de/zero-2-0",
+ "n_gemeinden": 42,
+ "n_kreise": 66,
+ "n_werte": 1019,
+ "gemeinde": {
+  "11000000": {
+   "qm": 8.22,
+   "n": 6,
+   "jahr": 2026,
+   "herkunft": [
+    "Gutachterausschuss für Grundstückswerte in Berlin 2026"
+   ]
+  },
+  "16052000": {
+   "qm": 5.92,
+   "n": 2,
+   "jahr": 2026,
+   "herkunft": [
+    "Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Altenburger Land, des Landkreises Greiz und der kreisfreien Stadt Gera 2026"
+   ]
+  },
+  "05158028": {
+   "qm": 9.3,
+   "n": 3,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte in der Stadt Ratingen 2025"
+   ]
+  },
+  "05158032": {
+   "qm": 6.35,
+   "n": 4,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte in der Stadt Velbert 2025"
+   ]
+  },
+  "05162024": {
+   "qm": 9.1,
+   "n": 3,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte in der Stadt Neuss 2025"
+   ]
+  },
+  "05170008": {
+   "qm": 8,
+   "n": 4,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte in der Stadt Dinslaken 2025"
+   ]
+  },
+  "05170024": {
+   "qm": 7.5,
+   "n": 4,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte in der Stadt Moers 2025"
+   ]
+  },
+  "05170048": {
+   "qm": 7,
+   "n": 1,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte in der Stadt Wesel 2025"
+   ]
+  },
+  "05358008": {
+   "qm": 7.1,
+   "n": 2,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte in der Stadt Düren 2025"
+   ]
+  },
+  "05378004": {
+   "qm": 9.6,
+   "n": 4,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte in der Stadt Bergisch Gladbach 2025"
+   ]
+  },
+  "05554008": {
+   "qm": 7.7,
+   "n": 4,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte in der Stadt Bocholt 2025"
+   ]
+  },
+  "05562012": {
+   "qm": 6.7,
+   "n": 4,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte in den Städten Dorsten, Gladbeck und Marl 2025"
+   ]
+  },
+  "05562014": {
+   "qm": 6.7,
+   "n": 4,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte in den Städten Dorsten, Gladbeck und Marl 2025"
+   ]
+  },
+  "05562024": {
+   "qm": 6.7,
+   "n": 4,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte in den Städten Dorsten, Gladbeck und Marl 2025"
+   ]
+  },
+  "05562032": {
+   "qm": 5.8,
+   "n": 2,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte in der Stadt Recklinghausen 2025"
+   ]
+  },
+  "05566076": {
+   "qm": 7.2,
+   "n": 1,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte in der Stadt Rheine 2025"
+   ]
+  },
+  "05770024": {
+   "qm": 8,
+   "n": 1,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte in der Stadt Minden 2025"
+   ]
+  },
+  "05774032": {
+   "qm": 6.55,
+   "n": 4,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte in der Stadt Paderborn 2025"
+   ]
+  },
+  "05958004": {
+   "qm": 5.95,
+   "n": 4,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte in der Stadt Arnsberg 2025"
+   ]
+  },
+  "05962024": {
+   "qm": 6.1,
+   "n": 3,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte in der Stadt Iserlohn 2025"
+   ]
+  },
+  "05962032": {
+   "qm": 6.8,
+   "n": 4,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte in der Stadt Lüdenscheid 2025"
+   ]
+  },
+  "05970040": {
+   "qm": 7.4,
+   "n": 4,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte in der Universitätsstadt Siegen 2025"
+   ]
+  },
+  "05974028": {
+   "qm": 6.55,
+   "n": 4,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte in der Stadt Lippstadt 2025"
+   ]
+  },
+  "05978036": {
+   "qm": 6.4,
+   "n": 7,
+   "jahr": 2024,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte in der Stadt Unna 2024"
+   ]
+  },
+  "06411000": {
+   "qm": 13.19,
+   "n": 2,
+   "jahr": 2026,
+   "herkunft": [
+    "Gutachterausschuss für Immobilienwerte für den Bereich der Wissenschaftsstadt Darmstadt 2026"
+   ]
+  },
+  "06414000": {
+   "qm": 10.67,
+   "n": 3,
+   "jahr": 2026,
+   "herkunft": [
+    "Gutachterausschuss für Immobilienwerte für den Bereich der Landeshauptstadt Wiesbaden 2026"
+   ]
+  },
+  "06531005": {
+   "qm": 9.35,
+   "n": 1,
+   "jahr": 2026,
+   "herkunft": [
+    "Gutachterausschuss für Immobilienwerte für den Bereich der Universitätsstadt Gießen 2026"
+   ]
+  },
+  "06534014": {
+   "qm": 10.58,
+   "n": 2,
+   "jahr": 2026,
+   "herkunft": [
+    "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Marburg 2026"
+   ]
+  },
+  "06631009": {
+   "qm": 7.82,
+   "n": 2,
+   "jahr": 2026,
+   "herkunft": [
+    "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Fulda 2026"
+   ]
+  },
+  "08317026": {
+   "qm": 8.34,
+   "n": 2,
+   "jahr": 2025,
+   "herkunft": [
+    "Gemeinsamer Gutachterausschuss Lahr 2025"
+   ]
+  },
+  "08317031": {
+   "qm": 8.34,
+   "n": 2,
+   "jahr": 2025,
+   "herkunft": [
+    "Gemeinsamer Gutachterausschuss Lahr 2025"
+   ]
+  },
+  "08317059": {
+   "qm": 8.34,
+   "n": 2,
+   "jahr": 2025,
+   "herkunft": [
+    "Gemeinsamer Gutachterausschuss Lahr 2025"
+   ]
+  },
+  "08317065": {
+   "qm": 8.34,
+   "n": 2,
+   "jahr": 2025,
+   "herkunft": [
+    "Gemeinsamer Gutachterausschuss Lahr 2025"
+   ]
+  },
+  "08317073": {
+   "qm": 8.34,
+   "n": 2,
+   "jahr": 2025,
+   "herkunft": [
+    "Gemeinsamer Gutachterausschuss Lahr 2025"
+   ]
+  },
+  "08317075": {
+   "qm": 8.34,
+   "n": 2,
+   "jahr": 2025,
+   "herkunft": [
+    "Gemeinsamer Gutachterausschuss Lahr 2025"
+   ]
+  },
+  "08317113": {
+   "qm": 8.34,
+   "n": 2,
+   "jahr": 2025,
+   "herkunft": [
+    "Gemeinsamer Gutachterausschuss Lahr 2025"
+   ]
+  },
+  "08317114": {
+   "qm": 8.34,
+   "n": 2,
+   "jahr": 2025,
+   "herkunft": [
+    "Gemeinsamer Gutachterausschuss Lahr 2025"
+   ]
+  },
+  "08317121": {
+   "qm": 8.34,
+   "n": 2,
+   "jahr": 2025,
+   "herkunft": [
+    "Gemeinsamer Gutachterausschuss Lahr 2025"
+   ]
+  },
+  "08317127": {
+   "qm": 8.34,
+   "n": 2,
+   "jahr": 2025,
+   "herkunft": [
+    "Gemeinsamer Gutachterausschuss Lahr 2025"
+   ]
+  },
+  "08317150": {
+   "qm": 8.34,
+   "n": 2,
+   "jahr": 2025,
+   "herkunft": [
+    "Gemeinsamer Gutachterausschuss Lahr 2025"
+   ]
+  },
+  "08317151": {
+   "qm": 8.34,
+   "n": 2,
+   "jahr": 2025,
+   "herkunft": [
+    "Gemeinsamer Gutachterausschuss Lahr 2025"
+   ]
+  },
+  "08317152": {
+   "qm": 8.34,
+   "n": 2,
+   "jahr": 2025,
+   "herkunft": [
+    "Gemeinsamer Gutachterausschuss Lahr 2025"
+   ]
+  }
+ },
+ "kreis": {
+  "13076": {
+   "qm": 8.45,
+   "n": 1,
+   "jahr": 2026,
+   "herkunft": [
+    "Gutachterausschuss für Grundstückswerte im Landkreis Ludwigslust-Parchim 2026"
+   ]
+  },
+  "16076": {
+   "qm": 5.3,
+   "n": 2,
+   "jahr": 2026,
+   "herkunft": [
+    "Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Altenburger Land, des Landkreises Greiz und der kreisfreien Stadt Gera 2026"
+   ]
+  },
+  "16077": {
+   "qm": 5.48,
+   "n": 2,
+   "jahr": 2026,
+   "herkunft": [
+    "Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Altenburger Land, des Landkreises Greiz und der kreisfreien Stadt Gera 2026"
+   ]
+  },
+  "05111": {
+   "qm": 10,
+   "n": 2,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Düsseldorf 2025"
+   ]
+  },
+  "05112": {
+   "qm": 6.3,
+   "n": 3,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte in der Stadt Duisburg 2025"
+   ]
+  },
+  "05113": {
+   "qm": 7.6,
+   "n": 4,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte in der Stadt Essen 2025"
+   ]
+  },
+  "05114": {
+   "qm": 7.8,
+   "n": 2,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte in der Stadt Krefeld 2025"
+   ]
+  },
+  "05116": {
+   "qm": 7.2,
+   "n": 3,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte in der Stadt Mönchengladbach 2025"
+   ]
+  },
+  "05117": {
+   "qm": 6.8,
+   "n": 3,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte in der Stadt Mülheim an der Ruhr 2025"
+   ]
+  },
+  "05119": {
+   "qm": 6.45,
+   "n": 4,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte in der Stadt Oberhausen 2025"
+   ]
+  },
+  "05120": {
+   "qm": 6.3,
+   "n": 4,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte in der Stadt Remscheid 2025"
+   ]
+  },
+  "05122": {
+   "qm": 7.25,
+   "n": 2,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte in der Klingenstadt Solingen 2025"
+   ]
+  },
+  "05124": {
+   "qm": 7.2,
+   "n": 3,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte in der Stadt Wuppertal 2025"
+   ]
+  },
+  "05154": {
+   "qm": 7.35,
+   "n": 4,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte im Kreis Kleve 2025"
+   ]
+  },
+  "05158": {
+   "qm": 8.55,
+   "n": 4,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte im Kreis Mettmann 2025"
+   ]
+  },
+  "05162": {
+   "qm": 8.2,
+   "n": 3,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte im Rhein-Kreis Neuss ohne die Stadt Neuss 2025"
+   ]
+  },
+  "05166": {
+   "qm": 6.9,
+   "n": 4,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte im Kreis Viersen 2025"
+   ]
+  },
+  "05170": {
+   "qm": 6.65,
+   "n": 4,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte im Kreis Wesel 2025"
+   ]
+  },
+  "05314": {
+   "qm": 10.1,
+   "n": 3,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte in der Bundesstadt Bonn 2025"
+   ]
+  },
+  "05315": {
+   "qm": 11.7,
+   "n": 3,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte in der Stadt Köln 2025"
+   ]
+  },
+  "05316": {
+   "qm": 8.5,
+   "n": 4,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte in der Stadt Leverkusen 2025"
+   ]
+  },
+  "05334": {
+   "qm": 8.2,
+   "n": 4,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte in der Städteregion Aachen 2025"
+   ]
+  },
+  "05358": {
+   "qm": 6.7,
+   "n": 2,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte im Kreis Düren 2025"
+   ]
+  },
+  "05362": {
+   "qm": 7.4,
+   "n": 4,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte im Rhein-Erft-Kreis 2025"
+   ]
+  },
+  "05366": {
+   "qm": 7.4,
+   "n": 3,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte im Kreis Euskirchen 2025"
+   ]
+  },
+  "05370": {
+   "qm": 6.15,
+   "n": 4,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte im Kreis Heinsberg 2025"
+   ]
+  },
+  "05374": {
+   "qm": 6.5,
+   "n": 4,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte im Oberbergischen Kreis 2025"
+   ]
+  },
+  "05378": {
+   "qm": 8,
+   "n": 4,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte im Rheinisch-Bergischen Kreis 2025"
+   ]
+  },
+  "05382": {
+   "qm": 7.9,
+   "n": 3,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte im Rhein-Sieg-Kreis und in der Stadt Troisdorf 2025"
+   ]
+  },
+  "05512": {
+   "qm": 7.85,
+   "n": 4,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte in der Stadt Bottrop 2025"
+   ]
+  },
+  "05513": {
+   "qm": 6.2,
+   "n": 4,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte in der Stadt Gelsenkirchen 2025"
+   ]
+  },
+  "05515": {
+   "qm": 10.2,
+   "n": 4,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte in der Stadt Münster 2025"
+   ]
+  },
+  "05554": {
+   "qm": 6.85,
+   "n": 4,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte im Kreis Borken 2025"
+   ]
+  },
+  "05558": {
+   "qm": 7.3,
+   "n": 4,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte im Kreis Coesfeld 2025"
+   ]
+  },
+  "05562": {
+   "qm": 7,
+   "n": 4,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte im Kreis Recklinghausen, in der Stadt Castrop-Rauxel und in der Stadt Herten 2025"
+   ]
+  },
+  "05566": {
+   "qm": 7.45,
+   "n": 4,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte im Kreis Steinfurt 2025"
+   ]
+  },
+  "05570": {
+   "qm": 7.5,
+   "n": 3,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte im Kreis Warendorf 2025"
+   ]
+  },
+  "05711": {
+   "qm": 8.7,
+   "n": 3,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte in der Stadt Bielefeld 2025"
+   ]
+  },
+  "05754": {
+   "qm": 7.15,
+   "n": 4,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte im Kreis Gütersloh und in der Stadt Gütersloh 2025"
+   ]
+  },
+  "05758": {
+   "qm": 6.35,
+   "n": 4,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte im Kreis Herford und in der Stadt Herford 2025"
+   ]
+  },
+  "05762": {
+   "qm": 5.55,
+   "n": 4,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte im Kreis Höxter 2025"
+   ]
+  },
+  "05766": {
+   "qm": 6.5,
+   "n": 4,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte im Kreis Lippe und in der Stadt Detmold 2025"
+   ]
+  },
+  "05770": {
+   "qm": 6.08,
+   "n": 1,
+   "jahr": 2026,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte im Kreis Minden-Lübbecke 2026"
+   ]
+  },
+  "05774": {
+   "qm": 6.55,
+   "n": 4,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte im Kreis Paderborn 2025"
+   ]
+  },
+  "05911": {
+   "qm": 6.55,
+   "n": 4,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte in der Stadt Bochum 2025"
+   ]
+  },
+  "05913": {
+   "qm": 7.5,
+   "n": 4,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte in der Stadt Dortmund 2025"
+   ]
+  },
+  "05914": {
+   "qm": 6.05,
+   "n": 4,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte in der Stadt Hagen 2025"
+   ]
+  },
+  "05915": {
+   "qm": 6.2,
+   "n": 4,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte in der Stadt Hamm 2025"
+   ]
+  },
+  "05916": {
+   "qm": 6.15,
+   "n": 4,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte in der Stadt Herne 2025"
+   ]
+  },
+  "05954": {
+   "qm": 7.2,
+   "n": 4,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte im Ennepe-Ruhr-Kreis mit der Stadt Witten 2025"
+   ]
+  },
+  "05958": {
+   "qm": 7.4,
+   "n": 4,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte im Hochsauerlandkreis 2025"
+   ]
+  },
+  "05962": {
+   "qm": 6.1,
+   "n": 3,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte im Märkischen Kreis 2025"
+   ]
+  },
+  "05966": {
+   "qm": 6.7,
+   "n": 3,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte im Kreis Olpe 2025"
+   ]
+  },
+  "05970": {
+   "qm": 6.75,
+   "n": 4,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte im Kreis Siegen-Wittgenstein 2025"
+   ]
+  },
+  "05974": {
+   "qm": 6.95,
+   "n": 4,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte im Kreis Soest 2025"
+   ]
+  },
+  "05978": {
+   "qm": 6.15,
+   "n": 4,
+   "jahr": 2025,
+   "herkunft": [
+    "Der Gutachterausschuss für Grundstückswerte im Kreis Unna 2025"
+   ]
+  },
+  "06531": {
+   "qm": 8.13,
+   "n": 3,
+   "jahr": 2026,
+   "herkunft": [
+    "Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Gießen, Lahn-Dill und Marburg-Biedenkopf 2026"
+   ]
+  },
+  "06532": {
+   "qm": 8.13,
+   "n": 3,
+   "jahr": 2026,
+   "herkunft": [
+    "Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Gießen, Lahn-Dill und Marburg-Biedenkopf 2026"
+   ]
+  },
+  "06534": {
+   "qm": 8.13,
+   "n": 3,
+   "jahr": 2026,
+   "herkunft": [
+    "Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Gießen, Lahn-Dill und Marburg-Biedenkopf 2026"
+   ]
+  },
+  "06535": {
+   "qm": 6.15,
+   "n": 2,
+   "jahr": 2026,
+   "herkunft": [
+    "Gutachterausschuss für Immobilienwerte für den Bereich des Landkreises Fulda und des Vogelsbergkreises 2026"
+   ]
+  },
+  "06631": {
+   "qm": 7.64,
+   "n": 2,
+   "jahr": 2026,
+   "herkunft": [
+    "Gutachterausschuss für Immobilienwerte für den Bereich des Landkreises Fulda und des Vogelsbergkreises 2026"
+   ]
+  },
+  "06632": {
+   "qm": 6.42,
+   "n": 2,
+   "jahr": 2026,
+   "herkunft": [
+    "Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Hersfeld-Rotenburg, Schwalm-Eder und Werra-Meißner 2026"
+   ]
+  },
+  "06633": {
+   "qm": 7.34,
+   "n": 1,
+   "jahr": 2026,
+   "herkunft": [
+    "Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Kassel und Waldeck-Frankenberg 2026"
+   ]
+  },
+  "06634": {
+   "qm": 6.42,
+   "n": 2,
+   "jahr": 2026,
+   "herkunft": [
+    "Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Hersfeld-Rotenburg, Schwalm-Eder und Werra-Meißner 2026"
+   ]
+  },
+  "06635": {
+   "qm": 6.5,
+   "n": 1,
+   "jahr": 2026,
+   "herkunft": [
+    "Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Kassel und Waldeck-Frankenberg 2026"
+   ]
+  },
+  "06636": {
+   "qm": 6.42,
+   "n": 2,
+   "jahr": 2026,
+   "herkunft": [
+    "Gutachterausschuss für Immobilienwerte für den Bereich der Landkreise Hersfeld-Rotenburg, Schwalm-Eder und Werra-Meißner 2026"
+   ]
+  }
+ },
+ "nrw_roh": [
+  {
+   "ags": "05158028",
+   "w": 9.6,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Ratingen",
+   "objektart": "mfh_bis6"
+  },
+  {
+   "ags": "05158028",
+   "w": 9.6,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Ratingen",
+   "objektart": "mfh_ueber6"
+  },
+  {
+   "ags": "05158028",
+   "w": 9.4,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Ratingen",
+   "objektart": "etw"
+  },
+  {
+   "ags": "05158032",
+   "w": 6.1,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Velbert",
+   "objektart": "mfh_bis6"
+  },
+  {
+   "ags": "05158032",
+   "w": 5.9,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Velbert",
+   "objektart": "mfh_ueber6"
+  },
+  {
+   "ags": "05162024",
+   "w": 8.3,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Neuss",
+   "objektart": "mfh_bis6"
+  },
+  {
+   "ags": "05162024",
+   "w": 8.7,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Neuss",
+   "objektart": "mfh_ueber6"
+  },
+  {
+   "ags": "05162024",
+   "w": 9.5,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Neuss",
+   "objektart": "etw"
+  },
+  {
+   "ags": "05170008",
+   "w": 7,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Dinslaken",
+   "objektart": "mfh_bis6"
+  },
+  {
+   "ags": "05170008",
+   "w": 8.1,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Dinslaken",
+   "objektart": "mfh_ueber6"
+  },
+  {
+   "ags": "05170008",
+   "w": 7.7,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Dinslaken",
+   "objektart": "etw"
+  },
+  {
+   "ags": "05170024",
+   "w": 6.4,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Moers",
+   "objektart": "mfh_bis6"
+  },
+  {
+   "ags": "05170024",
+   "w": 6.9,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Moers",
+   "objektart": "mfh_ueber6"
+  },
+  {
+   "ags": "05170024",
+   "w": 7.3,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Moers",
+   "objektart": "etw"
+  },
+  {
+   "ags": "05170048",
+   "w": 7.7,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Wesel",
+   "objektart": "mfh_bis6"
+  },
+  {
+   "ags": "05358008",
+   "w": 6.4,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Düren",
+   "objektart": "mfh_bis6"
+  },
+  {
+   "ags": "05378004",
+   "w": 8.7,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Bergisch Gladbach",
+   "objektart": "mfh_bis6"
+  },
+  {
+   "ags": "05378004",
+   "w": 8.8,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Bergisch Gladbach",
+   "objektart": "mfh_ueber6"
+  },
+  {
+   "ags": "05378004",
+   "w": 10.2,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Bergisch Gladbach",
+   "objektart": "etw"
+  },
+  {
+   "ags": "05554008",
+   "w": 7.3,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Bocholt",
+   "objektart": "mfh_bis6"
+  },
+  {
+   "ags": "05554008",
+   "w": 7.3,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Bocholt",
+   "objektart": "mfh_ueber6"
+  },
+  {
+   "ags": "05554008",
+   "w": 7.9,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Bocholt",
+   "objektart": "etw"
+  },
+  {
+   "ags": "05562032",
+   "w": 5.2,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Recklinghausen",
+   "objektart": "mfh_bis6"
+  },
+  {
+   "ags": "05562032",
+   "w": 5.9,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Recklinghausen",
+   "objektart": "mfh_ueber6"
+  },
+  {
+   "ags": "05774032",
+   "w": 7.2,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Paderborn",
+   "objektart": "mfh_bis6"
+  },
+  {
+   "ags": "05774032",
+   "w": 7,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Paderborn",
+   "objektart": "mfh_ueber6"
+  },
+  {
+   "ags": "05958004",
+   "w": 5.2,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Arnsberg",
+   "objektart": "mfh_bis6"
+  },
+  {
+   "ags": "05958004",
+   "w": 5.4,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Arnsberg",
+   "objektart": "mfh_ueber6"
+  },
+  {
+   "ags": "05962024",
+   "w": 5.2,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Iserlohn",
+   "objektart": "mfh_bis6"
+  },
+  {
+   "ags": "05962024",
+   "w": 6.1,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Iserlohn",
+   "objektart": "mfh_ueber6"
+  },
+  {
+   "ags": "05962032",
+   "w": 6.3,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Lüdenscheid",
+   "objektart": "mfh_bis6"
+  },
+  {
+   "ags": "05962032",
+   "w": 6,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Lüdenscheid",
+   "objektart": "mfh_ueber6"
+  },
+  {
+   "ags": "05962032",
+   "w": 7.5,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Lüdenscheid",
+   "objektart": "etw"
+  },
+  {
+   "ags": "05970040",
+   "w": 5.8,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Universitätsstadt Siegen",
+   "objektart": "mfh_bis6"
+  },
+  {
+   "ags": "05974028",
+   "w": 6.3,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Lippstadt",
+   "objektart": "mfh_bis6"
+  },
+  {
+   "ags": "05974028",
+   "w": 6.6,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Lippstadt",
+   "objektart": "mfh_ueber6"
+  },
+  {
+   "ags": "05978036",
+   "w": 6,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Unna",
+   "objektart": "mfh_bis6"
+  },
+  {
+   "ags": "05978036",
+   "w": 6.4,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Unna",
+   "objektart": "mfh_ueber6"
+  },
+  {
+   "ags": "05978036",
+   "w": 6.7,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Unna",
+   "objektart": "etw"
+  },
+  {
+   "ags": "05111",
+   "w": 9.8,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Düsseldorf",
+   "objektart": "mfh_bis6"
+  },
+  {
+   "ags": "05111",
+   "w": 9.7,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Düsseldorf",
+   "objektart": "mfh_ueber6"
+  },
+  {
+   "ags": "05112",
+   "w": 6.2,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Duisburg",
+   "objektart": "mfh_bis6"
+  },
+  {
+   "ags": "05112",
+   "w": 6.5,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Duisburg",
+   "objektart": "mfh_ueber6"
+  },
+  {
+   "ags": "05112",
+   "w": 7,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Duisburg",
+   "objektart": "etw"
+  },
+  {
+   "ags": "05358008",
+   "w": 7.8,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Düren",
+   "objektart": "etw"
+  },
+  {
+   "ags": "05113",
+   "w": 7.5,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Essen",
+   "objektart": "mfh_bis6"
+  },
+  {
+   "ags": "05113",
+   "w": 7,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Essen",
+   "objektart": "mfh_ueber6"
+  },
+  {
+   "ags": "05113",
+   "w": 7.3,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Essen",
+   "objektart": "etw"
+  },
+  {
+   "ags": "05114",
+   "w": 7.2,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Krefeld",
+   "objektart": "mfh_bis6"
+  },
+  {
+   "ags": "05114",
+   "w": 7.2,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Krefeld",
+   "objektart": "mfh_ueber6"
+  },
+  {
+   "ags": "05114",
+   "w": 8,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Krefeld",
+   "objektart": "etw"
+  },
+  {
+   "ags": "05116",
+   "w": 6.6,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Mönchengladbach",
+   "objektart": "mfh_bis6"
+  },
+  {
+   "ags": "05116",
+   "w": 7,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Mönchengladbach",
+   "objektart": "mfh_ueber6"
+  },
+  {
+   "ags": "05116",
+   "w": 7,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Mönchengladbach",
+   "objektart": "etw"
+  },
+  {
+   "ags": "05117",
+   "w": 6.9,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Mülheim an der Ruhr",
+   "objektart": "mfh_bis6"
+  },
+  {
+   "ags": "05117",
+   "w": 6.5,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Mülheim an der Ruhr",
+   "objektart": "mfh_ueber6"
+  },
+  {
+   "ags": "05117",
+   "w": 7,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Mülheim an der Ruhr",
+   "objektart": "etw"
+  },
+  {
+   "ags": "05119",
+   "w": 5.6,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Oberhausen",
+   "objektart": "mfh_bis6"
+  },
+  {
+   "ags": "05119",
+   "w": 5.6,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Oberhausen",
+   "objektart": "mfh_ueber6"
+  },
+  {
+   "ags": "05119",
+   "w": 7.1,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Oberhausen",
+   "objektart": "etw"
+  },
+  {
+   "ags": "05120",
+   "w": 6,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Remscheid",
+   "objektart": "mfh_bis6"
+  },
+  {
+   "ags": "05120",
+   "w": 6.2,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Remscheid",
+   "objektart": "mfh_ueber6"
+  },
+  {
+   "ags": "05120",
+   "w": 6.6,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Remscheid",
+   "objektart": "etw"
+  },
+  {
+   "ags": "05122",
+   "w": 7.3,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Klingenstadt Solingen",
+   "objektart": "mfh_bis6"
+  },
+  {
+   "ags": "05122",
+   "w": 7.6,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Klingenstadt Solingen",
+   "objektart": "mfh_ueber6"
+  },
+  {
+   "ags": "05124",
+   "w": 6.1,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Wuppertal",
+   "objektart": "mfh_bis6"
+  },
+  {
+   "ags": "05124",
+   "w": 6.1,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Wuppertal",
+   "objektart": "mfh_ueber6"
+  },
+  {
+   "ags": "05124",
+   "w": 7.2,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Wuppertal",
+   "objektart": "etw"
+  },
+  {
+   "ags": "05154",
+   "w": 7.2,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Kreis Kleve",
+   "objektart": "mfh_bis6"
+  },
+  {
+   "ags": "05154",
+   "w": 6.7,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Kreis Kleve",
+   "objektart": "mfh_ueber6"
+  },
+  {
+   "ags": "05154",
+   "w": 7.3,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Kreis Kleve",
+   "objektart": "etw"
+  },
+  {
+   "ags": "05158",
+   "w": 7.4,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Kreis Mettmann",
+   "objektart": "mfh_bis6"
+  },
+  {
+   "ags": "05158",
+   "w": 7.6,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Kreis Mettmann",
+   "objektart": "mfh_ueber6"
+  },
+  {
+   "ags": "05158",
+   "w": 8.8,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Kreis Mettmann",
+   "objektart": "etw"
+  },
+  {
+   "ags": "05166",
+   "w": 6.3,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Kreis Viersen",
+   "objektart": "mfh_bis6"
+  },
+  {
+   "ags": "05166",
+   "w": 6.3,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Kreis Viersen",
+   "objektart": "mfh_ueber6"
+  },
+  {
+   "ags": "05166",
+   "w": 7.1,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Kreis Viersen",
+   "objektart": "etw"
+  },
+  {
+   "ags": "05170",
+   "w": 6.9,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Kreis Wesel",
+   "objektart": "etw"
+  },
+  {
+   "ags": "05314",
+   "w": 8.8,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Bundesstadt Bonn",
+   "objektart": "mfh_bis6"
+  },
+  {
+   "ags": "05314",
+   "w": 10.4,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Bundesstadt Bonn",
+   "objektart": "mfh_ueber6"
+  },
+  {
+   "ags": "05314",
+   "w": 12.2,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Bundesstadt Bonn",
+   "objektart": "etw"
+  },
+  {
+   "ags": "05315",
+   "w": 10.8,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Köln",
+   "objektart": "mfh_bis6"
+  },
+  {
+   "ags": "05315",
+   "w": 10.8,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Köln",
+   "objektart": "mfh_ueber6"
+  },
+  {
+   "ags": "05315",
+   "w": 12,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Köln",
+   "objektart": "etw"
+  },
+  {
+   "ags": "05316",
+   "w": 7.9,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Leverkusen",
+   "objektart": "mfh_bis6"
+  },
+  {
+   "ags": "05316",
+   "w": 7.9,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Leverkusen",
+   "objektart": "mfh_ueber6"
+  },
+  {
+   "ags": "05316",
+   "w": 8.7,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Leverkusen",
+   "objektart": "etw"
+  },
+  {
+   "ags": "05334",
+   "w": 6.7,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Städteregion Aachen",
+   "objektart": "mfh_bis6"
+  },
+  {
+   "ags": "05334",
+   "w": 8.1,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Städteregion Aachen",
+   "objektart": "mfh_ueber6"
+  },
+  {
+   "ags": "05334",
+   "w": 9.1,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Städteregion Aachen",
+   "objektart": "etw"
+  },
+  {
+   "ags": "05566076",
+   "w": 6.6,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Rheine",
+   "objektart": "etw"
+  },
+  {
+   "ags": "05362",
+   "w": 6.8,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Rhein-Erft-Kreis",
+   "objektart": "mfh_bis6"
+  },
+  {
+   "ags": "05362",
+   "w": 6.9,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Rhein-Erft-Kreis",
+   "objektart": "mfh_ueber6"
+  },
+  {
+   "ags": "05362",
+   "w": 7.5,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Rhein-Erft-Kreis",
+   "objektart": "etw"
+  },
+  {
+   "ags": "05366",
+   "w": 6.6,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Kreis Euskirchen",
+   "objektart": "mfh_bis6"
+  },
+  {
+   "ags": "05366",
+   "w": 6.8,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Kreis Euskirchen",
+   "objektart": "mfh_ueber6"
+  },
+  {
+   "ags": "05366",
+   "w": 7.3,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Kreis Euskirchen",
+   "objektart": "etw"
+  },
+  {
+   "ags": "05370",
+   "w": 6.3,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Kreis Heinsberg",
+   "objektart": "mfh_bis6"
+  },
+  {
+   "ags": "05370",
+   "w": 6.1,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Kreis Heinsberg",
+   "objektart": "mfh_ueber6"
+  },
+  {
+   "ags": "05370",
+   "w": 6,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Kreis Heinsberg",
+   "objektart": "etw"
+  },
+  {
+   "ags": "05374",
+   "w": 5.7,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Oberbergischen Kreis",
+   "objektart": "mfh_bis6"
+  },
+  {
+   "ags": "05374",
+   "w": 6.1,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Oberbergischen Kreis",
+   "objektart": "mfh_ueber6"
+  },
+  {
+   "ags": "05374",
+   "w": 6.7,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Oberbergischen Kreis",
+   "objektart": "etw"
+  },
+  {
+   "ags": "05378",
+   "w": 8,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Rheinisch-Bergischen Kreis",
+   "objektart": "mfh_bis6"
+  },
+  {
+   "ags": "05378",
+   "w": 7.9,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Rheinisch-Bergischen Kreis",
+   "objektart": "mfh_ueber6"
+  },
+  {
+   "ags": "05378",
+   "w": 8.4,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Rheinisch-Bergischen Kreis",
+   "objektart": "etw"
+  },
+  {
+   "ags": "05382",
+   "w": 7.7,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Rhein-Sieg-Kreis und in der Stadt Troisdorf",
+   "objektart": "mfh_bis6"
+  },
+  {
+   "ags": "05382",
+   "w": 7.5,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Rhein-Sieg-Kreis und in der Stadt Troisdorf",
+   "objektart": "mfh_ueber6"
+  },
+  {
+   "ags": "05770024",
+   "w": 7.1,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Minden",
+   "objektart": "etw"
+  },
+  {
+   "ags": "05382",
+   "w": 9.6,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Rhein-Sieg-Kreis und in der Stadt Troisdorf",
+   "objektart": "etw"
+  },
+  {
+   "ags": "05512",
+   "w": 7.3,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Bottrop",
+   "objektart": "mfh_bis6"
+  },
+  {
+   "ags": "05512",
+   "w": 6.8,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Bottrop",
+   "objektart": "mfh_ueber6"
+  },
+  {
+   "ags": "05512",
+   "w": 7.9,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Bottrop",
+   "objektart": "etw"
+  },
+  {
+   "ags": "05513",
+   "w": 5.7,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Gelsenkirchen",
+   "objektart": "mfh_bis6"
+  },
+  {
+   "ags": "05513",
+   "w": 5.5,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Gelsenkirchen",
+   "objektart": "mfh_ueber6"
+  },
+  {
+   "ags": "05513",
+   "w": 6.4,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Gelsenkirchen",
+   "objektart": "etw"
+  },
+  {
+   "ags": "05515",
+   "w": 9.6,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Münster",
+   "objektart": "mfh_bis6"
+  },
+  {
+   "ags": "05515",
+   "w": 9.6,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Münster",
+   "objektart": "mfh_ueber6"
+  },
+  {
+   "ags": "05515",
+   "w": 10.4,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Münster",
+   "objektart": "etw"
+  },
+  {
+   "ags": "05554",
+   "w": 6.3,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Kreis Borken",
+   "objektart": "mfh_bis6"
+  },
+  {
+   "ags": "05554",
+   "w": 6,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Kreis Borken",
+   "objektart": "mfh_ueber6"
+  },
+  {
+   "ags": "05554",
+   "w": 6.5,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Kreis Borken",
+   "objektart": "etw"
+  },
+  {
+   "ags": "05558",
+   "w": 6.5,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Kreis Coesfeld",
+   "objektart": "mfh_bis6"
+  },
+  {
+   "ags": "05558",
+   "w": 6.6,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Kreis Coesfeld",
+   "objektart": "mfh_ueber6"
+  },
+  {
+   "ags": "05558",
+   "w": 7.5,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Kreis Coesfeld",
+   "objektart": "etw"
+  },
+  {
+   "ags": "05562",
+   "w": 6.3,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Kreis Recklinghausen",
+   "objektart": "mfh_bis6"
+  },
+  {
+   "ags": "05562",
+   "w": 5.9,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Kreis Recklinghausen",
+   "objektart": "mfh_ueber6"
+  },
+  {
+   "ags": "05562",
+   "w": 6.8,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Kreis Recklinghausen",
+   "objektart": "etw"
+  },
+  {
+   "ags": "05566",
+   "w": 6.8,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Kreis Steinfurt",
+   "objektart": "mfh_bis6"
+  },
+  {
+   "ags": "05566",
+   "w": 6.6,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Kreis Steinfurt",
+   "objektart": "mfh_ueber6"
+  },
+  {
+   "ags": "05566",
+   "w": 8.3,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Kreis Steinfurt",
+   "objektart": "etw"
+  },
+  {
+   "ags": "05570",
+   "w": 7,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Kreis Warendorf",
+   "objektart": "mfh_bis6"
+  },
+  {
+   "ags": "05570",
+   "w": 7.4,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Kreis Warendorf",
+   "objektart": "etw"
+  },
+  {
+   "ags": "05711",
+   "w": 7.3,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Bielefeld",
+   "objektart": "mfh_bis6"
+  },
+  {
+   "ags": "05711",
+   "w": 7.3,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Bielefeld",
+   "objektart": "mfh_ueber6"
+  },
+  {
+   "ags": "05711",
+   "w": 8.5,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Bielefeld",
+   "objektart": "etw"
+  },
+  {
+   "ags": "05754",
+   "w": 6.8,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Kreis Gütersloh und in der Stadt Gütersloh",
+   "objektart": "mfh_bis6"
+  },
+  {
+   "ags": "05754",
+   "w": 6.7,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Kreis Gütersloh und in der Stadt Gütersloh",
+   "objektart": "mfh_ueber6"
+  },
+  {
+   "ags": "05754",
+   "w": 7.2,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Kreis Gütersloh und in der Stadt Gütersloh",
+   "objektart": "etw"
+  },
+  {
+   "ags": "05958004",
+   "w": 5.8,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Arnsberg",
+   "objektart": "etw"
+  },
+  {
+   "ags": "05758",
+   "w": 5.4,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Kreis Herford und in der Stadt Herford",
+   "objektart": "mfh_bis6"
+  },
+  {
+   "ags": "05758",
+   "w": 5.5,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Kreis Herford und in der Stadt Herford",
+   "objektart": "mfh_ueber6"
+  },
+  {
+   "ags": "05758",
+   "w": 7.2,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Kreis Herford und in der Stadt Herford",
+   "objektart": "etw"
+  },
+  {
+   "ags": "05970040",
+   "w": 7,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Universitätsstadt Siegen",
+   "objektart": "mfh_ueber6"
+  },
+  {
+   "ags": "05970040",
+   "w": 8.1,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Universitätsstadt Siegen",
+   "objektart": "etw"
+  },
+  {
+   "ags": "05762",
+   "w": 4.8,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Kreis Höxter",
+   "objektart": "mfh_bis6"
+  },
+  {
+   "ags": "05762",
+   "w": 4.8,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Kreis Höxter",
+   "objektart": "mfh_ueber6"
+  },
+  {
+   "ags": "05762",
+   "w": 5.6,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Kreis Höxter",
+   "objektart": "etw"
+  },
+  {
+   "ags": "05974028",
+   "w": 6.8,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Lippstadt",
+   "objektart": "etw"
+  },
+  {
+   "ags": "05766",
+   "w": 6.2,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Kreis Lippe und in der Stadt Detmold",
+   "objektart": "mfh_bis6"
+  },
+  {
+   "ags": "05766",
+   "w": 6,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Kreis Lippe und in der Stadt Detmold",
+   "objektart": "mfh_ueber6"
+  },
+  {
+   "ags": "05766",
+   "w": 6.3,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Kreis Lippe und in der Stadt Detmold",
+   "objektart": "etw"
+  },
+  {
+   "ags": "05770",
+   "w": 6.7,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Kreis Minden-Lübbecke",
+   "objektart": "etw"
+  },
+  {
+   "ags": "05774",
+   "w": 5.8,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Kreis Paderborn",
+   "objektart": "mfh_bis6"
+  },
+  {
+   "ags": "05774",
+   "w": 5.8,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Kreis Paderborn",
+   "objektart": "mfh_ueber6"
+  },
+  {
+   "ags": "05774",
+   "w": 7,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Kreis Paderborn",
+   "objektart": "etw"
+  },
+  {
+   "ags": "05911",
+   "w": 6.1,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Bochum",
+   "objektart": "mfh_bis6"
+  },
+  {
+   "ags": "05911",
+   "w": 6.2,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Bochum",
+   "objektart": "mfh_ueber6"
+  },
+  {
+   "ags": "05911",
+   "w": 6.6,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Bochum",
+   "objektart": "etw"
+  },
+  {
+   "ags": "05913",
+   "w": 7,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Dortmund",
+   "objektart": "mfh_bis6"
+  },
+  {
+   "ags": "05913",
+   "w": 6.9,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Dortmund",
+   "objektart": "mfh_ueber6"
+  },
+  {
+   "ags": "05913",
+   "w": 7,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Dortmund",
+   "objektart": "etw"
+  },
+  {
+   "ags": "05914",
+   "w": 6,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Hagen",
+   "objektart": "mfh_bis6"
+  },
+  {
+   "ags": "05914",
+   "w": 5.7,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Hagen",
+   "objektart": "mfh_ueber6"
+  },
+  {
+   "ags": "05914",
+   "w": 6,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Hagen",
+   "objektart": "etw"
+  },
+  {
+   "ags": "05915",
+   "w": 5.8,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Hamm",
+   "objektart": "mfh_bis6"
+  },
+  {
+   "ags": "05915",
+   "w": 6,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Hamm",
+   "objektart": "mfh_ueber6"
+  },
+  {
+   "ags": "05915",
+   "w": 6.2,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Hamm",
+   "objektart": "etw"
+  },
+  {
+   "ags": "05916",
+   "w": 5.8,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Herne",
+   "objektart": "mfh_bis6"
+  },
+  {
+   "ags": "05916",
+   "w": 5.8,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Herne",
+   "objektart": "mfh_ueber6"
+  },
+  {
+   "ags": "05916",
+   "w": 5.8,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte in der Stadt Herne",
+   "objektart": "etw"
+  },
+  {
+   "ags": "05954",
+   "w": 6.7,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Ennepe-Ruhr-Kreis mit der Stadt Witten",
+   "objektart": "mfh_bis6"
+  },
+  {
+   "ags": "05954",
+   "w": 6.5,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Ennepe-Ruhr-Kreis mit der Stadt Witten",
+   "objektart": "mfh_ueber6"
+  },
+  {
+   "ags": "05954",
+   "w": 7,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Ennepe-Ruhr-Kreis mit der Stadt Witten",
+   "objektart": "etw"
+  },
+  {
+   "ags": "05958",
+   "w": 6,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Hochsauerlandkreis",
+   "objektart": "mfh_bis6"
+  },
+  {
+   "ags": "05958",
+   "w": 6.5,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Hochsauerlandkreis",
+   "objektart": "mfh_ueber6"
+  },
+  {
+   "ags": "05958",
+   "w": 7.3,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Hochsauerlandkreis",
+   "objektart": "etw"
+  },
+  {
+   "ags": "05962",
+   "w": 6,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Märkischen Kreis",
+   "objektart": "mfh_bis6"
+  },
+  {
+   "ags": "05962",
+   "w": 6,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Märkischen Kreis",
+   "objektart": "mfh_ueber6"
+  },
+  {
+   "ags": "05966",
+   "w": 6.3,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Kreis Olpe",
+   "objektart": "mfh_bis6"
+  },
+  {
+   "ags": "05966",
+   "w": 6.3,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Kreis Olpe",
+   "objektart": "mfh_ueber6"
+  },
+  {
+   "ags": "05966",
+   "w": 7.5,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Kreis Olpe",
+   "objektart": "etw"
+  },
+  {
+   "ags": "05970",
+   "w": 5.9,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Kreis Siegen-Wittgenstein",
+   "objektart": "mfh_bis6"
+  },
+  {
+   "ags": "05970",
+   "w": 6.2,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Kreis Siegen-Wittgenstein",
+   "objektart": "mfh_ueber6"
+  },
+  {
+   "ags": "05970",
+   "w": 7,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Kreis Siegen-Wittgenstein",
+   "objektart": "etw"
+  },
+  {
+   "ags": "05974",
+   "w": 5.8,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Kreis Soest",
+   "objektart": "mfh_bis6"
+  },
+  {
+   "ags": "05974",
+   "w": 6,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Kreis Soest",
+   "objektart": "mfh_ueber6"
+  },
+  {
+   "ags": "05974",
+   "w": 7.1,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Kreis Soest",
+   "objektart": "etw"
+  },
+  {
+   "ags": "05978",
+   "w": 6,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Kreis Unna",
+   "objektart": "mfh_bis6"
+  },
+  {
+   "ags": "05978",
+   "w": 6.4,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Kreis Unna",
+   "objektart": "mfh_ueber6"
+  },
+  {
+   "ags": "05978",
+   "w": 6.7,
+   "jahr": 2024,
+   "gaa": "Der Gutachterausschuss für Grundstückswerte im Kreis Unna",
+   "objektart": "etw"
+  }
+ ]
+}

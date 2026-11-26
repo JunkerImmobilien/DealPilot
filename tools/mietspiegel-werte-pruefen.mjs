@@ -183,6 +183,25 @@ for (const f of liste) {
   if (!LEISE) console.log('Häuser: ' + nHaus + ' Dateien mit Hausregel');
 }
 
+/* v5110 · DealPilot-Näherung: Spanne (oben/unten) und amtliche Marktmiete (EE6, Marcel 26.11.2026 „nicht zu niedrig") */
+{
+  const NZ = await import(new URL('../marktbericht/backend/src/lib/mietspiegel/naeherung.js', import.meta.url).href);
+  const P = NZ.naeherungParameter(), MM = NZ.marktmieteParameter();
+  const zl = [{ dimension: 'gesamt', auspraegung: 'gesamt', wert: 7 }];
+  const n0 = NZ.naeherungFuer(P, zl, { baujahr: 1975, wfl: 70 });
+  if (!(P && P.spanne && P.spanne.oben > 1 && P.spanne.unten < 1)) F('naeherung', 'naeherung.json ohne Spanne oben/unten');
+  else if (!(n0.qm > 0 && n0.oben > n0.qm && n0.unten < n0.qm && Math.abs(n0.oben / n0.qm - P.spanne.oben) < 0.01)) F('naeherung', 'Näherung liefert oben/unten nicht (' + n0.qm + '/' + n0.oben + '/' + n0.unten + ')');
+  if (P && P.marktmiete) {
+    const m = { qm: 9, ebene: 'kreis' }, n1 = NZ.naeherungFuer(P, zl, { baujahr: 1975, wfl: 70, marktmiete: m });
+    const soll = Math.round(((1 - P.marktmiete.gewicht_kreis) * n0.qm + P.marktmiete.gewicht_kreis * 9 * P.marktmiete.g) * 100) / 100;
+    if (!(Math.abs(n1.qm - soll) < 0.011)) F('naeherung', 'Marktmiete nicht wie berechnet eingerechnet (' + n1.qm + ' statt ' + soll + ')');
+    if (/Gutachterausschuss für|Open Data|NRW/.test(n1.rechnung || '')) F('naeherung', 'Quellenname im Rechenweg');
+    if (!MM || !(MM.n_gemeinden + MM.n_kreise > 0)) F('naeherung', 'marktmiete-amtlich.json fehlt oder leer');
+    else if (!NZ.marktmieteFuer(MM, '05711000') && !NZ.marktmieteFuer(MM, Object.keys(MM.gemeinde)[0])) F('naeherung', 'marktmieteFuer findet keinen Wert');
+  }
+  if (!LEISE) console.log('Näherung: Spanne ×' + (P && P.spanne && P.spanne.oben) + ' / ×' + (P && P.spanne && P.spanne.unten) + (P && P.marktmiete ? ', Marktmiete Gewicht Gemeinde ' + P.marktmiete.gewicht_gemeinde + ' Kreis ' + P.marktmiete.gewicht_kreis : ''));
+}
+
 if (!LEISE) {
   console.log('Mietspiegel-Werte: ' + dateien + ' Dateien, ' + zellenZahl + ' Tabellenfelder/Basiswerte, ' + beispiele + ' Prüfbeispiele');
   for (const w of warn.slice(0, 15)) console.log('  gelb  ' + w);
