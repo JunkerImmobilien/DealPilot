@@ -906,6 +906,10 @@ function wertAus(out) {
     q.push({ vermerk: _kunde(x.vermerk, 260), kennzahlen: (Array.isArray(x.kennzahlen) ? x.kennzahlen : []).map(function (k) { return _kunde(k, 60); }).filter(Boolean),
       jahrgang: _n(x.jahrgang), lizenz: _kunde(x.lizenz, 120) });
   });
+  /* v5090 · Pflichtvermerk des Angebotsdaten-Partners (AGB Ziff. 7.2c), nur wenn seine Daten drinstecken */
+  (Array.isArray(p.quellen_nachweis_markt) ? p.quellen_nachweis_markt : []).forEach(function (x) {
+    if (x && x.vermerk === '© by RealEstatePilot') q.push({ vermerk: x.vermerk, kennzahlen: Array.isArray(x.kennzahlen) ? x.kennzahlen : [] });
+  });
   aus.quellen = q.filter(function (x) { return x.vermerk; });
   return aus;
 }

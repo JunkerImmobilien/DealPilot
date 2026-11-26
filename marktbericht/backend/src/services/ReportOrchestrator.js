@@ -1922,7 +1922,12 @@ export const ReportOrchestrator = {
          standen nur die Teilscores im Bericht. Und die Namensnennung der
          Regionaldatenbank (dl-de/by-2-0), nur wenn ein Wert drinsteckt. */
       makro_kennzahlen: _makroKz,
-      quellen_nachweis_markt: (_makroKz && _makroKz.quellennachweis) ? [_makroKz.quellennachweis] : [],
+      quellen_nachweis_markt: [].concat((_makroKz && _makroKz.quellennachweis) ? [_makroKz.quellennachweis] : [],
+        /* v5090 · GeoMap-AGB Ziff. 7.2c/7.3c: Ergebnisse an Dritte nur mit „© by RealEstatePilot“.
+           Nur wenn Angebotsdaten dieses Anbieters im Bericht stecken; im Fließtext bleibt er ungenannt. */
+        ([sale, rent].some((x) => x && x.datenherkunft === 'geomap' && !x.enthaelt_demodaten)
+          || (geomapEnabled() && (insights || marktkontext)))
+          ? [{ vermerk: '© by RealEstatePilot', kennzahlen: ['Angebotspreise und Angebotsmieten am Markt'], lizenz: '', urls: [] }] : []),
         /* WETIK-1 · Herkunft der Wertermittlungsparameter im Klartext.
        * A/B sind amtlich, C/D/E sind indikativ — das muss im Bericht und
        * im PDF stehen, nicht nur als Buchstabe im Datensatz. */
