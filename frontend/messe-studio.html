@@ -322,20 +322,25 @@ body.mit-tafel #tafel{display:flex;flex-direction:column;gap:18px}
     /* warten, bis das Drehbuch in der App bereitsteht (Anmeldung, Plan) */
     var t0 = Date.now();
     while (!_bereit && Date.now() - t0 < 30000) await warte(250);
+    /* V1 26.11.2026 · Das Intro bleibt stehen, bis das Drehbuch seine erste Szene zeigt (erstes Kapitel).
+       Vorher lud die App sichtbar das Objekt: leeres Formular, weiße Ladefläche, Toast „Geladen“, 4 bis 12 s ohne Ton. */
+    try { app.contentWindow.postMessage({ source: 'dp-messe-studio', type: 'los' }, location.origin); } catch (e) {}
+    var t1 = Date.now();
+    while (!_ersteSzene && Date.now() - t1 < 45000) await warte(100);
     fx && (fx.ebene.style.transition = 'opacity .8s', fx.ebene.style.opacity = '0');
     await warte(800); fx && fx.weg();
-    try { app.contentWindow.postMessage({ source: 'dp-messe-studio', type: 'los' }, location.origin); } catch (e) {}
   }
+  var _ersteSzene = false;
   var _bereit = false;
   addEventListener('message', function (e) {
     if (e.origin !== location.origin || !e.data || e.data.source !== 'dp-messe-studio') return;
     var m = e.data;
     if (m.type === 'bereit') _bereit = true;
-    else if (m.type === 'kapitel') kapitel(m);
+    else if (m.type === 'kapitel') { _ersteSzene = true; kapitel(m); }
     else if (m.type === 'tafel') tafel(m.tafel);
     else if (m.type === 'zwischentitel') zwischentitel(m);
     else if (m.type === 'zwischentitel-weg') zwischentitelWeg();
-    else if (m.type === 'ende') ende();
+    else if (m.type === 'ende') { _ersteSzene = true; ende(); }
   });
   /* v3015 · Tafel: drei Punkte je Schritt (Texte aus dem Drehbuch, Zahlen dort live gelesen) */
   var tafelEl = document.getElementById('tafel');
