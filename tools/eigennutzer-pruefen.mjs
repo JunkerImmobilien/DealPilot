@@ -110,6 +110,19 @@ ok(texte.every((t) => !/[–—;]/.test(t)), 'Kundentext ohne – — ;');
   ok(ortUnt.leistbarkeit.aufstellung.find((x) => x.k === 'uebrige').eur === 199, 'Unterlagen schlagen den ortsgenauen Wert');
 }
 
+/* 12 · nn6 · ortsgenaue Nebenkosten (e.nebenkosten_qm) vor der Pauschale, Unterlagen vor beidem */
+{
+  const b = { kaufpreis: 310000, wfl: 130, baujahr: 1998, objektart: 'efh', ek: 100000, netto: 5200, zins_pct: 4.09, vergleichsmiete_qm: 7.3, lage_score: 57 };
+  const u = (r) => r.leistbarkeit.aufstellung.find((x) => x.k === 'uebrige');
+  const ort = K.kern(Object.assign({}, b, { nebenkosten_qm: { wert: 1.09, herkunft: 'Grundsteuer der Gemeinde, übrige Posten Durchschnitt' } }));
+  ok(u(ort).eur === Math.round(1.09 * 130) && /Grundsteuer der Gemeinde/.test(u(ort).herkunft || ''), 'nn6: ortsgenaue Nebenkosten 1,09 €/m² statt Pauschale');
+  const ohne = K.kern(Object.assign({}, b, { nebenkosten_qm: null }));
+  ok(u(ohne).eur === 260, 'nn6: ohne Ortswert Rückfall Pauschale 2,00 €/m²');
+  const unterl = K.kern(Object.assign({}, b, { nebenkosten_qm: { wert: 1.09 }, betriebskosten_monat: 199 }));
+  ok(u(unterl).eur === 199, 'nn6: Unterlagen vor Ortswert');
+  const demoNk = K.rechne({ kp: 310000, wfl: 130, bj: 1998, ek: 100000, netto: 5200, objektart: 'efh' }, { zinsFn: () => 4.09, mieteQm: 7.3, makro: 60, leer: 'gut', nebenkosten: { qm: 1.09, ortsgenau: ['grundsteuer'] } });
+  ok(demoNk.ok, 'nn6: Demo-Adapter nimmt d.nebenkosten an');
+}
 /* 10 · Spiegel im Backend gleich der Quelle */
 const quelle = path.join(W, 'frontend', 'js', 'eigennutzer-kern.js');
 const spiegel = path.join(W, 'backend', 'src', 'generated', 'rechenkerne', 'eigennutzer-kern.js');

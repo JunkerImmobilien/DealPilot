@@ -508,6 +508,44 @@
         }
       ],
       "hinweis": "tools/mietspiegel-verzeichnis-pruefen.mjs --liste; abgelaufene nachernten (nur amtliche Belege, quelle_geprueft_am setzen), danach stand und erwartet hier nachziehen. Faellig = fruehestes kommendes vermutung_bis/gueltig_bis im Verzeichnis, spaetestens faellig_am (v3250). Gelesen von der Route /mietspiegel und potenzial.js."
+    },
+    {
+      "id": "nebenkosten_grundsteuer",
+      "name": "Grundsteuer je Gemeinde für den Haus-Check (Aufkommen B je m² Wohnfläche, Hebesatz B)",
+      "gruppe": "finanzierung",
+      "stand": "Regionaldatenbank Jahr 2024 (vor der Reform), abgerufen 26.11.2026, nn6",
+      "erwartet": "2024",
+      "quelle": "Regionaldatenbank 71231-01-03-5 und 31231-02-01-5 (dl-de/by-2-0); tools/nebenkosten-grundsteuer-holen.mjs + -bauen.mjs",
+      "turnus": "jährlich; sobald das Jahr 2025 (neue Hebesätze nach der Reform) in 71231-01-03-5 steht, neu holen",
+      "faellig_am": "2027-03-31",
+      "verfahren": "agent",
+      "orte": [
+        {
+          "datei": "marktbericht/backend/src/lib/nebenkosten/grundsteuer-gemeinden.json",
+          "bezeichner": "jahr",
+          "muster": "\"jahr\":(\\d{4})"
+        }
+      ],
+      "hinweis": "Nach dem Neuholen node tools/nebenkosten-pruefen.mjs. mb-backend braucht Rebuild (Datei im Image)."
+    },
+    {
+      "id": "nebenkosten_bund",
+      "name": "Bundesdurchschnitte der laufenden Wohnnebenkosten (Wasser, Müll, Versicherung, Schornsteinfeger, Straßenreinigung, Strom Allgemein, Grundsteuer-Kalibrierung)",
+      "gruppe": "finanzierung",
+      "stand": "Abrechnungsjahr 2024 (veröffentlicht 18.12.2025)",
+      "erwartet": "2024",
+      "quelle": "Betriebskostenspiegel des Deutschen Mieterbunds (nur intern, nie im Kundentext), https://mieterbund.de/app/uploads/2025/12/20251218-3.pdf",
+      "turnus": "jährlich im Dezember",
+      "faellig_am": "2027-01-15",
+      "verfahren": "agent",
+      "orte": [
+        {
+          "datei": "marktbericht/backend/src/lib/nebenkosten/nebenkosten.js",
+          "bezeichner": "BUND.stand",
+          "muster": "stand: '(\\d{4})'"
+        }
+      ],
+      "hinweis": "Nach Änderung BUND.grundsteuer: tools/nebenkosten-grundsteuer-bauen.mjs neu laufen lassen (Faktor K)."
     }
   ]
 }

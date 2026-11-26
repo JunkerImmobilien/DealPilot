@@ -65,6 +65,7 @@ import { tiefeVorab } from '../lib/tiefe_vorab.js';   /* v4630 */
 import { registerStand } from '../lib/ausschuss_register.js';
 import { mbDatenumfang } from '../lib/datenumfang.js';   /* v3930 · landing-zahlen-live-1 */
 import { beleihungswert as belwCheck, eingabenAusBericht as belwEingaben } from '../lib/beleihungswert.js';   /* v2630 */
+import { nebenkostenFuer } from '../lib/nebenkosten/nebenkosten.js';   /* nn6 · Wohnnebenkosten je Gemeinde */
 
 export const router = express.Router();
 
@@ -1168,6 +1169,14 @@ router.get('/bwk/ansaetze', (req, res) => {
 router.get('/mietspiegel/waechter', async (req, res) => {
   try { res.json(await msWaechterStand()); } catch (e) { res.status(500).json({ error: e.message }); }
 });
+// GET /nebenkosten?ags=05758020&wfl=140&art=efh — nn6 (26.11.2026): laufende Wohnnebenkosten ohne Heizung je Posten
+// mit Herkunft (Grundsteuer als Durchschnitt der Gemeinde, übrige Posten Bundesschnitt). Nur Datei, keine DB.
+router.get('/nebenkosten', (req, res) => {
+  const ags = String(req.query.ags || '');
+  if (!/^\d{8}$/.test(ags)) return res.status(400).json({ error: 'ags (8-stellig) erforderlich' });
+  try { res.json(nebenkostenFuer(ags, { wfl: req.query.wfl, art: req.query.art })); } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 router.get('/mietspiegel', async (req, res) => {
   try {
     const r = mietspiegelFuer(req.query.ags);

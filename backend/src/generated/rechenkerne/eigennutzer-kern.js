@@ -281,7 +281,9 @@
     var r = rechne({ kaufpreis: kp, wfl: e.wfl, baujahr: e.bj, objektart: art, ek: ek, netto: e.netto,
       zins_pct: zins, grest_pct: e.grest_pct, vergleichsmiete_qm: d.mieteQm,
       hauszuschlag_pct: e.hauszuschlag_pct != null ? e.hauszuschlag_pct : (art === 'etw' ? 0 : 15),
-      lage_score: lageAusMarkt(d), zustand: e.zustand, weg: e.weg, wert: e.wert });
+      lage_score: lageAusMarkt(d), zustand: e.zustand, weg: e.weg, wert: e.wert,
+      /* nn6 · ortsgenaue Nebenkosten (ohne Heizung), Rückfall bleibt die Pauschale im Kern */
+      nebenkosten_qm: d.nebenkosten && d.nebenkosten.qm > 0 ? { wert: d.nebenkosten.qm, herkunft: (d.nebenkosten.ortsgenau && d.nebenkosten.ortsgenau.length ? 'Grundsteuer der Gemeinde, übrige Posten Durchschnitt' : 'Durchschnittswerte') } : null });
     if (!r.ok) return r;
     var G = r.haus.gruppen, L = r.leistbarkeit;
     var leistS = L.quote == null ? null : r0(lin(L.quote, [[30, 100], [35, 90], [40, 72], [45, 50], [50, 30], [60, 5]]));
@@ -319,6 +321,7 @@
         if (j.leerstand && j.leerstand.ton) d.leer = j.leerstand.ton;
         if (j.bevoelkerung && j.bevoelkerung.wert != null) d.bev = j.bevoelkerung.wert;
         if (j.gebiet) d.gebiet = j.gebiet;
+        if (j.nebenkosten && j.nebenkosten.qm > 0) d.nebenkosten = j.nebenkosten;   /* nn6 · Grundsteuer je Gemeinde, übrige Posten Bundesschnitt */
       }).catch(function () {});
     return Promise.all([z, m]).then(function () { return d; });
   }
@@ -334,7 +337,7 @@
 
   var api = { rechne: function (e, d) { return arguments.length >= 2 || (e && e.kp != null) ? rechneDemo(e, d) : rechne(e); },
     kern: rechne, rechneDemo: rechneDemo, daten: daten, umfeld: umfeld, nebenkosten: nebenkosten, eur: eur, stufe: stufe,
-    GEWICHT: GEWICHT, STANDARD: STANDARD, ARTEN: ARTEN, MFH_HINWEIS: MFH_HINWEIS, version: 'v5130j' };
+    GEWICHT: GEWICHT, STANDARD: STANDARD, ARTEN: ARTEN, MFH_HINWEIS: MFH_HINWEIS, version: 'v5140nn6' };
   root.DpEigennutzerKern = api;
   root.DpEigennutzer = api;
 
