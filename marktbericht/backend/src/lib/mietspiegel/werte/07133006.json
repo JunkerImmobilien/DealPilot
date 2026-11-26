@@ -1,0 +1,260 @@
+{
+ "ags": "07133006",
+ "gemeinde": "Bad Kreuznach",
+ "art": "einfach",
+ "stand": "2025-07-01",
+ "erhebungsstichtag": null,
+ "gueltig_ab": "2025-07-01",
+ "gueltig_bis": null,
+ "quelle": {
+  "url": "https://www.bad-kreuznach.de/buergerservice/wirtschaft-bauen-wohnen/grundstuecke-bauen-wohnen/mietspiegel/mietspiegel-2025.pdf?cid=278p",
+  "dokument": "Mietspiegelanpassung 2025 für das Gebiet der Stadt Bad Kreuznach (Stichtag 01.07.2025), Stadtverwaltung Bad Kreuznach mit Miet- und Pachtverein Bad Kreuznach e. V. und Haus & Grund Bad Kreuznach e. V., anerkannt nach § 558c Abs. 1 BGB; dazu Mietspiegelrechner der Stadt (Excel, Stand 10/2025): https://www.bad-kreuznach.de/buergerservice/wirtschaft-bauen-wohnen/grundstuecke-bauen-wohnen/mietspiegel/mietspiegelrechner/mietspiegelrechner-stand-10-2025-neu.xls?cid=27bp",
+  "seite": "PDF S. 1 (Art, Stichtag, Durchschnittsmiete 7,50 €), S. 3 (Merkmale), S. 3–4 (Anpassungsfaktoren), S. 4–5 (Rechner, ±20 %); Gewichte 20/20/40/5/5/10 % und Spanne ±20 % nur im Mietspiegelrechner (Blatt „Mietspiegelrechner“)",
+  "lizenz": "kein Rechtevorbehalt und kein Speicherverbot im PDF und im Rechner (geprüft 26.11.2026)",
+  "abgerufen": "2026-11-26"
+ },
+ "einheit": "eur_qm_nettokalt",
+ "form": "regression",
+ "rundung": 2,
+ "hinweis": "Einfacher Mietspiegel (§ 558c), Indexfortschreibung (Index der Nettokaltmieten RP) einer Stichprobe 2017–2023. Rechenweg aus dem Mietspiegelrechner der Stadt (nicht im PDF ausgeschrieben): gewichtete Durchschnittsmiete 7,50 €/m² × Σ (Gewicht × Anpassungsfaktor) mit Gewichten Bauperiode 20 %, Wohnungsgröße 20 %, Ausstattung 40 %, Anzahl Wohnungen im Objekt 5 %, Lage der Wohnung im Objekt 5 %, Lage des Objekts 10 %; Spanne −20 %/+20 % („unterer/oberer Wert“). Weil die Gewichte zusammen 100 % ergeben, ist das gleich 7,50 × (1 + Σ Gewicht × (Faktor − 1)); so ist jeder Faktor als Prozentpunkt (art pct) eingetragen, ohne Rundung. Faktoren aus dem PDF (drei Stellen); der Rechner rechnet mit ungerundeten Faktoren, Unterschied höchstens 0,01 €. Bauperiode bis 1969 MIT Sanierung/Modernisierung 0,943 statt 0,856 (Merkmal saniert_modernisiert, nur bis 1969). Ausstattung nach dem Dokument „Standardstufen“ (einfach/standard/gehoben) — ohne Angabe wird „standard“ angenommen. Lage des Objekts nach Wohnlagenkarte (KG Kurgebiet, SZ Stadtzentrum, MG Mischgebiet, WG Wohngebiet, ST Stadtteil) — ohne Lage kein Wert. ACHTUNG: Anzahl der Wohnungen im Objekt und Lage der Wohnung im Objekt (Geschoss) haben im Dokument keinen Standard; ohne Angabe rechnet der Kern sie neutral (Faktor 1,0), das weicht je Merkmal um höchstens rund 0,7 % ab — für den genauen Wert merkmale.anzahl_wohnungen und merkmale.geschoss angeben. Zuschläge in €/Monat für Stellplatz, Garage, Tiefgarage, Einbauküche (Rechner) nicht abgebildet, weil sie zur Monatsmiete und nicht zum m²-Wert kommen. Zu Ein-/Zweifamilienhäusern sagt das Dokument nichts (Klasse 1–3 Wohnungen im Objekt).",
+ "regression": {
+  "basis_eur_qm": 7.5,
+  "verknuepfung": "summe",
+  "faktoren": [
+   {
+    "merkmal": "baujahr",
+    "label": "Bauperiode (Gewicht 20 %)",
+    "typ": "baujahr_klasse",
+    "art": "pct",
+    "werte": [
+     {
+      "von": null,
+      "bis": 1969,
+      "wert": -2.88,
+      "faktor": 0.856
+     },
+     {
+      "von": 1970,
+      "bis": 1985,
+      "wert": -1.14,
+      "faktor": 0.943
+     },
+     {
+      "von": 1986,
+      "bis": 2000,
+      "wert": -1.62,
+      "faktor": 0.919
+     },
+     {
+      "von": 2001,
+      "bis": 2014,
+      "wert": -0.58,
+      "faktor": 0.971
+     },
+     {
+      "von": 2015,
+      "bis": null,
+      "wert": 7.68,
+      "faktor": 1.384
+     }
+    ],
+    "beleg": "PDF S. 3–4 Nr. 1 (ohne San/Mod)"
+   },
+   {
+    "merkmal": "saniert_modernisiert",
+    "label": "Bauperiode bis 1969 mit Sanierung/Modernisierung (0,943 statt 0,856)",
+    "typ": "flag",
+    "art": "pct",
+    "werte": 1.74,
+    "bedingung": {
+     "baujahr_von": null,
+     "baujahr_bis": 1969
+    },
+    "beleg": "PDF S. 4 Nr. 1 (mit San/Mod bis 1969 0,943)"
+   },
+   {
+    "merkmal": "wfl",
+    "label": "Wohnungsgröße (Gewicht 20 %)",
+    "typ": "wfl_kurve",
+    "art": "pct",
+    "werte": [
+     {
+      "von": null,
+      "bis": 40,
+      "wert": 1.72,
+      "faktor": 1.086
+     },
+     {
+      "von": 40,
+      "von_inkl": false,
+      "bis": 60,
+      "wert": 1.66,
+      "faktor": 1.083
+     },
+     {
+      "von": 60,
+      "von_inkl": false,
+      "bis": 80,
+      "wert": -1.2,
+      "faktor": 0.94
+     },
+     {
+      "von": 80,
+      "von_inkl": false,
+      "bis": null,
+      "wert": -0.18,
+      "faktor": 0.991
+     }
+    ],
+    "beleg": "PDF S. 4 Nr. 2 (bis 40, 41–60, 61–80, ab 81 m²; als stetige Grenzen)"
+   },
+   {
+    "merkmal": "ausstattung",
+    "label": "Ausstattung (Gewicht 40 %)",
+    "typ": "auswahl",
+    "art": "pct",
+    "werte": {
+     "einfach": -4.04,
+     "standard": -2.4,
+     "gehoben": 14.2
+    },
+    "standard": "standard",
+    "beleg": "PDF S. 4 Nr. 3, Einordnung nach „Standardstufen“"
+   },
+   {
+    "merkmal": "anzahl_wohnungen",
+    "label": "Anzahl Wohnungen im Objekt (Gewicht 5 %)",
+    "typ": "auswahl",
+    "art": "pct",
+    "werte": {
+     "1-3": -0.59,
+     "4-6": -0.3,
+     "7-12": -0.13,
+     "13-18": -0.365,
+     "ab 19": 0.72
+    },
+    "aliase": {
+     "1-3": [
+      "1 - 3",
+      "1 bis 3"
+     ],
+     "4-6": [
+      "4 - 6",
+      "4 bis 6"
+     ],
+     "7-12": [
+      "7 - 12",
+      "7 bis 12"
+     ],
+     "13-18": [
+      "13 - 18",
+      "13 bis 18"
+     ],
+     "ab 19": [
+      ">19",
+      "mehr als 19",
+      "19+"
+     ]
+    },
+    "beleg": "PDF S. 4 Nr. 4"
+   },
+   {
+    "merkmal": "geschoss",
+    "label": "Lage der Wohnung im Objekt (Gewicht 5 %)",
+    "typ": "auswahl",
+    "art": "pct",
+    "werte": {
+     "eg": 0.01,
+     "og": -0.26,
+     "1. og": 0.075,
+     "2. og": 0.495,
+     "ab 3. og": 0.595,
+     "dg": -0.3
+    },
+    "aliase": {
+     "1. og": [
+      "1.og",
+      "1 og"
+     ],
+     "2. og": [
+      "2.og",
+      "2 og"
+     ],
+     "ab 3. og": [
+      "ab 3.og",
+      "ab 3 og"
+     ]
+    },
+    "beleg": "PDF S. 4 Nr. 5"
+   },
+   {
+    "merkmal": "lage",
+    "label": "Lage des Objekts (Gewicht 10 %)",
+    "typ": "lage",
+    "art": "pct",
+    "werte": {
+     "kg": -0.37,
+     "sz": -0.34,
+     "mg": -1.59,
+     "wg": 0.31,
+     "st": -0.31
+    },
+    "aliase": {
+     "kg": [
+      "kurgebiet"
+     ],
+     "sz": [
+      "stadtzentrum"
+     ],
+     "mg": [
+      "mischgebiet"
+     ],
+     "wg": [
+      "wohngebiet"
+     ],
+     "st": [
+      "stadtteil"
+     ]
+    },
+    "beleg": "PDF S. 4 Nr. 6, Wohnlagenkarte"
+   }
+  ],
+  "spanne": {
+   "unten_pct": -20,
+   "oben_pct": 20
+  },
+  "beleg": "Mietspiegelrechner (xls) Blatt „Mietspiegelrechner“: Gewichtung, „Vergleichsmiete pro m²“, „− 20 % unterer Wert“, „+ 20 % oberer Wert“; PDF S. 4–5"
+ },
+ "pruefbeispiele": [
+  {
+   "eingabe": {
+    "baujahr": 1990,
+    "wfl": 35,
+    "lage": "MG",
+    "merkmale": {
+     "ausstattung": "einfach",
+     "anzahl_wohnungen": "ab 19",
+     "geschoss": "ab 3. OG"
+    }
+   },
+   "erwartet": {
+    "unten": 5.75,
+    "mittel": 7.18,
+    "oben": 8.62
+   },
+   "seite": "Mietspiegelrechner (xls), Voreinstellung",
+   "art": "anwendungsbeispiel",
+   "anmerkung": "Rechner: 7,18348 €, unterer Wert 5,74679 €, oberer 8,62018 €; mit den dreistelligen PDF-Faktoren 7,5 × 0,95785 = 7.1839"
+  },
+  {
+   "eingabe": {
+    "baujahr": 1960,
+    "wfl": 70
+   },
+   "erwartet": null,
+   "seite": "PDF S. 4 Nr. 6",
+   "art": "tabellenzelle",
+   "anmerkung": "ohne Lage des Objekts kein Wert"
+  }
+ ]
+}
