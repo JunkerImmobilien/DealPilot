@@ -1,0 +1,516 @@
+{
+ "ags": "12073452",
+ "gemeinde": "Prenzlau",
+ "art": "qualifiziert",
+ "stand": "2026",
+ "erhebungsstichtag": "2025-06-01",
+ "gueltig_ab": null,
+ "gueltig_bis": null,
+ "quelle": {
+  "url": "https://www.prenzlau.eu/sixcms/media.php/54/Qualifizierter%20Prenzlauer%20Mietspiegel%202026%20Tabelle.pdf",
+  "dokument": "Qualifizierter Prenzlauer Mietspiegel 2026, Tabelle (1 Seite); dazu Endbericht „Grundlagendaten für den Mietspiegel“, Anlage 2 zur DS 67/2025",
+  "seite": "Tabelle S. 1; Endbericht S. 2 (Geltungsbereich, Stichtag 01.06.2025), S. 7 (Anerkennung durch die Stadtverordnetenversammlung)",
+  "lizenz": "kein Rechtevorbehalt und kein Speicherverbot in Tabelle und Endbericht (geprüft 26.11.2026); amtliche Veröffentlichung der Stadt Prenzlau",
+  "abgerufen": "2026-11-26"
+ },
+ "einheit": "eur_qm_nettokalt",
+ "form": "tabelle",
+ "rundung": 2,
+ "hinweis": "Qualifiziert nach § 558d BGB durch Beschluss der Stadtverordnetenversammlung (vorgelegt am 04.12.2025), da der Mieterverein die Anerkennung versagte bzw. sich nicht äußerte (Endbericht S. 7). Erstellt von der Stadtverwaltung Prenzlau mit der AG Mietspiegel; Stichtag 01.06.2025, Erhebungszeitraum 02.06.2019–01.06.2025, Geltung Stadt Prenzlau mit allen Ortsteilen (Endbericht S. 2). Ein Gültigkeitsdatum nennt das Dokument nicht. Tabelle am Druckbild geprüft (Textschicht stimmt): Mittelwert und Spanne je Feld, Felder mit * (11–20 Mietwerte, geringe Aussagekraft) eingetragen, durchgekreuzte Felder nicht. Ausstattung A = Bad, WC, Sammelheizung, nicht oder teilsaniert; B = Bad, WC, Sammelheizung, Neubau oder nach Sanierung. Die Ausstattung muss angegeben werden (kein Standard). Die Grenze „bis 40 qm“ / „40 bis unter 60 qm“: 40 m² zählt zur ersten Klasse. Zu Häusern sagt das Dokument nichts.",
+ "tabelle": {
+  "achsen": {
+   "baujahr": [
+    {
+     "von": null,
+     "bis": 1945,
+     "label": "vor 1946"
+    },
+    {
+     "von": 1946,
+     "bis": 1960,
+     "label": "1946–1960"
+    },
+    {
+     "von": 1961,
+     "bis": 1975,
+     "label": "1961–1975"
+    },
+    {
+     "von": 1976,
+     "bis": 1990,
+     "label": "1976–1990"
+    },
+    {
+     "von": 1991,
+     "bis": 2000,
+     "label": "1991–2000"
+    },
+    {
+     "von": 2001,
+     "bis": null,
+     "label": "ab 2001"
+    }
+   ],
+   "wfl": [
+    {
+     "von": null,
+     "bis": 40,
+     "label": "bis 40 m²"
+    },
+    {
+     "von": 40,
+     "von_inkl": false,
+     "bis": 60,
+     "bis_inkl": false,
+     "label": "40 bis unter 60 m²"
+    },
+    {
+     "von": 60,
+     "bis": 75,
+     "bis_inkl": false,
+     "label": "60 bis unter 75 m²"
+    },
+    {
+     "von": 75,
+     "bis": 95,
+     "bis_inkl": false,
+     "label": "75 bis unter 95 m²"
+    },
+    {
+     "von": 95,
+     "bis": null,
+     "label": "95 m² und mehr"
+    }
+   ],
+   "ausstattung": [
+    {
+     "schluessel": "A",
+     "label": "A: Bad, WC, Sammelheizung (nicht oder teilsaniert)",
+     "aliase": [
+      "unsaniert",
+      "teilsaniert"
+     ]
+    },
+    {
+     "schluessel": "B",
+     "label": "B: Bad, WC, Sammelheizung (Neubau oder nach Sanierung)",
+     "aliase": [
+      "saniert",
+      "neubau"
+     ]
+    }
+   ]
+  },
+  "zellen": [
+   {
+    "baujahr": 0,
+    "wfl": 0,
+    "ausstattung": "A",
+    "unten": 4.76,
+    "mittel": 5.65,
+    "oben": 6.35,
+    "seite": "1"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 0,
+    "ausstattung": "B",
+    "unten": 5.62,
+    "mittel": 6.52,
+    "oben": 6.85,
+    "seite": "1"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 0,
+    "ausstattung": "B",
+    "unten": 5.87,
+    "mittel": 6.65,
+    "oben": 7.62,
+    "seite": "1"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 0,
+    "ausstattung": "B",
+    "unten": 5.5,
+    "mittel": 6.32,
+    "oben": 7.32,
+    "seite": "1"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 0,
+    "ausstattung": "A",
+    "unten": 5.42,
+    "mittel": 5.66,
+    "oben": 6.0,
+    "seite": "1"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 0,
+    "ausstattung": "B",
+    "unten": 5.54,
+    "mittel": 6.25,
+    "oben": 6.7,
+    "seite": "1"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 1,
+    "ausstattung": "A",
+    "unten": 5.05,
+    "mittel": 5.72,
+    "oben": 6.41,
+    "seite": "1"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 1,
+    "ausstattung": "B",
+    "unten": 5.5,
+    "mittel": 6.42,
+    "oben": 7.35,
+    "seite": "1"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 1,
+    "ausstattung": "A",
+    "unten": 5.2,
+    "mittel": 5.88,
+    "oben": 6.5,
+    "seite": "1"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 1,
+    "ausstattung": "B",
+    "unten": 5.54,
+    "mittel": 6.28,
+    "oben": 7.0,
+    "seite": "1"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 1,
+    "ausstattung": "B",
+    "unten": 5.5,
+    "mittel": 6.13,
+    "oben": 7.06,
+    "seite": "1"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 1,
+    "ausstattung": "A",
+    "unten": 5.0,
+    "mittel": 5.53,
+    "oben": 6.19,
+    "seite": "1"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 1,
+    "ausstattung": "B",
+    "unten": 5.5,
+    "mittel": 6.05,
+    "oben": 7.0,
+    "seite": "1"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 1,
+    "ausstattung": "A",
+    "unten": 6.19,
+    "mittel": 6.66,
+    "oben": 7.14,
+    "seite": "1"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 1,
+    "ausstattung": "A",
+    "unten": 5.92,
+    "mittel": 6.35,
+    "oben": 7.13,
+    "seite": "1"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 1,
+    "ausstattung": "B",
+    "unten": 9.01,
+    "mittel": 9.73,
+    "oben": 11.0,
+    "seite": "1"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 2,
+    "ausstattung": "A",
+    "unten": 4.74,
+    "mittel": 5.54,
+    "oben": 6.28,
+    "seite": "1"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 2,
+    "ausstattung": "B",
+    "unten": 5.42,
+    "mittel": 6.23,
+    "oben": 7.24,
+    "seite": "1"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 2,
+    "ausstattung": "A",
+    "unten": 5.0,
+    "mittel": 5.57,
+    "oben": 6.0,
+    "seite": "1"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 2,
+    "ausstattung": "B",
+    "unten": 5.5,
+    "mittel": 6.22,
+    "oben": 6.83,
+    "seite": "1"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 2,
+    "ausstattung": "A",
+    "unten": 5.2,
+    "mittel": 5.67,
+    "oben": 6.0,
+    "seite": "1",
+    "anmerkung": "* 11–20 Mietwerte, geringe Aussagekraft"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 2,
+    "ausstattung": "B",
+    "unten": 5.38,
+    "mittel": 5.95,
+    "oben": 6.69,
+    "seite": "1"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 2,
+    "ausstattung": "A",
+    "unten": 4.74,
+    "mittel": 5.34,
+    "oben": 5.9,
+    "seite": "1"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 2,
+    "ausstattung": "B",
+    "unten": 5.25,
+    "mittel": 5.69,
+    "oben": 6.5,
+    "seite": "1"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 2,
+    "ausstattung": "A",
+    "unten": 6.5,
+    "mittel": 6.83,
+    "oben": 7.0,
+    "seite": "1",
+    "anmerkung": "* 11–20 Mietwerte, geringe Aussagekraft"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 2,
+    "ausstattung": "A",
+    "unten": 6.98,
+    "mittel": 7.44,
+    "oben": 7.9,
+    "seite": "1"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 2,
+    "ausstattung": "B",
+    "unten": 9.17,
+    "mittel": 9.46,
+    "oben": 10.5,
+    "seite": "1"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 3,
+    "ausstattung": "A",
+    "unten": 4.89,
+    "mittel": 5.46,
+    "oben": 5.84,
+    "seite": "1"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 3,
+    "ausstattung": "B",
+    "unten": 5.5,
+    "mittel": 6.44,
+    "oben": 7.76,
+    "seite": "1"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 3,
+    "ausstattung": "A",
+    "unten": 4.5,
+    "mittel": 5.44,
+    "oben": 6.19,
+    "seite": "1",
+    "anmerkung": "* 11–20 Mietwerte, geringe Aussagekraft"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 3,
+    "ausstattung": "B",
+    "unten": 5.5,
+    "mittel": 6.1,
+    "oben": 6.89,
+    "seite": "1"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 3,
+    "ausstattung": "B",
+    "unten": 5.36,
+    "mittel": 5.7,
+    "oben": 6.1,
+    "seite": "1"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 3,
+    "ausstattung": "A",
+    "unten": 4.32,
+    "mittel": 4.9,
+    "oben": 5.5,
+    "seite": "1",
+    "anmerkung": "* 11–20 Mietwerte, geringe Aussagekraft"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 3,
+    "ausstattung": "B",
+    "unten": 5.12,
+    "mittel": 5.52,
+    "oben": 6.03,
+    "seite": "1"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 3,
+    "ausstattung": "A",
+    "unten": 6.0,
+    "mittel": 6.6,
+    "oben": 7.0,
+    "seite": "1",
+    "anmerkung": "* 11–20 Mietwerte, geringe Aussagekraft"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 3,
+    "ausstattung": "A",
+    "unten": 6.37,
+    "mittel": 6.94,
+    "oben": 7.4,
+    "seite": "1",
+    "anmerkung": "* 11–20 Mietwerte, geringe Aussagekraft"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 3,
+    "ausstattung": "B",
+    "unten": 7.64,
+    "mittel": 9.21,
+    "oben": 10.45,
+    "seite": "1"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 4,
+    "ausstattung": "A",
+    "unten": 4.81,
+    "mittel": 6.19,
+    "oben": 8.5,
+    "seite": "1",
+    "anmerkung": "* 11–20 Mietwerte, geringe Aussagekraft"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 4,
+    "ausstattung": "B",
+    "unten": 5.34,
+    "mittel": 6.52,
+    "oben": 7.98,
+    "seite": "1"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 4,
+    "ausstattung": "B",
+    "unten": 7.0,
+    "mittel": 8.68,
+    "oben": 10.18,
+    "seite": "1",
+    "anmerkung": "* 11–20 Mietwerte, geringe Aussagekraft"
+   }
+  ]
+ },
+ "pruefbeispiele": [
+  {
+   "eingabe": {
+    "baujahr": 1980,
+    "wfl": 65,
+    "ausstattung": "B"
+   },
+   "erwartet": {
+    "unten": 5.25,
+    "mittel": 5.69,
+    "oben": 6.5
+   },
+   "seite": "1",
+   "art": "tabellenzelle"
+  },
+  {
+   "eingabe": {
+    "baujahr": 2010,
+    "wfl": 50,
+    "ausstattung": "B"
+   },
+   "erwartet": {
+    "unten": 9.01,
+    "mittel": 9.73,
+    "oben": 11.0
+   },
+   "seite": "1",
+   "art": "tabellenzelle"
+  },
+  {
+   "eingabe": {
+    "baujahr": 1995,
+    "wfl": 65,
+    "ausstattung": "B"
+   },
+   "erwartet": null,
+   "seite": "1",
+   "art": "tabellenzelle",
+   "anmerkung": "Feld durchgekreuzt"
+  }
+ ]
+}
