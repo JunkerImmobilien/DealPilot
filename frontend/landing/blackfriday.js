@@ -240,15 +240,63 @@
     });
   }
 
+  /* landing-deal-sprung-1 (Marcel 26.11.2026): statt Vollbild-Fenster eine schmale Leiste am unteren Rand,
+     erst nach 20 s oder ab gut einem Drittel der Seite. Schließen gilt für die Sitzung. Das Fenster zeigen() bleibt
+     als Funktion stehen, wird aber nicht mehr aufgerufen. */
+  var LZU = "dp_bw26_leiste_zu";
+  function leiste() {
+    if (document.getElementById("dp-bf-leiste")) return;
+    var st = document.createElement("style");
+    st.id = "dp-bf-leiste-stil";
+    st.textContent = [
+      "#dp-bf-leiste{position:fixed;left:12px;right:12px;bottom:12px;z-index:9000;max-width:760px;margin:0 auto;display:flex;align-items:center;gap:12px;",
+      "background:rgba(12,11,9,.96);color:#ECE6D6;border:1px solid rgba(201,168,76,.28);border-radius:10px;padding:10px 10px 10px 16px;",
+      "box-shadow:0 18px 40px rgba(0,0,0,.35);transform:translateY(160%);transition:transform .45s cubic-bezier(.2,.7,.3,1);font-family:Inter,system-ui,sans-serif}",
+      "#dp-bf-leiste.an{transform:none}",
+      "#dp-bf-leiste p{margin:0;flex:1;font-size:13.5px;line-height:1.35}",
+      "#dp-bf-leiste p b{color:var(--wl-e8cc7a,#E8CC7A);font:600 11.5px 'JetBrains Mono',monospace;letter-spacing:.12em;margin-right:6px}",
+      "#dp-bf-leiste code{font:600 12.5px 'JetBrains Mono',monospace;color:#fff;background:rgba(255,255,255,.08);padding:2px 6px;border-radius:4px;cursor:pointer}",
+      "#dp-bf-leiste a{flex:0 0 auto;display:inline-flex;align-items:center;min-height:40px;padding:8px 14px;border-radius:4px;",
+      "background:linear-gradient(110deg,var(--wl-e8cc7a,#E8CC7A),var(--wl-c9a84c,#C9A84C) 55%,var(--wl-b8932f,#b8932f));color:#3a2e08;font-weight:600;font-size:14px;text-decoration:none}",
+      "#dp-bf-leiste button{flex:0 0 40px;height:40px;border:0;background:transparent;color:rgba(255,255,255,.5);font-size:22px;cursor:pointer;border-radius:6px}",
+      "#dp-bf-leiste button:hover{color:#fff;background:rgba(255,255,255,.06)}",
+      "@media(max-width:520px){#dp-bf-leiste{left:8px;right:8px;bottom:8px;padding:8px 6px 8px 12px}#dp-bf-leiste p{font-size:12.5px}#dp-bf-leiste .lang{display:none}#dp-bf-leiste a{padding:8px 11px;font-size:13.5px}}",
+      "@media(prefers-reduced-motion:reduce){#dp-bf-leiste{transition:none}}"
+    ].join("");
+    document.head.appendChild(st);
+    var l = document.createElement("aside");
+    l.id = "dp-bf-leiste";
+    l.setAttribute("aria-label", "Black Week Angebot");
+    l.innerHTML = "<p><b>BLACK WEEK</b>20 % auf Investor und Pro<span class=\"lang\"> im ersten Jahr</span> bis 06.12. mit Code <code title=\"Code kopieren\">" + CODE + "</code></p>" +
+      "<a href=\"#pricing\">Zu den Paketen</a><button type=\"button\" aria-label=\"Angebot schließen\">×</button>";
+    document.body.appendChild(l);
+    setTimeout(function () { l.classList.add("an"); }, 30);
+    var c = l.querySelector("code");
+    c.addEventListener("click", function () { kopieren(c); });
+    l.querySelector("a").addEventListener("click", function (e) {
+      var p = document.getElementById("pricing");
+      if (p) { e.preventDefault(); p.scrollIntoView({ behavior: "smooth", block: "start" }); }
+      else { e.preventDefault(); location.href = "preise.html"; }
+    });
+    l.querySelector("button").addEventListener("click", function () {
+      l.classList.remove("an");
+      setTimeout(function () { if (l.parentNode) l.parentNode.removeChild(l); }, 450);
+      try { sessionStorage.setItem(LZU, "1"); } catch (e) {}
+    });
+  }
+
   function start() {
     if (!aktiv()) return;
     stil();
     malen();
     anUmschalter();
     if (!startseite()) return;
-    try { if (localStorage.getItem(GESEHEN) === '1') return; } catch (e) {}
-    try { localStorage.setItem(GESEHEN, '1'); } catch (e) {}
-    setTimeout(function () { if (aktiv()) zeigen(); }, 1200);
+    try { if (sessionStorage.getItem(LZU) === "1") return; } catch (e) {}
+    var an = false;
+    function los() { if (an || !aktiv()) return; an = true; removeEventListener("scroll", sc); leiste(); }
+    function sc() { if (scrollY > document.documentElement.scrollHeight * 0.35) los(); }
+    setTimeout(los, 20000);
+    addEventListener("scroll", sc, { passive: true });
   }
 
   window.DpBlackFriday = { aktiv: aktiv, rabatt: rabatt, ende: ENDE, code: CODE };

@@ -77,6 +77,7 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
 <link rel="stylesheet" href="dp2-module.css?v=landing-module-2">
 <link rel="stylesheet" href="dp2-kern.css?v=landing-strecke-3">
 <link rel="stylesheet" href="dp2-dealcheck.css?v=einzelcheck-2">
+<link rel="stylesheet" href="landing-deal-sprung.css?v=landing-deal-sprung-1">
 <link rel="stylesheet" href="landing-faecher.css?v=zahlen-raus-1"><!-- landing-faecher-1 · Streifen, Riss, Startbahn „Fächer“, Videothek als Slider · landing-faecher-2 Gesamturteil, Datenbasis, Partnerkarten -->
 <link rel="stylesheet" href="seo.css?v=landing-seo-5">
 </head><body>
@@ -176,19 +177,19 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
   <div class="wrap"><div class="hero-grid">
     <div>
       <div class="eye">Immobilien-Investmentanalyse</div>
-      <h1><span class="zl"><i>Immobilien&shy;entscheidungen</i></span>
-          <span class="zl"><i>sind zu groß für <em>ein Bauchgefühl.</em></i></span></h1>
+      <h1><span class="zl"><i>Rechnet sich der Deal?</i></span>
+          <span class="zl"><i>Prüf es <em>in 30 Sekunden.</em></i></span></h1>
       <!-- landing-satz-1 · Marcel 28.10.2026: im Hero in einem Satz, was DealPilot ist (Storybook, Fassung A) -->
-      <p class="lead">DealPilot begleitet deine Immobilie vom ersten Exposé bis in den Bestand, mit
-        vollständiger Rechnung, einem amtlich begründeten Wert und einem Investment Case, der bei der Bank besteht.
-        Ab dann fliegst du nach Flugdaten.</p>
+      <p class="lead">Kaufpreis und Miete eintragen. DealPilot rechnet Rendite, Cashflow und Finanzierung mit denselben Kernen
+        wie in der App. Danach begleitet es deine Immobilie bis in den Bestand. Ab dann fliegst du nach Flugdaten.</p>
       <div class="hero-btn">
-        <a class="btn-p" href="https://app.dealpilot.immo/?register=1">Vier Wochen als Pro, kostenlos</a>
-        <a class="btn-l" href="#pricing"><svg class="ico" style="width:13px;height:13px;color:var(--gdh)"><use href="#i-pfeil"/></svg>Preise ansehen</a>
+        <!-- landing-deal-sprung-1 · Marcel 26.11.2026: Hauptknopf springt direkt zum Deal-Check -->
+        <a class="btn-p d2-hauptknopf" href="#dealcheck"><span>Deal jetzt prüfen<small>kostenlos und ohne Anmeldung</small></span><svg class="ico" style="width:15px;height:15px"><use href="#i-pfeil"/></svg></a>
+        <a class="btn-l" href="https://app.dealpilot.immo/?register=1">Vier Wochen als Pro, kostenlos</a>
       </div>
       <!-- landing-kern-1 · was am Knopf zugesagt wird, steht im Code: config.js PAYMENT.trial_days 28, plan_trials läuft
            automatisch aus (subscriptionService TR7-trial), danach Free ohne Kündigung -->
-      <p class="cta-haken"><span>Keine Zahlungsdaten</span><span>4 Wochen voller Pro-Umfang</span><span>Danach automatisch Free, ohne Kündigung</span></p>
+      <p class="cta-haken"><span>Deal-Check ohne Anmeldung</span><span>Keine Zahlungsdaten</span><span>4 Wochen voller Pro-Umfang</span></p>
       <div class="hbeleg">
         <div><b><span data-zaehl>30</span> s</b><span>VOM EXPOSÉ ZUR BEWERTUNG</span></div>
         <div><b data-zaehl>24</b><span>KPIs HINTER JEDEM SCORE</span></div>
@@ -231,6 +232,16 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
     </div>
   </div></div>
 </section>
+
+<!-- landing-deal-sprung-1 · Marcel 26.11.2026: Deal-Check direkt nach dem ersten Bildschirm -->
+<section class="sec sec-cream dealcheck dk" id="dealcheck"><div class="wrap dk-g">
+  <div class="dk-text rv"><div class="eye">Deal-Check · 20 Sekunden</div>
+    <h2>Rechnet sich das? <span class="ac">Dreh die Karte um.</span></h2>
+    <p>Zwei Zahlen, Zinsbindung und Tilgung. DealPilot rechnet mit denselben Kernen wie in der App und sagt dir sofort, wo der Deal steht.</p>
+    <ul class="dk-pkt"><li>Echter Deal Score, keine Schätzformel</li><li>Zins tagesaktuell je Zinsbindung</li><li>Mit PLZ: Lage &amp; Markt aus amtlichen Daten</li></ul></div>
+  <div class="dk-szene rv"><div class="dk-karte" id="dkKarte"><!-- landing-seo-3 · Inhalt baut dp2-dealcheck.js (eine Komponente für Startseite und Rechner-Seiten) --></div></div>
+</div></section>
+
 <!-- landing-einstieg-aus · Marcel 28.10.2026: „lass es uns wieder so darstellen wie vorher, mit dem Absprung auf die Seite.“
      Die Einstiegskarte (landing-einstieg-1..3, einstieg.js/.css) ist hier ausgebaut; Anmelden und Kostenlos starten
      führen wieder direkt in die App. Die Dateien bleiben liegen, js/einbettung.js wirkt nur mit ?einbettung=1. -->
@@ -350,7 +361,7 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
   <div><svg class="ico"><use href="#i-server"/></svg>
     <div><b>Server in Deutschland</b><span>Hosting bei Hetzner · DSGVO-konform</span></div></div>
   <div><svg class="ico"><use href="#i-pokal"/></svg>
-    <div><b>Aus der Gutachtenpraxis</b><span>DESAG-geprüfter Sachverständiger</span></div></div>
+    <div><b>Amtliche Daten</b><span>Herkunft je Wert, nichts erfunden</span></div></div>
   <div><svg class="ico"><use href="#i-schild"/></svg>
     <div><b>Deine Daten bleiben deine</b><span>Kein Weiterverkauf, keine Profilbildung</span></div></div>
   <div><svg class="ico"><use href="#i-globus"/></svg>
@@ -389,13 +400,7 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
      Progress-Bar … einfacher, kleiner". Vorderseite: Kaufpreis, Kaltmiete, Zinsbindung (indikativer Zins je Bindung,
      /api/v1/market-rates/bauzins), optional PLZ. Rückseite: Score zählt hoch, Stufe, Cashflow, zwei Kennzahlen,
      Lage & Markt aus eigenen amtlichen Daten (/api/v1/market-stats/schnellcheck), Übernahme in die App wie bisher. -->
-<section class="sec sec-cream dealcheck dk" id="dealcheck"><div class="wrap dk-g">
-  <div class="dk-text rv"><div class="eye">Deal-Check · 20 Sekunden</div>
-    <h2>Rechnet sich das? <span class="ac">Dreh die Karte um.</span></h2>
-    <p>Zwei Zahlen, Zinsbindung und Tilgung. DealPilot rechnet mit denselben Kernen wie in der App und sagt dir sofort, wo der Deal steht.</p>
-    <ul class="dk-pkt"><li>Echter Deal Score, keine Schätzformel</li><li>Zins tagesaktuell je Zinsbindung</li><li>Mit PLZ: Lage &amp; Markt aus amtlichen Daten</li></ul></div>
-  <div class="dk-szene rv"><div class="dk-karte" id="dkKarte"><!-- landing-seo-3 · Inhalt baut dp2-dealcheck.js (eine Komponente für Startseite und Rechner-Seiten) --></div></div>
-</div></section>
+<!-- landing-deal-sprung-1 · der Deal-Check steht jetzt direkt nach dem ersten Bildschirm -->
 
 <!-- ══ DIE STRECKE (Aufzug) · landing-strecke-1 ════════════════════════
      Marcel 17.11.2026: „dieselbe grafische Art für die Hauptseite … eine Strecke, die den Ablauf von
@@ -744,7 +749,7 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
 </div></footer>
 
 
-<script src="dp2-daten.js?v=landing-faecher-3"></script>
+<script src="dp2-daten.js?v=landing-deal-sprung-1"></script>
 <script src="dp2-inhalt.js?v=landing-vivi-1"></script>
 <script src="dp2-module.js?v=landing-module-2"></script>
 <!-- dp2-ablauf.js abgeloest durch demo-wechsel.js (v1588) -->
@@ -771,7 +776,7 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
 <script src="flyer-code.js?v=v1593"></script>
 <script src="promo-erstflug.js?v=v1590"></script>
 <script src="erstflug-popup.js?v=v1595d"></script>
-<script src="blackfriday.js?v=blackweek-2"></script><!-- landing-blackweek-1 · Fenster + durchgestrichene Preise bis 06.12.2026 23:59, danach still -->
+<script src="blackfriday.js?v=landing-deal-sprung-1"></script><!-- landing-blackweek-1 · Fenster + durchgestrichene Preise bis 06.12.2026 23:59, danach still -->
 <!-- v3277 · Messe-Pop-up (immocation FESTIVAL 2026, v1947) ausgebaut - die Messe ist vorbei.
      Marcel 10.11.2026: "Nimm bitte die Werbung fuer die Messe von der Landingpage."
      messe-popup.js bleibt als Vorlage liegen, wird aber von keiner Seite mehr geladen. -->
