@@ -20,6 +20,10 @@
 
   function bauen(e, B, c) {
     var H = e.haus, O = e.objekt || {}, W = e.wert || null, U = e.umfeld, L = e.belw;
+    /* pp6 · Datenschutz: das Netto-Einkommen verlässt den Browser nie. Der Server druckt den Bericht ohne Netto (quote null),
+       dann steht hier, ab welchem Netto die Wohnkosten gut tragbar bzw. knapp sind, gerechnet nur aus den Wohnkosten. */
+    var LB = H.leistbarkeit, abN = function (pct) { return LB.wohnkosten > 0 && pct > 0 ? Math.ceil(LB.wohnkosten / pct * 100 / 10) * 10 : null; };
+    var abGruen = abN(LB.grenzen && LB.grenzen.gruen), abGelb = abN(LB.grenzen && LB.grenzen.gelb);
     var P = [];
     function add(titel, unter, html) { P.push([titel, unter, html]); }
 
@@ -31,7 +35,7 @@
         g.preis ? { l: 'Preis', v: B.zahl(g.preis.score), s: 'von 100, Gewicht 35 %' } : null,
         { l: 'Zustand', v: B.zahl(g.zustand.score), s: 'von 100, Gewicht 35 %' },
         g.lage ? { l: 'Lage', v: B.zahl(g.lage.score), s: 'von 100, Gewicht 30 %' } : null,
-        { l: 'Passt es zu mir?', v: H.leistbarkeit.quote == null ? 'ohne Einkommen' : B.pct(H.leistbarkeit.quote, 0), s: H.leistbarkeit.ampel === 'gruen' ? 'gut tragbar' : H.leistbarkeit.ampel === 'gelb' ? 'knapp' : H.leistbarkeit.ampel === 'rot' ? 'zu hoch' : 'Belastung vom Netto',
+        { l: 'Passt es zu mir?', v: H.leistbarkeit.quote == null ? (abGruen ? 'ab ' + B.eur(abGruen) : 'ohne Einkommen') : B.pct(H.leistbarkeit.quote, 0), s: H.leistbarkeit.ampel === 'gruen' ? 'gut tragbar' : H.leistbarkeit.ampel === 'gelb' ? 'knapp' : H.leistbarkeit.ampel === 'rot' ? 'zu hoch' : (abGruen ? 'Netto im Monat, damit gut tragbar' : 'Belastung vom Netto'),
           art: H.leistbarkeit.ampel === 'gruen' ? 'gut' : H.leistbarkeit.ampel === 'rot' ? 'schlecht' : '' }
       ])
       + '<div class="block"><h3>Was du wissen solltest</h3><ul>' + H.urteil.map(function (t) { return '<li>' + B.esc(t) + '</li>'; }).join('') + '</ul></div>');
@@ -95,14 +99,15 @@
       { l: 'Darlehen', v: B.eur(F.darlehen), s: 'Beleihungsauslauf zum Kaufpreis ' + B.pct(F.ltv_pct, 0) },
       { l: 'Rate im Monat', v: B.eur(F.rate), s: 'Zins ' + B.pct(F.zins_pct, 2) + ' plus ' + B.pct(F.tilgung_pct, 0) + ' Tilgung' },
       { l: 'Wohnkosten im Monat', v: B.eur(H.leistbarkeit.wohnkosten), s: 'Rate, Eigentümer- und Betriebskosten' },
-      { l: 'Belastung', v: H.leistbarkeit.quote == null ? 'ohne Einkommen' : B.pct(H.leistbarkeit.quote, 0) + ' vom Netto', art: H.leistbarkeit.ampel === 'gruen' ? 'gut' : H.leistbarkeit.ampel === 'rot' ? 'schlecht' : '' }
+      { l: H.leistbarkeit.quote == null && abGruen ? 'Gut tragbar ab Netto' : 'Belastung', v: H.leistbarkeit.quote == null ? (abGruen ? B.eur(abGruen) + ' im Monat' : 'ohne Einkommen') : B.pct(H.leistbarkeit.quote, 0) + ' vom Netto', art: H.leistbarkeit.ampel === 'gruen' ? 'gut' : H.leistbarkeit.ampel === 'rot' ? 'schlecht' : '' }
     ]);
     /* v5130j · Haushaltsrechnung: Rate, Eigentümerkosten, Heizung, übrige Nebenkosten, Summe und Anteil vom Netto */
     var AU = H.leistbarkeit.aufstellung || [];
     if (AU.length) {
       /* pp6 · Posten der übrigen Nebenkosten eingerückt mit Herkunft (je Gemeinde, Landesmittel, Bundesschnitt) */
       var zeilen = AU.map(function (x) { return [(x.teil ? ' ' : '') + x.l + (x.herkunft ? ' (' + x.herkunft + ')' : ''), B.eur(x.eur), x.summe ? { art: 'summe' } : null].filter(function (y) { return y !== null; }); });
-      zeilen.push(['Anteil vom Netto-Einkommen', H.leistbarkeit.quote == null ? 'ohne Einkommen' : B.pct(H.leistbarkeit.quote, 0) + ' von ' + B.eur(H.leistbarkeit.netto)]);
+      if (H.leistbarkeit.quote == null && abGruen) { zeilen.push(['Gut tragbar ab einem Netto-Einkommen von', B.eur(abGruen)]); if (abGelb) zeilen.push(['Knapp ab einem Netto-Einkommen von', B.eur(abGelb)]); }
+      else zeilen.push(['Anteil vom Netto-Einkommen', H.leistbarkeit.quote == null ? 'ohne Einkommen' : B.pct(H.leistbarkeit.quote, 0) + ' von ' + B.eur(H.leistbarkeit.netto)]);
       bank += '<div class="block"><h3>Haushaltsrechnung</h3>' + B.liste(zeilen)
         + '<p class="det">Grün bis ' + H.leistbarkeit.grenzen.gruen + ' %, gelb bis ' + H.leistbarkeit.grenzen.gelb + ' % vom Netto. Banken rechnen meist nur die Rate gegen höchstens 40 % vom Netto, die Nebenkosten kommen hier dazu. Heizung aus dem Energieausweis bzw. der Annahme, übrige Nebenkosten aus den Unterlagen, sonst Grundsteuer und Trinkwasser je Gemeinde und die übrigen Posten als Durchschnitt.</p></div>';
     }

@@ -119,7 +119,7 @@
     meldung(/abbruch/.test(location.search) ? 'Die Zahlung wurde abgebrochen.' : 'Zahlung wird geprüft …', /abbruch/.test(location.search));
     if (/abbruch/.test(location.search)) return;
     var E = window.DpEigennutzerKern, A = window.DpHausCheckAblauf;
-    var d = null, html = null;
+    var d = null, html = null, htmlServer = null;
     warteBezahlt(t, 10).then(function () {
       meldung('Bezahlt. Wert, Beleihungswert und Umfeld werden gerechnet, das dauert bis zu einer Minute …');
       return E.daten(e.plz, e.bj, e.wfl);
@@ -130,11 +130,16 @@
       return post('/bericht', { token: t, adresse: adresse, darlehen: vor && vor.darlehen, nhk: e.objektart === 'etw' ? null : nhkAus(e) }).then(function (b) {
         if (!b || b._status >= 400) throw new Error((b && b.error) || 'Der Bericht ging gerade nicht.');
         return post('/status', { token: t }).then(function (st) {
-          return A.html({ e: { kp: e.kp, wfl: e.wfl, bj: e.bj, ek: e.ek, netto: e.netto, plz: e.plz, objektart: e.objektart }, d: d, bericht: b, adresse: adresse, anrechnung: st && st.anrechnung });
+          /* pp6 · Datenschutz: das Netto-Einkommen verlässt den Browser nie. Fassung mit Netto nur lokal (Ansicht im Browser),
+             die Fassung für den Druck auf dem Server rechnet ohne Netto (netto 0) und nennt das nötige Netto für grün/gelb. */
+          var o = { d: d, bericht: b, adresse: adresse, anrechnung: st && st.anrechnung };
+          var mit = A.html(Object.assign({ e: { kp: e.kp, wfl: e.wfl, bj: e.bj, ek: e.ek, netto: e.netto, plz: e.plz, objektart: e.objektart } }, o));
+          var ohne = A.html(Object.assign({ e: { kp: e.kp, wfl: e.wfl, bj: e.bj, ek: e.ek, netto: 0, plz: e.plz, objektart: e.objektart } }, o));
+          return Promise.all([mit, ohne]).then(function (z) { z[0].htmlServer = z[1].html; return z[0]; });
         });
       });
     }).then(function (erg) {
-      html = erg.html;
+      html = erg.html; htmlServer = erg.htmlServer;
       /* Score angleichen: das Ergebnis oben rechnet jetzt mit demselben Wert wie das PDF */
       try { if (window.DemoEgZeige && erg.r) { var kb = $('hcKauf'); window.DemoEgZeige(erg.r, d, e); if (kb && $('egErg')) $('egErg').appendChild(kb); } } catch (x) {}
       box.innerHTML = '<h4>Dein Haus-Check ist fertig</h4><p>Haus-Score ' + erg.haus.haus.score + ' von 100, ' + esc(erg.haus.haus.stufe.wort) + '. Der Kauf gilt 14 Tage, der Bericht lässt sich bis zu dreimal neu erzeugen.</p>'
@@ -143,7 +148,7 @@
       $('hcAnsehen').addEventListener('click', function () { window.DpDokument.vorschau(html, 'Haus-Check'); });
       $('hcPdf').addEventListener('click', function () {
         var btn = $('hcPdf'); btn.disabled = true; meldung('PDF wird erzeugt …');
-        fetch(API + '/pdf', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token: t, html: html, titel: (e.str ? e.str + ', ' : '') + e.plz }) })
+        fetch(API + '/pdf', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token: t, html: htmlServer, titel: (e.str ? e.str + ', ' : '') + e.plz }) })
           .then(function (r) { if (!r.ok) throw new Error('pdf'); return r.blob(); })
           .then(function (blob) { A.laden(blob, 'DealPilot Haus-Check ' + e.plz + '.pdf'); meldung('Gespeichert.'); })
           .catch(function () { meldung('Das PDF ging gerade nicht. Im Browser ansehen und dort drucken geht immer.', true); })

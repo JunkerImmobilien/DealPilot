@@ -119,5 +119,21 @@ ok(S.sicherung({ ausfuehren: true, live: false, schluessel: 'sk_live_x' }).rc ==
 ok(S.PREIS.unit_amount === 999 && S.PREIS.lookup_key === hc.LOOKUP_KEY, 'F  Skript und Dienst nennen denselben lookup_key, 999 Cent');
 ok(S.COUPON.id === hc.ANRECHNUNG_COUPON && S.COUPON.amount_off === 999 && S.COUPON.duration === 'once', 'F  Skript legt den Anrechnungs-Coupon 9,99 € einmal an, gleiche ID wie der Dienst');
 
+/* N · pp6 Datenschutz: das Netto-Einkommen verlässt den Browser nie (Datenschutzerklärung 1.8).
+   Der Server druckt die Fassung ohne Netto, kein Aufruf an den Server trägt netto oder die Quote. */
+{
+  const fs = await import('node:fs');
+  const kauf = fs.readFileSync(path.join(W, 'frontend/landing/haus-check-kauf.js'), 'utf8');
+  const pdfBody = (kauf.match(/fetch\(API \+ '\/pdf'[^;]*/) || [''])[0];
+  ok(/html: htmlServer/.test(pdfBody) && !/html: html\b/.test(pdfBody), 'N  /pdf bekommt die Fassung ohne Netto (htmlServer)');
+  ok(/var ohne = A\.html\(Object\.assign\(\{ e: \{[^}]*netto: 0[^}]*\} \}/.test(kauf), 'N  Fassung für den Server rechnet mit netto 0');
+  const posts = kauf.match(/post\('\/[a-z]+', \{[^)]*\)/g) || [];
+  ok(posts.length >= 3 && posts.every((p) => !/netto|quote|leistbar/i.test(p)), 'N  kein post() trägt netto oder die Quote (' + posts.length + ' Aufrufe)');
+  const pdfJs = fs.readFileSync(path.join(W, 'frontend/js/haus-check-pdf.js'), 'utf8');
+  ok(/Gut tragbar ab einem Netto-Einkommen von/.test(pdfJs), 'N  PDF ohne Netto nennt das nötige Netto für grün');
+  /* Gegenprobe: die alte Zeile (Netto im Body) würde rot */
+  ok(!/html: htmlServer/.test("fetch(API + '/pdf', { body: JSON.stringify({ token: t, html: html, titel: x }) })"), 'N  Gegenprobe greift');
+}
+
 console.log((rot ? 'ROT' : 'sauber') + ' · ' + gruen + ' grün, ' + rot + ' rot');
 process.exit(rot ? 1 : 0);
