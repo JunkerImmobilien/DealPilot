@@ -1,0 +1,359 @@
+{
+ "ags": "05954016",
+ "gemeinde": "Hattingen",
+ "haus": {
+  "regel": "gilt",
+  "hinweis": "Der Mietspiegel gilt für Wohnungen in Ein- und Mehrfamilienhäusern; für Einfamilienhäuser ist ein Zuschlag vorzunehmen, dessen Höhe der Mietspiegel nicht beziffert (undefinierter Zuschlag)",
+  "beleg": "PDF-S. 3 Nr. 1 („Vergleichsmieten für Wohnungen in Ein- und Mehrfamilienhäusern“), PDF-S. 6 Nr. 4.2 („Weitere Zuschläge sind vorzunehmen, wenn … Einfamilienhaus“)"
+ },
+ "art": "qualifiziert",
+ "stand": "2025-06-01",
+ "erhebungsstichtag": "2024-12-31",
+ "gueltig_ab": "2025-06-01",
+ "gueltig_bis": null,
+ "naechste_ausgabe": "2027-06-01",
+ "quelle": {
+  "url": "https://www.hattingen.de/stadt_hattingen/Rathaus/Fachbereiche/Soziales%20und%20Wohnen/Mietspiegel/mietspiegel_hattingen_2025.pdf",
+  "dokument": "Mietspiegel für nicht preisgebundene Wohnungen im Gebiet der Stadt Hattingen, Stand: 1. Juni 2025 (Haus-, Wohnungs- und Grundeigentümerverein Hattingen e.V., Mieterverein Bochum, Hattingen und Umgegend e.V., Stadt Hattingen – FB50)",
+  "seite": "PDF-S. 12 (Mietspiegeltabelle und Zuschläge), PDF-S. 3 (Allgemeines, qualifiziert § 558d), PDF-S. 5 (Zuschlagskriterien), PDF-S. 6 (undefinierte Zu-/Abschläge, Laufzeit)",
+  "lizenz": "kein Rechtevorbehalt im Dokument (nur „Alle Angaben nach bestem Wissen, aber ohne Gewähr.“, PDF-S. 12), geprüft am 2026-11-26",
+  "abgerufen": "2026-11-26"
+ },
+ "einheit": "eur_qm_nettokalt",
+ "form": "tabelle",
+ "rundung": 2,
+ "hinweis": "Tabelle Baujahr × Wohnfläche mit EINEM Wert je Feld (keine Spanne im Dokument). Keine Wohnlagen („keine signifikanten Preisunterschiede in Abhängigkeit von der Wohnlage“, PDF-S. 5). Definierte Zuschläge als €/m² (S. 12); undefinierte Zu- und Abschläge ohne Betrag (S. 6 Nr. 4.2: Zuschläge Einfamilienhaus, zweites Bad, Sonderausstattung, barrierefrei DIN 18025, verstärkter Einbruchschutz; Abschläge kein Bad, keine Heizung, unzureichende Küche, Einfachverglasung, WC außerhalb, kein Keller/Abstellraum, fehlender Wohnungsabschluss, kein Warmwasser, Souterrain) nicht abgebildet; „Weitere Zu- und Abschläge sind nicht zulässig.“ Wohnflächenklassen im Dokument ganzzahlig (bis 34, 35–49, 50–109, ab 110 m²), hier stetig. Verzeichnis führte form „punkte“ — das Dokument ist eine Tabelle. Laufzeit: in Kraft 01.06.2025, „wird bis spätestens zum 01.06.2027 … fortgeschrieben oder neu erstellt“ (S. 6). Erhebungsstichtag 31.12.2024 (S. 3).",
+ "tabelle": {
+  "achsen": {
+   "baujahr": [
+    {
+     "von": null,
+     "bis": 1924,
+     "label": "bis 1924"
+    },
+    {
+     "von": 1925,
+     "bis": 1964,
+     "label": "1925–1964"
+    },
+    {
+     "von": 1965,
+     "bis": 1979,
+     "label": "1965–1979"
+    },
+    {
+     "von": 1980,
+     "bis": 1994,
+     "label": "1980–1994"
+    },
+    {
+     "von": 1995,
+     "bis": 2009,
+     "label": "1995–2009"
+    },
+    {
+     "von": 2010,
+     "bis": 2019,
+     "label": "2010–2019"
+    },
+    {
+     "von": 2020,
+     "bis": null,
+     "label": "ab 2020"
+    }
+   ],
+   "wfl": [
+    {
+     "von": null,
+     "bis": 34,
+     "label": "bis 34 m²"
+    },
+    {
+     "von": 34,
+     "von_inkl": false,
+     "bis": 49,
+     "label": "35–49 m²"
+    },
+    {
+     "von": 49,
+     "von_inkl": false,
+     "bis": 109,
+     "label": "50–109 m²"
+    },
+    {
+     "von": 109,
+     "von_inkl": false,
+     "bis": null,
+     "label": "ab 110 m²"
+    }
+   ]
+  },
+  "zellen": [
+   {
+    "baujahr": 0,
+    "wfl": 0,
+    "mittel": 6.05,
+    "seite": "12"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 1,
+    "mittel": 6.28,
+    "seite": "12"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 2,
+    "mittel": 6.05,
+    "seite": "12"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 3,
+    "mittel": 6.51,
+    "seite": "12"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 0,
+    "mittel": 6.31,
+    "seite": "12"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 1,
+    "mittel": 6.54,
+    "seite": "12"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 2,
+    "mittel": 6.31,
+    "seite": "12"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 3,
+    "mittel": 6.77,
+    "seite": "12"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 0,
+    "mittel": 5.81,
+    "seite": "12"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 1,
+    "mittel": 6.04,
+    "seite": "12"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 2,
+    "mittel": 5.81,
+    "seite": "12"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 3,
+    "mittel": 6.27,
+    "seite": "12"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 0,
+    "mittel": 6.31,
+    "seite": "12"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 1,
+    "mittel": 6.54,
+    "seite": "12"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 2,
+    "mittel": 6.31,
+    "seite": "12"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 3,
+    "mittel": 6.77,
+    "seite": "12"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 0,
+    "mittel": 6.77,
+    "seite": "12"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 1,
+    "mittel": 7,
+    "seite": "12"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 2,
+    "mittel": 6.77,
+    "seite": "12"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 3,
+    "mittel": 7.23,
+    "seite": "12"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 0,
+    "mittel": 7.17,
+    "seite": "12"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 1,
+    "mittel": 7.4,
+    "seite": "12"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 2,
+    "mittel": 7.17,
+    "seite": "12"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 3,
+    "mittel": 7.63,
+    "seite": "12"
+   },
+   {
+    "baujahr": 6,
+    "wfl": 0,
+    "mittel": 8.78,
+    "seite": "12"
+   },
+   {
+    "baujahr": 6,
+    "wfl": 1,
+    "mittel": 9.01,
+    "seite": "12"
+   },
+   {
+    "baujahr": 6,
+    "wfl": 2,
+    "mittel": 8.78,
+    "seite": "12"
+   },
+   {
+    "baujahr": 6,
+    "wfl": 3,
+    "mittel": 9.24,
+    "seite": "12"
+   }
+  ],
+  "zuschlaege": [
+   {
+    "merkmal": "dachgeschoss",
+    "art": "eur_qm",
+    "wert": 0.22,
+    "label": "Dachgeschosswohnung",
+    "beleg": "PDF-S. 12 Zuschläge; Kriterien PDF-S. 5 Nr. 4.1 („Wohnung im obersten Geschoss eines Gebäudes“)"
+   },
+   {
+    "merkmal": "gaeste_wc",
+    "art": "eur_qm",
+    "wert": 0.2,
+    "label": "Zweites WC",
+    "beleg": "PDF-S. 12 Zuschläge; Kriterien PDF-S. 5 Nr. 4.1 („Zusätzliches Gäste-WC“)"
+   },
+   {
+    "merkmal": "balkon",
+    "art": "eur_qm",
+    "wert": 0.2,
+    "label": "Balkon und/oder Loggia",
+    "beleg": "PDF-S. 12 Zuschläge; Kriterien PDF-S. 5 Nr. 4.1 („eigener Balkon/Loggia“)"
+   },
+   {
+    "merkmal": "terrasse",
+    "art": "eur_qm",
+    "wert": 0.26,
+    "label": "Terrasse",
+    "beleg": "PDF-S. 12 Zuschläge; Kriterien PDF-S. 5 Nr. 4.1 („eigene Terrasse“)"
+   },
+   {
+    "merkmal": "garten",
+    "art": "eur_qm",
+    "wert": 0.33,
+    "label": "Alleinige Gartennutzung",
+    "beleg": "PDF-S. 12 Zuschläge; Kriterien PDF-S. 5 Nr. 4.1 („eigener Garten“)"
+   },
+   {
+    "merkmal": "gehobener_boden",
+    "art": "eur_qm",
+    "wert": 1.18,
+    "label": "Gehobener Fußbodenbelag",
+    "beleg": "PDF-S. 12 Zuschläge; Kriterien PDF-S. 5 Nr. 4.1 („in Wohnbereichen überwiegend vorhanden: Parkett, Kork, Echtholz, Naturstein, hochwertige Fliesen, Vinyl“)"
+   },
+   {
+    "merkmal": "rolllaeden",
+    "art": "eur_qm",
+    "wert": 0.5,
+    "label": "Rollläden an 2/3 der Fenster",
+    "beleg": "PDF-S. 12 Zuschläge; Kriterien PDF-S. 5 Nr. 4.1 („min. 2/3 der Fensterflächen mit Rollläden ausgestattet“)"
+   },
+   {
+    "merkmal": "energiewert_unter_100",
+    "art": "eur_qm",
+    "wert": 0.44,
+    "label": "Energiewert unter 100",
+    "beleg": "PDF-S. 12 Zuschläge; Kriterien PDF-S. 5 Nr. 4.1 („Energieeffizienzklasse C (Gebäude mit Standards nach Wärmeschutzverordnung 1995), oder besser“)"
+   }
+  ]
+ },
+ "pruefbeispiele": [
+  {
+   "eingabe": {
+    "baujahr": 1970,
+    "wfl": 70
+   },
+   "erwartet": {
+    "mittel": 5.81
+   },
+   "seite": "12",
+   "art": "tabellenzelle"
+  },
+  {
+   "eingabe": {
+    "baujahr": 2021,
+    "wfl": 40,
+    "merkmale": {
+     "balkon": true,
+     "rolllaeden": true
+    }
+   },
+   "erwartet": {
+    "mittel": 9.71
+   },
+   "seite": "12",
+   "art": "tabellenzelle"
+  },
+  {
+   "eingabe": {
+    "baujahr": 1950,
+    "wfl": 115
+   },
+   "erwartet": {
+    "mittel": 6.77
+   },
+   "seite": "12",
+   "art": "tabellenzelle"
+  }
+ ]
+}
