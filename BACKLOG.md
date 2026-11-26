@@ -27,6 +27,9 @@ direkt unter den Punkt — nicht kommentarlos liegenlassen.
 - postgis-Upgrade Marktbericht-DB (braucht ALTER EXTENSION, erst Staging)
 - Baukasten Runde 5 (v4995, nur Staging) nach Prod?
 - Je Investment-PDF-Fassung einmal auf Prod erzeugen und ansehen.
+- **Ernte + Formeln 26.11. nach Prod?** (nur Staging): BY Ingolstadt 4 VGF-Werte, 6 MV-SWF-Werte werden Sperren (Lizenz), 70 neue/nachgebesserte Sperren, LZS-Formel neu gelernt (NI fällt aus dem Einsatz), WGFZ-Formel neu. Siehe wissen/2026-11-26.md „Ernte 26.11.“.
+- Genehmigungsanfragen an Ausschüsse (Rendsburg-Eckernförde, Segeberg, Pinneberg, Stormarn, MV, Regionalverband Saarbrücken) und Kauf Landesbericht Saarland 75 € / Bremen 50 €?
+- Offen Claude: UK-Flächen-Ableiter liest 29 Tabellen weniger als am 03.11. (Stadt 53 → 23), Ursache klären, erst dann neu lernen.
 - Ältere offene Punkte: siehe Blöcke 25.11. und 24.11. darunter.
 
 ## → Offen aus dem 25.11.2026 (Marcel entscheidet)
