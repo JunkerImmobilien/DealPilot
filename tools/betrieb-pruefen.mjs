@@ -121,6 +121,7 @@ pr('M1 Mietspiegel geändert = gelb', (msP({ letzter_lauf: 'x', geprueft: 9, gea
 pr('M2 Mietspiegel abgelaufen = gelb', (msP({ letzter_lauf: 'x', geprueft: 9, geaendert: [], abgelaufen: [{ gemeinde: 'B', bis: '2026-01-01' }] })[0] || {}).stufe === 'gelb');
 pr('M3 Mietspiegel ohne Befund = grün', (msP({ letzter_lauf: 'x', geprueft: 9, geaendert: [], abgelaufen: [] })[0] || {}).stufe === 'gruen');
 pr('M4 Mietspiegel ohne Antwort = kein Punkt', msP({ fehler_abruf: 'ECONNREFUSED' }).length === 0 && msP(null).length === 0);
+pr('M6 Mietspiegel läuft bald ab = gelb', (msP({ letzter_lauf: 'x', geprueft: 9, geaendert: [], abgelaufen: [], laeuft_ab: [{ gemeinde: 'Coesfeld', bis: '2026-11-30' }] })[0] || {}).stufe === 'gelb');
 pr('M5 mietspiegel nicht in ROT_MAILEN', B.ROT_MAILEN.indexOf('mietspiegel') < 0);
 
 console.log((rot ? 'ROT' : 'GRÜN') + ' · betrieb-pruefen ' + ok + '/' + (ok + rot));

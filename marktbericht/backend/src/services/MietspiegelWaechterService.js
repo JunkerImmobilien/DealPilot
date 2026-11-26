@@ -125,6 +125,11 @@ export function abgelaufen(heute, werteMap, vz) {
   return out.sort((a, b) => (a.bis < b.bis ? -1 : 1));
 }
 
+/** Wertedateien, deren Ende (wie abgelaufen()) zwischen heute und bis liegt (rein). */
+export function laeuftAb(heute, bis, werteMap, vz) {
+  return abgelaufen(bis, werteMap, vz).filter((x) => x.bis >= heute);
+}
+
 /** Stand für Admin › Betrieb (GET /mietspiegel/waechter) */
 export async function stand() {
   const zeilen = await q('SELECT ags, url, art, status, http_status, fehler, geprueft_am, geaendert_am FROM mb.mietspiegel_waechter');
@@ -137,6 +142,8 @@ export async function stand() {
     geaendert: zeilen.filter((r) => r.status === 'geaendert').map((r) => ({ ags: r.ags, gemeinde: nm(r.ags), url: r.url, art: r.art, seit: r.geaendert_am })),
     fehler: zeilen.filter((r) => r.status === 'fehler').length,
     abgelaufen: abgelaufen(new Date().toISOString().slice(0, 10), W, V),
+    /* v5080 · läuft in den nächsten 30 Tagen ab (z. B. Kreis Coesfeld 30.11.2026): früh melden, damit die neue Ausgabe gesucht wird */
+    laeuft_ab: laeuftAb(new Date().toISOString().slice(0, 10), new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10), W, V),
   };
 }
 
