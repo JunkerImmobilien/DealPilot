@@ -1,0 +1,1558 @@
+{
+ "ags": "05314000",
+ "gemeinde": "Bonn",
+ "art": "qualifiziert",
+ "stand": "2026-06",
+ "erhebungsstichtag": "2025-10-01",
+ "gueltig_ab": "2026-07-01",
+ "gueltig_bis": null,
+ "quelle": {
+  "url": "https://bonn.de/medien-global/amt-62/Mietspiegeldokumentation-Bonn-2026.pdf",
+  "dokument": "Dokumentation zum Mietspiegel Bonn 2026 (Fortschreibung), ALP Institut, Juni 2026, mit Verweis auf die Dokumentation zum qualifizierten Bonner Mietspiegel 2024 mit Anlagen (Anlage 1: Broschüre „Bonner Mietspiegel 2024“), https://bonn.de/medien-global/amt-62/01_Dokumentation-zum-qualifizierten-Bonner-Mietspiegel-2024_mit_Anlagen.pdf",
+  "seite": "Dok. 2026 S. 2 (Faktor 1,044, Stichtag 01.10.2025), S. 3 (gilt ab 01.07.2026, qualifiziert); Broschüre 2024 (PDF-Seiten 62–84 der Dokumentation 2024) S. 7 (Ausschlüsse), S. 9 (Rechenweg), S. 10–11 (Basismiete), S. 12 (Baujahr), S. 13 (Wohnlage), S. 14–19 (Merkmale); Dokumentation 2024 Tabelle 15 S. 44–46",
+  "lizenz": "kein Rechtevorbehalt und kein Speicherverbot (Impressum Broschüre S. 47 geprüft 26.11.2026; Kartenbilder CC BY-SA 4.0, Bundesstadt Bonn, Amt für Bodenmanagement und Geoinformation)",
+  "abgerufen": "2026-11-26"
+ },
+ "einheit": "eur_qm_nettokalt",
+ "form": "regression",
+ "rundung": 2,
+ "hinweis": "Mietspiegel 2026 = qualifizierter Mietspiegel 2024 × 1,044 (VPI Okt. 2023 → Okt. 2025, Dok. 2026 S. 2: „Für die Anwendung des Mietspiegels 2026 wird die ortsübliche Vergleichsmiete wie im Mietspiegel 2024 bestimmt und anschließend mit dem Fortschreibungsfaktor multipliziert“). Weil der Kern € -Beträge nicht nachträglich multipliziert, ist JEDER 2024-Betrag (Basis, Baujahr, Wohnlage, Merkmale) mit 1,044 multipliziert und ungerundet (5 Stellen) eingetragen; der 2024-Wert steht daneben (eur_qm_2024, wert_2024). Rechnerisch gleich (Summe × 1,044), Rundung erst am Ende. Additives Regressionsmodell: Basismiete (je volle m² 16–160, Interpolation bei Nachkommastellen erlaubt, S. 10 — der Kern interpoliert nicht, gebrochene Flächen geben null) + Baujahr + Wohnlage (Punktwert der Wohnlagenkarte des Gutachterausschusses, 0–17,5 Punkte, S. 13; ohne Punktwert kein Wert) + Merkmale. Baujahr nach 2023 nicht im Mietspiegel. Keine Spanne beziffert (S. 21: Abweichen nur bei stark abweichender Ausstattung UND sehr gutem/schlechtem Erhaltungszustand). Ausgeschlossen u. a. Ein- und Zweifamilienhäuser, Wohnungen unter 16 / über 160 m², Untermiete, Dienstwohnungen, ohne eigenen Abschluss (S. 7). Stuck an der Fassade nur bis Baujahr vor 1919 (S. 8, 14). Fußboden- und Sanitärmodernisierung nur bei Baujahr bis 1990, Elektrounterverteilung außerhalb nur bis Baujahr 1970. Textschicht der Broschüre verrutscht Tabellenwerte (Basismiete ab 100 m², Merkmale): alle Werte am Druckbild bzw. an Tabelle 15 der Dokumentation geprüft.",
+ "haus": {
+  "regel": "ausgeschlossen",
+  "beleg": "Broschüre 2024 S. 7 Gültigkeitsbereich: „Weitere Ausschlüsse … Ein- und Zweifamilienhäuser“"
+ },
+ "regression": {
+  "basis": {
+   "typ": "wfl_tabelle",
+   "werte": [
+    {
+     "von": 16,
+     "bis": 16,
+     "eur_qm": 16.79796,
+     "eur_qm_2024": 16.09
+    },
+    {
+     "von": 17,
+     "bis": 17,
+     "eur_qm": 15.99408,
+     "eur_qm_2024": 15.32
+    },
+    {
+     "von": 18,
+     "bis": 18,
+     "eur_qm": 15.28416,
+     "eur_qm_2024": 14.64
+    },
+    {
+     "von": 19,
+     "bis": 19,
+     "eur_qm": 14.65776,
+     "eur_qm_2024": 14.04
+    },
+    {
+     "von": 20,
+     "bis": 20,
+     "eur_qm": 14.094,
+     "eur_qm_2024": 13.5
+    },
+    {
+     "von": 21,
+     "bis": 21,
+     "eur_qm": 13.59288,
+     "eur_qm_2024": 13.02
+    },
+    {
+     "von": 22,
+     "bis": 22,
+     "eur_qm": 13.13352,
+     "eur_qm_2024": 12.58
+    },
+    {
+     "von": 23,
+     "bis": 23,
+     "eur_qm": 12.72636,
+     "eur_qm_2024": 12.19
+    },
+    {
+     "von": 24,
+     "bis": 24,
+     "eur_qm": 12.36096,
+     "eur_qm_2024": 11.84
+    },
+    {
+     "von": 25,
+     "bis": 25,
+     "eur_qm": 12.02688,
+     "eur_qm_2024": 11.52
+    },
+    {
+     "von": 26,
+     "bis": 26,
+     "eur_qm": 11.71368,
+     "eur_qm_2024": 11.22
+    },
+    {
+     "von": 27,
+     "bis": 27,
+     "eur_qm": 11.4318,
+     "eur_qm_2024": 10.95
+    },
+    {
+     "von": 28,
+     "bis": 28,
+     "eur_qm": 11.18124,
+     "eur_qm_2024": 10.71
+    },
+    {
+     "von": 29,
+     "bis": 29,
+     "eur_qm": 10.94112,
+     "eur_qm_2024": 10.48
+    },
+    {
+     "von": 30,
+     "bis": 30,
+     "eur_qm": 10.72188,
+     "eur_qm_2024": 10.27
+    },
+    {
+     "von": 31,
+     "bis": 31,
+     "eur_qm": 10.52352,
+     "eur_qm_2024": 10.08
+    },
+    {
+     "von": 32,
+     "bis": 32,
+     "eur_qm": 10.34604,
+     "eur_qm_2024": 9.91
+    },
+    {
+     "von": 33,
+     "bis": 33,
+     "eur_qm": 10.16856,
+     "eur_qm_2024": 9.74
+    },
+    {
+     "von": 34,
+     "bis": 34,
+     "eur_qm": 10.01196,
+     "eur_qm_2024": 9.59
+    },
+    {
+     "von": 35,
+     "bis": 35,
+     "eur_qm": 9.8658,
+     "eur_qm_2024": 9.45
+    },
+    {
+     "von": 36,
+     "bis": 36,
+     "eur_qm": 9.73008,
+     "eur_qm_2024": 9.32
+    },
+    {
+     "von": 37,
+     "bis": 37,
+     "eur_qm": 9.6048,
+     "eur_qm_2024": 9.2
+    },
+    {
+     "von": 38,
+     "bis": 38,
+     "eur_qm": 9.48996,
+     "eur_qm_2024": 9.09
+    },
+    {
+     "von": 39,
+     "bis": 39,
+     "eur_qm": 9.37512,
+     "eur_qm_2024": 8.98
+    },
+    {
+     "von": 40,
+     "bis": 40,
+     "eur_qm": 9.27072,
+     "eur_qm_2024": 8.88
+    },
+    {
+     "von": 41,
+     "bis": 41,
+     "eur_qm": 9.17676,
+     "eur_qm_2024": 8.79
+    },
+    {
+     "von": 42,
+     "bis": 42,
+     "eur_qm": 9.09324,
+     "eur_qm_2024": 8.71
+    },
+    {
+     "von": 43,
+     "bis": 43,
+     "eur_qm": 9.00972,
+     "eur_qm_2024": 8.63
+    },
+    {
+     "von": 44,
+     "bis": 44,
+     "eur_qm": 8.9262,
+     "eur_qm_2024": 8.55
+    },
+    {
+     "von": 45,
+     "bis": 45,
+     "eur_qm": 8.86356,
+     "eur_qm_2024": 8.49
+    },
+    {
+     "von": 46,
+     "bis": 46,
+     "eur_qm": 8.79048,
+     "eur_qm_2024": 8.42
+    },
+    {
+     "von": 47,
+     "bis": 47,
+     "eur_qm": 8.72784,
+     "eur_qm_2024": 8.36
+    },
+    {
+     "von": 48,
+     "bis": 48,
+     "eur_qm": 8.6652,
+     "eur_qm_2024": 8.3
+    },
+    {
+     "von": 49,
+     "bis": 49,
+     "eur_qm": 8.613,
+     "eur_qm_2024": 8.25
+    },
+    {
+     "von": 50,
+     "bis": 50,
+     "eur_qm": 8.5608,
+     "eur_qm_2024": 8.2
+    },
+    {
+     "von": 51,
+     "bis": 51,
+     "eur_qm": 8.5086,
+     "eur_qm_2024": 8.15
+    },
+    {
+     "von": 52,
+     "bis": 52,
+     "eur_qm": 8.46684,
+     "eur_qm_2024": 8.11
+    },
+    {
+     "von": 53,
+     "bis": 53,
+     "eur_qm": 8.42508,
+     "eur_qm_2024": 8.07
+    },
+    {
+     "von": 54,
+     "bis": 54,
+     "eur_qm": 8.38332,
+     "eur_qm_2024": 8.03
+    },
+    {
+     "von": 55,
+     "bis": 55,
+     "eur_qm": 8.34156,
+     "eur_qm_2024": 7.99
+    },
+    {
+     "von": 56,
+     "bis": 56,
+     "eur_qm": 8.31024,
+     "eur_qm_2024": 7.96
+    },
+    {
+     "von": 57,
+     "bis": 57,
+     "eur_qm": 8.27892,
+     "eur_qm_2024": 7.93
+    },
+    {
+     "von": 58,
+     "bis": 58,
+     "eur_qm": 8.2476,
+     "eur_qm_2024": 7.9
+    },
+    {
+     "von": 59,
+     "bis": 59,
+     "eur_qm": 8.21628,
+     "eur_qm_2024": 7.87
+    },
+    {
+     "von": 60,
+     "bis": 60,
+     "eur_qm": 8.18496,
+     "eur_qm_2024": 7.84
+    },
+    {
+     "von": 61,
+     "bis": 61,
+     "eur_qm": 8.16408,
+     "eur_qm_2024": 7.82
+    },
+    {
+     "von": 62,
+     "bis": 62,
+     "eur_qm": 8.1432,
+     "eur_qm_2024": 7.8
+    },
+    {
+     "von": 63,
+     "bis": 63,
+     "eur_qm": 8.11188,
+     "eur_qm_2024": 7.77
+    },
+    {
+     "von": 64,
+     "bis": 64,
+     "eur_qm": 8.091,
+     "eur_qm_2024": 7.75
+    },
+    {
+     "von": 65,
+     "bis": 65,
+     "eur_qm": 8.07012,
+     "eur_qm_2024": 7.73
+    },
+    {
+     "von": 66,
+     "bis": 66,
+     "eur_qm": 8.05968,
+     "eur_qm_2024": 7.72
+    },
+    {
+     "von": 67,
+     "bis": 67,
+     "eur_qm": 8.0388,
+     "eur_qm_2024": 7.7
+    },
+    {
+     "von": 68,
+     "bis": 68,
+     "eur_qm": 8.01792,
+     "eur_qm_2024": 7.68
+    },
+    {
+     "von": 69,
+     "bis": 69,
+     "eur_qm": 8.00748,
+     "eur_qm_2024": 7.67
+    },
+    {
+     "von": 70,
+     "bis": 70,
+     "eur_qm": 7.9866,
+     "eur_qm_2024": 7.65
+    },
+    {
+     "von": 71,
+     "bis": 71,
+     "eur_qm": 7.97616,
+     "eur_qm_2024": 7.64
+    },
+    {
+     "von": 72,
+     "bis": 72,
+     "eur_qm": 7.96572,
+     "eur_qm_2024": 7.63
+    },
+    {
+     "von": 73,
+     "bis": 73,
+     "eur_qm": 7.95528,
+     "eur_qm_2024": 7.62
+    },
+    {
+     "von": 74,
+     "bis": 74,
+     "eur_qm": 7.94484,
+     "eur_qm_2024": 7.61
+    },
+    {
+     "von": 75,
+     "bis": 75,
+     "eur_qm": 7.9344,
+     "eur_qm_2024": 7.6
+    },
+    {
+     "von": 76,
+     "bis": 76,
+     "eur_qm": 7.92396,
+     "eur_qm_2024": 7.59
+    },
+    {
+     "von": 77,
+     "bis": 77,
+     "eur_qm": 7.91352,
+     "eur_qm_2024": 7.58
+    },
+    {
+     "von": 78,
+     "bis": 78,
+     "eur_qm": 7.90308,
+     "eur_qm_2024": 7.57
+    },
+    {
+     "von": 79,
+     "bis": 79,
+     "eur_qm": 7.89264,
+     "eur_qm_2024": 7.56
+    },
+    {
+     "von": 80,
+     "bis": 80,
+     "eur_qm": 7.8822,
+     "eur_qm_2024": 7.55
+    },
+    {
+     "von": 81,
+     "bis": 81,
+     "eur_qm": 7.87176,
+     "eur_qm_2024": 7.54
+    },
+    {
+     "von": 82,
+     "bis": 82,
+     "eur_qm": 7.87176,
+     "eur_qm_2024": 7.54
+    },
+    {
+     "von": 83,
+     "bis": 83,
+     "eur_qm": 7.86132,
+     "eur_qm_2024": 7.53
+    },
+    {
+     "von": 84,
+     "bis": 84,
+     "eur_qm": 7.85088,
+     "eur_qm_2024": 7.52
+    },
+    {
+     "von": 85,
+     "bis": 85,
+     "eur_qm": 7.85088,
+     "eur_qm_2024": 7.52
+    },
+    {
+     "von": 86,
+     "bis": 86,
+     "eur_qm": 7.84044,
+     "eur_qm_2024": 7.51
+    },
+    {
+     "von": 87,
+     "bis": 87,
+     "eur_qm": 7.84044,
+     "eur_qm_2024": 7.51
+    },
+    {
+     "von": 88,
+     "bis": 88,
+     "eur_qm": 7.83,
+     "eur_qm_2024": 7.5
+    },
+    {
+     "von": 89,
+     "bis": 89,
+     "eur_qm": 7.83,
+     "eur_qm_2024": 7.5
+    },
+    {
+     "von": 90,
+     "bis": 90,
+     "eur_qm": 7.81956,
+     "eur_qm_2024": 7.49
+    },
+    {
+     "von": 91,
+     "bis": 91,
+     "eur_qm": 7.81956,
+     "eur_qm_2024": 7.49
+    },
+    {
+     "von": 92,
+     "bis": 92,
+     "eur_qm": 7.80912,
+     "eur_qm_2024": 7.48
+    },
+    {
+     "von": 93,
+     "bis": 93,
+     "eur_qm": 7.80912,
+     "eur_qm_2024": 7.48
+    },
+    {
+     "von": 94,
+     "bis": 94,
+     "eur_qm": 7.79868,
+     "eur_qm_2024": 7.47
+    },
+    {
+     "von": 95,
+     "bis": 95,
+     "eur_qm": 7.79868,
+     "eur_qm_2024": 7.47
+    },
+    {
+     "von": 96,
+     "bis": 96,
+     "eur_qm": 7.78824,
+     "eur_qm_2024": 7.46
+    },
+    {
+     "von": 97,
+     "bis": 97,
+     "eur_qm": 7.78824,
+     "eur_qm_2024": 7.46
+    },
+    {
+     "von": 98,
+     "bis": 98,
+     "eur_qm": 7.7778,
+     "eur_qm_2024": 7.45
+    },
+    {
+     "von": 99,
+     "bis": 99,
+     "eur_qm": 7.7778,
+     "eur_qm_2024": 7.45
+    },
+    {
+     "von": 100,
+     "bis": 100,
+     "eur_qm": 7.7778,
+     "eur_qm_2024": 7.45
+    },
+    {
+     "von": 101,
+     "bis": 101,
+     "eur_qm": 7.76736,
+     "eur_qm_2024": 7.44
+    },
+    {
+     "von": 102,
+     "bis": 102,
+     "eur_qm": 7.76736,
+     "eur_qm_2024": 7.44
+    },
+    {
+     "von": 103,
+     "bis": 103,
+     "eur_qm": 7.75692,
+     "eur_qm_2024": 7.43
+    },
+    {
+     "von": 104,
+     "bis": 104,
+     "eur_qm": 7.75692,
+     "eur_qm_2024": 7.43
+    },
+    {
+     "von": 105,
+     "bis": 105,
+     "eur_qm": 7.74648,
+     "eur_qm_2024": 7.42
+    },
+    {
+     "von": 106,
+     "bis": 106,
+     "eur_qm": 7.74648,
+     "eur_qm_2024": 7.42
+    },
+    {
+     "von": 107,
+     "bis": 107,
+     "eur_qm": 7.73604,
+     "eur_qm_2024": 7.41
+    },
+    {
+     "von": 108,
+     "bis": 108,
+     "eur_qm": 7.73604,
+     "eur_qm_2024": 7.41
+    },
+    {
+     "von": 109,
+     "bis": 109,
+     "eur_qm": 7.7256,
+     "eur_qm_2024": 7.4
+    },
+    {
+     "von": 110,
+     "bis": 110,
+     "eur_qm": 7.7256,
+     "eur_qm_2024": 7.4
+    },
+    {
+     "von": 111,
+     "bis": 111,
+     "eur_qm": 7.71516,
+     "eur_qm_2024": 7.39
+    },
+    {
+     "von": 112,
+     "bis": 112,
+     "eur_qm": 7.71516,
+     "eur_qm_2024": 7.39
+    },
+    {
+     "von": 113,
+     "bis": 113,
+     "eur_qm": 7.70472,
+     "eur_qm_2024": 7.38
+    },
+    {
+     "von": 114,
+     "bis": 114,
+     "eur_qm": 7.70472,
+     "eur_qm_2024": 7.38
+    },
+    {
+     "von": 115,
+     "bis": 115,
+     "eur_qm": 7.69428,
+     "eur_qm_2024": 7.37
+    },
+    {
+     "von": 116,
+     "bis": 116,
+     "eur_qm": 7.68384,
+     "eur_qm_2024": 7.36
+    },
+    {
+     "von": 117,
+     "bis": 117,
+     "eur_qm": 7.68384,
+     "eur_qm_2024": 7.36
+    },
+    {
+     "von": 118,
+     "bis": 118,
+     "eur_qm": 7.6734,
+     "eur_qm_2024": 7.35
+    },
+    {
+     "von": 119,
+     "bis": 119,
+     "eur_qm": 7.66296,
+     "eur_qm_2024": 7.34
+    },
+    {
+     "von": 120,
+     "bis": 120,
+     "eur_qm": 7.66296,
+     "eur_qm_2024": 7.34
+    },
+    {
+     "von": 121,
+     "bis": 121,
+     "eur_qm": 7.65252,
+     "eur_qm_2024": 7.33
+    },
+    {
+     "von": 122,
+     "bis": 122,
+     "eur_qm": 7.64208,
+     "eur_qm_2024": 7.32
+    },
+    {
+     "von": 123,
+     "bis": 123,
+     "eur_qm": 7.64208,
+     "eur_qm_2024": 7.32
+    },
+    {
+     "von": 124,
+     "bis": 124,
+     "eur_qm": 7.63164,
+     "eur_qm_2024": 7.31
+    },
+    {
+     "von": 125,
+     "bis": 125,
+     "eur_qm": 7.6212,
+     "eur_qm_2024": 7.3
+    },
+    {
+     "von": 126,
+     "bis": 126,
+     "eur_qm": 7.61076,
+     "eur_qm_2024": 7.29
+    },
+    {
+     "von": 127,
+     "bis": 127,
+     "eur_qm": 7.60032,
+     "eur_qm_2024": 7.28
+    },
+    {
+     "von": 128,
+     "bis": 128,
+     "eur_qm": 7.58988,
+     "eur_qm_2024": 7.27
+    },
+    {
+     "von": 129,
+     "bis": 129,
+     "eur_qm": 7.58988,
+     "eur_qm_2024": 7.27
+    },
+    {
+     "von": 130,
+     "bis": 130,
+     "eur_qm": 7.57944,
+     "eur_qm_2024": 7.26
+    },
+    {
+     "von": 131,
+     "bis": 131,
+     "eur_qm": 7.569,
+     "eur_qm_2024": 7.25
+    },
+    {
+     "von": 132,
+     "bis": 132,
+     "eur_qm": 7.55856,
+     "eur_qm_2024": 7.24
+    },
+    {
+     "von": 133,
+     "bis": 133,
+     "eur_qm": 7.54812,
+     "eur_qm_2024": 7.23
+    },
+    {
+     "von": 134,
+     "bis": 134,
+     "eur_qm": 7.53768,
+     "eur_qm_2024": 7.22
+    },
+    {
+     "von": 135,
+     "bis": 135,
+     "eur_qm": 7.52724,
+     "eur_qm_2024": 7.21
+    },
+    {
+     "von": 136,
+     "bis": 136,
+     "eur_qm": 7.50636,
+     "eur_qm_2024": 7.19
+    },
+    {
+     "von": 137,
+     "bis": 137,
+     "eur_qm": 7.49592,
+     "eur_qm_2024": 7.18
+    },
+    {
+     "von": 138,
+     "bis": 138,
+     "eur_qm": 7.48548,
+     "eur_qm_2024": 7.17
+    },
+    {
+     "von": 139,
+     "bis": 139,
+     "eur_qm": 7.47504,
+     "eur_qm_2024": 7.16
+    },
+    {
+     "von": 140,
+     "bis": 140,
+     "eur_qm": 7.4646,
+     "eur_qm_2024": 7.15
+    },
+    {
+     "von": 141,
+     "bis": 141,
+     "eur_qm": 7.44372,
+     "eur_qm_2024": 7.13
+    },
+    {
+     "von": 142,
+     "bis": 142,
+     "eur_qm": 7.43328,
+     "eur_qm_2024": 7.12
+    },
+    {
+     "von": 143,
+     "bis": 143,
+     "eur_qm": 7.42284,
+     "eur_qm_2024": 7.11
+    },
+    {
+     "von": 144,
+     "bis": 144,
+     "eur_qm": 7.40196,
+     "eur_qm_2024": 7.09
+    },
+    {
+     "von": 145,
+     "bis": 145,
+     "eur_qm": 7.39152,
+     "eur_qm_2024": 7.08
+    },
+    {
+     "von": 146,
+     "bis": 146,
+     "eur_qm": 7.38108,
+     "eur_qm_2024": 7.07
+    },
+    {
+     "von": 147,
+     "bis": 147,
+     "eur_qm": 7.3602,
+     "eur_qm_2024": 7.05
+    },
+    {
+     "von": 148,
+     "bis": 148,
+     "eur_qm": 7.34976,
+     "eur_qm_2024": 7.04
+    },
+    {
+     "von": 149,
+     "bis": 149,
+     "eur_qm": 7.32888,
+     "eur_qm_2024": 7.02
+    },
+    {
+     "von": 150,
+     "bis": 150,
+     "eur_qm": 7.31844,
+     "eur_qm_2024": 7.01
+    },
+    {
+     "von": 151,
+     "bis": 151,
+     "eur_qm": 7.29756,
+     "eur_qm_2024": 6.99
+    },
+    {
+     "von": 152,
+     "bis": 152,
+     "eur_qm": 7.27668,
+     "eur_qm_2024": 6.97
+    },
+    {
+     "von": 153,
+     "bis": 153,
+     "eur_qm": 7.26624,
+     "eur_qm_2024": 6.96
+    },
+    {
+     "von": 154,
+     "bis": 154,
+     "eur_qm": 7.24536,
+     "eur_qm_2024": 6.94
+    },
+    {
+     "von": 155,
+     "bis": 155,
+     "eur_qm": 7.22448,
+     "eur_qm_2024": 6.92
+    },
+    {
+     "von": 156,
+     "bis": 156,
+     "eur_qm": 7.21404,
+     "eur_qm_2024": 6.91
+    },
+    {
+     "von": 157,
+     "bis": 157,
+     "eur_qm": 7.19316,
+     "eur_qm_2024": 6.89
+    },
+    {
+     "von": 158,
+     "bis": 158,
+     "eur_qm": 7.17228,
+     "eur_qm_2024": 6.87
+    },
+    {
+     "von": 159,
+     "bis": 159,
+     "eur_qm": 7.1514,
+     "eur_qm_2024": 6.85
+    },
+    {
+     "von": 160,
+     "bis": 160,
+     "eur_qm": 7.13052,
+     "eur_qm_2024": 6.83
+    }
+   ],
+   "beleg": "Broschüre 2024 S. 10–11 Arbeitsschritt 1 (am Druckbild geprüft), × 1,044 (Dok. 2026 S. 2)"
+  },
+  "verknuepfung": "summe",
+  "faktoren": [
+   {
+    "merkmal": "baujahr",
+    "label": "Baujahr",
+    "typ": "baujahr_klasse",
+    "art": "eur_qm",
+    "werte": [
+     {
+      "von": null,
+      "bis": 1918,
+      "wert": 0,
+      "wert_2024": 0
+     },
+     {
+      "von": 1919,
+      "bis": 1945,
+      "wert": 0.49068,
+      "wert_2024": 0.47
+     },
+     {
+      "von": 1946,
+      "bis": 1960,
+      "wert": 0.3132,
+      "wert_2024": 0.3
+     },
+     {
+      "von": 1961,
+      "bis": 2004,
+      "wert": 0,
+      "wert_2024": 0
+     },
+     {
+      "von": 2005,
+      "bis": 2011,
+      "wert": 0.58464,
+      "wert_2024": 0.56
+     },
+     {
+      "von": 2012,
+      "bis": 2019,
+      "wert": 1.50336,
+      "wert_2024": 1.44
+     },
+     {
+      "von": 2020,
+      "bis": 2023,
+      "wert": 2.68308,
+      "wert_2024": 2.57
+     }
+    ],
+    "beleg": "Broschüre 2024 S. 12 Arbeitsschritt 2 (am Druckbild geprüft)"
+   },
+   {
+    "merkmal": "lage",
+    "label": "Wohnlage (Punkte)",
+    "typ": "lage",
+    "art": "eur_qm",
+    "werte": {
+     "0.0": 0,
+     "0.5": 0.06264,
+     "1.0": 0.11484,
+     "1.5": 0.17748,
+     "2.0": 0.24012,
+     "2.5": 0.30276,
+     "3.0": 0.35496,
+     "3.5": 0.4176,
+     "4.0": 0.48024,
+     "4.5": 0.53244,
+     "5.0": 0.59508,
+     "5.5": 0.65772,
+     "6.0": 0.72036,
+     "6.5": 0.77256,
+     "7.0": 0.8352,
+     "7.5": 0.89784,
+     "8.0": 0.95004,
+     "8.5": 1.01268,
+     "9.0": 1.07532,
+     "9.5": 1.13796,
+     "10.0": 1.19016,
+     "10.5": 1.2528,
+     "11.0": 1.31544,
+     "11.5": 1.36764,
+     "12.0": 1.43028,
+     "12.5": 1.49292,
+     "13.0": 1.55556,
+     "13.5": 1.60776,
+     "14.0": 1.6704,
+     "14.5": 1.73304,
+     "15.0": 1.78524,
+     "15.5": 1.84788,
+     "16.0": 1.91052,
+     "16.5": 1.97316,
+     "17.0": 2.02536,
+     "17.5": 2.088
+    },
+    "werte_2024": {
+     "0.0": 0,
+     "0.5": 0.06,
+     "1.0": 0.11,
+     "1.5": 0.17,
+     "2.0": 0.23,
+     "2.5": 0.29,
+     "3.0": 0.34,
+     "3.5": 0.4,
+     "4.0": 0.46,
+     "4.5": 0.51,
+     "5.0": 0.57,
+     "5.5": 0.63,
+     "6.0": 0.69,
+     "6.5": 0.74,
+     "7.0": 0.8,
+     "7.5": 0.86,
+     "8.0": 0.91,
+     "8.5": 0.97,
+     "9.0": 1.03,
+     "9.5": 1.09,
+     "10.0": 1.14,
+     "10.5": 1.2,
+     "11.0": 1.26,
+     "11.5": 1.31,
+     "12.0": 1.37,
+     "12.5": 1.43,
+     "13.0": 1.49,
+     "13.5": 1.54,
+     "14.0": 1.6,
+     "14.5": 1.66,
+     "15.0": 1.71,
+     "15.5": 1.77,
+     "16.0": 1.83,
+     "16.5": 1.89,
+     "17.0": 1.94,
+     "17.5": 2
+    },
+    "aliase": {
+     "0.0": [
+      "0,0",
+      "0,0 pkt.",
+      "0.0 pkt",
+      "0"
+     ],
+     "0.5": [
+      "0,5",
+      "0,5 pkt.",
+      "0.5 pkt"
+     ],
+     "1.0": [
+      "1,0",
+      "1,0 pkt.",
+      "1.0 pkt",
+      "1"
+     ],
+     "1.5": [
+      "1,5",
+      "1,5 pkt.",
+      "1.5 pkt"
+     ],
+     "2.0": [
+      "2,0",
+      "2,0 pkt.",
+      "2.0 pkt",
+      "2"
+     ],
+     "2.5": [
+      "2,5",
+      "2,5 pkt.",
+      "2.5 pkt"
+     ],
+     "3.0": [
+      "3,0",
+      "3,0 pkt.",
+      "3.0 pkt",
+      "3"
+     ],
+     "3.5": [
+      "3,5",
+      "3,5 pkt.",
+      "3.5 pkt"
+     ],
+     "4.0": [
+      "4,0",
+      "4,0 pkt.",
+      "4.0 pkt",
+      "4"
+     ],
+     "4.5": [
+      "4,5",
+      "4,5 pkt.",
+      "4.5 pkt"
+     ],
+     "5.0": [
+      "5,0",
+      "5,0 pkt.",
+      "5.0 pkt",
+      "5"
+     ],
+     "5.5": [
+      "5,5",
+      "5,5 pkt.",
+      "5.5 pkt"
+     ],
+     "6.0": [
+      "6,0",
+      "6,0 pkt.",
+      "6.0 pkt",
+      "6"
+     ],
+     "6.5": [
+      "6,5",
+      "6,5 pkt.",
+      "6.5 pkt"
+     ],
+     "7.0": [
+      "7,0",
+      "7,0 pkt.",
+      "7.0 pkt",
+      "7"
+     ],
+     "7.5": [
+      "7,5",
+      "7,5 pkt.",
+      "7.5 pkt"
+     ],
+     "8.0": [
+      "8,0",
+      "8,0 pkt.",
+      "8.0 pkt",
+      "8"
+     ],
+     "8.5": [
+      "8,5",
+      "8,5 pkt.",
+      "8.5 pkt"
+     ],
+     "9.0": [
+      "9,0",
+      "9,0 pkt.",
+      "9.0 pkt",
+      "9"
+     ],
+     "9.5": [
+      "9,5",
+      "9,5 pkt.",
+      "9.5 pkt"
+     ],
+     "10.0": [
+      "10,0",
+      "10,0 pkt.",
+      "10.0 pkt",
+      "10"
+     ],
+     "10.5": [
+      "10,5",
+      "10,5 pkt.",
+      "10.5 pkt"
+     ],
+     "11.0": [
+      "11,0",
+      "11,0 pkt.",
+      "11.0 pkt",
+      "11"
+     ],
+     "11.5": [
+      "11,5",
+      "11,5 pkt.",
+      "11.5 pkt"
+     ],
+     "12.0": [
+      "12,0",
+      "12,0 pkt.",
+      "12.0 pkt",
+      "12"
+     ],
+     "12.5": [
+      "12,5",
+      "12,5 pkt.",
+      "12.5 pkt"
+     ],
+     "13.0": [
+      "13,0",
+      "13,0 pkt.",
+      "13.0 pkt",
+      "13"
+     ],
+     "13.5": [
+      "13,5",
+      "13,5 pkt.",
+      "13.5 pkt"
+     ],
+     "14.0": [
+      "14,0",
+      "14,0 pkt.",
+      "14.0 pkt",
+      "14"
+     ],
+     "14.5": [
+      "14,5",
+      "14,5 pkt.",
+      "14.5 pkt"
+     ],
+     "15.0": [
+      "15,0",
+      "15,0 pkt.",
+      "15.0 pkt",
+      "15"
+     ],
+     "15.5": [
+      "15,5",
+      "15,5 pkt.",
+      "15.5 pkt"
+     ],
+     "16.0": [
+      "16,0",
+      "16,0 pkt.",
+      "16.0 pkt",
+      "16"
+     ],
+     "16.5": [
+      "16,5",
+      "16,5 pkt.",
+      "16.5 pkt"
+     ],
+     "17.0": [
+      "17,0",
+      "17,0 pkt.",
+      "17.0 pkt",
+      "17"
+     ],
+     "17.5": [
+      "17,5",
+      "17,5 pkt.",
+      "17.5 pkt"
+     ]
+    },
+    "beleg": "Broschüre 2024 S. 13 Arbeitsschritt 3"
+   },
+   {
+    "merkmal": "raumhoehe",
+    "label": "Lichte Raumhöhe über 2,70 m",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.6264,
+    "wert_2024": 0.6,
+    "beleg": "Broschüre 2024 S. 14 (Dokumentation 2024 Tabelle 15)"
+   },
+   {
+    "merkmal": "stuck_fassade",
+    "label": "Stuckverzierung an Außenfassade (Baujahr vor 1919)",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.69948,
+    "wert_2024": 0.67,
+    "beleg": "Broschüre 2024 S. 14 (Dokumentation 2024 Tabelle 15)",
+    "bedingung": {
+     "baujahr_von": null,
+     "baujahr_bis": 1918
+    }
+   },
+   {
+    "merkmal": "stuck_decken",
+    "label": "Stuckverzierungen an den Decken",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.77256,
+    "wert_2024": 0.74,
+    "beleg": "Broschüre 2024 S. 14 (Dokumentation 2024 Tabelle 15)"
+   },
+   {
+    "merkmal": "souterrain",
+    "label": "Wohnung im Untergeschoss oder Souterrain",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": -0.8874,
+    "wert_2024": -0.85,
+    "beleg": "Broschüre 2024 S. 14 (Dokumentation 2024 Tabelle 15)"
+   },
+   {
+    "merkmal": "elektrische_rolllaeden",
+    "label": "Elektrisch betriebene Rollläden",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.32364,
+    "wert_2024": 0.31,
+    "beleg": "Broschüre 2024 S. 14 (Dokumentation 2024 Tabelle 15)"
+   },
+   {
+    "merkmal": "kein_balkon",
+    "label": "Kein Balkon/Loggia, Dachterrasse oder Terrasse/Veranda",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": -0.261,
+    "wert_2024": -0.25,
+    "beleg": "Broschüre 2024 S. 14 (Dokumentation 2024 Tabelle 15)"
+   },
+   {
+    "merkmal": "keine_gegensprechanlage",
+    "label": "Keine Gegensprechanlage",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": -0.3132,
+    "wert_2024": -0.3,
+    "beleg": "Broschüre 2024 S. 15 (Dokumentation 2024 Tabelle 15)"
+   },
+   {
+    "merkmal": "fussboden_erneuert",
+    "label": "Erneuerung der Fußbodenbeläge in den letzten 5 Jahren (Baujahr bis 1990)",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.48024,
+    "wert_2024": 0.46,
+    "beleg": "Broschüre 2024 S. 15 (Dokumentation 2024 Tabelle 15)",
+    "bedingung": {
+     "baujahr_von": null,
+     "baujahr_bis": 1990
+    }
+   },
+   {
+    "merkmal": "sanitaer_modernisiert",
+    "label": "Modernisierung der Sanitärräume in den letzten 5 Jahren (Baujahr bis 1990)",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.30276,
+    "wert_2024": 0.29,
+    "beleg": "Broschüre 2024 S. 15 (Dokumentation 2024 Tabelle 15)",
+    "bedingung": {
+     "baujahr_von": null,
+     "baujahr_bis": 1990
+    }
+   },
+   {
+    "merkmal": "stand_wc",
+    "label": "Stand-WC",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": -0.2088,
+    "wert_2024": -0.2,
+    "beleg": "Broschüre 2024 S. 15 (Dokumentation 2024 Tabelle 15)"
+   },
+   {
+    "merkmal": "glasabtrennung_dusche",
+    "label": "Bodenstehende Glasabtrennung (Dusche)",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.60552,
+    "wert_2024": 0.58,
+    "beleg": "Broschüre 2024 S. 15 (Dokumentation 2024 Tabelle 15)"
+   },
+   {
+    "merkmal": "vorhangelemente_bad",
+    "label": "Vorhangelemente als Wandbeläge im Spritzwasserbereich",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.69948,
+    "wert_2024": 0.67,
+    "beleg": "Broschüre 2024 S. 16 (Dokumentation 2024 Tabelle 15)"
+   },
+   {
+    "merkmal": "schwerkraftlueftung",
+    "label": "Schwerkraftlüftung (z. B. „Kölner“ Lüftung)",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": -0.25056,
+    "wert_2024": -0.24,
+    "beleg": "Broschüre 2024 S. 16 (Dokumentation 2024 Tabelle 15)"
+   },
+   {
+    "merkmal": "bad_ausserhalb",
+    "label": "Bad und/oder WC außerhalb der Wohnung",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": -1.37808,
+    "wert_2024": -1.32,
+    "beleg": "Broschüre 2024 S. 16 (Dokumentation 2024 Tabelle 15)"
+   },
+   {
+    "merkmal": "offene_kueche",
+    "label": "Offene Küche",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.43848,
+    "wert_2024": 0.42,
+    "beleg": "Broschüre 2024 S. 16 (Dokumentation 2024 Tabelle 15)"
+   },
+   {
+    "merkmal": "einbaukueche",
+    "label": "Mitvermietete Einbauküche ohne zusätzliche Mietzahlung",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.54288,
+    "wert_2024": 0.52,
+    "beleg": "Broschüre 2024 S. 16 (Dokumentation 2024 Tabelle 15)"
+   },
+   {
+    "merkmal": "schallschutzfenster",
+    "label": "Fenster überwiegend mit Lärm-/Schallschutz",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.27144,
+    "wert_2024": 0.26,
+    "beleg": "Broschüre 2024 S. 17 (Dokumentation 2024 Tabelle 15)"
+   },
+   {
+    "merkmal": "elektro_veraltet",
+    "label": "Keine zeitgemäße Absicherung der Elektroinstallation",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": -0.4176,
+    "wert_2024": -0.4,
+    "beleg": "Broschüre 2024 S. 17 (Dokumentation 2024 Tabelle 15)"
+   },
+   {
+    "merkmal": "elektroverteilung_ausserhalb",
+    "label": "Elektrounterverteilung außerhalb der Wohnung (Baujahr bis 1970)",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": -0.39672,
+    "wert_2024": -0.38,
+    "beleg": "Broschüre 2024 S. 17 (Dokumentation 2024 Tabelle 15)",
+    "bedingung": {
+     "baujahr_von": null,
+     "baujahr_bis": 1970
+    }
+   },
+   {
+    "merkmal": "warmwasser_untertisch",
+    "label": "Warmwasser über Untertischgerät",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": -0.3654,
+    "wert_2024": -0.35,
+    "beleg": "Broschüre 2024 S. 17 (Dokumentation 2024 Tabelle 15)"
+   },
+   {
+    "merkmal": "kein_warmwasser_bad",
+    "label": "Kein Warmwasser im Bad",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": -0.43848,
+    "wert_2024": -0.42,
+    "beleg": "Broschüre 2024 S. 17 (Dokumentation 2024 Tabelle 15)"
+   },
+   {
+    "merkmal": "tuer_schallschutz",
+    "label": "Wohnungsabschlusstür mit mind. Schallschutzklasse 1",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.39672,
+    "wert_2024": 0.38,
+    "beleg": "Broschüre 2024 S. 18 (Dokumentation 2024 Tabelle 15)"
+   },
+   {
+    "merkmal": "tuer_rc2",
+    "label": "Einbruchhemmende Wohnungsabschlusstür mind. RC2",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.2088,
+    "wert_2024": 0.2,
+    "beleg": "Broschüre 2024 S. 18 (Dokumentation 2024 Tabelle 15)"
+   },
+   {
+    "merkmal": "waeschetrockner",
+    "label": "Wäschetrockner in Gemeinschaftseinrichtung",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.44892,
+    "wert_2024": 0.43,
+    "beleg": "Broschüre 2024 S. 18 (Dokumentation 2024 Tabelle 15)"
+   },
+   {
+    "merkmal": "bad_boden_einfach",
+    "label": "Bad überwiegend weder Fliesen noch Natur(werk)stein",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": -0.24012,
+    "wert_2024": -0.23,
+    "beleg": "Broschüre 2024 S. 18 (Dokumentation 2024 Tabelle 15)"
+   },
+   {
+    "merkmal": "hochwertiger_boden",
+    "label": "Wohn-/Schlafräume überwiegend Natur(werk)stein, Fliesen oder Parkett",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.28188,
+    "wert_2024": 0.27,
+    "beleg": "Broschüre 2024 S. 18 (Dokumentation 2024 Tabelle 15)"
+   },
+   {
+    "merkmal": "kueche_boden_einfach",
+    "label": "Küche überwiegend Teppich, PVC/Linoleum oder Estrich",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": -0.24012,
+    "wert_2024": -0.23,
+    "beleg": "Broschüre 2024 S. 19 (Dokumentation 2024 Tabelle 15)"
+   }
+  ],
+  "geltung": {
+   "baujahr_von": null,
+   "baujahr_bis": 2023,
+   "wfl_von": 16,
+   "wfl_bis": 160
+  },
+  "beleg": "Broschüre 2024 S. 20 Arbeitsschritt 5 (Summe der Arbeitsschritte 1–4), Dok. 2026 S. 2 (× 1,044)"
+ },
+ "pruefbeispiele": [
+  {
+   "eingabe": {
+    "baujahr": 1950,
+    "wfl": 70,
+    "lage": "5,0",
+    "merkmale": {
+     "einbaukueche": true
+    }
+   },
+   "erwartet": {
+    "mittel": 9.44
+   },
+   "seite": "Broschüre 2024 S. 10, 12, 13, 16; Dok. 2026 S. 2",
+   "art": "rechenweg",
+   "anmerkung": "(7,65 Basis 70 m² + 0,30 Baujahr 1946–1960 + 0,57 Wohnlage 5,0 Pkt. + 0,52 Einbauküche) × 1,044 = 9,04 × 1,044 = 9,44"
+  },
+  {
+   "eingabe": {
+    "baujahr": 1980,
+    "wfl": 20,
+    "lage": "0"
+   },
+   "erwartet": {
+    "mittel": 14.09
+   },
+   "seite": "Broschüre 2024 S. 10; Dok. 2026 S. 2",
+   "art": "tabellenzelle",
+   "anmerkung": "13,50 × 1,044 = 14,09"
+  },
+  {
+   "eingabe": {
+    "baujahr": 1980,
+    "wfl": 85.5,
+    "lage": "3,0"
+   },
+   "erwartet": null,
+   "seite": "Broschüre 2024 S. 10",
+   "art": "tabellenzelle",
+   "anmerkung": "Nachkommastellen: Interpolation/Rechner, der Kern gibt null"
+  },
+  {
+   "eingabe": {
+    "baujahr": 2024,
+    "wfl": 70,
+    "lage": "3,0"
+   },
+   "erwartet": null,
+   "seite": "Broschüre 2024 S. 12",
+   "art": "tabellenzelle",
+   "anmerkung": "Baujahr nach 2023 nicht im Mietspiegel"
+  }
+ ]
+}
