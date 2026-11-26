@@ -45790,3 +45790,9 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** staging 65800543 · main cfc0903c, f414b3eb (Version).
 - **Nachweis:** Prod curl `pilot-analyse-v4.js?v=v5050ss5m` mit dem Zusatz, version.json patch 229, gold-audit Prod RC 0, buster-ebenen, vorschau-pruefen grün.
 - **Rest:** keiner.
+
+### Rollout 1.0.232 · 26.11.2026 · v5070 (TT5)
+- **Was:** Handy-Menü. Marcel 26.11.: das einzeilige Band aus v5000 „sieht nicht mehr so aus wie jetzt“, die aufgeklappte Leiste „mega breit“. Umschalter Aktionen · Ankauf · Bestand unter 900 px wieder als drei Reiter-Karten wie am Schreibtisch (Symbol über Wort, Zahl als Plakette oben rechts, Space Grotesk), 44 px hoch. Schublade `min(280px,76vw)` statt `min(90vw,380px)`. Objektkarten in der Schublade: Knöpfe ohne Score an den Rand, Anschrift zweizeilig mit Abstand zu Knöpfen und Score (Selektor braucht `#sidebar #sb-list`, sonst gewinnt die nowrap-Regel aus layout-varianten.css Z. ~7896).
+- **Commit:** staging `988e8440`, main `34f026ff` + `a74d10f6` (1.0.232), Rückmerge `59b8e940`.
+- **Nachweis:** Headless-Chrome mit Testkonto menue-pruefer (eigenes Profil, nicht Marcels Chrome). Schublade 390 px: 359 → 280 px (92 → 72 vw); 360: 331 → 274; 430: 360 → 280; 820: 360 → 280. Reiter 113×32 einzeilig → 84×44 in Spalten. Schreibtisch 1440 vorher/nachher gleich (Schalter 231×56, Reiter 73×56). Kein Überlauf, keine waagerechte Scrollleiste. gold-audit Staging und Prod RC 0, buster-ebenen und vorschau-pruefen sauber. Prod: ausgelieferte CSS trägt v5070, index.html Buster v5070m, version.json patch 232.
+- **Rest:** Prod nicht angemeldet nachgemessen (kein Konto). Senkrechte Laufnummer der einzeiligen Objektkarte bleibt „2026-0…“ (schon vorher so).
