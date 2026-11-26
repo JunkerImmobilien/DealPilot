@@ -133,8 +133,10 @@
           /* pp6 · Datenschutz: das Netto-Einkommen verlässt den Browser nie. Fassung mit Netto nur lokal (Ansicht im Browser),
              die Fassung für den Druck auf dem Server rechnet ohne Netto (netto 0) und nennt das nötige Netto für grün/gelb. */
           var o = { d: d, bericht: b, adresse: adresse, anrechnung: st && st.anrechnung };
-          var mit = A.html(Object.assign({ e: { kp: e.kp, wfl: e.wfl, bj: e.bj, ek: e.ek, netto: e.netto, plz: e.plz, objektart: e.objektart } }, o));
-          var ohne = A.html(Object.assign({ e: { kp: e.kp, wfl: e.wfl, bj: e.bj, ek: e.ek, netto: 0, plz: e.plz, objektart: e.objektart } }, o));
+          /* pp6 · Grundangaben für den Bericht (Grundstück, Haustyp, Ausstattung, Straße) gehen mit, das Netto nur in die lokale Fassung */
+          var basis = { kp: e.kp, wfl: e.wfl, bj: e.bj, ek: e.ek, plz: e.plz, objektart: e.objektart, gsfl: e.gsfl, keller: e.keller, geschosse: e.geschosse, dach: e.dach, ausst: e.ausst, str: e.str };
+          var mit = A.html(Object.assign({ e: Object.assign({}, basis, { netto: e.netto }) }, o));
+          var ohne = A.html(Object.assign({ e: Object.assign({}, basis, { netto: 0 }) }, o));
           return Promise.all([mit, ohne]).then(function (z) { z[0].htmlServer = z[1].html; return z[0]; });
         });
       });

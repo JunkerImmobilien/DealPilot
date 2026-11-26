@@ -33,14 +33,17 @@
       belw: b.belw && b.belw.verfuegbar ? b.belw : null,
       umfeld: b.umfeld || null,
       karte: b.karte || null,
+      /* pp6 · Lage, Vergleichsmiete und Angebotspreise am Ort aus derselben Berichtsantwort (bisher ungenutzt) */
+      lage: b.lage || null, vmiete: b.vergleichsmiete || null, markt: b.markt || null, stichtag: b.stichtag || null,
       anrechnung: o.anrechnung || null,
       objekt: { adresse: o.adresse || ((e.plz || '') + ' ' + ((o.d && o.d.gebiet) || '')).trim(), objektart: String(e.objektart || 'efh').toLowerCase(),
-        baujahr: e.bj, wfl: e.wfl, kaufpreis: e.kp, energieklasse: e.energieklasse || null, unterlagen: e.unterlagen || [], foerderung: foerderung(e) }
+        baujahr: e.bj, wfl: e.wfl, kaufpreis: e.kp, energieklasse: e.energieklasse || null, unterlagen: e.unterlagen || [], foerderung: foerderung(e),
+        gsfl: e.gsfl || null, keller: e.keller || null, geschosse: e.geschosse || null, dach: e.dach || null, ausst: e.ausst || null, ek: e.ek || 0, str: e.str || '' }
     }).then(function (h) { return { html: h, haus: haus, r: r, anrechnung: o.anrechnung || null }; });
   }
   function laden(blob, name) {
     var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name || 'DealPilot Haus-Check.pdf';
     document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 2000);
   }
-  root.DpHausCheckAblauf = { html: html, laden: laden, version: 'v5130kk6' };
+  root.DpHausCheckAblauf = { html: html, laden: laden, version: 'v5150pp6' };
 })(typeof window !== 'undefined' ? window : this);

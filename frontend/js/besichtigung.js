@@ -160,13 +160,16 @@
   var THEMEN = [/dach/, /fassade|anstrich/, /feucht|keller|lichtschacht|schimmel/, /heiz|w(ä|ae)rmepumpe|kessel/, /fenster/, /sonderumlage/, /leerstand/, /miete/, /energie/, /elektr/, /leitung|wasser|abwasser/, /aufzug/, /balkon/, /streit|\bklage|gericht/, /asbest|schadstoff/];
   function themen(t) { t = String(t || '').toLowerCase(); var r = []; THEMEN.forEach(function (re, i) { if (re.test(t)) r.push('t' + i); }); return r; }
   /** Alle Gruppen: [{titel, quelle:'objekt'|'art'|'allgemein'|'baujahr', punkte:[{id,titel,text,herkunft,prio}]}] */
-  function gruppen() {
-    var G = [], bj = zahl(val('baujahr')), art = val('objart');
+  /* pp6 · gruppen(o) ohne Formular: o = { bj, art } (Haus-Check-PDF der Landing). Dann nur Objektart, Baujahr und allgemein,
+     die Punkte aus Unterlagen und Objektfeldern lesen das Formular der App und fallen weg. */
+  function gruppen(o) {
+    var ohneForm = !!(o && typeof o === 'object');
+    var G = [], bj = ohneForm ? zahl(o.bj) : zahl(val('baujahr')), art = ohneForm ? String(o.art || '').toUpperCase() : val('objart');
     /* v5020 · gemessen Lindenallee 14: 21 Punkte, fünf davon dasselbe Flachdach (Risiko, Sonderumlage, Beschluss, Maßnahme, dazu
        das Feld Bekannte Risiken, das aus denselben Protokollen gefüllt wurde). Ein Punkt fällt, wenn alle seine Themen schon
        vorkommen. Unterlagen vor Objektdaten vor eigenem Feld, höchstens zehn. */
     var gesehen = {}, obj = [];
-    ausUnterlagen().concat(ausObjekt()).forEach(function (x) {
+    (ohneForm ? [] : ausUnterlagen().concat(ausObjekt())).forEach(function (x) {
       var t = themen(x.titel); if (obj.length >= 10) return;
       if (t.length && t.every(function (k) { return gesehen[k]; })) return;
       if (!t.length) { var k0 = String(x.titel).toLowerCase().slice(0, 40); if (gesehen[k0]) return; gesehen[k0] = 1; }
@@ -301,5 +304,5 @@
     (document.head || document.documentElement).appendChild(s);
   })();
 
-  g.DpBesichtigung = { VERSION: 'v5020', html: html, gruppen: gruppen, laden: laden, drucken: drucken };
+  g.DpBesichtigung = { VERSION: 'v5150pp6', html: html, gruppen: gruppen, laden: laden, drucken: drucken };
 })();
