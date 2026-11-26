@@ -570,11 +570,11 @@
   }
   var HW_MS = {
     oben: 'der obere Spannenwert trägt nur, wenn Ausstattung und Merkmale der Wohnung ihn rechtfertigen, sonst Mittelwert',
-    veraltet: 'veraltet — nur noch Indiz: der qualifizierte Mietspiegel ist älter als zwei Jahre, die Vermutungswirkung (§ 558d Abs. 2 und 3 BGB) entfällt',
-    qualifiziert: 'qualifizierter Mietspiegel: nach oben abweichen nur mit Gutachten oder Vergleichswohnungen; die Mietspiegelwerte sind im Erhöhungsverlangen zu nennen (§ 558a Abs. 3 BGB)',
-    einfach: 'einfacher Mietspiegel — mit drei Vergleichswohnungen absichern (§ 558a Abs. 2 Nr. 4 BGB)',
-    ohne_stand: 'Stand des Mietspiegels fehlt — ob die Vermutungswirkung noch gilt (zwei Jahre, § 558d Abs. 2 BGB), ist nicht geprüft',
-    ohne_art: 'Art des Mietspiegels nicht angegeben — gewertet wie ein einfacher Mietspiegel'
+    veraltet: 'veraltet, nur noch Indiz: der qualifizierte Mietspiegel ist älter als zwei Jahre, die Vermutungswirkung (§ 558d Abs. 2 und 3 BGB) entfällt',
+    qualifiziert: 'qualifizierter Mietspiegel: nach oben abweichen nur mit Gutachten oder Vergleichswohnungen. Die Mietspiegelwerte sind im Erhöhungsverlangen zu nennen (§ 558a Abs. 3 BGB)',
+    einfach: 'einfacher Mietspiegel, mit drei Vergleichswohnungen absichern (§ 558a Abs. 2 Nr. 4 BGB)',
+    ohne_stand: 'Stand des Mietspiegels fehlt. Ob die Vermutungswirkung noch gilt (zwei Jahre, § 558d Abs. 2 BGB), ist nicht geprüft',
+    ohne_art: 'Art des Mietspiegels nicht angegeben, gewertet wie ein einfacher Mietspiegel'
   };
   /** 'JJJJ-MM' aus 'JJJJ-MM', 'JJJJ-MM-TT', 'MM/JJJJ', 'MM.JJJJ' oder 'JJJJ' (dann Januar), sonst null */
   function ymAus(v) {
@@ -639,7 +639,7 @@
       qualifiziert: ms.art === 'qualifiziert' && !veraltet && !!ms.stand, veraltet: veraltet,
       stand: ms.stand || null, gueltig_bis: ms.gueltig_bis || null, url: ms.url || null, quelle: ms.quelle,
       unten: ms.unten, mittel: ms.mittel, oben: ms.oben,
-      herkunft: ms.herkunft + ' — ' + (ms.art === 'qualifiziert' ? 'qualifiziert (§ 558d BGB)' : 'einfach (§ 558c BGB)')
+      herkunft: ms.herkunft + ', ' + (ms.art === 'qualifiziert' ? 'qualifiziert (§ 558d BGB)' : 'einfach (§ 558c BGB)')
         + ', ' + MS_WAHL[genutzt] + (ms.stand ? ', Stand ' + mmjj(ms.stand) : '') + (veraltet ? ', veraltet' : ''),
       hinweise: h };
   }
@@ -649,10 +649,10 @@
        url, zugang, preis, gefunden }. Phase 1 führt KEINE Werte - die Zeile sagt nur, ob und welcher Mietspiegel gilt
        und wo er steht. heute: 'JJJJ-MM-TT' (Parameter; ohne: Uhr). */
   var MS_REG = {
-    keiner: 'kein Mietspiegel — die Vergleichsmiete mit drei Vergleichswohnungen oder einem Gutachten belegen (§ 558a Abs. 2 BGB) oder mit dem Mietspiegel einer vergleichbaren Gemeinde (§ 558a Abs. 4 BGB)',
-    unklar: 'nicht belegt — ob ein Mietspiegel gilt, ist nicht belegt — bei der Stadt nachfragen',
-    fehlt: 'nicht im Verzeichnis — Pflicht ist ein Mietspiegel erst ab 50.000 Einwohnern (§ 558c Abs. 4 BGB), kleinere Gemeinden haben oft keinen — bei der Stadt nachfragen',
-    werte: 'Werte aus dem Mietspiegel eintragen — sonst rechnet DealPilot mit der Schätzung aus Angebotsmieten'
+    keiner: 'kein Mietspiegel. Die Vergleichsmiete mit drei Vergleichswohnungen oder einem Gutachten belegen (§ 558a Abs. 2 BGB) oder mit dem Mietspiegel einer vergleichbaren Gemeinde (§ 558a Abs. 4 BGB)',
+    unklar: 'nicht belegt, ob ein Mietspiegel gilt. Bei der Stadt nachfragen',
+    fehlt: 'nicht im Verzeichnis. Pflicht ist ein Mietspiegel erst ab 50.000 Einwohnern (§ 558c Abs. 4 BGB), kleinere Gemeinden haben oft keinen. Bei der Stadt nachfragen',
+    werte: 'Werte aus dem Mietspiegel eintragen, sonst rechnet DealPilot mit der Schätzung aus Angebotsmieten'
   };
   /** 'JJJJ-MM-TT' -> 'TT.MM.JJJJ', 'JJJJ-MM' -> 'MM/JJJJ', 'JJJJ' -> 'JJJJ' */
   function msDatum(v) {
@@ -690,8 +690,8 @@
     r.bis = bis; r.veraltet = !!(bisTag && bisTag < h);
     var t = [q ? 'qualifiziert (§ 558d BGB)' : 'einfach (§ 558c BGB)'];
     if (msDatum(r.stand)) t.push('Stand ' + msDatum(r.stand));
-    if (r.veraltet) t.push(q ? 'veraltet seit ' + msDatum(bis) + ' — Vermutungswirkung (§ 558d Abs. 2 und 3 BGB) entfällt, nur noch Indiz; neuere Fassung bei der Stadt prüfen'
-      : 'abgelaufen am ' + msDatum(bis) + ' — neuere Fassung bei der Stadt prüfen');
+    if (r.veraltet) t.push(q ? 'veraltet seit ' + msDatum(bis) + ', Vermutungswirkung (§ 558d Abs. 2 und 3 BGB) entfällt, nur noch Indiz. Neuere Fassung bei der Stadt prüfen'
+      : 'abgelaufen am ' + msDatum(bis) + ', neuere Fassung bei der Stadt prüfen');
     else if (bisTag) t.push('gilt bis ' + (q && /^abgeleitet/.test(satz.vermutung_bis_herleitung || '') ? 'voraussichtlich ' : '') + msDatum(bis));
     if (satz.zugang === 'kostenpflichtig') t.push('kostenpflichtig' + (satz.preis ? ' (' + satz.preis + ')' : ''));
     else if (satz.zugang === 'online_rechner') t.push('nur als Online-Rechner');
@@ -703,11 +703,16 @@
     var bisDahin = satz.naeherung_verfuegbar ? 'DealPilot-Näherung' : 'Schätzung aus Angebotsmieten';
     if (satz.werte_nutzung === 'verboten' || (satz.werte_nutzung === 'vorbehalt' && satz.werte_gesperrt === true)) {
       r.nutzung = satz.werte_nutzung;
-      r.werte_hinweis = (satz.werte_nutzung === 'verboten'
-        ? 'Die Werte darf DealPilot nicht vorhalten (' + (satz.werte_nutzung_grund || 'Speicherung nur mit Genehmigung des Herausgebers') + ').'
-        : 'Die Werte darf DealPilot derzeit nicht ausliefern (Rechtevorbehalt des Herausgebers, die Nutzung wird geklärt).')
-        + ' Bitte die Spanne aus dem Mietspiegel eintragen — bis dahin rechnet DealPilot mit der ' + bisDahin + '.';
-    } else if (satz.naeherung_verfuegbar) r.werte_hinweis = 'Werte aus dem Mietspiegel eintragen — sonst rechnet DealPilot mit der DealPilot-Näherung';
+      /* v5080 · Marcel 26.11.2026: wo DealPilot den Mietspiegel nicht speichern darf, rechnet die Näherung. Der Text sagt,
+         dass es einen amtlichen Mietspiegel gibt (Link steht in der Zeile: Weg zur Quelle), nennt nie Werte „laut Mietspiegel“
+         und bei qualifizierten die Nennungspflicht im Erhöhungsverlangen (§ 558a Abs. 3 BGB). Keine Gedankenstriche. */
+      r.werte_hinweis = 'Für diese Gemeinde gibt es einen amtlichen Mietspiegel. '
+        + (satz.werte_nutzung === 'verboten'
+          ? 'Seine Werte darf DealPilot nicht speichern (' + (satz.werte_nutzung_grund || 'Speicherung nur mit Genehmigung des Herausgebers') + ').'
+          : 'Seine Werte darf DealPilot derzeit nicht ausliefern (Rechtevorbehalt des Herausgebers, die Nutzung wird geklärt).')
+        + ' Gerechnet wird mit der ' + bisDahin + '. Die genaue Spanne steht im Mietspiegel der Stadt und kann eingetragen werden.'
+        + (art === 'qualifiziert' ? ' Ein Erhöhungsverlangen muss die Werte des qualifizierten Mietspiegels nennen (§ 558a Abs. 3 BGB).' : '');
+    } else if (satz.naeherung_verfuegbar) r.werte_hinweis = 'Werte aus dem Mietspiegel eintragen, sonst rechnet DealPilot mit der DealPilot-Näherung';
     return r;
   }
   /**

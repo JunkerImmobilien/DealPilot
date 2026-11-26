@@ -89,9 +89,9 @@ function geltungPruefen(g, bj, wfl) {
   if (!g) return null;
   const bv = num(g.baujahr_von), bb = num(g.baujahr_bis), wv = num(g.wfl_von), wb = num(g.wfl_bis);
   if (bj !== null && ((bv !== null && bj < bv) || (bb !== null && bj > bb)))
-    return 'Baujahr ' + bj + ' liegt außerhalb des Mietspiegels (' + (bv !== null ? bv : '…') + '–' + (bb !== null ? bb : '…') + ') — dort endet die Rechnung';
+    return 'Baujahr ' + bj + ' liegt außerhalb des Mietspiegels (' + (bv !== null ? bv : '…') + '–' + (bb !== null ? bb : '…') + '), dort endet die Rechnung';
   if (wfl !== null && ((wv !== null && wfl < wv) || (wb !== null && wfl > wb)))
-    return 'Wohnfläche ' + zahlText(wfl, wfl % 1 ? 1 : 0) + ' m² liegt außerhalb des Mietspiegels (' + (wv !== null ? wv : '…') + '–' + (wb !== null ? wb : '…') + ' m²) — dort endet die Rechnung';
+    return 'Wohnfläche ' + zahlText(wfl, wfl % 1 ? 1 : 0) + ' m² liegt außerhalb des Mietspiegels (' + (wv !== null ? wv : '…') + '–' + (wb !== null ? wb : '…') + ' m²), dort endet die Rechnung';
   return null;
 }
 
@@ -191,24 +191,24 @@ function tabelleRechnen(w, objekt, bj, wfl, n, hinweise) {
 
   const wahl = {}; const teile = [];
   if (Array.isArray(A.baujahr) && A.baujahr.length) {
-    if (bj === null) return leer(hinweise.concat('Baujahr fehlt — der Mietspiegel ordnet nach Baualtersklassen'));
+    if (bj === null) return leer(hinweise.concat('Baujahr fehlt, der Mietspiegel ordnet nach Baualtersklassen'));
     const i = klasseFinden(A.baujahr, bj);
-    if (i < 0) return leer(hinweise.concat('Baujahr ' + bj + ' liegt außerhalb der Baualtersklassen des Mietspiegels — dort endet die Rechnung'));
+    if (i < 0) return leer(hinweise.concat('Baujahr ' + bj + ' liegt außerhalb der Baualtersklassen des Mietspiegels, dort endet die Rechnung'));
     wahl.baujahr = i; teile.push('Baujahr ' + klasseText(A.baujahr[i]));
   }
   if (Array.isArray(A.wfl) && A.wfl.length) {
-    if (wflT === null) return leer(hinweise.concat('Wohnfläche fehlt — der Mietspiegel ordnet nach Wohnungsgröße'));
+    if (wflT === null) return leer(hinweise.concat('Wohnfläche fehlt, der Mietspiegel ordnet nach Wohnungsgröße'));
     const i = klasseFinden(A.wfl, wflT);
-    if (i < 0) return leer(hinweise.concat('Wohnfläche ' + zahlText(wfl, wfl % 1 ? 1 : 0) + ' m² liegt außerhalb der Größenklassen des Mietspiegels — dort endet die Rechnung'));
+    if (i < 0) return leer(hinweise.concat('Wohnfläche ' + zahlText(wfl, wfl % 1 ? 1 : 0) + ' m² liegt außerhalb der Größenklassen des Mietspiegels, dort endet die Rechnung'));
     wahl.wfl = i; teile.push(klasseText(A.wfl[i]) + (/m²/.test(klasseText(A.wfl[i])) ? '' : ' m²'));
   }
   for (const ax of ['lage', 'ausstattung']) {
     if (!Array.isArray(A[ax]) || !A[ax].length) continue;
     const name = ax === 'lage' ? 'Lage' : 'Ausstattung';
     const r = auswahlFinden(A[ax], objekt[ax]);
-    if (!r) return leer(hinweise.concat(name + ' nicht angegeben — der Mietspiegel unterscheidet sie, ohne Angabe kein Wert'));
+    if (!r) return leer(hinweise.concat(name + ' nicht angegeben, der Mietspiegel unterscheidet sie, ohne Angabe kein Wert'));
     if (r.unbekannt) return leer(hinweise.concat(name + ' „' + objekt[ax] + '“ kennt der Mietspiegel nicht (' + A[ax].map(e => e.label || e.schluessel).join(', ') + ')'));
-    if (r.angenommen) hinweise.push(name + ' nicht angegeben — ' + (r.eintrag.label || r.eintrag.schluessel) + ' angenommen');
+    if (r.angenommen) hinweise.push(name + ' nicht angegeben, ' + (r.eintrag.label || r.eintrag.schluessel) + ' angenommen');
     wahl[ax] = r; teile.push(r.eintrag.label || r.eintrag.schluessel);
   }
 
@@ -223,7 +223,7 @@ function tabelleRechnen(w, objekt, bj, wfl, n, hinweise) {
   };
   const zelle = (T.zellen || []).find(passt);
   const zelleText = teile.join(' · ');
-  if (!zelle) return leer(hinweise.concat('Tabellenfeld ' + zelleText + ' ist im Mietspiegel leer (zu wenige Fälle) — kein Wert'), { zelle: zelleText });
+  if (!zelle) return leer(hinweise.concat('Tabellenfeld ' + zelleText + ' ist im Mietspiegel leer (zu wenige Fälle), kein Wert'), { zelle: zelleText });
 
   /* Zu-/Abschläge */
   let pct = 0, eurSumme = 0; const zs = [];
@@ -250,7 +250,7 @@ function tabelleRechnen(w, objekt, bj, wfl, n, hinweise) {
     if (z.art === 'pct') pct += wert; else eurSumme += wert;
     zs.push((z.label || z.merkmal) + ' ' + (wert > 0 ? '+' : '') + (z.art === 'pct' ? zahlText(wert, 1) + ' %' : eur(wert) + ' €'));
   }
-  if (lageZuschlagDa && !lageAngabe) hinweise.push('Lage (Ortsteil/Gebiet) nicht angegeben — ohne Lagezu- oder -abschlag gerechnet');
+  if (lageZuschlagDa && !lageAngabe) hinweise.push('Lage (Ortsteil/Gebiet) nicht angegeben, ohne Lagezu- oder -abschlag gerechnet');
   const f = (v) => v === null || v === undefined ? null : runden(num(v) * (1 + pct / 100) + eurSumme, n);
   let unten, mittel, oben, spText = '';
   if (T.spanne) {
@@ -281,12 +281,12 @@ function regressionRechnen(w, objekt, bj, wfl, n, hinweise) {
   if (ersatz) { basis = num(ersatz.eur_qm); basisText = 'Basis ' + eur(basis) + ' €/m² (' + (ersatz.label || ersatz.merkmal) + ')'; }
   else if (num(R.basis_eur_qm) !== null) { basis = num(R.basis_eur_qm); basisText = 'Basis ' + eur(basis) + ' €/m²'; }
   else if (B && Array.isArray(B.werte)) {
-    if (wflR === null) return leer(hinweise.concat('Wohnfläche fehlt — die Basismiete hängt von der Wohnfläche ab'));
+    if (wflR === null) return leer(hinweise.concat('Wohnfläche fehlt, die Basismiete hängt von der Wohnfläche ab'));
     const i = klasseFinden(B.werte, wflR);
-    if (i < 0) return leer(hinweise.concat('Wohnfläche ' + zahlText(wfl, wfl % 1 ? 1 : 0) + ' m² liegt außerhalb der Basistabelle — dort endet die Rechnung'));
+    if (i < 0) return leer(hinweise.concat('Wohnfläche ' + zahlText(wfl, wfl % 1 ? 1 : 0) + ' m² liegt außerhalb der Basistabelle, dort endet die Rechnung'));
     basis = num(B.werte[i].eur_qm); basisText = 'Basis ' + eur(basis) + ' €/m² (' + zahlText(wflR, wflR % 1 ? 1 : 0) + ' m²)';
   }
-  if (basis === null) return leer(hinweise.concat('Mietspiegel ohne Basismiete — nicht rechenbar'));
+  if (basis === null) return leer(hinweise.concat('Mietspiegel ohne Basismiete, nicht rechenbar'));
 
   let pct = 0, eurSumme = 0, prod = 1; const teile = [], jeRubrik = {};
   /* v3261 · Faktoren mit eigenen Konfidenzgrenzen (Ibbenbüren: UK 1,05 [1,02 – 1,07]): Wert als Zahl ODER { wert, unten, oben }.
@@ -301,9 +301,9 @@ function regressionRechnen(w, objekt, bj, wfl, n, hinweise) {
     let wert = null, wu = null, wo = null, was = f.label || f.merkmal;
     if (f.typ === 'baujahr_klasse' || f.typ === 'wfl_kurve') {
       const x = f.typ === 'baujahr_klasse' ? bj : wflR;
-      if (x === null) return leer(hinweise.concat((f.typ === 'baujahr_klasse' ? 'Baujahr' : 'Wohnfläche') + ' fehlt — der Mietspiegel braucht es für „' + was + '“'));
+      if (x === null) return leer(hinweise.concat((f.typ === 'baujahr_klasse' ? 'Baujahr' : 'Wohnfläche') + ' fehlt, der Mietspiegel braucht es für „' + was + '“'));
       const i = klasseFinden(f.werte, x);
-      if (i < 0) return leer(hinweise.concat((f.typ === 'baujahr_klasse' ? 'Baujahr ' + x : 'Wohnfläche ' + x + ' m²') + ' liegt außerhalb der Klassen für „' + was + '“ — dort endet die Rechnung'));
+      if (i < 0) return leer(hinweise.concat((f.typ === 'baujahr_klasse' ? 'Baujahr ' + x : 'Wohnfläche ' + x + ' m²') + ' liegt außerhalb der Klassen für „' + was + '“, dort endet die Rechnung'));
       { const d = drei(f.werte[i]); wert = d.w; wu = d.u; wo = d.o; } was = was + ' ' + klasseText(f.werte[i]);
     } else if (f.typ === 'lage' || f.typ === 'auswahl') {
       const angabe = f.typ === 'lage' ? objekt.lage : (objekt.merkmale && objekt.merkmale[f.merkmal]);
@@ -317,9 +317,9 @@ function regressionRechnen(w, objekt, bj, wfl, n, hinweise) {
         if (!k) return leer(hinweise.concat((f.typ === 'lage' ? 'Lage' : was) + ' „' + angabe + '“ kennt der Mietspiegel nicht (' + schl.join(', ') + ')'));
       } else if (f.standard !== undefined && f.standard !== null) {
         k = f.standard;
-        if (f.typ === 'lage') hinweise.push('Lage nicht angegeben — ' + (f.standard_label || k) + ' angenommen');
+        if (f.typ === 'lage') hinweise.push('Lage nicht angegeben, ' + (f.standard_label || k) + ' angenommen');
       } else if (f.typ === 'lage') {
-        return leer(hinweise.concat('Lage nicht angegeben — der Mietspiegel unterscheidet sie, ohne Angabe kein Wert'));
+        return leer(hinweise.concat('Lage nicht angegeben, der Mietspiegel unterscheidet sie, ohne Angabe kein Wert'));
       } else continue;
       { const d = drei(W[k]); wert = d.w; wu = d.u; wo = d.o; } was = was + ' ' + k;
     } else if (f.typ === 'flag') {
@@ -332,7 +332,7 @@ function regressionRechnen(w, objekt, bj, wfl, n, hinweise) {
       const roh = f.merkmal === 'lage' ? objekt.lage : (objekt.merkmale && objekt.merkmale[f.merkmal]);
       const v = (roh === true || roh === false) ? null : num(roh);
       if (v === null) {
-        if (f.pflicht) return leer(hinweise.concat((f.label || f.merkmal) + ' nicht angegeben — ' + (f.hinweis_fehlt || 'der Mietspiegel braucht den Betrag, ohne Angabe kein Wert')));
+        if (f.pflicht) return leer(hinweise.concat((f.label || f.merkmal) + ' nicht angegeben, ' + (f.hinweis_fehlt || 'der Mietspiegel braucht den Betrag, ohne Angabe kein Wert')));
         continue;
       }
       const ev = num(f.von), eb = num(f.bis);
@@ -387,7 +387,7 @@ export function mietspiegelWerteFuer(werte, objekt) {
   if (w.einheit && w.einheit !== 'eur_qm_nettokalt') r = leer(['Einheit ' + w.einheit + ' wird nicht gerechnet']);
   else if (w.form === 'tabelle') r = tabelleRechnen(w, o, bj, wflOk, n, hinweise);
   else if (w.form === 'regression') r = regressionRechnen(w, o, bj, wflOk, n, hinweise);
-  else if (w.form === 'punkte') r = leer(['Punkte-Mietspiegel — DealPilot rechnet ihn noch nicht; Werte im Dokument der Stadt ablesen']);
+  else if (w.form === 'punkte') r = leer(['Punkte-Mietspiegel, DealPilot rechnet ihn noch nicht. Werte im Dokument der Stadt ablesen']);
   else r = leer(['Form des Mietspiegels unbekannt']);
   /* w.hinweis ist die Arbeitsnotiz der Ernte (Ablesung, Besonderheiten) - eigenes Feld, nicht in die Kundenhinweise */
   return Object.assign(kopf, r, { seite: r.seite || (w.quelle && w.quelle.seite) || null, hinweis_quelle: w.hinweis || null });

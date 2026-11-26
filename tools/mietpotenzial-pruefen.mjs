@@ -454,7 +454,7 @@ const EINH = [{ nr: '1', wfl: '60', ist: '480', status: 'vermietet' }, { nr: '2'
     K.mietspiegelWert(K.mietspiegelAus(null, { art: 'einfach', unten: 7, oben: 9 }), 'mittel', H26).hinweise.some((h) => /eingetragen nur der unterer Spannenwert/.test(h))], [7, true]);
   w = K.mietspiegelWert(K.mietspiegelAus(null, Object.assign({}, MSQ, { stand: '2024-05' })), 'oben', H26);
   gleich('K4 qualifiziert, Stand 05/2024 (älter als 2 Jahre): veraltet, keine Vermutung', [w.veraltet, w.qualifiziert, w.qm], [true, false, 8.4]);
-  wahr('K4 Hinweis „veraltet — nur noch Indiz“ mit § 558d', w.hinweise.some((h) => /veraltet — nur noch Indiz/.test(h) && /§ 558d Abs\. 2 und 3/.test(h)) && /veraltet/.test(w.herkunft));
+  wahr('K4 Hinweis „veraltet, nur noch Indiz“ mit § 558d', w.hinweise.some((h) => /veraltet, nur noch Indiz/.test(h) && /§ 558d Abs\. 2 und 3/.test(h)) && /veraltet/.test(w.herkunft));
   w = K.mietspiegelWert(K.mietspiegelAus(null, Object.assign({}, MSQ, { stand: '' })), 'oben', H26);
   wahr('K4 qualifiziert ohne Stand: Hinweis Stand fehlt', w.hinweise.some((h) => /Stand des Mietspiegels fehlt/.test(h)) && w.qualifiziert === false);
   w = K.mietspiegelWert(K.mietspiegelAus(null, { art: 'einfach', unten: 7, mittel: 7.5, oben: 8, stand: '05/2026' }), 'oben', H26);
@@ -502,7 +502,7 @@ const EINH = [{ nr: '1', wfl: '60', ist: '480', status: 'vermietet' }, { nr: '2'
   gleich('K12b eigene Wahl „oben“ schlägt die Einordnung (v3343): 8,40, § 558 bis 504', [P.modell({ einheiten: EIN1 }).vgl.qm, P.soll558(P.modell({ einheiten: EIN1 }).wohnungen[0])], [8.4, 504]);
   P = await lauf(Object.assign({ plz: '52062', ms_art: 'qualifiziert', ms_oben: '8,40', ms_unten: '6,80', ms_stand: '2024-05' }));
   zv = P.mietrechtDaten(P.modell({ einheiten: EIN1 }), 0).zeilen.find((z) => z.k === 'Vergleichsmiete');
-  wahr('K13 veralteter qualifizierter Mietspiegel: Zeile warnt „veraltet — nur noch Indiz“', zv && zv.warn && /veraltet — nur noch Indiz/.test(zv.u));
+  wahr('K13 veralteter qualifizierter Mietspiegel: Zeile warnt „veraltet, nur noch Indiz“', zv && zv.warn && /veraltet, nur noch Indiz/.test(zv.u));
   P = await lauf(Object.assign({ plz: '52062', ms_art: 'einfach', ms_oben: '8,40', ms_stand: '2026-01' }));
   zv = P.mietrechtDaten(P.modell({ einheiten: EIN1 }), 0).zeilen.find((z) => z.k === 'Vergleichsmiete');
   wahr('K13 einfacher Mietspiegel: Zeile nennt drei Vergleichswohnungen', zv && /drei Vergleichswohnungen/.test(zv.u));
@@ -569,13 +569,13 @@ const EINH = [{ nr: '1', wfl: '60', ist: '480', status: 'vermietet' }, { nr: '2'
   let z = K.mietspiegelRegister(det, '2026-11-09');
   gleich('L2 qualifiziert: Status, vorhanden, nicht veraltet', [z.status, z.vorhanden, z.veraltet, z.url === det.url], ['qualifiziert', true, false, true]);
   gleich('L2 Wortlaut', z.text, 'Mietspiegel der Gemeinde: qualifiziert (§ 558d BGB) · Stand 04.04.2025 · gilt bis voraussichtlich 03.04.2027');
-  gleich('L2 Hinweis ohne Werte', z.werte_hinweis, 'Werte aus dem Mietspiegel eintragen — sonst rechnet DealPilot mit der Schätzung aus Angebotsmieten');
+  gleich('L2 Hinweis ohne Werte', z.werte_hinweis, 'Werte aus dem Mietspiegel eintragen, sonst rechnet DealPilot mit der Schätzung aus Angebotsmieten');
   z = K.mietspiegelRegister(det, '2027-05-01');
-  wahr('L3 Register veraltet (vermutung_bis < heute): „veraltet seit 03.04.2027“, § 558d', z.status === 'veraltet' && z.veraltet && z.vorhanden && /veraltet seit 03\.04\.2027 — Vermutungswirkung \(§ 558d Abs\. 2 und 3 BGB\) entfällt, nur noch Indiz/.test(z.text));
+  wahr('L3 Register veraltet (vermutung_bis < heute): „veraltet seit 03.04.2027“, § 558d', z.status === 'veraltet' && z.veraltet && z.vorhanden && /veraltet seit 03\.04\.2027, Vermutungswirkung \(§ 558d Abs\. 2 und 3 BGB\) entfällt, nur noch Indiz/.test(z.text));
   z = K.mietspiegelRegister(loer, '2026-11-09');
   wahr('L4 keiner: „kein Mietspiegel“, nicht vorhanden', z.status === 'keiner' && !z.vorhanden && /^Mietspiegel der Gemeinde: kein Mietspiegel/.test(z.text));
   z = K.mietspiegelRegister(unkl, '2026-11-09');
-  wahr('L5 unklar: „ob ein Mietspiegel gilt, ist nicht belegt — bei der Stadt nachfragen“', z.status === 'unklar' && !z.vorhanden && /nicht belegt — ob ein Mietspiegel gilt, ist nicht belegt — bei der Stadt nachfragen/.test(z.text));
+  wahr('L5 unklar: „nicht belegt, ob ein Mietspiegel gilt. Bei der Stadt nachfragen“', z.status === 'unklar' && !z.vorhanden && /nicht belegt, ob ein Mietspiegel gilt\. Bei der Stadt nachfragen/.test(z.text));
   z = K.mietspiegelRegister(ohne, '2026-11-09');
   wahr('L6 nicht im Verzeichnis: Weg mit 50.000 Einwohnern', z.status === 'fehlt' && /nicht im Verzeichnis/.test(z.text) && /50\.000 Einwohnern/.test(z.text));
   z = K.mietspiegelRegister({ art: 'einfach', stand: '2023', gueltig_bis: '2025-12-31', url: 'https://example.org/e' }, '2026-11-09');
@@ -641,7 +641,7 @@ const EINH = [{ nr: '1', wfl: '60', ist: '480', status: 'vermietet' }, { nr: '2'
   gleich('M3 Gemeinde ohne Werte (Hüllhorst): werte_verfuegbar false, keine Werte', [a.werte_verfuegbar, a.werte], [false, undefined]);
   a = route({ ags: '05766020' });
   gleich('M3 ohne Baujahr/Fläche: nur werte_verfuegbar', [a.werte_verfuegbar, a.werte], [true, undefined]);
-  gleich('M3 Kern ohne Fläche: null mit Grund', mietspiegelWerteFuer(werteFuer('05770024'), { baujahr: 1972 }).hinweise, ['Wohnfläche fehlt — der Mietspiegel ordnet nach Wohnungsgröße']);
+  gleich('M3 Kern ohne Fläche: null mit Grund', mietspiegelWerteFuer(werteFuer('05770024'), { baujahr: 1972 }).hinweise, ['Wohnfläche fehlt, der Mietspiegel ordnet nach Wohnungsgröße']);
 
   /* Wirkung: potenzial.js holt die Werte über Auth.apiCall (hier: dieselbe Routenfunktion) */
   const cfgText = fs.readFileSync(JS('config.js'), 'utf8').replace(/\r\n/g, '\n');
@@ -733,7 +733,7 @@ const EINH = [{ nr: '1', wfl: '60', ist: '480', status: 'vermietet' }, { nr: '2'
     [false, true, 'verboten', soll, 'dealpilot_naeherung']);
   wahr('N1 Rechenweg nennt Zensus, Klassen und Faktor', /Zensus 2022 Bestandsmiete der Gemeinde 10,00/.test(a.naeherung.rechnung) && /1970 - 1979: 9,00/.test(a.naeherung.rechnung) && /Kalibrierfaktor/.test(a.naeherung.rechnung));
   gleich('N1 Wortlaut der Herkunft', a.naeherung.text, 'DealPilot-Näherung der ortsüblichen Vergleichsmiete (aus der Zensus-Bestandsmiete, kalibriert an ' + P0.n_staedte
-    + ' freien Mietspiegeln; mittlere Abweichung ' + P0.guete.mape_pct.toFixed(1).replace('.', ',') + ' %) — nicht der Mietspiegel; für das Erhöhungsverlangen mit dem Mietspiegel, drei Vergleichswohnungen oder Gutachten belegen');
+    + ' freien Mietspiegeln, mittlere Abweichung ' + P0.guete.mape_pct.toFixed(1).replace('.', ',') + ' %), nicht der Mietspiegel. Für das Erhöhungsverlangen mit dem Mietspiegel, drei Vergleichswohnungen oder Gutachten belegen');
   wahr('N1 ohne Portal- oder Anbieternamen', !/Scout|Immowelt|immonet|PriceHubble|Sprengnetter|BBSR/i.test(JSON.stringify(a.naeherung)));
   a = await route({ ags: '05711000', baujahr: '2030', wfl: '70' });   /* Bielefeld: freie Werte, Baujahr außerhalb */
   gleich('N2 freie Werte (Bielefeld), auch außerhalb der Tabelle: nie Näherung', [a.werte_verfuegbar, a.naeherung_verfuegbar, a.naeherung], [true, false, undefined]);
@@ -778,11 +778,11 @@ const EINH = [{ nr: '1', wfl: '60', ist: '480', status: 'vermietet' }, { nr: '2'
   wahr('N5 Abruf mit Baujahr und Fläche über den Proxy', rufe.some((u) => /^\/marktbericht\/mietspiegel\?ags=08111000&baujahr=1975&wfl=70$/.test(u)));
   P.msHinweis();
   const txt = String((P._el['ms-hinweis'] || {}).innerHTML || '').replace(/<[^>]+>/g, '').replace(/&nbsp;| /g, ' ');
-  wahr('N6 #ms-hinweis bei Speicherverbot: „… · Mietspiegel öffnen — Die Werte darf DealPilot nicht vorhalten (Speicherung nur mit Genehmigung des Herausgebers). Bitte die Spanne aus dem Mietspiegel eintragen — bis dahin rechnet DealPilot mit der DealPilot-Näherung.“',
-    /^Mietspiegel der Gemeinde: qualifiziert \(§ 558d BGB\)\. Stand 04\/2024\. Gilt bis 31\.12\.2026\. Mietspiegel öffnen Die Werte darf DealPilot nicht vorhalten \(Speicherung nur mit Genehmigung des Herausgebers\)\. Bitte die Spanne aus dem Mietspiegel eintragen\. Bis dahin rechnet DealPilot mit der DealPilot-Näherung\./.test(txt));
+  wahr('N6 #ms-hinweis bei Speicherverbot (v5080): amtlicher Mietspiegel, Link, Näherung, § 558a Abs. 3, ohne Werte „laut Mietspiegel“',
+    /^Mietspiegel der Gemeinde: qualifiziert \(§ 558d BGB\)\. Stand 04\/2024\. Gilt bis 31\.12\.2026\. Mietspiegel öffnen Für diese Gemeinde gibt es einen amtlichen Mietspiegel\. Seine Werte darf DealPilot nicht speichern \(Speicherung nur mit Genehmigung des Herausgebers\)\. Gerechnet wird mit der DealPilot-Näherung\. Die genaue Spanne steht im Mietspiegel der Stadt und kann eingetragen werden\. Ein Erhöhungsverlangen muss die Werte des qualifizierten Mietspiegels nennen \(§ 558a Abs\. 3 BGB\)\./.test(txt) && !/—|;/.test(txt.split('Mietspiegel öffnen')[1] || ''));
   /* v3840 · Kundentext nur Punkt und Komma: „Gerechnet wird mit X/m². Quelle: DealPilot-Näherung …“ */
   wahr('N6 darunter: „Gerechnet wird mit …. Quelle: DealPilot-Näherung …“', /Gerechnet wird mit .*\/m²\. Quelle: DealPilot-Näherung der ortsüblichen Vergleichsmiete/.test(txt));
-  gleich('N6 Felder unten/mittel/oben: Platzhalter und Fokus-Hinweis', [P._el.ms_oben.placeholder, /^Die Werte darf DealPilot nicht vorhalten/.test(P._el.ms_oben.title || '')], ['bitte aus dem Mietspiegel eintragen', true]);
+  gleich('N6 Felder unten/mittel/oben: Platzhalter und Fokus-Hinweis', [P._el.ms_oben.placeholder, /^Für diese Gemeinde gibt es einen amtlichen Mietspiegel\. Seine Werte darf DealPilot nicht speichern/.test(P._el.ms_oben.title || '')], ['bitte aus dem Mietspiegel eintragen', true]);
   P = await lauf({ plz: '70173', baujahr: '1975', wfl: '70', ds2_marktmiete: '14', ms_oben: '9,80' }, '08111000');
   P.modell(); await warte(); await warte();
   m = P.modell({ einheiten: EIN1 });
@@ -802,10 +802,10 @@ const EINH = [{ nr: '1', wfl: '60', ist: '480', status: 'vermietet' }, { nr: '2'
   const t2 = String((P._el['ms-hinweis'] || {}).innerHTML || '').replace(/<[^>]+>/g, '');
   gleich('N9 Vorbehalt auf Prod (Minden, nur_frei): Näherung rechnet', m.vgl.quelle_art, 'dealpilot_naeherung');
   wahr('N9 Hinweis Vorbehalt: „Die Werte darf DealPilot derzeit nicht ausliefern (Rechtevorbehalt …) … DealPilot-Näherung.“',
-    /Mietspiegel öffnen Die Werte darf DealPilot derzeit nicht ausliefern \(Rechtevorbehalt des Herausgebers, die Nutzung wird geklärt\)\. Bitte die Spanne aus dem Mietspiegel eintragen\. Bis dahin rechnet DealPilot mit der DealPilot-Näherung\./.test(t2));
+    /Mietspiegel öffnen Für diese Gemeinde gibt es einen amtlichen Mietspiegel\. Seine Werte darf DealPilot derzeit nicht ausliefern \(Rechtevorbehalt des Herausgebers, die Nutzung wird geklärt\)\. Gerechnet wird mit der DealPilot-Näherung\./.test(t2));
   /* Kern: ohne Näherung (Route bietet sie nicht an) bleibt der Rückfall im Text */
   const z = K.mietspiegelRegister(Object.assign({}, mietspiegelFuer('08111000'), { naeherung_verfuegbar: false }), '2026-11-09');
-  wahr('N10 Speicherverbot ohne Näherung: „bis dahin rechnet DealPilot mit der Schätzung aus Angebotsmieten.“', z.nutzung === 'verboten' && /bis dahin rechnet DealPilot mit der Schätzung aus Angebotsmieten\.$/.test(z.werte_hinweis));
+  wahr('N10 Speicherverbot ohne Näherung: „Gerechnet wird mit der Schätzung aus Angebotsmieten.“', z.nutzung === 'verboten' && /Gerechnet wird mit der Schätzung aus Angebotsmieten\./.test(z.werte_hinweis));
   const z2 = K.mietspiegelRegister(Object.assign({}, mietspiegelFuer('05770024'), { werte_verfuegbar: true }), '2026-11-09');
   wahr('N10 Vorbehalt mit ausgelieferten Werten (Staging): kein Nutzungshinweis', !z2.nutzung && z2.werte_hinweis === K.MS_REG.werte);
 }
