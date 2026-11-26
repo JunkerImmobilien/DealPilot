@@ -55,9 +55,6 @@
         return '<li class="det">' + B.esc(q.vermerk) + (q.kennzahlen && q.kennzahlen.length ? ' (' + B.esc(q.kennzahlen.join(', ')) + ')' : '') + '</li>'; }).join('') + '</ul></div>';
     } else wHtml = '<p>Für dieses Objekt liegt noch keine Wertermittlung vor.' + (W && (W.weg || W.grund) && !/^[a-z_]+$/.test(String(W.weg || W.grund)) ? ' ' + B.esc(W.weg || W.grund) : '') + '</p>'
       + '<p class="det">Mit der vollständigen Anschrift rechnet DealPilot den Wert nach ImmoWertV aus den Daten des Gutachterausschusses.</p>';
-    wHtml += '<div class="block"><h3>Kaufnebenkosten</h3>' + B.liste([
-      ['Grunderwerbsteuer', B.eur(H.nebenkosten.grest)], ['Notar', B.eur(H.nebenkosten.notar)], ['Grundbuch', B.eur(H.nebenkosten.grundbuch)],
-      ['Makler (Käuferanteil)', B.eur(H.nebenkosten.makler)], ['Summe', B.eur(H.nebenkosten.summe) + ' (' + B.pct(H.nebenkosten.pct, 1) + ')', { art: 'summe' }]]) + '</div>';
     add('Preis und Wert', 'Kaufpreis gegen den Wert nach ImmoWertV, Kaufnebenkosten', wHtml);
 
     /* 3 · Kaufen oder mieten */
@@ -109,7 +106,11 @@
     bank += '<div class="block"><h3>Für das Bankgespräch</h3><ul><li>Exposé, Grundriss, Wohnflächenberechnung</li><li>Energieausweis</li><li>Grundbuchauszug, Flurkarte</li>'
       + (O.objektart === 'etw' ? '<li>Teilungserklärung, letzte drei Protokolle, Wirtschaftsplan, Hausgeldabrechnung</li>' : '<li>Baubeschreibung, Liste der Modernisierungen</li>')
       + '<li>Einkommensnachweise, Eigenkapitalnachweis</li></ul></div>';
-    add('Finanzierung und Bank', 'Rate, Belastung, Beleihungswert, Unterlagen', bank);
+    /* Kaufnebenkosten hier statt unter Preis und Wert: dort sprengte der Rechenweg die Seite (Testkauf 26.11.2026) */
+    bank += '<div class="block"><h3>Kaufnebenkosten</h3>' + B.liste([
+      ['Grunderwerbsteuer', B.eur(H.nebenkosten.grest)], ['Notar', B.eur(H.nebenkosten.notar)], ['Grundbuch', B.eur(H.nebenkosten.grundbuch)],
+      ['Makler (Käuferanteil)', B.eur(H.nebenkosten.makler)], ['Summe', B.eur(H.nebenkosten.summe) + ' (' + B.pct(H.nebenkosten.pct, 1) + ')', { art: 'summe' }]]) + '</div>';
+    add('Finanzierung und Bank', 'Rate, Belastung, Kaufnebenkosten, Beleihungswert, Unterlagen', bank);
 
     /* 7 · Förderung */
     if (O.foerderung && O.foerderung.length) add('Förderung', 'Öffentliche Programme, die in Frage kommen',
