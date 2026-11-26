@@ -1,0 +1,382 @@
+{
+ "ags": "05562012",
+ "freigabe": "gesperrt",
+ "freigabe_grund": "„Vervielfältigungen zum Verkauf sind gemäß Urheberrechtsgesetz untersagt.“ (PDF-S. 2) — Rechtevorbehalt ohne ausdrückliches Speicherverbot; auf Prod gesperrt bis zur Klärung",
+ "gemeinde": "Dorsten",
+ "haus": {
+  "regel": "zuschlag",
+  "merkmal": "haus_efh",
+  "fuer": [
+   "efh"
+  ],
+  "hinweis": "Sonderform Einfamilienhaus (inkl. Garten) Faktor 1,15; Zweifamilienhäuser ohne nachweisbaren Einfluss",
+  "beleg": "PDF-S. 5 (Sonderform EFH; Zweifamilienhäuser ohne statistische Relevanz), PDF-S. 6 (Faktor 1,15)"
+ },
+ "art": "einfach",
+ "stand": "2025-07-01",
+ "erhebungsstichtag": null,
+ "gueltig_ab": "2025-07-01",
+ "gueltig_bis": null,
+ "quelle": {
+  "url": "https://www.dorsten.de/_Resources/Persistent/a/e/7/8/ae78abd0ae4e1507b519961960184be7e6e454e3/Dorsten_Mietspiegel_2025_150725.pdf",
+  "dokument": "Mietspiegel für freifinanzierte (nicht preisgebundene) Wohnungen im Stadtgebiet Dorsten nach dem Stand vom 01. Juli 2025 (Haus-, Wohnungs- und Grundeigentümerverein Dorsten e.V., Mieterverein Dorsten und Umgebung e.V., Mieterschutzbund e.V., Arbeitsgemeinschaft der Wohnungswirtschaft Emscher-Lippe; Organisation Stadt Dorsten)",
+  "seite": "PDF-S. 6 (Ausgangswert und Faktoren), PDF-S. 7 (Punkte), PDF-S. 3 (Allgemeines, § 558c), PDF-S. 4–5 (Einflussfaktoren)",
+  "lizenz": "PDF-S. 2: „Digitale Version: kostenlos zum Download unter www.dorsten.de/gutachterausschuss. Vervielfältigungen zum Verkauf sind gemäß Urheberrechtsgesetz untersagt.“",
+  "abgerufen": "2026-11-26"
+ },
+ "einheit": "eur_qm_nettokalt",
+ "form": "tabelle",
+ "rundung": 2,
+ "hinweis": "Ausgangswert je Baujahrsklasse (ein Wert, keine Spanne) × Faktoren Lage im Stadtgebiet, Lage im Stadtteil, Wohnungsgröße (S. 6), dann + Punkte × 0,15 €/m² (S. 7). Das Dokument MULTIPLIZIERT die Faktoren; der Kern addiert Prozente (Anwendungsbeispiel S. 6–7: 5,55 × 1,05 × 1,00 × 0,90 = 5,25, + 10 Punkte × 0,15 = 6,75 €/m²; der Kern rechnet 5,55 × 0,95 = 5,27 bzw. 6,77). Klasse VI (ab 2021): „*“ — kein belastbares Zahlenmaterial, kein Wert. Lage im Stadtgebiet über Stadtteil (lage), Mikrolage „sehr gute“/„sehr einfache Lage“ als Merkmale. Wohnungsgröße > 100 m² Faktor 0,90 „ohne EFH“ — der Kern zieht ihn auch beim Einfamilienhaus ab, wenn Merkmal haus_efh gesetzt ist (nicht abgebildet). Punkte: je Kästchen 1 Punkt (am Druckbild S. 7 gezählt), Ausstattung höchstens +10 Punkte, Modernisierungen in der Wohnung (Bad/WC bis Grundriss) höchstens +5 Punkte — die Höchstwerte prüft der Kern nicht. Modernisierungen nur, wenn in den letzten 15 Jahren erfolgt, und nur Baujahrsklassen I–III (S. 5). Mieterseits erbrachte Ausstattung zählt nicht (S. 5). Basis: zweite Fortschreibung der Umfrage zum Mietspiegel 2021 (S. 3).",
+ "tabelle": {
+  "achsen": {
+   "baujahr": [
+    {
+     "von": null,
+     "bis": 1949,
+     "label": "Klasse I (bis 1949)"
+    },
+    {
+     "von": 1950,
+     "bis": 1979,
+     "label": "Klasse II (1950 bis 1979)"
+    },
+    {
+     "von": 1980,
+     "bis": 1999,
+     "label": "Klasse III (1980 bis 1999)"
+    },
+    {
+     "von": 2000,
+     "bis": 2015,
+     "label": "Klasse IV (2000 bis 2015)"
+    },
+    {
+     "von": 2016,
+     "bis": 2020,
+     "label": "Klasse V (2016 bis 2020)"
+    },
+    {
+     "von": 2021,
+     "bis": null,
+     "label": "Klasse VI (ab 2021)"
+    }
+   ]
+  },
+  "zellen": [
+   {
+    "baujahr": 0,
+    "mittel": 5.25,
+    "seite": "6"
+   },
+   {
+    "baujahr": 1,
+    "mittel": 5.55,
+    "seite": "6"
+   },
+   {
+    "baujahr": 2,
+    "mittel": 6.2,
+    "seite": "6"
+   },
+   {
+    "baujahr": 3,
+    "mittel": 7.3,
+    "seite": "6"
+   },
+   {
+    "baujahr": 4,
+    "mittel": 8.3,
+    "seite": "6"
+   }
+  ],
+  "zuschlaege": [
+   {
+    "merkmal": "lage:altstadt hardt",
+    "aliase": [
+     "altstadt",
+     "hardt"
+    ],
+    "art": "pct",
+    "wert": 5,
+    "label": "Lage im Stadtgebiet Altstadt, Hardt (Faktor 1,05)",
+    "beleg": "PDF-S. 6 Lage im Stadtgebiet"
+   },
+   {
+    "merkmal": "lage:aussenbereiche",
+    "aliase": [
+     "altendorf-ulfkotte",
+     "altendorf ulfkotte",
+     "barkenberg",
+     "deuten",
+     "lembeck",
+     "östrich",
+     "oestrich",
+     "rhade"
+    ],
+    "art": "pct",
+    "wert": -5,
+    "label": "Lage im Stadtgebiet Altendorf-Ulfkotte, Barkenberg, Deuten, Lembeck, Östrich, Rhade (Faktor 0,95)",
+    "beleg": "PDF-S. 6 Lage im Stadtgebiet"
+   },
+   {
+    "merkmal": "sehr_gute_lage",
+    "art": "pct",
+    "wert": 2,
+    "label": "Sehr gute Lage im Stadtteil (Faktor 1,02)",
+    "beleg": "PDF-S. 6 Lage im Stadtteil, Definition S. 4"
+   },
+   {
+    "merkmal": "sehr_einfache_lage",
+    "art": "pct",
+    "wert": -2,
+    "label": "Sehr einfache Lage im Stadtteil (Faktor 0,98)",
+    "beleg": "PDF-S. 6 Lage im Stadtteil, Definition S. 4"
+   },
+   {
+    "merkmal": "wohnungsgroesse",
+    "label": "Wohnungsgröße",
+    "art": "pct",
+    "beleg": "PDF-S. 6 (kleiner als 45 m² 1,05; 45 bis 100 m² 1,00; größer als 100 m² (ohne EFH) 0,90)",
+    "wfl_klassen": [
+     {
+      "von": null,
+      "bis": 45,
+      "bis_inkl": false,
+      "wert": 5
+     },
+     {
+      "von": 45,
+      "bis": 100,
+      "wert": 0
+     },
+     {
+      "von": 100,
+      "von_inkl": false,
+      "bis": null,
+      "wert": -10
+     }
+    ]
+   },
+   {
+    "merkmal": "haus_efh",
+    "art": "pct",
+    "wert": 15,
+    "label": "Sonderform Einfamilienhaus inkl. Garten (Faktor 1,15)",
+    "beleg": "PDF-S. 6"
+   },
+   {
+    "merkmal": "dreifachverglasung",
+    "art": "eur_qm",
+    "wert": 0.6,
+    "label": "Dreifachverglasung (+4 Punkte × 0,15 €)",
+    "beleg": "PDF-S. 7 Ausstattung (Punkte als Kästchen, 4 Kästchen)"
+   },
+   {
+    "merkmal": "alarmanlage",
+    "art": "eur_qm",
+    "wert": 0.6,
+    "label": "Alarmanlage (+4 Punkte × 0,15 €)",
+    "beleg": "PDF-S. 7 Ausstattung (Punkte als Kästchen, 4 Kästchen)"
+   },
+   {
+    "merkmal": "fussbodenheizung",
+    "art": "eur_qm",
+    "wert": 0.6,
+    "label": "Fußbodenheizung (+4 Punkte × 0,15 €)",
+    "beleg": "PDF-S. 7 Ausstattung (Punkte als Kästchen, 4 Kästchen)"
+   },
+   {
+    "merkmal": "fernwaerme",
+    "art": "eur_qm",
+    "wert": 0.3,
+    "label": "Fernwärmeheizung (+2 Punkte × 0,15 €)",
+    "beleg": "PDF-S. 7 Ausstattung (Punkte als Kästchen, 2 Kästchen)"
+   },
+   {
+    "merkmal": "hochwertiges_bad",
+    "art": "eur_qm",
+    "wert": 0.3,
+    "label": "sehr hochwertiges Bad (+2 Punkte × 0,15 €)",
+    "beleg": "PDF-S. 7 Ausstattung (Punkte als Kästchen, 2 Kästchen)"
+   },
+   {
+    "merkmal": "sicherheitsausstattung",
+    "art": "eur_qm",
+    "wert": 0.3,
+    "label": "umfangreiche Sicherheitsausstattung (+2 Punkte × 0,15 €)",
+    "beleg": "PDF-S. 7 Ausstattung (Punkte als Kästchen, 2 Kästchen)"
+   },
+   {
+    "merkmal": "hochwertige_oberboeden",
+    "art": "eur_qm",
+    "wert": 0.3,
+    "label": "sehr hochwertige Oberböden (+2 Punkte × 0,15 €)",
+    "beleg": "PDF-S. 7 Ausstattung (Punkte als Kästchen, 2 Kästchen)"
+   },
+   {
+    "merkmal": "fehlende_oberboeden",
+    "art": "eur_qm",
+    "wert": -0.45,
+    "label": "fehlende Oberböden (-3 Punkte × 0,15 €)",
+    "beleg": "PDF-S. 7 Ausstattung (Punkte als Kästchen, „minus 3“)"
+   },
+   {
+    "merkmal": "einfachverglasung",
+    "art": "eur_qm",
+    "wert": -0.45,
+    "label": "Einfachverglasung (-3 Punkte × 0,15 €)",
+    "beleg": "PDF-S. 7 Ausstattung (Punkte als Kästchen, „minus 3“)"
+   },
+   {
+    "merkmal": "nachtspeicherheizung",
+    "art": "eur_qm",
+    "wert": -0.45,
+    "label": "Nachtspeicherheizung (-3 Punkte × 0,15 €)",
+    "beleg": "PDF-S. 7 Ausstattung (Punkte als Kästchen, „minus 3“)"
+   },
+   {
+    "merkmal": "garten",
+    "art": "eur_qm",
+    "wert": 0.45,
+    "label": "Gartenfläche zur alleinigen Nutzung (+3 Punkte × 0,15 €)",
+    "beleg": "PDF-S. 7 Garten (Punkte als Kästchen, 3 Kästchen)"
+   },
+   {
+    "merkmal": "mod_fassadendaemmung",
+    "art": "eur_qm",
+    "wert": 0.6,
+    "label": "Modernisierung Fassadendämmung entsprechend EnEV (+4 Punkte × 0,15 €)",
+    "beleg": "PDF-S. 7 Modernisierungen (Punkte als Kästchen, 4 Kästchen)",
+    "bedingung": {
+     "baujahr_bis": 1999
+    }
+   },
+   {
+    "merkmal": "mod_dach",
+    "art": "eur_qm",
+    "wert": 0.3,
+    "label": "Modernisierung Dachdämmung inkl. Neueindeckung (+2 Punkte × 0,15 €)",
+    "beleg": "PDF-S. 7 Modernisierungen (Punkte als Kästchen, 2 Kästchen)",
+    "bedingung": {
+     "baujahr_bis": 1999
+    }
+   },
+   {
+    "merkmal": "mod_heizung",
+    "art": "eur_qm",
+    "wert": 0.3,
+    "label": "Modernisierung Heizungsanlage (+2 Punkte × 0,15 €)",
+    "beleg": "PDF-S. 7 Modernisierungen (Punkte als Kästchen, 2 Kästchen)",
+    "bedingung": {
+     "baujahr_bis": 1999
+    }
+   },
+   {
+    "merkmal": "mod_bad",
+    "art": "eur_qm",
+    "wert": 0.3,
+    "label": "Modernisierung Bad/WC (durchgreifende Erneuerung) (+2 Punkte × 0,15 €)",
+    "beleg": "PDF-S. 7 Modernisierungen (Punkte als Kästchen, 2 Kästchen)",
+    "bedingung": {
+     "baujahr_bis": 1999
+    }
+   },
+   {
+    "merkmal": "mod_elektro",
+    "art": "eur_qm",
+    "wert": 0.3,
+    "label": "Modernisierung Elektroinstallation (+2 Punkte × 0,15 €)",
+    "beleg": "PDF-S. 7 Modernisierungen (Punkte als Kästchen, 2 Kästchen)",
+    "bedingung": {
+     "baujahr_bis": 1999
+    }
+   },
+   {
+    "merkmal": "mod_heizkoerper",
+    "art": "eur_qm",
+    "wert": 0.15,
+    "label": "Modernisierung Heizkörper (+1 Punkte × 0,15 €)",
+    "beleg": "PDF-S. 7 Modernisierungen (Punkte als Kästchen, 1 Kästchen)",
+    "bedingung": {
+     "baujahr_bis": 1999
+    }
+   },
+   {
+    "merkmal": "mod_tueren",
+    "art": "eur_qm",
+    "wert": 0.15,
+    "label": "Modernisierung Türen (+1 Punkte × 0,15 €)",
+    "beleg": "PDF-S. 7 Modernisierungen (Punkte als Kästchen, 1 Kästchen)",
+    "bedingung": {
+     "baujahr_bis": 1999
+    }
+   },
+   {
+    "merkmal": "mod_fenster",
+    "art": "eur_qm",
+    "wert": 0.15,
+    "label": "Modernisierung Fenster (+1 Punkte × 0,15 €)",
+    "beleg": "PDF-S. 7 Modernisierungen (Punkte als Kästchen, 1 Kästchen)",
+    "bedingung": {
+     "baujahr_bis": 1999
+    }
+   },
+   {
+    "merkmal": "mod_grundriss",
+    "art": "eur_qm",
+    "wert": 0.15,
+    "label": "Wesentliche Grundrissverbesserungen (+1 Punkte × 0,15 €)",
+    "beleg": "PDF-S. 7 Modernisierungen (Punkte als Kästchen, 1 Kästchen)",
+    "bedingung": {
+     "baujahr_bis": 1999
+    }
+   }
+  ]
+ },
+ "punkte": {
+  "beleg": "PDF-S. 7",
+  "euro_je_punkt": 0.15,
+  "max_ausstattung": 10,
+  "max_modernisierung_wohnung": 5,
+  "hinweis": "Punkte sind im Dokument als Kästchen dargestellt; je Kästchen 1 Punkt, als €/m²-Zuschläge oben abgebildet"
+ },
+ "pruefbeispiele": [
+  {
+   "eingabe": {
+    "baujahr": 1960,
+    "wfl": 70
+   },
+   "erwartet": {
+    "mittel": 5.55
+   },
+   "seite": "6",
+   "art": "tabellenzelle"
+  },
+  {
+   "eingabe": {
+    "baujahr": 1990,
+    "wfl": 80,
+    "lage": "hardt",
+    "merkmale": {
+     "garten": true
+    }
+   },
+   "erwartet": {
+    "mittel": 6.96
+   },
+   "seite": "6, 7",
+   "art": "tabellenzelle",
+   "anmerkung": "6,20 × 1,05 + 3 × 0,15"
+  },
+  {
+   "eingabe": {
+    "baujahr": 2022,
+    "wfl": 70
+   },
+   "erwartet": null,
+   "seite": "6",
+   "art": "tabellenzelle"
+  }
+ ]
+}
