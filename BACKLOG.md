@@ -22,6 +22,13 @@ direkt unter den Punkt — nicht kommentarlos liegenlassen.
 
 ## → Offen aus dem 26.11.2026 (Weitermachen + Marcel entscheidet)
 
+**Eigennutzer-Check (KK6, v5130kk6, Staging, hinter Vorschau `eigennutzer`):**
+- [ ] **Marcel entscheidet:** Stripe-Preis 9,99 € „Haus-Check“ für Prod anlegen (auf Staging nur Testpreis oder SQL „bezahlt“, Kauf-Fluss noch nicht verdrahtet).
+- [ ] **Marcel entscheidet: OSM-Weg.** Öffentliches Overpass war am 26.11. überlastet (502), Spiegel kumi zeitweise weg; heute rechnet der Rückfall über Geoapify (Kontingent). Dauerhaft: eigener Overpass oder Geofabrik-Auszug (`OVERPASS_ENDPOINT`), dann auch Autobahnauffahrt wieder ermittelt.
+- [ ] Gemischter Fall MFH „eine Einheit selbst, Rest vermietet“: heute abgewiesen mit „Für Mehrfamilienhäuser den Modus Vermieten nutzen“. Offen, ob ein eigener Mischmodus kommt.
+- [ ] Bezahlter Bericht: Stufe 3 (Wert) + `beleihungswert` + Umfeld automatisch in `DpHausCheck.dokument()` verdrahten, PDF-Knopf in der App-Demo (II6) und auf der Landing nach dem Kauf.
+- [ ] Beleihungswert für Eigennutzer: Lib rechnet beim Haus mit Ertragswert (Mindestzins 5,5 %) und landet weit unter dem Sachwert; für selbst genutzte EZFH nach § 4 Abs. 2 BelWertV den Sach-/Vergleichswert-Weg wählen (im Muster so gerechnet).
+
 **GeoMap (v5090, XX5):** Mit GeoMap im Dezember 2026 schriftlich bestätigen lassen: KI-Nutzung, eigene Statistik aus API-Abrufen, kein Konkurrenzprodukt (AGB Stand 28.11.2025, Ziff. 7.2a/7.3a KI nur mit Zustimmung, Ziff. 7 d kein Konkurrenzprodukt). Pflichtvermerk „© by RealEstatePilot“ steht seit v5090a im Quellennachweis. Zusammengefasste Angebotsmieten je Marktbericht (mb.angebot_miete_messung, Admin › Register & Ernte › Jahreswerte) gehen erst in die Mietspiegel-Näherung, wenn je Kreis und Klasse mindestens 20 Messungen vorliegen und die Bestätigung da ist.
 
 **Stand Prod 1.0.232.** Live seit 25.11.: Handy-Menüband wie Desktop, Leiste 280 px (1.0.232), Leerzustände + Besichtigungs-Checkliste (1.0.231), Investment-PDF Kombi/Kurz/Bank (1.0.230), Hinweis Marktpreisindikation Zielbild (1.0.229), Feld-Tipps + Portfolio-Cockpit Handy (1.0.228), npm-Sicherheit (bcrypt 6, zod 4, nodemailer 10, puppeteer 25).
