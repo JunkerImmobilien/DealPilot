@@ -253,13 +253,13 @@
     return s;
   }
   /** Score-Ring 0-100 */
-  function scoreRing(score, wort) {
+  function scoreRing(score, wort, unter) {   /* v4790i · unter: Unterzeile, z. B. „Investor Deal Score von 100“ */
     if (!istZahl(score)) return '';
     var r = 30, u = 2 * Math.PI * r, t = Math.max(0, Math.min(100, Number(score))) / 100;
-    return '<div class="score"><svg viewBox="0 0 80 80" role="img" aria-label="Deal Score ' + zahl(score, 0) + '"><circle cx="40" cy="40" r="' + r + '" fill="none" stroke="#E3E1DA" stroke-width="7"/>'
+    return '<div class="score"><svg viewBox="0 0 80 80" role="img" aria-label="' + esc(unter || 'Deal Score') + ' ' + zahl(score, 0) + '"><circle cx="40" cy="40" r="' + r + '" fill="none" stroke="#E3E1DA" stroke-width="7"/>'
       + '<circle cx="40" cy="40" r="' + r + '" fill="none" style="stroke:var(--gold)" stroke-width="7" stroke-linecap="round" stroke-dasharray="' + (u * t).toFixed(1) + ' ' + u.toFixed(1) + '" transform="rotate(-90 40 40)"/>'
       + '<text x="40" y="46" text-anchor="middle" style="font:600 20px \'Space Grotesk\',sans-serif;fill:#16161A">' + zahl(score, 0) + '</text></svg>'
-      + '<div><div class="w">' + esc(wort || '') + '</div><div class="det">Deal Score von 100</div></div></div>';
+      + '<div><div class="w">' + esc(wort || '') + '</div><div class="det">' + esc(unter || 'Deal Score von 100') + '</div></div></div>';
   }
   var EFFIZIENZ = [['A+', 0, 30, '#00843d'], ['A', 30, 50, '#2ba13a'], ['B', 50, 75, '#8cbf26'], ['C', 75, 100, '#cddc28'], ['D', 100, 130, '#fde70a'], ['E', 130, 160, '#fbb913'], ['F', 160, 200, '#f18a1d'], ['G', 200, 250, '#e5361d'], ['H', 250, null, '#b3191e']];
   function energieSkala(klasse, kwh) {

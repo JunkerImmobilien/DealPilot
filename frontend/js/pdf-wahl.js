@@ -59,6 +59,9 @@
   var SCHLUESSEL = 'pdf_vorgabe';  /* v2900 · user_settings */
 
   var WAHLEN = [
+    /* v5060 · Kombi: die vollstaendige neue Fassung (Inhaltsverzeichnis, Kapitel 1, 2, 3, Rechenwege) - Standard */
+    { id: 'kombi', titel: 'Kombi', unter: 'Vollständig mit Rechenwegen, Inhaltsverzeichnis',
+      fuer: 'Eigene Prüfung · Partner · Bank', hell: true, art: 'kombi' },
     { id: 'bank', titel: 'Bankfassung', unter: 'Weisses Papier, Kennzahlen als Tabelle',
       fuer: 'Bank · Finanzierung · Steuerberater', hell: true, art: 'bank' },
     { id: 'kurz', titel: 'Kurzfassung', unter: 'Fünf bis sechs Seiten, weisses Papier',
@@ -162,7 +165,10 @@
      als Kurzfassung." Im einheitlichen Design also zwei Wahlen; „hell" führt dort auf dieselbe vollständige Fassung. */
   function sichtbar() {
     if (vorgabe.design === 'klassisch') return WAHLEN.slice();
-    return [Object.assign({}, wahl('bank'), { titel: 'Investment-PDF · vollständig', unter: 'Alle Kapitel, 18 bis 24 Seiten', fuer: 'Bank · Partner · Steuerberater' }), wahl('kurz')];
+    /* v5060 · Marcel 26.11.2026: drei Fassungen zur Auswahl, Kombi vorausgewaehlt */
+    return [wahl('kombi'),
+      Object.assign({}, wahl('kurz'), { unter: 'Das Wichtigste auf wenigen Seiten', fuer: 'Erstkontakt · Bank · Investor' }),
+      Object.assign({}, wahl('bank'), { unter: 'Für die Finanzierung, ohne Kaufempfehlung', fuer: 'Bank · Finanzierung · Steuerberater' })];
   }
   function fuehreAus(w) {
     if (w.art !== 'profi' && window.DpDokWeiche && window.DpDokWeiche.aktiv()) return window.DpDokWeiche.investment(w.art);
@@ -173,6 +179,7 @@
     try {
       if (typeof window._dpPdfSetLight === 'function') window._dpPdfSetLight(w.hell);
       else window._dpPdfLight = w.hell;
+      if (w.art === 'kombi') { if (origVoll) return origVoll.call(window, { ohneRueckfrage: true }); return; }
       if (w.art === 'profi') { if (window.DpProfi) return window.DpProfi.oeffnen(window._currentObjKey); return; }
       if (w.art === 'bank') { if (origBank) return origBank.call(window, { ohneRueckfrage: true }); }
       else if (w.art === 'kurz') { if (origBank) return origBank.call(window, { ohneRueckfrage: true, kurz: true }); }
@@ -194,13 +201,20 @@
     try { return localStorage.getItem(LS) || ''; } catch (e) { return ''; }
   }
 
+  /* v5060 · gespeicherte Vorauswahl im einheitlichen Design: 'bank' hiess bis v5060 „Investment-PDF · vollstaendig“
+     und fuehrt deshalb auf die Kombi; Kurzfassung bleibt Kurzfassung */
+  function vorauswahlNeu() {
+    var f = vorgabe.fassung;
+    return f === 'kurz' || f === 'kombi' ? f : 'kombi';
+  }
   function frage(vorauswahl) {
-    var g = gemerkt();
+    var g = vorgabe.design === 'klassisch' ? gemerkt() : '';   /* v5060 · im einheitlichen Design immer fragen: ein alter Merker 'bank' hiess bis v5060 „vollstaendig“ */
     if (g) {
       var w = wahl(g);
       if (w) return fuehreAus(w);
     }
-    zeige(vorgabe.fassung || vorauswahl);
+    var vf = vorauswahlNeu();
+    zeige(vf || (vorgabe.design === 'klassisch' ? vorauswahl : 'kombi'));   /* v5060 · Standard Kombi */
   }
 
   function zeige(vorauswahl) {
@@ -225,8 +239,8 @@
       + '<button type="button" class="dpw-zu" aria-label="Schliessen">×</button></div>'
       /* v3235: das einheitliche Design zeigt ZWEI Fassungen - hier stand „=== 3 ? Drei : Vier“,
          und bei zwei Karten hiess es „Vier Fassungen“. */
-      + '<p class="dpw-vor">' + (['Keine', 'Eine', 'Zwei', 'Drei', 'Vier'][sichtbar().length] || sichtbar().length) + ' Fassungen stehen bereit. Sie unterscheiden sich im Umfang '
-      + 'und im Deckblatt - die Zahlen sind dieselben.</p>'
+      + '<p class="dpw-vor">' + (['Keine', 'Eine', 'Zwei', 'Drei', 'Vier'][sichtbar().length] || sichtbar().length) + ' Fassungen stehen bereit. Sie unterscheiden sich im Umfang. '
+      + 'Die Zahlen sind dieselben.</p>'
       + '<div class="dpw-liste">' + karten + '</div>'
       /* v1733 · hier stand „(änderbar in den Einstellungen)". Das war eine
          Zusage ohne Code: `vergessen()` hatte ausserhalb dieser Datei null
@@ -243,7 +257,7 @@
 
     function zu() { ov.remove(); }
     ov.querySelector('.dpw-zu').addEventListener('click', zu);
-    ov.addEventListener('click', function (e) { if (e.target === ov) zu(); });
+    /* v5060 · Marcel 24.11.2026: ein Modal schliesst nie per Klick daneben, nur × und Esc */
     document.addEventListener('keydown', function esc(e) {
       if (e.key === 'Escape') { zu(); document.removeEventListener('keydown', esc); }
     });
@@ -281,7 +295,7 @@
       + '<div style="' + rahmen + '">'
       + '<label for="set_pdf_fassung" style="display:block;font-weight:500;color:var(--ch,#2A2727);margin-bottom:6px">Vorausgewählte Fassung</label>'
       + '<select id="set_pdf_fassung" style="' + feld + '" onchange="window.DealPilotPdfWahl.ausEinstellungen()">'
-      + '<option value=""' + (vorgabe.fassung ? '' : ' selected') + '>Keine (Bankfassung markiert)</option>'
+      + '<option value=""' + (vorgabe.fassung ? '' : ' selected') + '>Keine (Kombi markiert)</option>'
       + sichtbar().map(function (w) { return '<option value="' + w.id + '"' + (vorgabe.fassung === w.id ? ' selected' : '') + '>' + w.titel + '</option>'; }).join('')
       + '</select>'
       /* v3181 · Marcel 04.11.2026: neue Dokumente überall, die bisherigen als Einstellung zum Auswählen */
@@ -350,7 +364,7 @@
        die alte. */
     neuWaehlen: function (vorauswahl) {
       setze({ immer: false });
-      zeige(vorauswahl || vorgabe.fassung || 'bank');
+      zeige(vorauswahl || (vorgabe.design === 'klassisch' ? vorgabe.fassung : vorauswahlNeu()) || 'kombi');
     },
     gemerkt: gemerkt,
     /* v3184 · direkt eine Fassung erzeugen, ohne Dialog (Deal-Aktion: Knöpfe „Vollständig" und „Kurzfassung") */
