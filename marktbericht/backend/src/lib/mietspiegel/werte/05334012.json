@@ -1,0 +1,471 @@
+{
+ "ags": "05334012",
+ "gemeinde": "Eschweiler",
+ "haus": {
+  "regel": "gilt",
+  "fuer": [
+   "efh"
+  ],
+  "beleg": "S. 3 Wohnungsgrößen: „Für vermietete Einfamilienhäuser gelten die Werte des Mietspiegels sinngemäß, wobei die Besonderheiten des Einzelfalls zu berücksichtigen sind.“"
+ },
+ "art": "einfach",
+ "stand": "2025-12-18",
+ "erhebungsstichtag": null,
+ "gueltig_ab": "2026-01-01",
+ "gueltig_bis": "2027-12-31",
+ "quelle": {
+  "url": "https://service.eschweiler.de/detail/-/vr-bis-detail/dokument/1735704/download",
+  "dokument": "Mietspiegel für freifinanzierte Wohnungen im Stadtgebiet Eschweiler für den Zeitraum 01.01.2026 bis 31.12.2027, erstellt durch Haus-, Wohnungs- und Grundeigentümerverein Eschweiler e. V. und Mieterschutzverein für Aachen und Umgebung e. V. unter Mitwirkung der Stadt Eschweiler (unterzeichnet 18.12.2025)",
+  "seite": "S. 1–2 (Tabelle), S. 2 (Lagemerkmale), S. 3 (Ausstattung, Wohnungsgrößen, Einfamilienhäuser)",
+  "lizenz": "kein Rechtevorbehalt und kein Nutzungshinweis im Dokument (4 Seiten), geprüft am 2026-11-26",
+  "abgerufen": "2026-11-26"
+ },
+ "einheit": "eur_qm_nettokalt",
+ "form": "tabelle",
+ "rundung": 2,
+ "hinweis": "Download der Stadt (Serviceportal) ist ein Bild-PDF ohne Textschicht: Werte am Druckbild abgelesen und gegen die textlesbare Anlage der Ratsvorlage 402/25 (https://rat.eschweiler.de/bi/getfile.php?id=100365&type=do) abgeglichen, beide gleich. Tabelle Baujahresgruppe × Wohnlage (einfach/mittel/gut) × Ausstattung, nur Spannen (von–bis), kein Mittelwert im Dokument: mittel = Mitte der Spanne (DealPilot-Rechnung). Keine Größenklassen. Ausstattung A = WE mit Bad/Dusche ODER mit Heizung (nur Baujahre bis 1960 belegt, sonst „-“), B = mit Bad/Dusche UND Heizung (Standard). Art „einfach“ aus der Ratsvorlage 402/25 (Verzeichnis), das Dokument selbst nennt keine Art. Kleinwohnungen unter 45 m² mit integriertem Sanitär- und Versorgungsbereich: „im Einzelfall … ein Zuschlag von 10 % erforderlich“ (S. 3) – als Merkmal kleinwohnung_integriert abgebildet, nicht automatisch nach Fläche. Normalwohnungen „in der Regel bis zu 100 m²“ (S. 3), kein Abschlag für größere genannt. Besondere Ausstattungsmerkmale (S. 3) ohne Betrag – nicht abgebildet. Vollmodernisierung (≥ 1/3 Neubauaufwand) ändert die Baujahresgruppe (S. 2) – das übergebene Baujahr gilt als Baujahresgruppe. Möblierung: angemessener Zuschlag nach Zeitwert (S. 3), nicht abgebildet.",
+ "tabelle": {
+  "achsen": {
+   "baujahr": [
+    {
+     "von": null,
+     "bis": 1960,
+     "label": "bis 1960"
+    },
+    {
+     "von": 1961,
+     "bis": 1970,
+     "label": "1961–1970"
+    },
+    {
+     "von": 1971,
+     "bis": 1980,
+     "label": "1971–1980"
+    },
+    {
+     "von": 1981,
+     "bis": 1989,
+     "label": "1981–1989"
+    },
+    {
+     "von": 1990,
+     "bis": 2001,
+     "label": "1990–2001"
+    },
+    {
+     "von": 2002,
+     "bis": 2009,
+     "label": "2002–2009"
+    },
+    {
+     "von": 2010,
+     "bis": 2015,
+     "label": "2010–2015"
+    },
+    {
+     "von": 2016,
+     "bis": 2019,
+     "label": "2016–2019"
+    },
+    {
+     "von": 2020,
+     "bis": 2021,
+     "label": "2020–2021"
+    },
+    {
+     "von": 2022,
+     "bis": null,
+     "label": "ab 2022"
+    }
+   ],
+   "lage": [
+    {
+     "schluessel": "einfach",
+     "label": "einfache Wohnlage"
+    },
+    {
+     "schluessel": "mittel",
+     "label": "mittlere Wohnlage",
+     "standard": true
+    },
+    {
+     "schluessel": "gut",
+     "label": "gute Wohnlage"
+    }
+   ],
+   "ausstattung": [
+    {
+     "schluessel": "A",
+     "label": "A mit Bad/Dusche oder mit Heizung"
+    },
+    {
+     "schluessel": "B",
+     "label": "B mit Bad/Dusche und mit Heizung",
+     "standard": true
+    }
+   ]
+  },
+  "zellen": [
+   {
+    "baujahr": 0,
+    "lage": "einfach",
+    "ausstattung": "A",
+    "unten": 3.9,
+    "mittel": 4.6,
+    "oben": 5.3,
+    "seite": "1"
+   },
+   {
+    "baujahr": 0,
+    "lage": "mittel",
+    "ausstattung": "A",
+    "unten": 4.1,
+    "mittel": 4.9,
+    "oben": 5.7,
+    "seite": "1"
+   },
+   {
+    "baujahr": 0,
+    "lage": "gut",
+    "ausstattung": "A",
+    "unten": 5,
+    "mittel": 5.65,
+    "oben": 6.3,
+    "seite": "1"
+   },
+   {
+    "baujahr": 0,
+    "lage": "einfach",
+    "ausstattung": "B",
+    "unten": 4.7,
+    "mittel": 5.75,
+    "oben": 6.8,
+    "seite": "1"
+   },
+   {
+    "baujahr": 0,
+    "lage": "mittel",
+    "ausstattung": "B",
+    "unten": 5,
+    "mittel": 5.95,
+    "oben": 6.9,
+    "seite": "1"
+   },
+   {
+    "baujahr": 0,
+    "lage": "gut",
+    "ausstattung": "B",
+    "unten": 5.7,
+    "mittel": 6.65,
+    "oben": 7.6,
+    "seite": "1"
+   },
+   {
+    "baujahr": 1,
+    "lage": "einfach",
+    "ausstattung": "B",
+    "unten": 5.3,
+    "mittel": 6.05,
+    "oben": 6.8,
+    "seite": "1"
+   },
+   {
+    "baujahr": 1,
+    "lage": "mittel",
+    "ausstattung": "B",
+    "unten": 5.6,
+    "mittel": 6.25,
+    "oben": 6.9,
+    "seite": "1"
+   },
+   {
+    "baujahr": 1,
+    "lage": "gut",
+    "ausstattung": "B",
+    "unten": 5.8,
+    "mittel": 6.85,
+    "oben": 7.9,
+    "seite": "1"
+   },
+   {
+    "baujahr": 2,
+    "lage": "einfach",
+    "ausstattung": "B",
+    "unten": 6,
+    "mittel": 6.5,
+    "oben": 7,
+    "seite": "1"
+   },
+   {
+    "baujahr": 2,
+    "lage": "mittel",
+    "ausstattung": "B",
+    "unten": 6.4,
+    "mittel": 6.8,
+    "oben": 7.2,
+    "seite": "1"
+   },
+   {
+    "baujahr": 2,
+    "lage": "gut",
+    "ausstattung": "B",
+    "unten": 6.5,
+    "mittel": 7.3,
+    "oben": 8.1,
+    "seite": "1"
+   },
+   {
+    "baujahr": 3,
+    "lage": "einfach",
+    "ausstattung": "B",
+    "unten": 6.1,
+    "mittel": 6.7,
+    "oben": 7.3,
+    "seite": "1"
+   },
+   {
+    "baujahr": 3,
+    "lage": "mittel",
+    "ausstattung": "B",
+    "unten": 6.5,
+    "mittel": 7.2,
+    "oben": 7.9,
+    "seite": "1"
+   },
+   {
+    "baujahr": 3,
+    "lage": "gut",
+    "ausstattung": "B",
+    "unten": 6.9,
+    "mittel": 7.65,
+    "oben": 8.4,
+    "seite": "1"
+   },
+   {
+    "baujahr": 4,
+    "lage": "einfach",
+    "ausstattung": "B",
+    "unten": 8,
+    "mittel": 8.65,
+    "oben": 9.3,
+    "seite": "1"
+   },
+   {
+    "baujahr": 4,
+    "lage": "mittel",
+    "ausstattung": "B",
+    "unten": 8.3,
+    "mittel": 8.95,
+    "oben": 9.6,
+    "seite": "1"
+   },
+   {
+    "baujahr": 4,
+    "lage": "gut",
+    "ausstattung": "B",
+    "unten": 9.3,
+    "mittel": 9.9,
+    "oben": 10.5,
+    "seite": "1"
+   },
+   {
+    "baujahr": 5,
+    "lage": "einfach",
+    "ausstattung": "B",
+    "unten": 8.1,
+    "mittel": 8.8,
+    "oben": 9.5,
+    "seite": "1"
+   },
+   {
+    "baujahr": 5,
+    "lage": "mittel",
+    "ausstattung": "B",
+    "unten": 9.2,
+    "mittel": 9.75,
+    "oben": 10.3,
+    "seite": "1"
+   },
+   {
+    "baujahr": 5,
+    "lage": "gut",
+    "ausstattung": "B",
+    "unten": 9.4,
+    "mittel": 10.05,
+    "oben": 10.7,
+    "seite": "1"
+   },
+   {
+    "baujahr": 6,
+    "lage": "einfach",
+    "ausstattung": "B",
+    "unten": 8.5,
+    "mittel": 9.15,
+    "oben": 9.8,
+    "seite": "1"
+   },
+   {
+    "baujahr": 6,
+    "lage": "mittel",
+    "ausstattung": "B",
+    "unten": 9.4,
+    "mittel": 10,
+    "oben": 10.6,
+    "seite": "1"
+   },
+   {
+    "baujahr": 6,
+    "lage": "gut",
+    "ausstattung": "B",
+    "unten": 9.8,
+    "mittel": 10.4,
+    "oben": 11,
+    "seite": "1"
+   },
+   {
+    "baujahr": 7,
+    "lage": "einfach",
+    "ausstattung": "B",
+    "unten": 9.5,
+    "mittel": 10.1,
+    "oben": 10.7,
+    "seite": "2"
+   },
+   {
+    "baujahr": 7,
+    "lage": "mittel",
+    "ausstattung": "B",
+    "unten": 10.8,
+    "mittel": 11.05,
+    "oben": 11.3,
+    "seite": "2"
+   },
+   {
+    "baujahr": 7,
+    "lage": "gut",
+    "ausstattung": "B",
+    "unten": 11.3,
+    "mittel": 11.65,
+    "oben": 12,
+    "seite": "2"
+   },
+   {
+    "baujahr": 8,
+    "lage": "einfach",
+    "ausstattung": "B",
+    "unten": 10,
+    "mittel": 10.6,
+    "oben": 11.2,
+    "seite": "2"
+   },
+   {
+    "baujahr": 8,
+    "lage": "mittel",
+    "ausstattung": "B",
+    "unten": 11.2,
+    "mittel": 11.75,
+    "oben": 12.3,
+    "seite": "2"
+   },
+   {
+    "baujahr": 8,
+    "lage": "gut",
+    "ausstattung": "B",
+    "unten": 11.8,
+    "mittel": 12.4,
+    "oben": 13,
+    "seite": "2"
+   },
+   {
+    "baujahr": 9,
+    "lage": "einfach",
+    "ausstattung": "B",
+    "unten": 11.4,
+    "mittel": 11.9,
+    "oben": 12.4,
+    "seite": "2"
+   },
+   {
+    "baujahr": 9,
+    "lage": "mittel",
+    "ausstattung": "B",
+    "unten": 12.1,
+    "mittel": 12.8,
+    "oben": 13.5,
+    "seite": "2"
+   },
+   {
+    "baujahr": 9,
+    "lage": "gut",
+    "ausstattung": "B",
+    "unten": 12.8,
+    "mittel": 13.7,
+    "oben": 14.6,
+    "seite": "2"
+   }
+  ],
+  "zuschlaege": [
+   {
+    "merkmal": "kleinwohnung_integriert",
+    "label": "Kleinwohnung unter 45 m² mit integriertem Sanitär- und Versorgungsbereich",
+    "art": "pct",
+    "wert": 10,
+    "beleg": "S. 3 Wohnungsgrößen"
+   }
+  ]
+ },
+ "pruefbeispiele": [
+  {
+   "eingabe": {
+    "baujahr": 1975,
+    "wfl": 70
+   },
+   "erwartet": {
+    "unten": 6.4,
+    "mittel": 6.8,
+    "oben": 7.2
+   },
+   "seite": "1",
+   "art": "tabellenzelle"
+  },
+  {
+   "eingabe": {
+    "baujahr": 2023,
+    "wfl": 80,
+    "lage": "gut"
+   },
+   "erwartet": {
+    "unten": 12.8,
+    "mittel": 13.7,
+    "oben": 14.6
+   },
+   "seite": "2",
+   "art": "tabellenzelle"
+  },
+  {
+   "eingabe": {
+    "baujahr": 1955,
+    "wfl": 50,
+    "lage": "einfach",
+    "ausstattung": "A"
+   },
+   "erwartet": {
+    "unten": 3.9,
+    "mittel": 4.6,
+    "oben": 5.3
+   },
+   "seite": "1",
+   "art": "tabellenzelle"
+  },
+  {
+   "eingabe": {
+    "baujahr": 1975,
+    "wfl": 70,
+    "ausstattung": "A"
+   },
+   "erwartet": null,
+   "seite": "1",
+   "art": "tabellenzelle"
+  }
+ ]
+}
