@@ -86,7 +86,7 @@
       await zeile('Die Grundangaben', 'Was in den Unterlagen steht, ist schon eingetragen, mit Herkunft. Du ergänzt nur, was fehlt.');
       /* Pflichtfelder, die noch leer sind, mit Musterwerten füllen (nichts Echtes) */
       var setz = function (sel, v) { var e = q(sel, fenster()); if (e && String(e.value).trim() === '') { e.value = v; e.dispatchEvent(new Event('input', { bubbles: true })); e.dispatchEvent(new Event('change', { bubbles: true })); } };
-      setz('#ecgEk', '60000'); setz('#ecgZins', '3,9');
+      setz('#ecgEk', '300000'); setz('#ecgZins', '3,9');
       qa('.ec-wahl', fenster()).forEach(function (w) { if (!q('button.an', w)) { var b0 = q('button', w); if (b0) b0.click(); } });
       var sub = g && (q('button[type=submit]', g) || qa('button', g).filter(function (x) { return /weiter|rechnen|prüfen|Ergebnis/i.test(txt(x)); })[0]);
       if (sub) { zeige(sub, 8); await warte(1200); sub.click(); }
@@ -98,8 +98,8 @@
       await zeile('Das Ergebnis', 'Ein Score wie im Quick-Check, darunter Objekt gegen Finanzierung. So siehst du, ob das Haus trägt oder nur die Finanzierung.');
     },
     async function () {   /* 6 · Mietpotenzial und was die Unterlagen sagen */
-      var m = qa('.ec-kz, .ec-miete, .ec-gelesen, .ec-unterlagen, h4', fenster()).filter(function (x) { return x.offsetWidth && /Miete|gelesen|Unterlagen|Potenzial/i.test(txt(x)); })[0];
-      if (m) zeige(m.closest('section,div') || m, 10);
+      var m = qa('.ec-l', fenster()).filter(function (x) { return x.offsetWidth && /^Unterlagen|gelesen/i.test(txt(x)); })[0];
+      if (m) zeige(m.parentElement || m, 10);
       await zeile('Gelesen, nicht getippt', 'Was aus den Unterlagen kommt, steht dabei. Weicht etwas von deiner Angabe ab, übernimmst du es mit einem Klick.');
     },
     async function () {   /* 7 · Bericht, vor dem Kauf */
