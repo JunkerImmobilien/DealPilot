@@ -166,13 +166,14 @@ function bewerten(o) {
      Mietspiegel sind gelb, nie rot (kein Ausfall, sondern Pflege). Ohne Antwort des mb-Backends kein Punkt. */
   const ms = o.mietspiegel;
   if (ms && !ms.fehler_abruf) {
-    const neu = (ms.geaendert || []).length, ab = (ms.abgelaufen || []).length;
+    const neu = (ms.geaendert || []).length, ab = (ms.abgelaufen || []).length, bald = (ms.laeuft_ab || []).length;
     const namen = (l, f) => l.slice(0, 6).map(f).join(', ') + (l.length > 6 ? ' und ' + (l.length - 6) + ' weitere' : '');
     if (!ms.letzter_lauf) add('mietspiegel', 'gelb', 'Mietspiegel-Wächter hat noch keine Quelle geprüft', 'Läuft 20 Minuten nach dem Start des mb-Backends, danach täglich.');
-    else if (neu || ab) {
+    else if (neu || ab || bald) {
       const t = [];
       if (neu) t.push(neu + ' Quelle' + (neu > 1 ? 'n' : '') + ' geändert (neue Ausgabe?): ' + namen(ms.geaendert, (x) => x.gemeinde));
       if (ab) t.push(ab + ' Mietspiegel abgelaufen: ' + namen(ms.abgelaufen, (x) => x.gemeinde + ' (' + x.bis + ')'));
+      if (bald) t.push(bald + ' Mietspiegel laufen in 30 Tagen ab: ' + namen(ms.laeuft_ab, (x) => x.gemeinde + ' (' + x.bis + ')'));
       add('mietspiegel', 'gelb', t.join('. '), 'Neue Ausgabe von einem Agenten ernten lassen und zur Prüfung vorlegen, danach quittieren. Nichts wird automatisch übernommen.');
     } else add('mietspiegel', 'gruen', 'Mietspiegel: ' + (ms.geprueft || 0) + ' Quellen geprüft, keine neue Ausgabe, keiner abgelaufen' + (ms.fehler ? ' (' + ms.fehler + ' nicht erreichbar)' : ''));
   }
