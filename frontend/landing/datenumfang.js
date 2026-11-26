@@ -1,8 +1,8 @@
-/* datenumfang-messen.mjs · erzeugt 2026-11-26T11:07:43.357Z — NICHT von Hand ändern.
+/* datenumfang-messen.mjs · erzeugt 2026-11-26T11:16:00.056Z — NICHT von Hand ändern.
    Neu erzeugen: node tools/datenumfang-messen.mjs (statischer Rückfall; live: landing-zahlen.js) */
 window.DPS_UMFANG = {
  "stand": "2026-11-26",
- "db_gemessen": "2026-11-26T11:07:43.357Z",
+ "db_gemessen": "2026-11-26T11:16:00.056Z",
  "quelle": "tools/datenumfang-messen.mjs · Endpunkt /api/v1/public/datenumfang v3930, gemessen 2026-11-26T06:20:17.010Z",
  "db": {
   "portale": 99,
@@ -25,7 +25,7 @@ window.DPS_UMFANG = {
   "zins_werte": 2796,
   "zins_monat_werte": 56,
   "zins_seit": "2025-07-14",
-  "gemessen": "2026-11-26T11:07:43.357Z"
+  "gemessen": "2026-11-26T11:16:00.056Z"
  },
  "teile": {
   "zensus": 894880,
@@ -87,16 +87,16 @@ window.DPS_UMFANG = {
   "nutzer_rund": 880,
   "register_saetze": 18475,
   "laender_mit_wert": 15,
-  "api_endpunkte": 551,
+  "api_endpunkte": 550,
   "pruefstrecken": 104,
   "videos": 38,
   "video_stunden": 3.5
  },
  "fakten": {
   "nutzer": 881,
-  "api_endpunkte": 551,
+  "api_endpunkte": 550,
   "api_haupt": 473,
-  "api_mb": 78,
+  "api_mb": 77,
   "pruefstrecken": 104,
   "videos": 38,
   "video_stunden": 3.5
