@@ -27,6 +27,7 @@ direkt unter den Punkt — nicht kommentarlos liegenlassen.
 - [x] 26.11.2026 Beleihungswert § 4 Abs. 2 bei Eigennutzung (Haus Sachwert, ETW Vergleichswert), Prüffall 13 (v5130dkk6).
 - [x] 26.11.2026 Bezahlter Haus-Check 9,99 € über den Einzel-Check-Kaufweg, Bericht mit Wert, Beleihungswert und Umfeld, PDF-Knopf in App und Landing (`frontend/landing/haus-check.html`), Testpreis in der Sandbox, Testkauf auf Staging (v5130d bis v5130ikk6).
 - [x] 26.11.2026 Prod-Livegang Haus-Check und Deal-Check-Verkauf, Version 1.0.252 (main `2faa2805e`, `4f61259e`), Stripe live, Schalter an.
+- [x] 26.11.2026 Wohnnebenkosten je Gemeinde statt Pauschale (NN6, 1.0.254, main 5c7298de3): Grundsteuer ortsgenau, übrige Posten Bundesschnitt. Offen: Wasser je Land, Müll je Kreis, Grundsteuer nach Reform, Posten im Bericht einzeln zeigen.
 - [ ] **Abnahmekauf mit Erstattung (Marcel)** nach `Dateien/Konzepte/Eigennutzer-Bericht-Muster/Abnahme-Haus-Check-Prod.md`.
 - [ ] App-Knopf „Haus-Check als PDF“ am echten Objekt mit Stufe-3-Bericht im Browser abnehmen (Staging-Abnahmepunkt, Route ohne Anmeldung 401 gemessen).
 - [x] 26.11.2026 Score angeglichen: nach dem Kauf rechnet das Ergebnis oben mit dem Wert (v5130kkk6).
