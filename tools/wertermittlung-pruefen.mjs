@@ -562,6 +562,10 @@ fallB('B10', () => {
   const swOhneBw = sachwert(Object.assign({}, swBasis, { standardstufe: 3 }), null, { wert: 1.0 });
   pruefe('B', 'B10i', 'Sachwert ohne Bodenwert entfällt (§ 35 Abs. 2), Grund genannt', swOhneBw.wert == null && swOhneBw.anwendbar === false
     && swOhneBw.grund_code === 'bodenwert_fehlt' && /§ 35 Abs. 2/.test(swOhneBw.grund || ''), swOhneBw.wert != null ? eur(swOhneBw.wert) : 'kein Wert');
+  /* pp6 · B10k EFH mit drei Vollgeschossen: NHK 2010 kennt für Ein- und Zweifamilienhäuser keinen Typ (x.01 bis x.33 enden bei
+     Erd- und Obergeschoss). Die Landing schickt dann keinen Gebäudetyp, der Mapper bildet keinen nhk_typ, der Sachwert rechnet nicht halb. */
+  const sw3 = sachwert({ nhk_typ: null, objektart: 'efh', wohnflaeche_qm: 180, standardstufe: 3, baupreisindex: 1.91, gnd_jahre: 80, rnd_jahre: 40 }, { vollstaendig: true, wert: 100000 }, { wert: 1.0 });
+  pruefe('B', 'B10k', 'EFH mit 3 Vollgeschossen (kein NHK-Typ): kein Sachwert, Grund genannt', sw3.anwendbar === false && sw3.wert == null && !!sw3.grund, sw3.wert != null ? eur(sw3.wert) : String(sw3.grund || '').slice(0, 60));
   const swEtw = sachwert(Object.assign({}, swBasis, { standardstufe: 3 }), bwEtw, null);
   pruefe('B', 'B10j', 'ETW ohne MEA: kein Sachwert, Grund nennt den Miteigentumsanteil', swEtw.wert == null && /Miteigentumsanteil/.test(swEtw.grund || ''));
   /* Pauschalweg im CrossCheck: Haus ohne Typ/Stufe und OHNE Grundstuecksflaeche */

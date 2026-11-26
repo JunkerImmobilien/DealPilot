@@ -61,6 +61,20 @@ ok(!mitU.leistbarkeit.aufstellung.some((x) => x.teil), 'Unterlagen ersetzen die 
 const ohneP = K.kern({ kaufpreis: 310000, wfl: 140, baujahr: 1998, objektart: 'efh', ek: 100000, zins_pct: 4.09, grest_pct: 6.5, vergleichsmiete_qm: 7.30 });
 ok(!ohneP.leistbarkeit.aufstellung.some((x) => x.teil), 'Pauschale ohne Posten');
 
+/* pp6 · Zustand als Stufe (Anlage 2), Tilgung und Zinsbindung */
+const zB = (st) => K.kern({ kaufpreis: 310000, wfl: 140, baujahr: 1975, objektart: 'efh', ek: 100000, zins_pct: 4, grest_pct: 6.5, vergleichsmiete_qm: 7.3, zustand: st ? { stufe: st } : undefined });
+const z0 = zB(null), zU = zB('unsaniert'), zK = zB('kernsaniert'), zT = zB('teilweise');
+ok(zK.haus.gruppen.zustand.score > z0.haus.gruppen.zustand.score && zU.haus.gruppen.zustand.score < z0.haus.gruppen.zustand.score, 'Zustand: kernsaniert hebt, unsaniert senkt (' + zU.haus.gruppen.zustand.score + ' / ' + z0.haus.gruppen.zustand.score + ' / ' + zK.haus.gruppen.zustand.score + ')');
+ok(zK.haus.gruppen.zustand.mod_punkte === 19 && zT.haus.gruppen.zustand.mod_punkte === 8 && zU.haus.gruppen.zustand.mod_punkte === 0, 'Punkte nach Anlage 2: 0 / 8 / 19');
+ok(zK.haus.gruppen.zustand.hinweise.some((t) => /Anlage 2/.test(t)), 'Hinweis nennt Anlage 2');
+const t3 = K.kern({ kaufpreis: 310000, wfl: 140, baujahr: 1998, objektart: 'efh', ek: 100000, zins_pct: 4, tilgung_pct: 3, bindung_jahre: 15, zins_herkunft: 'tagesaktuell', grest_pct: 6.5, vergleichsmiete_qm: 7.3 });
+const t2 = K.kern({ kaufpreis: 310000, wfl: 140, baujahr: 1998, objektart: 'efh', ek: 100000, zins_pct: 4, grest_pct: 6.5, vergleichsmiete_qm: 7.3 });
+ok(t3.finanzierung.tilgung_pct === 3 && t2.finanzierung.tilgung_pct === 2 && Math.abs(t3.finanzierung.rate - t2.finanzierung.rate - t2.finanzierung.darlehen * 0.01 / 12) <= 1, 'Tilgung 3 % hebt die Rate um 1 % des Darlehens im Jahr');
+ok(t3.finanzierung.bindung_jahre === 15 && t3.finanzierung.zins_herkunft === 'tagesaktuell' && t2.finanzierung.bindung_jahre === 10, 'Zinsbindung und Herkunft im Ergebnis');
+const dz = { zinsFn: (ltv, b) => ({ 10: 4.11, 15: 4.31, 20: 4.41 })[b || 10], zinsLive: true, mieteQm: 7.3 };
+const rd15 = K.rechneDemo({ kp: 310000, wfl: 140, bj: 1998, ek: 100000, objektart: 'efh', bindung: 15 }, dz), rdE = K.rechneDemo({ kp: 310000, wfl: 140, bj: 1998, ek: 100000, objektart: 'efh', zins_eigen: 3.5 }, dz);
+ok(rd15.zins === 4.31 && rd15.kern.finanzierung.zins_herkunft === 'tagesaktuell' && rdE.zins === 3.5 && rdE.kern.finanzierung.zins_herkunft === 'deine Angabe', 'Zins zur Bindung, eigener Zins schlägt den Live-Zins');
+
 /* 4 · MFH abgewiesen */
 const mfh = K.kern({ kaufpreis: 600000, wfl: 400, baujahr: 1970, objektart: 'mfh' });
 ok(mfh.ok === false && mfh.grund === 'mfh' && /Vermieten/.test(mfh.hinweis), 'MFH mit Hinweis Modus Vermieten');

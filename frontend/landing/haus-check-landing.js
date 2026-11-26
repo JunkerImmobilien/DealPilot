@@ -36,10 +36,18 @@
       '<label class="eg-f klein" id="egGsflF"><span>Grundstück m²</span><input id="egGsfl" inputmode="numeric" value="600"></label>' +
       /* v5130 KK6 · für den Sachwert nach NHK 2010 (Gebäudetyp und Standardstufe), beim Haus */
       '<label class="eg-f klein"><span>Keller</span><select id="egKeller"><option value="ja">unterkellert</option><option value="nein">ohne Keller</option></select></label>' +
-      '<label class="eg-f klein eg-breit"><span>Geschosse</span><select id="egGeschosse"><option value="2">Erd- und Obergeschoss</option><option value="1">nur Erdgeschoss</option></select></label>' +
+      '<label class="eg-f klein eg-breit"><span>Geschosse</span><select id="egGeschosse"><option value="2">Erd- und Obergeschoss</option><option value="1">nur Erdgeschoss</option><option value="3">Erdgeschoss und 2 Obergeschosse</option><option value="4">3 und mehr Vollgeschosse</option></select></label>' +
       '<label class="eg-f klein eg-breit"><span>Dach</span><select id="egDach"><option value="1">Dachgeschoss ausgebaut</option><option value="2">Dachgeschoss nicht ausgebaut</option><option value="3">Flachdach</option></select></label>' +
       '<label class="eg-f klein eg-breit"><span>Ausstattung</span><select id="egAusst"><option value="normal">normal</option><option value="einfach">einfach</option><option value="gehoben">gehoben</option></select></label>' +
-      '<div class="eg-opt">Eigenkapital und Einkommen sind freiwillig. Straße und Grundstück braucht der Bericht für den Wert.</div>' +
+      /* pp6 · Zustand wie im Deal-Check (Punkte nach Anlage 2), optional Heizung und Energieklasse */
+      '<label class="eg-f klein eg-breit"><span>Zustand</span><select id="egZustand"><option value="">keine Angabe, nach Baujahr</option><option value="unsaniert">unsaniert</option><option value="teilweise">teilweise modernisiert</option><option value="ueberwiegend">überwiegend modernisiert</option><option value="kernsaniert">kernsaniert</option></select></label>' +
+      '<label class="eg-f klein"><span>Heizung Baujahr</span><input id="egHzBj" inputmode="numeric" placeholder="optional"></label>' +
+      '<label class="eg-f klein"><span>Energieklasse</span><select id="egEkl"><option value="">keine Angabe</option><option>A+</option><option>A</option><option>B</option><option>C</option><option>D</option><option>E</option><option>F</option><option>G</option><option>H</option></select></label>' +
+      /* pp6 · Zins und Tilgung: Vorgabe ist der Zins von heute zur gewählten Bindung */
+      '<label class="eg-f klein"><span>Zinsbindung</span><select id="egBindung"><option value="10">10 Jahre</option><option value="15">15 Jahre</option><option value="20">20 Jahre</option></select></label>' +
+      '<label class="eg-f klein"><span>Zins %</span><input id="egZins" inputmode="decimal" placeholder="von heute"></label>' +
+      '<label class="eg-f klein"><span>Tilgung %</span><input id="egTilg" inputmode="decimal" value="2"></label>' +
+      '<div class="eg-opt">Eigenkapital, Einkommen, Zustand, Zins und Tilgung sind freiwillig. Straße und Grundstück braucht nur der Bericht, für den Wert und das Umfeld. Die kostenlose Rechnung nutzt sie nicht.</div>' +
     '</div></details>' +
     '<button type="button" class="eg-start" id="egStart">Startfreigabe · Haus prüfen</button>' +
     '</div>' +
@@ -50,6 +58,7 @@
     '</div>';
   szene.appendChild(k);
 
+  function komma(id) { var v = String(document.getElementById(id).value || '').trim().replace(',', '.'); var n = parseFloat(v); return v && isFinite(n) ? n : null; }
   function zahl(id) { return Number(String(document.getElementById(id).value).replace(/\./g, '').replace(',', '.')) || 0; }
   function farbe(s) { return s == null ? 'rgba(255,255,255,.2)' : s >= 70 ? '#5BD98E' : s >= 50 ? 'var(--wl-c9a84c,#C9A84C)' : '#E08A7E'; }
 
@@ -63,8 +72,9 @@
       '<div class="eg-oben"><div class="eg-dial"><svg viewBox="0 0 120 120"><circle class="bg" cx="60" cy="60" r="54"/><circle class="fg" cx="60" cy="60" r="54" stroke-dasharray="' + U + '" stroke-dashoffset="' + U + '"/></svg><b id="egZahl">0</b><small>von 100</small></div>' +
       '<div class="eg-urteil"><h3>Ist das Haus gut? ' + r.stufe.wort + '.</h3><p>' + (r.gebiet || '') + '. Gerechnet mit dem Zins von heute und der ortsüblichen Miete.</p></div></div>' +
       '<div class="eg-gr">' + g + '</div>' +
-      '<div class="eg-zahlen"><div><b>' + E.eur(r.miete) + '</b><span>Ersparte Miete im Monat</span></div><div><b>' + E.eur(r.rate) + '</b><span>Rate im Monat</span></div><div><b>' + r.zins.toFixed(2).replace('.', ',') + ' %</b><span>Zins 10 Jahre</span></div></div>' +
+      '<div class="eg-zahlen"><div><b>' + E.eur(r.miete) + '</b><span>Ersparte Miete im Monat</span></div><div><b>' + E.eur(r.rate) + '</b><span>Rate im Monat</span></div><div><b>' + r.zins.toFixed(2).replace('.', ',') + ' %</b><span>Zins ' + (r.kern && r.kern.finanzierung ? r.kern.finanzierung.bindung_jahre : 10) + ' Jahre</span></div></div>' +
       '<div class="eg-satz">' + satz + '</div>' +
+      (r.kern && r.kern.finanzierung ? '<div class="eg-fuss"><b>Zins ' + String(r.kern.finanzierung.zins_pct.toFixed(2)).replace('.', ',') + ' % für ' + r.kern.finanzierung.bindung_jahre + ' Jahre, ' + (r.kern.finanzierung.zins_herkunft || 'tagesaktuell') + ', ' + String(r.kern.finanzierung.tilgung_pct).replace('.', ',') + ' % Tilgung.</b></div>' : '') +
       (r.kern && r.kern.haus.gruppen.preis && r.kern.haus.gruppen.preis.wert_score != null ? '<div class="eg-fuss"><b>Mit dem Wert nach ImmoWertV gerechnet</b>, derselbe Haus-Score wie im PDF.</div>' : '<div class="eg-fuss">Kostenlose Schnellrechnung ohne den Wert nach ImmoWertV. Der Haus-Check rechnet den Preis zusätzlich gegen den ermittelten Wert, der Score kann sich dadurch ändern.</div>') +
       '<div class="eg-fuss">Beispielrechnung. Ersparte Miete aus ' + (r.quelle === 'Mietspiegel' ? 'dem Mietspiegel' : 'der DealPilot-Näherung') + ' mit Hauszuschlag, Wertentwicklung 1,5 % und Mietsteigerung 2 % im Jahr angenommen. Keine Finanzierungszusage.</div>';
     var erg = document.getElementById('egErg'); erg.classList.add('da');
@@ -104,12 +114,16 @@
   }
   function start() {
     var e = { kp: zahl('egKp'), wfl: zahl('egWfl'), bj: zahl('egBj'), ek: zahl('egEk'), netto: zahl('egNetto'), plz: document.getElementById('egPlz').value.trim(),
-      objektart: document.getElementById('egArt').value };
+      objektart: document.getElementById('egArt').value,
+      /* pp6 · Zustand, Heizung, Energieklasse, Zinsbindung, eigener Zins, Tilgung */
+      zustand: { stufe: document.getElementById('egZustand').value || null, heizung_baujahr: zahl('egHzBj') || null, energieklasse: document.getElementById('egEkl').value || null },
+      bindung: Number(document.getElementById('egBindung').value) || 10, zins_eigen: komma('egZins'), tilgung: komma('egTilg') };
+    var ZS = E.ZSTUFE || {}, modP = e.zustand.stufe && ZS[e.zustand.stufe] ? ZS[e.zustand.stufe].punkte : null;
     if (e.objektart === 'mfh') { var erg0 = document.getElementById('egErg'); erg0.innerHTML = '<div class="eg-satz">' + E.MFH_HINWEIS + '</div>'; erg0.classList.add('da'); drehe(true); return; }
     /* pp6 · während die Daten kommen, sagt der Knopf, dass gerechnet wird; gedreht wird erst mit dem fertigen Ergebnis */
     var sb = document.getElementById('egStart'), sbText = sb.textContent; sb.disabled = true; sb.textContent = 'Wird geprüft …';
     var fertig = function () { sb.disabled = false; sb.textContent = sbText; };
-    E.daten(e.plz, e.bj, e.wfl).then(function (d) { fertig(); var r = E.rechne(e, d); if (!r.ok) return; zeige(r); zusatz(r, d, e); drehe(true); }, fertig);
+    E.daten(e.plz, e.bj, e.wfl, { mod_punkte: modP }).then(function (d) { fertig(); var r = E.rechne(e, d); if (!r.ok) return; zeige(r); zusatz(r, d, e); drehe(true); }, fertig);
   }
   document.getElementById('egStart').addEventListener('click', start);
 

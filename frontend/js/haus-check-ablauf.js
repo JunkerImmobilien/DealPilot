@@ -15,7 +15,7 @@
   function foerderung(e) {
     var F = root.DpFoerderung; if (!F || typeof F.passend !== 'function') return [];
     try {
-      var f = F.passend({ nutzung: 'eigen', kauf: true, baujahr: e.bj, energieklasse: e.energieklasse || null, massnahmen: [] });
+      var f = F.passend({ nutzung: 'eigen', kauf: true, baujahr: e.bj, energieklasse: e.energieklasse || (e.zustand && e.zustand.energieklasse) || null, massnahmen: [] });
       return (f.liste || []).map(function (x) { return { name: x.name, warum: x.warum || '', betrag: x.betrag || '', satz: [x.warum, x.betrag].filter(Boolean).join(' ') }; });
     } catch (err) { return []; }
   }
@@ -38,8 +38,12 @@
       lage: b.lage || null, vmiete: b.vergleichsmiete || null, markt: b.markt || null, stichtag: b.stichtag || null,
       anrechnung: o.anrechnung || null,
       objekt: { adresse: o.adresse || ((e.plz || '') + ' ' + ((o.d && o.d.gebiet) || '')).trim(), objektart: String(e.objektart || 'efh').toLowerCase(),
-        baujahr: e.bj, wfl: e.wfl, kaufpreis: e.kp, energieklasse: e.energieklasse || null, unterlagen: e.unterlagen || [], foerderung: foerderung(e),
-        gsfl: e.gsfl || null, keller: e.keller || null, geschosse: e.geschosse || null, dach: e.dach || null, ausst: e.ausst || null, ek: e.ek || 0, str: e.str || '' }
+        baujahr: e.bj, wfl: e.wfl, kaufpreis: e.kp, unterlagen: e.unterlagen || [], foerderung: foerderung(e),
+        gsfl: e.gsfl || null, keller: e.keller || null, geschosse: e.geschosse || null, dach: e.dach || null, ausst: e.ausst || null, ek: e.ek || 0, str: e.str || '',
+        /* pp6 · Zustand, Heizung und Energieklasse aus der Eingabe */
+        zustand_text: e.zustand && e.zustand.stufe ? ({ unsaniert: 'unsaniert', teilweise: 'teilweise modernisiert', ueberwiegend: 'überwiegend modernisiert', kernsaniert: 'kernsaniert' })[e.zustand.stufe] || null : null,
+        modernisiert: !!(e.zustand && /teilweise|ueberwiegend|kernsaniert/.test(e.zustand.stufe || '')),
+        heizung_baujahr: e.zustand && e.zustand.heizung_baujahr || null, energieklasse: (e.zustand && e.zustand.energieklasse) || e.energieklasse || null }
     }).then(function (h) { return { html: h, haus: haus, r: r, anrechnung: o.anrechnung || null }; });
   }
   function laden(blob, name) {

@@ -1,5 +1,5 @@
 {
- "erzeugt_am": "2026-11-26T21:51:04.174Z",
+ "erzeugt_am": "2026-11-26T22:32:17.405Z",
  "hinweis": "Woertliche Spiegelung von frontend/js/ — NICHT hier bearbeiten. Quelle aendern, dann: node tools/rechenkerne-spiegeln.mjs",
  "reihenfolge": [
   "dscr-engine.js",
@@ -25,6 +25,6 @@
   "rnd-gnd-table.js": "ed1df0eab13887a1c971f26e129924063b2665e0d33d249843c11f9cac206fb0",
   "rnd-calc.js": "c193a0026ef24f4b8d7424a2d52a5d2af34286ff4acdeb48dbf9fb2352d19d40",
   "gnotkg.js": "d439b1cf178a7fa5c55a1428fb62ca90de5267d6aec0d9eb7ab9dc2ec152c83e",
-  "eigennutzer-kern.js": "1298607371920a725d4b7dc31dbc40ffb142a0bfcb308d9b112417d468da1601"
+  "eigennutzer-kern.js": "2c174c7c6f467739beb8a8bbea09aac60290f7c4f9aaa23cdcf88297c7fea6ca"
  }
 }

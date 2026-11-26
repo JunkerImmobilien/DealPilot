@@ -152,6 +152,7 @@
           return zeile(esc(glatt(z.pos)), z.detail ? esc(glatt(z.detail)) : '', wert);
         }).join('') + zeile(esc(wertName(W)) + ', gerundet', '', eur(W.betrag), 'summe') + '</table>';
     } else if (W) pw += '<table>' + zeile(esc(wertName(W)), '', eur(W.betrag), 'summe') + '</table>';
+    else if (!ETW && (O.geschosse === '3' || O.geschosse === '4')) pw += '<div class="box"><b>Kein Sachwert für dieses Haus.</b> Für Ein- und Zweifamilienhäuser mit mehr als zwei Vollgeschossen kennen die Normalherstellungskosten 2010 keinen Gebäudetyp. Kein Verfahren rechnet halb, deshalb weist dieser Bericht hier keinen Sachwert aus. Zur Einordnung dient die Marktpreisindikation unten. Für einen Verkehrswert braucht es ein Gutachten.</div>';
     else pw += '<div class="box">Für dieses Objekt liegt noch keine vollständige Wertermittlung vor. ' + esc(glatt(Wroh && (Wroh.weg || Wroh.grund) && !/^[a-z_]+$/.test(String(Wroh.weg || Wroh.grund)) ? (Wroh.weg || Wroh.grund) : 'Mit Straße, Hausnummer und Grundstücksfläche rechnet DealPilot den Wert nach ImmoWertV.')) + '</div>';
     pw += '<h3>Was Häuser am Ort kosten sollen</h3><table class="eng">'
       + (M && M.wert ? zeile('Marktpreisindikation', 'aus Angebotspreisen vergleichbarer Häuser' + (M.abschlag_pct ? ', nach ' + zahl(M.abschlag_pct) + ' % Abschlag' : '') + ', kein Verkehrswert', eur(M.wert)) : '')
