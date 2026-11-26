@@ -343,7 +343,7 @@
         + '<div class="vw">' + eur(w) + (wfl ? '<small>' + zahl(w / wfl, 0) + ' €/m²</small>' : '') + '</div></div>'
         + (zus ? '<p class="det" style="margin:-1mm 0 2mm 49mm">' + esc(zus.trim()) + '</p>' : '');
     }).join('');
-    return h + (mw ? '<p class="det">Senkrechter Strich: Marktwert-Indikation ' + eur(mw) + '.</p>' : '');
+    return h + (mw ? '<p class="det">Senkrechter Strich: ' + ((!v.fuehrend || v.fuehrend.id === 'angebote') ? 'Marktpreisindikation' : 'führendes Verfahren, ' + esc(v.fuehrend.name)) + ' ' + eur(mw) + '.</p>' : '');
   }
   function fuehrendBox(v) {
     if (!v.fuehrend) return '';
@@ -707,6 +707,8 @@
     var v = verfahren(p);
     var stichtag = (p.wertermittlungsstichtag && typeof p.wertermittlungsstichtag === 'object' ? p.wertermittlungsstichtag.datum : p.wertermittlungsstichtag) || (p.ref && p.ref.wertermittlungsstichtag) || d.erstellt;
     var ergebnis = v.fuehrend ? v.fuehrend.wert : null;
+    /* bb6 · Marcel 26.11.2026: Wert aus Angebotspreisen heisst Marktpreisindikation, das Ergebnis eines amtlichen Verfahrens (Stufe 3) bleibt Verkehrswert */
+    var ergName = (!v.fuehrend || v.fuehrend.id === 'angebote') ? 'Marktpreisindikation' : 'Verkehrswert';
     var art = OBJART[String(od.objart || r.property_type || '').toLowerCase()] || OBJART[String(r.property_type || '').toLowerCase()] || (od.objart || r.property_type || 'Immobilie');
     var b = d.marke || {};
     var teile = [];
@@ -729,7 +731,7 @@
     var tsd = function (x) { return zahl(Math.round(x / 1000), 0); };
     var lvD = p.land_value || {};
     var kpis = [];
-    kpis.push('<div class="kpi hl"><div class="kl">Marktwert-Indikation</div><div class="kw">' + eur(ergebnis) + '</div><div class="ks">'
+    kpis.push('<div class="kpi hl"><div class="kl">' + ergName + '</div><div class="kw">' + eur(ergebnis) + '</div><div class="ks">'
       + (istZahl(ergebnis) && istZahl(r.living_area) && Number(r.living_area) > 0 ? zahl(Number(ergebnis) / Number(r.living_area), 0) + ' €/m²' : '')
       + (v.fuehrend ? (istZahl(r.living_area) ? ' · ' : '') + esc(({ sachwert: 'Sachwert', vergleichswert: 'Vergleichswert', ertragswert: 'Ertragswert', angebote: 'aus Angeboten' })[v.fuehrend.id] || v.fuehrend.name) : '') + '</div></div>');
     if (werteV.length > 1) kpis.push('<div class="kpi"><div class="kl">Spanne der Verfahren</div><div class="kw">' + tsd(vMin) + '–' + tsd(vMax) + ' T€</div><div class="ks">' + werteV.length + ' Verfahren</div></div>');
@@ -787,7 +789,7 @@
       return '<tr><td>' + esc(z[0]) + '</td><td class="r num">' + (istZahl(z[1]) ? zahl(z[1], 2) + ' €/m²' : '') + '</td><td class="q">' + esc(String(z[2] || '').slice(0, 140)) + '</td></tr>';
     }).join('') + '</tbody></table></div>' : '';
     void kacheln;
-    teile.push(seite(d, 'Ergebnis', ab('Ergebnis') + '<h2>Marktwert-Indikation ' + eur(ergebnis) + '</h2>'
+    teile.push(seite(d, 'Ergebnis', ab('Ergebnis') + '<h2>' + ergName + ' ' + eur(ergebnis) + '</h2>'
       + '<p class="sub">' + (istZahl(ergebnis) && wflQm ? zahl(Number(ergebnis) / wflQm, 0) + ' €/m² Wohnfläche' : '')
       + (p.sale && istZahl(p.sale.sample_size) ? (wflQm ? ' · ' : '') + zahl(p.sale.sample_size, 0) + ' Vergleichsangebote' : '') + (v.fuehrend ? '' : ' · ' + esc(v.grund)) + '</p>'
       + fuehrendBox(v) + '<h3>Wertspanne</h3>' + spanneBand(v.liste, r.purchase_price) + '<h3>Die Verfahren</h3>' + verfahrenBalken(v, wflQm)

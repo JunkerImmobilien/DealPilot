@@ -1772,7 +1772,7 @@ function confInfo(c, parts) {
   }
 
   if (c >= 0.85) return { label: 'Sehr hoch', color: '#3FA56C',
-    text: 'Große, eng beieinander liegende Vergleichsstichprobe – belastbare Marktwertindikation.' };
+    text: 'Große, eng beieinander liegende Vergleichsstichprobe – belastbare Marktpreisindikation.' };
   if (c >= 0.70) return { label: 'Hoch', color: '#3FA56C',
     text: 'Solide Datenbasis mit überschaubarer Streuung – gute Indikation.' };
   if (c >= 0.55) return { label: 'Mittel', color: window._wlc('#C9A84C'),

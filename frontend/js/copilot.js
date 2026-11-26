@@ -210,7 +210,7 @@
          > dahinter - eine Zahl, die dreihundertfach daneben liegt und
          > trotzdem plausibel aussieht. */
       var mw = _eur(e.marktwert), lo = _eur(e.low), hi = _eur(e.high);
-      if (mw) zeilen.push('Marktwert-Indikation: ' + mw
+      if (mw) zeilen.push('Marktpreisindikation (aus Angebotspreisen, kein Verkehrswert): ' + mw
         + (lo && hi ? '  (Spanne ' + lo + ' bis ' + hi + ')' : '')
         + (_eurQm(e.eurPerSqm) ? '  ·  ' + _eurQm(e.eurPerSqm) : ''));
 
