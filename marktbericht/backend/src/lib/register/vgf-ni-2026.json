@@ -1783,7 +1783,7 @@
   "verwendung": "produkt",
   "zweig": "ezfh",
   "objektart": "ezfh",
-  "gaa_name": "Gutachterausschuss für Grundstückswerte Braunschweig",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg",
   "formel": {
    "form": "konstante",
    "wert": 2745.95,
@@ -2031,7 +2031,7 @@
   "verwendung": "produkt",
   "zweig": "rhdhh",
   "objektart": "rhdhh",
-  "gaa_name": "Gutachterausschuss für Grundstückswerte Braunschweig",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg",
   "formel": {
    "form": "konstante",
    "wert": 2556.07,
@@ -2278,7 +2278,7 @@
   "verwendung": "produkt",
   "zweig": "etw",
   "objektart": "etw",
-  "gaa_name": "Gutachterausschuss für Grundstückswerte Braunschweig",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg",
   "formel": {
    "form": "konstante",
    "wert": 2161.86,

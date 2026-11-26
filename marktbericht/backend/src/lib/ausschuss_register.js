@@ -520,6 +520,7 @@ export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json', 'lzs-he-2026.json', 
                                ETW-Sperren in den Umland-Gemeinden (8-stellig, neben den OGA-Saetzen). */
                             'vgf-sn-2026.json', 'vgf-th-2026.json', 'vgf-mv-2026.json', 'vgf-bb-kreise-2026.json',
                             'vgf-bw-konstanz-2026.json',   /* v3008: Konstanz ETW-Tabelle Wohnlage x Baujahr x Ausstattung (merkmalsmatrix), loest die Sperre in vgf-bw-2026.json ab */
+                            'vgf-by-ingolstadt-2025.json', /* Ernte BY 26.11.2026: Ingolstadt EFH/ZFH, DHH, REH, ETW (merkmalsmatrix BRW-Niveau x Baujahr, Stichtag 01.01.2025); die drei Sperren 09161 in vgf-by-2026.json entfernt */
                             /* v2279: Umrechnungskoeffizienten Grundstuecksgroesse
                                (§ 19 ImmoWertV), Kennzahl umrechnungskoeffizient_flaeche.
                                Erster Satz: Stadt Bielefeld (BORIS-NRW 2026). Gelesen
@@ -644,6 +645,11 @@ export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json', 'lzs-he-2026.json', 
                                SL Regionalverband Saarbruecken Jahrgang 2025 (Daten zum 01.06.2025, Vollversion 50 €,
                                genehmigungspflichtig) neben den Sperren 2022. */
                             'lzs-swf-by-2026.json', 'lzs-swf-sl-2026.json',
+                            /* Ernte 26.11.2026 SL/HB: Lueckensperren je Objektart (29 Saetze, keine Werte) -
+                               HB Bremen LZS EZFH/RH-DHH/Gewerbe kostenpflichtig, SWF MFH/ETW nicht abgeleitet;
+                               Bremerhaven LZS EZFH/RH-DHH/Gewerbe, SWF MFH/ETW, WGFZ nicht veroeffentlicht;
+                               SL LHS Saarbruecken LZS/SWF ueber Landesbericht (75 EUR), Kreise LZS WGH/Gewerbe */
+                            'sperren-sl-hb-2026-ernte-20261126.json',
                             /* Ernte 27.10.2026 (RP/SN/MV/SH/TH): Kreis Stormarn, Grundstuecksmarktbericht
                                Stand 01.01.2025, Teil 2 (Mai 2026) - Zinssaetze MFH 3,33 / WGH 3,16 / Gewerbe 5,6 %
                                als SPERREN (Schutzvermerk ohne Wiedergabeerlaubnis), Werte unter formel_vorgemerkt. */
@@ -703,6 +709,7 @@ export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json', 'lzs-he-2026.json', 
                             /* Ernte 22.11.2026: BY (Muenchen MFH 2,8 %), NI (Aurich 12 LZS, GND 80), HE (Kassel wgh/buero/produktion), SH (Segeberg/Flensburg Sperren mit Grund) */
                             'ernte-by-20261122.json', 'ernte-ni-20261122.json', 'ernte-he-20261122.json', 'ernte-sh-20261122.json',
                             'ernte-bw-20261122.json',   /* BW: Freiburg UK Flaeche+WGFZ, Bruchsal UK Flaeche (12), Ulm Vergleichsfaktoren (4) */
+                            'ernte-sh-20261126.json',   /* SH: Rendsburg-Eckernfoerde SWF aus GMB 2024 (frei verlinkt, genehmigungspflichtig): 4 Sperren mit Modell GND 80, Index Regelfall; liegt hinter der 2025er-Sperre (kostenpflichtig) */
                            ];
 
 /* ═══ v1778 · WAS LIEGT IM ORDNER, STEHT ABER NICHT IN DER LISTE? ═══

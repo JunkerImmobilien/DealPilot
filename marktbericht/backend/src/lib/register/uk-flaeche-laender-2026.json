@@ -716,7 +716,8 @@
     },
     "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte in Bremerhaven (Geschäftsstelle beim Vermessungs- und Katasteramt Bremerhaven), Jahrgang 2026",
     "quelle_parser": "v2287-uk-ernte (Fachinformation/Marktbericht, pdftotext und Seitenbild, 16.10.2026)",
-    "modellansaetze": {}
+    "modellansaetze": {},
+    "zugang": "nicht veröffentlicht"
   },
   {
     "land_code": "BE",

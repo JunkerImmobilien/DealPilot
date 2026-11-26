@@ -1,4 +1,4 @@
-/* messe-schleife-daten.mjs · erzeugt 2026-11-21T11:10:03.001Z — NICHT von Hand ändern.
+/* messe-schleife-daten.mjs · erzeugt 2026-11-26T10:14:39.097Z — NICHT von Hand ändern.
    Neu erzeugen: node tools/messe-schleife-daten.mjs */
 window.DPS_VIDEOTHEK = {
  "stand": "2026-11-11",
@@ -1570,7 +1570,7 @@ window.DPS_VIDEOTHEK = {
    "nr": "24",
    "kategorie": "Erweitert",
    "titel": "Bodenrichtwert und Unterlagen",
-   "unterzeile": "BORIS, die zuständigen Ämter — und was DealPilot nicht verschickt.",
+   "unterzeile": "Der amtliche Bodenrichtwert, die zuständigen Ämter und was DealPilot nicht verschickt.",
    "datei": "dealpilot-modul-24-bodenrichtwert-und-unterlagen.mp4",
    "dauer": 195,
    "kapitel": [

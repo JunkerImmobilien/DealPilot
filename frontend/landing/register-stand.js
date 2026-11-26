@@ -1,21 +1,21 @@
-/* messe-schleife-daten.mjs · erzeugt 2026-11-21T11:10:03.001Z — NICHT von Hand ändern.
+/* messe-schleife-daten.mjs · erzeugt 2026-11-26T10:14:39.097Z — NICHT von Hand ändern.
    Neu erzeugen: node tools/messe-schleife-daten.mjs */
 window.DPS_REGISTER = {
- "stand": "2026-11-21",
- "erzeugt": "2026-11-21T11:10:03.001Z",
- "register_commit": "4a552043",
+ "stand": "2026-11-26",
+ "erzeugt": "2026-11-26T10:14:39.097Z",
+ "register_commit": "3d120f9b",
  "register_lokal_geaendert": true,
  "quelle": "registerDeckung() · lib/register_deckung.js, ohne Datenbank (wie Admin „Register & Ernte\")",
- "dateien": 154,
- "saetze": 18470,
+ "dateien": 163,
+ "saetze": 18512,
  "kopf": {
-  "werte_gesamt": 6097,
-  "lzs": 2500,
-  "swf": 853,
-  "uk_flaeche": 162,
-  "uk_wgfz": 117,
-  "vgf": 1295,
-  "uk": 279,
+  "werte_gesamt": 6133,
+  "lzs": 2516,
+  "swf": 847,
+  "uk_flaeche": 177,
+  "uk_wgfz": 118,
+  "vgf": 1305,
+  "uk": 295,
   "irw_tabellen": 135,
   "irw_ausschuesse": 57,
   "ausschuesse": 201,
@@ -24,11 +24,11 @@ window.DPS_REGISTER = {
   "laender_gesamt": 16
  },
  "herkunft": {
-  "werte": 6097,
-  "mit_ausschuss": 6097,
-  "mit_jahrgang": 6097,
-  "mit_quelle": 6097,
-  "mit_seite": 6096
+  "werte": 6133,
+  "mit_ausschuss": 6133,
+  "mit_jahrgang": 6133,
+  "mit_quelle": 6133,
+  "mit_seite": 6132
  },
  "jahrgaenge": [
   2018,
@@ -44,7 +44,7 @@ window.DPS_REGISTER = {
    },
    "swf": {
     "w": 6,
-    "anteil": 0.1
+    "anteil": 0.09
    },
    "uk_flaeche": {
     "w": 5,
@@ -54,7 +54,7 @@ window.DPS_REGISTER = {
     "w": 5,
     "anteil": 0.31
    },
-   "anteil4": 0.25,
+   "anteil4": 0.24,
    "erfasst": true
   },
   "HH": {
@@ -81,10 +81,10 @@ window.DPS_REGISTER = {
   },
   "NI": {
    "name": "Niedersachsen",
-   "werte": 1447,
+   "werte": 1459,
    "lzs": {
-    "w": 302,
-    "anteil": 0.78
+    "w": 314,
+    "anteil": 0.82
    },
    "swf": {
     "w": 150,
@@ -98,7 +98,7 @@ window.DPS_REGISTER = {
     "w": 0,
     "anteil": 0
    },
-   "anteil4": 0.74,
+   "anteil4": 0.76,
    "erfasst": true
   },
   "HB": {
@@ -118,9 +118,9 @@ window.DPS_REGISTER = {
    },
    "uk_wgfz": {
     "w": 1,
-    "anteil": 0.5
+    "anteil": 0.33
    },
-   "anteil4": 0.15,
+   "anteil4": 0.08,
    "erfasst": true
   },
   "NW": {
@@ -147,9 +147,9 @@ window.DPS_REGISTER = {
   },
   "HE": {
    "name": "Hessen",
-   "werte": 590,
+   "werte": 595,
    "lzs": {
-    "w": 157,
+    "w": 160,
     "anteil": 0.86
    },
    "swf": {
@@ -164,7 +164,7 @@ window.DPS_REGISTER = {
     "w": 10,
     "anteil": 0.27
    },
-   "anteil4": 0.72,
+   "anteil4": 0.73,
    "erfasst": true
   },
   "RP": {
@@ -191,7 +191,7 @@ window.DPS_REGISTER = {
   },
   "BW": {
    "name": "Baden-Württemberg",
-   "werte": 438,
+   "werte": 456,
    "lzs": {
     "w": 242,
     "anteil": 0.09
@@ -201,11 +201,11 @@ window.DPS_REGISTER = {
     "anteil": 0.08
    },
    "uk_flaeche": {
-    "w": 1,
-    "anteil": 0
+    "w": 14,
+    "anteil": 0.01
    },
    "uk_wgfz": {
-    "w": 46,
+    "w": 47,
     "anteil": 0.05
    },
    "anteil4": 0.07,
@@ -213,9 +213,9 @@ window.DPS_REGISTER = {
   },
   "BY": {
    "name": "Bayern",
-   "werte": 6,
+   "werte": 11,
    "lzs": {
-    "w": 0,
+    "w": 1,
     "anteil": 0
    },
    "swf": {
@@ -301,14 +301,14 @@ window.DPS_REGISTER = {
   },
   "MV": {
    "name": "Mecklenburg-Vorpommern",
-   "werte": 46,
+   "werte": 40,
    "lzs": {
     "w": 20,
     "anteil": 0.37
    },
    "swf": {
-    "w": 17,
-    "anteil": 0.5
+    "w": 11,
+    "anteil": 0.32
    },
    "uk_flaeche": {
     "w": 2,
@@ -318,12 +318,12 @@ window.DPS_REGISTER = {
     "w": 0,
     "anteil": 0
    },
-   "anteil4": 0.35,
+   "anteil4": 0.3,
    "erfasst": true
   },
   "SN": {
    "name": "Sachsen",
-   "werte": 62,
+   "werte": 64,
    "lzs": {
     "w": 46,
     "anteil": 0.58
@@ -333,14 +333,14 @@ window.DPS_REGISTER = {
     "anteil": 0.55
    },
    "uk_flaeche": {
-    "w": 0,
-    "anteil": 0
+    "w": 2,
+    "anteil": 0.15
    },
    "uk_wgfz": {
     "w": 0,
     "anteil": 0
    },
-   "anteil4": 0.46,
+   "anteil4": 0.48,
    "erfasst": true
   },
   "ST": {
