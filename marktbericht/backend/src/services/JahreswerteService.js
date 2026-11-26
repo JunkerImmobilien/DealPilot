@@ -19,6 +19,7 @@
 // Abschnitt „Jahreswerte" im Admin und den Agenten .claude/agents/jahreswerte.md.
 //
 // Aus: JAHRESWERTE_TAKT=0. Von Hand: POST /api/v1/marktbericht/jahreswerte/abruf.
+import { ueberblick as angebotMieteUeberblick } from './AngebotMieteService.js';   /* v5090 */
 import { q } from '../lib/db.js';
 import { takt as _taktSperre } from '../lib/taktSperre.js';   /* v3311: Sperre gegen Doppellauf */
 import { REIHEN, holeSeite, holeGenesis, pruefe } from '../lib/destatis_reihen.js';
@@ -218,6 +219,7 @@ export async function stand() {
     o.abschlag.jahre = await q(`SELECT jahr, segment, pct::float AS pct, n, n_roh, n_ausreisser, min_n, aktiv, berechnet_am
                                   FROM mb.angebot_abschlag_jahr ORDER BY jahr DESC, segment`);
   } catch (e) { o.fehler = e.message; }
+  try { o.angebot_miete = await angebotMieteUeberblick(); } catch (e) { o.angebot_miete = { fehler: e.message }; }   /* v5090 */
   o.genesis_token = !!process.env.GENESIS_TOKEN;
   o.bwk_vorschlag = bwkVorschlag();
   return o;

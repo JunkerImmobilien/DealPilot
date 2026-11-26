@@ -54,6 +54,7 @@ import { MarktkontextService } from './MarktkontextService.js';   /* v1321 */
 import { objektartNormal, gewerbeArt, zinsObjektart, istGrundstueck } from '../lib/marktsegment.js';   /* v2241 */
 import { zensusMieteAmStichtag, nkmIndexAm, NKM_INDEX } from '../lib/zensus_miete.js';   /* v2993, v3043: Fortschreibung im Zensus-Block */
 import { protokolliereMessung as protokolliereAbschlag } from './JahreswerteService.js';   /* v3021 */
+import { protokolliereMiete } from './AngebotMieteService.js';   /* v5090 */
 import { stichtagVon, stichtagJahr, stichtagIso } from '../lib/stichtag.js';
 import { vergleichsmieteKontext } from '../lib/mietanker_kontext.js';   /* v3343 · Vergleichsmiete der Wohnung */
 import { mietpreisbremseFuer as _mpbFuer } from '../lib/kappung.js';   /* einzelcheck-9 */
@@ -611,6 +612,8 @@ export const ReportOrchestrator = {
        Bodenwert im Quercheck 0,4439 (Tabelle des Ausschusses), in der
        Marktpreisindikation 0,8097 (Formel) - im selben Bericht. */
     ref.ags = ref.ags || _agsWert || null;
+    /* v5090 · zusammengefasste Angebotsmiete dieses Abrufs mitnehmen (kein Zusatzabruf, keine Rohdaten) */
+    protokolliereMiete(rent, ref).catch(() => {});
 
     // 6) Bewertung (inkl. Grundstuecks-Mehrflaechenkorrektur ueber BORIS-BRW)
     const valuation = ValuationService.compute(ref, sale, rent, landValue);
