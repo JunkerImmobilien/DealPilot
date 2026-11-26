@@ -45,11 +45,14 @@
   <url><loc>https://dealpilot.immo/datenschutz.html</loc><lastmod>2026-11-08</lastmod></url>
   <!-- landing-seo-2:rechner · landing-seo-6 (22.11.2026): die drei Rechner liegen auf Prod (gemessen: eigene Groesse, nicht die Startseite),
        die zwei Ratgeber kommen mit demselben Rollout. Erst ausrollen, wenn beide Dateien mit auf Prod gehen. -->
-  <url><loc>https://dealpilot.immo/immobilien-rendite-berechnen.html</loc><lastmod>2026-11-22</lastmod></url>
-  <url><loc>https://dealpilot.immo/cashflow-immobilie-berechnen.html</loc><lastmod>2026-11-22</lastmod></url>
+  <url><loc>https://dealpilot.immo/immobilien-rendite-berechnen.html</loc><lastmod>2026-11-26</lastmod></url>
+  <url><loc>https://dealpilot.immo/cashflow-immobilie-berechnen.html</loc><lastmod>2026-11-26</lastmod></url>
   <url><loc>https://dealpilot.immo/kaufpreisfaktor-berechnen.html</loc><lastmod>2026-11-22</lastmod></url>
-  <url><loc>https://dealpilot.immo/immobilien-investment-rechner.html</loc><lastmod>2026-11-22</lastmod></url>
+  <url><loc>https://dealpilot.immo/immobilien-investment-rechner.html</loc><lastmod>2026-11-26</lastmod></url>
   <url><loc>https://dealpilot.immo/renditeobjekt-pruefen.html</loc><lastmod>2026-11-22</lastmod></url>
+  <!-- zz5 (26.11.2026) · zwei neue Ratgeber, erst mit dem Prod-Rollout der Seiten scharf -->
+  <url><loc>https://dealpilot.immo/immobilienbewertung-immowertv.html</loc><lastmod>2026-11-26</lastmod></url>
+  <url><loc>https://dealpilot.immo/immobilien-ankauf-checkliste.html</loc><lastmod>2026-11-26</lastmod></url>
   <!-- landing-partner-1:partner · nach Marcels Okay und dem Prod-Rollout eintragen:
   <url><loc>https://dealpilot.immo/partner.html</loc><lastmod>2026-11-16</lastmod></url> -->
 </urlset>
