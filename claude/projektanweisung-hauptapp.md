@@ -45286,3 +45286,19 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** main c8a7c271, 3887e000 (Version). Staging 6630e40e.
 - **Nachweis:** Headless 360/390/1440 auf Prod: keine waagerechte Scrollleiste, Hauptknopf am Handy unten bei 591 von 844 px, Knopf springt zum Deal-Check (Oberkante 70 px), kein Vollbild-Fenster, Leiste nach Scroll bei 766/844. Prod `version.json` patch 240 auf app.dealpilot.immo und app.dealpilot.junker-immobilien.io, dealpilot.junker-immobilien.io leitet 301 auf dealpilot.immo. buster-ebenen sauber.
 - **Rest:** www.dealpilot.immo liefert eine Platzhalterseite des alten Hosters (nicht unser Server), DNS prüfen. Demo 3 (Deal-Check im Cockpit-Look) folgt als Demo.
+
+## Rollout-Journal 26.11.2026 — 1.0.239 v5080 bis v5080h: Mietspiegel auf Prod (Fork VV5)
+
+- **Was:** 190 Mietspiegel-Wertedateien (Ernte Runde 1 und 2), Verzeichnis 421 Sätze, Hausregel `haus.gilt_fuer`
+  (Wortlaut bzw. Rechtslage § 181 Abs. 2 BewG), DealPilot-Näherung an 202 freien Städten (LOO 8,5 %, Faktor 1,123) mit
+  Genauigkeit nur im Tooltip, Mietspiegel-Wächter (Migration 027, 30-Tage-Vorwarnung), Vergleichsmiete im KI-Prompt,
+  Deal-Check-Rechenweg mit Genauigkeit, Landing-Abruf mit `nur_frei=1` außerhalb von Staging (v5080h).
+  Gesperrte Dateien (45, Rechtevorbehalt) rechnen auf Prod nicht: Proxy und Landing-Abruf setzen `nur_frei=1`, der
+  Wertkern nimmt sie nie (`mietanker_kontext.js`). Nicht dabei: XX5 v5090 (Angebotsmiete, Migration 028).
+- **Commit:** main `d87c2092` (Buster), `7e2acc14` (Version 1.0.239), davor 202 Cherry-Picks aus staging.
+- **Nachweis Prod (nur lesend):** Saarbrücken Werte 6,75 €/m², Bamberg 7,46, Stuttgart Näherung 10,32 (Tooltip ±10,8 %),
+  Dortmund EFH Näherung 6,54 (±7,9 %), Frankfurt gesperrt → Näherung 9,51 (±8,7 %), Wächter 453 Quellen, 13 laufen in
+  30 Tagen ab, Migration 027 angewandt, App 200 auf beiden Adressen, gold-audit RC 0. Sicherung vorher
+  `/root/backups/haupt-vor-v5080m-20261126-1315.sql.gz` und `mb-vor-v5080m-…` (Köpfe gelesen).
+- **Rest:** Wächter-Punkt in Admin › Betrieb ist gelb bis zum ersten Lauf (20 Minuten nach Start). Tooltip im
+  Investment- und Marktbericht-PDF offen. Anwaltliche Prüfung § 44b vor jeder TDM-Nutzung.
