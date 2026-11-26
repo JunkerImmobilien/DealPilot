@@ -174,12 +174,27 @@ export function naeherungFuer(param, zeilen, objekt) {
       qm = neu;
     }
   }
+  /* MM6 · Modernisierung (Anlage-2-Punkte, Feld mod_punkte): gemessener Zuschlag der freien Mietspiegel je Stufe (naeherung.json
+     modernisierung, tools/mietspiegel-naeherung-ableiten.mjs). Nur mit Angabe, ohne Punkte bleibt alles wie bisher. */
+  let modTeil = null;
+  const mpkt = num(o.mod_punkte), ms = (p.modernisierung && Array.isArray(p.modernisierung.stufen)) ? p.modernisierung.stufen : [];
+  if (mpkt != null && mpkt > 0 && ms.length) {
+    const st = ms.filter((x) => num(x.ab_punkte) != null && mpkt >= num(x.ab_punkte) && num(x.pct) > 0)
+      .sort((x, y) => num(y.ab_punkte) - num(x.ab_punkte))[0];
+    if (st) {
+      const neu = runden(qm * (1 + num(st.pct) / 100), 2);
+      rechnung += ' · modernisiert (' + String(mpkt).replace('.', ',') + ' Punkte nach Anlage 2 ImmoWertV, ' + st.name + ') + '
+        + String(st.pct).replace('.', ',') + ' % = ' + dez(neu) + ' €/m²';
+      modTeil = { punkte: mpkt, pct: num(st.pct), ab_punkte: num(st.ab_punkte), stufe: st.name };
+      qm = neu;
+    }
+  }
   /* v5110 · Spanne wie beim Mietspiegel (Marcel 26.11.2026 „nicht zu niedrig"): die App rechnet mit dem OBEREN Wert (potenzial.js msWahl) */
   const sp = p.spanne || {};
   const oben = num(sp.oben) > 1 ? runden(qm * num(sp.oben), 2) : null;
   const unten = num(sp.unten) > 0 && num(sp.unten) < 1 ? runden(qm * num(sp.unten), 2) : null;
   return {
-    qm, oben, unten, marktmiete: mmTeil, quelle_art: 'dealpilot_naeherung', text: naeherungText(), genauigkeit_text: genauigkeitText(p, o.ags), text_detail: naeherungTextDetail(p, o.ags), rechnung, hinweise,
+    qm, oben, unten, marktmiete: mmTeil, modernisierung: modTeil, quelle_art: 'dealpilot_naeherung', text: naeherungText(), genauigkeit_text: genauigkeitText(p, o.ags), text_detail: naeherungTextDetail(p, o.ags), rechnung, hinweise,
     faktor: ff.f, basis: runden(basis, 2), marktlage: ff.je,
     zensus: { gemeinde: b.name, gesamt: b.gesamt, baujahr: b.baujahr, flaeche: b.flaeche, stichtag: '2022-05-15' },
     n_staedte: p.n_staedte || null, mape_pct: genauigkeit(p, o.ags).pct || null, genauigkeit_ebene: genauigkeit(p, o.ags).ebene, stand: p.stand || null,
@@ -222,7 +237,7 @@ export async function mietspiegelMitNaeherung(satz, q, holeZeilen, param) {
   if (!satz.naeherung_verfuegbar || !(q.baujahr || q.wfl) || typeof holeZeilen !== 'function') return satz;
   let zeilen = null;
   try { zeilen = await holeZeilen(satz.ags); } catch (e) { zeilen = null; }
-  satz.naeherung = naeherungFuer(p, zeilen, { baujahr: q.baujahr, wfl: q.wfl, marktlage: q.marktlage || null, ags: satz.ags,
+  satz.naeherung = naeherungFuer(p, zeilen, { baujahr: q.baujahr, wfl: q.wfl, marktlage: q.marktlage || null, ags: satz.ags, mod_punkte: q.mod_punkte,   /* MM6 */
     marktmiete: marktmieteFuer(marktmieteParameter(), satz.ags) });   /* v5110 */
   return satz;
 }
