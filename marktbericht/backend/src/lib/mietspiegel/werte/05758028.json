@@ -1,0 +1,276 @@
+{
+ "ags": "05758028",
+ "gemeinde": "Rödinghausen",
+ "art": "einfach",
+ "stand": "2025-12-01",
+ "erhebungsstichtag": null,
+ "gueltig_ab": "2025-12-01",
+ "gueltig_bis": null,
+ "quelle": {
+  "url": "https://www.roedinghausen.de/loadDocument.phtml?ObjSvrID=3463&ObjID=1473&ObjLa=1&Ext=PDF",
+  "dokument": "Mietspiegel – Fortschreibung – für die Gemeinde Rödinghausen, gültig ab 01. Dezember 2025 (Herausgeberin Gemeinde Rödinghausen; erstellt und beschlossen vom Gutachterausschuss für Grundstückswerte im Kreis Herford und in der Stadt Herford; im Einvernehmen mit Mieterbund OWL und VHWG Herford)",
+  "seite": "S. 1 (Tabelle), S. 2 (Erläuterungen, § 558c, Lage, Ausstattung, Vollmodernisierung)",
+  "lizenz": "kein Rechtevorbehalt im Dokument (kein Nachdruck- oder Speicherverbot, kein Urheberrechtsvermerk), geprüft am 2026-11-26",
+  "abgerufen": "2026-11-26"
+ },
+ "einheit": "eur_qm_nettokalt",
+ "form": "tabelle",
+ "rundung": 2,
+ "hinweis": "Einfacher Mietspiegel (§ 558c BGB, S. 2), Fortschreibung, gültig ab 01.12.2025. BILD-TABELLE: Werte auf S. 1 nur als Bild — am Druckbild (200 dpi, Ausschnitt) abgelesen. Baujahr 2001–2010: Größenklasse „über 80“ im Dokument zusammengefasst — hier für über 80–100 und über 100 m² dasselbe Feld. Vollmodernisierungszuschlag durchschnittlich 1,00 €/m² nur für Gebäude vor 1990 und alle Maßnahmen, sonst anteilig — hier nur ganz. Lage, Ausstattung innerhalb der Spanne. Baujahr nach 2024 nicht in der Tabelle. Quelle verlinkt vom Haus & Grund OWL (Übersicht OWL-Mietspiegel).",
+ "haus": {
+  "regel": "ausgeschlossen",
+  "gilt_fuer": [
+   "efh",
+   "dhh",
+   "rh"
+  ],
+  "gilt_fuer_herkunft": "rechtslage",
+  "gilt_fuer_begruendung": "Rechtslage: „Einfamilienhaus“ ohne „freistehend“ umfasst Doppelhaushälfte und Reihenhaus (§ 181 Abs. 2 BewG); Zweifamilienhaus nicht genannt.",
+  "beleg": "S. 1 Tabellenkopf: „keine Anwendung für Einfamilienhäuser“; S. 2: „Mietwerte für Einfamilienhäuser blie[ben unberücksichtigt]“"
+ },
+ "tabelle": {
+  "achsen": {
+   "baujahr": [
+    {
+     "von": null,
+     "bis": 1960,
+     "label": "bis 1960"
+    },
+    {
+     "von": 1961,
+     "bis": 1980,
+     "label": "1961 bis 1980"
+    },
+    {
+     "von": 1981,
+     "bis": 2000,
+     "label": "1981 bis 2000"
+    },
+    {
+     "von": 2001,
+     "bis": 2010,
+     "label": "2001 bis 2010"
+    },
+    {
+     "von": 2011,
+     "bis": 2024,
+     "label": "2011 bis 2024"
+    }
+   ],
+   "wfl": [
+    {
+     "von": null,
+     "bis": 60,
+     "label": "bis 60 m²"
+    },
+    {
+     "von": 60,
+     "bis": 80,
+     "label": "über 60 - 80 m²",
+     "von_inkl": false
+    },
+    {
+     "von": 80,
+     "bis": 100,
+     "label": "über 80 - 100 m²",
+     "von_inkl": false
+    },
+    {
+     "von": 100,
+     "bis": null,
+     "label": "über 100 m²",
+     "von_inkl": false
+    }
+   ]
+  },
+  "zellen": [
+   {
+    "baujahr": 0,
+    "wfl": 0,
+    "unten": 4.82,
+    "mittel": 6.52,
+    "oben": 8.03,
+    "seite": "1"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 1,
+    "unten": 4.82,
+    "mittel": 6.05,
+    "oben": 7.49,
+    "seite": "1"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 2,
+    "unten": 4.28,
+    "mittel": 4.99,
+    "oben": 5.89,
+    "seite": "1"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 3,
+    "unten": 4.28,
+    "mittel": 5.17,
+    "oben": 5.89,
+    "seite": "1"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 0,
+    "unten": 5.35,
+    "mittel": 6.63,
+    "oben": 7.49,
+    "seite": "1"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 1,
+    "unten": 4.82,
+    "mittel": 5.42,
+    "oben": 7.49,
+    "seite": "1"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 2,
+    "unten": 4.82,
+    "mittel": 5.93,
+    "oben": 7.49,
+    "seite": "1"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 3,
+    "unten": 4.82,
+    "mittel": 5.71,
+    "oben": 7.49,
+    "seite": "1"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 0,
+    "unten": 5.89,
+    "mittel": 6.88,
+    "oben": 7.49,
+    "seite": "1"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 1,
+    "unten": 4.82,
+    "mittel": 6.05,
+    "oben": 7.49,
+    "seite": "1"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 2,
+    "unten": 4.82,
+    "mittel": 5.99,
+    "oben": 6.96,
+    "seite": "1"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 3,
+    "unten": 4.28,
+    "mittel": 5.5,
+    "oben": 6.96,
+    "seite": "1"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 0,
+    "unten": 5.89,
+    "mittel": 6.64,
+    "oben": 8.03,
+    "seite": "1"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 1,
+    "unten": 5.35,
+    "mittel": 5.93,
+    "oben": 6.42,
+    "seite": "1"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 2,
+    "unten": 5.35,
+    "mittel": 5.7,
+    "oben": 6.42,
+    "seite": "1"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 3,
+    "unten": 5.35,
+    "mittel": 5.7,
+    "oben": 6.42,
+    "seite": "1"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 0,
+    "unten": 6.42,
+    "mittel": 9.6,
+    "oben": 12.31,
+    "seite": "1"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 1,
+    "unten": 6.42,
+    "mittel": 8.23,
+    "oben": 10.7,
+    "seite": "1"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 2,
+    "unten": 6.96,
+    "mittel": 8.67,
+    "oben": 10.7,
+    "seite": "1"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 3,
+    "unten": 5.89,
+    "mittel": 7.56,
+    "oben": 10.7,
+    "seite": "1"
+   }
+  ],
+  "zuschlaege": [
+   {
+    "merkmal": "energetische_vollmodernisierung",
+    "label": "energetische Vollmodernisierung (durchschnittlich 1,00 €/m², alle Maßnahmen)",
+    "art": "eur_qm",
+    "wert": 1,
+    "bedingung": {
+     "baujahr_bis": 1989
+    },
+    "beleg": "S. 2 „Gebäude mit einem Baujahr vor 1990“, „Zuschlagswert … durchschnittlich 1,00 €/m²“"
+   }
+  ]
+ },
+ "pruefbeispiele": [
+  {
+   "eingabe": {
+    "baujahr": 1975,
+    "wfl": 70
+   },
+   "erwartet": {
+    "unten": 4.82,
+    "mittel": 5.42,
+    "oben": 7.49
+   },
+   "seite": "1",
+   "art": "tabellenzelle"
+  }
+ ]
+}
