@@ -21,6 +21,20 @@ DealPilot läuft im Browser und auf dem Handy. Die Server stehen in Deutschland.
 - [Renditeobjekt vor dem Kauf prüfen](https://dealpilot.immo/renditeobjekt-pruefen.html)
 - [Immobilien Ankauf Checkliste](https://dealpilot.immo/immobilien-ankauf-checkliste.html): Unterlagen, Besichtigung nach Baujahr, Eigentumswohnung und Mehrfamilienhaus
 - [Immobilienbewertung nach ImmoWertV online](https://dealpilot.immo/immobilienbewertung-immowertv.html): Ertragswert, Sachwert und Vergleichswert mit Rechenweg
+- [Alle Ratgeber](https://dealpilot.immo/ratgeber.html)
+- [Mietpotenzial berechnen](https://dealpilot.immo/mietpotenzial-berechnen.html): Mietspiegel, Kappungsgrenze, Sperrfrist und Mietpreisbremse
+- [Ertragswert berechnen](https://dealpilot.immo/ertragswert-berechnen.html)
+- [Restnutzungsdauer berechnen](https://dealpilot.immo/restnutzungsdauer-berechnen.html)
+- [DSCR berechnen](https://dealpilot.immo/dscr-berechnen.html)
+- [Bankunterlagen für die Kapitalanlage](https://dealpilot.immo/bankunterlagen-kapitalanlage.html)
+- [Kaufpreisaufteilung Grund und Gebäude](https://dealpilot.immo/kaufpreisaufteilung-grund-gebaeude.html)
+
+## Vergleiche
+- [Immobilien-Software im Vergleich](https://dealpilot.immo/immobilien-software-vergleich.html)
+- [DealPilot oder ImmoCalc](https://dealpilot.immo/dealpilot-oder-immocalc.html)
+- [DealPilot oder immoment](https://dealpilot.immo/dealpilot-oder-immoment.html)
+- [DealPilot oder immoflow](https://dealpilot.immo/dealpilot-oder-immoflow.html)
+- [DealPilot oder InvestBud](https://dealpilot.immo/dealpilot-oder-investbud.html)
 
 ## Für Partner
 - [Lösungen für Makler und Berater](https://dealpilot.immo/loesungen.html)
