@@ -6527,7 +6527,7 @@
         r27Oben(r27Host(), 110); await warte(400);
         var z1 = r27ZahlW(1), z2 = r27ZahlW(2);
         await zeige(r27Zahl(1), 8);
-        await b2oZeile(s, 'Erstattungen bis dahin', '<b>' + z1.w + '</b> in den Jahren ' + z1.u.replace('–', ' bis ') + ' — so viel hat das Haus deine Steuer gesenkt.');
+        await b2oZeile(s, 'Erstattungen bis dahin', /Erstattung/.test(z1.u) ? 'Bis zum Wendepunkt unterm Strich <b>' + z1.w + '</b>: ' + z1.u.replace(/\s*·\s*/g, ', ') + '.' : '<b>' + z1.w + '</b> in den Jahren ' + z1.u.replace('–', ' bis ') + ' — so viel hat das Haus deine Steuer gesenkt.');   /* M11: Kachel zeigt seit v4570 Saldo mit Erstattung und Steuer */
         await zeige(r27Zahl(2), 8);
         await b2oZeile(s, 'Steuern ab dem Wendepunkt', '<b>' + z2.w + '</b> von ' + z2.u.replace('–', ' bis ') + ' — mit deinem Grenzsteuersatz gerechnet.');
         await zeige(r27Sel('.dp-stv-satz'), 8);
@@ -6608,7 +6608,9 @@
         await zeige(karte, 8);
         var p0 = r27ZahlW(0, r27PaHost), p1 = r27ZahlW(1, r27PaHost);
         DPM_REIHE.r27pa = [p0, p1];
-        await b2oZeile(s, 'Pilot-Analyse · Steuer', 'Dieselbe Grafik steht in der Pilot-Analyse: positiv ab <b>' + p0.w + '</b>, Erstattungen bis dahin <b>' + p1.w + '</b>.', 800);
+        /* M11 26.11.: im Bestand oeffnet das Objekt-Cockpit, die Pilot-Kennzahlen fehlen dann - nur zeigen, was da ist */
+        if (p0.w && p0.w !== '–') await b2oZeile(s, 'Pilot-Analyse · Steuer', 'Dieselbe Grafik steht in der Pilot-Analyse: positiv ab <b>' + p0.w + '</b>, Erstattungen bis dahin <b>' + p1.w + '</b>.', 800);
+        else if (karte()) await b2oZeile(s, 'Auch im Cockpit', 'Dieselbe Grafik steht im Objekt-Cockpit unter Steuer, mit denselben Jahreswerten.', 800);
       },
       async function (s) {   /* 11 · Gegenbild Westerfeldstr. 140 */
         await r27Laden(R27_BI, 'DEMO-BI1');

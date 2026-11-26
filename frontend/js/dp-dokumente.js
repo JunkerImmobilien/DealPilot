@@ -1266,6 +1266,8 @@
       'Deal Score und Investor Deal Score aus denselben Kernen wie in der App und im Quick-Check.'];
     var qn = (P3 && P3.cross_check && P3.cross_check.quellen_nachweis) || [];
     qn.forEach(function (x) { if (x && x.vermerk) quellen.push((x.kennzahlen ? x.kennzahlen.join(', ') + ': ' : '') + x.vermerk); });
+    /* v5090 · Pflichtvermerk des Angebotsdaten-Partners, nur wenn der Bericht seine Daten nutzt */
+    ((P3 && P3.quellen_nachweis_markt) || []).forEach(function (x) { if (x && x.vermerk === '© by RealEstatePilot') quellen.push((x.kennzahlen ? x.kennzahlen.join(', ') + ': ' : '') + x.vermerk); });
     if (info.karte) quellen.push('Kartengrundlage: © OpenStreetMap-Mitwirkende.');
     Sx.push(mark(B.seite(c, 'Quellen', B.abschnitt('Anhang', 'Quellen, Methodik und Annahmen')
       + '<div class="block"><h3>Quellen und Methodik</h3><ul>' + quellen.filter(function (x, i) { return quellen.indexOf(x) === i; }).map(function (x) { return '<li>' + B.esc(x) + '</li>'; }).join('') + '</ul></div>'
