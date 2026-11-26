@@ -12,6 +12,7 @@ export const SCHLUESSEL = Object.freeze({
   baustatistik: 2,   // services/BaustatistikService.js, alle 12 h (monatlicher Abgleich)
   jahreswerte: 3,    // services/JahreswerteService.js
   makro: 4,          // services/MakroImportService.js (Makro + Gemeinden)
+  mietspiegel: 5,    // services/MietspiegelWaechterService.js, täglich, je Quelle alle 30 Tage (v5080)
 });
 
 const log = (t) => console.log('[takt-sperre] ' + t);

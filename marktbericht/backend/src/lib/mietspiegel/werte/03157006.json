@@ -1,11 +1,13 @@
 {
  "ags": "03157006",
  "gemeinde": "Peine",
+ "haus": {"regel":"zuschlag","merkmal":"einfamilienhaus","fuer":["efh","zfh","dhh","rh"],"beleg":"laut Dokument, siehe Zuschlag bzw. Geltungsbereich in dieser Datei"},
  "art": "qualifiziert",
  "stand": "2026-03-01",
  "erhebungsstichtag": "2023-10-01",
  "gueltig_ab": "2026-03-01",
  "gueltig_bis": "2028-02-28",
+ "naechste_ausgabe": "2028",
  "quelle": {
   "url": "https://www.peine.de/de-wAssets/docs/mediadaten_stadt/eigene_daten/Hochbau/Bauleitplaene-Stadtplanung/Laufende/Broschuere-Mietspiegel-2026-Fortschreibung_ohne_leere_Seite.pdf",
   "dokument": "Mietspiegel Peine 2026 Fortschreibung (qualifiziert, VPI-Fortschreibung +4,41 % des Mietspiegels 2024), Stadt Peine",

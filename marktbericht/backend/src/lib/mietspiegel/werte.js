@@ -112,6 +112,51 @@ function merkmalWahr(objekt, name) {
   return v === true || v === 1 || v === 'ja' || v === 'true';
 }
 
+/* ── Häuser (v5080, Marcel 26.11.2026: „auch für Häuser … und auch für Mehrfamilienhäuser") ──────────
+   Ein Mietspiegel gilt für Wohnungen. Ob und wie er für ein vermietetes Haus gilt, sagt das Dokument selbst:
+   Zuschlag (fest oder Spanne), gilt ohne Zuschlag, nur zur Orientierung, oberer Spannenwert, oder gar nicht.
+   Datei-Feld `haus` (README „Häuser“):
+     { regel: 'zuschlag' | 'gilt' | 'orientierung' | 'oberer_spannenwert' | 'ausgeschlossen',
+       merkmal: '<Zuschlag-Merkmal der Datei>' | { efh, zfh, dhh, rh },   // nur bei 'zuschlag'
+       fuer: ['efh','zfh','dhh','rh'],                                  // für welche Bauformen die Regel gilt (sonst alle)
+       beleg, hinweis }
+   Ein MFH ist kein Haus in diesem Sinn: es wird je Wohnung gerechnet (Größe der Wohnung), wie bisher. */
+const HAUS_TYPEN = { efh: 'efh', einfamilienhaus: 'efh', zfh: 'zfh', zweifamilienhaus: 'zfh', dhh: 'dhh', doppelhaushaelfte: 'dhh',
+  'doppelhaushälfte': 'dhh', rh: 'rh', reihenhaus: 'rh', reh: 'rh', rmh: 'rh', reihenendhaus: 'rh', reihenmittelhaus: 'rh' };
+/** Objektart der App (EFH, ZFH, DHH, RH …) → 'efh' | 'zfh' | 'dhh' | 'rh' | null (Wohnung, MFH, Gewerbe) */
+export function hausTyp(objektart) {
+  const k = String(objektart == null ? '' : objektart).trim().toLowerCase().replace(/[\s_-]+/g, '');
+  return HAUS_TYPEN[k] || null;
+}
+const HAUS_WORT = { efh: 'Einfamilienhaus', zfh: 'Zweifamilienhaus', dhh: 'Doppelhaushälfte', rh: 'Reihenhaus' };
+/**
+ * Hausregel der Datei für eine Objektart anwenden. Setzt bei 'zuschlag' das Merkmal in `merkmale` (nur wenn der Nutzer
+ * selbst kein Hausmerkmal gewählt hat) und gibt { regel, hinweis } zurück, sonst null (kein Haus oder keine Angabe).
+ */
+export function hausAnwenden(werte, objektart, merkmale) {
+  const ht = hausTyp(objektart);
+  if (!ht || !werte) return null;
+  const H = werte.haus;
+  const wort = HAUS_WORT[ht];
+  if (!H || !H.regel) return { regel: 'unbekannt', hinweis: 'Der Mietspiegel sagt nichts zu Häusern. Gerechnet wie eine Wohnung gleicher Größe' };
+  if (Array.isArray(H.fuer) && H.fuer.length && H.fuer.indexOf(ht) < 0) {
+    return { regel: 'gilt', hinweis: 'Der Mietspiegel kennt für ' + wort + ' keinen eigenen Zuschlag. Gerechnet wie eine Wohnung gleicher Größe' };
+  }
+  const zus = H.hinweis ? '. ' + H.hinweis : '';
+  if (H.regel === 'ausgeschlossen') return { regel: 'ausgeschlossen', hinweis: 'Mietspiegel gilt nicht für Häuser, Näherung' };
+  if (H.regel === 'orientierung') return { regel: 'orientierung', hinweis: 'Für ' + wort + ' gilt der Mietspiegel nur zur Orientierung' + zus };
+  if (H.regel === 'oberer_spannenwert') return { regel: 'oberer_spannenwert', hinweis: 'Für ' + wort + ' gilt laut Mietspiegel der obere Spannenwert' + zus };
+  if (H.regel === 'zuschlag') {
+    const name = typeof H.merkmal === 'string' ? H.merkmal : (H.merkmal && (H.merkmal[ht] || H.merkmal.standard)) || null;
+    if (!name) return { regel: 'gilt', hinweis: 'Der Mietspiegel kennt für ' + wort + ' keinen eigenen Zuschlag. Gerechnet wie eine Wohnung gleicher Größe' };
+    const m = merkmale || {};
+    const eigenes = Object.keys(m).some(k => /efh|zfh|familien|dhh|reihen|doppelh/i.test(k) && m[k] !== false && m[k] !== 'nein');
+    if (!eigenes) m[name] = true;
+    return { regel: 'zuschlag', merkmal: eigenes ? null : name, hinweis: 'Zuschlag für ' + wort + ' laut Mietspiegel' + zus };
+  }
+  return { regel: 'gilt', hinweis: 'Der Mietspiegel gilt auch für ' + wort + ', ohne eigenen Zuschlag' + zus };
+}
+
 /** Spanne auf einen (gerundeten) Mittelwert: { unten_pct, oben_pct } | { unten_abs, oben_abs } | { baujahr_klassen: [...] } */
 function spanneAnwenden(sp, mittel, bj, n, hinweise, objekt) {
   let s = sp;
@@ -381,6 +426,13 @@ export function mietspiegelMitWerten(satz, q, ordner) {
      bis geklaert ist, ob die Werte genutzt werden duerfen. Der Proxy der Haupt-App setzt nur_frei=1 ausserhalb
      von Staging (backend/src/routes/marktbericht.js). */
   if (w && w.freigabe === 'gesperrt' && q && String(q.nur_frei) === '1') { w = null; satz.werte_gesperrt = true; }
+  /* v5080 · Häuser: schließt der Mietspiegel Häuser aus, gilt er für dieses Objekt nicht. Dann keine Werte, die Route
+     rechnet mit der DealPilot-Näherung (mietspiegelMitNaeherung sieht werte_verfuegbar false). */
+  satz.haus_regel = w && w.haus && w.haus.regel ? w.haus.regel : null;   /* v5080 · die App braucht sie ohne Objektart in der Anfrage */
+  if (w && q && q.objektart && hausTyp(q.objektart)) {
+    const h0 = hausAnwenden(w, q.objektart, {});
+    if (h0 && h0.regel === 'ausgeschlossen') { w = null; satz.haus_ausgeschlossen = true; satz.haus_hinweis = h0.hinweis; }
+  }
   satz.werte_verfuegbar = !!w;
   /* v3880 · Marcel 19.11.2026: „Eine 80-m²-Wohnung hat einen anderen Mietspiegel wie eine 100-m²-Wohnung, und der
      Zustand fließt auch ein." Gemessen: die Rechnung kann Lage, Ausstattung und Zu-/Abschläge, die App schickte sie nie
@@ -403,7 +455,13 @@ export function mietspiegelMitWerten(satz, q, ordner) {
       const i = x.indexOf(':');
       if (i > 0) merkmale[x.slice(0, i).trim()] = x.slice(i + 1).trim(); else merkmale[x] = true;
     });
+    const haus = hausAnwenden(w, q.objektart, merkmale);
     satz.werte = mietspiegelWerteFuer(w, { baujahr: q.baujahr, wfl: q.wfl, lage: q.lage || null, ausstattung: q.ausstattung || null, merkmale });
+    if (haus) {
+      satz.werte.haus = haus.regel;
+      if (haus.regel === 'oberer_spannenwert' && satz.werte.oben > 0) satz.werte.mittel = satz.werte.oben;
+      satz.werte.hinweise = [haus.hinweis].concat(satz.werte.hinweise || []);
+    }
   }
   return satz;
 }

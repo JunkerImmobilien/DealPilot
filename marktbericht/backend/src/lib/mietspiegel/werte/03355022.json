@@ -1,11 +1,13 @@
 {
  "ags": "03355022",
  "gemeinde": "Lüneburg",
+ "haus": {"regel":"zuschlag","merkmal":"efh_dhh_zfh_rh","fuer":["efh","zfh","dhh","rh"],"beleg":"laut Dokument, siehe Zuschlag bzw. Geltungsbereich in dieser Datei"},
  "art": "qualifiziert",
  "stand": "2026-02-12",
  "erhebungsstichtag": "2025-09-01",
  "gueltig_ab": "2026-02-12",
- "gueltig_bis": null,
+ "gueltig_bis": "2028-01-31",
+ "gueltig_bis_herkunft": "Mietspiegel-Verzeichnis, Beleg dort",
  "quelle": {
   "url": "https://www.hansestadt-lueneburg.de/_Resources/Persistent/6/e/c/0/6ec077feddf0eb29a0e1aa5d8fe7d210414bb65a/Lu%CC%88neburg_2026_Mietspiegel_A4_Broschu%CC%88re.pdf",
   "dokument": "Qualifizierter Mietspiegel 2026 der Hansestadt Lüneburg (Broschüre)",

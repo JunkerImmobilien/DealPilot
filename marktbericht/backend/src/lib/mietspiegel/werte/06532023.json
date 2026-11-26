@@ -1,6 +1,7 @@
 {
  "ags": "06532023",
  "gemeinde": "Wetzlar",
+ "haus": {"regel":"zuschlag","merkmal":"einfamilienhaus","fuer":["efh","zfh","dhh","rh"],"beleg":"laut Dokument, siehe Zuschlag bzw. Geltungsbereich in dieser Datei"},
  "art": "qualifiziert",
  "stand": "2026-06-01",
  "erhebungsstichtag": "2023-11-01",

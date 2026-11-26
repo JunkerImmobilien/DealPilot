@@ -1,6 +1,7 @@
 {
  "ags": "03103000",
  "gemeinde": "Wolfsburg",
+ "haus": {"regel":"ausgeschlossen","beleg":"laut Dokument, siehe Zuschlag bzw. Geltungsbereich in dieser Datei"},
  "art": "qualifiziert",
  "stand": "2026-01-01",
  "erhebungsstichtag": "2025-03-01",

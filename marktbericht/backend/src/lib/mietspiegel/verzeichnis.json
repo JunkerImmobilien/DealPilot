@@ -269,7 +269,7 @@
    "form": "regression",
    "quelle_geprueft_am": "2026-11-09",
    "beleg": "https://www.pforzheim.de/mietspiegel (Mietspiegel 2025, gültig ab 01.04.2025, qualifiziert § 558d, Regressionsmethode, kostenloser Download)",
-   "hinweis": "PDF als 'Neufassung vom 17.04.2025' (Korrektur); Online-Rechner pfad.pforzheim.de/Mietspiegelrechner; Broschüre bestellbar, Preis nicht genannt"
+   "hinweis": "PDF als 'Neufassung vom 17.04.2025' (Korrektur); Online-Rechner pfad.pforzheim.de/Mietspiegelrechner; Broschüre bestellbar, Preis nicht genannt 26.11.2026 gelesen, Rechtevorbehalt ohne Speicherverbot, S. 18: „Der Mietspiegel ist in allen Teilen urheberrechtlich geschützt.“ Zuschläge über Punkte (Modernisierung, Ausstattung), die DealPilot noch nicht rechnet. Keine Wertedatei angelegt."
   },
   {
    "ags": "08121000",
@@ -958,7 +958,7 @@
    "form": "regression",
    "quelle_geprueft_am": "2026-11-09",
    "beleg": "https://www.fuerth.de/fileadmin/redaktion/02-Bauen-Mobilitaet/02-Dokumente-Allgemein/Mietspiegel-Stadt-Fuerth-2025.pdf, S. 2 Titelei ('anerkannt ... am 30.07.2025. Gültig ab 1. August 2025'), Abschnitt Basismiete ('Regressionsmethode')",
-   "hinweis": "Basismiete plus Zu- und Abschläge"
+   "hinweis": "Basismiete plus Zu- und Abschläge 26.11.2026 gelesen, Rechtevorbehalt ohne Speicherverbot, S. 52: „Nachdruck - auch auszugsweise - und Kopien nicht gestattet.“ Keine Wertedatei angelegt."
   },
   {
    "ags": "09562000",
@@ -980,7 +980,7 @@
    "form": "regression",
    "quelle_geprueft_am": "2026-11-09",
    "beleg": "https://erlangen.de/uwao-api/faila/files/bypath/Dokumente/Statistik/Mietspiegel/doku_mietspiegel_erlangen_2025_teil2.pdf (Anerkennung 25.09.2025, gültig ab 01.10.2025); Broschüre Titel 'Erlanger Mietspiegel 2025–2027'",
-   "hinweis": "Titel 2025–2027; Form regression angenommen nach EMA-Methodik, nicht im Dokument geprüft"
+   "hinweis": "Titel 2025–2027; Form regression angenommen nach EMA-Methodik, nicht im Dokument geprüft 26.11.2026 gelesen, Rechtevorbehalt ohne Speicherverbot, S. 2: „Darüber hinaus sind Vervielfältigungen jeder Art, sowie Verkauf und alle sonstigen Rechte am Mietspiegel … vorbehalten.“ Keine Wertedatei angelegt."
   },
   {
    "ags": "09461000",
@@ -4262,7 +4262,7 @@
    "form": "tabelle",
    "quelle_geprueft_am": "2026-11-09",
    "beleg": "https://www.saarbruecken.de/leben_in_saarbruecken/planen_bauen_wohnen/mietspiegel (Abschnitte 'Fortschreibung des Saarbrücker Mietspiegels zum 1. Januar 2026', 'Welche Methodik' (VPI-Fortschreibung des Mietspiegels 2024), 'Wer war an der Erstellung beteiligt'); Form: Mietspiegel 2026 (URL im Feld url; Textschicht teilweise fehlerhaft kodiert), PDF-S. 7 „3.5 Basismiettabellen“ („Die Basistabellen 1 bis 3 geben getrennt die Basismieten für die einfache, mittlere und gute Wohnlage“), PDF-S. 8 „Tabelle 1: Monatliche Nettokaltmiete für Wohnungen in einfacher Wohnlage“ (je m² Wohnfläche × 5 Baualtersklassen), PDF-S. 11 Tabelle 2 mittlere Wohnlage, PDF-S. 20–21 Berechnung Basismiete plus Zu- und Abschläge → tabelle",
-   "hinweis": "VPI-Fortschreibung 2026 des qualifizierten Mietspiegels 2024; Online-Rechner"
+   "hinweis": "VPI-Fortschreibung 2026 des qualifizierten Mietspiegels 2024; Online-Rechner 26.11.2026: Mietspiegel 2026 gelesen. Die Tabellen führen je Quadratmeter Wohnfläche einen Wert (S. 8 ff.), die Textschicht des PDFs ist verfälscht (Zahlen weichen vom Druckbild ab), deshalb keine Wertedatei. Ablesen am Druckbild steht aus."
   },
   {
    "ags": "14713000",
@@ -4428,7 +4428,10 @@
    "form": "punkte",
    "quelle_geprueft_am": "2026-11-09",
    "beleg": "https://www.magdeburg.de/loadDocument.phtml?FID=698.19217.1&Ext=PDF Titel ('Mietspiegel der Landeshauptstadt Magdeburg 2026', 'Gültig vom 31.01.2026 bis maximal 30.01.2028', 'Schutzgebühr: 5 Euro'), Vorwort (Indexfortschreibung des ersten qualifizierten Mietspiegels 2024)",
-   "hinweis": "VPI-Fortschreibung 2026 des qualifizierten Mietspiegels 2024; Basis plus Zu-/Abschläge (Ausstattungsindex, Straßenverzeichnis mit Zu-/Abschlägen); Online-Rechner"
+   "hinweis": "VPI-Fortschreibung 2026 des qualifizierten Mietspiegels 2024; Basis plus Zu-/Abschläge (Ausstattungsindex, Straßenverzeichnis mit Zu-/Abschlägen); Online-Rechner",
+   "werte_nutzung": "verboten",
+   "werte_nutzung_grund": "Verwendung von Daten nur mit Genehmigung",
+   "werte_nutzung_beleg": "Seite 6: „Die Vervielfältigung, Verwendung und / oder Verbreitung von Veröffentlichungen oder Daten …“ (gelesen 26.11.2026)"
   },
   {
    "ags": "15002000",

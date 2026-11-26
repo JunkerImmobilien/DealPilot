@@ -115,5 +115,13 @@ pr('H8 Mails nur mit BETRIEB_MAIL=1', /BETRIEB_MAIL \|\| ''\) === '1'/.test(idx)
 pr('H10 Mail nur rot aus Liste', JSON.stringify(B.ROT_MAILEN) === JSON.stringify(['platte','sicherung','tls','probe','messung']));
 pr('H9 Routen requireAdmin', /router\.get\('\/betrieb', requireAdmin/.test(adm) && /router\.get\('\/betrieb\/mail-vorschau', requireAdmin/.test(adm));
 
+/* v5080 · Mietspiegel-Wächter: gelb bei neuer Ausgabe oder Ablauf, nie rot, nie in der Sofort-Mail; ohne Antwort kein Punkt */
+const msP = (ms) => B.bewerten({ mietspiegel: ms }).punkte.filter((p) => p.bereich === 'mietspiegel');
+pr('M1 Mietspiegel geändert = gelb', (msP({ letzter_lauf: 'x', geprueft: 9, geaendert: [{ gemeinde: 'A' }], abgelaufen: [] })[0] || {}).stufe === 'gelb');
+pr('M2 Mietspiegel abgelaufen = gelb', (msP({ letzter_lauf: 'x', geprueft: 9, geaendert: [], abgelaufen: [{ gemeinde: 'B', bis: '2026-01-01' }] })[0] || {}).stufe === 'gelb');
+pr('M3 Mietspiegel ohne Befund = grün', (msP({ letzter_lauf: 'x', geprueft: 9, geaendert: [], abgelaufen: [] })[0] || {}).stufe === 'gruen');
+pr('M4 Mietspiegel ohne Antwort = kein Punkt', msP({ fehler_abruf: 'ECONNREFUSED' }).length === 0 && msP(null).length === 0);
+pr('M5 mietspiegel nicht in ROT_MAILEN', B.ROT_MAILEN.indexOf('mietspiegel') < 0);
+
 console.log((rot ? 'ROT' : 'GRÜN') + ' · betrieb-pruefen ' + ok + '/' + (ok + rot));
 process.exit(rot ? 1 : 0);

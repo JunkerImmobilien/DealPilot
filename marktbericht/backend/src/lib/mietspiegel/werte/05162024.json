@@ -3,6 +3,7 @@
  "freigabe": "gesperrt",
  "freigabe_grund": "„Eine Veröffentlichung des Mietspiegels ist ohne die Genehmigung der o.g. Vereine nicht gestattet“ (Titelseite) — kein ausdrückliches Speicherverbot; auf Prod gesperrt bis zur Klärung",
  "gemeinde": "Neuss",
+ "haus": {"regel":"zuschlag","merkmal":"haus_efh","fuer":["efh","dhh","rh"],"hinweis":"Mitte der Spanne des Mietspiegels","beleg":"S. 3 (Einfamilienhaus 5 bis 10 %), geprüft 26.11.2026"},
  "art": "einfach",
  "stand": "2026-01-01",
  "erhebungsstichtag": null,
@@ -135,6 +136,7 @@
    }
   ],
   "zuschlaege": [
+   {"merkmal":"haus_efh","art":"pct","wert":7.5,"label":"Einfamilienhaus (Mitte der Spanne 5 bis 10 %)","beleg":"S. 3 (Einfamilienhaus 5 bis 10 %), geprüft 26.11.2026"},
    {
     "merkmal": "wohnungsgroesse",
     "art": "pct",

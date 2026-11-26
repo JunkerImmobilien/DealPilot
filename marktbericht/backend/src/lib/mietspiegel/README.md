@@ -320,3 +320,33 @@ Die Route liefert sie nur ohne verwendbare Werte (`naeherung_verfuegbar`, mit Ba
 `objektVgl()` steht sie zwischen amtlicher Mietpreisübersicht und Schätzung aus Angebotsmieten, nie gegen eine
 eigene Eingabe. **Nach jeder Ernte** `node tools/mietspiegel-naeherung-ableiten.mjs` (Leave-one-Stadt-out-Güte,
 schreibt `naeherung.json`; `--holen` liest den Zensus-Ausschnitt `naeherung-zensus.json` neu von Staging).
+
+## Häuser und Mehrfamilienhäuser (v5080, 26.11.2026)
+
+Marcel 26.11.2026: „haben wir … aktuelle Vergleichsmieten für unterschiedliche Größen … auch für Häuser … und auch für
+Mehrfamilienhäuser". Ein Mietspiegel gilt für **Wohnungen**. Was er zu vermieteten Häusern sagt, steht im Datei-Feld
+**`haus`**:
+
+| `regel` | Wirkung (`hausAnwenden`, `mietspiegelMitWerten`) |
+|---|---|
+| `zuschlag` | `merkmal` (Name eines Zuschlags der Datei, oder `{ efh, zfh, dhh, rh }`) wird gesetzt, wenn die Objektart ein Haus ist und der Nutzer selbst kein Hausmerkmal gewählt hat |
+| `gilt` | wie eine Wohnung gleicher Größe, mit Hinweis (z. B. „Zuschlag für Garten wählbar“) |
+| `orientierung` | gerechnet, Hinweis „gilt nur zur Orientierung“ |
+| `oberer_spannenwert` | Mittelwert = oberer Spannenwert (Krefeld) |
+| `ausgeschlossen` | keine Werte, `werte_verfuegbar: false`, `haus_ausgeschlossen: true`, die Route rechnet die DealPilot-Näherung („Mietspiegel gilt nicht für Häuser, Näherung“) |
+
+`fuer` begrenzt die Regel auf Bauformen (`efh`, `zfh`, `dhh`, `rh`), sonst gilt sie für alle. Die Objektart kommt als
+`&objektart=EFH|ZFH|DHH|RH|…` an die Route (App: `objart`). **Spannen-Zuschläge** („EFH 10 bis 35 %“) stehen als Mitte
+der Spanne mit Seite im `beleg` (Kleve, Moers, Neuss, Recklinghausen, am PDF geprüft 26.11.2026). Ohne Feld `haus`: Hinweis
+„Der Mietspiegel sagt nichts zu Häusern“, gerechnet wie eine Wohnung. Prüfer: `mietspiegel-werte-pruefen.mjs`, Abschnitt Häuser.
+
+**Mehrfamilienhaus:** kein Haus in diesem Sinn. Die App rechnet je Wohnung mit der eigenen Zelle (Wohnungsgröße, v3255
+in `potenzial.js`), ohne Mietspiegel-Werte die Näherung je Größenklasse (Zensus nach Fläche).
+
+## Wächter (v5080)
+
+`services/MietspiegelWaechterService.js` unter `takt('mietspiegel')`: täglich, je Quelle alle 30 Tage, Kennung der
+Quellseite (ETag, Last-Modified, Länge, Hash des Anfangs) gegen die Basis in `mb.mietspiegel_waechter` (Migration 027).
+`GET /mietspiegel/waechter` liefert geänderte Quellen und abgelaufene Wertedateien (`gueltig_bis`, sonst Verzeichnis,
+sonst Vermutungsfrist, sonst `naechste_ausgabe`). Admin › Betrieb zeigt das gelb, die Wochenmail nimmt es mit.
+**Übernommen wird nichts:** eine neue Ausgabe erntet ein Agent und legt sie vor, danach `quittieren(ags)`.

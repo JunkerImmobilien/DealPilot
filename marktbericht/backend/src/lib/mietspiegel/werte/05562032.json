@@ -3,11 +3,13 @@
  "freigabe": "gesperrt",
  "freigabe_grund": "„Nachdruck, Vervielfältigung oder Wiedergabe jedweder Art, auch auszugsweise, ist nur mit Zustimmung des Herausgebers und unter Angabe des Herkunftsvermerkes gestattet“ (S. 3) — kein ausdrückliches Speicherverbot; auf Prod gesperrt bis zur Klärung",
  "gemeinde": "Recklinghausen",
+ "haus": {"regel":"zuschlag","merkmal":{"efh":"haus_efh_freistehend","dhh":"haus_dhh_reh"},"fuer":["efh","dhh"],"hinweis":"Mitte der Spanne des Mietspiegels","beleg":"S. 5 (freistehende Einfamilienhäuser bis zu 10 %, Doppelhaushälften/Reihenendhäuser bis zu 5 %), geprüft 26.11.2026"},
  "art": "einfach",
  "stand": "2026-01-01",
  "erhebungsstichtag": null,
  "gueltig_ab": "2026-01-01",
- "gueltig_bis": null,
+ "gueltig_bis": "2027-12-31",
+ "gueltig_bis_herkunft": "Mietspiegel-Verzeichnis, Beleg dort",
  "quelle": {
   "url": "https://bso.gkd-re.de/bsointer320/redirect?mandant=320&netz=4&typ=2&id=11906",
   "dokument": "Mietspiegel 2026 der Stadt Recklinghausen (Mietwerttabelle Stand 01.01.2026, Fortschreibung des Mietspiegels 2024), Herausgeber Stadt Recklinghausen",
@@ -174,6 +176,8 @@
    }
   ],
   "zuschlaege": [
+   {"merkmal":"haus_efh_freistehend","art":"pct","wert":5,"label":"freistehendes Einfamilienhaus (Mitte von bis zu 10 %)","beleg":"S. 5 (freistehende Einfamilienhäuser bis zu 10 %, Doppelhaushälften/Reihenendhäuser bis zu 5 %), geprüft 26.11.2026"},
+   {"merkmal":"haus_dhh_reh","art":"pct","wert":2.5,"label":"Doppelhaushälfte oder Reihenendhaus (Mitte von bis zu 5 %)","beleg":"S. 5 (freistehende Einfamilienhäuser bis zu 10 %, Doppelhaushälften/Reihenendhäuser bis zu 5 %), geprüft 26.11.2026"},
    {
     "merkmal": "barrierefrei_din_18040",
     "art": "pct",

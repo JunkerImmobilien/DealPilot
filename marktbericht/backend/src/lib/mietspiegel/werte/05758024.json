@@ -1,6 +1,7 @@
 {
  "ags": "05758024",
  "gemeinde": "Löhne",
+ "haus": {"regel":"ausgeschlossen","beleg":"laut Dokument, siehe Zuschlag bzw. Geltungsbereich in dieser Datei"},
  "art": "einfach",
  "stand": "2025-11",
  "erhebungsstichtag": null,

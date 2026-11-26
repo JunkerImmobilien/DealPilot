@@ -17,9 +17,10 @@ import { jahreswerteRegister, jahreswerteStatus } from '../lib/jahreswerte.js'; 
 import { indexreihen } from '../lib/indexreihen.js';                             /* v3026 */
 import { mietspiegelFuer } from '../lib/mietspiegel/verzeichnis.js';              /* v3250 */
 import { mietspiegelMitWerten } from '../lib/mietspiegel/werte.js';               /* v3255 */
+import { stand as msWaechterStand } from '../services/MietspiegelWaechterService.js';   /* v5080 */
 import { mietspiegelMitNaeherung } from '../lib/mietspiegel/naeherung.js';       /* v3266 */
 import { vergleichsmieteWohnung, zielMaximum, signaleAus, mietsteigerungRate, fortschreibung, spanneFortschreiben, kappungsPfad } from '../lib/mietanker.js';   /* v3343 */
-import { werteFuer as msWerteFuer } from '../lib/mietspiegel/werte.js';   /* v3343 */
+import { werteFuer as msWerteFuer, hausAnwenden as msHausAnwenden } from '../lib/mietspiegel/werte.js';   /* v3343, v5080 */
 import { naeherungParameter as msNaeherungParameter } from '../lib/mietspiegel/naeherung.js';   /* v3343 */
 import { kappungFuer, mietpreisbremseFuer } from '../lib/kappung.js';           /* landing-dealcheck-5 */
 import { zensusMieteAmStichtag, nkmIndexAm, NKM_INDEX } from '../lib/zensus_miete.js';   /* v3028 */
@@ -1114,6 +1115,11 @@ router.get('/bwk/ansaetze', (req, res) => {
 // (§ 558c Abs. 4 BGB: Pflicht ab 50.000 Einwohnern). Nur Datei, keine DB, kein Kontingent.
 // v3255: + werte_verfuegbar; mit &baujahr=&wfl= (&lage=&ausstattung=&merkmale=a,b) + werte { unten, mittel, oben, zelle, rechnung, hinweise }.
 // v3266: + naeherung_verfuegbar; ohne verwendbare Werte mit &baujahr=&wfl= + naeherung { qm, text, rechnung, hinweise, ... }.
+// v5080 · GET /mietspiegel/waechter — Stand des Mietspiegel-Wächters (services/MietspiegelWaechterService.js) für
+// Admin › Betrieb: geänderte Quellen (neue Ausgabe?), abgelaufene Wertedateien, Abruffehler. Nur lesen.
+router.get('/mietspiegel/waechter', async (req, res) => {
+  try { res.json(await msWaechterStand()); } catch (e) { res.status(500).json({ error: e.message }); }
+});
 router.get('/mietspiegel', async (req, res) => {
   try {
     const r = mietspiegelFuer(req.query.ags);
@@ -1138,6 +1144,7 @@ router.get('/mietspiegel', async (req, res) => {
           "SELECT dimension, auspraegung, auspraegung_text, wert, gebiet_name FROM mb.zensus_werte WHERE ebene = 'gemeinde' AND kennzahl = 'nettokaltmiete_qm' AND ags = $1", [ags]) : null;
         const merk = {};
         String(req.query.merkmale || '').split(',').map((x) => x.trim()).filter(Boolean).forEach((x) => { const i = x.indexOf(':'); if (i > 0) merk[x.slice(0, i).trim()] = x.slice(i + 1).trim(); else merk[x] = true; });
+        if (w) msHausAnwenden(w, req.query.objektart, merk);   /* v5080 · Hauszuschlag auch in der Vergleichsmiete der Wohnung */
         const k = { werte: w, naeherung_param: w ? null : msNaeherungParameter(), zensus_zeilen: zeilen, baujahr: req.query.baujahr,
           lage: req.query.lage || null, ausstattung: req.query.ausstattung || null, merkmale: merk,
           signale: signaleAus({ standardstufe: req.query.standardstufe, mikrolage: req.query.mikrolage, mod_punkte: req.query.mod_punkte,

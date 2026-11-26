@@ -1,6 +1,7 @@
 {
  "ags": "05382068",
  "gemeinde": "Troisdorf",
+ "haus": {"regel":"zuschlag","merkmal":"efh","fuer":["efh"],"beleg":"laut Dokument, siehe Zuschlag bzw. Geltungsbereich in dieser Datei"},
  "art": "qualifiziert",
  "stand": "2025-10-01",
  "erhebungsstichtag": "2025-03-01",

@@ -1,55 +1,55 @@
 {
  "titel": "DealPilot-Näherung der ortsüblichen Vergleichsmiete (nie amtlich, nicht der Mietspiegel)",
  "version": "v3266",
- "stand": "2026-11-09",
+ "stand": "2026-11-26",
  "erzeugt_von": "tools/mietspiegel-naeherung-ableiten.mjs",
  "methode": "Mittelwert ≈ Faktor × Zensus-2022-Bestandsmiete der Gemeinde nach Baujahresklasse × nach Größenklasse / gesamt (Form klassen_faktor) bzw. Faktor × gesamt (gesamt_faktor); Faktor = Median der Quotienten Mietspiegel-Mittelwert / Zensus über alle Rasterpunkte der freien Mietspiegel. Kalibriert nur an freien Wertedateien (freigabe ≠ gesperrt); Mietspiegel mit Speicherverbot sind nicht im Register und gehen nie ein.",
  "modell": "klassen_faktor",
- "faktor": 1.109,
- "n_staedte": 59,
- "n_punkte": 1062,
+ "faktor": 1.111,
+ "n_staedte": 60,
+ "n_punkte": 1080,
  "guete": {
   "verfahren": "Leave-one-Stadt-out über das Raster (Baujahr 1955–2005 × 50/70/90 m²)",
-  "mape_pct": 7.5,
+  "mape_pct": 7.6,
   "mae_eur": 0.56,
   "anteil_5_pct": 40,
-  "anteil_10_pct": 74,
+  "anteil_10_pct": 73,
   "median_pct": 6.3,
-  "n": 1062
+  "n": 1080
  },
  "guete_normwohnung": {
   "objekt": "Baujahr 1975, 70 m²",
-  "mape_pct": 6,
-  "mae_eur": 0.42,
-  "anteil_5_pct": 51,
+  "mape_pct": 5.9,
+  "mae_eur": 0.41,
+  "anteil_5_pct": 52,
   "anteil_10_pct": 85,
   "median_pct": 4.8,
-  "n": 59
+  "n": 60
  },
  "vergleich": {
   "zensus_roh": {
-   "raster_mape_pct": 10.4,
-   "raster_10_pct": 58,
-   "norm_mape_pct": 7.1
+   "raster_mape_pct": 10.5,
+   "raster_10_pct": 57,
+   "norm_mape_pct": 7.2
   },
   "gesamt_faktor": {
-   "raster_mape_pct": 9.3,
-   "raster_10_pct": 61,
-   "norm_mape_pct": 9.2
+   "raster_mape_pct": 9.4,
+   "raster_10_pct": 59,
+   "norm_mape_pct": 9.5
   },
   "klassen_faktor": {
-   "raster_mape_pct": 7.5,
-   "raster_10_pct": 74,
-   "norm_mape_pct": 6
+   "raster_mape_pct": 7.6,
+   "raster_10_pct": 73,
+   "norm_mape_pct": 5.9
   },
   "klassen_faktor_marktlage": {
    "raster_mape_pct": 7.6,
    "raster_10_pct": 73,
-   "norm_mape_pct": 6.1
+   "norm_mape_pct": 6
   },
   "vpi_fortschreibung": {
-   "raster_mape_pct": 7.7,
-   "raster_10_pct": 70,
+   "raster_mape_pct": 7.8,
+   "raster_10_pct": 69,
    "norm_mape_pct": 6.7
   },
   "rueckfall_angebot_abschlag": "nicht messbar: DealPilot führt keine Angebotsmiete je Gemeinde (sie kommt je Objekt von außen)"
@@ -485,7 +485,7 @@
    "gemeinde": "Hanau",
    "land": "HE",
    "stand": "2026-09-15",
-   "marktlage": "mittel",
+   "marktlage": "angespannt",
    "punkte": 18,
    "quotient_median": 1.124
   },
@@ -494,7 +494,7 @@
    "gemeinde": "Gießen",
    "land": "HE",
    "stand": "2026-07-01",
-   "marktlage": "mittel",
+   "marktlage": "angespannt",
    "punkte": 18,
    "quotient_median": 1.044
   },
@@ -578,6 +578,15 @@
    "marktlage": "mittel",
    "punkte": 18,
    "quotient_median": 1.058
+  },
+  {
+   "ags": "16051000",
+   "gemeinde": "Erfurt",
+   "land": "TH",
+   "stand": "2025",
+   "marktlage": "angespannt",
+   "punkte": 18,
+   "quotient_median": 1.193
   },
   {
    "ags": "16053000",

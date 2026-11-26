@@ -150,6 +150,36 @@ for (const f of liste) {
   });
 }
 
+/* v5080 · Häuser: jede Datei mit Feld haus hat eine bekannte Regel, ein Zuschlags-Merkmal, das die Datei auch führt,
+   und die Regel wirkt in mietspiegelMitWerten (Ausschluss → keine Werte, Zuschlag → anderer Wert als die Wohnung). */
+{
+  const { mietspiegelMitWerten, hausTyp, werteLaden } = await import(pathToFileURL(path.join(MS, 'werte.js')).href);
+  const REGELN = ['zuschlag', 'gilt', 'orientierung', 'oberer_spannenwert', 'ausgeschlossen'];
+  let nHaus = 0;
+  for (const [ags, w] of werteLaden().jeAgs) {
+    const H = w.haus; if (!H) continue; nHaus++;
+    if (REGELN.indexOf(H.regel) < 0) { F(ags, 'haus.regel unbekannt: ' + H.regel); continue; }
+    if (!H.beleg) F(ags, 'haus ohne beleg');
+    if (H.regel === 'zuschlag') {
+      const namen = typeof H.merkmal === 'string' ? [H.merkmal] : Object.values(H.merkmal || {});
+      const da = new Set([...(((w.tabelle || {}).zuschlaege) || []), ...(((w.regression || {}).faktoren) || []), ...((((w.regression || {}).basis || {}).ersatz) || [])].map((z) => z.merkmal));
+      for (const m of namen) if (!da.has(m)) F(ags, 'haus.merkmal ' + m + ' fehlt in den Zuschlägen der Datei');
+    }
+    if (H.regel === 'ausgeschlossen') {
+      const s = mietspiegelMitWerten({ ags }, { baujahr: 1975, wfl: 80, objektart: 'EFH' });
+      if (s.werte_verfuegbar || !s.haus_ausgeschlossen) F(ags, 'Ausschluss für Häuser wirkt nicht');
+      const s2 = mietspiegelMitWerten({ ags }, { baujahr: 1975, wfl: 80, objektart: 'ETW' });
+      if (!s2.werte_verfuegbar) F(ags, 'Ausschluss für Häuser trifft auch die Wohnung');
+    }
+  }
+  if (hausTyp('EFH') !== 'efh' || hausTyp('MFH') !== null || hausTyp('ETW') !== null || hausTyp('Reihenendhaus') !== 'rh') F('hausTyp', 'Zuordnung der Objektart falsch');
+  /* Moers 1975/80 m²: Haus mit Zuschlag Mitte der Spanne (22,5 %) liegt über der Wohnung */
+  const wo = mietspiegelMitWerten({ ags: '05170024' }, { baujahr: 1975, wfl: 80, objektart: 'ETW' }).werte;
+  const ha = mietspiegelMitWerten({ ags: '05170024' }, { baujahr: 1975, wfl: 80, objektart: 'EFH' }).werte;
+  if (!(wo && ha && ha.mittel > wo.mittel && Math.abs(ha.mittel / wo.mittel - 1.225) < 0.01)) F('05170024', 'Hauszuschlag Moers nicht 22,5 % (' + (wo && wo.mittel) + ' / ' + (ha && ha.mittel) + ')');
+  if (!LEISE) console.log('Häuser: ' + nHaus + ' Dateien mit Hausregel');
+}
+
 if (!LEISE) {
   console.log('Mietspiegel-Werte: ' + dateien + ' Dateien, ' + zellenZahl + ' Tabellenfelder/Basiswerte, ' + beispiele + ' Prüfbeispiele');
   for (const w of warn.slice(0, 15)) console.log('  gelb  ' + w);

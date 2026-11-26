@@ -2301,7 +2301,7 @@ router.get('/betrieb', requireAdmin, async (req, res) => {
   try {
     const betrieb = require('../services/betrieb');
     const d = await betrieb.laden(req.app.get('db'));
-    const b = betrieb.bewerten({ messung: d.messung, verlauf: d.verlauf, probe: d.probe, audit: d.audit, schwellen: betrieb.schwellenAusUmgebung(), konfigOffsite: String(process.env.BETRIEB_KONFIG_OFFSITE || '') === '1' });
+    const b = betrieb.bewerten({ messung: d.messung, verlauf: d.verlauf, probe: d.probe, audit: d.audit, mietspiegel: d.mietspiegel, schwellen: betrieb.schwellenAusUmgebung(), konfigOffsite: String(process.env.BETRIEB_KONFIG_OFFSITE || '') === '1' });
     const reihe = d.verlauf.map((v) => ({ t: v.erfasst_am, platte: v.daten && v.daten.platte && v.daten.platte.pct,
       ram: v.daten && v.daten.speicher && v.daten.speicher.pct, last: v.daten && v.daten.last && v.daten.last.kerne ? +(v.daten.last.l1 / v.daten.last.kerne).toFixed(2) : null }));
     res.json({ server: d.server, stand: d.messung && d.messung.erfasst_am, messung: d.messung && d.messung.daten,
@@ -2313,7 +2313,7 @@ router.get('/betrieb/mail-vorschau', requireAdmin, async (req, res) => {
   try {
     const betrieb = require('../services/betrieb');
     const d = await betrieb.laden(req.app.get('db'));
-    const b = betrieb.bewerten({ messung: d.messung, verlauf: d.verlauf, probe: d.probe, audit: d.audit, schwellen: betrieb.schwellenAusUmgebung(), konfigOffsite: String(process.env.BETRIEB_KONFIG_OFFSITE || '') === '1' });
+    const b = betrieb.bewerten({ messung: d.messung, verlauf: d.verlauf, probe: d.probe, audit: d.audit, mietspiegel: d.mietspiegel, schwellen: betrieb.schwellenAusUmgebung(), konfigOffsite: String(process.env.BETRIEB_KONFIG_OFFSITE || '') === '1' });
     res.type('html').send(betrieb.mailHtml(d.server, b, 'Wochenbericht Betrieb ' + d.server + ' (Vorschau)'));
   } catch (e) { res.status(500).json({ error: e.message }); }
 });

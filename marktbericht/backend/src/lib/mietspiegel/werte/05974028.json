@@ -1,6 +1,7 @@
 {
  "ags": "05974028",
  "gemeinde": "Lippstadt",
+ "haus": {"regel":"zuschlag","merkmal":"einfamilienhaus","fuer":["efh","dhh","rh"],"hinweis":"Zuschlag bis 160 m² Wohnfläche","beleg":"laut Dokument, siehe Zuschlag bzw. Geltungsbereich in dieser Datei"},
  "art": "einfach",
  "stand": "2025-01-01",
  "erhebungsstichtag": "2024-12-31",

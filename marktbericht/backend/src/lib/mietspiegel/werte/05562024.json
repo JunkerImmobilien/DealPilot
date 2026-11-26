@@ -1,6 +1,7 @@
 {
   "ags": "05562024",
   "gemeinde": "Marl",
+  "haus": {"regel":"zuschlag","merkmal":{"efh":"einfamilienhaus","zfh":"zweifamilienhaus","dhh":"einfamilienhaus","rh":"einfamilienhaus"},"fuer":["efh","zfh","dhh","rh"],"beleg":"laut Dokument, siehe Zuschlag bzw. Geltungsbereich in dieser Datei"},
   "art": "einfach",
   "stand": "2026-04-01",
   "erhebungsstichtag": null,

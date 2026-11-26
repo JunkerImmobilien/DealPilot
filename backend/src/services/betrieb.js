@@ -162,6 +162,21 @@ function bewerten(o) {
     else add('audit', 'gruen', 'npm audit: keine kritischen oder hohen Schwachstellen');
   } else add('audit', 'gelb', au ? 'npm audit lief nicht durch' : 'Noch kein npm audit', 'Wöchentlichen Audit-Takt prüfen.');
 
+  /* v5080 · Mietspiegel-Wächter (mb-Backend, services/MietspiegelWaechterService.js): neue Ausgaben und abgelaufene
+     Mietspiegel sind gelb, nie rot (kein Ausfall, sondern Pflege). Ohne Antwort des mb-Backends kein Punkt. */
+  const ms = o.mietspiegel;
+  if (ms && !ms.fehler_abruf) {
+    const neu = (ms.geaendert || []).length, ab = (ms.abgelaufen || []).length;
+    const namen = (l, f) => l.slice(0, 6).map(f).join(', ') + (l.length > 6 ? ' und ' + (l.length - 6) + ' weitere' : '');
+    if (!ms.letzter_lauf) add('mietspiegel', 'gelb', 'Mietspiegel-Wächter hat noch keine Quelle geprüft', 'Läuft 20 Minuten nach dem Start des mb-Backends, danach täglich.');
+    else if (neu || ab) {
+      const t = [];
+      if (neu) t.push(neu + ' Quelle' + (neu > 1 ? 'n' : '') + ' geändert (neue Ausgabe?): ' + namen(ms.geaendert, (x) => x.gemeinde));
+      if (ab) t.push(ab + ' Mietspiegel abgelaufen: ' + namen(ms.abgelaufen, (x) => x.gemeinde + ' (' + x.bis + ')'));
+      add('mietspiegel', 'gelb', t.join('. '), 'Neue Ausgabe von einem Agenten ernten lassen und zur Prüfung vorlegen, danach quittieren. Nichts wird automatisch übernommen.');
+    } else add('mietspiegel', 'gruen', 'Mietspiegel: ' + (ms.geprueft || 0) + ' Quellen geprüft, keine neue Ausgabe, keiner abgelaufen' + (ms.fehler ? ' (' + ms.fehler + ' nicht erreichbar)' : ''));
+  }
+
   const rang = { rot: 2, gelb: 1, gruen: 0 };
   const gesamt = punkte.reduce((g, p) => (rang[p.stufe] > rang[g] ? p.stufe : g), 'gruen');
   const handlungsbedarf = punkte.filter((p) => p.stufe !== 'gruen').sort((a, b) => rang[b.stufe] - rang[a.stufe]);
@@ -193,7 +208,14 @@ async function laden(db, server) {
     kunden = await q(`SELECT p.name AS plan, COUNT(*)::int AS anzahl FROM subscriptions s JOIN plans p ON p.id = s.plan_id
                       WHERE s.status IN ('active','trialing') GROUP BY p.name ORDER BY 2 DESC`);
   } catch (e) { kunden = []; }
-  return { server: sv, messung: mess || null, verlauf, probe: probe || null, audit: audit || null, kunden };
+  /* v5080 · Stand des Mietspiegel-Wächters aus dem mb-Backend (nur lesen, 5 s) */
+  let mietspiegel = null;
+  try {
+    const basis = (process.env.MB_BACKEND_URL || 'http://mb-backend:4000/api/v1/marktbericht').replace(/\/+$/, '');
+    const r = await fetch(basis + '/mietspiegel/waechter', { signal: AbortSignal.timeout(5000) });
+    mietspiegel = r.ok ? await r.json() : { fehler_abruf: 'HTTP ' + r.status };
+  } catch (e) { mietspiegel = { fehler_abruf: e.message }; }
+  return { server: sv, messung: mess || null, verlauf, probe: probe || null, audit: audit || null, kunden, mietspiegel };
 }
 
 function mailHtml(server, b, titel) {
@@ -222,7 +244,7 @@ async function lauf(db, opt) {
   opt = opt || {};
   const jetzt = opt.jetzt || Date.now();
   const d = await laden(db);
-  const b = bewerten({ messung: d.messung, verlauf: d.verlauf, probe: d.probe, audit: d.audit, jetzt, schwellen: schwellenAusUmgebung(), konfigOffsite: String(process.env.BETRIEB_KONFIG_OFFSITE || '') === '1' });
+  const b = bewerten({ messung: d.messung, verlauf: d.verlauf, probe: d.probe, audit: d.audit, mietspiegel: d.mietspiegel, jetzt, schwellen: schwellenAusUmgebung(), konfigOffsite: String(process.env.BETRIEB_KONFIG_OFFSITE || '') === '1' });
   const mails = await db.query(`SELECT daten->>'schluessel' AS s, MAX(erfasst_am) AS t FROM betrieb_messungen WHERE server=$1 AND art='mail' AND erfasst_am > NOW() - INTERVAL '8 days' GROUP BY 1`, [d.server]).then((r) => r.rows);
   const gemailt = {}; mails.forEach((x) => { gemailt[x.s] = new Date(x.t).getTime(); });
   const rot = rotZuMailen(b, gemailt, jetzt);
