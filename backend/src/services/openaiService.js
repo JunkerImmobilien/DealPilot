@@ -139,6 +139,13 @@ function _potenzialBlock(pz) {
     z.push('Miete im Zielbild-Ertragswert (so wiedergeben): ' + pz.miete_nach_modernisierung.satz);
   }
   if (pz.sanierung_regel) z.push('Sanierungskosten im Marktbericht: ' + pz.sanierung_regel);
+  /* v5080 · Vergleichsmiete mit Herkunft (eigene Angabe des Nutzers laut Mietspiegel der Stadt schlaegt die Naeherung) */
+  if (pz.vergleichsmiete && pz.vergleichsmiete.qm > 0) {
+    z.push('Vergleichsmiete, mit der gerechnet ist: ' + String(pz.vergleichsmiete.qm.toFixed(2)).replace('.', ',') + ' EUR/m2 ('
+      + (pz.vergleichsmiete.herkunft || pz.vergleichsmiete.art || 'Herkunft unbekannt') + ').'
+      + (pz.vergleichsmiete.eigene_angabe ? ' Das ist eine eigene Angabe des Nutzers laut Mietspiegel der Stadt: so nennen, nicht durch eine Schaetzung ersetzen.' : '')
+      + (pz.vergleichsmiete.art === 'dealpilot_naeherung' ? ' Das ist die DealPilot-Naeherung, nie "laut Mietspiegel" nennen.' : ''));
+  }
   /* v2541 · die Jahre: woher sie kommen, und was „offen" heisst */
   if (pz.jahre) z.push('Jahre: Bestand ab Kaufdatum' + (pz.jahre.ankauf ? ' ' + pz.jahre.ankauf : ' (nicht eingetragen)')
     + (pz.jahre.mieterhoehung ? ', Mieterhoehung ab ' + pz.jahre.mieterhoehung + ' (' + (pz.jahre.mieterhoehung_herkunft || '') + ')' : '')
