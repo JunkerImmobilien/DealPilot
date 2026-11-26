@@ -7,6 +7,8 @@
 (function () {
   'use strict';
   if (window.__dpmLanding) return; window.__dpmLanding = true;
+  /* V1 26.11.2026 · Aktions-Leiste und -Fenster (Black Week) nie im Video: sie veralten und verdecken das Fenster */
+  try { var _bf = document.createElement('style'); _bf.textContent = '#dp-bf-leiste,#dp-bf-pop,[id^="dp-bf-"]:not(style){display:none!important}'; document.head.appendChild(_bf); } catch (e) {}
   function an(m) { try { m.source = 'dp-messe-studio'; window.parent.postMessage(m, location.origin); } catch (e) {} }
   function warte(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
   function q(s, w) { return (w || document).querySelector(s); }
