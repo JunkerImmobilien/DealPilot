@@ -1,0 +1,140 @@
+/* ════════════════════════════════════════════════════════════════════
+   dp2-dealcheck-d3.css · Deal-Check im Cockpit-Look (landing-dealcheck-d3-1, 26.11.2026, Marcel: freigegeben)
+   Marcel 26.11.2026: „Können wir den Deal-Check-Bereich noch cooler gestalten
+   und ansprechender?“ Nur Gestaltung und Anordnung. Logik, Rechnung und der
+   Weg zum Bericht bleiben in dp2-dealcheck.js unverändert. Greift nur mit
+   .dk-d3 am <section id="dealcheck">. Gold als --wl-Token, Status-Grün/Rot fest.
+   ════════════════════════════════════════════════════════════════════ */
+.dk-d3{--d3-gd:var(--wl-c9a84c,#C9A84C);--d3-gdh:var(--wl-e8cc7a,#E8CC7A);--d3-gdd:var(--wl-b8932f,#b8932f);
+  --d3-ob:#070707;--d3-panel:#0d0c0a;--d3-txt:#ECE6D6;--d3-mut:rgba(236,230,214,.62);--d3-dim:rgba(236,230,214,.40);
+  --d3-ln:color-mix(in srgb,var(--wl-e8cc7a,#E8CC7A) 16%,transparent);--d3-grn:#5BD98E;--d3-rd:#E08A7E;
+  position:relative;overflow:hidden;color:var(--d3-txt);
+  background:
+    radial-gradient(60% 70% at 78% 30%,color-mix(in srgb,var(--wl-c9a84c,#C9A84C) 16%,transparent),transparent 62%),
+    radial-gradient(40% 50% at 8% 90%,color-mix(in srgb,var(--wl-c9a84c,#C9A84C) 7%,transparent),transparent 60%),
+    var(--d3-ob)!important}
+.dk-d3::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.5;
+  background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);
+  background-size:44px 44px;-webkit-mask-image:radial-gradient(70% 80% at 60% 40%,#000,transparent);mask-image:radial-gradient(70% 80% at 60% 40%,#000,transparent)}
+.dk-d3 .dk-g{position:relative;z-index:1;grid-template-columns:minmax(0,1fr) minmax(0,500px);gap:clamp(28px,5vw,72px);max-width:1160px}
+.dk-d3 .eye,.dk-d3 .eye::before{color:var(--d3-gdh)}
+.dk-d3 .eye::before{background:var(--d3-gdh)}
+.dk-d3 .dk-text h2{color:#fff}
+.dk-d3 .dk-text h2 .ac{color:var(--d3-gdh)}
+.dk-d3 .dk-text p{color:var(--d3-mut);max-width:470px}
+.dk-d3 .dk-pkt li{color:var(--d3-txt)}
+.dk-d3 .dk-pkt li::before{background:var(--d3-gd)}
+/* Ablauf-Liste der Textspalte (dp2-dealcheck.js) auf dunkel */
+.dk-d3 .dk-ablauf,.dk-d3 .dk-wahl{background:rgba(255,255,255,.035)!important;border-color:var(--d3-ln)!important;color:var(--d3-txt)!important}
+.dk-d3 .dk-ablauf *{color:inherit}
+.dk-d3 .dk-ablauf b,.dk-d3 .dk-wahl b{color:#fff!important}
+.dk-d3 .dk-wahl a,.dk-d3 .dk-ablauf a{color:var(--d3-gdh)!important}
+
+/* Instrumentenleiste unter dem Text */
+.d3-leiste{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:22px;max-width:470px}
+.d3-leiste div{border:1px solid var(--d3-ln);border-radius:10px;padding:10px 12px;background:rgba(255,255,255,.025)}
+.d3-leiste b{display:block;font:700 18px/1 var(--disp);color:#fff}
+.d3-leiste span{display:block;margin-top:6px;font:600 9.5px/1.3 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--d3-dim)}
+
+/* ── Karte: Instrumentenpanel ─────────────────────────────────────── */
+.dk-d3 .dk-seite{background:linear-gradient(180deg,#121110,#090908 60%);border:1px solid color-mix(in srgb,var(--wl-e8cc7a,#E8CC7A) 26%,transparent);border-radius:18px;padding:20px 20px 18px;gap:14px;
+  box-shadow:0 40px 90px -40px rgba(0,0,0,.9),0 0 0 6px rgba(255,255,255,.02),inset 0 1px 0 rgba(255,255,255,.05)}
+.dk-d3 .dk-seite::before{height:2px}
+.dk-d3 .dk-kopf{padding-bottom:12px;border-bottom:1px dashed color-mix(in srgb,var(--wl-e8cc7a,#E8CC7A) 18%,transparent)}
+.dk-d3 .dk-marke{display:flex;align-items:center;gap:8px;color:var(--d3-gdh)}
+.dk-d3 .dk-marke::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--d3-grn);box-shadow:0 0 0 3px rgba(91,217,142,.16),0 0 12px rgba(91,217,142,.6);animation:d3-led 2.4s ease-in-out infinite}
+@keyframes d3-led{50%{opacity:.45}}
+.dk-d3 .dk-nr{color:var(--d3-dim)}
+
+/* Eingaben als Anzeigen */
+.dk-d3 .d3-haupt{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.dk-d3 .d3-haupt .dk-f{background:#050505;border:1px solid rgba(255,255,255,.09);border-radius:12px;padding:10px 12px 8px;margin:0;transition:border-color .2s,box-shadow .2s}
+.dk-d3 .d3-haupt .dk-f:focus-within{border-color:var(--d3-gd);box-shadow:0 0 0 3px color-mix(in srgb,var(--wl-c9a84c,#C9A84C) 18%,transparent)}
+.dk-d3 .d3-haupt .dk-f span{font:600 10px/1.2 var(--mono);letter-spacing:.12em;color:var(--d3-dim)}
+.dk-d3 .d3-haupt .dk-f input{font:700 clamp(22px,2.4vw,28px)/1.15 var(--disp);color:#fff;font-variant-numeric:tabular-nums;letter-spacing:-.01em;padding:4px 0 0;background:transparent;border:0;width:100%}
+.dk-d3 .d3-haupt .dk-f i{color:var(--d3-gdh);font-style:normal}
+.dk-d3 .dk-bind legend{color:var(--d3-dim)}
+.dk-d3 .dk-chips button{background:#050505;border-color:rgba(255,255,255,.10);min-height:46px}
+.dk-d3 .dk-chips button.an{background:linear-gradient(180deg,color-mix(in srgb,var(--wl-e8cc7a,#E8CC7A) 18%,transparent),color-mix(in srgb,var(--wl-c9a84c,#C9A84C) 6%,transparent));border-color:var(--d3-gd);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--wl-e8cc7a,#E8CC7A) 25%,transparent),0 0 18px color-mix(in srgb,var(--wl-c9a84c,#C9A84C) 18%,transparent)}
+.dk-d3 .dk-stand{color:var(--d3-dim)}
+
+/* weitere Angaben, eingeklappt */
+.d3-mehr{border:1px solid rgba(255,255,255,.08);border-radius:12px;background:rgba(255,255,255,.02)}
+.d3-mehr>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;padding:12px 14px;min-height:46px;font:600 13px/1.2 var(--body);color:var(--d3-txt)}
+.d3-mehr>summary::-webkit-details-marker{display:none}
+.d3-mehr>summary::before{content:"+";flex:0 0 20px;height:20px;display:grid;place-items:center;border:1px solid var(--d3-ln);border-radius:50%;color:var(--d3-gdh);font:400 15px/1 var(--body);transition:transform .25s}
+.d3-mehr[open]>summary::before{transform:rotate(45deg)}
+.d3-mehr>summary em{margin-left:auto;font:500 10.5px/1.3 var(--mono);font-style:normal;color:var(--d3-dim);text-align:right}
+.d3-mehr-in{display:flex;flex-direction:column;gap:12px;padding:0 14px 14px}
+
+/* Startfreigabe: Knopf als Startbahn */
+.dk-d3 .dk-los{position:relative;overflow:hidden;min-height:60px;border-radius:12px;display:flex;align-items:center;justify-content:center;gap:12px;
+  font:700 16px/1.1 var(--body);letter-spacing:.01em;color:#2b2208;background:linear-gradient(110deg,var(--wl-e8cc7a,#E8CC7A),var(--wl-c9a84c,#C9A84C) 55%,var(--wl-b8932f,#b8932f));
+  box-shadow:0 14px 34px -10px color-mix(in srgb,var(--wl-c9a84c,#C9A84C) 55%,transparent),inset 0 1px 0 rgba(255,255,255,.35);transition:transform .2s cubic-bezier(.2,.7,.3,1),box-shadow .2s}
+.dk-d3 .dk-los:hover{transform:translateY(-1px);box-shadow:0 18px 40px -10px color-mix(in srgb,var(--wl-c9a84c,#C9A84C) 70%,transparent),inset 0 1px 0 rgba(255,255,255,.35)}
+.dk-d3 .dk-los:active{transform:translateY(1px)}
+.dk-d3 .dk-los .d3-frei{font:700 10px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;background:rgba(5,5,5,.86);color:var(--d3-gdh);padding:6px 8px;border-radius:6px}
+.dk-d3 .dk-los .d3-bahn{position:absolute;left:0;right:0;bottom:7px;height:2px;pointer-events:none;opacity:.55;
+  background:repeating-linear-gradient(90deg,rgba(5,5,5,.75) 0 14px,transparent 14px 28px);background-size:28px 2px;animation:d3-bahn 1.1s linear infinite}
+@keyframes d3-bahn{to{background-position:-28px 0}}
+.dk-d3 .dk-los span,.dk-d3 .dk-los:hover span{transform:none}
+.dk-d3 .dk-los .d3-pfeil{transition:transform .3s}
+.dk-d3 .dk-los:hover .d3-pfeil{transform:translateX(4px)}
+.dk-d3 .dk-los-h{color:var(--d3-dim);text-align:center}
+
+/* ── Rückseite: Flugdaten ──────────────────────────────────────────── */
+.dk-d3 .dk-score{flex-direction:column;align-items:center;text-align:center;gap:14px}
+.dk-d3 .dk-ring{width:190px;height:190px}
+.dk-d3 .dk-ring circle{stroke-width:7}
+.dk-d3 .dk-ring-bg{stroke:rgba(255,255,255,.06)}
+.dk-d3 .dk-ring-v{filter:drop-shadow(0 0 8px var(--dk-f))}
+.dk-d3 .d3-skala{position:absolute;inset:-12px;width:calc(100% + 24px);height:calc(100% + 24px);pointer-events:none;transform:none!important}
+.dk-d3 .d3-skala line{stroke:color-mix(in srgb,var(--wl-e8cc7a,#E8CC7A) 28%,transparent);stroke-width:1.2}
+.dk-d3 .d3-skala line.gr{stroke:color-mix(in srgb,var(--wl-e8cc7a,#E8CC7A) 60%,transparent);stroke-width:2}
+.dk-d3 .dk-ring-z b{font-size:64px;letter-spacing:-.02em;text-shadow:0 0 24px rgba(255,255,255,.12)}
+.dk-d3 .dk-ring-z small{font-size:11px;letter-spacing:.12em}
+.dk-d3 .dk-stufe-box{width:100%}
+.dk-d3 .dk-stufe{font-size:26px;margin-bottom:10px}
+.dk-d3 .dk-skala{height:10px}
+.dk-d3 .dk-skala-w{text-align:left}
+
+.dk-d3 .dk-kpi{gap:10px;background:transparent;border:0;border-radius:0;overflow:visible}
+.dk-d3 .dk-kpi>div{position:relative;background:#050505;border:1px solid rgba(255,255,255,.09);border-radius:12px;padding:12px 12px 16px;overflow:hidden}
+.dk-d3 .dk-kpi b{font-size:21px}
+.dk-d3 .dk-kpi .dk-cf b{font-size:23px}
+.dk-d3 .d3-mess{position:absolute;left:12px;right:12px;bottom:8px;height:3px;border-radius:3px;background:rgba(255,255,255,.07);overflow:hidden}
+.dk-d3 .d3-mess i{position:absolute;inset:0;transform-origin:left center;transform:scaleX(0);border-radius:3px;background:var(--d3-gd);
+  transition:transform 1.2s cubic-bezier(.2,.8,.2,1)}
+.dk-d3 .d3-mess i.gut{background:var(--d3-grn)}
+.dk-d3 .d3-mess i.schlecht{background:var(--d3-rd)}
+.dk-d3 .dk-kpi>div:nth-child(2) .d3-mess i{transition-delay:.12s}
+.dk-d3 .dk-kpi>div:nth-child(3) .d3-mess i{transition-delay:.24s}
+.dk-d3 .dk-weiter{min-height:52px;border-radius:12px}
+.dk-d3 .dk-annahme{color:var(--d3-dim)}
+
+@media (max-width:860px){
+  .dk-d3 .dk-g{grid-template-columns:1fr}
+  .d3-leiste{max-width:none}
+}
+@media (max-width:420px){
+  .dk-d3 .dk-seite{padding:16px 14px 14px;border-radius:16px}
+  .dk-d3 .d3-haupt{gap:8px}
+  .dk-d3 .d3-haupt .dk-f input{font-size:22px}
+  .dk-d3 .dk-ring{width:164px;height:164px}
+  .dk-d3 .dk-ring-z b{font-size:54px}
+  .dk-d3 .dk-kpi{grid-template-columns:1fr 1fr}
+  .dk-d3 .dk-kpi .dk-haupt,.dk-d3 .dk-kpi>div:first-child{grid-column:1/-1}
+  .d3-mehr>summary em{display:none}
+  .d3-leiste b{font-size:16px}
+}
+@media (prefers-reduced-motion:reduce){
+  .dk-d3 .dk-marke::before,.dk-d3 .dk-los .d3-bahn{animation:none}
+  .dk-d3 .d3-mess i{transition:none}
+}
+
+/* Nachschliff: Ablauf bündig, Weitere Angaben einzeilig, Felder gleich hoch, Paket-Hinweis lesbar */
+.dk-d3 .dk-text .dk-ablauf{margin-left:0;max-width:470px}
+.d3-mehr>summary span{white-space:nowrap}
+.dk-d3 .dk-pakete-eye{color:var(--d3-gdh)!important}
+.dk-d3 .dk-pakete-k p,.dk-d3 .dk-pakete p{color:var(--d3-mut)!important}
+.dk-d3 .dk-pakete a{color:var(--d3-gdh)!important}
