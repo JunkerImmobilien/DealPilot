@@ -16,7 +16,7 @@
     var F = root.DpFoerderung; if (!F || typeof F.passend !== 'function') return [];
     try {
       var f = F.passend({ nutzung: 'eigen', kauf: true, baujahr: e.bj, energieklasse: e.energieklasse || null, massnahmen: [] });
-      return (f.liste || []).map(function (x) { return { name: x.name, satz: [x.warum, x.betrag].filter(Boolean).join(' ') }; });
+      return (f.liste || []).map(function (x) { return { name: x.name, warum: x.warum || '', betrag: x.betrag || '', satz: [x.warum, x.betrag].filter(Boolean).join(' ') }; });
     } catch (err) { return []; }
   }
   function html(o) {
@@ -34,6 +34,7 @@
       umfeld: b.umfeld || null,
       karte: b.karte || null,
       /* pp6 · Lage, Vergleichsmiete und Angebotspreise am Ort aus derselben Berichtsantwort (bisher ungenutzt) */
+      amort: b.am_ort || null, gruppen: r.gruppen || null,   /* pp6 · Marktdaten am Ort, Noten inkl. Leistbarkeit */
       lage: b.lage || null, vmiete: b.vergleichsmiete || null, markt: b.markt || null, stichtag: b.stichtag || null,
       anrechnung: o.anrechnung || null,
       objekt: { adresse: o.adresse || ((e.plz || '') + ' ' + ((o.d && o.d.gebiet) || '')).trim(), objektart: String(e.objektart || 'efh').toLowerCase(),
