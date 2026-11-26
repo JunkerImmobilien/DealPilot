@@ -126,7 +126,7 @@ ok(S.COUPON.id === hc.ANRECHNUNG_COUPON && S.COUPON.amount_off === 999 && S.COUP
   const kauf = fs.readFileSync(path.join(W, 'frontend/landing/haus-check-kauf.js'), 'utf8');
   const pdfBody = (kauf.match(/fetch\(API \+ '\/pdf'[^;]*/) || [''])[0];
   ok(/html: htmlServer/.test(pdfBody) && !/html: html\b/.test(pdfBody), 'N  /pdf bekommt die Fassung ohne Netto (htmlServer)');
-  ok(/var ohne = A\.html\(Object\.assign\(\{ e: \{[^}]*netto: 0[^}]*\} \}/.test(kauf), 'N  Fassung für den Server rechnet mit netto 0');
+  ok(/var ohne = A\.html\([^\n]*netto: 0\b/.test(kauf) && !/var ohne = A\.html\([^\n]*e\.netto/.test(kauf) && !/var basis = [^\n]*netto/.test(kauf), 'N  Fassung für den Server rechnet mit netto 0, die Grundangaben tragen kein Netto');
   const posts = kauf.match(/post\('\/[a-z]+', \{[^)]*\)/g) || [];
   ok(posts.length >= 3 && posts.every((p) => !/netto|quote|leistbar/i.test(p)), 'N  kein post() trägt netto oder die Quote (' + posts.length + ' Aufrufe)');
   const pdfJs = fs.readFileSync(path.join(W, 'frontend/js/haus-check-pdf.js'), 'utf8');
