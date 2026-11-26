@@ -10899,10 +10899,15 @@
       rhAufraeumen();
     },
     szenen: [
-      async function (s) {   /* 1 · Meine Dokumente */
-        await k5Cockpit();
+      async function (s) {   /* 1 · Eingelesen und aufbewahrt (M8 26.11.: Kopie der Lindenallee 14 mit Unterlagen statt Parkstr.) */
+        var id = await l6ObjektSuchen(/Lindenallee\s*14/);
+        await r6KopieStart(id || R11_PARK, { behalte: true });
+        await warteAuf(function () { return q('nav.tabs .tab[data-target-sec="s5"]'); }, 8000);
+        if (!q('#s5.active')) { reiter('s5'); await warte(900); }
+        await warteAuf(function () { return q('#ai-content .dp-pa-tab'); }, 10000);
+        await warte(800);
         await k5Tab(/^Haus/);
-        await zeige(k5Karte(/Meine Dokumente|Eingelesen und übernommen/), 8);
+        await zeige(function () { var e = rhIm(k5Panel(), /Eingelesen und übernommen/); return (e && k5Eng(e, 520)) || k5Karte(/Meine Dokumente|Risiken aus den Unterlagen/)(); }, 8);
         await b2oZeile(s, 'Eingelesen und aufbewahrt', 'Jede eingelesene Unterlage mit Zuordnung, die Originale nach Jahr, dazu die Belegung deiner Ablage.');
       },
       async function (s) {   /* 2 · Belege einlesen */
@@ -10912,6 +10917,13 @@
       },
       async function (s) {   /* 3 · Adressprüfung (nur erklärt, kein Upload) */
         await b2oZeile(s, 'Falsche Adresse, kein Eintrag', 'Gehört eine Unterlage zu einer anderen Adresse, lehnt DealPilot sie ab. Vorhandene Werte überschreibt nichts still.');
+      },
+      async function (s) {   /* 4 · Einstellungen › Dokumente (M8 26.11.) */
+        await r6Einstellungen('dokumente');
+        await warteAuf(function () { var h = document.getElementById('st-dokumente-host'); return h && h.offsetHeight > 80; }, 6000);
+        await zeige(function () { return document.getElementById('st-dokumente-host'); }, 8);
+        await b2oZeile(s, 'Deine Ablage', 'In den Einstellungen siehst du, wie voll deine Ablage ist. Die Originale liegen nach Objekt und Jahr sortiert.');
+        r6EinstellungenZu(); await warte(700);
       }
     ]
   };
@@ -11081,8 +11093,12 @@
           await b2oZeile(s, 'EK-Rendite in vier Stufen', 'Operativ, nach Steuer, mit Wert und die Hauptkennzahl. Der Tooltip zeigt alle vier und den Hebel.');
         }
       },
-      async function (s) {   /* 5 · Einstellungen */
+      async function (s) {   /* 5 · Einstellungen (M8 26.11.: jetzt wirklich im Bild) */
+        await r6Einstellungen('dealscore');
+        var pc = function (i) { return function () { var a = document.querySelectorAll('.settings-modal .ds2-preset-card'); return a.length ? a[i < 0 ? a.length - 1 : i] : null; }; };
+        if (pc(0)()) await zeigeGruppe(pc(0), pc(-1), 8); else await zeige(function () { return q('.settings-modal'); }, 8);
         await b2oZeile(s, 'Deine Schwellen', 'Gewichtung und Schwellen stellst du in den Einstellungen ein. Die Aufteilung in zwei Scores bleibt immer.');
+        r6EinstellungenZu(); await warte(700);
       }
     ]
   };
@@ -11238,11 +11254,26 @@
         if (v()) await zeige(v, 8);
         await b2oZeile(s, 'Abgleichen', 'Unter Deal-Aktion gleichst du jederzeit neu ab. Was ViVi liefert, ist im Objekt gesperrt und mit Schloss markiert.');
       },
-      async function (s) {   /* 3 · Fragen an ViVi */
+      async function (s) {   /* 3 · Fragen an ViVi (M8 26.11.: Co-Pilot-Fenster wirklich offen; die Figur bleibt aus, nur das Fenster) */
+        var st = document.getElementById('dpm-blase-an') || document.createElement('style');
+        st.id = 'dpm-blase-an'; st.textContent = 'html #dp-blase.an{display:flex!important}'; document.head.appendChild(st);
+        try { if (window.DealPilotBlase) DealPilotBlase.auf(); } catch (e) {}
+        await warteAuf(function () { return q('#dp-cp .dp-cpp-sel'); }, 6000);
+        try { if (window.DealPilotCoPilotPillen) DealPilotCoPilotPillen.viviGruppe(); } catch (e) {}
+        var sel = q('#dp-cp .dp-cpp-sel'), og = sel && sel.querySelector('optgroup[data-vivi]');
+        var inp = q('#dp-cp-in'); if (inp && og && og.children[0]) inp.value = og.children[0].value;   /* nur eingetragen, nie gesendet */
+        await zeige(function () { return q('#dp-blase.an') || q('#dp-cp'); }, 8);
         await b2oZeile(s, 'Fragen an ViVi', 'Im Co-Pilot gibt es eigene Fragen an ViVi, zum Beispiel nach offenen Mieten oder der Restschuld.');
+        if (inp) inp.value = '';
+        try { if (window.DealPilotBlase) DealPilotBlase.zu(); } catch (e) {}
+        st.remove(); await warte(600);
       },
-      async function (s) {   /* 4 · verbinden */
+      async function (s) {   /* 4 · verbinden (M8 26.11.: Einstellungen › Konto, Karte ViVi im Bild) */
+        await r6Einstellungen('account');
+        await warteAuf(function () { return q('.settings-modal #pk-vivi'); }, 6000);
+        await zeige(function () { return q('.settings-modal #pk-vivi'); }, 8);
         await b2oZeile(s, 'Verbinden', 'Verknüpft wird einmal in den Einstellungen. ViVi gibt es ab dem Investor-Plan.');
+        r6EinstellungenZu(); await warte(700);
       }
     ]
   };
