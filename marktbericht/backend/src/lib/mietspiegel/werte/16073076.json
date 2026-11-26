@@ -1,0 +1,193 @@
+{
+ "ags": "16073076",
+ "gemeinde": "Rudolstadt",
+ "haus": {
+  "regel": "orientierung",
+  "beleg": "S. 3 Art: „Er gilt nicht für Einfamilienhäuser, Reihenhäuser, Doppelhaushälften. Er kann jedoch hierfür als geeigneter Anhaltspunkt herangezogen werden.“"
+ },
+ "art": "einfach",
+ "stand": "2026-01-01",
+ "erhebungsstichtag": null,
+ "gueltig_ab": "2026-01-01",
+ "gueltig_bis": null,
+ "quelle": {
+  "url": "https://www.rudolstadt.de/fileadmin/1_Leben/Bauen_Wohnen/Wohnungs-_Immobilienmarkt/Mietspiegel/Mietspiegel_120126.pdf",
+  "dokument": "Mietspiegel der Stadt Rudolstadt, Mietspiegeltabelle gültig ab 01.01.2026",
+  "seite": "S. 6 Tabelle, S. 2 (einfacher Mietspiegel, Fortschreibung), S. 3 Geltungsbereich, Größe, Baualter, S. 4–5 Ausstattungskategorien, S. 7–9 Spanneneinordnung und Beispiel, S. 10 Arbeitskreis",
+  "lizenz": "kein Rechtevorbehalt und kein Speicherverbot im Dokument (alle 10 Seiten durchgesehen, 26.11.2026); amtliche Veröffentlichung der Stadt Rudolstadt",
+  "abgerufen": "2026-11-26"
+ },
+ "einheit": "eur_qm_nettokalt",
+ "form": "tabelle",
+ "rundung": 2,
+ "hinweis": "Einfacher (nicht qualifizierter) Mietspiegel (S. 2), erstellt von der Stadt Rudolstadt mit Arbeitskreis (Mieterschutzgemeinschaft Ostthüringen, Haus-, Wohnungs- und Grundstückseigentümer e.V., Wohnungsunternehmen, Sachverständiger, vtw), 2018 überarbeitet, bis 31.12.2025 fortgeschrieben, Tabelle gültig ab 01.01.2026; Meldung der Stadt: nächste Fortschreibung 2027, Veröffentlichung 2028. Tabelle S. 6 am Druckbild geprüft: Spanne (grün) und Mittelwert (schwarz); die Werte sind in allen drei Wohnflächenklassen (bis 50 / 50,1–80 / ab 80,1 m²) gleich, deshalb ohne Flächenachse. „6,00 - 6.30“ steht im Dokument mit Punkt, gelesen als 6,30. Ausstattung B (mind. 3 der 7 Kriterien), A (mind. 6), A Plus (A und mind. 7 Zusatzmerkmale), S. 4–5 – Angabe nötig, kein Standard; für Bezugsfertigkeit ab 1991 gibt es keine Kategorie B. Spanneneinordnung nach Lage-/Wohnumfeldpunkten (−5 … +5, S. 7–8) ist nicht abgebildet; ohne Punkte gilt der Mittelwert. Gilt nur für Mehrfamilienhäuser (S. 3).",
+ "tabelle": {
+  "achsen": {
+   "baujahr": [
+    {
+     "von": null,
+     "bis": 1961,
+     "label": "vor 1962"
+    },
+    {
+     "von": 1962,
+     "bis": 1990,
+     "label": "1962–1990"
+    },
+    {
+     "von": 1991,
+     "bis": 2012,
+     "label": "1991–2012"
+    },
+    {
+     "von": 2013,
+     "bis": null,
+     "label": "ab 2013"
+    }
+   ],
+   "ausstattung": [
+    {
+     "schluessel": "B",
+     "label": "Kategorie B (mind. 3 Kriterien)"
+    },
+    {
+     "schluessel": "A",
+     "label": "Kategorie A (mind. 6 Kriterien)"
+    },
+    {
+     "schluessel": "A_plus",
+     "label": "Kategorie A Plus",
+     "aliase": [
+      "A Plus",
+      "A+",
+      "Aplus"
+     ]
+    }
+   ]
+  },
+  "zellen": [
+   {
+    "baujahr": 0,
+    "ausstattung": "B",
+    "unten": 6.0,
+    "mittel": 6.15,
+    "oben": 6.3,
+    "seite": "6"
+   },
+   {
+    "baujahr": 0,
+    "ausstattung": "A",
+    "unten": 6.25,
+    "mittel": 6.88,
+    "oben": 7.5,
+    "seite": "6"
+   },
+   {
+    "baujahr": 0,
+    "ausstattung": "A_plus",
+    "unten": 7.0,
+    "mittel": 7.63,
+    "oben": 8.25,
+    "seite": "6"
+   },
+   {
+    "baujahr": 1,
+    "ausstattung": "B",
+    "unten": 4.5,
+    "mittel": 5.2,
+    "oben": 5.9,
+    "seite": "6"
+   },
+   {
+    "baujahr": 1,
+    "ausstattung": "A",
+    "unten": 5.25,
+    "mittel": 6.38,
+    "oben": 7.5,
+    "seite": "6"
+   },
+   {
+    "baujahr": 1,
+    "ausstattung": "A_plus",
+    "unten": 5.5,
+    "mittel": 6.63,
+    "oben": 7.75,
+    "seite": "6"
+   },
+   {
+    "baujahr": 2,
+    "ausstattung": "A",
+    "unten": 6.0,
+    "mittel": 6.75,
+    "oben": 7.5,
+    "seite": "6"
+   },
+   {
+    "baujahr": 2,
+    "ausstattung": "A_plus",
+    "unten": 6.25,
+    "mittel": 7.0,
+    "oben": 7.75,
+    "seite": "6"
+   },
+   {
+    "baujahr": 3,
+    "ausstattung": "A",
+    "unten": 6.25,
+    "mittel": 7.38,
+    "oben": 8.5,
+    "seite": "6"
+   },
+   {
+    "baujahr": 3,
+    "ausstattung": "A_plus",
+    "unten": 7.5,
+    "mittel": 8.25,
+    "oben": 9.0,
+    "seite": "6"
+   }
+  ]
+ },
+ "pruefbeispiele": [
+  {
+   "eingabe": {
+    "baujahr": 1975,
+    "wfl": 65,
+    "ausstattung": "B"
+   },
+   "erwartet": {
+    "unten": 4.5,
+    "mittel": 5.2,
+    "oben": 5.9
+   },
+   "seite": "9",
+   "art": "anwendungsbeispiel",
+   "anmerkung": "Beispiel S. 9: 50,1–80 m², 1962–1990, B: Mittelwert 5,20, Spanne 4,50–5,90; mit +5 Lagepunkten ergibt das Dokument 5,90 (= oben)"
+  },
+  {
+   "eingabe": {
+    "baujahr": 2015,
+    "wfl": 90,
+    "ausstattung": "A Plus"
+   },
+   "erwartet": {
+    "unten": 7.5,
+    "mittel": 8.25,
+    "oben": 9.0
+   },
+   "seite": "6",
+   "art": "tabellenzelle"
+  },
+  {
+   "eingabe": {
+    "baujahr": 2000,
+    "wfl": 60,
+    "ausstattung": "B"
+   },
+   "erwartet": null,
+   "seite": "6",
+   "art": "tabellenzelle",
+   "anmerkung": "ab 1991 keine Kategorie B"
+  }
+ ]
+}
