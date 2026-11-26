@@ -227,6 +227,24 @@ function nhkSauber(n) {
   if (/^(einfach|normal|gehoben|luxus)$/.test(String(n.ausst))) o.ausst = String(n.ausst);
   return o;
 }
+/* pp6 (26.11.2026) · Marktdaten am Ort für den Bericht (Marcel: „das sah gut aus mit den GeoMap-Sachen“), nur Weißliste:
+   Angebotspreis und -miete je m² (Median, Quartile, Stichprobe, Umkreis), Preis- und Mietreihe je Jahr, Vergleichsangebote
+   OHNE Adresse und OHNE Koordinaten (Preis/m², Fläche, Baujahr, Entfernung, Monat). Keine Rohangebote dauerhaft speichern. */
+const _z = (v) => (Number.isFinite(Number(v)) ? Number(v) : null);
+function marktAmOrt(j, m) {
+  const d = (j && j.data) || {}, sale = d.sale || {}, rent = d.rent || {}, mh = d.market_history || {};
+  const reihe = (a) => (Array.isArray(a) ? a : []).filter((p) => _z(p.year) && _z(p.median) > 0).slice(-8).map((p) => ({ jahr: _z(p.year), median: Math.round(_z(p.median) * 100) / 100, n: _z(p.count) }));
+  const angebote = (Array.isArray(sale.comparables) ? sale.comparables : []).filter((c) => _z(c.price_per_sqm) > 0).slice(0, 10).map((c) => ({
+    qm_preis: Math.round(_z(c.price_per_sqm)), flaeche: _z(c.living_area), baujahr: _z(c.build_year), entfernung_m: _z(c.distance_m) != null ? Math.round(_z(c.distance_m) / 10) * 10 : null,
+    monat: /^\d{4}-\d{2}/.test(String(c.offer_date || '')) ? String(c.offer_date).slice(0, 7) : null }));
+  const mk = m.markt || {};
+  return { wert: mk.wert, wert_von: mk.wert_von, wert_bis: mk.wert_bis, abschlag_pct: mk.abschlag ? mk.abschlag.pct : null, abschlag_herkunft: mk.abschlag ? mk.abschlag.herkunft : null,
+    kauf: { median: _z(sale.median_per_sqm), q25: _z(sale.q25_per_sqm), q75: _z(sale.q75_per_sqm), n: _z(sale.sample_size), umkreis_m: _z(sale.used_radius_m) },
+    miete: { median: _z(rent.median_per_sqm), q25: _z(rent.q25_per_sqm), q75: _z(rent.q75_per_sqm), n: _z(rent.sample_size), umkreis_m: _z(rent.used_radius_m) },
+    preis_trend_pct: mk.preis_trend_pct, miete_trend_pct: mk.miete_trend_pct,
+    reihe: { preis: reihe(mh.price), miete: reihe(mh.rent) }, angebote,
+    aus_markt: !!(_z(sale.median_per_sqm) || angebote.length || (mh.price && mh.price.length)) };
+}
 async function bericht(zeile, adresse, darlehen, nhk) {
   if (!zeile) throw _fehler('Der Kauf ist unbekannt.', 403, 'kauf_unbekannt');
   const darf = ec.berichtErlaubt(zeile);
@@ -250,8 +268,9 @@ async function bericht(zeile, adresse, darlehen, nhk) {
   let karte = null;
   try { const kt = await ec.karteHolen(j.data && j.data.address); if (kt) karte = kt.bild; } catch (e) { karte = null; }
   return { verfuegbar: true, zahlen: z, wert: hausWert(m.wert), belw: belwAus(j.beleihungswert), umfeld: umfeldAus(j.umfeld),
-    lage: m.lage, vergleichsmiete: m.vergleichsmiete, markt: { qm: m.markt.qm, miete_qm: m.markt.miete_qm }, stichtag: m.stichtag, karte };
+    lage: m.lage, vergleichsmiete: m.vergleichsmiete, markt: { qm: m.markt.qm, miete_qm: m.markt.miete_qm }, stichtag: m.stichtag, karte,
+    am_ort: (function () { try { return marktAmOrt(j, m); } catch (e) { return null; } })() };
 }
 
 module.exports = { VERSION, PRODUKT, LOOKUP_KEY, ANRECHNUNG_COUPON, aktiv, anrechnungAnlegen, ARTEN, PFLICHT, MFH_HINWEIS, grundSauber, grundFehlt, artErlaubt, preis, kaufAnlegen, kaufLesen,
-  statusAus, handlePaid, hausWert, belwAus, umfeldAus, nhkSauber, bericht, _setzeDeps };
+  statusAus, handlePaid, hausWert, belwAus, umfeldAus, nhkSauber, marktAmOrt, bericht, _setzeDeps };
