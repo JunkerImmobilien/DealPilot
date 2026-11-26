@@ -50,7 +50,7 @@ const deps = {
 hc._setzeDeps(deps);
 
 /* A */
-const gut = { kp: 395000, wfl: 140, bj: 2009, art: 'EFH', ek_eur: 80000, plz: '32278' };
+const gut = { kp: 395000, wfl: 140, gsfl: 620, bj: 2009, art: 'EFH', ek_eur: 80000, plz: '32278' };
 ok(hc.grundFehlt(gut).length === 0, 'A  vollständige Angaben');
 ok(hc.grundFehlt({ kp: 1 }).indexOf('wfl') >= 0 && hc.grundFehlt({ kp: 1 }).indexOf('plz') >= 0, 'A  fehlende Angaben werden genannt');
 let fehler = null; try { await hc.kaufAnlegen({ grund: Object.assign({}, gut, { art: 'MFH' }) }); } catch (e) { fehler = e; }
@@ -58,6 +58,9 @@ ok(fehler && fehler.code === 'mfh' && /Vermieten/.test(fehler.message), 'A  MFH 
 fehler = null; try { await hc.kaufAnlegen({ grund: Object.assign({}, gut, { art: 'GEW' }) }); } catch (e) { fehler = e; }
 ok(fehler && fehler.code === 'objektart', 'A  Gewerbe abgewiesen');
 ok(hc.ARTEN.join() === 'EFH,ZFH,DHH,RH,ETW', 'A  nur EFH, ZFH, DHH, RH, ETW');
+
+ok(hc.grundFehlt(Object.assign({}, gut, { gsfl: null })).indexOf('gsfl') >= 0, 'A  Haus ohne Grundstücksfläche: Pflicht');
+ok(hc.grundFehlt(Object.assign({}, gut, { art: 'ETW', gsfl: null })).length === 0, 'A  ETW ohne Grundstücksfläche erlaubt');
 
 /* B */
 const k = await hc.kaufAnlegen({ grund: Object.assign({}, gut, { netto: 5400 }), rueckweg: '/haus-check.html' });

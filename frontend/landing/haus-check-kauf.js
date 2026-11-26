@@ -33,11 +33,11 @@
 
   function eingaben() {
     var str = ($('egStr') || {}).value || '';
-    return { kp: zahl('egKp'), wfl: zahl('egWfl'), bj: zahl('egBj'), ek: zahl('egEk'), netto: zahl('egNetto'),
+    return { kp: zahl('egKp'), wfl: zahl('egWfl'), gsfl: zahl('egGsfl'), bj: zahl('egBj'), ek: zahl('egEk'), netto: zahl('egNetto'),
       plz: (($('egPlz') || {}).value || '').trim(), objektart: ($('egArt') || {}).value || 'efh', str: str.trim() };
   }
   function setzeFelder(e) {
-    var map = { egKp: e.kp, egWfl: e.wfl, egBj: e.bj, egEk: e.ek, egNetto: e.netto, egPlz: e.plz, egArt: e.objektart, egStr: e.str };
+    var map = { egKp: e.kp, egWfl: e.wfl, egGsfl: e.gsfl, egBj: e.bj, egEk: e.ek, egNetto: e.netto, egPlz: e.plz, egArt: e.objektart, egStr: e.str };
     Object.keys(map).forEach(function (id) { var el = $(id); if (el && map[id] != null && map[id] !== '') el.value = typeof map[id] === 'number' ? map[id].toLocaleString('de-DE') : map[id]; });
   }
 
@@ -56,7 +56,7 @@
       + '<p>Für dich und für das Gespräch mit der Bank. Einmalig, ohne Abo.</p>'
       + '<ul><li>Wert nach ImmoWertV mit Rechenweg aus den Daten des Gutachterausschusses</li><li>Indikativer Beleihungswert und Haushaltsrechnung</li>'
       + '<li>Zustand, Umfeld und Unterlagenliste für die Bank</li></ul>'
-      + (e.str ? '' : '<p>Für den Wert braucht es die Straße mit Hausnummer.</p>')
+      + (e.str && (e.objektart === 'etw' || e.gsfl > 0) ? '' : '<p>Für den Wert braucht es die Straße mit Hausnummer' + (e.objektart === 'etw' ? '' : ' und die Grundstücksfläche') + '.</p>')
       + '<label><input type="checkbox" id="hcWv"> Ich möchte, dass der Bericht sofort entsteht. Mir ist bekannt, dass mein Widerrufsrecht damit erlischt.</label>'
       + '<button type="button" id="hcKaufen">Haus-Check kaufen · ' + preisText + '</button><div class="hc-msg" id="hcMsg"></div>';
     erg.appendChild(box);
@@ -68,10 +68,11 @@
     var e = eingaben();
     if (!$('hcWv').checked) return meldung('Bitte bestätige zuerst das Häkchen zum Widerrufsrecht.', true);
     if (!(e.kp > 0 && e.wfl > 0 && e.bj > 0 && /^\d{5}$/.test(e.plz))) return meldung('Bitte Kaufpreis, Wohnfläche, Baujahr und Postleitzahl eintragen.', true);
+    if (e.objektart !== 'etw' && !(e.gsfl > 0)) return meldung('Bitte die Grundstücksfläche eintragen. Ohne sie fehlt der Bodenwert und damit der Wert des Hauses.', true);
     $('hcKaufen').disabled = true; meldung('Weiter zur Zahlung …');
     ss(MERK, JSON.stringify(e));
     post('/kaufen', { widerruf_verzicht: true, rueckweg: location.pathname,
-      grund: { kp: e.kp, wfl: e.wfl, bj: e.bj, art: String(e.objektart).toUpperCase(), ek_eur: e.ek || 0, plz: e.plz } })
+      grund: { kp: e.kp, wfl: e.wfl, gsfl: e.gsfl || undefined, bj: e.bj, art: String(e.objektart).toUpperCase(), ek_eur: e.ek || 0, plz: e.plz } })
       .then(function (j) {
         if (j && j.url) { location.href = j.url; return; }
         $('hcKaufen').disabled = false; meldung((j && j.error) || 'Der Kauf ging gerade nicht. Bitte noch einmal.', true);
@@ -133,7 +134,7 @@
       /* anderer Tab oder Gerät: die Grundangaben stehen beim Kauf, das Einkommen nicht */
       post('/status', { token: t }).then(function (s) {
         var z = (s && s.zahlen) || {};
-        e = { kp: z.kp, wfl: z.wfl, bj: z.bj, ek: z.ek_eur, netto: 0, plz: z.plz, objektart: String(z.art || 'EFH').toLowerCase(), str: '' };
+        e = { kp: z.kp, wfl: z.wfl, gsfl: z.gsfl, bj: z.bj, ek: z.ek_eur, netto: 0, plz: z.plz, objektart: String(z.art || 'EFH').toLowerCase(), str: '' };
         weiter(e, t);
       });
       return;

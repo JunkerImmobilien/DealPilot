@@ -43,6 +43,9 @@ function grundFehlt(g) {
   const z = grundSauber(g);
   const f = PFLICHT.filter(function (k) { return z[k] == null || (k !== 'ek_eur' && k !== 'art' && !(z[k] > 0)); });
   if (!z.plz && !z.ort) f.push('plz');
+  /* Haus ohne Grundstücksfläche: kein Bodenwert, damit kein Sach- und kein Ertragswert. Der bezahlte Bericht bräuchte
+     ihn, also Pflicht (gemessen 26.11.2026 am Testkauf: „Sachwert nicht ausgewiesen: der Bodenwert fehlt“). */
+  if (z.art && z.art !== 'ETW' && !(z.gsfl > 0)) f.push('gsfl');
   return f;
 }
 function artErlaubt(art) { return ARTEN.indexOf(String(art || '').toUpperCase()) >= 0; }
@@ -70,7 +73,7 @@ async function kaufAnlegen({ grund, rueckweg }) {
   const z = grundSauber(grund);
   if (z.art === 'MFH') throw _fehler(MFH_HINWEIS, 400, 'mfh');
   const fehlt = grundFehlt(z);
-  if (fehlt.length) throw _fehler('Bitte zuerst Kaufpreis, Wohnfläche, Objektart, Baujahr, Eigenkapital und Postleitzahl eintragen.', 400, 'grundangaben', { fehlt });
+  if (fehlt.length) throw _fehler('Bitte zuerst Kaufpreis, Wohnfläche, Grundstücksfläche, Objektart, Baujahr, Eigenkapital und Postleitzahl eintragen.', 400, 'grundangaben', { fehlt });
   if (!artErlaubt(z.art)) throw _fehler('Der Haus-Check gilt für Einfamilien-, Zweifamilien-, Doppel- und Reihenhaus und die Eigentumswohnung.', 400, 'objektart');
   const p = await preis(false);
   const token = ec.neuesToken();
