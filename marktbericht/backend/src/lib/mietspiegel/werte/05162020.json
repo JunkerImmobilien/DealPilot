@@ -1,0 +1,275 @@
+{
+ "ags": "05162020",
+ "freigabe": "gesperrt",
+ "freigabe_grund": "„Eine Veröffentlichung des Mietspiegels ist ohne die Genehmigung der o.g. Vereine nicht gestattet.“ (Titelseite S. 1) — Rechtevorbehalt ohne ausdrückliches Speicherverbot (wie Neuss, Meerbusch, Dormagen); auf Prod gesperrt bis zur Klärung",
+ "gemeinde": "Korschenbroich",
+ "art": "einfach",
+ "stand": "2023-01-01",
+ "erhebungsstichtag": null,
+ "gueltig_ab": "2023-01-01",
+ "gueltig_bis": null,
+ "quelle": {
+  "url": "https://www.hausundgrundneuss.de/fileadmin/neuss/media/pdfs/Mietspiegel_Korschenbroich_2023.pdf",
+  "dokument": "Mietspiegel für nicht preisgebundenen Wohnraum im Stadtgebiet Korschenbroich, Stand 1. Januar 2023 — Haus-, Wohnungs- und Grundeigentümer-Verein Stadt und Kreis Neuss e.V. und Mieterbüro Neuss / Mieterverein Düsseldorf e.V., Im Benehmen mit der Stadt Korschenbroich erstellt; Dokumentation https://www.hausundgrundneuss.de/fileadmin/neuss/media/pdfs/MS_Korschenbroich_2023_Dokumentation.pdf",
+  "seite": "S. 1 (Titel, Herausgeber, Rechtevorbehalt, Schutzgebühr 3,00 €, § 558c BGB), S. 2–3 (Wohnlage, Baujahr, Modernisierung, Zu-/Abschläge), S. 4 (Tabelle III), S. 5–6 (Straßenverzeichnis Wohnlagen)",
+  "lizenz": "Rechtevorbehalt: „Eine Veröffentlichung des Mietspiegels ist ohne die Genehmigung der o.g. Vereine nicht gestattet.“ (Titelseite S. 1); Schutzgebühr 3,00 €, PDF frei abrufbar",
+  "abgerufen": "2026-11-26"
+ },
+ "einheit": "eur_qm_nettokalt",
+ "form": "tabelle",
+ "rundung": 2,
+ "hinweis": "Einfacher Mietspiegel (§ 558c BGB, S. 1), Stand 1. Januar 2023; der Verband meldet eine laufende Erhebung für die Fortschreibung (https://www.hausundgrundneuss.de/mietspiegel/, 26.11.2026). Tabelle S. 4 nur nach Baujahr für die MITTLERE Wohnlage, Mietspanne und Mittelwert (Textschicht, am Druckbild verglichen). Gilt für Standardwohnungen 56–119 m² mit Heizung, Bad/Dusche, WC; Zu-/Abschläge „in der Regel vom Mittelwert“ (S. 3) — der Kern wendet % auf Mittel und Spanne an. Größe automatisch über wfl_klassen (bis 30 +20 %, bis 40 +15 %, bis 50 +10 %, bis 55 +5 %, ab 120 m² −5 %, ab 140 m² −10 % — die beiden letzten laut Dokument nur in MFH und nicht für Einfamilienhäuser). Lage gut +10 %, einfach −10 % (S. 2/3; Einordnung nach Straßenverzeichnis S. 5–6). Spannen-Zuschläge als Mitte: Einfamilienhaus 5–10 % → 7,5 %, regenerative Energien 0,15–0,30 €/m² → 0,225. Voll-/Teilmodernisierung verjüngt die Baualtersklasse (S. 2–3) — die Rechnung nimmt das übergebene Baujahr. Bitte auf PDF-Seiten achten: Seitenzahlen gedruckt = PDF.",
+ "haus": {
+  "regel": "zuschlag",
+  "merkmal": "einfamilienhaus",
+  "gilt_fuer": [
+   "efh",
+   "dhh",
+   "rh"
+  ],
+  "gilt_fuer_herkunft": "rechtslage",
+  "gilt_fuer_begruendung": "Rechtslage: „Einfamilienhaus“ ohne „freistehend“ umfasst Doppelhaushälfte und Reihenhaus (§ 181 Abs. 2 BewG); Zweifamilienhaus nicht genannt.",
+  "hinweis": "Einfamilienhaus 5–10 % „abhängig vom zusätzlichen Nutzungswert“, hier Mitte 7,5 %",
+  "beleg": "S. 3 Nr. 4 a"
+ },
+ "tabelle": {
+  "achsen": {
+   "baujahr": [
+    {
+     "von": null,
+     "bis": 1948,
+     "label": "bis 1948"
+    },
+    {
+     "von": 1949,
+     "bis": 1960,
+     "label": "1949 – 1960"
+    },
+    {
+     "von": 1961,
+     "bis": 1969,
+     "label": "1961 – 1969"
+    },
+    {
+     "von": 1970,
+     "bis": 1980,
+     "label": "1970 – 1980"
+    },
+    {
+     "von": 1981,
+     "bis": 1989,
+     "label": "1981 – 1989"
+    },
+    {
+     "von": 1990,
+     "bis": 1999,
+     "label": "1990 – 1999"
+    },
+    {
+     "von": 2000,
+     "bis": 2009,
+     "label": "2000 – 2009"
+    },
+    {
+     "von": 2010,
+     "bis": null,
+     "label": "ab 2010"
+    }
+   ]
+  },
+  "zellen": [
+   {
+    "baujahr": 0,
+    "unten": 5.8,
+    "mittel": 6,
+    "oben": 6.2,
+    "seite": "4"
+   },
+   {
+    "baujahr": 1,
+    "unten": 6.1,
+    "mittel": 6.32,
+    "oben": 6.54,
+    "seite": "4"
+   },
+   {
+    "baujahr": 2,
+    "unten": 6.68,
+    "mittel": 7.03,
+    "oben": 7.38,
+    "seite": "4"
+   },
+   {
+    "baujahr": 3,
+    "unten": 7.1,
+    "mittel": 7.45,
+    "oben": 7.8,
+    "seite": "4"
+   },
+   {
+    "baujahr": 4,
+    "unten": 7.12,
+    "mittel": 7.57,
+    "oben": 8.02,
+    "seite": "4"
+   },
+   {
+    "baujahr": 5,
+    "unten": 7.62,
+    "mittel": 7.98,
+    "oben": 8.34,
+    "seite": "4"
+   },
+   {
+    "baujahr": 6,
+    "unten": 8.13,
+    "mittel": 8.44,
+    "oben": 8.75,
+    "seite": "4"
+   },
+   {
+    "baujahr": 7,
+    "unten": 8.52,
+    "mittel": 9,
+    "oben": 9.48,
+    "seite": "4"
+   }
+  ],
+  "zuschlaege": [
+   {
+    "merkmal": "wohnungsgroesse",
+    "art": "pct",
+    "label": "Größenzu-/-abschlag",
+    "beleg": "S. 3 Nr. 4 a/b",
+    "wfl_klassen": [
+     {
+      "von": null,
+      "bis": 30,
+      "wert": 20
+     },
+     {
+      "von": 30,
+      "von_inkl": false,
+      "bis": 40,
+      "wert": 15
+     },
+     {
+      "von": 40,
+      "von_inkl": false,
+      "bis": 50,
+      "wert": 10
+     },
+     {
+      "von": 50,
+      "von_inkl": false,
+      "bis": 55,
+      "wert": 5
+     },
+     {
+      "von": 120,
+      "bis": 140,
+      "bis_inkl": false,
+      "wert": -5
+     },
+     {
+      "von": 140,
+      "bis": null,
+      "wert": -10
+     }
+    ]
+   },
+   {
+    "merkmal": "lage:gut",
+    "art": "pct",
+    "wert": 10,
+    "label": "gute Wohnlage",
+    "aliase": [
+     "gute Wohnlage"
+    ],
+    "beleg": "S. 2–3"
+   },
+   {
+    "merkmal": "lage:einfach",
+    "art": "pct",
+    "wert": -10,
+    "label": "einfache Wohnlage",
+    "aliase": [
+     "einfache Wohnlage"
+    ],
+    "beleg": "S. 2–3"
+   },
+   {
+    "merkmal": "einfamilienhaus",
+    "art": "pct",
+    "wert": 7.5,
+    "label": "Einfamilienhaus (5–10 %, Mitte)",
+    "beleg": "S. 3 Nr. 4 a"
+   },
+   {
+    "merkmal": "sanitaer_uebernormal",
+    "art": "pct",
+    "wert": 5,
+    "label": "übernormale Sanitärausstattung",
+    "beleg": "S. 3 Nr. 4 a"
+   },
+   {
+    "merkmal": "regenerative_energien",
+    "art": "eur_qm",
+    "wert": 0.225,
+    "label": "Nutzung regenerativer Energien (0,15–0,30 €/m², Mitte)",
+    "beleg": "S. 3 Nr. 4 a"
+   },
+   {
+    "merkmal": "aufzug",
+    "art": "eur_qm",
+    "wert": 0.15,
+    "label": "Aufzug",
+    "beleg": "S. 3 Nr. 4 a"
+   },
+   {
+    "merkmal": "souterrain",
+    "art": "pct",
+    "wert": -20,
+    "label": "Untergeschosswohnung (Souterrain)",
+    "beleg": "S. 3 Nr. 4 b"
+   },
+   {
+    "merkmal": "kein_abstellraum",
+    "art": "pct",
+    "wert": -5,
+    "label": "fehlender Abstellraum außerhalb der Wohnung",
+    "beleg": "S. 3 Nr. 4 b"
+   }
+  ]
+ },
+ "pruefbeispiele": [
+  {
+   "eingabe": {
+    "baujahr": 1972,
+    "wfl": 80
+   },
+   "erwartet": {
+    "unten": 7.1,
+    "mittel": 7.45,
+    "oben": 7.8
+   },
+   "seite": "4",
+   "art": "tabellenzelle"
+  },
+  {
+   "eingabe": {
+    "baujahr": 1972,
+    "wfl": 45,
+    "lage": "gut"
+   },
+   "erwartet": {
+    "unten": 8.52,
+    "mittel": 8.94,
+    "oben": 9.36
+   },
+   "seite": "3, 4",
+   "art": "rechenweg",
+   "anmerkung": "bis 50 m² +10 % und gute Lage +10 %"
+  }
+ ]
+}
