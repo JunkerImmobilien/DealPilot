@@ -9482,7 +9482,9 @@
   }
   function qgbPaText() { return r6Text(r11Panel()); }
   /* v3440 · „Was in dem Objekt steckt“ (Stufenkarten) ist gefallen - die Zielbild-Spalte der Kennzahlen-Tabelle trägt dieselben Zahlen */
-  function qgbZiel() { var p = r11Panel(); var t = p ? p.querySelector('[data-dp-pa5-si] table') : null; if (t) return t; var l = p ? p.querySelectorAll('.dp-pap-stufen .dp-pap-st') : []; return l.length > 1 ? l[l.length - 1] : null; }
+  function qgbZiel() { var p = r11Panel(); var t = p ? p.querySelector('[data-dp-pa5-si] table') : null; if (t) return t; var l = p ? p.querySelectorAll('.dp-pap-stufen .dp-pap-st') : []; if (l.length > 1) return l[l.length - 1];
+    /* M11 26.11.2026 · im Bestand zeigt die App das Objekt-Cockpit: die sichtbare Kennzahlen-Tabelle mit Spalte Zielbild und Zeile Ertragswert */
+    return [].filter.call(document.querySelectorAll('table'), function (x) { return x.offsetWidth && /Zielbild/.test(r6Text(x.querySelector('thead') || x.rows[0] || x)) && /Ertragswert/.test(r6Text(x)); })[0] || null; }
   function qgbStufe(e) {
     if (e && e.tagName === 'TABLE') {   /* v3440 · Spalte Zielbild der Kennzahlen-Tabelle */
       var zl = function (re) { var tr = [].filter.call(e.querySelectorAll('tbody tr'), function (x) { return x.cells[0] && re.test(r6Text(x.cells[0])); })[0]; var i = tr ? r11Spalte(tr, /^Zielbild/) : -1; return tr && i > 0 && tr.cells[i] ? r6Text(tr.cells[i]) : ''; };
