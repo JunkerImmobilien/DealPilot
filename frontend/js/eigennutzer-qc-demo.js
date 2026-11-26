@@ -49,7 +49,7 @@
     + '.eig-k{background:#141416;border-radius:12px;padding:10px}.eig-k span{font:600 10px "JetBrains Mono",monospace;color:#9a927f;letter-spacing:.06em;text-transform:uppercase}'
     + '.eig-k strong{display:block;font:700 18px "Space Grotesk",sans-serif;color:#fff;margin-top:2px}.eig-k small{font:400 11px Inter,sans-serif;color:#9a927f}'
     + '.eig-satz{font:600 14px Inter,sans-serif;margin:14px 0 6px;color:var(--wl-e8cc7a,#E8CC7A)}'
-    + '.eig-chart{width:100%;height:auto;display:block}'
+    + '.eig-chart{width:100%;max-width:620px;height:auto;display:block}'
     + '.eig-check{margin:12px 0 0;padding:0 0 0 18px;font:400 12.5px/1.5 Inter,sans-serif;color:#cfc8b8}'
     + '.eig-hinweis{font:400 11px Inter,sans-serif;color:#8a826f;margin:10px 0 0}'
     + '@media(max-width:640px){.eig-gruppen{grid-template-columns:repeat(2,minmax(0,1fr))}.eig-kpis{grid-template-columns:1fr 1fr}.eig-ring{width:80px;height:80px;flex-basis:80px}}';
