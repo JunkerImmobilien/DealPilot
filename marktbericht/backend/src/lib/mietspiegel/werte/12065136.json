@@ -1,10 +1,7 @@
 {
  "ags": "12065136",
  "gemeinde": "Hennigsdorf",
- "haus": {
-  "regel": "ausgeschlossen",
-  "beleg": "S. 2 Nr. 2 Geltungsbereich: ausgenommen „Wohnungen in Ein- und Zweifamilienhäusern“; S. 4 Nr. 4.2.1: nur Mieten in Mehrfamilienhäusern mit drei und mehr Wohnungen"
- },
+ "haus": {"regel":"ausgeschlossen","beleg":"S. 2 Nr. 2 Geltungsbereich: ausgenommen „Wohnungen in Ein- und Zweifamilienhäusern“; S. 4 Nr. 4.2.1: nur Mieten in Mehrfamilienhäusern mit drei und mehr Wohnungen"},
  "art": "qualifiziert",
  "stand": "2026-04-01",
  "erhebungsstichtag": "2026-01-01",

@@ -17,16 +17,7 @@
  "form": "tabelle",
  "rundung": 2,
  "hinweis": "Einfacher Mietspiegel: „Übersicht über die ortsübliche Vergleichsmiete im Sinne von § 558c BGB“, von Gemeinde und Interessenvertretern gemeinsam erstellt und anerkannt (S. 2); Mieten bezogen auf 01.01.2025, Betrachtungszeitraum 2019–2024 (als erhebungsstichtag eingetragen). Gültigkeitsdaten nennt das Dokument nicht. Punktemodell: Mietrichtwert der Altersklasse am Bezugsbaujahr + Baujahrsanpassung je Jahr in der Klasse (Tabelle 1, S. 3) — hier je Baujahr als eigene Klasse ausgerechnet (bis 1948 fest 6,01; Klasse „ab 2017“ bis Baujahr 2025 ausgerechnet, „kein Erstbezug in Neubauwohnungen“). Bezug: Wohnungen 60–90 m², mittlere Wohnlage, durchschnittliche Ausstattung (S. 3). Dann Modernisierungszuschlag (Tabelle 2, S. 4: Punkte je Element nach Jahren seit Modernisierung × 0,08 €/m²) — NICHT abgebildet, weil zeitabhängig; dann Qualitätszu-/-abschläge (Tabelle 3, S. 5) je Punkt 0,08 €/m², Summe „in der Regel auf 40 Punkte zu begrenzen“ (Deckel nicht abgebildet). Wohnungsgröße auf 5 m² gerundet: unter 60 m² +1 Punkt je 5 m² (bis 30 m²), über 90 m² −1 Punkt je 5 m² (bis 130 m²) — außerhalb 27,5–132,5 m² kein Wert. Einfamilienhaus (ohne typische Zechenhäuser) „≥ 15“ Punkte — mit 15 Punkten (Mindestwert) abgebildet. Nicht abgebildet (nur „bis“-Werte oder je Etage): ungünstiger Grundriss bis −3, ab 3. OG ohne Aufzug −1/Etage, barrierefrei bis +10, Unterhaltungszustand unter-/überdurchschnittlich bis −4/−2 bzw. +4/+2. Keine Spanne (Mittelwerte, S. 4). Das Beispiel S. 7 (Bj. 1956, 52 m², einfache Lage, kein Balkon, einfache Bodenbeläge, 7 Modernisierungspunkte → 6,63 €/m²) ist ohne den Modernisierungszuschlag (+0,56) als 6,07 nachgerechnet. Hinweis: Die Tabelle 1 im Beispielbild S. 7 zeigt für 1978–1994 das Bezugsbaujahr 1960 (Abbildungsfehler); maßgeblich ist Tabelle 1 S. 3 (1978).",
- "haus": {
-  "regel": "zuschlag",
-  "merkmal": {
-   "efh": "einfamilienhaus",
-   "dhh": "einfamilienhaus",
-   "rh": "einfamilienhaus",
-   "zfh": "zweifamilienhaus"
-  },
-  "beleg": "S. 5 Tabelle 3, Art: Einfamilienhäuser (ohne typische Zechenhäuser) ≥ 15 Punkte, Wohnungen im Zweifamilienhaus +3 Punkte (je 0,08 €/m²)"
- },
+ "haus": {"regel":"zuschlag","merkmal":{"efh":"einfamilienhaus","dhh":"einfamilienhaus","rh":"einfamilienhaus","zfh":"zweifamilienhaus"},"beleg":"S. 5 Tabelle 3, Art: Einfamilienhäuser (ohne typische Zechenhäuser) ≥ 15 Punkte, Wohnungen im Zweifamilienhaus +3 Punkte (je 0,08 €/m²)","gilt_fuer":["efh","dhh","rh"],"gilt_fuer_herkunft":"rechtslage","gilt_fuer_begruendung":"Rechtslage: „Einfamilienhaus“ ohne „freistehend“ umfasst Doppelhaushälfte und Reihenhaus (§ 181 Abs. 2 BewG: Wohngrundstück mit bis zu zwei Wohnungen; AG Hanau: Doppelhaushälfte ist Einfamilienhaus im Sinne des Mietspiegels). Zweifamilienhaus nur, wo genannt."},
  "tabelle": {
   "achsen": {
    "baujahr": [

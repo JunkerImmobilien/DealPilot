@@ -1,7 +1,7 @@
 {
   "ags": "06435014",
   "gemeinde": "Hanau",
-  "haus": {"regel":"zuschlag","merkmal":"einfamilienhaus","fuer":["efh","dhh","rh"],"beleg":"laut Dokument, siehe Zuschlag bzw. Geltungsbereich in dieser Datei"},
+  "haus": {"regel":"zuschlag","merkmal":"einfamilienhaus","gilt_fuer":["efh","dhh","rh"],"beleg":"laut Dokument, siehe Zuschlag bzw. Geltungsbereich in dieser Datei","gilt_fuer_herkunft":"wortlaut"},
   "art": "einfach",
   "stand": "2026-09-15",
   "erhebungsstichtag": null,

@@ -17,16 +17,7 @@
  "form": "tabelle",
  "rundung": 2,
  "hinweis": "Läuft am 30.11.2026 aus; auf https://www.tuebingen.de/mietspiegel am 26.11.2026 noch kein Nachfolger (nur Mietspiegel 2024). Mittelwert = Basismiete × (100 + Punktwert) / 100 (Rechenschema S. 13) — ein Punkt wirkt wie 1 % Zuschlag, abgebildet als Zuschläge in Prozent. Spanne = Mittelwert × 0,85 bzw. × 1,15 (S. 13). Gilt für 25 bis unter 160 m² (S. 10), Baujahr bis 2024. Die Tabelle führt zweimal den Zeilentitel „100 – 109“ und „100 – 119“ (S. 14/15) — wörtlich übernommen; nach der Regel „erste passende Klasse“ gilt die zweite Zeile damit für über 109 bis 119 m². Wohnlage Zone A–F (0/6/9/12/15/17 Punkte, S. 19, Straßenverzeichnis ab S. 33) — ohne Zone kein Wert, Zone X nicht anwendbar. Sanitär einfach/gehoben und die Bodenbeläge sind jeweils nur einzeln wählbar. Die Textschicht (-layout) ist in den Tabellen verschoben; die Werte stammen aus der Wortlage (pdftotext -bbox) und sind gegen das Druckbild S. 14–15 geprüft. Das Dokument enthält kein ausgerechnetes Beispiel.",
- "haus": {
-  "regel": "zuschlag",
-  "merkmal": "einfamilienhaus",
-  "fuer": [
-   "efh",
-   "dhh",
-   "rh"
-  ],
-  "beleg": "S. 18 Tabelle 2: „Einfamilienhaus (evtl. mit Einlieger-Wohnung, freistehend oder gereiht)“ +5 Punkte"
- },
+ "haus": {"regel":"zuschlag","merkmal":"einfamilienhaus","gilt_fuer":["efh","dhh","rh"],"beleg":"S. 18 Tabelle 2: „Einfamilienhaus (evtl. mit Einlieger-Wohnung, freistehend oder gereiht)“ +5 Punkte","gilt_fuer_herkunft":"wortlaut"},
  "tabelle": {
   "achsen": {
    "baujahr": [

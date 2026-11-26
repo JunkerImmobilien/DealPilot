@@ -1,11 +1,7 @@
 {
  "ags": "05970040",
  "gemeinde": "Siegen",
- "haus": {
-  "regel": "gilt",
-  "hinweis": "Gebäudeart fließt über Punkte in die Wohnqualität ein: freistehendes Einfamilienhaus +8, Zweifamilienhaus/Doppelhaus/Reihenhaus/Einliegerwohnung +5, Mehrfamilienhaus +3 Punkte; Wohnqualität dann selbst wählen",
-  "beleg": "PDF-S. 3 Nr. 1.2.1 Gebäude-/Wohnungsart"
- },
+ "haus": {"regel":"gilt","hinweis":"Gebäudeart fließt über Punkte in die Wohnqualität ein: freistehendes Einfamilienhaus +8, Zweifamilienhaus/Doppelhaus/Reihenhaus/Einliegerwohnung +5, Mehrfamilienhaus +3 Punkte; Wohnqualität dann selbst wählen","beleg":"PDF-S. 3 Nr. 1.2.1 Gebäude-/Wohnungsart"},
  "art": "einfach",
  "stand": "2026-05-01",
  "erhebungsstichtag": null,

@@ -35,6 +35,7 @@ const saetze = Array.isArray(roh) ? roh : roh.saetze;
 if (!Array.isArray(saetze)) { console.error('verzeichnis.json: kein Feld "saetze"'); process.exit(1); }
 
 const fehler = [];
+const ausstehend = [];   /* v5080 · Vorbehalt entschieden, Wertedatei folgt */
 const veraltet = [];
 const anpassungFaellig = [];
 const agsGesehen = new Set();
@@ -84,12 +85,14 @@ for (const [i, s] of saetze.entries()) {
     if (!['verboten', 'vorbehalt'].includes(s.werte_nutzung)) fehler.push(`${id}: werte_nutzung ungültig: ${s.werte_nutzung}`);
     const b = String(s.werte_nutzung_beleg || '');
     if (!b) fehler.push(`${id}: werte_nutzung ohne werte_nutzung_beleg`);
+    /* v5080 · Marcel 26.11.2026: Vorbehalt entschieden, die Datei erntet ein Agent später (werte_datei_ausstehend) */
+    else if (s.werte_nutzung === 'vorbehalt' && s.werte_datei_ausstehend === true && !WERTE.get(s.ags)) { ausstehend.push(s.gemeinde); }
     else if (s.werte_nutzung === 'vorbehalt') { if (!b.includes(`werte/${s.ags}.json`)) fehler.push(`${id}: vorbehalt-Beleg nennt die Wertedatei nicht (dort steht freigabe_grund)`); }
     else if (!/^laut Impressum/.test(b) && !(/„[^“]{12,}“/.test(b) && /Seite \d+/.test(b))) fehler.push(`${id}: werte_nutzung_beleg ohne Zitat mit Seite und nicht „laut Impressum“`);
     if (!s.werte_nutzung_grund) fehler.push(`${id}: werte_nutzung ohne werte_nutzung_grund (Kurzgrund für den Hinweis)`);
     const w = WERTE.get(s.ags);
     if (s.werte_nutzung === 'verboten' && w) fehler.push(`${id}: Speicherverbot, aber Wertedatei werte/${s.ags}.json vorhanden`);
-    if (s.werte_nutzung === 'vorbehalt' && !(w && w.freigabe === 'gesperrt')) fehler.push(`${id}: vorbehalt ohne Wertedatei mit freigabe gesperrt`);
+    if (s.werte_nutzung === 'vorbehalt' && !(w && w.freigabe === 'gesperrt') && !(s.werte_datei_ausstehend === true && !w)) fehler.push(`${id}: vorbehalt ohne Wertedatei mit freigabe gesperrt`);
   } else if (s.werte_nutzung_beleg || s.werte_nutzung_grund) fehler.push(`${id}: werte_nutzung_beleg/-grund ohne werte_nutzung`);
   { const w = WERTE.get(s.ags); if (w && w.freigabe === 'gesperrt' && s.werte_nutzung !== 'vorbehalt') fehler.push(`${id}: Wertedatei gesperrt, aber werte_nutzung nicht 'vorbehalt'`); }
 
@@ -132,4 +135,5 @@ if (fehler.length) {
   if (fehler.length > 40) console.log(`  … und ${fehler.length - 40} weitere`);
   process.exit(1);
 }
+if (ausstehend.length) console.log('Vorbehalt, Wertedatei folgt: ' + ausstehend.join(', '));
 console.log('\nRC=0 — Form sauber.');

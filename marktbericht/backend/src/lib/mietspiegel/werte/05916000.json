@@ -17,18 +17,7 @@
  "form": "tabelle",
  "rundung": 2,
  "hinweis": "Erster qualifizierter Mietspiegel Herne (§ 558d, Regressionsmietspiegel nach MsV, S. 3), Laufzeit bis 31.12.2026 (S. 4); ein Nachfolger war am 26.11.2026 weder auf herne.de noch im Serviceportal veröffentlicht. Basistabelle Baualter × Wohnungsgröße für Wohnlage 1 (Referenz: Etagenheizung, ohne Oberboden, ohne Balkon, Zwei-Scheiben-Isolierverglasung), Zu-/Abschläge in €/m² auf den Basiswert (S. 6–11), Spanne −13,4/+13,8 % um die errechnete Miete (Zwei-Drittel-Spanne, S. 11; Vordruck: M × 0,866 bzw. × 1,138, S. 15). Gilt für Wohnungen in Gebäuden ab drei Wohnungen und für Wohnungen in Ein-/Zweifamilienhäusern als Doppelhaushälfte, Reihenmittel- und Reihenendhaus, 19–152 m² (S. 4). Keine Angaben zu freistehenden Ein- und Zweifamilienhäusern, Penthouse, Staffelgeschoss, Wohnungen ohne Bad/WC — „als Orientierung“ verwendbar (S. 4). Ab Baujahr 2022 nicht Teil des Mietspiegels (Baualter 2015–2021 nur als Orientierung, S. 6) — hier kein Wert. Kernsanierung → Baualter des Jahres der Maßnahme (S. 5), nicht abgebildet. Wohnlage je Adresse aus dem Wohnlagenverzeichnis S. 17 ff. (Grundsatz Wohnlage 1); als Lage „2“ bzw. „3“ übergeben. Haustyp-Zuschläge: DHH/Reihenendhaus ab Baujahr 1970 +0,61 (DealPilot-Merkmal dhh_reh), Reihenmittelhaus ab 1950 +0,51 bzw. bis 1949 −0,57 (Merkmal reihenmittelhaus); DHH/Reihenendhaus bis 1969 nur Tendenz zum Abschlag in der Spanne (S. 12). Modernisierungszuschläge nur für Baujahr vor 1985 (Tabelle 8). Merkmale, die nur in der Spanne zu berücksichtigen sind (S. 12–13), nicht abgebildet.",
- "haus": {
-  "regel": "zuschlag",
-  "merkmal": {
-   "dhh": "dhh_reh",
-   "rh": "reihenmittelhaus"
-  },
-  "fuer": [
-   "dhh",
-   "rh"
-  ],
-  "beleg": "S. 4 Geltung (Ein-/Zweifamilienhäuser als DHH, Reihenmittel- und Reihenendhaus erfasst, freistehende nur zur Orientierung); S. 7 Tabelle 2: DHH/Reihenendhaus (ab 1970) +0,61 €/m², Reihenmittelhaus ab 1950 +0,51, bis 1949 −0,57 €/m²"
- },
+ "haus": {"regel":"zuschlag","merkmal":{"dhh":"dhh_reh","rh":"reihenmittelhaus"},"gilt_fuer":["dhh","rh"],"beleg":"S. 4 Geltung (Ein-/Zweifamilienhäuser als DHH, Reihenmittel- und Reihenendhaus erfasst, freistehende nur zur Orientierung); S. 7 Tabelle 2: DHH/Reihenendhaus (ab 1970) +0,61 €/m², Reihenmittelhaus ab 1950 +0,51, bis 1949 −0,57 €/m²","gilt_fuer_herkunft":"wortlaut"},
  "tabelle": {
   "achsen": {
    "baujahr": [

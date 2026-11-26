@@ -18,10 +18,7 @@
  "form": "tabelle",
  "rundung": 2,
  "hinweis": "Einfacher Mietspiegel (S. 5: „erfüllt nicht die Voraussetzungen … qualifizierten“), nur Wohnungen in Mehrfamilienhäusern, nur freifinanziert. Die Tabelle nennt nur Spannen (von–bis); `mittel` ist die von DealPilot gerechnete Mitte der Spanne, kaufmännisch gerundet — kein Wert des Dokuments. Achse Ausstattung = Wohnungsqualität (einfach/mittel/gut/sehr gut aus dem Punktesystem S. 3: ≤ 1 Punkt einfach, 2–4 mittel, 5–7 gut, ≥ 8 sehr gut) × Grundausstattung („WC Bad/Dusche oder Zentralheizung“ / „… und Zentralheizung“). Ohne Angabe nimmt DealPilot „mittel, Bad und Zentralheizung“ an — Annahme. Die Punktevergabe selbst rechnet der Kern nicht; die Merkmale stehen unter `punkte_qualitaet`. Leere Tabellenfelder (z. B. ab 1985 ohne Zentralheizung, „einfach“ ab 1967, „sehr gut“ bis 1996) nicht eingetragen. „Bei sehr guter Ausstattung von Mietwohnhäusern bis Baujahr 1996 erhöhen sich die jeweiligen Tabellenwerte um 5 %“ (S. 2) als Zuschlag `sehr_gut_bis_1996`. „Für Wohnungen, die weder … Bad/Dusche noch … Zentralheizung verfügen, kann ein Abschlag von 20 % des jeweiligen Tabellensatzes vorgenommen werden“ (S. 5) als Zuschlag `weder_bad_noch_zentralheizung` (mit der Spalte „oder“ verwenden). Bei umfassender Modernisierung tritt das Modernisierungsjahr an die Stelle des Baujahrs (S. 5). Mietspiegel gilt „bis auf Weiteres“ (S. 4); laut Stadtseite Fortschreibung im Zwei-Jahres-Turnus zum 01.02. ungerader Jahre. Textschicht in den unteren Zeilen verschoben — alle Werte am Druckbild abgelesen.",
- "haus": {
-  "regel": "ausgeschlossen",
-  "beleg": "S. 2 Tabellenkopf: „für Wohnungen in Mehrfamilienhäusern“"
- },
+ "haus": {"regel":"ausgeschlossen","beleg":"S. 2 Tabellenkopf: „für Wohnungen in Mehrfamilienhäusern“"},
  "tabelle": {
   "achsen": {
    "baujahr": [

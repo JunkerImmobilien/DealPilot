@@ -3,7 +3,7 @@
  "freigabe": "gesperrt",
  "freigabe_grund": "„Eine Veröffentlichung des Mietspiegels ist ohne die Genehmigung der o.g. Vereine nicht gestattet“ (Titelseite) — kein ausdrückliches Speicherverbot; auf Prod gesperrt bis zur Klärung",
  "gemeinde": "Dormagen",
- "haus": {"regel":"zuschlag","merkmal":"einfamilienhaus","fuer":["efh","zfh","dhh","rh"],"beleg":"laut Dokument, siehe Zuschlag bzw. Geltungsbereich in dieser Datei"},
+ "haus": {"regel":"zuschlag","merkmal":"einfamilienhaus","gilt_fuer":["efh","zfh","dhh","rh"],"beleg":"laut Dokument, siehe Zuschlag bzw. Geltungsbereich in dieser Datei","gilt_fuer_herkunft":"rechtslage","gilt_fuer_begruendung":"Rechtslage: „Einfamilienhaus“ ohne „freistehend“ umfasst Doppelhaushälfte und Reihenhaus (§ 181 Abs. 2 BewG: Wohngrundstück mit bis zu zwei Wohnungen; AG Hanau: Doppelhaushälfte ist Einfamilienhaus im Sinne des Mietspiegels). Zweifamilienhaus nur, wo genannt."},
  "art": "einfach",
  "stand": "2023-01-01",
  "erhebungsstichtag": null,

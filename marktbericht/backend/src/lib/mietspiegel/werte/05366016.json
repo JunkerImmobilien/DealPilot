@@ -1,13 +1,7 @@
 {
  "ags": "05366016",
  "gemeinde": "Euskirchen",
- "haus": {
-  "regel": "ausgeschlossen",
-  "fuer": [
-   "efh"
-  ],
-  "beleg": "S. 1 Allgemeine Erläuterungen: „Einfamilienhäuser sind nicht erfasst.“"
- },
+ "haus": {"regel":"ausgeschlossen","gilt_fuer":["efh"],"beleg":"S. 1 Allgemeine Erläuterungen: „Einfamilienhäuser sind nicht erfasst.“","gilt_fuer_herkunft":"wortlaut"},
  "art": "einfach",
  "stand": "2026-10-01",
  "erhebungsstichtag": null,

@@ -17,10 +17,7 @@
  "form": "regression",
  "rundung": 2,
  "hinweis": "Gilt für freifinanzierten Wohnraum in Mehrfamilienhäusern mit drei und mehr Wohnungen (S. 1). Basis je vollem m² 20–160 m² („Es gilt die kaufmännische Rundung“, S. 2), alle Zu-/Abschläge in €/m² additiv (S. 2–3). Spanne −14 %/+14 % auf die ermittelte durchschnittliche ortsübliche Vergleichsmiete (S. 3). Wohnlage nach Entfernung zur Innenstadt; ohne Angabe wird die neutrale Klasse „über 1.000 m und unter 2.000 m“ (± 0,00 €) angenommen — Annahme von DealPilot, nicht des Dokuments. Modernisierungszuschläge nur bei Baujahr vor 2002 und nur für Maßnahmen ab 2010 (S. 3), abgebildet als zwei Auswahlfelder (Anzahl 2010–2019, Anzahl ab 2020); wie Maßnahmen aus beiden Zeiträumen zusammentreffen, sagt das Dokument nicht ausdrücklich. Baujahr nach 2025 liegt außerhalb der Klassen. Das Dokument enthält kein Rechenbeispiel. Haus & Grund hat zugestimmt, der Mieterverein abgelehnt (S. 1). Textschicht gegen das Druckbild S. 1–2 geprüft.",
- "haus": {
-  "regel": "ausgeschlossen",
-  "beleg": "S. 1: „gilt für freifinanzierten Wohnraum in Mehrfamilienhäusern mit drei und mehr Wohnungen“"
- },
+ "haus": {"regel":"ausgeschlossen","beleg":"S. 1: „gilt für freifinanzierten Wohnraum in Mehrfamilienhäusern mit drei und mehr Wohnungen“"},
  "regression": {
   "wfl_runden": 0,
   "basis": {

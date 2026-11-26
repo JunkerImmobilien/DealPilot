@@ -19,15 +19,7 @@
  "form": "tabelle",
  "rundung": 2,
  "hinweis": "Basismiete nach Wohnfläche × Baujahr (S. 12–13), dann Punktwert: Mittelwert = Basismiete × (100 + Punkte) / 100 (Rechenschema S. 11) — ein Punkt wirkt also wie 1 % Zuschlag; abgebildet als Zuschläge in Prozent. Spanne = Mittelwert × 0,88 bzw. × 1,12 (S. 11). Gilt nur für Wohnungen 35 bis unter 160 m², bis August 2024 gebaut, im freien Wohnungsmarkt (S. 7). Wohnflächenklassen „42 bis 43 m²“ als über 41 bis 43 eingetragen; „35 m²“ als über 34 bis 35 (unter 35 m² gilt der Mietspiegel nicht). Wohngebiet Zone A–D (0/3/6/9 Punkte, S. 15, Straßenverzeichnis S. 20 ff.) als Lage — ohne Zonenangabe kein Wert, Zone X = nicht anwendbar. Heizung, Bodenbelag, Sanitär, Küche jeweils nur ein Merkmal wählen. Bedingungen laut Fußnoten S. 15: Sanitär/Heizung/Elektro ab 2015 modernisiert nur Baujahr bis 2014 (4), Fußboden ab 2019 nur bis 2018 (5), Fenster mit Wärmeschutz und Dach/Fassade seit 1997 nur bis 1996 (6; die Zeile des Fenstermerkmals sagt „Baujahren bis 1997“, die Fußnote „bis 1996“ — hier die Fußnote); Erdgeschoss nur in Gebäuden mit mindestens zwei Wohnungen (2). Textschicht gegen Druckbild S. 12–15 geprüft. Das Dokument enthält kein ausgerechnetes Beispiel.",
- "haus": {
-  "regel": "zuschlag",
-  "merkmal": "maisonette_penthouse_haus",
-  "fuer": [
-   "efh",
-   "rh"
-  ],
-  "beleg": "S. 15 Tabelle 2: „Maisonette-/Galeriewohnung, Penthousewohnung oder komplettes Haus (freistehend / Reihenhaus)“ +5 Punkte"
- },
+ "haus": {"regel":"zuschlag","merkmal":"maisonette_penthouse_haus","gilt_fuer":["efh","dhh","rh"],"beleg":"S. 15 Tabelle 2: „Maisonette-/Galeriewohnung, Penthousewohnung oder komplettes Haus (freistehend / Reihenhaus)“ +5 Punkte","gilt_fuer_herkunft":"rechtslage","gilt_fuer_begruendung":"Rechtslage: „Einfamilienhaus“ ohne „freistehend“ umfasst Doppelhaushälfte und Reihenhaus (§ 181 Abs. 2 BewG: Wohngrundstück mit bis zu zwei Wohnungen; AG Hanau: Doppelhaushälfte ist Einfamilienhaus im Sinne des Mietspiegels). Zweifamilienhaus nur, wo genannt."},
  "tabelle": {
   "achsen": {
    "baujahr": [
