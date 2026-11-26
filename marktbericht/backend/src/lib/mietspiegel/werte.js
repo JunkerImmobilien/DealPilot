@@ -139,7 +139,8 @@ export function hausAnwenden(werte, objektart, merkmale) {
   const H = werte.haus;
   const wort = HAUS_WORT[ht];
   if (!H || !H.regel) return { regel: 'unbekannt', hinweis: 'Der Mietspiegel sagt nichts zu Häusern. Gerechnet wie eine Wohnung gleicher Größe' };
-  if (Array.isArray(H.fuer) && H.fuer.length && H.fuer.indexOf(ht) < 0) {
+  const gilt = Array.isArray(H.gilt_fuer) ? H.gilt_fuer : H.fuer;   /* v5080: gilt_fuer (Wortlaut bzw. Rechtslage), fuer = alter Name */
+  if (Array.isArray(gilt) && gilt.length && gilt.indexOf(ht) < 0) {
     return { regel: 'gilt', hinweis: 'Der Mietspiegel kennt für ' + wort + ' keinen eigenen Zuschlag. Gerechnet wie eine Wohnung gleicher Größe' };
   }
   const zus = H.hinweis ? '. ' + H.hinweis : '';

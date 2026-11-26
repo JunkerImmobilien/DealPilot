@@ -3,7 +3,7 @@
  "freigabe": "gesperrt",
  "freigabe_grund": "„Nachdruck, Vervielfältigung oder Wiedergabe jedweder Art, auch auszugsweise, ist nur mit Zustimmung des Herausgebers und unter Angabe des Herkunftsvermerkes gestattet“ (S. 3) — kein ausdrückliches Speicherverbot; auf Prod gesperrt bis zur Klärung",
  "gemeinde": "Recklinghausen",
- "haus": {"regel":"zuschlag","merkmal":{"efh":"haus_efh_freistehend","dhh":"haus_dhh_reh"},"fuer":["efh","dhh"],"hinweis":"Mitte der Spanne des Mietspiegels","beleg":"S. 5 (freistehende Einfamilienhäuser bis zu 10 %, Doppelhaushälften/Reihenendhäuser bis zu 5 %), geprüft 26.11.2026"},
+ "haus": {"regel":"zuschlag","merkmal":{"efh":"haus_efh_freistehend","dhh":"haus_dhh_reh"},"gilt_fuer":["efh","dhh"],"hinweis":"Mitte der Spanne des Mietspiegels","beleg":"S. 5 (freistehende Einfamilienhäuser bis zu 10 %, Doppelhaushälften/Reihenendhäuser bis zu 5 %), geprüft 26.11.2026","gilt_fuer_herkunft":"wortlaut"},
  "art": "einfach",
  "stand": "2026-01-01",
  "erhebungsstichtag": null,

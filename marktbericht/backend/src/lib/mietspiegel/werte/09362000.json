@@ -3,7 +3,7 @@
  "freigabe": "gesperrt",
  "freigabe_grund": "© Stadt Regensburg (Impressum, „Herausgeber und Layout: © Stadt Regensburg“), keine Lizenzangabe — auf Prod gesperrt bis zur Klärung (wie Detmold)",
  "gemeinde": "Regensburg",
- "haus": {"regel":"zuschlag","merkmal":"efh","fuer":["efh"],"beleg":"laut Dokument, siehe Zuschlag bzw. Geltungsbereich in dieser Datei"},
+ "haus": {"regel":"zuschlag","merkmal":"efh","gilt_fuer":["efh"],"beleg":"laut Dokument, siehe Zuschlag bzw. Geltungsbereich in dieser Datei","gilt_fuer_herkunft":"wortlaut"},
  "art": "qualifiziert",
  "stand": "2026-03-01",
  "erhebungsstichtag": "2025-08-01",

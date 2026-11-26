@@ -17,16 +17,7 @@
  "form": "regression",
  "rundung": 2,
  "hinweis": "Qualifiziert (§ 558d, S. 3): Fortschreibung 2025 des Mietspiegels 2023 mit dem Verbraucherpreisindex, anerkannt durch Ratsbeschluss; Übersicht der am 01.11.2024 gezahlten Mieten (S. 4, als erhebungsstichtag eingetragen, keine Neuerhebung). Gültigkeitsdaten nennt das Dokument nicht, nur „für weitere zwei Jahre“ (S. 2). Gilt für nicht preisgebundene Wohnungen 20–170 m², bezugsfertig bis 01.11.2022; die Klasse „2012 bis 11/2022“ gilt laut Tabelle 2 „als Orientierungshilfe auch für Baufertigstellungen ab Dezember 2022“ (S. 8) — hier nicht abgebildet, ab Baujahr 2023 kein Wert. Ausschlüsse S. 5 (u. a. WC außerhalb, ohne Küche, möbliert, Wohngemeinschaft, Betreutes Wohnen). Gilt ausdrücklich auch für vermietete Einfamilienhäuser, Reihenhäuser, Doppelhaushälften und Wohnungen in Zweifamilienhäusern (S. 4); Einfamilienhaus (freistehend, DHH, RH) +3 % (S. 10–11). Wohnfläche kaufmännisch auf ganze m² (S. 6). Rechenweg (S. 17): Basismiete × (1 + Σ Zu-/Abschläge Tab. 2 und 3); energetische Gebäudequalität +15 % für Baujahr bis 31.12.2001, wenn nach 01.01.2002 alle drei Dämmungen (Außenwände, Dach/oberste Geschossdecke, Kellerdecke) erfolgt sind, erst danach auf das Ergebnis (S. 13, 18) — als Faktor 1,15. Spanne ±15 % (S. 15); das Beispiel S. 17 nennt 5,83/7,87 bei 6,85 — rechnerisch 6,85 ± 1,03 = 5,82/7,88, die Abweichung von 0,01 liegt im Dokument. Wohnlage je Adresse aus dem Wohnlagenverzeichnis (Anhang; Karte https://www.hamm.de/masterportal/hamm_open_data/wohnlage): nur gut +4 %, mittel und einfach ±0 %. Nicht abgebildet: Beispielmerkmale innerhalb der Spanne (S. 15–16). Tabelle 1 aus der Textschicht (pdftotext -raw) gegen das Druckbild S. 7 geprüft; die Layout-Ausgabe verschiebt die Spalten.",
- "haus": {
-  "regel": "zuschlag",
-  "merkmal": "einfamilienhaus",
-  "fuer": [
-   "efh",
-   "dhh",
-   "rh"
-  ],
-  "beleg": "S. 4: gilt auch für vermietete Einfamilienhäuser, Reihenhäuser, Doppelhaushälften und Wohnungen in Zweifamilienhäusern; S. 10 Tabelle 3 und S. 11: vermietetes Einfamilienhaus (freistehend, DHH, RH) +3 %"
- },
+ "haus": {"regel":"zuschlag","merkmal":"einfamilienhaus","gilt_fuer":["efh","dhh","rh"],"beleg":"S. 4: gilt auch für vermietete Einfamilienhäuser, Reihenhäuser, Doppelhaushälften und Wohnungen in Zweifamilienhäusern; S. 10 Tabelle 3 und S. 11: vermietetes Einfamilienhaus (freistehend, DHH, RH) +3 %","gilt_fuer_herkunft":"wortlaut"},
  "regression": {
   "basis": {
    "typ": "wfl_tabelle",

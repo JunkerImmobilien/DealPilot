@@ -2,7 +2,7 @@
 
 Erzeugt am 2026-11-26 mit `node tools/mietspiegel-arbeitsliste.mjs` aus `marktbericht/backend/src/lib/mietspiegel/verzeichnis.json` (alle Gemeinden ab 50.000 Einwohnern, Destatis 31.12.2024, dazu die Demo-Orte) und dem Ordner `werte/`.
 
-**Gesamt:** 219 Gemeinden · verboten 74 · fertig 107 · gesperrt 18 · offen 12 · unklar 7 · kein 1
+**Gesamt:** 219 Gemeinden · verboten 68 · fertig 107 · gesperrt 18 · offen 18 · unklar 7 · kein 1
 
 Status: **fertig** = Wertedatei frei nutzbar · **gesperrt** = Wertedatei mit Rechtevorbehalt (`freigabe: gesperrt`, nur Staging) · **verboten** = Speicherverbot im Dokument, nie eine Datei · **OFFEN** = zu ernten · **nicht_frei** = nur gegen Gebühr oder auf Anfrage · **unklar** = Art erst klären · **kein** = Gemeinde hat keinen.
 
@@ -49,7 +49,7 @@ sonst eine eindeutig ablesbare Tabellenzelle (`tabellenzelle`). Eine Grenze mit 
 
 **7 · Häuser (`haus`).** Was sagt das Dokument zu Ein-, Zweifamilien-, Reihen- und Doppelhäusern?
 `zuschlag` (mit `merkmal` aus den Zuschlägen, ggf. `{ efh, zfh, dhh, rh }`), `gilt`, `orientierung`,
-`oberer_spannenwert` oder `ausgeschlossen` („gilt nur für Wohnungen in Mehrfamilienhäusern“). `fuer` begrenzt auf
+`oberer_spannenwert` oder `ausgeschlossen` („gilt nur für Wohnungen in Mehrfamilienhäusern“). `gilt_fuer` begrenzt auf
 Bauformen, `beleg` mit Seite. Sagt das Dokument nichts: Feld weglassen.
 
 **8 · Danach immer:** `node tools/mietspiegel-werte-pruefen.mjs` (RC 0), `node tools/mietspiegel-verzeichnis-pruefen.mjs`
@@ -61,6 +61,11 @@ Commit neu von staging holen und mergen.
 
 **9 · Gemeinden unter 50.000 Einwohnern** mit eigenem Mietspiegel stehen noch nicht im Verzeichnis. Wer einen findet
 (z. B. Kreis-Mietspiegel), legt zuerst den Verzeichnis-Satz an (Felder siehe README), dann die Wertedatei.
+
+**Hausregel und Bauformen (v5080, Marcel 26.11.2026 „recherchieren, was richtig ist“):** `haus.gilt_fuer` nach dem
+Wortlaut des Dokuments, `gilt_fuer_herkunft: "wortlaut"`. Ist er unklar (nur „Einfamilienhaus“), gilt die Rechtslage:
+ohne „freistehend“ umfasst das Einfamilienhaus auch Doppelhaushälfte und Reihenhaus (§ 181 Abs. 2 BewG, AG Hanau),
+Zweifamilienhaus nur, wo genannt; dann `gilt_fuer_herkunft: "rechtslage"` mit `gilt_fuer_begruendung`.
 
 ## Region Nord (SH, HH, NI, HB, MV) · verboten 13, fertig 37, gesperrt 1
 
@@ -140,9 +145,9 @@ Commit neu von staging holen und mergen.
 | Greifswald | 13075039 | 56.092 | qualifiziert | regression | frei | 2028-02-29 | verboten (Speicherverbot) | [Quelle](https://www.greifswald.de/de/.galleries/dokumente/Pressestelle-Dokumente/2026-04-14-BV-V_08_0261-Mietspiegelbroschuere-Greifswald-2026.pdf) |
 | Stralsund | 13073088 | 54.094 | qualifiziert | tabelle | frei | 2027-12-31 | verboten (Speicherverbot) | [Quelle](https://service.stralsund.de/dienstleistungen/-/egov-bis-detail/dienstleistung/23498/show) |
 
-## Region West (NW) · verboten 19, fertig 42, gesperrt 11, offen 3, unklar 5
+## Region West (NW) · verboten 13, fertig 42, gesperrt 11, offen 9, unklar 5
 
-### Nordrhein-Westfalen · 80 Gemeinden · verboten 19, fertig 42, gesperrt 11, offen 3, unklar 5
+### Nordrhein-Westfalen · 80 Gemeinden · verboten 13, fertig 42, gesperrt 11, offen 9, unklar 5
 
 | Gemeinde | AGS | Einwohner | Art | Form | Zugang | gültig bis | Status | Link |
 |---|---|---:|---|---|---|---|---|---|
@@ -165,7 +170,7 @@ Commit neu von staging holen und mergen.
 | Hamm | 05915000 | 179.968 | qualifiziert | regression | frei | nächste 2027 | fertig | [Quelle](https://www.hamm.de/fileadmin/user_upload/Medienarchiv_neu/Dokumente/Vermessungs-und-Katasteramt/Mietspiegel_2025_Hamm.pdf) |
 | Mülheim an der Ruhr | 05117000 | 173.050 | qualifiziert | tabelle | frei | 2027-12-31 | fertig | [Quelle](https://cms.muelheim-ruhr.de/sites/default/files/2026-01/Mietspiegel-2026_.pdf) |
 | Leverkusen | 05316000 | 168.581 | qualifiziert | tabelle | frei | 2027-11-30 | verboten (Speicherverbot) | [Quelle](https://www.leverkusen.de/stadt-entwickeln/planen-bauen/dokumente-planen-und-bauen/Mietspiegel-Leverkusen-2025-Broschuere_Fortschreibung.pdf) |
-| Solingen | 05122000 | 165.626 | einfach | tabelle | frei |  | verboten (Speicherverbot) | [Quelle](https://www.mieterbundrbl.de/wp-content/uploads/2025/01/Mietspiegel_2025.pdf) |
+| Solingen | 05122000 | 165.626 | einfach | tabelle | frei |  | OFFEN | [Quelle](https://www.mieterbundrbl.de/wp-content/uploads/2025/01/Mietspiegel_2025.pdf) |
 | Paderborn | 05774032 | 156.378 | qualifiziert | tabelle | frei |  | fertig | [Quelle](https://www.paderborn.de/wohnen-soziales/bauen-wohnen/mietspiegel.php.media/297832/Mietspiegel_25_Web.pdf) |
 | Herne | 05916000 | 155.851 | qualifiziert | tabelle | frei | 2026-12-31 | fertig | [Quelle](https://herne.de/PDF/mietspiegel/mietspiegel.pdf) |
 | Neuss | 05162024 | 154.317 | einfach | tabelle | frei |  | Datei gesperrt (Rechtevorbehalt, nur Staging) | [Quelle](https://www.mieterverein-duesseldorf.de/fileadmin/user_upload/redaktion/duesseldorf-2025/Downloads/Mietspiegel/Mietspiegel_Neuss_2026.pdf) |
@@ -197,11 +202,11 @@ Commit neu von staging holen und mergen.
 | Lippstadt | 05974028 | 68.739 | einfach | tabelle | frei gedruckt in der Bürgerberatung erhältlich |  | fertig | [Quelle](https://www.lippstadt.de/fileadmin/user_upload/Mietspiegel_2025.pdf) |
 | Herford | 05758012 | 67.503 | einfach | tabelle | frei |  | fertig | [Quelle](https://www.herford.de/mietspiegel) |
 | Dinslaken | 05170008 | 66.993 | einfach | tabelle | frei | 2027-12-31 | fertig | [Quelle](https://www.dinslaken.de/system/files/2025-12/Mietspiegel%202026-2027.pdf) |
-| Kerpen | 05362032 | 66.585 | einfach | tabelle | frei |  | verboten (Speicherverbot) | [Quelle](https://www.rheinische-immobilienboerse.de/upload/2026_Kerpen_1751.pdf) |
+| Kerpen | 05362032 | 66.585 | einfach | tabelle | frei |  | OFFEN | [Quelle](https://www.rheinische-immobilienboerse.de/upload/2026_Kerpen_1751.pdf) |
 | Grevenbroich | 05162008 | 65.983 | unklar | unbekannt | kostenpflichtig Preis nicht angegeben |  | unklar, erst Art klären | [Quelle](https://grevenbroich.de/rathaus-buergerservice/dienstleistungen-a-z/dienstleistung/mietspiegel) |
 | Dormagen | 05162004 | 63.799 | einfach | tabelle | frei |  | Datei gesperrt (Rechtevorbehalt, nur Staging) | [Quelle](https://www.hausundgrundneuss.de/fileadmin/neuss/media/pdfs/Mietspiegel_Dormagen_2023.pdf) |
-| Hürth | 05362028 | 62.160 | einfach | tabelle | frei |  | verboten (Speicherverbot) | [Quelle](https://web.rheinische-immobilienboerse.de/upload/Huerth_2026_1736.pdf) |
-| Bergheim | 05362008 | 61.611 | einfach | tabelle | frei |  | verboten (Speicherverbot) | [Quelle](https://web.rheinische-immobilienboerse.de/upload/Bergheim_2026_1721.pdf) |
+| Hürth | 05362028 | 62.160 | einfach | tabelle | frei |  | OFFEN | [Quelle](https://web.rheinische-immobilienboerse.de/upload/Huerth_2026_1736.pdf) |
+| Bergheim | 05362008 | 61.611 | einfach | tabelle | frei |  | OFFEN | [Quelle](https://web.rheinische-immobilienboerse.de/upload/Bergheim_2026_1721.pdf) |
 | Herten | 05562020 | 60.941 | unklar | tabelle | frei |  | unklar, erst Art klären | [Quelle](https://www.herten.de/fileadmin/user_upload/citkoBuerger/Sozialamt/Mietspiegel_2025_2027.pdf) |
 | Wesel | 05170048 | 60.785 | einfach | regression | frei |  | verboten (Speicherverbot) | [Quelle](https://www.wesel.de/system/files/2025-02/Mietspiegel%20Wesel%202025.pdf) |
 | Euskirchen | 05366016 | 60.021 | einfach | tabelle | frei |  | fertig | [Quelle](https://www.euskirchen.de/fileadmin/user_upload/PDF/service/Mietspiegel_2026.pdf) |
@@ -211,13 +216,13 @@ Commit neu von staging holen und mergen.
 | Eschweiler | 05334012 | 57.534 | einfach | tabelle | frei | 2027-12-31 | fertig | [Quelle](https://service.eschweiler.de/detail/-/vr-bis-detail/dokument/1735704/download) |
 | Meerbusch | 05162022 | 57.078 | einfach | tabelle | frei |  | Datei gesperrt (Rechtevorbehalt, nur Staging) | [Quelle](https://hausundgrundddf.de/wp-content/uploads/2025/06/MS-Meerbusch-07-2025-s.pdf) |
 | Sankt Augustin | 05382056 | 56.521 | qualifiziert | regression | frei | 2027-12-31 | fertig | [Quelle](https://www.sankt-augustin.de/fortschreibung-des-qualifizierten-mietspiegels-liegt-vor/) |
-| Pulheim | 05362036 | 56.150 | einfach | tabelle | frei | nächste 2026 | verboten (Speicherverbot) | [Quelle](https://www.rheinische-immobilienboerse.de/upload/2026_Pulheim_1761.pdf) |
+| Pulheim | 05362036 | 56.150 | einfach | tabelle | frei | nächste 2026 | OFFEN | [Quelle](https://www.rheinische-immobilienboerse.de/upload/2026_Pulheim_1761.pdf) |
 | Hilden | 05158016 | 55.157 | einfach | regression | frei | 2027-12-31 | verboten (Speicherverbot) | [Quelle](https://www.hilden.de/de/stadt-rathaus/buergerservice/wichtige-anlaufstellen/mietspiegel/einfacher-mietspiegel-stadt-hilden-2026.pdf?cid=h2j) |
 | Bad Salzuflen | 05766008 | 53.958 | qualifiziert | tabelle | frei |  | verboten (Speicherverbot) | [Quelle](https://www.stadt-bad-salzuflen.de/wirtschaft-und-mobilitaet/wirtschaftsstandort/online-mietspiegelrechner) |
 | Hattingen | 05954016 | 53.044 | qualifiziert | tabelle | frei | nächste 2027-06-01 | fertig | [Quelle](https://www.hattingen.de/stadt_hattingen/Rathaus/Fachbereiche/Soziales%20und%20Wohnen/Mietspiegel/mietspiegel_hattingen_2025.pdf) |
 | Kleve | 05154036 | 53.028 | einfach | tabelle | frei |  | fertig | [Quelle](https://www.kleve.de/system/files/2025-08/Mietspiegel%20Stadt%20Kleve%202025.pdf) |
 | Ahlen | 05570004 | 52.666 | qualifiziert | tabelle | frei |  | fertig | [Quelle](https://serviceportal.ahlen.de/detail/-/vr-bis-detail/dienstleistung/111940/show) |
-| Frechen | 05362024 | 52.309 | einfach | tabelle | frei |  | verboten (Speicherverbot) | [Quelle](https://www.rheinische-immobilienboerse.de/upload/2026_Frechen_1771.pdf) |
+| Frechen | 05362024 | 52.309 | einfach | tabelle | frei |  | OFFEN | [Quelle](https://www.rheinische-immobilienboerse.de/upload/2026_Frechen_1771.pdf) |
 | Menden (Sauerland) | 05962040 | 52.255 | einfach | tabelle | frei |  | fertig | [Quelle](https://www.menden.de/fileadmin/user_upload/Leben_in_Menden/Mietspiegel/mietspiegel_hsk_mk_01.04.2026.pdf) |
 | Ibbenbüren | 05566028 | 51.803 | qualifiziert | regression | frei |  | fertig | [Quelle](https://www.ibbenbueren.de/media/custom/3030_9012_1.PDF) |
 | Gummersbach | 05374012 | 51.290 | einfach | online_rechner | online_rechner | nächste 2027-10-01 | OFFEN (nur Online-Rechner, Dokumentation suchen) | [Quelle](https://rio.obk.de/omix/omix.php) |

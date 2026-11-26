@@ -17,10 +17,7 @@
  "form": "regression",
  "rundung": 2,
  "hinweis": "Mietspiegel 2026 = qualifizierter Mietspiegel 2024 × 1,044 (VPI Okt. 2023 → Okt. 2025, Dok. 2026 S. 2: „Für die Anwendung des Mietspiegels 2026 wird die ortsübliche Vergleichsmiete wie im Mietspiegel 2024 bestimmt und anschließend mit dem Fortschreibungsfaktor multipliziert“). Weil der Kern € -Beträge nicht nachträglich multipliziert, ist JEDER 2024-Betrag (Basis, Baujahr, Wohnlage, Merkmale) mit 1,044 multipliziert und ungerundet (5 Stellen) eingetragen; der 2024-Wert steht daneben (eur_qm_2024, wert_2024). Rechnerisch gleich (Summe × 1,044), Rundung erst am Ende. Additives Regressionsmodell: Basismiete (je volle m² 16–160, Interpolation bei Nachkommastellen erlaubt, S. 10 — der Kern interpoliert nicht, gebrochene Flächen geben null) + Baujahr + Wohnlage (Punktwert der Wohnlagenkarte des Gutachterausschusses, 0–17,5 Punkte, S. 13; ohne Punktwert kein Wert) + Merkmale. Baujahr nach 2023 nicht im Mietspiegel. Keine Spanne beziffert (S. 21: Abweichen nur bei stark abweichender Ausstattung UND sehr gutem/schlechtem Erhaltungszustand). Ausgeschlossen u. a. Ein- und Zweifamilienhäuser, Wohnungen unter 16 / über 160 m², Untermiete, Dienstwohnungen, ohne eigenen Abschluss (S. 7). Stuck an der Fassade nur bis Baujahr vor 1919 (S. 8, 14). Fußboden- und Sanitärmodernisierung nur bei Baujahr bis 1990, Elektrounterverteilung außerhalb nur bis Baujahr 1970. Textschicht der Broschüre verrutscht Tabellenwerte (Basismiete ab 100 m², Merkmale): alle Werte am Druckbild bzw. an Tabelle 15 der Dokumentation geprüft.",
- "haus": {
-  "regel": "ausgeschlossen",
-  "beleg": "Broschüre 2024 S. 7 Gültigkeitsbereich: „Weitere Ausschlüsse … Ein- und Zweifamilienhäuser“"
- },
+ "haus": {"regel":"ausgeschlossen","beleg":"Broschüre 2024 S. 7 Gültigkeitsbereich: „Weitere Ausschlüsse … Ein- und Zweifamilienhäuser“"},
  "regression": {
   "basis": {
    "typ": "wfl_tabelle",

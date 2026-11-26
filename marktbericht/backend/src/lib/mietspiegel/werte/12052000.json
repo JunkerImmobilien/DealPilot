@@ -3,10 +3,7 @@
  "gemeinde": "Cottbus/Chóśebuz",
  "freigabe": "gesperrt",
  "freigabe_grund": "„© 2024 Stadt Cottbus/Chóśebuz . Alle Rechte vorbehalten.“ (Impressum, S. 2) — Rechtevorbehalt ohne ausdrückliches Speicherverbot; auf Prod gesperrt bis zur Klärung",
- "haus": {
-  "regel": "ausgeschlossen",
-  "beleg": "S. 7 (nicht mietspiegelrelevant: „Wohnungen in Ein- und Zweifamilienhäusern, bzw. Wohn- oder Geschäftshaus mit weniger als 3 Wohnungen“), S. 8 Nr. 2 Geltungsbereich „Wohnraum in Mehrfamilienhäusern“"
- },
+ "haus": {"regel":"ausgeschlossen","beleg":"S. 7 (nicht mietspiegelrelevant: „Wohnungen in Ein- und Zweifamilienhäusern, bzw. Wohn- oder Geschäftshaus mit weniger als 3 Wohnungen“), S. 8 Nr. 2 Geltungsbereich „Wohnraum in Mehrfamilienhäusern“"},
  "art": "qualifiziert",
  "stand": "2024-03-01",
  "erhebungsstichtag": "2024-03-01",

@@ -3,10 +3,7 @@
  "freigabe": "gesperrt",
  "freigabe_grund": "„Vervielfältigungen sind nicht erlaubt.“ (PDF-S. 2, Erläuterungen) — Rechtevorbehalt ohne ausdrückliches Speicherverbot; auf Prod gesperrt bis zur Klärung",
  "gemeinde": "Velbert",
- "haus": {
-  "regel": "ausgeschlossen",
-  "beleg": "PDF-S. 2: „Der Mietspiegel dient als Richtschnur … für vergleichbare Wohnungen in Mehrfamilienhäusern. Er enthält keine Werte für Einfamilienhäuser.“"
- },
+ "haus": {"regel":"ausgeschlossen","beleg":"PDF-S. 2: „Der Mietspiegel dient als Richtschnur … für vergleichbare Wohnungen in Mehrfamilienhäusern. Er enthält keine Werte für Einfamilienhäuser.“"},
  "art": "einfach",
  "stand": "2025-01-01",
  "erhebungsstichtag": null,

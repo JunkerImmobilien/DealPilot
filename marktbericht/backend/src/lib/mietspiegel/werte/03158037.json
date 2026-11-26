@@ -3,17 +3,7 @@
  "gemeinde": "Wolfenbüttel",
  "freigabe": "gesperrt",
  "freigabe_grund": "„Das Urheberrecht liegt bei der Stadt Wolfenbüttel. Alle Rechte vorbehalten.“ (Impressum S. 16) — Rechtevorbehalt ohne ausdrückliches Speicherverbot; auf Prod gesperrt bis zur Klärung",
- "haus": {
-  "regel": "zuschlag",
-  "merkmal": "einfamilienhaus",
-  "fuer": [
-   "efh",
-   "dhh",
-   "rh"
-  ],
-  "hinweis": "Zuschlag 4 % für Einfamilienhaus, Doppelhaushälfte, Reihenhaus; der Mietspiegel gilt für „Mietwohnungen und vermietete Häuser“ (S. 6)",
-  "beleg": "S. 10 Tabelle 2 „Einfamilienhaus, Doppelhaushälfte, Reihenhaus 4“; S. 6 Nr. 2.3 Geltungsbereich"
- },
+ "haus": {"regel":"zuschlag","merkmal":"einfamilienhaus","gilt_fuer":["efh","dhh","rh"],"hinweis":"Zuschlag 4 % für Einfamilienhaus, Doppelhaushälfte, Reihenhaus; der Mietspiegel gilt für „Mietwohnungen und vermietete Häuser“ (S. 6)","beleg":"S. 10 Tabelle 2 „Einfamilienhaus, Doppelhaushälfte, Reihenhaus 4“; S. 6 Nr. 2.3 Geltungsbereich","gilt_fuer_herkunft":"wortlaut"},
  "art": "qualifiziert",
  "stand": "2026-01-01",
  "erhebungsstichtag": null,

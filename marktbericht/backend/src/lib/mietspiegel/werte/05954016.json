@@ -1,11 +1,7 @@
 {
  "ags": "05954016",
  "gemeinde": "Hattingen",
- "haus": {
-  "regel": "gilt",
-  "hinweis": "Der Mietspiegel gilt für Wohnungen in Ein- und Mehrfamilienhäusern; für Einfamilienhäuser ist ein Zuschlag vorzunehmen, dessen Höhe der Mietspiegel nicht beziffert (undefinierter Zuschlag)",
-  "beleg": "PDF-S. 3 Nr. 1 („Vergleichsmieten für Wohnungen in Ein- und Mehrfamilienhäusern“), PDF-S. 6 Nr. 4.2 („Weitere Zuschläge sind vorzunehmen, wenn … Einfamilienhaus“)"
- },
+ "haus": {"regel":"gilt","hinweis":"Der Mietspiegel gilt für Wohnungen in Ein- und Mehrfamilienhäusern; für Einfamilienhäuser ist ein Zuschlag vorzunehmen, dessen Höhe der Mietspiegel nicht beziffert (undefinierter Zuschlag)","beleg":"PDF-S. 3 Nr. 1 („Vergleichsmieten für Wohnungen in Ein- und Mehrfamilienhäusern“), PDF-S. 6 Nr. 4.2 („Weitere Zuschläge sind vorzunehmen, wenn … Einfamilienhaus“)"},
  "art": "qualifiziert",
  "stand": "2025-06-01",
  "erhebungsstichtag": "2024-12-31",
