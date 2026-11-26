@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<!-- DEMO (FF6, 26.11.2026) · Quick-Check mit Umschalter „Zum Vermieten / Selbst nutzen“.
+     Nur Demo, kein App-Code. Rechnet mit demo-eigennutzer.js (Annahmen dort kommentiert).
+     Optik: Kachel A wie Objekt-Cockpit (Inter-Beschriftung 10,5 px Versalien, Space Grotesk Zahlen 20 px, Creme-Karten). -->
+<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Quick-Check Demo</title>
+<link rel="stylesheet" href="/fonts/dp-fonts.css">
+<style>
+:root{--ob:#050505;--creme:#FDFCFA;--karte:#FBF6E9;--ink:#1b1a17;--ink2:#6B645A;--line:#E9E1CC;
+  --gd:var(--wl-c9a84c,#C9A84C);--gdh:var(--wl-e8cc7a,#E8CC7A);--gdd:var(--wl-b8932f,#b8932f);--grn:#3FA56C;--rot:#B8625C;--blau:#3A6EA5}
+*{box-sizing:border-box}
+body{margin:0;background:#EDEAE3;font:400 14px/1.5 Inter,system-ui,sans-serif;color:var(--ink)}
+.fenster{max-width:980px;margin:24px auto;background:var(--creme);border-radius:16px;box-shadow:0 30px 80px -30px rgba(0,0,0,.35);overflow:hidden}
+.kopf{background:var(--ob);color:#fff;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.kopf h1{margin:0;font:700 18px/1.2 'Space Grotesk',sans-serif}
+.kopf h1 small{display:block;font:600 10px/1.4 'JetBrains Mono',monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--gdh);margin-bottom:4px}
+.umsch{display:inline-flex;gap:4px;padding:4px;border-radius:999px;background:#111;border:1px solid rgba(232,204,122,.25)}
+.umsch button{border:0;cursor:pointer;padding:9px 16px;border-radius:999px;background:transparent;color:rgba(255,255,255,.65);font:600 11px/1 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;min-height:38px}
+.umsch button.an{background:linear-gradient(110deg,var(--gdh),var(--gd) 55%,var(--gdd));color:#0a0907}
+.inhalt{padding:20px}
+.eing{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:18px}
+.eing label{background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+.eing span{display:block;font:500 10.5px/1.3 Inter,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2)}
+.eing input{width:100%;border:0;font:600 16px/1.3 'Space Grotesk',sans-serif;background:transparent;color:var(--ink);outline:0;padding-top:2px}
+.raster{display:grid;grid-template-columns:1.1fr 1fr;gap:14px}
+.k{background:var(--karte);border:1px solid var(--line);border-radius:14px;padding:16px}
+.k h2{margin:0 0 10px;font:600 10.5px/1.3 Inter,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2)}
+.score{display:flex;gap:16px;align-items:center}
+.ring{position:relative;width:110px;height:110px;flex:0 0 auto}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring b{position:absolute;inset:0;display:grid;place-items:center;font:700 32px/1 'Space Grotesk',sans-serif}
+.score h3{margin:0;font:700 20px/1.2 'Space Grotesk',sans-serif}
+.score p{margin:4px 0 0;color:var(--ink2);font-size:13px}
+.gr{display:grid;gap:8px;margin-top:14px}
+.g{display:grid;grid-template-columns:96px 1fr 30px;gap:10px;align-items:center}
+.g span{font:500 10.5px/1.3 Inter,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2)}
+.g i{height:8px;border-radius:4px;background:#ECE4CF;overflow:hidden;display:block}
+.g i em{display:block;height:100%;border-radius:4px}
+.g b{font:600 15px/1 'Space Grotesk',sans-serif;text-align:right}
+.g small{grid-column:2/4;margin-top:-4px;font-size:12px;color:var(--ink2)}
+.kz{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.kz div{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px}
+.kz b{display:block;font:600 20px/1.1 'Space Grotesk',sans-serif}
+.kz span{display:block;margin-top:4px;font:500 10.5px/1.3 Inter,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2)}
+.ampel{display:flex;align-items:center;gap:10px;margin-top:12px;padding:10px 12px;border-radius:10px;background:#fff;border:1px solid var(--line);font-size:13px}
+.ampel i{width:14px;height:14px;border-radius:50%;flex:0 0 auto}
+.chart{position:relative}
+.chart svg{width:100%;height:auto;display:block}
+.leg{display:flex;gap:16px;font-size:12px;color:var(--ink2);margin-bottom:6px}
+.leg i{display:inline-block;width:14px;height:3px;border-radius:2px;vertical-align:middle;margin-right:6px}
+.tip{position:absolute;pointer-events:none;background:#1b1a17;color:#fff;font-size:12px;padding:7px 9px;border-radius:8px;white-space:nowrap;display:none}
+.satz{margin-top:10px;padding:10px 12px;border-radius:10px;background:color-mix(in srgb,var(--gd) 14%,transparent);font-weight:600}
+.check li{margin:4px 0;font-size:13px}
+.kette{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;align-items:stretch}
+.kette div{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px;position:relative}
+.kette div:not(:last-child)::after{content:"›";position:absolute;right:-7px;top:50%;transform:translateY(-50%);color:var(--gdd);font-weight:700}
+.kette b{display:block;font:600 18px/1.1 'Space Grotesk',sans-serif}
+.kette span{display:block;margin-top:4px;font:500 10.5px/1.3 Inter,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2)}
+.kette small{display:block;margin-top:4px;font-size:11.5px;color:var(--ink2)}
+.fuss{font-size:11px;color:var(--ink2);margin-top:12px}
+.verm{display:none}.ansicht-verm .verm{display:block}.ansicht-verm .selbst{display:none}
+.demo{position:fixed;left:12px;bottom:12px;background:#E08A7E;color:#1a0d0b;font:700 11px/1 'JetBrains Mono',monospace;letter-spacing:.1em;padding:8px 10px;border-radius:8px}
+@media(max-width:720px){.fenster{margin:0;border-radius:0}.eing{grid-template-columns:repeat(2,1fr)}.raster{grid-template-columns:1fr}.kette{grid-template-columns:1fr 1fr}.kette div:nth-child(2)::after{display:none}.ring{width:92px;height:92px}.ring b{font-size:26px}}
+</style></head>
+<body>
+<div class="fenster" id="fenster">
+  <div class="kopf"><h1><small>Quick-Check · Beispielrechnung</small>Musterweg 12, 33602 Bielefeld</h1>
+    <div class="umsch" role="tablist"><button data-m="verm" role="tab">Zum Vermieten</button><button data-m="selbst" class="an" role="tab">Selbst nutzen</button></div></div>
+  <div class="inhalt">
+    <div class="eing">
+      <label><span>Kaufpreis</span><input id="kp" value="310.000"></label>
+      <label><span>Wohnfläche</span><input id="wfl" value="130"></label>
+      <label><span>Baujahr</span><input id="bj" value="1998"></label>
+      <label><span>PLZ</span><input id="plz" value="33602"></label>
+      <label><span>Eigenkapital</span><input id="ek" value="100.000"></label>
+      <label><span>Netto im Monat</span><input id="netto" value="5.200"></label>
+    </div>
+
+    <div class="selbst">
+      <div class="raster">
+        <div class="k"><h2>Ist das Haus gut?</h2>
+          <div class="score"><div class="ring"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="52" fill="none" stroke="#ECE4CF" stroke-width="10"/><circle id="ringFg" cx="60" cy="60" r="52" fill="none" stroke="var(--gd)" stroke-width="10" stroke-linecap="round"/></svg><b id="sz">–</b></div>
+            <div><h3 id="wort">–</h3><p id="gebiet"></p></div></div>
+          <div class="gr" id="gr"></div>
+        </div>
+        <div class="k"><h2>Leistbarkeit</h2>
+          <div class="kz"><div><b id="rate">–</b><span>Rate im Monat</span></div><div><b id="miete">–</b><span>Ersparte Miete</span></div><div><b id="zins">–</b><span>Zins 10 Jahre</span></div></div>
+          <div class="ampel"><i id="ampelI"></i><span id="ampelT">–</span></div>
+          <h2 style="margin-top:16px">Bei der Besichtigung prüfen</h2><ul class="check" id="check"></ul>
+        </div>
+      </div>
+      <div class="k" style="margin-top:14px"><h2>Kaufen oder mieten · Vermögen über 20 Jahre</h2>
+        <div class="leg"><span><i style="background:var(--gdd)"></i>Kaufen</span><span><i style="background:var(--blau)"></i>Mieten und anlegen</span></div>
+        <div class="chart" id="chart"></div><div class="satz" id="satz"></div>
+        <div class="fuss">Beispielrechnung. Wertentwicklung 1,5 %, Mietsteigerung 2 %, Anlagezins 3 % im Jahr, Nebenkosten 10 %, Tilgung 2 %. Keine Finanzierungszusage.</div>
+      </div>
+    </div>
+
+    <div class="verm">
+      <div class="k"><h2>Miete · eine Kette wie in der App</h2>
+        <div class="kette" id="kette"></div>
+        <div class="fuss">Vergleichsmiete aus dem Mietspiegel, sonst DealPilot-Näherung. Zulässig nach Kappungsgrenze in 3 Jahren. Neuvermietung mit Mietpreisbremse höchstens Vergleichsmiete × 1,10.</div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="demo">DEMO · QUICK-CHECK</div>
+<script src="demo-eigennutzer.js?v=ff6-3"></script>
+<script>
+(function(){
+  var E=window.DemoEigennutzer;
+  function z(id){return Number(String(document.getElementById(id).value).replace(/\./g,'').replace(',','.'))||0}
+  function f(s){return s==null?'#cfc6b2':s>=70?'var(--grn)':s>=50?'var(--gd)':'var(--rot)'}
+  function chart(r){
+    var W=640,H=230,L=58,R=14,T=12,B=28,max=0;r.reihe.forEach(function(p){max=Math.max(max,p.kauf,p.mieten)});max=Math.ceil(max/100000)*100000;
+    function x(t){return L+(W-L-R)*t/20}function y(v){return T+(H-T-B)*(1-v/max)}
+    var grid='';for(var g=0;g<=max;g+=max/4){grid+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+y(g)+'" y2="'+y(g)+'" stroke="#E9E1CC"/><text x="'+(L-8)+'" y="'+(y(g)+4)+'" text-anchor="end" font-size="11" fill="#6B645A">'+Math.round(g/1000)+' T€</text>'}
+    for(var t=0;t<=20;t+=5)grid+='<text x="'+x(t)+'" y="'+(H-8)+'" text-anchor="middle" font-size="11" fill="#6B645A">'+(t===0?'heute':t+' J')+'</text>';
+    function pfad(k){return r.reihe.map(function(p,i){return(i?'L':'M')+x(p.t).toFixed(1)+' '+y(p[k]).toFixed(1)}).join(' ')}
+    var end=r.reihe[20];
+    var svg='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Vermögen Kaufen gegen Mieten über 20 Jahre">'+grid+
+      '<path d="'+pfad('mieten')+'" fill="none" stroke="var(--blau)" stroke-width="2"/><path d="'+pfad('kauf')+'" fill="none" stroke="var(--gdd)" stroke-width="2"/>'+
+      (r.jahr?'<line x1="'+x(r.jahr)+'" x2="'+x(r.jahr)+'" y1="'+T+'" y2="'+(H-B)+'" stroke="#1b1a17" stroke-dasharray="3 4" opacity=".5"/>':'')+
+      '<text x="'+(W-R-2)+'" y="'+(y(end.kauf)-6)+'" text-anchor="end" font-size="11" font-weight="600" fill="#1b1a17">Kaufen '+Math.round(end.kauf/1000)+' T€</text>'+
+      '<text x="'+(W-R-2)+'" y="'+(y(end.mieten)+22)+'" text-anchor="end" font-size="11" font-weight="600" fill="#1b1a17">Mieten '+Math.round(end.mieten/1000)+' T€</text>'+
+      '<line id="hx" y1="'+T+'" y2="'+(H-B)+'" stroke="#1b1a17" opacity="0"/><rect x="'+L+'" y="'+T+'" width="'+(W-L-R)+'" height="'+(H-T-B)+'" fill="transparent" id="hit"/></svg><div class="tip" id="tip"></div>';
+    var c=document.getElementById('chart');c.innerHTML=svg;
+    var hit=c.querySelector('#hit'),hx=c.querySelector('#hx'),tip=c.querySelector('#tip'),sv=c.querySelector('svg');
+    hit.addEventListener('mousemove',function(ev){var b=sv.getBoundingClientRect(),px=(ev.clientX-b.left)*W/b.width,t=Math.max(0,Math.min(20,Math.round((px-L)/(W-L-R)*20))),p=r.reihe[t];
+      hx.setAttribute('x1',x(t));hx.setAttribute('x2',x(t));hx.setAttribute('opacity','.35');
+      tip.style.display='block';tip.innerHTML=(t?'Jahr '+t:'heute')+'<br>Kaufen '+E.eur(p.kauf)+'<br>Mieten '+E.eur(p.mieten);
+      tip.style.left=Math.min(b.width-150,(x(t)/W)*b.width+10)+'px';tip.style.top='10px'});
+    hit.addEventListener('mouseleave',function(){tip.style.display='none';hx.setAttribute('opacity','0')});
+  }
+  function zeige(r,e){
+    var U=2*Math.PI*52,el=document.getElementById('ringFg');el.setAttribute('stroke-dasharray',U);el.setAttribute('stroke-dashoffset',U-U*r.gesamt/100);
+    document.getElementById('sz').textContent=r.gesamt;document.getElementById('wort').textContent=r.stufe.wort;document.getElementById('gebiet').textContent=r.gebiet+'. Preis, Zustand, Lage und Leistbarkeit zusammen.';
+    document.getElementById('gr').innerHTML=r.gruppen.map(function(x){return'<div class="g"><span>'+x.k+'</span><i><em style="width:'+(x.s||0)+'%;background:'+f(x.s)+'"></em></i><b>'+(x.s==null?'–':x.s)+'</b><small>'+x.t+'</small></div>'}).join('');
+    document.getElementById('rate').textContent=E.eur(r.rate);document.getElementById('miete').textContent=E.eur(r.miete);document.getElementById('zins').textContent=r.zins.toFixed(2).replace('.',',')+' %';
+    var q=r.quote,ai=document.getElementById('ampelI'),at=document.getElementById('ampelT');
+    if(q==null){ai.style.background='#cfc6b2';at.textContent='Netto-Einkommen eintragen für die Leistbarkeit.'}
+    else{ai.style.background=q<=35?'var(--grn)':q<=45?'var(--gd)':'var(--rot)';at.textContent='Wohnkosten '+E.eur(r.rate+r.bew)+' im Monat, das sind '+Math.round(q)+' % vom Netto. '+(q<=35?'Gut tragbar.':q<=45?'Knapp, Puffer einplanen.':'Zu hoch für die meisten Haushalte.')}
+    document.getElementById('check').innerHTML=r.gruppen[1].punkte.map(function(p){return'<li>'+p+'</li>'}).join('');
+    chart(r);document.getElementById('satz').textContent=r.jahr?'Kaufen ist nach '+r.jahr+' Jahren günstiger als mieten.':'In 20 Jahren wird Kaufen hier nicht günstiger als mieten.';
+    /* Investoren-Kette (Beispiel): Ist = Vergleichsmiete −12 %, zulässig = min(Ist×1,15 (Kappung 15 % Bielefeld), Vergleich oben), Neuvermietung = Vergleich × 1,10 (Bremse) */
+    var vq=r.miete/e.wfl/1.15,ist=vq*0.88,zul=Math.min(ist*1.15,vq*1.16),neu=vq*1.10;
+    function m(qm,t,s){return'<div><b>'+qm.toFixed(2).replace('.',',')+' €/m²</b><span>'+t+'</span><small>'+s+'</small></div>'}
+    document.getElementById('kette').innerHTML=m(ist,'Ist heute','laut Mietvertrag')+m(zul,'Zulässig in 3 Jahren','Kappung 15 %')+m(vq,'Vergleichsmiete',r.quelle==='Mietspiegel'?'Mietspiegel':'DealPilot-Näherung')+m(neu,'Neuvermietung','Mietpreisbremse × 1,10');
+  }
+  function los(){var e={kp:z('kp'),wfl:z('wfl'),bj:z('bj'),ek:z('ek'),netto:z('netto'),plz:document.getElementById('plz').value.trim()};E.daten(e.plz,e.bj,e.wfl).then(function(d){zeige(E.rechne(e,d),e)})}
+  document.querySelectorAll('.eing input').forEach(function(i){i.addEventListener('change',los)});
+  document.querySelector('.umsch').addEventListener('click',function(ev){var b=ev.target.closest('button');if(!b)return;document.querySelectorAll('.umsch button').forEach(function(x){x.classList.toggle('an',x===b)});document.getElementById('fenster').classList.toggle('ansicht-verm',b.getAttribute('data-m')==='verm')});
+  if(/[?&]verm=1/.test(location.search)){document.querySelector('[data-m=verm]').click()}
+  los();
+})();
+</script>
+</body></html>

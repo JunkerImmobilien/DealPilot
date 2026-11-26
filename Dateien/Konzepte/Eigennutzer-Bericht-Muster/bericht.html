@@ -1,0 +1,412 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>DealPilot Haus-Check · Muster</title>
+<!-- MUSTER (HH6, 26.11.2026) · Eigennutzer-Bericht „Haus-Check · Selbst nutzen“.
+     Erfundenes Objekt (Musterstraße 12, 33602 Bielefeld), erfundene Unterlagen.
+     Zahlen gerechnet mit demo-eigennutzer.js (Score, Kaufen/Mieten, Rate), gnotkg.js (Notar, Grundbuch),
+     GrESt NRW 6,5 %, Makler 3,57 % Käuferanteil. Sachwert-Rechenweg mit Beispielwerten (BRW, NHK, SWF),
+     NICHT aus einem echten Marktbericht. Kein Produkt, nur Ansicht. -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root { --gold: var(--wl-c9a84c, #C9A84C); --gold-d: var(--wl-b8932f, #b8932f); --ink: #1a1818; --mut: #6b6560; --linie: #e4ded2; --gruen: #3FA56C; --rot: #B8625C; --creme: #FBF6E9; }
+  @page { size: A4; margin: 0; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #e9e6df; font-family: Inter, Arial, sans-serif; color: var(--ink); font-size: 10.5pt; line-height: 1.45; }
+  .seite { width: 210mm; height: 297mm; margin: 8mm auto; background: #fff; position: relative; padding: 16mm 17mm 20mm; overflow: hidden; page-break-after: always; break-after: page; }
+  @media print { body { background: #fff; } .seite { margin: 0; box-shadow: none; } }
+  .kopf { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1.2px solid var(--ink); padding-bottom: 5mm; margin-bottom: 7mm; }
+  .kopf img { height: 11mm; }
+  .kopf .r { font-family: 'JetBrains Mono', monospace; font-size: 7.5pt; letter-spacing: .14em; text-transform: uppercase; text-align: right; color: var(--ink); line-height: 1.6; }
+  .fuss { position: absolute; left: 17mm; right: 17mm; bottom: 9mm; display: flex; justify-content: space-between; font-size: 7.5pt; color: var(--mut); border-top: .6px solid var(--linie); padding-top: 2.5mm; }
+  .ober { font-family: 'JetBrains Mono', monospace; font-size: 7.5pt; letter-spacing: .18em; text-transform: uppercase; color: var(--gold-d); margin: 0 0 2mm; }
+  h1 { font-family: 'Space Grotesk', sans-serif; font-size: 22pt; margin: 0 0 2mm; letter-spacing: -.01em; }
+  h2 { font-family: 'Space Grotesk', sans-serif; font-size: 17pt; margin: 0 0 2mm; }
+  h3 { font-family: 'Space Grotesk', sans-serif; font-size: 11.5pt; margin: 6mm 0 2mm; }
+  .unter { color: var(--mut); margin: 0 0 6mm; }
+  table { width: 100%; border-collapse: collapse; font-size: 9.5pt; }
+  th { font-family: 'JetBrains Mono', monospace; font-weight: 400; font-size: 7pt; letter-spacing: .14em; text-transform: uppercase; text-align: left; color: var(--mut); border-bottom: 1px solid var(--ink); padding: 2mm 0; }
+  th.z, td.z { text-align: right; }
+  td { border-bottom: .6px solid var(--linie); padding: 2.2mm 0; vertical-align: top; }
+  td small { display: block; color: var(--mut); font-size: 7.8pt; }
+  td.z { font-family: 'JetBrains Mono', monospace; white-space: nowrap; padding-left: 4mm; }
+  tr.summe td { border-top: 1px solid var(--ink); border-bottom: none; font-weight: 600; }
+  .kacheln { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3mm; margin: 5mm 0; }
+  .kachel { border: .8px solid var(--linie); border-top: 2px solid var(--gold); padding: 3mm; }
+  .kachel span { font-family: 'JetBrains Mono', monospace; font-size: 6.8pt; letter-spacing: .14em; text-transform: uppercase; color: var(--mut); display: block; }
+  .kachel b { font-family: 'Space Grotesk', sans-serif; font-size: 15pt; display: block; margin: 1.5mm 0 .5mm; }
+  .kachel small { font-size: 7.5pt; color: var(--mut); }
+  .karte { position: relative; height: 92mm; margin: -16mm -17mm 8mm; overflow: hidden; background: #ddd; }
+  .karte .tiles { position: absolute; display: grid; grid-template-columns: repeat(4, 256px); }
+  .karte .tiles img { width: 256px; height: 256px; display: block; }
+  .karte .logo { position: absolute; left: 17mm; top: 12mm; background: #050505; padding: 2.5mm 3.5mm; border-radius: 2mm; }
+  .karte .logo img { height: 9mm; display: block; }
+  .karte .attr { position: absolute; right: 2mm; bottom: 1.5mm; font-size: 6.5pt; background: rgba(255,255,255,.85); padding: .5mm 1.5mm; }
+  .pin { position: absolute; left: 50%; top: 52%; transform: translate(-50%, -100%); width: 12mm; height: 15mm; }
+  .score { display: flex; gap: 7mm; align-items: center; margin: 5mm 0 2mm; }
+  .ring { width: 34mm; height: 34mm; position: relative; }
+  .ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+  .ring b { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: 'Space Grotesk', sans-serif; font-size: 24pt; }
+  .urteil h2 { margin: 0; }
+  .gruppen { margin: 4mm 0; }
+  .gr { display: grid; grid-template-columns: 28mm 1fr 12mm; gap: 3mm; align-items: center; padding: 2.4mm 0; border-bottom: .6px solid var(--linie); }
+  .gr .bal { height: 2.6mm; background: #efebe2; border-radius: 2mm; overflow: hidden; }
+  .gr .bal i { display: block; height: 100%; border-radius: 2mm; }
+  .gr b { font-family: 'JetBrains Mono', monospace; text-align: right; }
+  .gr p { grid-column: 2 / 4; margin: 0; font-size: 8.6pt; color: var(--mut); }
+  .box { background: var(--creme); border-left: 2px solid var(--gold); padding: 3.5mm 4mm; margin: 4mm 0; font-size: 9.3pt; }
+  .box b { font-family: 'Space Grotesk', sans-serif; }
+  ul.p { margin: 2mm 0; padding-left: 5mm; } ul.p li { margin: 1.2mm 0; }
+  .ampel { display: inline-block; width: 2.6mm; height: 2.6mm; border-radius: 50%; margin-right: 1.5mm; vertical-align: middle; }
+  .zwei { display: grid; grid-template-columns: 1fr 1fr; gap: 6mm; }
+  .check li { list-style: none; position: relative; padding-left: 6mm; margin: 1.6mm 0; font-size: 9.3pt; }
+  .check li::before { content: ''; position: absolute; left: 0; top: .6mm; width: 3.2mm; height: 3.2mm; border: .8px solid var(--ink); border-radius: .6mm; }
+  .check { padding: 0; margin: 1mm 0 3mm; }
+  .check li small { color: var(--mut); }
+  .toc td { padding: 2.6mm 0; font-size: 10.5pt; } .toc td.n { width: 10mm; font-family: 'JetBrains Mono', monospace; color: var(--gold-d); }
+  .quelle { font-size: 7.6pt; color: var(--mut); }
+  .chart { width: 100%; height: auto; margin: 2mm 0 0; }
+</style>
+</head>
+<body>
+
+<!-- 1 · Deckblatt -->
+<section class="seite">
+  <div class="karte" id="karte">
+    <div class="tiles" id="tiles"></div>
+    <svg class="pin" viewBox="0 0 24 30"><path d="M12 0C5.4 0 0 5.2 0 11.6 0 20.3 12 30 12 30s12-9.7 12-18.4C24 5.2 18.6 0 12 0z" fill="#C9A84C"/><path d="M6.5 13.5 12 8.8l5.5 4.7V19h-3.6v-3.6h-3.8V19H6.5z" fill="#fff"/></svg>
+    <div class="logo"><img src="logo.png" alt="DealPilot"></div>
+    <div class="attr">© OpenStreetMap-Mitwirkende · Lage beispielhaft</div>
+  </div>
+  <p class="ober">DealPilot Haus-Check · Selbst nutzen</p>
+  <h1>Einfamilienhaus in 33602 Bielefeld</h1>
+  <p class="unter">Musterstraße 12 · 130 m² Wohnfläche · 480 m² Grundstück · Baujahr 1998 · Kaufpreis 310.000 €</p>
+  <div class="score">
+    <div class="ring"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="52" fill="none" stroke="#efebe2" stroke-width="10"/><circle cx="60" cy="60" r="52" fill="none" stroke="#3FA56C" stroke-width="10" stroke-linecap="round" stroke-dasharray="326.7" stroke-dashoffset="81.7"/></svg><b>75</b></div>
+    <div class="urteil"><p class="ober">Ist das Haus gut?</p><h2>Gut. Der Preis passt, die Lage ist durchschnittlich.</h2><p style="margin:1.5mm 0 0;color:var(--mut)">Für dich als Selbstnutzer: Preis, Zustand und Leistbarkeit sprechen für das Haus. Plane Heizung und Dach in den nächsten Jahren ein.</p></div>
+  </div>
+  <div class="kacheln">
+    <div class="kachel"><span>Wertindikation</span><b>314.000 €</b><small>Sachwertverfahren, vorläufig</small></div>
+    <div class="kachel"><span>Ersparte Miete</span><b>1.091 €</b><small>im Monat, ortsüblich</small></div>
+    <div class="kachel"><span>Rate</span><b>1.247 €</b><small>im Monat, 4,09 % Zins</small></div>
+    <div class="kachel"><span>Kaufen lohnt</span><b>ab Jahr 16</b><small>gegen Mieten und Anlegen</small></div>
+  </div>
+  <table><tr><th>Stand</th><th>Unterlagen</th><th>Bewertungsstichtag</th></tr><tr><td>26.11.2026</td><td>5 gelesen</td><td>26.11.2026</td></tr></table>
+  <div class="fuss"><span>DealPilot · Junker Solution · info@dealpilot.immo</span><span>Muster · Entscheidungshilfe, kein Gutachten · Seite 1</span></div>
+</section>
+
+<!-- 2 · Inhalt -->
+<section class="seite">
+  <div class="kopf"><img src="logo.png" alt="DealPilot"><div class="r">Haus-Check · Inhalt<br>33602 Bielefeld</div></div>
+  <p class="ober">Inhalt</p><h2>Was in diesem Bericht steht</h2>
+  <table class="toc">
+    <tr><td class="n">1</td><td>Kurzurteil: Ist das Haus gut?</td><td class="z">3</td></tr>
+    <tr><td class="n">2</td><td>Deine Unterlagen und Grundangaben</td><td class="z">4</td></tr>
+    <tr><td class="n">3</td><td>Preis gegen Wert, mit Rechenweg</td><td class="z">5</td></tr>
+    <tr><td class="n">4</td><td>Kaufen oder mieten?</td><td class="z">6</td></tr>
+    <tr><td class="n">5</td><td>Leistbarkeit: Was dich das Haus im Monat kostet</td><td class="z">7</td></tr>
+    <tr><td class="n">6</td><td>Zustand, Energie und Sanierung</td><td class="z">8</td></tr>
+    <tr><td class="n">7</td><td>Förderung</td><td class="z">9</td></tr>
+    <tr><td class="n">8</td><td>Lage und Umfeld</td><td class="z">10</td></tr>
+    <tr><td class="n">9</td><td>Checkliste für die Besichtigung</td><td class="z">11</td></tr>
+    <tr><td class="n">10</td><td>Kaufnebenkosten</td><td class="z">12</td></tr>
+    <tr><td class="n">11</td><td>Quellen und Methodik</td><td class="z">13</td></tr>
+  </table>
+  <div class="box"><b>So liest du den Bericht.</b> Seite 3 sagt dir in einer Minute, ob das Haus zu dir passt. Die folgenden Kapitel zeigen, wie wir darauf kommen. Jede Zahl steht mit ihrer Herkunft da: aus deinen Unterlagen, aus deiner Angabe oder aus amtlichen Daten.</div>
+  <div class="fuss"><span>DealPilot · Haus-Check</span><span>Muster · Seite 2 von 13</span></div>
+</section>
+
+<!-- 3 · Kurzurteil -->
+<section class="seite">
+  <div class="kopf"><img src="logo.png" alt="DealPilot"><div class="r">Haus-Check · Kurzurteil<br>33602 Bielefeld</div></div>
+  <p class="ober">1 · Kurzurteil</p><h2>Ist das Haus gut? Gut, 75 von 100.</h2>
+  <p class="unter">Vier Fragen, die für dich als Selbstnutzer zählen. Jede Frage hat eine eigene Note.</p>
+  <div class="gruppen">
+    <div class="gr"><span>Preis</span><div class="bal"><i style="width:77%;background:var(--gruen)"></i></div><b>77</b><p>Du zahlst 23,7 Jahresmieten. Üblich sind am Ort rund 22 bis 26. Der Kaufpreis liegt 1 % unter der Wertindikation.</p></div>
+    <div class="gr"><span>Zustand</span><div class="bal"><i style="width:75%;background:var(--gruen)"></i></div><b>75</b><p>Baujahr 1998, Fenster und Bad modernisiert. Dach und Heizung sind original bzw. 22 Jahre alt.</p></div>
+    <div class="gr"><span>Lage</span><div class="bal"><i style="width:57%;background:var(--gold)"></i></div><b>57</b><p>Durchschnittliche Wohnlage, niedriger Leerstand, Bevölkerung stabil.</p></div>
+    <div class="gr"><span>Leistbarkeit</span><div class="bal"><i style="width:85%;background:var(--gruen)"></i></div><b>85</b><p>Wohnkosten 31,5 % vom Netto-Einkommen. Das liegt im gesunden Bereich unter 35 %.</p></div>
+  </div>
+  <h3>Was du wissen solltest</h3>
+  <ul class="p">
+    <li><b>Preis:</b> Der Preis ist fair. Verhandlungsspielraum siehst du vor allem beim Dach (Kapitel 6).</li>
+    <li><b>Heizung:</b> Gas-Brennwert von 2004. Keine Austauschpflicht, aber in rund 5 bis 10 Jahren steht der Tausch an. Rechne mit 25.000 bis 35.000 € vor Förderung.</li>
+    <li><b>Pflicht nach dem Kauf:</b> Nach dem Eigentümerwechsel musst du innerhalb von zwei Jahren die oberste Geschossdecke dämmen, falls sie noch nicht gedämmt ist. Bitte bei der Besichtigung prüfen.</li>
+    <li><b>Kaufen oder mieten:</b> Kaufen wird nach 16 Jahren günstiger als mieten und das Geld anlegen. Nach 20 Jahren liegt dein Vermögen rund 30.000 € höher.</li>
+  </ul>
+  <div class="box">Die Note folgt den Stufen von DealPilot: ab 85 sehr gut, ab 70 gut, ab 50 solide, ab 35 schwach, darunter kritisch. Gewichtung im Muster: Preis 30 %, Zustand 20 %, Lage 20 %, Leistbarkeit 30 %.</div>
+  <div class="fuss"><span>DealPilot · Haus-Check</span><span>Muster · Seite 3 von 13</span></div>
+</section>
+
+<!-- 4 · Unterlagen -->
+<section class="seite">
+  <div class="kopf"><img src="logo.png" alt="DealPilot"><div class="r">Haus-Check · Unterlagen<br>33602 Bielefeld</div></div>
+  <p class="ober">2 · Unterlagen und Grundangaben</p><h2>Was wir aus deinen Unterlagen gelesen haben</h2>
+  <p class="unter">Erst lesen wir alles ein, dann bestätigst du die Grundangaben. Erst danach rechnen wir.</p>
+  <table>
+    <tr><th>Unterlage</th><th>gelesen</th></tr>
+    <tr><td>Exposé<small>Kaufpreis, Wohnfläche, Grundstück, Baujahr, Ausstattung</small></td><td class="z">8 Angaben</td></tr>
+    <tr><td>Energieausweis (Bedarf)<small>Endenergie 118 kWh/m²a, Klasse D, Gas-Brennwert 2004</small></td><td class="z">5 Angaben</td></tr>
+    <tr><td>Grundriss<small>Wohnfläche je Geschoss, 5 Zimmer, Keller</small></td><td class="z">3 Angaben</td></tr>
+    <tr><td>Modernisierungsliste des Verkäufers<small>Fenster 2015, Bad 2012, Dach original</small></td><td class="z">3 Angaben</td></tr>
+    <tr><td>Flurkarte<small>Grundstück 480 m², keine Baulast genannt</small></td><td class="z">1 Angabe</td></tr>
+  </table>
+  <h3>Grundangaben, von dir bestätigt</h3>
+  <table>
+    <tr><th>Merkmal</th><th class="z">Wert</th></tr>
+    <tr><td>Objektart<small>Exposé</small></td><td class="z">Einfamilienhaus, freistehend</td></tr>
+    <tr><td>Wohnfläche<small>Grundriss, mit Exposé abgeglichen</small></td><td class="z">130 m²</td></tr>
+    <tr><td>Grundstück<small>Flurkarte</small></td><td class="z">480 m²</td></tr>
+    <tr><td>Baujahr<small>Exposé</small></td><td class="z">1998</td></tr>
+    <tr><td>Heizung<small>Energieausweis</small></td><td class="z">Gas-Brennwert 2004</td></tr>
+    <tr><td>Kaufpreis<small>Exposé</small></td><td class="z">310.000 €</td></tr>
+    <tr><td>Eigenkapital<small>deine Angabe</small></td><td class="z">100.000 €</td></tr>
+    <tr><td>Netto-Haushaltseinkommen<small>deine Angabe, freiwillig</small></td><td class="z">5.200 €</td></tr>
+  </table>
+  <div class="box"><b>Abweichung gefunden:</b> Das Exposé nennt 135 m², der Grundriss ergibt 130 m². Wir rechnen mit 130 m². Frag beim Makler nach der Wohnflächenberechnung.</div>
+  <div class="fuss"><span>DealPilot · Haus-Check</span><span>Muster · Seite 4 von 13</span></div>
+</section>
+
+<!-- 5 · Preis gegen Wert -->
+<section class="seite">
+  <div class="kopf"><img src="logo.png" alt="DealPilot"><div class="r">Haus-Check · Wert<br>33602 Bielefeld</div></div>
+  <p class="ober">3 · Preis gegen Wert</p><h2>Zahlst du zu viel? Nein.</h2>
+  <p class="unter">Für ein selbst genutztes Einfamilienhaus ist das Sachwertverfahren der übliche Weg. Daneben steht, was vergleichbare Häuser am Ort kosten sollen.</p>
+  <table>
+    <tr><th>Sachwertverfahren · Rechenweg</th><th class="z">Betrag</th></tr>
+    <tr><td>Bodenwert<small>480 m² × 230 €/m² Bodenrichtwert</small></td><td class="z">110.400 €</td></tr>
+    <tr><td>Herstellungskosten Gebäude<small>195 m² Brutto-Grundfläche × 835 €/m² (Standardstufe 3) × Baupreisindex 2,00</small></td><td class="z">325.650 €</td></tr>
+    <tr><td>Alterswertminderung<small>Restnutzungsdauer 52 von 80 Jahren, Faktor 0,65</small></td><td class="z">− 113.978 €</td></tr>
+    <tr><td>Außenanlagen<small>4 % des Gebäudewerts</small></td><td class="z">8.467 €</td></tr>
+    <tr><td>Vorläufiger Sachwert</td><td class="z">330.539 €</td></tr>
+    <tr><td>Sachwertfaktor<small>Marktanpassung des Gutachterausschusses, Beispielwert</small></td><td class="z">× 0,95</td></tr>
+    <tr class="summe"><td>Wertindikation, gerundet</td><td class="z">314.000 €</td></tr>
+  </table>
+  <h3>Was Häuser am Ort kosten sollen</h3>
+  <table>
+    <tr><td>Marktpreisindikation<small>aus Angebotspreisen vergleichbarer Häuser, nach 10 % Abschlag, kein Verkehrswert</small></td><td class="z">304.000 €</td></tr>
+    <tr><td>Kaufpreis</td><td class="z">310.000 €</td></tr>
+    <tr><td>Kaufpreis in Jahresmieten<small>310.000 € geteilt durch 13.092 € ersparte Jahresmiete</small></td><td class="z">23,7</td></tr>
+  </table>
+  <div class="box">Der Kaufpreis liegt 1 % unter der Wertindikation und 2 % über der Marktpreisindikation. Das ist ein fairer Preis. Einen Verkehrswert nach ImmoWertV weist dieser Bericht nicht aus. Dafür braucht es den amtlichen Marktbericht der Stufe 3 oder ein Gutachten.</div>
+  <p class="quelle">Muster: Bodenrichtwert, Normalherstellungskosten und Sachwertfaktor sind Beispielwerte. Im echten Bericht stehen hier die amtlichen Werte mit Stichtag und Ausschuss.</p>
+  <div class="fuss"><span>DealPilot · Haus-Check</span><span>Muster · Seite 5 von 13</span></div>
+</section>
+
+<!-- 6 · Kaufen oder mieten -->
+<section class="seite">
+  <div class="kopf"><img src="logo.png" alt="DealPilot"><div class="r">Haus-Check · Kaufen oder mieten<br>33602 Bielefeld</div></div>
+  <p class="ober">4 · Kaufen oder mieten?</p><h2>Kaufen ist nach 16 Jahren günstiger.</h2>
+  <p class="unter">Wir vergleichen dein Vermögen in zwei Fällen. Kaufen: Wert des Hauses minus Restschuld. Mieten: Eigenkapital und Kaufnebenkosten angelegt, dazu jeden Monat der Betrag, den der Kauf mehr kostet als die Miete.</p>
+  <svg class="chart" id="chart" viewBox="0 0 640 300"></svg>
+  <table>
+    <tr><th>Nach Jahren</th><th class="z">Kaufen</th><th class="z">Mieten und anlegen</th><th class="z">Unterschied</th></tr>
+    <tr><td>5</td><td class="z">114.940 €</td><td class="z">147.927 €</td><td class="z">− 32.987 €</td></tr>
+    <tr><td>10</td><td class="z">173.328 €</td><td class="z">195.964 €</td><td class="z">− 22.636 €</td></tr>
+    <tr><td>16</td><td class="z">255.719 €</td><td class="z">252.662 €</td><td class="z">+ 3.057 €</td></tr>
+    <tr><td>20</td><td class="z">319.537 €</td><td class="z">289.104 €</td><td class="z">+ 30.433 €</td></tr>
+  </table>
+  <div class="box"><b>Ersparte Miete:</b> 1.091 € im Monat. Das ist die ortsübliche Vergleichsmiete für ein Haus dieser Größe und dieses Baujahrs, Mittelwert mit Hauszuschlag. Für Selbstnutzer rechnen wir bewusst mit dem Mittelwert, nicht mit der höchstmöglichen Miete.</div>
+  <p class="quelle">Annahmen: Wertentwicklung 1,5 % im Jahr, Mietsteigerung 2,0 % im Jahr, Anlagezins 3,0 % im Jahr, Instandhaltung und eigentümertypische Kosten 3,00 €/m² im Monat. Andere Annahmen ändern das Ergebnis. Keine Prognose.</p>
+  <div class="fuss"><span>DealPilot · Haus-Check</span><span>Muster · Seite 6 von 13</span></div>
+</section>
+
+<!-- 7 · Leistbarkeit -->
+<section class="seite">
+  <div class="kopf"><img src="logo.png" alt="DealPilot"><div class="r">Haus-Check · Leistbarkeit<br>33602 Bielefeld</div></div>
+  <p class="ober">5 · Leistbarkeit</p><h2>Was dich das Haus im Monat kostet</h2>
+  <p class="unter">Gerechnet mit dem Bauzins von heute für 10 Jahre Zinsbindung und 2 % Tilgung.</p>
+  <table>
+    <tr><th>Finanzierung</th><th class="z">Betrag</th></tr>
+    <tr><td>Kaufpreis</td><td class="z">310.000 €</td></tr>
+    <tr><td>Kaufnebenkosten<small>Kapitel 10</small></td><td class="z">35.680 €</td></tr>
+    <tr><td>Eigenkapital<small>deine Angabe</small></td><td class="z">− 100.000 €</td></tr>
+    <tr class="summe"><td>Darlehen</td><td class="z">245.680 €</td></tr>
+    <tr><td>Beleihung<small>Darlehen geteilt durch Kaufpreis</small></td><td class="z">79 %</td></tr>
+    <tr><td>Zins 10 Jahre<small>Bauzins heute für diese Beleihung</small></td><td class="z">4,09 %</td></tr>
+  </table>
+  <h3>Monatliche Belastung</h3>
+  <table>
+    <tr><td>Rate (Zins und Tilgung)</td><td class="z">1.247 €</td></tr>
+    <tr><td>Instandhaltung und Rücklage<small>1,50 €/m², Dach und Heizung kommen</small></td><td class="z">195 €</td></tr>
+    <tr><td>Versicherung und Grundsteuer<small>1,50 €/m², trägt sonst der Vermieter</small></td><td class="z">195 €</td></tr>
+    <tr class="summe"><td>Wohnkosten im Monat</td><td class="z">1.637 €</td></tr>
+    <tr><td>Anteil am Netto-Haushaltseinkommen</td><td class="z"><span class="ampel" style="background:var(--gruen)"></span>31,5 %</td></tr>
+  </table>
+  <div class="box">Unter 35 % gilt die Belastung als tragbar, über 40 % wird es eng. Heizung und Strom zahlst du wie ein Mieter auch, deshalb stehen sie nicht in dieser Rechnung. Nach 10 Jahren sind noch rund 190.000 € offen. Steigt der Zins dann um 2 Prozentpunkte, steigt die Rate um etwa 320 €.</div>
+  <p class="quelle">Keine Finanzierungszusage. Die Bank prüft Einkommen, Ausgaben und Objekt selbst.</p>
+  <div class="fuss"><span>DealPilot · Haus-Check</span><span>Muster · Seite 7 von 13</span></div>
+</section>
+
+<!-- 8 · Zustand -->
+<section class="seite">
+  <div class="kopf"><img src="logo.png" alt="DealPilot"><div class="r">Haus-Check · Zustand<br>33602 Bielefeld</div></div>
+  <p class="ober">6 · Zustand, Energie und Sanierung</p><h2>Was in den nächsten Jahren auf dich zukommt</h2>
+  <div class="zwei">
+    <div>
+      <h3 style="margin-top:0">Typisch für Baujahr 1998</h3>
+      <ul class="p"><li>Wärmedämmfassade auf Risse und Algen prüfen</li><li>Fenster und Lüftung, Feuchte in Ecken</li><li>Heizung: Tausch meist nach 25 bis 30 Jahren</li><li>Dachabdichtung und Dachfenster</li></ul>
+    </div>
+    <div>
+      <h3 style="margin-top:0">Aus deinen Unterlagen</h3>
+      <ul class="p"><li>Energieklasse D, 118 kWh/m²a <small>(Energieausweis)</small></li><li>Fenster 2015 und Bad 2012 erneuert <small>(Modernisierungsliste)</small></li><li>Dach original von 1998 <small>(Modernisierungsliste)</small></li><li>Abweichung Wohnfläche 135 zu 130 m² <small>(Exposé, Grundriss)</small></li></ul>
+    </div>
+  </div>
+  <h3>Heizung und Gebäudeenergiegesetz</h3>
+  <table>
+    <tr><td>Austauschpflicht nach 30 Jahren<small>gilt nicht für Brennwertkessel</small></td><td class="z">keine</td></tr>
+    <tr><td>Beim Tausch<small>neue Heizung mit 65 % erneuerbarer Energie, Übergangsfristen beachten</small></td><td class="z">ab Tausch</td></tr>
+    <tr><td>Nach dem Eigentümerwechsel<small>oberste Geschossdecke dämmen und Leitungen im Keller dämmen, falls noch nicht geschehen</small></td><td class="z">2 Jahre</td></tr>
+    <tr><td>Heizkosten heute<small>15.340 kWh im Jahr × 0,12 €/kWh, Bedarf laut Ausweis</small></td><td class="z">1.841 € im Jahr</td></tr>
+  </table>
+  <h3>Grobe Kosten je Gewerk</h3>
+  <table>
+    <tr><th>Gewerk</th><th>wann</th><th class="z">Kosten grob</th></tr>
+    <tr><td>Heizung auf Wärmepumpe</td><td>in 5 bis 10 Jahren</td><td class="z">25.000 bis 35.000 €</td></tr>
+    <tr><td>Dach neu eindecken und dämmen</td><td>in 5 bis 15 Jahren</td><td class="z">30.000 bis 45.000 €</td></tr>
+    <tr><td>Oberste Geschossdecke dämmen</td><td>in 2 Jahren, falls offen</td><td class="z">2.500 bis 5.000 €</td></tr>
+    <tr><td>Fassade ausbessern und streichen</td><td>bei Bedarf</td><td class="z">8.000 bis 15.000 €</td></tr>
+  </table>
+  <p class="quelle">Kostenrahmen sind Erfahrungswerte für ein Haus dieser Größe, vor Förderung. Sie ersetzen kein Angebot eines Fachbetriebs.</p>
+  <div class="fuss"><span>DealPilot · Haus-Check</span><span>Muster · Seite 8 von 13</span></div>
+</section>
+
+<!-- 9 · Förderung -->
+<section class="seite">
+  <div class="kopf"><img src="logo.png" alt="DealPilot"><div class="r">Haus-Check · Förderung<br>33602 Bielefeld</div></div>
+  <p class="ober">7 · Förderung</p><h2>Wofür es Geld vom Staat geben kann</h2>
+  <p class="unter">Öffentliche Programme ändern sich oft. Prüfe vor jedem Auftrag, was am Tag der Antragstellung gilt.</p>
+  <table>
+    <tr><th>Maßnahme</th><th>Programm</th><th class="z">Förderung, Größenordnung</th></tr>
+    <tr><td>Heizung auf Wärmepumpe</td><td>KfW Heizungsförderung</td><td class="z">Zuschuss, Anteil der Kosten</td></tr>
+    <tr><td>Dämmung, Fenster, Lüftung</td><td>BAFA Einzelmaßnahmen</td><td class="z">Zuschuss, Bonus mit Sanierungsfahrplan</td></tr>
+    <tr><td>Sanierungsfahrplan</td><td>BAFA Energieberatung</td><td class="z">Zuschuss zur Beratung</td></tr>
+    <tr><td>Kauf und Sanierung zusammen</td><td>KfW Wohngebäude Kredit</td><td class="z">zinsgünstiger Kredit</td></tr>
+    <tr><td>Kauf durch Familien</td><td>KfW Wohneigentum für Familien</td><td class="z">je nach Einkommen</td></tr>
+  </table>
+  <div class="box"><b>Tipp:</b> Lass vor dem ersten Auftrag einen Sanierungsfahrplan erstellen. Er bringt bei vielen Einzelmaßnahmen einen Bonus und zeigt dir die sinnvolle Reihenfolge, zum Beispiel erst Dach und Dämmung, dann die Heizung.</div>
+  <p class="quelle">Hinweis: Diese Übersicht ist allgemein. Höhe, Bedingungen und Fristen bestimmen die Programme selbst. DealPilot vermittelt keine Förderung.</p>
+  <div class="fuss"><span>DealPilot · Haus-Check</span><span>Muster · Seite 9 von 13</span></div>
+</section>
+
+<!-- 10 · Lage -->
+<section class="seite">
+  <div class="kopf"><img src="logo.png" alt="DealPilot"><div class="r">Haus-Check · Lage<br>33602 Bielefeld</div></div>
+  <p class="ober">8 · Lage und Umfeld</p><h2>Durchschnittliche Lage, stabile Nachfrage</h2>
+  <table>
+    <tr><td>Makrolage<small>Wirtschaft, Kaufkraft, Erreichbarkeit der Stadt</small></td><td class="z">51 von 100</td></tr>
+    <tr><td>Leerstand<small>Anteil leer stehender Wohnungen</small></td><td class="z">niedrig</td></tr>
+    <tr><td>Bevölkerung<small>Entwicklung der letzten Jahre</small></td><td class="z">stabil, + 0,1 % im Jahr</td></tr>
+    <tr><td>Bodenrichtwert<small>Zone Wohnen, Stichtag 01.01.2026</small></td><td class="z">230 €/m²</td></tr>
+    <tr><td>Nahversorgung<small>Supermarkt, Schule, Arzt in Laufweite</small></td><td class="z">gut</td></tr>
+    <tr><td>Lärm<small>Straße und Bahn laut Lärmkarte</small></td><td class="z">gering</td></tr>
+  </table>
+  <div class="box">Für den Wert zählt die Lage stark. Für dich zählt dazu, was die Karte nicht zeigt: Nachbarschaft, Schulweg, Licht am Abend. Geh einmal am Abend und einmal am Wochenende vorbei.</div>
+  <p class="quelle">Muster: Lagewerte beispielhaft. Im echten Bericht kommen sie aus amtlichen Statistiken, mit Stand.</p>
+  <div class="fuss"><span>DealPilot · Haus-Check</span><span>Muster · Seite 10 von 13</span></div>
+</section>
+
+<!-- 11 · Checkliste -->
+<section class="seite">
+  <div class="kopf"><img src="logo.png" alt="DealPilot"><div class="r">Haus-Check · Besichtigung<br>33602 Bielefeld</div></div>
+  <p class="ober">9 · Checkliste für die Besichtigung</p><h2>Zum Ausdrucken und Abhaken</h2>
+  <div class="zwei">
+    <div>
+      <h3 style="margin-top:0">Aus deinen Unterlagen</h3>
+      <ul class="check">
+        <li>Wohnfläche: Berechnung zeigen lassen <small>(135 zu 130 m²)</small></li>
+        <li>Dach von 1998: Ziegel, Dachfenster, Feuchte im Dachboden</li>
+        <li>Oberste Geschossdecke gedämmt? <small>(Pflicht nach Kauf)</small></li>
+        <li>Heizung 2004: Wartungsprotokoll, Schornsteinfeger</li>
+      </ul>
+      <h3>Typisch für Baujahr 1998</h3>
+      <ul class="check">
+        <li>Fassade: Risse, Algen, Spechtlöcher</li>
+        <li>Fenster: Dichtungen, Beschläge, Schimmel in Ecken</li>
+        <li>Keller: Feuchte, Ausblühungen</li>
+        <li>Elektrik: Sicherungskasten, FI-Schalter</li>
+      </ul>
+    </div>
+    <div>
+      <h3 style="margin-top:0">Bei jeder Besichtigung</h3>
+      <ul class="check">
+        <li>Feuchte und Gerüche im Keller</li>
+        <li>Risse in Wänden und Decken</li>
+        <li>Wasserdruck und Warmwasser</li>
+        <li>Bad: Silikonfugen, Abfluss</li>
+        <li>Energieausweis im Original</li>
+        <li>Grundbuch: Rechte und Lasten</li>
+        <li>Baulastenverzeichnis anfragen</li>
+        <li>Nachbarschaft am Abend ansehen</li>
+      </ul>
+      <h3>Meine Notizen</h3>
+      <div style="border-bottom:.6px solid var(--linie);height:9mm"></div><div style="border-bottom:.6px solid var(--linie);height:9mm"></div><div style="border-bottom:.6px solid var(--linie);height:9mm"></div>
+    </div>
+  </div>
+  <div class="fuss"><span>DealPilot · Haus-Check</span><span>Muster · Seite 11 von 13</span></div>
+</section>
+
+<!-- 12 · Kaufnebenkosten -->
+<section class="seite">
+  <div class="kopf"><img src="logo.png" alt="DealPilot"><div class="r">Haus-Check · Nebenkosten<br>33602 Bielefeld</div></div>
+  <p class="ober">10 · Kaufnebenkosten</p><h2>Was zum Kaufpreis dazukommt</h2>
+  <table>
+    <tr><th>Posten</th><th class="z">Betrag</th></tr>
+    <tr><td>Grunderwerbsteuer<small>6,5 % in Nordrhein-Westfalen</small></td><td class="z">20.150 €</td></tr>
+    <tr><td>Notar<small>Kaufvertrag und Grundschuld nach Gebührenordnung, mit Umsatzsteuer</small></td><td class="z">2.975 €</td></tr>
+    <tr><td>Grundbuchamt<small>Eigentumsumschreibung und Grundschuld</small></td><td class="z">1.488 €</td></tr>
+    <tr><td>Makler<small>3,57 % Käuferanteil mit Umsatzsteuer</small></td><td class="z">11.067 €</td></tr>
+    <tr class="summe"><td>Kaufnebenkosten gesamt<small>11,5 % des Kaufpreises</small></td><td class="z">35.680 €</td></tr>
+  </table>
+  <div class="box">Notar- und Grundbuchkosten sind gesetzlich festgelegt und bei jedem Notar gleich. Die Maklerprovision teilen sich Käufer und Verkäufer bei Einfamilienhäusern in der Regel hälftig. Banken finanzieren die Nebenkosten oft nicht mit, plane sie aus dem Eigenkapital.</div>
+  <div class="fuss"><span>DealPilot · Haus-Check</span><span>Muster · Seite 12 von 13</span></div>
+</section>
+
+<!-- 13 · Quellen -->
+<section class="seite">
+  <div class="kopf"><img src="logo.png" alt="DealPilot"><div class="r">Haus-Check · Quellen<br>33602 Bielefeld</div></div>
+  <p class="ober">11 · Quellen und Methodik</p><h2>Woher die Zahlen kommen</h2>
+  <table>
+    <tr><td>Objektdaten<small>deine Unterlagen und deine Angaben, Kapitel 2</small></td></tr>
+    <tr><td>Wertindikation<small>Sachwertverfahren nach ImmoWertV mit Bodenrichtwert, Normalherstellungskosten und Sachwertfaktor des zuständigen Gutachterausschusses</small></td></tr>
+    <tr><td>Marktpreisindikation<small>Angebotspreise vergleichbarer Häuser im Umkreis, mit Abschlag auf übliche Kaufpreise</small></td></tr>
+    <tr><td>Ersparte Miete<small>Mietspiegel der Gemeinde, sonst DealPilot-Näherung aus Zensus und amtlichen Marktmieten, mit Hauszuschlag</small></td></tr>
+    <tr><td>Zins<small>Bauzins von heute je Beleihung und Zinsbindung</small></td></tr>
+    <tr><td>Kaufnebenkosten<small>Grunderwerbsteuer des Landes, Gerichts- und Notarkostengesetz</small></td></tr>
+    <tr><td>Lage<small>amtliche Statistiken zu Wirtschaft, Bevölkerung und Leerstand</small></td></tr>
+  </table>
+  <div class="box"><b>Grenzen.</b> Dieser Bericht ist eine Entscheidungshilfe, kein Gutachten und keine Finanzierungszusage. Er ersetzt nicht die Besichtigung, die Prüfung durch einen Fachbetrieb und den Blick ins Grundbuch.</div>
+  <p class="quelle">Karte: © OpenStreetMap-Mitwirkende. Muster mit erfundenem Objekt und erfundenen Unterlagen.</p>
+  <div class="fuss"><span>DealPilot · Junker Solution · info@dealpilot.immo</span><span>Muster · Seite 13 von 13</span></div>
+</section>
+
+<script>
+/* Karte: OSM-Kacheln um Bielefeld-Mitte (beispielhafte Lage), 4×2 Kacheln, Zoom 16 */
+(function () {
+  var lat = 52.0215, lon = 8.5340, z = 16, n = Math.pow(2, z);
+  var x = (lon + 180) / 360 * n, y = (1 - Math.log(Math.tan(lat * Math.PI / 180) + 1 / Math.cos(lat * Math.PI / 180)) / Math.PI) / 2 * n;
+  var x0 = Math.floor(x) - 2, y0 = Math.floor(y) - 1, t = document.getElementById('tiles'), k = document.getElementById('karte');
+  for (var j = 0; j < 2; j++) for (var i = 0; i < 4; i++) { var im = new Image(); im.src = 'https://tile.openstreetmap.org/' + z + '/' + (x0 + i) + '/' + (y0 + j) + '.png'; t.appendChild(im); }
+  var w = k.clientWidth, h = k.clientHeight, px = (x - x0) * 256, py = (y - y0) * 256;
+  t.style.left = (w / 2 - px) + 'px'; t.style.top = (h * 0.52 - py) + 'px';
+})();
+/* Diagramm Kaufen gegen Mieten (Vermögen in Tsd. €) */
+(function () {
+  var R = [[0,64320,100000],[1,73884,109546],[2,83718,119116],[3,93832,128706],[4,104236,138311],[5,114940,147927],[6,125953,157547],[7,137287,167167],[8,148953,176781],[9,160963,186382],[10,173328,195964],[11,186061,205521],[12,199175,215045],[13,212683,224529],[14,226600,233965],[15,240940,243346],[16,255719,252662],[17,270951,261906],[18,286653,271067],[19,302842,280136],[20,319537,289104]];
+  var W = 640, H = 300, L = 56, Rr = 120, T = 18, B = 34, max = 350000;
+  function X(t) { return L + t / 20 * (W - L - Rr); } function Y(v) { return T + (1 - v / max) * (H - T - B); }
+  var s = '';
+  for (var v = 0; v <= max; v += 50000) s += '<line x1="' + L + '" x2="' + (W - Rr) + '" y1="' + Y(v) + '" y2="' + Y(v) + '" stroke="#ece7dc"/><text x="' + (L - 8) + '" y="' + (Y(v) + 4) + '" text-anchor="end" font-size="10" fill="#6b6560" font-family="JetBrains Mono">' + (v / 1000) + '</text>';
+  for (var t = 0; t <= 20; t += 5) s += '<text x="' + X(t) + '" y="' + (H - 12) + '" text-anchor="middle" font-size="10" fill="#6b6560" font-family="JetBrains Mono">Jahr ' + t + '</text>';
+  s += '<line x1="' + X(16) + '" x2="' + X(16) + '" y1="' + T + '" y2="' + (H - B) + '" stroke="#1a1818" stroke-dasharray="4 4"/><text x="' + (X(16) - 4) + '" y="' + (T + 10) + '" text-anchor="end" font-size="10" fill="#1a1818" font-family="Inter">ab Jahr 16 liegt Kaufen vorn</text>';
+  function linie(i, farbe) { return '<polyline fill="none" stroke="' + farbe + '" stroke-width="2.6" points="' + R.map(function (r) { return X(r[0]).toFixed(1) + ',' + Y(r[i]).toFixed(1); }).join(' ') + '"/>'; }
+  s += linie(2, '#3B6FA0') + linie(1, '#C9A84C');
+  s += '<text x="' + (X(20) + 6) + '" y="' + (Y(319537) + 4) + '" font-size="11" fill="#8a6d1f" font-family="Inter" font-weight="600">Kaufen 320 Tsd.</text>';
+  s += '<text x="' + (X(20) + 6) + '" y="' + (Y(289104) + 12) + '" font-size="11" fill="#3B6FA0" font-family="Inter" font-weight="600">Mieten 289 Tsd.</text>';
+  s += '<text x="' + L + '" y="' + (T - 6) + '" font-size="10" fill="#6b6560" font-family="JetBrains Mono">Vermögen in Tsd. €</text>';
+  document.getElementById('chart').innerHTML = s;
+})();
+</script>
+</body>
+</html>
