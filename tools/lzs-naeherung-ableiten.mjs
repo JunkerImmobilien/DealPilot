@@ -164,7 +164,10 @@ const kennz = (e) => ({ median_pp: r3(median(e)), p80_pp: r3(quantil(e, 0.8)), p
  *                      die Spanne sich selbst).
  * Ausgegeben wird sie noch nicht (Marcels Entscheidung); lzsNaeherung()
  * liefert pct_von/pct_bis mit. */
-const laenderBesser = Object.keys(lolo.jeGruppe).filter((l) => lolo.jeGruppe[l].formel_median_pp < lolo.jeGruppe[l].bewg256_median_pp).sort();
+/* UU5 26.11.2026 · Mindestens 8 Saetze je Land, bevor die Formel dort eingesetzt wird (wie beim
+   Landesmittel). Ohne die Schwelle kam BY mit EINEM amtlichen Satz in den Einsatz. */
+const MIN_EINSATZ_SAETZE = 8;
+const laenderBesser = Object.keys(lolo.jeGruppe).filter((l) => lolo.jeGruppe[l].saetze >= MIN_EINSATZ_SAETZE && lolo.jeGruppe[l].formel_median_pp < lolo.jeGruppe[l].bewg256_median_pp).sort();
 const einsatz = rows.filter((r) => laenderBesser.includes(r.land));
 const fehlerLoao = (r) => Math.abs(loao.vorhersage.get(r) - r.w);
 const spanne = {}, deckungJe = {};

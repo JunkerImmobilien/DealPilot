@@ -1,10 +1,10 @@
 {
-  "stand": "2026-10-21",
+  "stand": "2026-11-26",
   "form": "UK(WGFZ Objekt)/UK(WGFZ Richtwert) = (WGFZ Objekt / WGFZ Richtwert)^b",
   "herkunft": "DealPilot-Naeherung aus allen amtlichen WGFZ-Umrechnungstabellen und -formeln des Registers (Werte und interne Stuetzstellen), Median der Exponenten je Kurve; gleiche Zahlenreihen einmal gezaehlt",
   "kennzeichnung": "abgeleitet aus der DealPilot-Formel (nie amtlich)",
   "stufe": "N",
-  "empfehlung": "Ein Exponent fuer den Geschosswohnungsbau (b = 0.498 aus 80 Kurven, 15 Laender). Individueller Wohnungsbau getrennt waere flacher (b = 0.342), aber nur 6 Kurven aus BY/NW - zu wenig; dort rechnen die Ausschuesse ueber die Flaeche, keine WGFZ-Naeherung. Gewerbe/Geschaeft nicht einbezogen (b = 0.805, fast proportional). Mit dem Bodenrichtwert steigt b in den Tabellen mit BRW-Zeilen deutlich (VW-RL-Typ), getragen von nur 22 Kurven aus NW/HE/HB - als Befund dokumentiert, nicht getrennt.",
+  "empfehlung": "Ein Exponent fuer den Geschosswohnungsbau (b = 0.498 aus 82 Kurven, 15 Laender). Individueller Wohnungsbau getrennt waere flacher (b = 0.342), aber nur 6 Kurven aus BY/NW - zu wenig; dort rechnen die Ausschuesse ueber die Flaeche, keine WGFZ-Naeherung. Gewerbe/Geschaeft nicht einbezogen (b = 0.825, fast proportional). Mit dem Bodenrichtwert steigt b in den Tabellen mit BRW-Zeilen deutlich (VW-RL-Typ), getragen von nur 22 Kurven aus NW/HE/HB - als Befund dokumentiert, nicht getrennt.",
   "gilt_fuer": {
     "verhaeltnis_von": 0.5,
     "verhaeltnis_bis": 2,
@@ -22,30 +22,30 @@
   "alle": {
     "b": 0.494,
     "b_q1": 0.37,
-    "b_q3": 0.561,
+    "b_q3": 0.558,
     "b_min": 0,
     "b_max": 1.185,
-    "b_p10": 0.234,
-    "b_p90": 0.754,
+    "b_p10": 0.236,
+    "b_p90": 0.748,
     "pruefung": {
       "loto": {
-        "median_pct": 3.584,
-        "p80_pct": 9.456,
-        "p95_pct": 19.623,
-        "punkte": 14740
+        "median_pct": 3.573,
+        "p80_pct": 9.398,
+        "p95_pct": 19.449,
+        "punkte": 15208
       },
       "lolo": {
-        "median_pct": 3.527,
-        "p80_pct": 9.498,
-        "p95_pct": 19.685,
-        "punkte": 14740
+        "median_pct": 3.517,
+        "p80_pct": 9.448,
+        "p95_pct": 19.559,
+        "punkte": 15208
       },
       "spanne_b_deckung_pct": 78.3,
       "methode": "Leave-one-Kurve-out (b = Median der uebrigen Kurven) und Leave-one-Land-out; |Naeherung/amtlich - 1| in Prozent an allen Stuetzpunkten; Spanne r^b_p10..r^b_p90 mit P10/P90 der uebrigen Kurven"
     },
-    "tabellen": 86,
-    "uebernahmen": 252,
-    "punkte": 14740,
+    "tabellen": 88,
+    "uebernahmen": 263,
+    "punkte": 15208,
     "laender": [
       "BB",
       "BE",
@@ -65,8 +65,8 @@
     ],
     "wgfz_median_von": 0.4,
     "wgfz_median_bis": 3,
-    "abweichung_median_pct": 3.562,
-    "abweichung_p90_pct": 14.602
+    "abweichung_median_pct": 3.548,
+    "abweichung_p90_pct": 14.476
   },
   "ifw": {
     "b": 0.342,
@@ -107,31 +107,31 @@
   },
   "gwb": {
     "b": 0.498,
-    "b_q1": 0.379,
-    "b_q3": 0.576,
+    "b_q1": 0.373,
+    "b_q3": 0.566,
     "b_min": 0,
     "b_max": 1.185,
-    "b_p10": 0.253,
-    "b_p90": 0.775,
+    "b_p10": 0.255,
+    "b_p90": 0.768,
     "pruefung": {
       "loto": {
-        "median_pct": 3.589,
-        "p80_pct": 9.445,
-        "p95_pct": 19.487,
-        "punkte": 14219
+        "median_pct": 3.576,
+        "p80_pct": 9.353,
+        "p95_pct": 19.409,
+        "punkte": 14687
       },
       "lolo": {
-        "median_pct": 3.51,
-        "p80_pct": 9.415,
-        "p95_pct": 19.605,
-        "punkte": 14219
+        "median_pct": 3.502,
+        "p80_pct": 9.356,
+        "p95_pct": 19.462,
+        "punkte": 14687
       },
-      "spanne_b_deckung_pct": 78.1,
+      "spanne_b_deckung_pct": 78,
       "methode": "Leave-one-Kurve-out (b = Median der uebrigen Kurven) und Leave-one-Land-out; |Naeherung/amtlich - 1| in Prozent an allen Stuetzpunkten; Spanne r^b_p10..r^b_p90 mit P10/P90 der uebrigen Kurven"
     },
-    "tabellen": 80,
-    "uebernahmen": 246,
-    "punkte": 14219,
+    "tabellen": 82,
+    "uebernahmen": 257,
+    "punkte": 14687,
     "laender": [
       "BB",
       "BE",
@@ -151,36 +151,36 @@
     ],
     "wgfz_median_von": 0.4,
     "wgfz_median_bis": 3,
-    "abweichung_median_pct": 3.549,
-    "abweichung_p90_pct": 14.576
+    "abweichung_median_pct": 3.542,
+    "abweichung_p90_pct": 14.433
   },
   "gewerbe_nicht_in_der_formel": {
-    "b": 0.805,
-    "b_q1": 0.745,
-    "b_q3": 0.956,
+    "b": 0.825,
+    "b_q1": 0.758,
+    "b_q3": 1,
     "b_min": 0.398,
     "b_max": 1,
-    "b_p10": 0.565,
+    "b_p10": 0.598,
     "b_p90": 1,
     "pruefung": {
       "loto": {
-        "median_pct": 4.511,
-        "p80_pct": 12.217,
-        "p95_pct": 23.077,
-        "punkte": 819
+        "median_pct": 5.704,
+        "p80_pct": 11.536,
+        "p95_pct": 25.713,
+        "punkte": 998
       },
       "lolo": {
-        "median_pct": 4.634,
-        "p80_pct": 12.663,
-        "p95_pct": 23.077,
-        "punkte": 819
+        "median_pct": 5.492,
+        "p80_pct": 11.15,
+        "p95_pct": 21.262,
+        "punkte": 998
       },
-      "spanne_b_deckung_pct": 35.7,
+      "spanne_b_deckung_pct": 82.4,
       "methode": "Leave-one-Kurve-out (b = Median der uebrigen Kurven) und Leave-one-Land-out; |Naeherung/amtlich - 1| in Prozent an allen Stuetzpunkten; Spanne r^b_p10..r^b_p90 mit P10/P90 der uebrigen Kurven"
     },
-    "tabellen": 6,
-    "uebernahmen": 6,
-    "punkte": 819,
+    "tabellen": 7,
+    "uebernahmen": 7,
+    "punkte": 998,
     "laender": [
       "BE",
       "BY",
@@ -188,38 +188,38 @@
       "HH",
       "NW"
     ],
-    "wgfz_median_von": 0.75,
-    "wgfz_median_bis": 3.1,
-    "abweichung_median_pct": 3.839,
-    "abweichung_p90_pct": 14.805
+    "wgfz_median_von": 0.5,
+    "wgfz_median_bis": 3,
+    "abweichung_median_pct": 4.493,
+    "abweichung_p90_pct": 12.912
   },
   "nur_werte": {
     "b": 0.487,
-    "b_q1": 0.39,
-    "b_q3": 0.551,
+    "b_q1": 0.37,
+    "b_q3": 0.549,
     "b_min": 0,
     "b_max": 1.185,
-    "b_p10": 0.258,
-    "b_p90": 0.713,
+    "b_p10": 0.259,
+    "b_p90": 0.706,
     "pruefung": {
       "loto": {
-        "median_pct": 3.369,
-        "p80_pct": 8.657,
-        "p95_pct": 19.352,
-        "punkte": 11760
+        "median_pct": 3.366,
+        "p80_pct": 8.602,
+        "p95_pct": 18.959,
+        "punkte": 12228
       },
       "lolo": {
-        "median_pct": 3.362,
-        "p80_pct": 8.809,
-        "p95_pct": 19.723,
-        "punkte": 11760
+        "median_pct": 3.355,
+        "p80_pct": 8.727,
+        "p95_pct": 19.428,
+        "punkte": 12228
       },
       "spanne_b_deckung_pct": 76.9,
       "methode": "Leave-one-Kurve-out (b = Median der uebrigen Kurven) und Leave-one-Land-out; |Naeherung/amtlich - 1| in Prozent an allen Stuetzpunkten; Spanne r^b_p10..r^b_p90 mit P10/P90 der uebrigen Kurven"
     },
-    "tabellen": 67,
-    "uebernahmen": 193,
-    "punkte": 11760,
+    "tabellen": 69,
+    "uebernahmen": 204,
+    "punkte": 12228,
     "laender": [
       "BB",
       "BE",
@@ -234,36 +234,36 @@
     ],
     "wgfz_median_von": 0.4,
     "wgfz_median_bis": 3,
-    "abweichung_median_pct": 3.331,
-    "abweichung_p90_pct": 13.927
+    "abweichung_median_pct": 3.329,
+    "abweichung_p90_pct": 13.721
   },
   "stadt": {
     "b": 0.508,
     "b_q1": 0.414,
-    "b_q3": 0.607,
+    "b_q3": 0.595,
     "b_min": 0.125,
     "b_max": 1.185,
-    "b_p10": 0.266,
-    "b_p90": 0.789,
+    "b_p10": 0.268,
+    "b_p90": 0.782,
     "pruefung": {
       "loto": {
-        "median_pct": 3.338,
-        "p80_pct": 9.162,
-        "p95_pct": 18.867,
-        "punkte": 13430
+        "median_pct": 3.345,
+        "p80_pct": 9.125,
+        "p95_pct": 18.76,
+        "punkte": 13898
       },
       "lolo": {
-        "median_pct": 3.294,
-        "p80_pct": 9.19,
-        "p95_pct": 19.049,
-        "punkte": 13430
+        "median_pct": 3.299,
+        "p80_pct": 9.16,
+        "p95_pct": 18.929,
+        "punkte": 13898
       },
-      "spanne_b_deckung_pct": 78.5,
+      "spanne_b_deckung_pct": 78.4,
       "methode": "Leave-one-Kurve-out (b = Median der uebrigen Kurven) und Leave-one-Land-out; |Naeherung/amtlich - 1| in Prozent an allen Stuetzpunkten; Spanne r^b_p10..r^b_p90 mit P10/P90 der uebrigen Kurven"
     },
-    "tabellen": 76,
-    "uebernahmen": 228,
-    "punkte": 13430,
+    "tabellen": 78,
+    "uebernahmen": 239,
+    "punkte": 13898,
     "laender": [
       "BB",
       "BE",
@@ -282,8 +282,8 @@
     ],
     "wgfz_median_von": 0.4,
     "wgfz_median_bis": 3,
-    "abweichung_median_pct": 3.325,
-    "abweichung_p90_pct": 14.032
+    "abweichung_median_pct": 3.334,
+    "abweichung_p90_pct": 13.948
   },
   "land": {
     "b": 0.291,
@@ -502,16 +502,16 @@
     },
     "gwb_mit_gesamt_b": {
       "b": 0.494,
-      "b_q1": 0.379,
-      "b_q3": 0.576,
+      "b_q1": 0.373,
+      "b_q3": 0.566,
       "b_min": 0,
       "b_max": 1.185,
-      "b_p10": 0.253,
-      "b_p90": 0.775,
+      "b_p10": 0.255,
+      "b_p90": 0.768,
       "pruefung": null,
-      "tabellen": 80,
-      "uebernahmen": 246,
-      "punkte": 14219,
+      "tabellen": 82,
+      "uebernahmen": 257,
+      "punkte": 14687,
       "laender": [
         "BB",
         "BE",
@@ -531,8 +531,8 @@
       ],
       "wgfz_median_von": 0.4,
       "wgfz_median_bis": 3,
-      "abweichung_median_pct": 3.566,
-      "abweichung_p90_pct": 14.548
+      "abweichung_median_pct": 3.546,
+      "abweichung_p90_pct": 14.452
     }
   },
   "kurven": [
@@ -684,6 +684,15 @@
       ]
     },
     {
+      "wo": "BW Heidelberg, Stadtkreis [mfh]",
+      "land": "BW",
+      "klasse": "gwb",
+      "quelle": "wert",
+      "brw": null,
+      "b": 0.531,
+      "punkte": 213
+    },
+    {
       "wo": "BW Heilbronn, Stadtkreis [alle]",
       "land": "BW",
       "klasse": "alle",
@@ -735,6 +744,26 @@
         "BW Ottersweier [mfh]",
         "BW Sinzheim [mfh]",
         "BW Rheinmünster [mfh]"
+      ]
+    },
+    {
+      "wo": "BW Altdorf [alle]",
+      "land": "BW",
+      "klasse": "gwb",
+      "quelle": "wert",
+      "brw": null,
+      "b": 0.324,
+      "punkte": 255,
+      "uebernommen_von": [
+        "BW Altdorf [alle]",
+        "BW Böblingen [alle]",
+        "BW Ehningen [alle]",
+        "BW Hildrizhausen [alle]",
+        "BW Holzgerlingen [alle]",
+        "BW Schönaich [alle]",
+        "BW Steinenbronn [alle]",
+        "BW Waldenbuch [alle]",
+        "BW Weil im Schönbuch [alle]"
       ]
     },
     {
@@ -801,6 +830,15 @@
         "BW Seebach [mfh]",
         "BW Rheinau [mfh]"
       ]
+    },
+    {
+      "wo": "HE Main-Taunus-Kreis [gewerbe]",
+      "land": "HE",
+      "klasse": "gewerbe",
+      "quelle": "stuetzstelle",
+      "brw": null,
+      "b": 1,
+      "punkte": 179
     },
     {
       "wo": "BE Berlin [mfh]",
@@ -1212,6 +1250,19 @@
       ]
     },
     {
+      "wo": "NW Stadt Gütersloh [mfh]",
+      "land": "NW",
+      "klasse": "gwb",
+      "quelle": "wert",
+      "brw": null,
+      "b": 0.483,
+      "punkte": 227,
+      "uebernommen_von": [
+        "NW Stadt Gütersloh [mfh]",
+        "NW Stadt Gütersloh [mfh]"
+      ]
+    },
+    {
       "wo": "NW Stadt Bottrop [mfh]",
       "land": "NW",
       "klasse": "gwb",
@@ -1435,15 +1486,6 @@
       "brw": null,
       "b": 0,
       "punkte": 125
-    },
-    {
-      "wo": "NW Stadt Gütersloh [mfh]",
-      "land": "NW",
-      "klasse": "gwb",
-      "quelle": "wert",
-      "brw": null,
-      "b": 0.483,
-      "punkte": 227
     },
     {
       "wo": "NW Stadt Paderborn [alle]",

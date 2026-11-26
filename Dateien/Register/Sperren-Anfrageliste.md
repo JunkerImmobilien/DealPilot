@@ -1,28 +1,28 @@
 # Sperren — Anfrageliste an die Gutachterausschüsse
 
-Stand 2026-11-22 · erzeugt mit `node tools/sperren-anfrageliste.mjs` aus den aktiven Registerdateien und `ausschuss_kontakte.json` (Stand 2026-11-20).
+Stand 2026-11-26 · erzeugt mit `node tools/sperren-anfrageliste.mjs` aus den aktiven Registerdateien und `ausschuss_kontakte.json` (Stand 2026-11-20).
 
 ## Zusammenfassung
 
 | | |
 |---|---:|
-| Ausschüsse mit Sperren | 398 |
-| Sperren | 12340 |
+| Ausschüsse mit Sperren | 397 |
+| Sperren | 12379 |
 | davon Ausschüsse mit belegter E-Mail der Geschäftsstelle | 368 |
 | nur E-Mail der oberen Stelle | 1 |
 | nur Kontaktformular | 2 |
-| ohne Kontakt | 27 |
+| ohne Kontakt | 26 |
 
 **Sperren je Grund** (Feld `zugang`)
 
 | Grund | Sperren |
 |---|---:|
-| kostenpflichtig | 3561 |
-| auf Anfrage | 3332 |
-| ohne Angabe | 2327 |
-| nicht abgeleitet | 952 |
-| genehmigungspflichtig | 944 |
-| nicht veröffentlicht | 407 |
+| kostenpflichtig | 3597 |
+| auf Anfrage | 3331 |
+| ohne Angabe | 2272 |
+| nicht abgeleitet | 978 |
+| genehmigungspflichtig | 959 |
+| nicht veröffentlicht | 425 |
 | frei, aber nicht verwertbar | 325 |
 | kostenfrei, aber nicht verwertbar | 278 |
 | nur nichtkommerziell | 200 |
@@ -37,15 +37,15 @@ Stand 2026-11-22 · erzeugt mit `node tools/sperren-anfrageliste.mjs` aus den ak
 | BE | 1 | 14 | 1 |
 | BW | 111 | 8720 | 98 |
 | BY | 96 | 1165 | 96 |
-| HB | 2 | 17 | 2 |
+| HB | 2 | 28 | 2 |
 | HE | 19 | 320 | 19 |
 | HH | 1 | 7 | 1 |
-| MV | 9 | 101 | 9 |
-| NI | 11 | 383 | 0 |
+| MV | 9 | 107 | 9 |
+| NI | 10 | 383 | 0 |
 | NW | 72 | 250 | 68 |
 | RP | 13 | 479 | 12 |
-| SH | 15 | 155 | 15 |
-| SL | 7 | 91 | 7 |
+| SH | 15 | 159 | 15 |
+| SL | 7 | 109 | 7 |
 | SN | 13 | 109 | 13 |
 | ST | 1 | 81 | 1 |
 | TH | 10 | 184 | 9 |
@@ -210,7 +210,7 @@ Stand 2026-11-22 · erzeugt mit `node tools/sperren-anfrageliste.mjs` aus den ak
 | Gutachterausschuss für Grundstückswerte Fürth | 13 | Liegenschaftszinssatz 4, Sachwertfaktor 4, Vergleichsfaktor (§ 20) 3, UK Grundstücksgröße 1, UK WGFZ 1 | kostenpflichtig 6, auf Anfrage 5, genehmigungspflichtig 2 | Grundstücksmarktbericht 2025: 60 € über BORIS-Bayern (Stand 27.10.2026) | 2026 | gutachterausschuss@fuerth.de | [Quelle](https://www.boris-bayern.de/gutachterausschuss/fuerth) |
 | Gutachterausschuss für Grundstückswerte Garmisch-Partenkirchen | 13 | Liegenschaftszinssatz 4, Sachwertfaktor 4, Vergleichsfaktor (§ 20) 3, UK Grundstücksgröße 1, UK WGFZ 1 | nicht abgeleitet 6, kostenpflichtig 4, auf Anfrage 2, genehmigungspflichtig 1 | Wertermittlungsrelevante Daten 2026: 100 € als PDF-Download über BORIS-Bayern (Stand 27.10.2026); Grundstücksmarktbericht 2025: 45 € | 2026 | gutachterausschuss@lra-gap.de | [Quelle](https://www.boris-bayern.de/gutachterausschuss/garmisch) |
 | Gutachterausschuss für Grundstückswerte im Bereich des Landkreises Rosenheim | 13 | Liegenschaftszinssatz 4, Sachwertfaktor 4, Vergleichsfaktor (§ 20) 3, UK Grundstücksgröße 1, UK WGFZ 1 | auf Anfrage 8, kostenpflichtig 2, nicht abgeleitet 2, nicht veröffentlicht 1 | 40 € (BORIS-Bayern, Produkt „Vergleichsfaktoren bebaute Grundstücke 2023-2024 … Enthält keine ETW“, Gebühr 40,00 €) | 2026 | gutachterausschuss@lra-rosenheim.de | [Quelle](https://www.boris-bayern.de/gutachterausschuss/rosenheim-lkr) |
-| Gutachterausschuss für Grundstückswerte Ingolstadt | 13 | Liegenschaftszinssatz 4, Sachwertfaktor 4, Vergleichsfaktor (§ 20) 3, UK Grundstücksgröße 1, UK WGFZ 1 | auf Anfrage 11, nicht veröffentlicht 1, genehmigungspflichtig 1 |  | 2026 | gutachterausschuss@ingolstadt.de | [Quelle](https://www.gutachterausschuesse-bayern.de/marktberichte-bayern/) |
+| Gutachterausschuss für Grundstückswerte Ingolstadt | 13 | Liegenschaftszinssatz 4, Sachwertfaktor 4, Vergleichsfaktor (§ 20) 3, UK Grundstücksgröße 1, UK WGFZ 1 | auf Anfrage 10, nicht abgeleitet 1, nicht veröffentlicht 1, genehmigungspflichtig 1 | Marktbericht 30 Euro (Inhalt nicht frei einsehbar) | 2026 | gutachterausschuss@ingolstadt.de | [Quelle](https://www.ingolstadt.de/Rathaus/Planen-Bauen/Stadtplanung/Gutachterausschuss-Grundst%C3%BCcksbewertung/) |
 | Gutachterausschuss für Grundstückswerte Kempten (Allgäu) | 13 | Liegenschaftszinssatz 4, Sachwertfaktor 4, Vergleichsfaktor (§ 20) 3, UK Grundstücksgröße 1, UK WGFZ 1 | kostenpflichtig 6, auf Anfrage 5, nicht veröffentlicht 1, nicht abgeleitet 1 | Marktbericht 2024: 50 € über BORIS-Bayern (Stand 27.10.2026) | 2026 | gutachterausschuss@kempten.de | [Quelle](https://www.boris-bayern.de/gutachterausschuss/kempten) |
 | Gutachterausschuss für Grundstückswerte Landsberg am Lech | 13 | Liegenschaftszinssatz 4, Sachwertfaktor 4, Vergleichsfaktor (§ 20) 3, UK Grundstücksgröße 1, UK WGFZ 1 | auf Anfrage 11, nicht veröffentlicht 1, genehmigungspflichtig 1 |  | 2026 | gutachterausschuss@LRA-LL.bayern.de | [Quelle](https://www.gutachterausschuesse-bayern.de/marktberichte-bayern/) |
 | Gutachterausschuss für Grundstückswerte Landshut | 13 | Liegenschaftszinssatz 4, Sachwertfaktor 4, Vergleichsfaktor (§ 20) 3, UK Grundstücksgröße 1, UK WGFZ 1 | kostenpflichtig 6, auf Anfrage 5, genehmigungspflichtig 2 | Sonstige für die Wertermittlung erforderlichen Daten 2024: 45 € über BORIS-Bayern (Stand 27.10.2026); Immobilien-Marktbericht 2025: 45 € | 2026 | gutachterausschuss@landshut.de | [Quelle](https://www.boris-bayern.de/gutachterausschuss/landshut) |
@@ -299,8 +299,8 @@ Stand 2026-11-22 · erzeugt mit `node tools/sperren-anfrageliste.mjs` aus den ak
 
 | Ausschuss | Sperren | Kennzahlen | Grund | Preis | Jg. | E-Mail | Link |
 |---|---:|---|---|---|---|---|---|
-| Gutachterausschuss für Grundstückswerte in Bremen (bei GeoInformation Bremen) | 9 | Liegenschaftszinssatz 3, Vergleichsfaktor (§ 20) 3, Sachwertfaktor 2, UK WGFZ 1 | kostenpflichtig 6, ohne Angabe 3 | Vollbericht 50 € (PDF); Verbreitung zusätzlich genehmigungspflichtig | 2026 | gutachterausschuss@geo.bremen.de | [Quelle](https://www.gutachterausschuss.bremen.de/marktbericht-1469) |
-| Gutachterausschuss für Grundstückswerte in Bremerhaven (Geschäftsstelle beim Vermessungs- und Katasteramt Bremerhaven) | 8 | Vergleichsfaktor (§ 20) 3, Liegenschaftszinssatz 2, Sachwertfaktor 2, UK Grundstücksgröße 1 | kostenpflichtig 5, ohne Angabe 3 | Gebühr nach VermWertKostV; Verbreitung zusätzlich genehmigungspflichtig | 2026 | gutachterausschuss@magistrat.bremerhaven.de | [Quelle](https://www.buergerservice.bremen.de/sixcms/media.php/9/Grundst%C3%BCcksmarktbericht%202026.pdf) |
+| Gutachterausschuss für Grundstückswerte in Bremen (bei GeoInformation Bremen) | 14 | Liegenschaftszinssatz 6, Sachwertfaktor 4, Vergleichsfaktor (§ 20) 3, UK WGFZ 1 | kostenpflichtig 9, nicht abgeleitet 4, ohne Angabe 1 | Vollbericht 50 € (PDF); Verbreitung zusätzlich genehmigungspflichtig | 2026 | gutachterausschuss@geo.bremen.de | [Quelle](https://www.gutachterausschuss.bremen.de/marktbericht-1469) |
+| Gutachterausschuss für Grundstückswerte in Bremerhaven (Geschäftsstelle beim Vermessungs- und Katasteramt Bremerhaven) | 14 | Liegenschaftszinssatz 5, Sachwertfaktor 4, Vergleichsfaktor (§ 20) 3, UK Grundstücksgröße 1, UK WGFZ 1 | nicht veröffentlicht 7, kostenpflichtig 5, genehmigungspflichtig 2 | Gebühr nach VermWertKostV; Verbreitung zusätzlich genehmigungspflichtig | 2026 | gutachterausschuss@magistrat.bremerhaven.de | [Quelle](https://www.buergerservice.bremen.de/sixcms/media.php/9/Grundst%C3%BCcksmarktbericht%202026.pdf) |
 
 ## HE
 
@@ -339,8 +339,8 @@ Stand 2026-11-22 · erzeugt mit `node tools/sperren-anfrageliste.mjs` aus den ak
 | Gutachterausschuss für Grundstückswerte im Landkreis Rostock | 22 | Liegenschaftszinssatz 10, Sachwertfaktor 5, Vergleichsfaktor (§ 20) 4, UK Grundstücksgröße 1, UK WGFZ 1, rohertragsfaktor 1 | genehmigungspflichtig 20, ohne Angabe 2 | Bericht kostenlos im Geoshop, gedruckt 60,00 € | 2026 | gutachterausschuss@lkros.de | [Quelle](https://www.geocms.com/geoshop-lk-rostock/de/grundstuecksmarktbericht.html) |
 | Gutachterausschuss für Grundstückswerte im Landkreis Vorpommern-Greifswald | 17 | Liegenschaftszinssatz 6, Vergleichsfaktor (§ 20) 4, Sachwertfaktor 3, UK WGFZ 2, UK Grundstücksgröße 1, rohertragsfaktor 1 | genehmigungspflichtig 16, ohne Angabe 1 | Bericht digital kostenfrei im Geoshop VG — die Hürde ist die Genehmigung, nicht der Preis | 2026 | gutachterausschuss@kreis-vg.de | [Quelle](https://www.geocms.com/geoshop-lk-vorpommern-greifswald/de/grundstuecksmarktberichte.html) |
 | Gutachterausschuss für Grundstückswerte in der Hanse- und Universitätsstadt Rostock | 16 | Liegenschaftszinssatz 6, Vergleichsfaktor (§ 20) 4, Sachwertfaktor 3, UK Grundstücksgröße 1, UK WGFZ 1, rohertragsfaktor 1 | genehmigungspflichtig 14, ohne Angabe 2 | Bericht als Download kostenfrei, digitaler Versand bzw. Post 50,00 € (S. 81) — die Hürde ist die Genehmigung, nicht der Preis | 2026 | gutachterausschuss@rostock.de | [Quelle](https://www.geocms.com/geoshop-rostock/de/produktkatalog-grundstuecksmarkt.html) |
-| Gutachterausschuss für Grundstückswerte im Landkreis Mecklenburgische Seenplatte | 11 | Liegenschaftszinssatz 5, Vergleichsfaktor (§ 20) 3, UK WGFZ 1, Sachwertfaktor 1, UK Grundstücksgröße 1 | genehmigungspflichtig 10, ohne Angabe 1 | Bericht über den Geoshop des Landkreises abrufbar; die Hürde ist die Genehmigung, nicht der Preis | 2026 | gaa@lk-seenplatte.de | [Quelle](https://www.geocms.com/geoshop-lk-mecklenburgische-seenplatte/de/Grundstuecksmarktberichte.html) |
-| Gutachterausschuss für Grundstückswerte im Landkreis Vorpommern-Rügen | 10 | Liegenschaftszinssatz 4, Vergleichsfaktor (§ 20) 3, UK WGFZ 1, Sachwertfaktor 1, UK Grundstücksgröße 1 | genehmigungspflichtig 7, nicht abgeleitet 2, ohne Angabe 1 | Schutzgebühr 50,00 € pro Exemplar (S. 2, Tarifstelle 3.1.1 GAKostVO M-V) | 2026 | gutachterausschuss@lk-vr.de | [Quelle](https://www.geocms.com/geoshop-lk-vorpommern-ruegen/de/grundstuecksmarkt.html) |
+| Gutachterausschuss für Grundstückswerte im Landkreis Mecklenburgische Seenplatte | 14 | Liegenschaftszinssatz 5, Sachwertfaktor 4, Vergleichsfaktor (§ 20) 3, UK WGFZ 1, UK Grundstücksgröße 1 | genehmigungspflichtig 13, ohne Angabe 1 | Bericht über den Geoshop des Landkreises abrufbar; die Hürde ist die Genehmigung, nicht der Preis | 2026 | gaa@lk-seenplatte.de | [Quelle](https://www.geocms.com/geoshop-lk-mecklenburgische-seenplatte/de/Grundstuecksmarktberichte.html) |
+| Gutachterausschuss für Grundstückswerte im Landkreis Vorpommern-Rügen | 13 | Sachwertfaktor 4, Liegenschaftszinssatz 4, Vergleichsfaktor (§ 20) 3, UK WGFZ 1, UK Grundstücksgröße 1 | genehmigungspflichtig 10, nicht abgeleitet 2, ohne Angabe 1 | Schutzgebühr 50,00 € pro Exemplar (S. 2, Tarifstelle 3.1.1 GAKostVO M-V) | 2026 | gutachterausschuss@lk-vr.de | [Quelle](https://www.geocms.com/geoshop-lk-vorpommern-ruegen/de/grundstuecksmarkt.html) |
 | Gutachterausschuss für Grundstückswerte im Landkreis Ludwigslust-Parchim | 9 | Vergleichsfaktor (§ 20) 3, UK Grundstücksgröße 2, UK WGFZ 2, Liegenschaftszinssatz 1, Sachwertfaktor 1 | kostenfrei, aber nicht verwertbar 4, nicht abgeleitet 3, ohne Angabe 2 | Download kostenfrei, gedruckt bzw. per E-Mail 50,00 € Schutzgebühr (S. 2) | 2026 | gutachterausschuss@kreis-lup.de | [Quelle](https://www.kreis-lup.de/Verwaltung/%C3%9Cber-uns/Wer-macht-was-/Grundst%C3%BCckswerte/Marktberichte/) |
 | Gutachterausschuss für Grundstückswerte im Landkreis Nordwestmecklenburg | 9 | Vergleichsfaktor (§ 20) 3, Liegenschaftszinssatz 2, Sachwertfaktor 2, UK WGFZ 1, UK Grundstücksgröße 1 | genehmigungspflichtig 8, ohne Angabe 1 | PDF im Geoshop NWM kostenfrei, gedruckt 60,00 € bei der Geschäftsstelle — die Hürde ist die Genehmigung, nicht der Preis | 2026 | gutachterausschuss@nordwestmecklenburg.de | [Quelle](https://shop.geoport-nwm.de/de/grundstuecksmarktberichte-geoshop-nwm.html) |
 | Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Schwerin | 5 | Vergleichsfaktor (§ 20) 3, UK WGFZ 1, Sachwertfaktor 1 | nicht abgeleitet 2, ohne Angabe 2, kostenpflichtig 1 |  | 2026 | gutachterausschuss@schwerin.de | [Quelle](https://www.schwerin.de/export/sites/default/.galleries/Dokumente/Planen-Bauen/Grundstuecksmarkt/Grundstuecksmarktbericht-Schwerin-2025.pdf#page=79) |
@@ -353,9 +353,8 @@ Stand 2026-11-22 · erzeugt mit `node tools/sperren-anfrageliste.mjs` aus den ak
 | Gutachterausschuss für Grundstückswerte Aurich | 120 | Liegenschaftszinssatz 56, Vergleichsfaktor (§ 20) 52, Sachwertfaktor 12 | frei, aber nicht verwertbar 64, nicht abgeleitet 56 |  | 2026 | – | [Quelle](https://www.gag.niedersachsen.de/download/224463) |
 | Gutachterausschuss für Grundstückswerte Northeim | 113 | Vergleichsfaktor (§ 20) 88, UK Grundstücksgröße 11, Liegenschaftszinssatz 10, UK WGFZ 4 | frei, aber nicht verwertbar 92, nicht abgeleitet 17, ohne Angabe 4 |  | 2026 | – | [Quelle](https://www.gag.niedersachsen.de/download/224467) |
 | Gutachterausschuss für Grundstückswerte Lüneburg | 70 | Vergleichsfaktor (§ 20) 40, UK WGFZ 19, Sachwertfaktor 8, Liegenschaftszinssatz 2, UK Grundstücksgröße 1 | frei, aber nicht verwertbar 49, ohne Angabe 19, nicht abgeleitet 2 |  | 2026 | – | [Quelle](https://www.gag.niedersachsen.de/download/224466) |
+| Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg | 29 | Vergleichsfaktor (§ 20) 19, UK Grundstücksgröße 7, UK WGFZ 3 | frei, aber nicht verwertbar 19, nicht veröffentlicht 7, ohne Angabe 3 |  | 2026 | – | [Quelle](https://public.tableau.com/views/2026_vg_etw_bsce/Dashboard) |
 | Gutachterausschuss für Grundstückswerte Hameln-Hannover | 29 | UK WGFZ 16, UK Grundstücksgröße 7, Liegenschaftszinssatz 3, Vergleichsfaktor (§ 20) 3 | ohne Angabe 16, nicht abgeleitet 6, frei, aber nicht verwertbar 4, nicht veröffentlicht 3 |  | 2026 | – | [Quelle](https://www.gag.niedersachsen.de/download/224465) |
-| Gutachterausschuss für Grundstückswerte Braunschweig-Wolfsburg | 19 | Vergleichsfaktor (§ 20) 19 | frei, aber nicht verwertbar 19 |  | 2026 | – | [Quelle](https://public.tableau.com/views/2026_vg_etw_bsce/Dashboard) |
-| Gutachterausschuss für Grundstückswerte Braunschweig | 10 | UK Grundstücksgröße 7, UK WGFZ 3 | nicht veröffentlicht 7, ohne Angabe 3 |  | 2026 | – | [Quelle](https://immobilienmarkt.niedersachsen.de) |
 | Gutachterausschuss für Grundstückswerte Oldenburg-Cloppenburg | 7 | UK Grundstücksgröße 6, Sachwertfaktor 1 | frei, aber nicht verwertbar 5, nicht veröffentlicht 2 |  | 2026 | – | [Quelle](https://immobilienmarkt.niedersachsen.de) |
 | Gutachterausschuss für Grundstückswerte Osnabrück-Meppen | 4 | UK Grundstücksgröße 4 | nicht veröffentlicht 4 |  | 2026 | – | [Quelle](https://immobilienmarkt.niedersachsen.de) |
 | Gutachterausschuss für Grundstückswerte Otterndorf | 4 | Vergleichsfaktor (§ 20) 3, UK Grundstücksgröße 1 | frei, aber nicht verwertbar 4 |  | 2026 | – | [Quelle](https://public.tableau.com/views/2026_etw_vg_ottcuxkur/Dashboard1) |
@@ -464,11 +463,11 @@ Stand 2026-11-22 · erzeugt mit `node tools/sperren-anfrageliste.mjs` aus den ak
 | Gutachterausschuss für Grundstückswerte im Kreis Dithmarschen | 18 | Vergleichsfaktor (§ 20) 12, Sachwertfaktor 4, UK Grundstücksgröße 1, UK WGFZ 1 | frei, aber nicht verwertbar 12, kostenfrei, aber nicht verwertbar 4, nicht abgeleitet 1, nicht veröffentlicht 1 |  | 2026 | geschaeftsstelle-gutachterausschuss@dithmarschen.de | [Quelle](https://www.dithmarschen.de/fileadmin/download/themen/wirtschaft/grundstuecksmarktbericht_2025.pdf) |
 | Gutachterausschuss für Grundstückswerte im Kreis Pinneberg | 14 | Liegenschaftszinssatz 5, Sachwertfaktor 4, Vergleichsfaktor (§ 20) 3, UK Grundstücksgröße 1, UK WGFZ 1 | genehmigungspflichtig 9, frei, aber nicht verwertbar 3, nicht veröffentlicht 2 |  | 2026 | gutachterausschuss-pinneberg@lvermgeo.landsh.de | [Quelle](https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_Pinneberg/gaAntragKpsPinneberg.pdf?__blob=publicationFile&v=4) |
 | Gutachterausschuss für Grundstückswerte im Kreis Stormarn | 14 | Liegenschaftszinssatz 5, Sachwertfaktor 4, Vergleichsfaktor (§ 20) 3, UK Grundstücksgröße 1, UK WGFZ 1 | genehmigungspflichtig 7, nicht abgeleitet 3, frei, aber nicht verwertbar 3, nicht veröffentlicht 1 | Bericht kostenfrei abrufbar (Deckblatt: Gebühr 60,00 €); Wiedergabe nur mit Erlaubnis | 2026 | ga@kreis-stormarn.de | [Quelle](https://www.kreis-stormarn.de/kreis/sonderbereiche/gutachterausschuss-fuer-grundstueckswerte-im-kreis-stormarn/index.html) |
+| Gutachterausschuss für Grundstückswerte im Kreis Rendsburg-Eckernförde | 13 | Sachwertfaktor 8, Vergleichsfaktor (§ 20) 3, Liegenschaftszinssatz 1, UK WGFZ 1 | kostenpflichtig 5, genehmigungspflichtig 4, nicht abgeleitet 3, frei, aber nicht verwertbar 1 | 50,00 € (vollständiger Grundstücksmarktbericht 2025, Geschäftsstelle) | 2026 | gutachterausschuss@kreis-rd.de | [Quelle](https://www.kreis-rendsburg-eckernfoerde.de/bauen/gutachterausschuss) |
 | Gutachterausschuss für Grundstückswerte im Kreis Segeberg | 11 | Sachwertfaktor 4, Vergleichsfaktor (§ 20) 3, Liegenschaftszinssatz 2, UK Grundstücksgröße 1, UK WGFZ 1 | nicht veröffentlicht 6, frei, aber nicht verwertbar 3, genehmigungspflichtig 2 | Bericht kostenfrei abrufbar; Wiedergabe nur mit Genehmigung des Herausgebers | 2025 | gutachterausschuss@segeberg.de | [Quelle](https://www.segeberg.de/loadDocument.phtml?ObjSvrID=3466&ObjID=1081&ObjLa=1&Ext=PDF) |
 | Gutachterausschuss für Grundstückswerte im Kreis Nordfriesland | 10 | Sachwertfaktor 4, Vergleichsfaktor (§ 20) 3, Liegenschaftszinssatz 1, UK Grundstücksgröße 1, UK WGFZ 1 | nicht abgeleitet 5, frei, aber nicht verwertbar 3, nicht veröffentlicht 2 |  | 2026 | gutachterausschuss@nordfriesland.de | [Quelle](https://www.nordfriesland.de/gutachterausschuss) |
 | Gutachterausschuss für Grundstückswerte im Kreis Plön | 10 | Sachwertfaktor 4, Vergleichsfaktor (§ 20) 3, Liegenschaftszinssatz 1, UK Grundstücksgröße 1, UK WGFZ 1 | kostenpflichtig 10 | gegen Kostenerstattung (Betrag nicht genannt) | 2026 | gutachterausschuss.kreis_ploen@lvermgeo.landsh.de | [Quelle](https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_Ploen/gaMB2025Ploen.pdf?__blob=publicationFile&v=2) |
 | Gutachterausschuss für Grundstückswerte im Kreis Steinburg | 10 | Sachwertfaktor 4, Vergleichsfaktor (§ 20) 3, Liegenschaftszinssatz 1, UK Grundstücksgröße 1, UK WGFZ 1 | auf Anfrage 5, kostenpflichtig 3, nicht abgeleitet 1, nicht veröffentlicht 1 | Preis auf der Seite nicht genannt | 2026 | gutachterausschuss@steinburg.de | [Quelle](https://www.steinburg.de/kreisverwaltung/informationen-der-fachaemter/amt-fuer-kreisentwicklung/gutachterausschuss/grundstuecksmarktbericht.html) |
-| Gutachterausschuss für Grundstückswerte im Kreis Rendsburg-Eckernförde | 9 | Sachwertfaktor 4, Vergleichsfaktor (§ 20) 3, Liegenschaftszinssatz 1, UK WGFZ 1 | kostenpflichtig 5, genehmigungspflichtig 2, frei, aber nicht verwertbar 1, nicht abgeleitet 1 | 50,00 € (vollständiger Grundstücksmarktbericht 2025, Geschäftsstelle) | 2026 | gutachterausschuss@kreis-rd.de | [Quelle](https://www.kreis-rendsburg-eckernfoerde.de/bauen/gutachterausschuss) |
 | Gutachterausschuss für Grundstückswerte im Kreis Schleswig-Flensburg | 9 | Sachwertfaktor 4, Vergleichsfaktor (§ 20) 3, Liegenschaftszinssatz 1, UK WGFZ 1 | auf Anfrage (kostenfrei) 4, auf Anfrage 4, nicht abgeleitet 1 | gebührenfrei, Abgabe nur über ein Bestellformular mit E-Mail-Adresse | 2026 | gutachterausschuss@schleswig-flensburg.de | [Quelle](https://www.schleswig-flensburg.de/index.php?La=1&ffmod=frm&object=frm,3333.22.1&FID=3333.22.1) |
 | Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Kiel | 9 | Sachwertfaktor 4, Vergleichsfaktor (§ 20) 3, Liegenschaftszinssatz 1, UK WGFZ 1 | nur nichtkommerziell 5, frei, aber nicht verwertbar 3, nicht abgeleitet 1 | Bericht kostenfrei; nur nicht kommerzielle auszugsweise Vervielfältigung erlaubt | 2026 | gutachterausschuss@kiel.de | [Quelle](https://www.gutachterausschuss-kiel.de/wp-content/uploads/2026/07/Immobilienmarktbericht_2026.pdf) |
 | Gutachterausschuss für Grundstückswerte in der Stadt Neumünster | 9 | Sachwertfaktor 4, Vergleichsfaktor (§ 20) 3, Liegenschaftszinssatz 1, UK WGFZ 1 | auf Anfrage 8, nicht veröffentlicht 1 | nach Gebührenübersicht der Geschäftsstelle | 2026 | gutachterausschuss@neumuenster.de | [Quelle](https://www.schleswig-holstein.de/gaa/DE/wir_ueber_uns/Gutachterausschuesse/gaNeumuenster) |
@@ -481,13 +480,13 @@ Stand 2026-11-22 · erzeugt mit `node tools/sperren-anfrageliste.mjs` aus den ak
 
 | Ausschuss | Sperren | Kennzahlen | Grund | Preis | Jg. | E-Mail | Link |
 |---|---:|---|---|---|---|---|---|
-| Gutachterausschuss für Grundstückswerte für den Regionalverband Saarbrücken | 15 | Liegenschaftszinssatz 5, Sachwertfaktor 5, Vergleichsfaktor (§ 20) 3, UK Grundstücksgröße 1, UK WGFZ 1 | ohne Angabe 9, genehmigungspflichtig 4, kostenpflichtig 2 | Grundstücksmarktbericht 2022 (Vollversion): 50 € laut Impressum, frei abrufbar, Verbreitung genehmigungspflichtig | 2026 | gutachterausschuss@rvsbr.de | [Quelle](https://www.regionalverband-saarbruecken.de/fileadmin/RVSBR/Bauen_Planen/Downloads/Grundst%C3%BCcksmarktbericht/Grundst%C3%BCcksmarktbericht_2022_Vollversion.pdf) |
-| Gutachterausschuss für Grundstückswerte für den Saarpfalz-Kreis | 15 | Vergleichsfaktor (§ 20) 5, Liegenschaftszinssatz 4, Sachwertfaktor 4, UK Grundstücksgröße 1, UK WGFZ 1 | ohne Angabe 10, kostenpflichtig 4, auf Anfrage 1 | Grundstücksmarktbericht Saarland: 75 € (zweijährlich) | 2026 | gutachterausschuss@saarpfalz-kreis.de | [Quelle](https://www.saarpfalz-kreis.de/buergerservice-views/leistungen/SAL:entry:269302-VLR/vergleichswertfaktoren/) |
-| Gutachterausschuss für Grundstückswerte für den Landkreis Merzig-Wadern | 13 | Liegenschaftszinssatz 4, Sachwertfaktor 4, Vergleichsfaktor (§ 20) 3, UK Grundstücksgröße 1, UK WGFZ 1 | ohne Angabe 9, kostenpflichtig 4 | Grundstücksmarktbericht Saarland: 75 € (zweijährlich) | 2026 | gutachter@merzig-wadern.de | [Quelle](https://www.saarland.de/lvgl/DE/themen-aufgaben/themen/zgga/zgga_node.html) |
-| Gutachterausschuss für Grundstückswerte für den Landkreis Neunkirchen | 13 | Liegenschaftszinssatz 4, Sachwertfaktor 4, Vergleichsfaktor (§ 20) 3, UK Grundstücksgröße 1, UK WGFZ 1 | ohne Angabe 9, kostenpflichtig 4 | Grundstücksmarktbericht Saarland: 75 € (zweijährlich) | 2026 | gutachter@landkreis-neunkirchen.de | [Quelle](https://www.landkreis-neunkirchen.de/bauen-wohnen/gutachterausschuss) |
-| Gutachterausschuss für Grundstückswerte für den Landkreis Saarlouis | 13 | Liegenschaftszinssatz 4, Sachwertfaktor 4, Vergleichsfaktor (§ 20) 3, UK Grundstücksgröße 1, UK WGFZ 1 | ohne Angabe 9, kostenpflichtig 4 | Grundstücksmarktbericht Saarland: 75 € (zweijährlich) | 2026 | amt62@kreis-saarlouis.de | [Quelle](https://www.saarland.de/lvgl/DE/themen-aufgaben/themen/zgga/zgga_node.html) |
-| Gutachterausschuss für Grundstückswerte für den Landkreis St. Wendel | 13 | Liegenschaftszinssatz 4, Sachwertfaktor 4, Vergleichsfaktor (§ 20) 3, UK Grundstücksgröße 1, UK WGFZ 1 | ohne Angabe 9, kostenpflichtig 4 | Grundstücksmarktbericht Saarland: 75 € (zweijährlich) | 2026 | gutachterausschuss@lkwnd.de | [Quelle](https://www.saarland.de/lvgl/DE/themen-aufgaben/themen/zgga/zgga_node.html) |
-| Gutachterausschuss für Grundstückswerte für die Landeshauptstadt Saarbrücken | 9 | Liegenschaftszinssatz 4, Vergleichsfaktor (§ 20) 3, UK Grundstücksgröße 1, UK WGFZ 1 | ohne Angabe 5, kostenpflichtig 4 | Grundstücksmarktbericht Saarland: 75 € (zweijährlich) | 2026 | vermessungsamt@saarbruecken.de | [Quelle](https://www.saarbruecken.de/media/download-672dd7209e93a) |
+| Gutachterausschuss für Grundstückswerte für den Regionalverband Saarbrücken | 17 | Liegenschaftszinssatz 7, Sachwertfaktor 5, Vergleichsfaktor (§ 20) 3, UK Grundstücksgröße 1, UK WGFZ 1 | genehmigungspflichtig 9, nicht abgeleitet 3, kostenpflichtig 3, nicht veröffentlicht 2 | Grundstücksmarktbericht 2022 (Vollversion): 50 € laut Impressum, frei abrufbar, Verbreitung genehmigungspflichtig | 2026 | gutachterausschuss@rvsbr.de | [Quelle](https://www.regionalverband-saarbruecken.de/fileadmin/RVSBR/Bauen_Planen/Downloads/Grundst%C3%BCcksmarktbericht/Grundst%C3%BCcksmarktbericht_2022_Vollversion.pdf) |
+| Gutachterausschuss für Grundstückswerte für den Saarpfalz-Kreis | 17 | Liegenschaftszinssatz 6, Vergleichsfaktor (§ 20) 5, Sachwertfaktor 4, UK Grundstücksgröße 1, UK WGFZ 1 | kostenpflichtig 12, ohne Angabe 2, nicht abgeleitet 1, auf Anfrage 1, nicht veröffentlicht 1 | Grundstücksmarktbericht Saarland: 75 € (zweijährlich) | 2026 | gutachterausschuss@saarpfalz-kreis.de | [Quelle](https://www.saarpfalz-kreis.de/buergerservice-views/leistungen/SAL:entry:269302-VLR/vergleichswertfaktoren/) |
+| Gutachterausschuss für Grundstückswerte für den Landkreis Merzig-Wadern | 15 | Liegenschaftszinssatz 6, Sachwertfaktor 4, Vergleichsfaktor (§ 20) 3, UK Grundstücksgröße 1, UK WGFZ 1 | kostenpflichtig 9, nicht abgeleitet 3, ohne Angabe 2, nicht veröffentlicht 1 | Grundstücksmarktbericht Saarland: 75 € (zweijährlich) | 2026 | gutachter@merzig-wadern.de | [Quelle](https://www.saarland.de/lvgl/DE/themen-aufgaben/themen/zgga/zgga_node.html) |
+| Gutachterausschuss für Grundstückswerte für den Landkreis Neunkirchen | 15 | Liegenschaftszinssatz 6, Sachwertfaktor 4, Vergleichsfaktor (§ 20) 3, UK Grundstücksgröße 1, UK WGFZ 1 | kostenpflichtig 9, nicht abgeleitet 3, ohne Angabe 2, nicht veröffentlicht 1 | Grundstücksmarktbericht Saarland: 75 € (zweijährlich) | 2026 | gutachter@landkreis-neunkirchen.de | [Quelle](https://www.landkreis-neunkirchen.de/bauen-wohnen/gutachterausschuss) |
+| Gutachterausschuss für Grundstückswerte für den Landkreis Saarlouis | 15 | Liegenschaftszinssatz 6, Sachwertfaktor 4, Vergleichsfaktor (§ 20) 3, UK Grundstücksgröße 1, UK WGFZ 1 | kostenpflichtig 9, nicht abgeleitet 3, ohne Angabe 2, nicht veröffentlicht 1 | Grundstücksmarktbericht Saarland: 75 € (zweijährlich) | 2026 | amt62@kreis-saarlouis.de | [Quelle](https://www.saarland.de/lvgl/DE/themen-aufgaben/themen/zgga/zgga_node.html) |
+| Gutachterausschuss für Grundstückswerte für den Landkreis St. Wendel | 15 | Liegenschaftszinssatz 6, Sachwertfaktor 4, Vergleichsfaktor (§ 20) 3, UK Grundstücksgröße 1, UK WGFZ 1 | kostenpflichtig 9, nicht abgeleitet 3, ohne Angabe 2, nicht veröffentlicht 1 | Grundstücksmarktbericht Saarland: 75 € (zweijährlich) | 2026 | gutachterausschuss@lkwnd.de | [Quelle](https://www.saarland.de/lvgl/DE/themen-aufgaben/themen/zgga/zgga_node.html) |
+| Gutachterausschuss für Grundstückswerte für die Landeshauptstadt Saarbrücken | 15 | Liegenschaftszinssatz 6, Sachwertfaktor 4, Vergleichsfaktor (§ 20) 3, UK Grundstücksgröße 1, UK WGFZ 1 | kostenpflichtig 8, nicht veröffentlicht 4, nicht abgeleitet 3 | Grundstücksmarktbericht Saarland: 75 € (zweijährlich) | 2026 | vermessungsamt@saarbruecken.de | [Quelle](https://www.saarbruecken.de/media/download-672dd7209e93a) |
 
 ## SN
 

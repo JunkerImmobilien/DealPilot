@@ -4560,7 +4560,8 @@
     },
     "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte für die Landeshauptstadt Saarbrücken, Jahrgang 2026",
     "quelle_parser": "v2290-uk-ernte-west (IMB/BRW-Erläuterungen, pdftotext und Seitenbild, 16.10.2026)",
-    "modellansaetze": {}
+    "modellansaetze": {},
+    "zugang": "nicht veröffentlicht"
   },
   {
     "land_code": "SL",
@@ -4655,7 +4656,8 @@
       "nutzung_intern": "stuetzstelle",
       "nutzung_hinweis": "Nur intern als Stützstelle, aus der DealPilot später eine eigene, als Näherung gekennzeichnete Formel ableiten kann — nie als amtliche Zahl und nie wörtlich in einem Kundenbericht.",
       "lizenz_wortlaut": "Dieser Bericht ist urheberrechtlich geschützt. Vervielfältigung und Verbreitung (auch auszugsweise) bedürfen der Genehmigung des Herausgebers."
-    }
+    },
+    "zugang": "genehmigungspflichtig"
   },
   {
     "land_code": "SL",
