@@ -1547,6 +1547,10 @@
       var p = b.p, cc = p.cross_check || {}, vw = cc.verfahrenswahl || {}, mv = (p.valuation && p.valuation.market_value) || {};
       function weg(x) { return ((x && x.staffel) || []).map(function (e) { return { pos: e.pos, wert: e.wert == null ? null : String(e.wert) }; }); }
       return { id: 990000 + i, created_at: b.at, ai_mode: b.stufe === 1 ? 'schnell' : 'openai',
+        /* v5160v1 · Adresse und Stufe wie in der echten Antwort (api.js SELECT address, wert_stufe), sonst zeigte die
+           Liste „Marktberichte“ im Video M30 dreimal „Marktindikation · Adresse unbekannt“ */
+        address: (p.address && p.address.formatted) || (p.ref && p.ref.address) || null, wert_stufe: String(b.stufe),
+        property_type: (p.ref && p.ref.property_type) || null,
         market_value: mv.estimated != null ? String(mv.estimated) : null,
         ertragswert_eur: (cc.ertragswert && cc.ertragswert.value_eur) || null, sachwert_eur: (cc.sachwert && cc.sachwert.value_eur) || null,
         ertrag_weg: weg(cc.ertragswert), sachwert_weg: weg(cc.sachwert),
@@ -1580,6 +1584,9 @@
     if (m === 'POST' && /\/marktbericht\/reports\/generate-stream/.test(u)) return rhStrom(body && body.wert_stufe >= 2 ? Number(body.wert_stufe) : 1);
     if (m === 'GET' && /\/marktbericht\/objects\/history\?/.test(u)) {
       var ref = decodeURIComponent((u.match(/[?&]ref=([^&]+)/) || [])[1] || '');
+      /* v5160v1 · wert-zielbild.js, mb-abgleich.js und dashboard.js fragen ?key=dp:<Objekt>, nicht ?ref= - die gingen im
+         Lauf echt hinaus, fanden nichts, und daneben stand „Noch kein Marktbericht“ (Video M04/M30) */
+      if (!ref) ref = decodeURIComponent((u.match(/[?&]key=([^&]+)/) || [])[1] || '').replace(/^dp:/, '');
       if (ref && DPM_REIHE.angelegt.indexOf(ref) >= 0) return rhJ({ history: rhVerlauf() });
     }
     if (/\/api\/v1\/immometrica\//.test(u)) { var a = _imoAntwort(u); if (a) return rhJ(a); }

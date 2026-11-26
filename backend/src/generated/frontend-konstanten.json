@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-11-25T12:27:25.606Z",
+ "erzeugt_am": "2026-11-26T22:23:51.721Z",
  "quellen": {
   "voice-import": "b034c89b8920e501",
   "objektart-felder": "f3795cd7fc2b9b70",
-  "storage": "2d929d7da83d4809",
-  "index-html": "93f6885029401f9f",
+  "storage": "eee8f89613bf2cab",
+  "index-html": "73da774e8f89f261",
   "grest": "81f3fb0a4de3a6cf"
  },
  "daten": {
@@ -620,6 +620,8 @@
    "mv_befristet_bis",
    "mv_kuendigungsverzicht_bis",
    "mv_abw_jahre",
+   "_besichtigung",
+   "_nutzung",
    "nk_vorauszahlung",
    "_vivi",
    "ds2_zustand",
@@ -1632,8 +1634,7 @@
    },
    {
     "id": "grenz_auto",
-    "kind": "bool",
-    "label": "Kirchensteuer"
+    "kind": "bool"
    },
    {
     "id": "d1_vertragsdatum",
