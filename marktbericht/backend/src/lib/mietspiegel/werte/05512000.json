@@ -1,0 +1,1080 @@
+{
+ "ags": "05512000",
+ "gemeinde": "Bottrop",
+ "art": "einfach",
+ "stand": "2025-01-01",
+ "erhebungsstichtag": "2025-01-01",
+ "gueltig_ab": null,
+ "gueltig_bis": null,
+ "quelle": {
+  "url": "https://www.bottrop.de/downloads/wohnen/Mietspiegel-2025.pdf",
+  "dokument": "Mietspiegel für nicht preisgebundene Wohnungen in Bottrop nach dem Stand vom 01. Januar 2025 (Betrachtungszeitraum 2019 bis 2024), Stadt Bottrop, Abt. Grundstückswertermittlung, unter Mitwirkung von Gutachterausschuss, Haus- und Grundeigentümerverein Bottrop e.V. und Mieterbund Rhein-Ruhr e.V., Sitzung 04.12.2024",
+  "seite": "S. 1 (Titel), S. 2 (Allgemeines, § 558c), S. 3 Tabelle 1, S. 4 Tabelle 2, S. 5 Tabelle 3, S. 6 Lage, S. 7 Beispiel",
+  "lizenz": "kein Rechtevorbehalt und kein Speicherverbot im Dokument gefunden (geprüft am 26.11.2026)",
+  "abgerufen": "2026-11-26"
+ },
+ "einheit": "eur_qm_nettokalt",
+ "form": "tabelle",
+ "rundung": 2,
+ "hinweis": "Einfacher Mietspiegel: „Übersicht über die ortsübliche Vergleichsmiete im Sinne von § 558c BGB“, von Gemeinde und Interessenvertretern gemeinsam erstellt und anerkannt (S. 2); Mieten bezogen auf 01.01.2025, Betrachtungszeitraum 2019–2024 (als erhebungsstichtag eingetragen). Gültigkeitsdaten nennt das Dokument nicht. Punktemodell: Mietrichtwert der Altersklasse am Bezugsbaujahr + Baujahrsanpassung je Jahr in der Klasse (Tabelle 1, S. 3) — hier je Baujahr als eigene Klasse ausgerechnet (bis 1948 fest 6,01; Klasse „ab 2017“ bis Baujahr 2025 ausgerechnet, „kein Erstbezug in Neubauwohnungen“). Bezug: Wohnungen 60–90 m², mittlere Wohnlage, durchschnittliche Ausstattung (S. 3). Dann Modernisierungszuschlag (Tabelle 2, S. 4: Punkte je Element nach Jahren seit Modernisierung × 0,08 €/m²) — NICHT abgebildet, weil zeitabhängig; dann Qualitätszu-/-abschläge (Tabelle 3, S. 5) je Punkt 0,08 €/m², Summe „in der Regel auf 40 Punkte zu begrenzen“ (Deckel nicht abgebildet). Wohnungsgröße auf 5 m² gerundet: unter 60 m² +1 Punkt je 5 m² (bis 30 m²), über 90 m² −1 Punkt je 5 m² (bis 130 m²) — außerhalb 27,5–132,5 m² kein Wert. Einfamilienhaus (ohne typische Zechenhäuser) „≥ 15“ Punkte — mit 15 Punkten (Mindestwert) abgebildet. Nicht abgebildet (nur „bis“-Werte oder je Etage): ungünstiger Grundriss bis −3, ab 3. OG ohne Aufzug −1/Etage, barrierefrei bis +10, Unterhaltungszustand unter-/überdurchschnittlich bis −4/−2 bzw. +4/+2. Keine Spanne (Mittelwerte, S. 4). Das Beispiel S. 7 (Bj. 1956, 52 m², einfache Lage, kein Balkon, einfache Bodenbeläge, 7 Modernisierungspunkte → 6,63 €/m²) ist ohne den Modernisierungszuschlag (+0,56) als 6,07 nachgerechnet. Hinweis: Die Tabelle 1 im Beispielbild S. 7 zeigt für 1978–1994 das Bezugsbaujahr 1960 (Abbildungsfehler); maßgeblich ist Tabelle 1 S. 3 (1978).",
+ "haus": {
+  "regel": "zuschlag",
+  "merkmal": {
+   "efh": "einfamilienhaus",
+   "dhh": "einfamilienhaus",
+   "rh": "einfamilienhaus",
+   "zfh": "zweifamilienhaus"
+  },
+  "beleg": "S. 5 Tabelle 3, Art: Einfamilienhäuser (ohne typische Zechenhäuser) ≥ 15 Punkte, Wohnungen im Zweifamilienhaus +3 Punkte (je 0,08 €/m²)"
+ },
+ "tabelle": {
+  "achsen": {
+   "baujahr": [
+    {
+     "von": null,
+     "bis": 1948,
+     "label": "bis 1948"
+    },
+    {
+     "von": 1949,
+     "bis": 1949,
+     "label": "Baujahr 1949 (1949–1977: 6,17 € + 0 × 0,02 €)"
+    },
+    {
+     "von": 1950,
+     "bis": 1950,
+     "label": "Baujahr 1950 (1949–1977: 6,17 € + 1 × 0,02 €)"
+    },
+    {
+     "von": 1951,
+     "bis": 1951,
+     "label": "Baujahr 1951 (1949–1977: 6,17 € + 2 × 0,02 €)"
+    },
+    {
+     "von": 1952,
+     "bis": 1952,
+     "label": "Baujahr 1952 (1949–1977: 6,17 € + 3 × 0,02 €)"
+    },
+    {
+     "von": 1953,
+     "bis": 1953,
+     "label": "Baujahr 1953 (1949–1977: 6,17 € + 4 × 0,02 €)"
+    },
+    {
+     "von": 1954,
+     "bis": 1954,
+     "label": "Baujahr 1954 (1949–1977: 6,17 € + 5 × 0,02 €)"
+    },
+    {
+     "von": 1955,
+     "bis": 1955,
+     "label": "Baujahr 1955 (1949–1977: 6,17 € + 6 × 0,02 €)"
+    },
+    {
+     "von": 1956,
+     "bis": 1956,
+     "label": "Baujahr 1956 (1949–1977: 6,17 € + 7 × 0,02 €)"
+    },
+    {
+     "von": 1957,
+     "bis": 1957,
+     "label": "Baujahr 1957 (1949–1977: 6,17 € + 8 × 0,02 €)"
+    },
+    {
+     "von": 1958,
+     "bis": 1958,
+     "label": "Baujahr 1958 (1949–1977: 6,17 € + 9 × 0,02 €)"
+    },
+    {
+     "von": 1959,
+     "bis": 1959,
+     "label": "Baujahr 1959 (1949–1977: 6,17 € + 10 × 0,02 €)"
+    },
+    {
+     "von": 1960,
+     "bis": 1960,
+     "label": "Baujahr 1960 (1949–1977: 6,17 € + 11 × 0,02 €)"
+    },
+    {
+     "von": 1961,
+     "bis": 1961,
+     "label": "Baujahr 1961 (1949–1977: 6,17 € + 12 × 0,02 €)"
+    },
+    {
+     "von": 1962,
+     "bis": 1962,
+     "label": "Baujahr 1962 (1949–1977: 6,17 € + 13 × 0,02 €)"
+    },
+    {
+     "von": 1963,
+     "bis": 1963,
+     "label": "Baujahr 1963 (1949–1977: 6,17 € + 14 × 0,02 €)"
+    },
+    {
+     "von": 1964,
+     "bis": 1964,
+     "label": "Baujahr 1964 (1949–1977: 6,17 € + 15 × 0,02 €)"
+    },
+    {
+     "von": 1965,
+     "bis": 1965,
+     "label": "Baujahr 1965 (1949–1977: 6,17 € + 16 × 0,02 €)"
+    },
+    {
+     "von": 1966,
+     "bis": 1966,
+     "label": "Baujahr 1966 (1949–1977: 6,17 € + 17 × 0,02 €)"
+    },
+    {
+     "von": 1967,
+     "bis": 1967,
+     "label": "Baujahr 1967 (1949–1977: 6,17 € + 18 × 0,02 €)"
+    },
+    {
+     "von": 1968,
+     "bis": 1968,
+     "label": "Baujahr 1968 (1949–1977: 6,17 € + 19 × 0,02 €)"
+    },
+    {
+     "von": 1969,
+     "bis": 1969,
+     "label": "Baujahr 1969 (1949–1977: 6,17 € + 20 × 0,02 €)"
+    },
+    {
+     "von": 1970,
+     "bis": 1970,
+     "label": "Baujahr 1970 (1949–1977: 6,17 € + 21 × 0,02 €)"
+    },
+    {
+     "von": 1971,
+     "bis": 1971,
+     "label": "Baujahr 1971 (1949–1977: 6,17 € + 22 × 0,02 €)"
+    },
+    {
+     "von": 1972,
+     "bis": 1972,
+     "label": "Baujahr 1972 (1949–1977: 6,17 € + 23 × 0,02 €)"
+    },
+    {
+     "von": 1973,
+     "bis": 1973,
+     "label": "Baujahr 1973 (1949–1977: 6,17 € + 24 × 0,02 €)"
+    },
+    {
+     "von": 1974,
+     "bis": 1974,
+     "label": "Baujahr 1974 (1949–1977: 6,17 € + 25 × 0,02 €)"
+    },
+    {
+     "von": 1975,
+     "bis": 1975,
+     "label": "Baujahr 1975 (1949–1977: 6,17 € + 26 × 0,02 €)"
+    },
+    {
+     "von": 1976,
+     "bis": 1976,
+     "label": "Baujahr 1976 (1949–1977: 6,17 € + 27 × 0,02 €)"
+    },
+    {
+     "von": 1977,
+     "bis": 1977,
+     "label": "Baujahr 1977 (1949–1977: 6,17 € + 28 × 0,02 €)"
+    },
+    {
+     "von": 1978,
+     "bis": 1978,
+     "label": "Baujahr 1978 (1978–1994: 6,97 € + 0 × 0,03 €)"
+    },
+    {
+     "von": 1979,
+     "bis": 1979,
+     "label": "Baujahr 1979 (1978–1994: 6,97 € + 1 × 0,03 €)"
+    },
+    {
+     "von": 1980,
+     "bis": 1980,
+     "label": "Baujahr 1980 (1978–1994: 6,97 € + 2 × 0,03 €)"
+    },
+    {
+     "von": 1981,
+     "bis": 1981,
+     "label": "Baujahr 1981 (1978–1994: 6,97 € + 3 × 0,03 €)"
+    },
+    {
+     "von": 1982,
+     "bis": 1982,
+     "label": "Baujahr 1982 (1978–1994: 6,97 € + 4 × 0,03 €)"
+    },
+    {
+     "von": 1983,
+     "bis": 1983,
+     "label": "Baujahr 1983 (1978–1994: 6,97 € + 5 × 0,03 €)"
+    },
+    {
+     "von": 1984,
+     "bis": 1984,
+     "label": "Baujahr 1984 (1978–1994: 6,97 € + 6 × 0,03 €)"
+    },
+    {
+     "von": 1985,
+     "bis": 1985,
+     "label": "Baujahr 1985 (1978–1994: 6,97 € + 7 × 0,03 €)"
+    },
+    {
+     "von": 1986,
+     "bis": 1986,
+     "label": "Baujahr 1986 (1978–1994: 6,97 € + 8 × 0,03 €)"
+    },
+    {
+     "von": 1987,
+     "bis": 1987,
+     "label": "Baujahr 1987 (1978–1994: 6,97 € + 9 × 0,03 €)"
+    },
+    {
+     "von": 1988,
+     "bis": 1988,
+     "label": "Baujahr 1988 (1978–1994: 6,97 € + 10 × 0,03 €)"
+    },
+    {
+     "von": 1989,
+     "bis": 1989,
+     "label": "Baujahr 1989 (1978–1994: 6,97 € + 11 × 0,03 €)"
+    },
+    {
+     "von": 1990,
+     "bis": 1990,
+     "label": "Baujahr 1990 (1978–1994: 6,97 € + 12 × 0,03 €)"
+    },
+    {
+     "von": 1991,
+     "bis": 1991,
+     "label": "Baujahr 1991 (1978–1994: 6,97 € + 13 × 0,03 €)"
+    },
+    {
+     "von": 1992,
+     "bis": 1992,
+     "label": "Baujahr 1992 (1978–1994: 6,97 € + 14 × 0,03 €)"
+    },
+    {
+     "von": 1993,
+     "bis": 1993,
+     "label": "Baujahr 1993 (1978–1994: 6,97 € + 15 × 0,03 €)"
+    },
+    {
+     "von": 1994,
+     "bis": 1994,
+     "label": "Baujahr 1994 (1978–1994: 6,97 € + 16 × 0,03 €)"
+    },
+    {
+     "von": 1995,
+     "bis": 1995,
+     "label": "Baujahr 1995 (1995–2016: 7,72 € + 0 × 0,04 €)"
+    },
+    {
+     "von": 1996,
+     "bis": 1996,
+     "label": "Baujahr 1996 (1995–2016: 7,72 € + 1 × 0,04 €)"
+    },
+    {
+     "von": 1997,
+     "bis": 1997,
+     "label": "Baujahr 1997 (1995–2016: 7,72 € + 2 × 0,04 €)"
+    },
+    {
+     "von": 1998,
+     "bis": 1998,
+     "label": "Baujahr 1998 (1995–2016: 7,72 € + 3 × 0,04 €)"
+    },
+    {
+     "von": 1999,
+     "bis": 1999,
+     "label": "Baujahr 1999 (1995–2016: 7,72 € + 4 × 0,04 €)"
+    },
+    {
+     "von": 2000,
+     "bis": 2000,
+     "label": "Baujahr 2000 (1995–2016: 7,72 € + 5 × 0,04 €)"
+    },
+    {
+     "von": 2001,
+     "bis": 2001,
+     "label": "Baujahr 2001 (1995–2016: 7,72 € + 6 × 0,04 €)"
+    },
+    {
+     "von": 2002,
+     "bis": 2002,
+     "label": "Baujahr 2002 (1995–2016: 7,72 € + 7 × 0,04 €)"
+    },
+    {
+     "von": 2003,
+     "bis": 2003,
+     "label": "Baujahr 2003 (1995–2016: 7,72 € + 8 × 0,04 €)"
+    },
+    {
+     "von": 2004,
+     "bis": 2004,
+     "label": "Baujahr 2004 (1995–2016: 7,72 € + 9 × 0,04 €)"
+    },
+    {
+     "von": 2005,
+     "bis": 2005,
+     "label": "Baujahr 2005 (1995–2016: 7,72 € + 10 × 0,04 €)"
+    },
+    {
+     "von": 2006,
+     "bis": 2006,
+     "label": "Baujahr 2006 (1995–2016: 7,72 € + 11 × 0,04 €)"
+    },
+    {
+     "von": 2007,
+     "bis": 2007,
+     "label": "Baujahr 2007 (1995–2016: 7,72 € + 12 × 0,04 €)"
+    },
+    {
+     "von": 2008,
+     "bis": 2008,
+     "label": "Baujahr 2008 (1995–2016: 7,72 € + 13 × 0,04 €)"
+    },
+    {
+     "von": 2009,
+     "bis": 2009,
+     "label": "Baujahr 2009 (1995–2016: 7,72 € + 14 × 0,04 €)"
+    },
+    {
+     "von": 2010,
+     "bis": 2010,
+     "label": "Baujahr 2010 (1995–2016: 7,72 € + 15 × 0,04 €)"
+    },
+    {
+     "von": 2011,
+     "bis": 2011,
+     "label": "Baujahr 2011 (1995–2016: 7,72 € + 16 × 0,04 €)"
+    },
+    {
+     "von": 2012,
+     "bis": 2012,
+     "label": "Baujahr 2012 (1995–2016: 7,72 € + 17 × 0,04 €)"
+    },
+    {
+     "von": 2013,
+     "bis": 2013,
+     "label": "Baujahr 2013 (1995–2016: 7,72 € + 18 × 0,04 €)"
+    },
+    {
+     "von": 2014,
+     "bis": 2014,
+     "label": "Baujahr 2014 (1995–2016: 7,72 € + 19 × 0,04 €)"
+    },
+    {
+     "von": 2015,
+     "bis": 2015,
+     "label": "Baujahr 2015 (1995–2016: 7,72 € + 20 × 0,04 €)"
+    },
+    {
+     "von": 2016,
+     "bis": 2016,
+     "label": "Baujahr 2016 (1995–2016: 7,72 € + 21 × 0,04 €)"
+    },
+    {
+     "von": 2017,
+     "bis": 2017,
+     "label": "Baujahr 2017 (2017 ff.: 8,98 € + 0 × 0,05 €)"
+    },
+    {
+     "von": 2018,
+     "bis": 2018,
+     "label": "Baujahr 2018 (2017 ff.: 8,98 € + 1 × 0,05 €)"
+    },
+    {
+     "von": 2019,
+     "bis": 2019,
+     "label": "Baujahr 2019 (2017 ff.: 8,98 € + 2 × 0,05 €)"
+    },
+    {
+     "von": 2020,
+     "bis": 2020,
+     "label": "Baujahr 2020 (2017 ff.: 8,98 € + 3 × 0,05 €)"
+    },
+    {
+     "von": 2021,
+     "bis": 2021,
+     "label": "Baujahr 2021 (2017 ff.: 8,98 € + 4 × 0,05 €)"
+    },
+    {
+     "von": 2022,
+     "bis": 2022,
+     "label": "Baujahr 2022 (2017 ff.: 8,98 € + 5 × 0,05 €)"
+    },
+    {
+     "von": 2023,
+     "bis": 2023,
+     "label": "Baujahr 2023 (2017 ff.: 8,98 € + 6 × 0,05 €)"
+    },
+    {
+     "von": 2024,
+     "bis": 2024,
+     "label": "Baujahr 2024 (2017 ff.: 8,98 € + 7 × 0,05 €)"
+    },
+    {
+     "von": 2025,
+     "bis": 2025,
+     "label": "Baujahr 2025 (2017 ff.: 8,98 € + 8 × 0,05 €)"
+    }
+   ]
+  },
+  "geltung": {
+   "baujahr_von": null,
+   "baujahr_bis": 2025,
+   "wfl_von": 27.5,
+   "wfl_bis": 132.5
+  },
+  "zellen": [
+   {
+    "baujahr": 0,
+    "mittel": 6.01,
+    "seite": "3"
+   },
+   {
+    "baujahr": 1,
+    "mittel": 6.17,
+    "seite": "3"
+   },
+   {
+    "baujahr": 2,
+    "mittel": 6.19,
+    "seite": "3"
+   },
+   {
+    "baujahr": 3,
+    "mittel": 6.21,
+    "seite": "3"
+   },
+   {
+    "baujahr": 4,
+    "mittel": 6.23,
+    "seite": "3"
+   },
+   {
+    "baujahr": 5,
+    "mittel": 6.25,
+    "seite": "3"
+   },
+   {
+    "baujahr": 6,
+    "mittel": 6.27,
+    "seite": "3"
+   },
+   {
+    "baujahr": 7,
+    "mittel": 6.29,
+    "seite": "3"
+   },
+   {
+    "baujahr": 8,
+    "mittel": 6.31,
+    "seite": "3"
+   },
+   {
+    "baujahr": 9,
+    "mittel": 6.33,
+    "seite": "3"
+   },
+   {
+    "baujahr": 10,
+    "mittel": 6.35,
+    "seite": "3"
+   },
+   {
+    "baujahr": 11,
+    "mittel": 6.37,
+    "seite": "3"
+   },
+   {
+    "baujahr": 12,
+    "mittel": 6.39,
+    "seite": "3"
+   },
+   {
+    "baujahr": 13,
+    "mittel": 6.41,
+    "seite": "3"
+   },
+   {
+    "baujahr": 14,
+    "mittel": 6.43,
+    "seite": "3"
+   },
+   {
+    "baujahr": 15,
+    "mittel": 6.45,
+    "seite": "3"
+   },
+   {
+    "baujahr": 16,
+    "mittel": 6.47,
+    "seite": "3"
+   },
+   {
+    "baujahr": 17,
+    "mittel": 6.49,
+    "seite": "3"
+   },
+   {
+    "baujahr": 18,
+    "mittel": 6.51,
+    "seite": "3"
+   },
+   {
+    "baujahr": 19,
+    "mittel": 6.53,
+    "seite": "3"
+   },
+   {
+    "baujahr": 20,
+    "mittel": 6.55,
+    "seite": "3"
+   },
+   {
+    "baujahr": 21,
+    "mittel": 6.57,
+    "seite": "3"
+   },
+   {
+    "baujahr": 22,
+    "mittel": 6.59,
+    "seite": "3"
+   },
+   {
+    "baujahr": 23,
+    "mittel": 6.61,
+    "seite": "3"
+   },
+   {
+    "baujahr": 24,
+    "mittel": 6.63,
+    "seite": "3"
+   },
+   {
+    "baujahr": 25,
+    "mittel": 6.65,
+    "seite": "3"
+   },
+   {
+    "baujahr": 26,
+    "mittel": 6.67,
+    "seite": "3"
+   },
+   {
+    "baujahr": 27,
+    "mittel": 6.69,
+    "seite": "3"
+   },
+   {
+    "baujahr": 28,
+    "mittel": 6.71,
+    "seite": "3"
+   },
+   {
+    "baujahr": 29,
+    "mittel": 6.73,
+    "seite": "3"
+   },
+   {
+    "baujahr": 30,
+    "mittel": 6.97,
+    "seite": "3"
+   },
+   {
+    "baujahr": 31,
+    "mittel": 7,
+    "seite": "3"
+   },
+   {
+    "baujahr": 32,
+    "mittel": 7.03,
+    "seite": "3"
+   },
+   {
+    "baujahr": 33,
+    "mittel": 7.06,
+    "seite": "3"
+   },
+   {
+    "baujahr": 34,
+    "mittel": 7.09,
+    "seite": "3"
+   },
+   {
+    "baujahr": 35,
+    "mittel": 7.12,
+    "seite": "3"
+   },
+   {
+    "baujahr": 36,
+    "mittel": 7.15,
+    "seite": "3"
+   },
+   {
+    "baujahr": 37,
+    "mittel": 7.18,
+    "seite": "3"
+   },
+   {
+    "baujahr": 38,
+    "mittel": 7.21,
+    "seite": "3"
+   },
+   {
+    "baujahr": 39,
+    "mittel": 7.24,
+    "seite": "3"
+   },
+   {
+    "baujahr": 40,
+    "mittel": 7.27,
+    "seite": "3"
+   },
+   {
+    "baujahr": 41,
+    "mittel": 7.3,
+    "seite": "3"
+   },
+   {
+    "baujahr": 42,
+    "mittel": 7.33,
+    "seite": "3"
+   },
+   {
+    "baujahr": 43,
+    "mittel": 7.36,
+    "seite": "3"
+   },
+   {
+    "baujahr": 44,
+    "mittel": 7.39,
+    "seite": "3"
+   },
+   {
+    "baujahr": 45,
+    "mittel": 7.42,
+    "seite": "3"
+   },
+   {
+    "baujahr": 46,
+    "mittel": 7.45,
+    "seite": "3"
+   },
+   {
+    "baujahr": 47,
+    "mittel": 7.72,
+    "seite": "3"
+   },
+   {
+    "baujahr": 48,
+    "mittel": 7.76,
+    "seite": "3"
+   },
+   {
+    "baujahr": 49,
+    "mittel": 7.8,
+    "seite": "3"
+   },
+   {
+    "baujahr": 50,
+    "mittel": 7.84,
+    "seite": "3"
+   },
+   {
+    "baujahr": 51,
+    "mittel": 7.88,
+    "seite": "3"
+   },
+   {
+    "baujahr": 52,
+    "mittel": 7.92,
+    "seite": "3"
+   },
+   {
+    "baujahr": 53,
+    "mittel": 7.96,
+    "seite": "3"
+   },
+   {
+    "baujahr": 54,
+    "mittel": 8,
+    "seite": "3"
+   },
+   {
+    "baujahr": 55,
+    "mittel": 8.04,
+    "seite": "3"
+   },
+   {
+    "baujahr": 56,
+    "mittel": 8.08,
+    "seite": "3"
+   },
+   {
+    "baujahr": 57,
+    "mittel": 8.12,
+    "seite": "3"
+   },
+   {
+    "baujahr": 58,
+    "mittel": 8.16,
+    "seite": "3"
+   },
+   {
+    "baujahr": 59,
+    "mittel": 8.2,
+    "seite": "3"
+   },
+   {
+    "baujahr": 60,
+    "mittel": 8.24,
+    "seite": "3"
+   },
+   {
+    "baujahr": 61,
+    "mittel": 8.28,
+    "seite": "3"
+   },
+   {
+    "baujahr": 62,
+    "mittel": 8.32,
+    "seite": "3"
+   },
+   {
+    "baujahr": 63,
+    "mittel": 8.36,
+    "seite": "3"
+   },
+   {
+    "baujahr": 64,
+    "mittel": 8.4,
+    "seite": "3"
+   },
+   {
+    "baujahr": 65,
+    "mittel": 8.44,
+    "seite": "3"
+   },
+   {
+    "baujahr": 66,
+    "mittel": 8.48,
+    "seite": "3"
+   },
+   {
+    "baujahr": 67,
+    "mittel": 8.52,
+    "seite": "3"
+   },
+   {
+    "baujahr": 68,
+    "mittel": 8.56,
+    "seite": "3"
+   },
+   {
+    "baujahr": 69,
+    "mittel": 8.98,
+    "seite": "3"
+   },
+   {
+    "baujahr": 70,
+    "mittel": 9.03,
+    "seite": "3"
+   },
+   {
+    "baujahr": 71,
+    "mittel": 9.08,
+    "seite": "3"
+   },
+   {
+    "baujahr": 72,
+    "mittel": 9.13,
+    "seite": "3"
+   },
+   {
+    "baujahr": 73,
+    "mittel": 9.18,
+    "seite": "3"
+   },
+   {
+    "baujahr": 74,
+    "mittel": 9.23,
+    "seite": "3"
+   },
+   {
+    "baujahr": 75,
+    "mittel": 9.28,
+    "seite": "3"
+   },
+   {
+    "baujahr": 76,
+    "mittel": 9.33,
+    "seite": "3"
+   },
+   {
+    "baujahr": 77,
+    "mittel": 9.38,
+    "seite": "3"
+   }
+  ],
+  "zuschlaege": [
+   {
+    "merkmal": "wohnungsgroesse",
+    "art": "eur_qm",
+    "label": "Wohnungsgröße auf 5 m² gerundet (±1 Punkt je 5 m² unter 60 bzw. über 90 m²)",
+    "beleg": "S. 5 Tabelle 3, Größe",
+    "wfl_klassen": [
+     {
+      "von": 27.5,
+      "bis": 32.5,
+      "bis_inkl": false,
+      "wert": 0.48
+     },
+     {
+      "von": 32.5,
+      "bis": 37.5,
+      "bis_inkl": false,
+      "wert": 0.4
+     },
+     {
+      "von": 37.5,
+      "bis": 42.5,
+      "bis_inkl": false,
+      "wert": 0.32
+     },
+     {
+      "von": 42.5,
+      "bis": 47.5,
+      "bis_inkl": false,
+      "wert": 0.24
+     },
+     {
+      "von": 47.5,
+      "bis": 52.5,
+      "bis_inkl": false,
+      "wert": 0.16
+     },
+     {
+      "von": 52.5,
+      "bis": 57.5,
+      "bis_inkl": false,
+      "wert": 0.08
+     },
+     {
+      "von": 57.5,
+      "bis": 92.5,
+      "bis_inkl": false,
+      "wert": 0
+     },
+     {
+      "von": 92.5,
+      "bis": 97.5,
+      "bis_inkl": false,
+      "wert": -0.08
+     },
+     {
+      "von": 97.5,
+      "bis": 102.5,
+      "bis_inkl": false,
+      "wert": -0.16
+     },
+     {
+      "von": 102.5,
+      "bis": 107.5,
+      "bis_inkl": false,
+      "wert": -0.24
+     },
+     {
+      "von": 107.5,
+      "bis": 112.5,
+      "bis_inkl": false,
+      "wert": -0.32
+     },
+     {
+      "von": 112.5,
+      "bis": 117.5,
+      "bis_inkl": false,
+      "wert": -0.4
+     },
+     {
+      "von": 117.5,
+      "bis": 122.5,
+      "bis_inkl": false,
+      "wert": -0.48
+     },
+     {
+      "von": 122.5,
+      "bis": 127.5,
+      "bis_inkl": false,
+      "wert": -0.56
+     },
+     {
+      "von": 127.5,
+      "bis": 132.5,
+      "bis_inkl": true,
+      "wert": -0.64
+     }
+    ]
+   },
+   {
+    "merkmal": "lage:einfach",
+    "art": "eur_qm",
+    "wert": -0.24,
+    "label": "einfache Wohnlage (−3 Punkte)",
+    "beleg": "S. 5 Tabelle 3, S. 6 Lage"
+   },
+   {
+    "merkmal": "lage:gut",
+    "art": "eur_qm",
+    "wert": 0.24,
+    "label": "gute Wohnlage (+3 Punkte)",
+    "beleg": "S. 5 Tabelle 3, S. 6 Lage"
+   },
+   {
+    "merkmal": "einfamilienhaus",
+    "art": "eur_qm",
+    "wert": 1.2,
+    "label": "Einfamilienhaus, ohne typische Zechenhäuser, mindestens (+15 Punkte × 0,08 €)",
+    "beleg": "S. 5 Tabelle 3"
+   },
+   {
+    "merkmal": "zweifamilienhaus",
+    "art": "eur_qm",
+    "wert": 0.24,
+    "label": "Wohnung im Zweifamilienhaus (+3 Punkte × 0,08 €)",
+    "beleg": "S. 5 Tabelle 3"
+   },
+   {
+    "merkmal": "dreifamilienhaus",
+    "art": "eur_qm",
+    "wert": 0.08,
+    "label": "Wohnung im Dreifamilienhaus (+1 Punkte × 0,08 €)",
+    "beleg": "S. 5 Tabelle 3"
+   },
+   {
+    "merkmal": "wohnanlage",
+    "art": "eur_qm",
+    "wert": -0.16,
+    "label": "Wohnung in Wohnanlage über 12 Wohneinheiten (-2 Punkte × 0,08 €)",
+    "beleg": "S. 5 Tabelle 3"
+   },
+   {
+    "merkmal": "souterrain",
+    "art": "eur_qm",
+    "wert": -0.4,
+    "label": "Souterrainwohnung (-5 Punkte × 0,08 €)",
+    "beleg": "S. 5 Tabelle 3"
+   },
+   {
+    "merkmal": "einzeloefen",
+    "art": "eur_qm",
+    "wert": -0.4,
+    "label": "Einzelofenheizung Kohle/Gas/Öl oder (Nacht-)Stromspeicherheizung (-5 Punkte × 0,08 €)",
+    "beleg": "S. 5 Tabelle 3"
+   },
+   {
+    "merkmal": "keine_nebenraeume",
+    "art": "eur_qm",
+    "wert": -0.16,
+    "label": "ohne Nebenräume (-2 Punkte × 0,08 €)",
+    "beleg": "S. 5 Tabelle 3"
+   },
+   {
+    "merkmal": "kein_balkon",
+    "art": "eur_qm",
+    "wert": -0.24,
+    "label": "ohne Balkon/Terrasse/Loggia (-3 Punkte × 0,08 €)",
+    "beleg": "S. 5 Tabelle 3"
+   },
+   {
+    "merkmal": "elektro_mangelhaft",
+    "art": "eur_qm",
+    "wert": -0.24,
+    "label": "ohne ausreichende Elektroinstallation, Belichtung oder Belüftung (-3 Punkte × 0,08 €)",
+    "beleg": "S. 5 Tabelle 3"
+   },
+   {
+    "merkmal": "rolllaeden",
+    "art": "eur_qm",
+    "wert": 0.08,
+    "label": "Rollläden überwiegend (+1 Punkte × 0,08 €)",
+    "beleg": "S. 5 Tabelle 3"
+   },
+   {
+    "merkmal": "einfache_bodenbelaege",
+    "art": "eur_qm",
+    "wert": 0.08,
+    "label": "einfache Bodenbeläge komplett ausgelegt (+1 Punkte × 0,08 €)",
+    "beleg": "S. 5 Tabelle 3"
+   },
+   {
+    "merkmal": "hochwertige_bodenbelaege",
+    "art": "eur_qm",
+    "wert": 0.32,
+    "label": "überwiegend hochwertige Bodenbeläge (+4 Punkte × 0,08 €)",
+    "beleg": "S. 5 Tabelle 3"
+   },
+   {
+    "merkmal": "gartennutzung",
+    "art": "eur_qm",
+    "wert": 0.4,
+    "label": "individuelle Gartennutzung (+5 Punkte × 0,08 €)",
+    "beleg": "S. 5 Tabelle 3"
+   }
+  ]
+ },
+ "pruefbeispiele": [
+  {
+   "eingabe": {
+    "baujahr": 1956,
+    "wfl": 52,
+    "lage": "einfach",
+    "merkmale": {
+     "kein_balkon": true,
+     "einfache_bodenbelaege": true
+    }
+   },
+   "erwartet": {
+    "mittel": 6.07
+   },
+   "seite": "7",
+   "art": "rechenweg",
+   "anmerkung": "Beispiel S. 7 ohne Modernisierungszuschlag: 6,17 + 7 × 0,02 = 6,31; −3 Punkte (Größe +2, Lage −3, Balkon −3, Bodenbeläge +1) = −0,24 → 6,07; mit Modernisierung +0,56 = 6,63 laut Dokument"
+  },
+  {
+   "eingabe": {
+    "baujahr": 1940,
+    "wfl": 75
+   },
+   "erwartet": {
+    "mittel": 6.01
+   },
+   "seite": "3",
+   "art": "tabellenzelle"
+  },
+  {
+   "eingabe": {
+    "baujahr": 2000,
+    "wfl": 70
+   },
+   "erwartet": {
+    "mittel": 7.92
+   },
+   "seite": "3",
+   "art": "tabellenzelle",
+   "anmerkung": "7,72 + 5 × 0,04"
+  },
+  {
+   "eingabe": {
+    "baujahr": 1980,
+    "wfl": 140
+   },
+   "erwartet": null,
+   "seite": "5",
+   "art": "tabellenzelle"
+  }
+ ]
+}
