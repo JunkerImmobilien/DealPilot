@@ -1387,7 +1387,7 @@
   }
   /* v2255 · der Knopf sagt, ALS WAS übernommen wird */
   function _vwAmtlich(h) { return !!h && (h.art === 'Ertragswert' || h.art === 'Sachwert' || (h.art === 'Vergleichswert' && !!h.amtlich)); }   /* v2256 */
-  function _vwKnopf(h) { return _vwAmtlich(h) ? 'als Verkehrswert übernehmen' : (h && h.art === 'Vergleichswert' ? 'als Vergleichswert übernehmen' : 'als Marktwertindikation übernehmen'); }
+  function _vwKnopf(h) { return _vwAmtlich(h) ? 'als Verkehrswert übernehmen' : (h && h.art === 'Vergleichswert' ? 'als Vergleichswert übernehmen' : 'als Marktpreisindikation übernehmen'); }   /* v5160v1 · Kundentext Marktpreisindikation */
   function verkehrswertSetzen() {
     var box = $('oe-vw'), el = $('svwert'); if (!box || !el || !box._liste) return;
     /* v1979a: der Aufruf von `_unterschiedZeigen` stand HIER — in

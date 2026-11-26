@@ -34,6 +34,8 @@
   }
   function toast(m) { try { if (typeof window.toast === 'function') window.toast(m); } catch (e) {} }
   function gv(id) { var e = document.getElementById(id); return e ? String(e.value || '').trim() : ''; }
+  /* v5160v1 · Adresse des offenen Objekts, wenn der Bericht keine mitbringt (die Liste „Marktberichte“ gehört zu genau diesem Objekt) */
+  function _objAdresse() { var a = [gv('str'), gv('hnr')].filter(Boolean).join(' '), b = [gv('plz'), gv('ort')].filter(Boolean).join(' '); return [a, b].filter(Boolean).join(', '); }
   function gt(id) { var e = document.getElementById(id); return e ? String(e.textContent || '').trim() : ''; }
 
   var ICO = {
@@ -1261,22 +1263,43 @@
         var uhr = d.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
         var st = String(h.wert_stufe || '');
         var drei = st === '3';
-        var art = drei ? 'Wertermittlung' : 'Marktindikation';
+        /* v5160v1 · Video M30: dreimal „Marktindikation · Adresse unbekannt“ mit dem Angebotswert, obwohl Stufe 1, 2 und 3
+           abgerufen waren. Jetzt: Art mit Stufe, die Adresse immer (sonst die des Objekts), und als Zahl der Wert des
+           Berichts - bei Stufe 3 der Verkehrswert aus dem Verfahren (führend, sonst Ertrags-, Sach-, amtlicher
+           Vergleichswert), sonst die Marktpreisindikation nach Abschlag wie im Reiter Objekt (objekt-reiter.js v2490). */
+        var art = drei ? 'Wertermittlung' : 'Marktpreisindikation';
         if (st) art += ' · Stufe ' + st;
+        var mpi = _da(h.market_value) ? Number(h.market_value) : null;
+        if (mpi != null && !_da(h.angebot_abschlag_pct)) {
+          try { var _A = window.DealPilotAbschlag; if (_A && typeof _A.satz === 'function') { var _s = Number(_A.satz()); if (isFinite(_s) && _s > 0) mpi = Math.round(mpi * (1 - _s / 100) / 1000) * 1000; } } catch (e) {}
+        }
+        var ew = drei && _da(h.ertragswert_eur) ? Number(h.ertragswert_eur) : null;
+        var sw = drei && _da(h.sachwert_eur) && !(h.sachwert_vorlaeufig === true || h.sw_marktangepasst === false) ? Number(h.sachwert_eur) : null;
+        var vg = drei ? (_da(h.irw_vergleichswert_eur) ? Number(h.irw_vergleichswert_eur) : (h.vergleichsfaktor_amtlich && _da(h.vergleichswert_eur) ? Number(h.vergleichswert_eur) : null)) : null;
+        var fu = String(h.fuehrend || ''), haupt = null;
+        if (fu === 'ertragswert' && ew != null) haupt = { wert: ew, art: 'Ertragswert' };
+        else if (fu === 'sachwert' && sw != null) haupt = { wert: sw, art: 'Sachwert' };
+        else if (fu === 'vergleichswert' && vg != null) haupt = { wert: vg, art: 'Vergleichswert' };
+        else if (ew != null) haupt = { wert: ew, art: 'Ertragswert' };
+        else if (sw != null) haupt = { wert: sw, art: 'Sachwert' };
+        else if (vg != null) haupt = { wert: vg, art: 'Vergleichswert' };
         var weg = [];
-        if (drei && _da(h.ertragswert_eur)) weg.push('Ertragswert ' + _eur(h.ertragswert_eur));
-        if (drei && _da(h.sachwert_eur)) weg.push('Sachwert ' + _eur(h.sachwert_eur));
-        var adr = String(h.address || 'Adresse unbekannt').replace(/</g, '&lt;');
-        var mv = _da(h.market_value)
-          ? '<div class="dab-mbl-wert">' + _eur(h.market_value) + '<small>' + (drei ? 'Marktwert-Indikation' : 'Marktpreisindikation') + '</small></div>'
-          : '<div class="dab-mbl-wert nod">keine Daten</div>';
+        if (ew != null && !(haupt && haupt.art === 'Ertragswert')) weg.push('Ertragswert ' + _eur(ew));
+        if (drei && _da(h.sachwert_eur) && !(haupt && haupt.art === 'Sachwert')) weg.push((sw != null ? 'Sachwert ' : 'Sachwert vorläufig ') + _eur(h.sachwert_eur));
+        if (haupt && mpi != null) weg.push('Marktpreisindikation ' + _eur(mpi));
+        var adr = String(h.address || h.object_label || _objAdresse() || 'Adresse nicht hinterlegt').replace(/</g, '&lt;');
+        var mv = haupt
+          ? '<div class="dab-mbl-wert">' + _eur(haupt.wert) + '<small>Verkehrswert (' + haupt.art + ')</small></div>'
+          : (mpi != null
+            ? '<div class="dab-mbl-wert">' + _eur(mpi) + '<small>Marktpreisindikation</small></div>'
+            : '<div class="dab-mbl-wert nod">keine Daten</div>');
         var rid = h.report_id | 0;
         var pdf = (drei && window.DpProfi)
           ? 'DpProfi.oeffnen(' + (/^[0-9a-f-]{36}$/i.test(String(h.external_ref || '')) ? '\'' + h.external_ref + '\'' : 'null') + ',' + rid + ')'
           : 'DealActionBoarding.downloadReport(' + rid + ')';
         return '<div class="dab-mbl-z">'
           + '<div class="dab-mbl-dat">' + dat + '<small>' + uhr + ' Uhr</small></div>'
-          + '<div class="dab-mbl-art"><b>' + art + '</b><span class="dab-mbl-adr">' + (weg.length ? weg.join(' · ') : adr) + '</span></div>'
+          + '<div class="dab-mbl-art"><b>' + art + '</b><span class="dab-mbl-adr">' + adr + '</span>' + (weg.length ? '<span class="dab-mbl-adr">' + weg.join(' · ') + '</span>' : '') + '</div>'
           + mv
           + '<div class="dab-mbl-akt">'
           /* v3253 · Marcel 09.11.2026: „Bericht ansehen“ raus - das Marktbericht-Modul läuft nur im Hintergrund */

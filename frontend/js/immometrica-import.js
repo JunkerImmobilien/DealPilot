@@ -257,7 +257,7 @@
           '<span>KP <b>' + fmt(dp.kp) + ' \u20ac</b></span>' +
           '<span>Wfl <b>' + fmt(dp.wfl) + '</b> m\u00b2</span>' +
           '<span>' + esc(dp.objart || '') + '</span>' +
-          '<span>Bj ' + fmt(dp.baujahr) + '</span></div></div>';
+          /* v5160v1 · Baujahr nie durch Intl (stand „Bj 1.910“) */ '<span>Bj ' + fmtY(dp.baujahr) + '</span></div></div>';
     }).join('');
     list.querySelectorAll('.imo-o').forEach(function (el) {
       el.onclick = function () { state.active = parseInt(el.dataset.i, 10); renderList(total); renderDetail(); };
