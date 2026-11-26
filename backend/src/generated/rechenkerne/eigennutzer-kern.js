@@ -180,11 +180,22 @@
        e.nebenkosten_qm = Zahl oder { wert: €/m² mtl., herkunft: 'Text für die Aufstellung' }. Rangfolge:
        Unterlagen (betriebskosten_monat, umlagefähiges Hausgeld) > ortsgenauer Wert > Pauschale. */
     var nkq = e.nebenkosten_qm, nkqW = nkq != null && typeof nkq === 'object' ? num(nkq.wert) : num(nkq);
-    if (nkqW != null && nkqW > 0 && nkqW < 20) { uebrig = wfl * nkqW; uebrigHerkunft = (nkq && typeof nkq === 'object' && nkq.herkunft ? String(nkq.herkunft).slice(0, 80) : 'ortsüblicher Wert') + ', ' + komma(nkqW, 2) + ' €/m²'; }
+    /* pp6 · die Posten einzeln (nkq.posten: [{ id, name, qm, herkunft: 'gemeinde'|'land'|'bund' }]), nur solange der ortsgenaue
+       Wert gilt. Werte aus den Unterlagen ersetzen die Summe, dann gibt es keine Posten. */
+    var HK = { gemeinde: 'je Gemeinde', kreis: 'je Kreis', land: 'Landesmittel', bund: 'Bundesschnitt' }, uebrigPosten = [];
+    if (nkqW != null && nkqW > 0 && nkqW < 20) {
+      uebrig = wfl * nkqW; uebrigHerkunft = (nkq && typeof nkq === 'object' && nkq.herkunft ? String(nkq.herkunft).slice(0, 80) : 'ortsüblicher Wert') + ', ' + komma(nkqW, 2) + ' €/m²';
+      if (nkq && typeof nkq === 'object' && Array.isArray(nkq.posten)) uebrigPosten = nkq.posten.filter(function (p) { return p && num(p.qm) != null; }).map(function (p) {
+        var eurP = num(p.eur_monat) != null ? num(p.eur_monat) : num(p.qm) * wfl;
+        return { k: 'nk_' + String(p.id || ''), l: 'davon ' + String(p.name || ''), eur: r0(eurP), herkunft: HK[p.herkunft] || 'Bundesschnitt', teil: true };
+      });
+      /* Summe aus den Posten, damit Zeilen und Summe auf den Euro übereinstimmen (Grundgebühr Wasser ist absolut, nicht je m²) */
+      if (uebrigPosten.length) uebrig = uebrigPosten.reduce(function (s, p) { return s + p.eur; }, 0);
+    }
     var hgU = art === 'etw' && e.weg ? num(e.weg.hausgeld_umlagefaehig) : null;
-    if (num(e.betriebskosten_monat) != null) { uebrig = num(e.betriebskosten_monat); uebrigHerkunft = 'aus den Unterlagen'; }
+    if (num(e.betriebskosten_monat) != null) { uebrig = num(e.betriebskosten_monat); uebrigHerkunft = 'aus den Unterlagen'; uebrigPosten = []; }
     if (hgU != null) {
-      uebrig = hgU; uebrigHerkunft = 'umlagefähiges Hausgeld';
+      uebrig = hgU; uebrigHerkunft = 'umlagefähiges Hausgeld'; uebrigPosten = [];
       if (e.weg.heizung_im_hausgeld !== false) { heizMonat = 0; heizHerkunft = 'im Hausgeld enthalten'; }
     }
     if (num(e.heizkosten_monat) != null) { heizMonat = num(e.heizkosten_monat); heizHerkunft = 'aus den Unterlagen'; }
@@ -217,9 +228,10 @@
       { k: 'rate', l: 'Rate (Zins und Tilgung)', eur: r0(rate) },
       { k: 'eigentuemer', l: art === 'etw' && e.weg && num(e.weg.hausgeld_nicht_umlagefaehig) != null ? 'Eigentümerkosten (nicht umlagefähiges Hausgeld)' : 'Eigentümerkosten (Instandhaltung, Rücklage)', eur: r0(bewirt) },
       { k: 'heizung', l: 'Heizung', eur: r0(heizMonat), herkunft: heizHerkunft },
-      { k: 'uebrige', l: 'Übrige Nebenkosten (Grundsteuer, Wasser, Müll, Versicherung, Strom Allgemein)', eur: r0(uebrig), herkunft: uebrigHerkunft },
+      { k: 'uebrige', l: 'Übrige Nebenkosten (Grundsteuer, Wasser, Müll, Versicherung, Strom Allgemein)', eur: r0(uebrig), herkunft: uebrigHerkunft }
+    ].concat(uebrigPosten, [
       { k: 'summe', l: 'Summe im Monat', eur: r0(wohnkosten), summe: true }
-    ];
+    ]);
 
     /* Kaufen gegen Mieten über A.jahre */
     var reihe = [], wert = kp, schuld = darlehen, depot = ek, mieteJ = miete ? miete * 12 : null, jahr = null;
@@ -248,7 +260,7 @@
     if (reihe.length) urteil.push(jahr ? 'Kaufen ist nach ' + jahr + ' Jahren günstiger als mieten.' : 'In ' + A.jahre + ' Jahren wird Kaufen hier nicht günstiger als mieten.');
 
     return {
-      ok: true, version: 'v5130j',
+      ok: true, version: 'v5150pp6',
       haus: { score: haus, stufe: st, gewichte: GEWICHT,
         gruppen: { preis: pr, zustand: zu, lage: lage != null ? { score: r0(klemm(lage)) } : null } },
       leistbarkeit: { quote: quote != null ? r2(quote) : null, ampel: ampel, wohnkosten: r0(wohnkosten), netto: netto, aufstellung: aufstellung,
@@ -283,7 +295,8 @@
       hauszuschlag_pct: e.hauszuschlag_pct != null ? e.hauszuschlag_pct : (art === 'etw' ? 0 : 15),
       lage_score: lageAusMarkt(d), zustand: e.zustand, weg: e.weg, wert: e.wert,
       /* nn6 · ortsgenaue Nebenkosten (ohne Heizung), Rückfall bleibt die Pauschale im Kern */
-      nebenkosten_qm: d.nebenkosten && d.nebenkosten.qm > 0 ? { wert: d.nebenkosten.qm, herkunft: (d.nebenkosten.ortsgenau && d.nebenkosten.ortsgenau.length ? 'Grundsteuer der Gemeinde, übrige Posten Durchschnitt' : 'Durchschnittswerte') } : null });
+      nebenkosten_qm: d.nebenkosten && d.nebenkosten.qm > 0 ? { wert: d.nebenkosten.qm, posten: d.nebenkosten.posten || null,
+        herkunft: (d.nebenkosten.ortsgenau && d.nebenkosten.ortsgenau.length ? 'teils ortsgenau, übrige Posten Durchschnitt' : 'Durchschnittswerte') } : null });
     if (!r.ok) return r;
     var G = r.haus.gruppen, L = r.leistbarkeit;
     var leistS = L.quote == null ? null : r0(lin(L.quote, [[30, 100], [35, 90], [40, 72], [45, 50], [50, 30], [60, 5]]));
