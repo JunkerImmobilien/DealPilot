@@ -110,8 +110,8 @@
 .eg-mit-tip>label{display:inline}
 .eg-mit-tip>label span{display:inline}
 .eg-i{appearance:none;border:0;background:transparent;cursor:help;color:var(--wl-e8cc7a,#E8CC7A);font:600 13px/1 var(--body,Inter,sans-serif);padding:0 2px;margin-left:4px;vertical-align:baseline}
-.eg-tip{position:absolute;left:auto;right:0;width:min(300px,calc(100vw - 56px));bottom:calc(100% + 6px);z-index:5;display:none;padding:10px 12px;border-radius:10px;background:#050505;border:1px solid color-mix(in srgb,var(--wl-e8cc7a,#E8CC7A) 35%,transparent);box-shadow:0 14px 30px -12px rgba(0,0,0,.9);font:400 12px/1.45 var(--body,Inter,sans-serif);color:#ECE6D6;text-transform:none;letter-spacing:0}
-.eg-mit-tip:hover .eg-tip,.eg-i:focus-visible+.eg-tip,.eg-mit-tip.eg-tip-an .eg-tip{display:block}
+.eg-f .eg-tip{position:absolute;left:auto;right:0;width:min(300px,calc(100vw - 56px));bottom:calc(100% + 6px);z-index:5;display:none;padding:10px 12px;border-radius:10px;background:#050505;border:1px solid color-mix(in srgb,var(--wl-e8cc7a,#E8CC7A) 35%,transparent);box-shadow:0 14px 30px -12px rgba(0,0,0,.9);font:400 12px/1.45 var(--body,Inter,sans-serif);color:#ECE6D6;text-transform:none;letter-spacing:0}
+.eg-mit-tip:hover .eg-tip,.eg-mit-tip .eg-i:focus-visible+.eg-tip,.eg-mit-tip.eg-tip-an .eg-tip{display:block}
 .eg-mon{display:grid;gap:4px;margin-top:6px}
 .eg-mon div,.eg-teile div{display:flex;justify-content:space-between;gap:12px}
 .eg-mon b,.eg-teile b{font-weight:600;color:#e9e4d8;font-variant-numeric:tabular-nums;white-space:nowrap}
@@ -126,7 +126,11 @@
   .eg-karte{padding:16px 14px}
   .eg-kopf{gap:8px;flex-wrap:wrap}
   .eg-f input{font-size:18px}
-  .eg-tip{right:-4px}
+  .eg-f .eg-tip{right:-4px}
 }
 @media (max-width:380px){ .eg-felder{gap:8px} .eg-f{padding:9px 10px 7px} }
 @media (prefers-reduced-motion:reduce){ .eg-flip{transition:none}.eg-start::after{animation:none} }
+.eg-amp b{white-space:nowrap}
+.eg-amp{align-items:baseline;flex-wrap:wrap}
+.eg-amp i{align-self:center}
+.hc-kauf #hcMehr{color:var(--wl-e8cc7a,#E8CC7A);text-decoration:underline;text-underline-offset:2px}
