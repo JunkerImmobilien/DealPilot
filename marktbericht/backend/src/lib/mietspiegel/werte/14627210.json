@@ -1,0 +1,411 @@
+{
+ "ags": "14627210",
+ "gemeinde": "Radebeul",
+ "haus": {
+  "regel": "ausgeschlossen",
+  "beleg": "PDF S. 1 (Amtsblatt S. 18) Art der Wohnung: „Für Ein- und Zweifamilienhäuser liegen keine ausreichenden Datenmengen vor. Der Mietspiegel gilt daher nur für Wohnungen in Mehrfamilienhäusern.“"
+ },
+ "art": "einfach",
+ "stand": "2026-01-01",
+ "erhebungsstichtag": "2025-07-31",
+ "gueltig_ab": "2026-01-01",
+ "gueltig_bis": "2027-12-30",
+ "quelle": {
+  "url": "https://www.radebeul.de/radebeulmedia/Dokumente/Merk-und-Informationsblaetter/Mietspiegel/Wohnraummietspiegel-der-Grossen-Kreisstadt-Radebeul-2026.pdf",
+  "dokument": "Wohnraummietspiegel der Großen Kreisstadt Radebeul für nicht preisgebundene Wohnungen, gültig ab 01.01.2026 (Radebeuler Amtsblatt 01.01.2026, S. 18–20)",
+  "seite": "PDF S. 2 (Amtsblatt S. 19) Tabelle, PDF S. 1 (Amtsblatt S. 18) einfacher Mietspiegel, Gültigkeit, Wohnwertmerkmale",
+  "lizenz": "kein Rechtevorbehalt und kein Speicherverbot im Dokument (alle 3 Seiten durchgesehen, 26.11.2026); amtliche Bekanntmachung im Amtsblatt der Stadt Radebeul",
+  "abgerufen": "2026-11-26"
+ },
+ "einheit": "eur_qm_nettokalt",
+ "form": "tabelle",
+ "rundung": 2,
+ "hinweis": "Einfacher Mietspiegel nach § 558c BGB, gemeinsam erstellt von Mieterverein Dresden und Umgebung, Haus & Grund Dresden, Wohnungsunternehmen, Sachverständigen und Stadtverwaltung Radebeul, vereinbart am 02.12.2025; „vom 01.01.2026 bis 30.12.2027 gültig“ (so im Dokument), Stichtag 31.07.2025. Tabelle am Druckbild gelesen (300 dpi; die Textschicht zerreißt die verbundenen Felder): viele Felder gelten über mehrere Größenklassen oder ein ganzes Baualter, so übernommen. Leere Felder nicht eingetragen. Ausstattung 1/2/3 = Zahl der vorhandenen Merkmale zeitgemäße Heizung, Fenster, Elektroinstallation (Anlage 1) – Angabe nötig, kein Standard. Keine Wohnlagen (Lage über die Spanne, Anlage 2/3 nicht abgebildet). Größe: bis 60 / 60 bis 100 / über 100 m².",
+ "tabelle": {
+  "achsen": {
+   "baujahr": [
+    {
+     "von": null,
+     "bis": 1918,
+     "label": "bis 1918"
+    },
+    {
+     "von": 1919,
+     "bis": 1947,
+     "label": "1919–1947"
+    },
+    {
+     "von": 1948,
+     "bis": 1970,
+     "label": "1948–1970"
+    },
+    {
+     "von": 1971,
+     "bis": 1990,
+     "label": "1971–1990"
+    },
+    {
+     "von": 1991,
+     "bis": 2004,
+     "label": "1991–2004"
+    },
+    {
+     "von": 2005,
+     "bis": 2014,
+     "label": "2005–2014"
+    },
+    {
+     "von": 2015,
+     "bis": null,
+     "label": "ab 2015"
+    }
+   ],
+   "wfl": [
+    {
+     "von": null,
+     "bis": 60,
+     "label": "bis 60 m²"
+    },
+    {
+     "von": 60,
+     "von_inkl": false,
+     "bis": 100,
+     "label": "60 bis 100 m²"
+    },
+    {
+     "von": 100,
+     "von_inkl": false,
+     "bis": null,
+     "label": "über 100 m²"
+    }
+   ],
+   "ausstattung": [
+    {
+     "schluessel": "1",
+     "label": "1 Merkmal (Heizung, Fenster, Elektro zeitgemäß)"
+    },
+    {
+     "schluessel": "2",
+     "label": "2 Merkmale"
+    },
+    {
+     "schluessel": "3",
+     "label": "alle 3 Merkmale"
+    }
+   ]
+  },
+  "zellen": [
+   {
+    "baujahr": 1,
+    "wfl": 0,
+    "ausstattung": "1",
+    "unten": 5.0,
+    "mittel": 5.5,
+    "oben": 6.0,
+    "seite": "2"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 0,
+    "ausstattung": "2",
+    "unten": 7.0,
+    "mittel": 7.5,
+    "oben": 8.0,
+    "seite": "2"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 1,
+    "ausstattung": "2",
+    "unten": 7.0,
+    "mittel": 7.5,
+    "oben": 8.0,
+    "seite": "2"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 2,
+    "ausstattung": "2",
+    "unten": 7.0,
+    "mittel": 7.5,
+    "oben": 8.0,
+    "seite": "2"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 0,
+    "ausstattung": "2",
+    "unten": 5.8,
+    "mittel": 6.8,
+    "oben": 7.5,
+    "seite": "2"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 1,
+    "ausstattung": "2",
+    "unten": 5.8,
+    "mittel": 6.8,
+    "oben": 7.5,
+    "seite": "2"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 2,
+    "ausstattung": "2",
+    "unten": 5.8,
+    "mittel": 6.8,
+    "oben": 7.5,
+    "seite": "2"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 0,
+    "ausstattung": "2",
+    "unten": 5.6,
+    "mittel": 6.1,
+    "oben": 6.5,
+    "seite": "2"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 1,
+    "ausstattung": "2",
+    "unten": 5.6,
+    "mittel": 6.1,
+    "oben": 6.5,
+    "seite": "2"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 2,
+    "ausstattung": "2",
+    "unten": 5.6,
+    "mittel": 6.1,
+    "oben": 6.5,
+    "seite": "2"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 0,
+    "ausstattung": "3",
+    "unten": 6.5,
+    "mittel": 7.0,
+    "oben": 7.5,
+    "seite": "2"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 1,
+    "ausstattung": "3",
+    "unten": 6.5,
+    "mittel": 7.5,
+    "oben": 8.5,
+    "seite": "2"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 2,
+    "ausstattung": "3",
+    "unten": 7.5,
+    "mittel": 8.5,
+    "oben": 9.5,
+    "seite": "2"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 0,
+    "ausstattung": "3",
+    "unten": 5.9,
+    "mittel": 6.6,
+    "oben": 7.8,
+    "seite": "2"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 1,
+    "ausstattung": "3",
+    "unten": 6.3,
+    "mittel": 6.92,
+    "oben": 7.7,
+    "seite": "2"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 2,
+    "ausstattung": "3",
+    "unten": 6.3,
+    "mittel": 6.92,
+    "oben": 7.7,
+    "seite": "2"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 0,
+    "ausstattung": "3",
+    "unten": 6.0,
+    "mittel": 6.8,
+    "oben": 7.8,
+    "seite": "2"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 1,
+    "ausstattung": "3",
+    "unten": 6.0,
+    "mittel": 6.8,
+    "oben": 7.8,
+    "seite": "2"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 2,
+    "ausstattung": "3",
+    "unten": 6.0,
+    "mittel": 6.8,
+    "oben": 7.8,
+    "seite": "2"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 0,
+    "ausstattung": "3",
+    "unten": 5.78,
+    "mittel": 6.48,
+    "oben": 7.5,
+    "seite": "2"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 1,
+    "ausstattung": "3",
+    "unten": 5.97,
+    "mittel": 6.98,
+    "oben": 7.96,
+    "seite": "2"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 2,
+    "ausstattung": "3",
+    "unten": 5.97,
+    "mittel": 6.98,
+    "oben": 7.96,
+    "seite": "2"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 0,
+    "ausstattung": "3",
+    "unten": 6.5,
+    "mittel": 7.1,
+    "oben": 7.8,
+    "seite": "2"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 1,
+    "ausstattung": "3",
+    "unten": 6.5,
+    "mittel": 7.1,
+    "oben": 7.8,
+    "seite": "2"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 0,
+    "ausstattung": "3",
+    "unten": 8.0,
+    "mittel": 8.4,
+    "oben": 8.9,
+    "seite": "2"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 1,
+    "ausstattung": "3",
+    "unten": 7.93,
+    "mittel": 8.51,
+    "oben": 10.0,
+    "seite": "2"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 2,
+    "ausstattung": "3",
+    "unten": 7.93,
+    "mittel": 8.51,
+    "oben": 10.0,
+    "seite": "2"
+   },
+   {
+    "baujahr": 6,
+    "wfl": 0,
+    "ausstattung": "3",
+    "unten": 9.2,
+    "mittel": 10.7,
+    "oben": 12.2,
+    "seite": "2"
+   },
+   {
+    "baujahr": 6,
+    "wfl": 1,
+    "ausstattung": "3",
+    "unten": 9.2,
+    "mittel": 10.7,
+    "oben": 12.2,
+    "seite": "2"
+   },
+   {
+    "baujahr": 6,
+    "wfl": 2,
+    "ausstattung": "3",
+    "unten": 9.2,
+    "mittel": 10.7,
+    "oben": 12.2,
+    "seite": "2"
+   }
+  ]
+ },
+ "pruefbeispiele": [
+  {
+   "eingabe": {
+    "baujahr": 1980,
+    "wfl": 75,
+    "ausstattung": "3"
+   },
+   "erwartet": {
+    "unten": 5.97,
+    "mittel": 6.98,
+    "oben": 7.96
+   },
+   "seite": "2",
+   "art": "tabellenzelle"
+  },
+  {
+   "eingabe": {
+    "baujahr": 1910,
+    "wfl": 120,
+    "ausstattung": "3"
+   },
+   "erwartet": {
+    "unten": 7.5,
+    "mittel": 8.5,
+    "oben": 9.5
+   },
+   "seite": "2",
+   "art": "tabellenzelle"
+  },
+  {
+   "eingabe": {
+    "baujahr": 1995,
+    "wfl": 110,
+    "ausstattung": "3"
+   },
+   "erwartet": null,
+   "seite": "2",
+   "art": "tabellenzelle",
+   "anmerkung": "leeres Feld"
+  }
+ ]
+}
