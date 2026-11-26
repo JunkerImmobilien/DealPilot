@@ -1,0 +1,341 @@
+{
+ "ags": "05914000",
+ "freigabe": "gesperrt",
+ "freigabe_grund": "„Nachdruck, Vervielfältigung oder Wiedergabe auch von Teilen des Mietspiegels ist nur mit Genehmigung des Herausgebers gestattet.“ (Umschlag-Innenseite, PDF-Seite 2) — Rechtevorbehalt ohne ausdrückliches Speicherverbot; auf Prod gesperrt bis zur Klärung",
+ "gemeinde": "Hagen",
+ "art": "qualifiziert",
+ "stand": "2025-10-01",
+ "erhebungsstichtag": "2025-01-01",
+ "gueltig_ab": "2025-10-01",
+ "gueltig_bis": "2027-09-30",
+ "quelle": {
+  "url": "https://www.hagen.de/dateien/aus-dem-rathaus/fachbereiche-und-aemter/a-z/fachbereich-geoinformation-und-liegenschaftskataster/mietspiegel-2025-hagen.pdf",
+  "dokument": "Mietspiegel der Stadt Hagen 2025 für frei finanzierte Wohnungen, Gutachterausschuss für Grundstückswerte in der Stadt Hagen, herausgegeben durch die Stadt Hagen, gültig ab 01.10.2025",
+  "seite": "S. 1 (Geltung), S. 8 Tabelle 1, S. 9 Tabelle 2, S. 10 Tabelle 3, S. 11 Tabelle 4, S. 12 Beispielrechnung",
+  "lizenz": "Rechtevorbehalt: „Nachdruck, Vervielfältigung oder Wiedergabe auch von Teilen des Mietspiegels ist nur mit Genehmigung des Herausgebers gestattet.“ (PDF-Seite 2); gebührenfreier Download",
+  "abgerufen": "2026-11-26"
+ },
+ "einheit": "eur_qm_nettokalt",
+ "form": "tabelle",
+ "rundung": 2,
+ "hinweis": "Qualifizierter Regressionsmietspiegel (§ 558d, S. 4), Mietdatenerhebung Januar 2025, beschlossen 24.09.2025, Geltung 01.10.2025–30.09.2027 (S. 1). Gilt für Wohnungen in Mehrfamilienhäusern ab drei Wohneinheiten und vermietete Eigentumswohnungen, NICHT für Ein- und Zweifamilienhäuser und Sozialwohnungen (S. 1). Tabelle 1/3 = Mietausgangsgröße je Baujahresklasse × Ausstattungszustand (Kapitel 2.1.2, Anlage 2 Punkte-Anwendungshilfe); nur Mittelwerte — die Datengrundlage Q1/Q3 „kann nicht zur Mietberechnung verwendet werden“ (S. 8 Fußnote 3), deshalb keine Spanne. Ab Baujahr 2008 gibt es keinen Ausstattungszustand „mittel“ (S. 10) → ohne Angabe kein Wert. Zwischen Ausstattungsklassen ist Interpolation erlaubt, zwischen Baujahresklassen nicht (S. 8) — nicht abgebildet. Zu-/Abschläge sind im Dokument überwiegend SPANNEN mit Beurteilung im Einzelfall (S. 9, 11); abgebildet als Mitte der Spanne: Wohnlage einfach (bis 15 Lagepunkte BORIS) −5 bis −3 % → −4 %, mittel (16–22) −2 bis +2 % → 0 %, gut bis sehr gut (23–27) +3 bis +15 % → +9 %; Wohnfläche (nur bis Bj. 1994) 19–45 m² +8 bis +1 % → +4,5 %, 46–119 m² 0 %, 120–200 m² −1 bis −6 % → −3,5 %. Feste Werte: Balkon/Loggia/Terrasse nicht vorhanden −5 %, Gäste-WC/2. Bad +2 %, Kfz-Stellplatz anmietbar +2 % (bis 1994) bzw. nicht anmietbar „bis −5 %“ (ab 1995, nicht abgebildet). Nicht abgebildet (nur „bis“-Werte oder Einzelfall): Balkon je Nutzwert −3 bis +2 %, Terrasse +3 bis +6 %, ungünstiger Grundriss bis −2 %, Bad neuwertig bis +7 % / nicht zeitgemäß bis −3 % (ab 1995: älter als 20 J. bis −5 %), energetischer Zustand bis +15 %, barrierefreie Elemente bis +10 % (ab 1995), Besonderheiten je nach Einzelfall. Das Anwendungsbeispiel S. 12 (Bj. 1964, gut, 81 m², Lage 16 Punkte −2 %, Summe +5 % → 6,51 €/m²) benutzt Punkt-genaue Lagewerte und Einzelfallzuschläge und ist deshalb nur als Grundwert 6,20 nachgerechnet.",
+ "haus": {
+  "regel": "ausgeschlossen",
+  "fuer": [
+   "efh",
+   "zfh"
+  ],
+  "beleg": "S. 1 Geltungsbereich: „gilt nicht für Ein- und Zweifamilienhäuser“; S. 5: nur Mehrfamilienhäuser ab drei Wohneinheiten"
+ },
+ "tabelle": {
+  "achsen": {
+   "baujahr": [
+    {
+     "von": null,
+     "bis": 1948,
+     "label": "bis 1948"
+    },
+    {
+     "von": 1949,
+     "bis": 1977,
+     "label": "1949–1977"
+    },
+    {
+     "von": 1978,
+     "bis": 1994,
+     "label": "1978–1994"
+    },
+    {
+     "von": 1995,
+     "bis": 2007,
+     "label": "1995–2007"
+    },
+    {
+     "von": 2008,
+     "bis": 2015,
+     "label": "2008–2015"
+    },
+    {
+     "von": 2016,
+     "bis": null,
+     "label": "ab 2016"
+    }
+   ],
+   "ausstattung": [
+    {
+     "schluessel": "einfach",
+     "label": "einfach"
+    },
+    {
+     "schluessel": "mittel",
+     "label": "mittel (Standardwohnung)",
+     "standard": true
+    },
+    {
+     "schluessel": "gut",
+     "label": "gut"
+    },
+    {
+     "schluessel": "gehoben",
+     "label": "gehoben"
+    }
+   ]
+  },
+  "geltung": {
+   "baujahr_von": null,
+   "baujahr_bis": null,
+   "wfl_von": 19,
+   "wfl_bis": 200
+  },
+  "zellen": [
+   {
+    "baujahr": 0,
+    "ausstattung": "einfach",
+    "mittel": 5.7,
+    "seite": "8"
+   },
+   {
+    "baujahr": 0,
+    "ausstattung": "mittel",
+    "mittel": 5.85,
+    "seite": "8"
+   },
+   {
+    "baujahr": 0,
+    "ausstattung": "gut",
+    "mittel": 5.95,
+    "seite": "8"
+   },
+   {
+    "baujahr": 0,
+    "ausstattung": "gehoben",
+    "mittel": 6.35,
+    "seite": "8"
+   },
+   {
+    "baujahr": 1,
+    "ausstattung": "einfach",
+    "mittel": 5.95,
+    "seite": "8"
+   },
+   {
+    "baujahr": 1,
+    "ausstattung": "mittel",
+    "mittel": 6.1,
+    "seite": "8"
+   },
+   {
+    "baujahr": 1,
+    "ausstattung": "gut",
+    "mittel": 6.2,
+    "seite": "8"
+   },
+   {
+    "baujahr": 1,
+    "ausstattung": "gehoben",
+    "mittel": 6.6,
+    "seite": "8"
+   },
+   {
+    "baujahr": 2,
+    "ausstattung": "einfach",
+    "mittel": 6.2,
+    "seite": "8"
+   },
+   {
+    "baujahr": 2,
+    "ausstattung": "mittel",
+    "mittel": 6.35,
+    "seite": "8"
+   },
+   {
+    "baujahr": 2,
+    "ausstattung": "gut",
+    "mittel": 6.5,
+    "seite": "8"
+   },
+   {
+    "baujahr": 2,
+    "ausstattung": "gehoben",
+    "mittel": 6.85,
+    "seite": "8"
+   },
+   {
+    "baujahr": 3,
+    "ausstattung": "mittel",
+    "mittel": 7.6,
+    "seite": "10"
+   },
+   {
+    "baujahr": 3,
+    "ausstattung": "gut",
+    "mittel": 7.8,
+    "seite": "10"
+   },
+   {
+    "baujahr": 3,
+    "ausstattung": "gehoben",
+    "mittel": 8.4,
+    "seite": "10"
+   },
+   {
+    "baujahr": 4,
+    "ausstattung": "gut",
+    "mittel": 8.4,
+    "seite": "10"
+   },
+   {
+    "baujahr": 4,
+    "ausstattung": "gehoben",
+    "mittel": 9.5,
+    "seite": "10"
+   },
+   {
+    "baujahr": 5,
+    "ausstattung": "gut",
+    "mittel": 9.8,
+    "seite": "10"
+   },
+   {
+    "baujahr": 5,
+    "ausstattung": "gehoben",
+    "mittel": 10.4,
+    "seite": "10"
+   }
+  ],
+  "zuschlaege": [
+   {
+    "merkmal": "lage:einfach",
+    "art": "pct",
+    "wert": -4,
+    "label": "Wohnlage einfach (bis 15 Punkte), Mitte von −5 bis −3 %",
+    "beleg": "S. 9 Tabelle 2 / S. 11 Tabelle 4"
+   },
+   {
+    "merkmal": "lage:gut",
+    "art": "pct",
+    "wert": 9,
+    "label": "Wohnlage gut bis sehr gut (23–27 Punkte), Mitte von +3 bis +15 %",
+    "beleg": "S. 9 Tabelle 2 / S. 11 Tabelle 4",
+    "aliase": [
+     "sehr gut",
+     "gut bis sehr gut"
+    ]
+   },
+   {
+    "merkmal": "wohnflaeche",
+    "art": "pct",
+    "label": "Wohnfläche (Mitte der Spanne)",
+    "beleg": "S. 9 Tabelle 2 (nur bis Baujahr 1994)",
+    "bedingung": {
+     "baujahr_bis": 1994
+    },
+    "wfl_klassen": [
+     {
+      "von": 19,
+      "bis": 45,
+      "wert": 4.5
+     },
+     {
+      "von": 45,
+      "von_inkl": false,
+      "bis": 119,
+      "wert": 0
+     },
+     {
+      "von": 119,
+      "von_inkl": false,
+      "bis": 200,
+      "wert": -3.5
+     }
+    ]
+   },
+   {
+    "merkmal": "kein_balkon",
+    "art": "pct",
+    "wert": -5,
+    "label": "Balkon / Loggia / Terrasse nicht vorhanden",
+    "beleg": "S. 9 Tabelle 2, S. 11 Tabelle 4"
+   },
+   {
+    "merkmal": "gaeste_wc",
+    "art": "pct",
+    "wert": 2,
+    "label": "Gäste-WC / 2. Bad vorhanden",
+    "beleg": "S. 9 Tabelle 2, S. 11 Tabelle 4"
+   },
+   {
+    "merkmal": "stellplatz",
+    "art": "pct",
+    "wert": 2,
+    "label": "Kfz-Abstellmöglichkeit anmietbar oder überlassen",
+    "beleg": "S. 9 Tabelle 2",
+    "bedingung": {
+     "baujahr_bis": 1994
+    }
+   }
+  ]
+ },
+ "pruefbeispiele": [
+  {
+   "eingabe": {
+    "baujahr": 1964,
+    "wfl": 81,
+    "lage": "mittel",
+    "ausstattung": "gut"
+   },
+   "erwartet": {
+    "mittel": 6.2
+   },
+   "seite": "12",
+   "art": "tabellenzelle",
+   "anmerkung": "Grundwert des Anwendungsbeispiels S. 12 (6,20 €/m²); dessen Endwert 6,51 enthält Einzelfallzuschläge"
+  },
+  {
+   "eingabe": {
+    "baujahr": 1940,
+    "wfl": 70
+   },
+   "erwartet": {
+    "mittel": 5.85
+   },
+   "seite": "8",
+   "art": "tabellenzelle"
+  },
+  {
+   "eingabe": {
+    "baujahr": 1960,
+    "wfl": 40,
+    "lage": "einfach"
+   },
+   "erwartet": {
+    "mittel": 6.13
+   },
+   "seite": "8–9",
+   "art": "rechenweg",
+   "anmerkung": "6,10 × (1 − 4 % + 4,5 %) = 6,1305"
+  },
+  {
+   "eingabe": {
+    "baujahr": 2010,
+    "wfl": 70
+   },
+   "erwartet": null,
+   "seite": "10",
+   "art": "tabellenzelle",
+   "anmerkung": "ab 2008 kein Ausstattungszustand mittel"
+  },
+  {
+   "eingabe": {
+    "baujahr": 2010,
+    "wfl": 70,
+    "ausstattung": "gut"
+   },
+   "erwartet": {
+    "mittel": 8.4
+   },
+   "seite": "10",
+   "art": "tabellenzelle"
+  }
+ ]
+}
