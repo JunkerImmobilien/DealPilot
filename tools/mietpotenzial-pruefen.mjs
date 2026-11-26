@@ -731,7 +731,7 @@ const EINH = [{ nr: '1', wfl: '60', ist: '480', status: 'vermietet' }, { nr: '2'
   let a = await route({ ags: '08111000', baujahr: '1975', wfl: '70' });   /* Stuttgart: Speicherverbot, keine Wertedatei */
   gleich('N1 Route Speicherverbot (Stuttgart): keine Werte, Näherung = Faktor × 9 × 11 / 10', [a.werte_verfuegbar, a.naeherung_verfuegbar, a.werte_nutzung, a.naeherung.qm, a.naeherung.quelle_art],
     [false, true, 'verboten', soll, 'dealpilot_naeherung']);
-  wahr('N1 Rechenweg nennt Zensus, Klassen und Faktor', /Zensus 2022 Bestandsmiete der Gemeinde 10,00/.test(a.naeherung.rechnung) && /1970 bis 1979: 9,00/.test(a.naeherung.rechnung) && !/d - d/.test(a.naeherung.rechnung) && /Kalibrierfaktor/.test(a.naeherung.rechnung));
+  wahr('N1 Rechenweg nennt Zensus, Klassen und Faktor', /Zensus 2022 Bestandsmiete der Gemeinde 10,00/.test(a.naeherung.rechnung) && /1970 bis 1979: 9,00/.test(a.naeherung.rechnung) && !/\d - \d/.test(a.naeherung.rechnung) && /Kalibrierfaktor/.test(a.naeherung.rechnung));
   gleich('N1 Wortlaut der Herkunft (v5080: eine Zeile mit Genauigkeit der Region)', a.naeherung.text, naeherungText(P0, '08111000'));
   wahr('N1 Wortlaut „DealPilot-Näherung“, Genauigkeit nur im Tooltip-Feld, ohne Gedankenstrich und Semikolon', a.naeherung.text === 'DealPilot-Näherung' && /^im Mittel ±\d+,\d % zum Mietspiegel( der Stadt)?$/.test(a.naeherung.genauigkeit_text || '') && !/—|;/.test(a.naeherung.text_detail || ''));
   wahr('N1 ohne Portal- oder Anbieternamen', !/Scout|Immowelt|immonet|PriceHubble|Sprengnetter|BBSR/i.test(JSON.stringify(a.naeherung)));
