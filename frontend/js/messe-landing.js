@@ -81,13 +81,14 @@
     },
     async function () {   /* 4 · Grundangaben mit Herkunft */
       var g = q('.ec-grund', fenster());
-      zeige(g || inhalt(), 8);
-      await warte(800);
-      await zeile('Die Grundangaben', 'Was in den Unterlagen steht, ist schon eingetragen, mit Herkunft. Du ergänzt nur, was fehlt.');
-      /* Pflichtfelder, die noch leer sind, mit Musterwerten füllen (nichts Echtes) */
+      /* M9 26.11.: VOR der Zeile füllen, sonst stehen Eigenkapital und Zins leer und rot im Bild. Pflichtfelder, die noch leer sind, mit Musterwerten füllen (nichts Echtes) */
       var setz = function (sel, v) { var e = q(sel, fenster()); if (e && String(e.value).trim() === '') { e.value = v; e.dispatchEvent(new Event('input', { bubbles: true })); e.dispatchEvent(new Event('change', { bubbles: true })); } };
       setz('#ecgEk', '300000'); setz('#ecgZins', '3,9');
       qa('.ec-wahl', fenster()).forEach(function (w) { if (!q('button.an', w)) { var b0 = q('button', w); if (b0) b0.click(); } });
+      await warte(400);
+      zeige(g || inhalt(), 8);
+      await warte(800);
+      await zeile('Die Grundangaben', 'Was in den Unterlagen steht, ist schon eingetragen, mit Herkunft. Du ergänzt nur, was fehlt.');
       var sub = g && (q('button[type=submit]', g) || qa('button', g).filter(function (x) { return /weiter|rechnen|prüfen|Ergebnis/i.test(txt(x)); })[0]);
       if (sub) { zeige(sub, 8); await warte(1200); sub.click(); }
     },
