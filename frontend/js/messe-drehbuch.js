@@ -2118,7 +2118,7 @@
         var opts = [].map.call((q('#oe-vw-wahl') || { options: [] }).options, function (o) { return o.textContent; });
         var ew = opts.filter(function (t) { return /^Ertragswert/.test(t); })[0], sw = opts.filter(function (t) { return /^Sachwert/.test(t); })[0];
         function betrag(t) { var m = t && /·\s*([\d.]+ €)/.exec(t); return m ? m[1] : null; }
-        await b2oZeile(s, 'Ergebnis Stufe 3', 'Nach ImmoWertV gerechnet: Ertragswert <b>' + betrag(ew) + '</b>' + (sw ? ', vorläufiger Sachwert ' + betrag(sw) : '') + '. Das führende Verfahren ergibt den maßgebenden Wert, das andere stützt ihn.');
+        await b2oZeile(s, 'Ergebnis Stufe 3', 'Nach ImmoWertV gerechnet: Ertragswert <b>' + betrag(ew) + '</b>' + (sw ? ', vorläufiger Sachwert ' + betrag(sw) : '') + '. Daraus ergibt sich der Verkehrswert.');
         var sel = q('#oe-vw-wahl');
         if (sel) { var ix = [].findIndex.call(sel.options, function (o) { return /^Ertragswert/.test(o.textContent); }); if (ix >= 0) { sel.selectedIndex = ix; sel.dispatchEvent(new Event('change', { bubbles: true })); } }
         await warte(900);
@@ -2129,7 +2129,7 @@
         await zeige(feldVon('svwert'), 10);
         await warte(1200);
         var b = svBeschriftung();
-        await b2oZeile(s, 'Erst jetzt: maßgebender Wert', '„<b>' + b.titel + '</b> ' + b.hinweis + '“ — <b>' + eur(zahl('svwert')) + '</b>, aus dem führenden Verfahren der Stufe 3. Die Marktpreisindikation davor kam aus Angeboten, kein Verkehrswert.', 1200);
+        await b2oZeile(s, 'Erst jetzt: Verkehrswert', '„<b>' + b.titel + '</b> ' + b.hinweis + '“ — <b>' + eur(zahl('svwert')) + '</b>, aus Stufe 3. Die Marktpreisindikation davor kam aus Angeboten.', 1200);
       }
     ]
   };
