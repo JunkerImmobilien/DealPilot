@@ -264,8 +264,8 @@
     /* 10 · Förderung */
     var FO = O.foerderung || [];
     seite('Förderung', '<p class="ober">' + kapNr() + ' · Förderung</p><h2>Wofür es Geld vom Staat geben kann</h2><p class="unter">Öffentliche Programme ändern sich oft. Prüfe vor jedem Auftrag, was am Tag der Antragstellung gilt.</p>'
-      + (FO.length ? '<table><tr><th>Programm</th><th>wofür</th><th class="z">Größenordnung</th></tr>' + FO.slice(0, 9).map(function (f) {
-        return '<tr><td><b>' + esc(f.name) + '</b></td><td>' + esc(f.warum || f.satz || '') + '</td><td class="z">' + esc(f.betrag || '') + '</td></tr>'; }).join('') + '</table>'
+      + (FO.length ? '<table class="eng"><tr><th style="width:42%">Programm und wofür</th><th>Förderung, Größenordnung</th></tr>' + FO.slice(0, 7).map(function (f) {
+        return '<tr><td style="padding-right:4mm"><b>' + esc(f.name) + '</b><small>' + esc(f.warum || f.satz || '') + '</small></td><td style="font-size:8.6pt">' + esc(f.betrag || '') + '</td></tr>'; }).join('') + '</table>'
         : '<p>Für diese Angaben haben wir kein passendes Programm gefunden.</p>')
       + '<div class="box"><b>Tipp:</b> Lass vor dem ersten Auftrag einen Sanierungsfahrplan erstellen. Er bringt bei vielen Einzelmaßnahmen einen Bonus und zeigt dir die sinnvolle Reihenfolge, zum Beispiel erst Dach und Dämmung, dann die Heizung.</div>'
       + '<p class="quelle">Hinweis: Diese Übersicht ist allgemein. Höhe, Bedingungen und Fristen bestimmen die Programme selbst. Vor Vorhabenbeginn bzw. vor dem Kaufvertrag beantragen. DealPilot vermittelt keine Förderung.</p>', 'Förderung');
