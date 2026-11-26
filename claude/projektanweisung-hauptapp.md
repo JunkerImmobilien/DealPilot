@@ -45784,3 +45784,9 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** main 70df7756 (staging cf58ab8e).
 - **Nachweis:** Staging headless (v5060-Dateien per Fetch eingespielt, Speichern blockiert, Objekt-Hash vorher = nachher) an Westerfeldstr. 146: Kurz 14 S., Kombi 29 S., Bank 14 S., Inhaltsverzeichnis je eine Seite, alle Eintraege auf der richtigen Seite, Seitenzahl im Fuss auf jeder Seite, kein „Muster“, keine Selbstauskunft, kein NaN; App-Pfad des PDF-Dienstes (puppeteer 25, dok-pdf trackrecord) 200 und PDF. Prod: Dateien mit v5060m ausgeliefert, Fenster mit drei Karten, Kombi vorausgewaehlt, bleibt bei Klick daneben offen; pdf-dienst mit v4580g; Gold-Audit RC 0; buster-ebenen und vorschau sauber; Sicherung `haupt-vor-v5060m-*.sql.gz`.
 - **Rest:** PDF-Erzeugung auf Prod nicht selbst ausgeloest (kein Token fuer ein echtes Konto erzeugt), Marcel bitte einmal je Fassung ausprobieren · gold-audit meldet 2 Dateien unter der Basislinie (nachziehen) · Muster-Schluessel iv_*_muster bleiben intern.
+
+### Rollout 1.0.229 · v5050ss5 Zielbild-Marktpreisindikation mit Zusatz (26.11.2026)
+- **Was:** Pilot-Analyse/Objekt-Cockpit, Tabelle Ankauf · Heute · nach Mieterhöhung · Zielbild: die Marktpreisindikation im Zielbild trägt „Angebote im modernisierten Zustand“ (PotenzialService rechnet sie mit `ZIELBILD_REF`). Anlass Marcel M26: Sprung 945.000 → 1.045.000 € ohne Erklärung. Dazu Demo-Daten Westerfeldstr. 140 (Staging, eingefrorener Ankauf-Stand 3.195 → 2.650 € Nettokaltmiete), kein Logikfehler.
+- **Commit:** staging 65800543 · main cfc0903c, f414b3eb (Version).
+- **Nachweis:** Prod curl `pilot-analyse-v4.js?v=v5050ss5m` mit dem Zusatz, version.json patch 229, gold-audit Prod RC 0, buster-ebenen, vorschau-pruefen grün.
+- **Rest:** keiner.
