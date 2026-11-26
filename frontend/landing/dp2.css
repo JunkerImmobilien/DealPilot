@@ -392,3 +392,27 @@ img{max-width:100%;display:block}
 .footer-grid{grid-template-columns:1.4fr .9fr .9fr 1fr .9fr .9fr}
 @media(max-width:1080px){.footer-grid{grid-template-columns:1fr 1fr 1fr}}
 @media(max-width:700px){.footer-grid{grid-template-columns:1fr 1fr;gap:22px 18px}.footer-grid > div:first-child{grid-column:1 / -1}}
+
+/* aa6 (26.11.2026) · Menuepunkt Ratgeber dazu: am Desktop schnitt sonst der Knopf "Kostenlos starten" rechts ab (gemessen 1440 px). Abstaende enger statt Punkt weglassen. */
+@media(min-width:1081px){
+.nav .wrap{gap:16px}
+.nav ul li > a{padding:10px 8px}
+.nav ul li > a::after{left:8px;right:8px}
+.nav ul li:hover > a::after,.nav ul li > a.hier::after{width:calc(100% - 16px)}
+}
+/* aa6a · zwischen 1081 und 1279 px brachen Deal-Check und Für Partner schon vor dem Ratgeber zweizeilig um (auch auf Prod gemessen). Dort jetzt das Burger-Menue wie am Tablet. */
+@media(min-width:1081px) and (max-width:1279px){
+  .nav ul{display:none}
+  .burger{display:block}
+  .nav.menue-auf > .wrap > ul{display:flex;flex-direction:column;align-items:stretch;position:absolute;top:100%;left:0;right:0;background:#fff;padding:8px 20px 18px;border-bottom:1px solid rgba(20,18,15,.10);max-height:calc(100vh - 80px);max-height:calc(100dvh - 80px);overflow-y:auto;box-shadow:0 18px 40px rgba(0,0,0,.12)}
+  .nav.menue-auf > .wrap > ul > li{border-bottom:1px solid rgba(20,18,15,.07)}
+  .nav.menue-auf > .wrap > ul > li > a{display:flex;justify-content:space-between;align-items:center;padding:13px 0}
+  .nav.menue-auf > .wrap > ul > li > a::after{display:none}
+  .nav.menue-auf ul.sub{position:static;display:none;opacity:1;visibility:visible;transform:none;min-width:0;box-shadow:none;border:0;margin:0 0 10px;padding:0;background:transparent}
+  .nav.menue-auf ul.sub::before{display:none}
+  .nav.menue-auf li.zu-auf > ul.sub{display:block}
+  .nav.menue-auf li.zu-auf > a .kar{transform:rotate(180deg)}
+  .nav.menue-auf .sub a{padding:9px 6px}
+  .nav.menue-auf .sub span span{display:none}
+}
+.nav ul li > a,.b-cta,.b-log{white-space:nowrap}

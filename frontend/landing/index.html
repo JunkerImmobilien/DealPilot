@@ -31,7 +31,11 @@
   {"@type":"Offer","name":"Free","price":"0","priceCurrency":"EUR","description":"1 Objekt, die ersten 4 Wochen mit vollem Pro-Umfang"},
   {"@type":"Offer","name":"Starter","price":"19.99","priceCurrency":"EUR","priceSpecification":{"@type":"UnitPriceSpecification","price":"19.99","priceCurrency":"EUR","unitCode":"MON"}},
   {"@type":"Offer","name":"Investor","price":"34.99","priceCurrency":"EUR","priceSpecification":{"@type":"UnitPriceSpecification","price":"34.99","priceCurrency":"EUR","unitCode":"MON"}},
-  {"@type":"Offer","name":"Pro","price":"49.99","priceCurrency":"EUR","priceSpecification":{"@type":"UnitPriceSpecification","price":"49.99","priceCurrency":"EUR","unitCode":"MON"}}
+  {"@type":"Offer","name":"Pro","price":"49.99","priceCurrency":"EUR","priceSpecification":{"@type":"UnitPriceSpecification","price":"49.99","priceCurrency":"EUR","unitCode":"MON"}},
+  {"@type":"Offer","name":"Starter jährlich","price":"219","priceCurrency":"EUR","priceSpecification":{"@type":"UnitPriceSpecification","price":"219","priceCurrency":"EUR","unitCode":"ANN"}},
+  {"@type":"Offer","name":"Investor jährlich","price":"384","priceCurrency":"EUR","priceSpecification":{"@type":"UnitPriceSpecification","price":"384","priceCurrency":"EUR","unitCode":"ANN"}},
+  {"@type":"Offer","name":"Pro jährlich","price":"549","priceCurrency":"EUR","priceSpecification":{"@type":"UnitPriceSpecification","price":"549","priceCurrency":"EUR","unitCode":"ANN"}},
+  {"@type":"Offer","name":"Partner-Plan","price":"99","priceCurrency":"EUR","description":"Für Makler, Sachverständige, Steuerberater und Finanzierer, Kunden- und Teamplätze zubuchbar","priceSpecification":{"@type":"UnitPriceSpecification","price":"99","priceCurrency":"EUR","unitCode":"MON"}}
  ]}
 </script>
 <!-- landing-seo-1 · Betreiber wie im Impressum: Junker Solution, Einzelunternehmen von Marcel Junker, keine Gesellschaft. Keine Bewertungen (es gibt keine erhobenen). -->
@@ -62,7 +66,7 @@ if (/^#(partner-plan|module|nachkauf|feature-matrix)$/.test(location.hash)) loca
 /* landing-kern-2 · die Geschichten stehen auf geschichten.html, F&E auf forschung.html */
 if (location.hash === '#stories') location.replace('geschichten.html');
 if (location.hash === '#forschung') location.replace('forschung.html');</script>
-<link rel="stylesheet" href="dp2.css?v=gold-hell-1a">
+<link rel="stylesheet" href="dp2.css?v=aa6-nav-b">
 <link rel="stylesheet" href="dp2-hero.css?v=landing-hero-handy-1a">
 <link rel="stylesheet" href="dp2-teile.css?v=gold-hell-1">
 <link rel="stylesheet" href="dp2-buehne.css?v=v1570">
@@ -131,6 +135,7 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
     <li><a href="#dealcheck">Deal-Check</a></li>
     <li><a href="geschichten.html">Geschichten</a></li>
     <li><a href="videothek.html">Videothek</a></li>
+    <li><a href="ratgeber.html">Ratgeber</a></li>
     <li><a href="#pricing">Preise<i class="kar"></i></a>
       <ul class="sub">
         <li><a href="preise.html"><svg class="ico si"><use href="#i-bank"/></svg><span><b>Alle Preise</b><span>Vier Pakete von kostenlos bis Pro, im Detail</span></span></a></li>
@@ -671,6 +676,19 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
   <!-- landing-kern-1 · Bildzeile und die vier AMTLICH-Kacheln entfallen: die Datenquellen stehen jetzt ausführlich in #daten -->
 </div></section>
 
+<!-- aa6 · 26.11.2026 (Marcel: Ratgeber auffindbar) · dezenter Block vor dem Abschluss, drei Karten und der Weg zur Übersicht -->
+<style>.rg-home .rg-karten{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:22px 0 0;text-align:left}.rg-home .rg-karte{display:flex;flex-direction:column;gap:6px;min-width:0;background:#fff;border:1px solid var(--cream-line,#E8E1CF);border-top:3px solid var(--gd);padding:16px 16px 14px;text-decoration:none;color:var(--ink);transition:transform .15s ease,box-shadow .15s ease}.rg-home .rg-karte:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(5,5,5,.08)}.rg-home .rg-karte b{font:700 17px/1.25 var(--disp,"Space Grotesk"),sans-serif;overflow-wrap:anywhere;hyphens:auto;-webkit-hyphens:auto}.rg-home .rg-karte span{font-size:13.5px;line-height:1.45;color:var(--inkm,#555)}.rg-home .rg-alle{display:inline-block;margin-top:18px;font:700 11px/1.4 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--ink,#050505)}@media(max-width:760px){.rg-home .rg-karten{grid-template-columns:1fr}}</style>
+<section class="sec sec-cream rg-home" id="ratgeber"><div class="wrap">
+  <div class="head ctr rv"><div class="eye ctr">Aus dem Ratgeber</div>
+    <h2>Selbst rechnen. <span class="ac">Mit Beispiel.</span></h2></div>
+  <div class="rg-karten">
+    <a class="rg-karte" href="immobilien-rendite-berechnen.html"><b>Immobilien Rendite berechnen</b><span>Brutto, netto und auf das Eigenkapital, mit Rechenbeispiel.</span></a>
+    <a class="rg-karte" href="immobilien-ankauf-checkliste.html"><b>Ankauf Checkliste</b><span>Unterlagen und Besichtigung nach Baujahr, Schritt für Schritt.</span></a>
+    <a class="rg-karte" href="immobilienbewertung-immowertv.html"><b>Bewertung nach ImmoWertV</b><span>Vergleichs-, Ertrags- und Sachwert mit Rechenweg.</span></a>
+  </div>
+  <div style="text-align:center"><a class="rg-alle" href="ratgeber.html">Alle Ratgeber ansehen →</a></div>
+</div></section>
+
 <!-- ══ ABSCHLUSS ═════════════════════════════════════════════════════ -->
 <div class="board-band">
   <span class="perf-edge"></span><span class="perf-edge rechts"></span>
@@ -705,6 +723,8 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
       <a href="immobilien-investment-rechner.html">Investment-Rechner für Kapitalanleger</a>
       <a href="renditeobjekt-pruefen.html">Renditeobjekt vor dem Kauf prüfen</a>
       <a href="kaufpreisfaktor-berechnen.html">Kaufpreisfaktor berechnen</a>
+      <a href="immobilien-ankauf-checkliste.html">Ankauf Checkliste</a>
+      <a href="immobilienbewertung-immowertv.html">Bewertung nach ImmoWertV online</a>
       <a href="methodik.html">Immobilienbewertung nach ImmoWertV</a>
       <a href="prozesskarte.html">Der ganze Weg auf einer Karte</a></div>
     <div><h4>Junker Immobilien</h4>

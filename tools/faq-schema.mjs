@@ -13,7 +13,8 @@ import { dirname, join } from 'node:path';
 
 const LANDING = join(dirname(fileURLToPath(import.meta.url)), '..', 'frontend/landing');
 const SEITEN = ['fragen.html', 'immobilien-rendite-berechnen.html', 'cashflow-immobilie-berechnen.html', 'kaufpreisfaktor-berechnen.html',
-  'immobilien-investment-rechner.html', 'renditeobjekt-pruefen.html']
+  'immobilien-investment-rechner.html', 'renditeobjekt-pruefen.html',
+  'immobilienbewertung-immowertv.html', 'immobilien-ankauf-checkliste.html']
   .filter((s, i) => i === 0 || fs.existsSync(join(LANDING, s)));
 const ent = (s) => s.replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
   .replace(/&quot;/g, '"').replace(/&thinsp;/g, ' ').replace(/&shy;/g, '').replace(/&[a-z]+;/g, ' ');

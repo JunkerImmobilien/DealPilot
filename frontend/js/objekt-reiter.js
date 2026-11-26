@@ -1325,14 +1325,14 @@
         ? ' title="' + esc(h.fuehrend_grund + (h.fuehrend_quelle ? ' (' + h.fuehrend_quelle + ')' : '')) + '"' : '';
       /* v2255: der Marktwert heisst hier, was er ist - Marktwertindikation,
          mit dem Abschlag dahinter */
-      var _art = h.art === 'Marktwert' ? 'Marktwertindikation'
-        : (h.art === 'Vergleichswert' && !h.amtlich ? (h.fuehrend ? 'Vergleichswert (indikativ, aus Angebotspreisen)' : 'Vergleichswert (Angebotspreise)') : (h.art || 'Marktwertindikation'));   /* v3242 */
+      var _art = h.art === 'Marktwert' ? 'Marktpreisindikation'
+        : (h.art === 'Vergleichswert' && !h.amtlich ? (h.fuehrend ? 'Vergleichswert (indikativ, aus Angebotspreisen)' : 'Vergleichswert (Angebotspreise)') : (h.art || 'Marktpreisindikation'));   /* v3242 */
       var _ab = (h.art === 'Marktwert' && h.abschlag > 0) ? ' (−' + String(h.abschlag).replace('.', ',') + ' %)' : '';
       var _tr = _trauen(h.trau);
       return '<option value="' + i + '"' + _t + '>' + _art + ' · '
         + _datum(h.created_at) + ' · ' + deNum(h.wert) + ' €' + _ab + _f + (_tr ? ' · ' + (_tr.buchst ? _tr.buchst + ' ' : '') + _tr.kurz : '') + '</option>';
     };
-    var _k0 = liste[0].art === 'Marktwert' ? 'Marktwertindikation' : (liste[0].art || 'Marktwertindikation');
+    var _k0 = liste[0].art === 'Marktwert' ? 'Marktpreisindikation' : (liste[0].art || 'Marktpreisindikation');
     box.innerHTML = (liste.length > 1
       ? '<select id="oe-vw-wahl" aria-label="Marktbericht wählen">' + liste.map(opt).join('') + '</select>'   /* v3225: #oe-vw-diff steht als eigene Zeile in index.html */
       : '<span class="oe-q">' + _k0 + ' · '
@@ -1422,7 +1422,7 @@
     el.dispatchEvent(new Event('input', { bubbles: true }));
     el.dispatchEvent(new Event('change', { bubbles: true }));
     if (typeof calc === 'function') { try { calc(); } catch (e) {} }
-    if (typeof toast === 'function') { try { toast('✓ ' + (_amtlich ? h.art + ' als Verkehrswert' : 'Marktwertindikation') + ' ' + deNum(_wert, 0) + ' € übernommen (Marktbericht ' + _datum(h.created_at) + ')'); } catch (e) {} }
+    if (typeof toast === 'function') { try { toast('✓ ' + (_amtlich ? h.art + ' als Verkehrswert' : 'Marktpreisindikation') + ' ' + deNum(_wert, 0) + ' € übernommen (Marktbericht ' + _datum(h.created_at) + ')'); } catch (e) {} }
   }
 
   /* ═══ Verdrahtung ════════════════════════════════════════════════════ */
