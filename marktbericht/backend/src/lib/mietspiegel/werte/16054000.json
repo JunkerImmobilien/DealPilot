@@ -1,0 +1,745 @@
+{
+ "ags": "16054000",
+ "gemeinde": "Suhl",
+ "haus": {
+  "regel": "ausgeschlossen",
+  "beleg": "S. 6 Anwendungsbereich: „Der Mietspiegel gilt nicht für Ein- und Zweifamilienhäuser“"
+ },
+ "art": "einfach",
+ "stand": "2026-01-01",
+ "erhebungsstichtag": null,
+ "gueltig_ab": "2026-01-01",
+ "gueltig_bis": "2027-12-31",
+ "quelle": {
+  "url": "https://www.suhl.eu/_files/ugd/b4a114_6fe15c80d2e7451cb1cefd9c5257fd2b.pdf",
+  "dokument": "Mietspiegel der Stadt Suhl, gültig ab 01.01.2026 (Tabellenmietspiegel, Arbeitsgruppe „Mietspiegel“ mit Stadtverwaltung Suhl und Mieterverein Suhl und Umgebung e.V.)",
+  "seite": "S. 12 Tabelle, S. 5 (§ 558c, Fortschreibung, Inkrafttreten), S. 6 Anwendungsbereich, S. 7–9 Lage, Baujahr, Größe, Beschaffenheit, S. 13–17 Straßenverzeichnis",
+  "lizenz": "kein Rechtevorbehalt und kein Speicherverbot im Dokument (alle 17 Seiten durchgesehen, 26.11.2026); amtliche Veröffentlichung der Stadtverwaltung Suhl auf suhl.eu (Seite Planen, Bauen, Wohnen)",
+  "abgerufen": "2026-11-26"
+ },
+ "einheit": "eur_qm_nettokalt",
+ "form": "tabelle",
+ "rundung": 2,
+ "hinweis": "Einfacher Mietspiegel nach § 558c Abs. 1 BGB („kein qualifizierter Mietspiegel nach § 558d“, S. 5), fortgeschrieben aus dem bis 31.12.2025 gültigen Mietspiegel 2024, „einstimmig für zwei Jahre als verbindlich erklärt. Er tritt am 01.01.2026 in Kraft“ (S. 5); gueltig_bis daraus gerechnet. Die Fußzeile der PDF sagt „Mietspiegel Suhl 2025“, der Titel „Gültig ab 01.01.2026“. Arbeitsgruppe aus Stadtverwaltung Suhl (Sozialdezernat), Mieterverein, Wohnungsunternehmen, Sachverständigem und Maklern. Tabelle S. 12 am Druckbild geprüft (Textschicht stimmt in der Wertfolge, die Zeilenbeschriftungen sind dort verschoben). Nur Spannen von–bis, kein Mittelwert im Dokument: `mittel` = Mitte der Spanne. Felder mit * (5–14 Datensätze, eingeschränkte Aussagekraft) eingetragen, Felder mit „-“ (unter 5) nicht. Achsen: Baujahr bis 1990 (dort nach Beschaffenheit teilsaniert = bis 4, saniert = mindestens 5, vollständig saniert = alle Modernisierungsmaßnahmen nach S. 8), nach 1990 bis 2009 und nach 2009 jeweils „neu errichtet“. Die Beschaffenheit muss angegeben werden (kein Standard); für Baujahre nach 1990 gilt jede Angabe, der Wert ist „neu errichtet“. Lage nach Straßenverzeichnis S. 13–17 (einfach/mittel/gut), ohne Angabe mittlere Lage. Größe bis 130 m², darüber kein Wert. Gilt nicht für Ein- und Zweifamilienhäuser, Werks-, Heim-, preisgebundene Wohnungen (S. 6).",
+ "tabelle": {
+  "geltung": {
+   "wfl_bis": 130
+  },
+  "achsen": {
+   "baujahr": [
+    {
+     "von": null,
+     "bis": 1990,
+     "label": "bis 1990"
+    },
+    {
+     "von": 1991,
+     "bis": 2009,
+     "label": "nach 1990 bis 2009 (neu errichtet)"
+    },
+    {
+     "von": 2010,
+     "bis": null,
+     "label": "nach 2009 (neu errichtet)"
+    }
+   ],
+   "wfl": [
+    {
+     "von": null,
+     "bis": 30,
+     "label": "bis 30 m²"
+    },
+    {
+     "von": 30,
+     "von_inkl": false,
+     "bis": 50,
+     "label": "über 30 m² bis 50 m²"
+    },
+    {
+     "von": 50,
+     "von_inkl": false,
+     "bis": 70,
+     "label": "über 50 m² bis 70 m²"
+    },
+    {
+     "von": 70,
+     "von_inkl": false,
+     "bis": 90,
+     "label": "über 70 m² bis 90 m²"
+    },
+    {
+     "von": 90,
+     "von_inkl": false,
+     "bis": 130,
+     "label": "über 90 m² bis 130 m²"
+    }
+   ],
+   "lage": [
+    {
+     "schluessel": "einfach",
+     "label": "einfache Lage"
+    },
+    {
+     "schluessel": "mittel",
+     "label": "mittlere Lage",
+     "standard": true
+    },
+    {
+     "schluessel": "gut",
+     "label": "gute Lage"
+    }
+   ],
+   "ausstattung": [
+    {
+     "schluessel": "teilsaniert",
+     "label": "teilsaniert (bis 4 Modernisierungsmaßnahmen)"
+    },
+    {
+     "schluessel": "saniert",
+     "label": "saniert (mindestens 5 Modernisierungsmaßnahmen)"
+    },
+    {
+     "schluessel": "vollstaendig_saniert",
+     "label": "vollständig saniert (alle Modernisierungsmaßnahmen)",
+     "aliase": [
+      "vollständig saniert"
+     ]
+    },
+    {
+     "schluessel": "neu_errichtet",
+     "label": "neu errichtet (Baujahr nach 1990)",
+     "aliase": [
+      "neu errichtet",
+      "neubau"
+     ]
+    }
+   ]
+  },
+  "zellen": [
+   {
+    "baujahr": 0,
+    "wfl": 0,
+    "lage": "einfach",
+    "ausstattung": "teilsaniert",
+    "unten": 4.1,
+    "mittel": 4.6,
+    "oben": 5.1,
+    "seite": "12",
+    "anmerkung": "* wenig Datensätze (5–14), eingeschränkte Aussagekraft"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 0,
+    "lage": "einfach",
+    "ausstattung": "vollstaendig_saniert",
+    "unten": 6.2,
+    "mittel": 7.15,
+    "oben": 8.1,
+    "seite": "12"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 0,
+    "lage": "mittel",
+    "ausstattung": "teilsaniert",
+    "unten": 4.1,
+    "mittel": 4.8,
+    "oben": 5.5,
+    "seite": "12"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 0,
+    "lage": "mittel",
+    "ausstattung": "saniert",
+    "unten": 5.9,
+    "mittel": 6.05,
+    "oben": 6.2,
+    "seite": "12"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 0,
+    "lage": "mittel",
+    "ausstattung": "vollstaendig_saniert",
+    "unten": 6.2,
+    "mittel": 6.35,
+    "oben": 6.5,
+    "seite": "12"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 0,
+    "lage": "gut",
+    "ausstattung": "saniert",
+    "unten": 5.9,
+    "mittel": 6.75,
+    "oben": 7.6,
+    "seite": "12"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 0,
+    "lage": "gut",
+    "ausstattung": "vollstaendig_saniert",
+    "unten": 5.9,
+    "mittel": 6.95,
+    "oben": 8.0,
+    "seite": "12"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 1,
+    "lage": "einfach",
+    "ausstattung": "teilsaniert",
+    "unten": 4.2,
+    "mittel": 4.75,
+    "oben": 5.3,
+    "seite": "12"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 1,
+    "lage": "einfach",
+    "ausstattung": "saniert",
+    "unten": 4.6,
+    "mittel": 5.5,
+    "oben": 6.4,
+    "seite": "12"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 1,
+    "lage": "einfach",
+    "ausstattung": "vollstaendig_saniert",
+    "unten": 4.8,
+    "mittel": 5.65,
+    "oben": 6.5,
+    "seite": "12"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 1,
+    "lage": "einfach",
+    "unten": 5.6,
+    "mittel": 6.2,
+    "oben": 6.8,
+    "seite": "12"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 1,
+    "lage": "mittel",
+    "ausstattung": "teilsaniert",
+    "unten": 4.2,
+    "mittel": 5.3,
+    "oben": 6.4,
+    "seite": "12"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 1,
+    "lage": "mittel",
+    "ausstattung": "saniert",
+    "unten": 5.0,
+    "mittel": 5.9,
+    "oben": 6.8,
+    "seite": "12"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 1,
+    "lage": "mittel",
+    "ausstattung": "vollstaendig_saniert",
+    "unten": 5.1,
+    "mittel": 6.3,
+    "oben": 7.5,
+    "seite": "12"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 1,
+    "lage": "mittel",
+    "unten": 5.8,
+    "mittel": 6.65,
+    "oben": 7.5,
+    "seite": "12"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 1,
+    "lage": "mittel",
+    "unten": 9.3,
+    "mittel": 10.4,
+    "oben": 11.5,
+    "seite": "12",
+    "anmerkung": "* wenig Datensätze (5–14), eingeschränkte Aussagekraft"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 1,
+    "lage": "gut",
+    "ausstattung": "teilsaniert",
+    "unten": 4.5,
+    "mittel": 5.5,
+    "oben": 6.5,
+    "seite": "12"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 1,
+    "lage": "gut",
+    "ausstattung": "saniert",
+    "unten": 5.5,
+    "mittel": 6.25,
+    "oben": 7.0,
+    "seite": "12"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 1,
+    "lage": "gut",
+    "ausstattung": "vollstaendig_saniert",
+    "unten": 5.4,
+    "mittel": 6.5,
+    "oben": 7.6,
+    "seite": "12"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 1,
+    "lage": "gut",
+    "unten": 6.0,
+    "mittel": 6.75,
+    "oben": 7.5,
+    "seite": "12",
+    "anmerkung": "* wenig Datensätze (5–14), eingeschränkte Aussagekraft"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 2,
+    "lage": "einfach",
+    "ausstattung": "teilsaniert",
+    "unten": 4.1,
+    "mittel": 5.05,
+    "oben": 6.0,
+    "seite": "12"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 2,
+    "lage": "einfach",
+    "ausstattung": "saniert",
+    "unten": 4.3,
+    "mittel": 5.35,
+    "oben": 6.4,
+    "seite": "12"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 2,
+    "lage": "einfach",
+    "ausstattung": "vollstaendig_saniert",
+    "unten": 4.5,
+    "mittel": 5.65,
+    "oben": 6.8,
+    "seite": "12"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 2,
+    "lage": "einfach",
+    "unten": 5.6,
+    "mittel": 6.05,
+    "oben": 6.5,
+    "seite": "12"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 2,
+    "lage": "mittel",
+    "ausstattung": "teilsaniert",
+    "unten": 4.1,
+    "mittel": 5.15,
+    "oben": 6.2,
+    "seite": "12"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 2,
+    "lage": "mittel",
+    "ausstattung": "saniert",
+    "unten": 4.8,
+    "mittel": 5.8,
+    "oben": 6.8,
+    "seite": "12"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 2,
+    "lage": "mittel",
+    "ausstattung": "vollstaendig_saniert",
+    "unten": 4.9,
+    "mittel": 6.2,
+    "oben": 7.5,
+    "seite": "12"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 2,
+    "lage": "mittel",
+    "unten": 5.6,
+    "mittel": 6.6,
+    "oben": 7.6,
+    "seite": "12"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 2,
+    "lage": "mittel",
+    "unten": 6.6,
+    "mittel": 7.9,
+    "oben": 9.2,
+    "seite": "12",
+    "anmerkung": "* wenig Datensätze (5–14), eingeschränkte Aussagekraft"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 2,
+    "lage": "gut",
+    "ausstattung": "teilsaniert",
+    "unten": 4.2,
+    "mittel": 5.5,
+    "oben": 6.8,
+    "seite": "12"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 2,
+    "lage": "gut",
+    "ausstattung": "saniert",
+    "unten": 4.8,
+    "mittel": 5.9,
+    "oben": 7.0,
+    "seite": "12"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 2,
+    "lage": "gut",
+    "ausstattung": "vollstaendig_saniert",
+    "unten": 5.2,
+    "mittel": 6.65,
+    "oben": 8.1,
+    "seite": "12"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 2,
+    "lage": "gut",
+    "unten": 5.9,
+    "mittel": 7.1,
+    "oben": 8.3,
+    "seite": "12"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 2,
+    "lage": "gut",
+    "unten": 8.0,
+    "mittel": 8.85,
+    "oben": 9.7,
+    "seite": "12"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 3,
+    "lage": "einfach",
+    "ausstattung": "teilsaniert",
+    "unten": 4.0,
+    "mittel": 4.35,
+    "oben": 4.7,
+    "seite": "12",
+    "anmerkung": "* wenig Datensätze (5–14), eingeschränkte Aussagekraft"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 3,
+    "lage": "einfach",
+    "ausstattung": "saniert",
+    "unten": 4.5,
+    "mittel": 5.25,
+    "oben": 6.0,
+    "seite": "12"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 3,
+    "lage": "einfach",
+    "ausstattung": "vollstaendig_saniert",
+    "unten": 4.6,
+    "mittel": 5.9,
+    "oben": 7.2,
+    "seite": "12"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 3,
+    "lage": "mittel",
+    "ausstattung": "teilsaniert",
+    "unten": 4.1,
+    "mittel": 5.15,
+    "oben": 6.2,
+    "seite": "12"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 3,
+    "lage": "mittel",
+    "ausstattung": "saniert",
+    "unten": 4.8,
+    "mittel": 5.65,
+    "oben": 6.5,
+    "seite": "12"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 3,
+    "lage": "mittel",
+    "ausstattung": "vollstaendig_saniert",
+    "unten": 5.0,
+    "mittel": 6.15,
+    "oben": 7.3,
+    "seite": "12"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 3,
+    "lage": "mittel",
+    "unten": 5.7,
+    "mittel": 6.85,
+    "oben": 8.0,
+    "seite": "12",
+    "anmerkung": "* wenig Datensätze (5–14), eingeschränkte Aussagekraft"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 3,
+    "lage": "gut",
+    "ausstattung": "teilsaniert",
+    "unten": 4.4,
+    "mittel": 5.45,
+    "oben": 6.5,
+    "seite": "12"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 3,
+    "lage": "gut",
+    "ausstattung": "saniert",
+    "unten": 5.5,
+    "mittel": 6.05,
+    "oben": 6.6,
+    "seite": "12"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 3,
+    "lage": "gut",
+    "ausstattung": "vollstaendig_saniert",
+    "unten": 5.8,
+    "mittel": 6.65,
+    "oben": 7.5,
+    "seite": "12"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 3,
+    "lage": "gut",
+    "unten": 6.5,
+    "mittel": 7.25,
+    "oben": 8.0,
+    "seite": "12"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 3,
+    "lage": "gut",
+    "unten": 8.5,
+    "mittel": 9.25,
+    "oben": 10.0,
+    "seite": "12"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 4,
+    "lage": "einfach",
+    "ausstattung": "saniert",
+    "unten": 5.2,
+    "mittel": 5.5,
+    "oben": 5.8,
+    "seite": "12",
+    "anmerkung": "* wenig Datensätze (5–14), eingeschränkte Aussagekraft"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 4,
+    "lage": "einfach",
+    "ausstattung": "vollstaendig_saniert",
+    "unten": 5.2,
+    "mittel": 5.85,
+    "oben": 6.5,
+    "seite": "12",
+    "anmerkung": "* wenig Datensätze (5–14), eingeschränkte Aussagekraft"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 4,
+    "lage": "mittel",
+    "ausstattung": "teilsaniert",
+    "unten": 4.1,
+    "mittel": 4.55,
+    "oben": 5.0,
+    "seite": "12",
+    "anmerkung": "* wenig Datensätze (5–14), eingeschränkte Aussagekraft"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 4,
+    "lage": "mittel",
+    "ausstattung": "saniert",
+    "unten": 5.4,
+    "mittel": 5.65,
+    "oben": 5.9,
+    "seite": "12",
+    "anmerkung": "* wenig Datensätze (5–14), eingeschränkte Aussagekraft"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 4,
+    "lage": "mittel",
+    "ausstattung": "vollstaendig_saniert",
+    "unten": 5.5,
+    "mittel": 6.5,
+    "oben": 7.5,
+    "seite": "12"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 4,
+    "lage": "mittel",
+    "unten": 5.0,
+    "mittel": 5.75,
+    "oben": 6.5,
+    "seite": "12",
+    "anmerkung": "* wenig Datensätze (5–14), eingeschränkte Aussagekraft"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 4,
+    "lage": "mittel",
+    "unten": 6.5,
+    "mittel": 8.75,
+    "oben": 11.0,
+    "seite": "12"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 4,
+    "lage": "gut",
+    "ausstattung": "teilsaniert",
+    "unten": 4.0,
+    "mittel": 4.85,
+    "oben": 5.7,
+    "seite": "12",
+    "anmerkung": "* wenig Datensätze (5–14), eingeschränkte Aussagekraft"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 4,
+    "lage": "gut",
+    "ausstattung": "vollstaendig_saniert",
+    "unten": 5.5,
+    "mittel": 6.25,
+    "oben": 7.0,
+    "seite": "12",
+    "anmerkung": "* wenig Datensätze (5–14), eingeschränkte Aussagekraft"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 4,
+    "lage": "gut",
+    "unten": 5.5,
+    "mittel": 6.85,
+    "oben": 8.2,
+    "seite": "12"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 4,
+    "lage": "gut",
+    "unten": 8.0,
+    "mittel": 8.75,
+    "oben": 9.5,
+    "seite": "12",
+    "anmerkung": "* wenig Datensätze (5–14), eingeschränkte Aussagekraft"
+   }
+  ]
+ },
+ "pruefbeispiele": [
+  {
+   "eingabe": {
+    "baujahr": 1975,
+    "wfl": 60,
+    "lage": "mittel",
+    "ausstattung": "saniert"
+   },
+   "erwartet": {
+    "unten": 4.8,
+    "mittel": 5.8,
+    "oben": 6.8
+   },
+   "seite": "12",
+   "art": "tabellenzelle"
+  },
+  {
+   "eingabe": {
+    "baujahr": 2015,
+    "wfl": 80,
+    "lage": "gut",
+    "ausstattung": "neu_errichtet"
+   },
+   "erwartet": {
+    "unten": 8.5,
+    "mittel": 9.25,
+    "oben": 10.0
+   },
+   "seite": "12",
+   "art": "tabellenzelle"
+  },
+  {
+   "eingabe": {
+    "baujahr": 2015,
+    "wfl": 80,
+    "lage": "mittel",
+    "ausstattung": "neu_errichtet"
+   },
+   "erwartet": null,
+   "seite": "12",
+   "art": "tabellenzelle",
+   "anmerkung": "Feld „-“ (unter 5 Datensätze)"
+  },
+  {
+   "eingabe": {
+    "baujahr": 1975,
+    "wfl": 140,
+    "lage": "mittel",
+    "ausstattung": "saniert"
+   },
+   "erwartet": null,
+   "seite": "12",
+   "art": "tabellenzelle",
+   "anmerkung": "über 130 m² keine Klasse"
+  }
+ ]
+}
