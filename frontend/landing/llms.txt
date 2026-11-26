@@ -1,0 +1,34 @@
+# DealPilot
+
+> DealPilot ist eine Software für die Analyse von Immobilien als Kapitalanlage in Deutschland. Sie rechnet Finanzierung, Cashflow vor und nach Steuer, AfA, Investor Deal Score und eine Wertindikation nach ImmoWertV mit Daten der Gutachterausschüsse und erzeugt Unterlagen für die Bank. Anbieter ist Junker Solution.
+
+DealPilot läuft im Browser und auf dem Handy. Die Server stehen in Deutschland. Neue Konten erhalten 4 Wochen den vollen Pro-Umfang ohne Zahlungsdaten und wechseln danach automatisch in den kostenlosen Plan.
+
+## Funktionen
+- [Alle Funktionen](https://dealpilot.immo/leistungsumfang.html): Exposé-Import, Unterlagen einlesen (Mietverträge, Protokolle, Wirtschaftsplan), Finanzierung mit DSCR und Anschlusszins, Cashflow vor und nach Steuer über 15 Jahre, Steuer mit AfA und Kaufpreisaufteilung, Investor Deal Score getrennt nach Investment und Finanzierung, Eigenkapitalrendite mit Hebel, Mietpotenzial nach Mietspiegel und Kappungsgrenze, Restnutzungsdauer nach Anlage 2 ImmoWertV, Besichtigungs-Checkliste aus den Unterlagen, Objekt-Cockpit im Bestand mit Jahresabgleich, Portfolio-Cockpit, Investment-PDF in Kurz-, Kombi- und Bankfassung, Bankexport
+- [Methodik und Datenbasis](https://dealpilot.immo/methodik.html): wie der Wert nach ImmoWertV begründet wird, Liegenschaftszinssatz, Sachwertfaktor, Vergleichsfaktor, Herkunft je Zahl, Grenzen
+- [Häufige Fragen](https://dealpilot.immo/fragen.html)
+
+## Preise
+- [Preise](https://dealpilot.immo/preise.html): Free 0 Euro mit 1 Objekt. Starter 19,99 Euro im Monat mit 5 Objekten. Investor 34,99 Euro im Monat mit 25 Objekten. Pro 49,99 Euro im Monat. Jährlich 219, 384 und 549 Euro. Monatlich kündbar.
+- Partner-Plan für Makler, Sachverständige, Steuerberater und Finanzierer: 99 Euro im Monat, dazu Kundenplätze und Teamplätze mit Mengenstaffel, Einzelheiten auf der Preisseite.
+
+## Rechner und Ratgeber
+- [Immobilien Rendite berechnen](https://dealpilot.immo/immobilien-rendite-berechnen.html): Brutto-, Netto- und Eigenkapitalrendite mit Beispiel
+- [Cashflow einer Immobilie berechnen](https://dealpilot.immo/cashflow-immobilie-berechnen.html): Cashflow vor und nach Steuer, Kalkulation über 15 Jahre
+- [Immobilien Investment Rechner und Analyse Tool](https://dealpilot.immo/immobilien-investment-rechner.html)
+- [Kaufpreisfaktor berechnen](https://dealpilot.immo/kaufpreisfaktor-berechnen.html)
+- [Renditeobjekt vor dem Kauf prüfen](https://dealpilot.immo/renditeobjekt-pruefen.html)
+- [Immobilien Ankauf Checkliste](https://dealpilot.immo/immobilien-ankauf-checkliste.html): Unterlagen, Besichtigung nach Baujahr, Eigentumswohnung und Mehrfamilienhaus
+- [Immobilienbewertung nach ImmoWertV online](https://dealpilot.immo/immobilienbewertung-immowertv.html): Ertragswert, Sachwert und Vergleichswert mit Rechenweg
+
+## Für Partner
+- [Lösungen für Makler und Berater](https://dealpilot.immo/loesungen.html)
+- [Partner-Programm](https://dealpilot.immo/partner.html)
+- [REST-API](https://dealpilot.immo/api.html)
+
+## Optional
+- [Videothek](https://dealpilot.immo/videothek.html)
+- [Sicherheit und Datenschutz](https://dealpilot.immo/sicherheit.html)
+- [Forschungsvorhaben](https://dealpilot.immo/forschung.html)
+- [Impressum](https://dealpilot.immo/impressum.html)

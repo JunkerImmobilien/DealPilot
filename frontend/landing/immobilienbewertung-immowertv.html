@@ -1,0 +1,376 @@
+<!DOCTYPE html><!-- DealPilot · Immobilienbewertung nach ImmoWertV · zz5 (26.11.2026), Rahmen aus immobilien-rendite-berechnen.html -->
+<html lang="de"><head>
+<meta charset="utf-8">
+<meta name="google-site-verification" content="sjsXb3XudmYE75JCus789-lKn_IIX5jOySZx50Iy4i0">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Immobilienbewertung nach ImmoWertV online: so wird gerechnet · DealPilot</title>
+<meta name="description" content="Immobilienbewertung nach ImmoWertV online verstehen: Vergleichswert, Ertragswert und Sachwert mit Rechenweg und Beispiel. Was ein Online-Wert leistet und was ein Gutachten.">
+<link rel="canonical" href="https://dealpilot.immo/immobilienbewertung-immowertv.html">
+<meta property="og:title" content="Immobilienbewertung nach ImmoWertV online: so wird gerechnet · DealPilot"><meta property="og:description" content="Immobilienbewertung nach ImmoWertV online verstehen: Vergleichswert, Ertragswert und Sachwert mit Rechenweg und Beispiel. Was ein Online-Wert leistet und was ein Gutachten."><meta property="og:url" content="https://dealpilot.immo/immobilienbewertung-immowertv.html"><meta property="og:image" content="https://dealpilot.immo/assets/og-dealpilot.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="/fonts/dp-fonts.css">
+<link rel="stylesheet" href="dp2.css?v=gold-hell-1a">
+<link rel="stylesheet" href="dp2-teile.css?v=gold-hell-1">
+<link rel="stylesheet" href="dp2-kern.css?v=landing-strecke-3">
+<link rel="stylesheet" href="dp2-dealcheck.css?v=einzelcheck-2">
+<link rel="stylesheet" href="seo.css?v=landing-seo-5">
+<style>
+/* Methodik-Seite: Bausteine wie sicherheit.html (Kopf .sk, Abschnitte .kz,
+   Tabellen .tab-d, Hinweis), dazu Inhaltsverzeichnis und Fliesstext.
+   Der Inhalt wird aus der finalen Markdown-Fassung erzeugt
+   (scratchpad md2html.cjs) - Text nicht hier von Hand aendern, sondern dort. */
+.w, .w-schmal{max-width:var(--max);margin:0 auto;padding:0 26px}
+.w-schmal{max-width:920px}
+.sk{background:var(--ob);color:var(--txtd);padding:56px 0 50px;position:relative;overflow:hidden}
+.sk .raster{position:absolute;inset:0;opacity:.12;
+  background-image:linear-gradient(rgba(232,204,122,.4) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(232,204,122,.4) 1px,transparent 1px);
+  background-size:56px 56px}
+.sk .w{position:relative}
+.sk .kick{font:700 10px/1 var(--mono);letter-spacing:.26em;text-transform:uppercase;
+  color:var(--gdh);display:flex;align-items:center;gap:11px}
+.sk .kick::before{content:'';width:24px;height:1px;background:var(--gdh);flex:none}
+.sk h1{font-size:clamp(28px,4vw,46px);margin:15px 0 13px;color:#fff;line-height:1.08;hyphens:manual}
+.sk h1 em{font-style:normal;color:var(--gdh)}
+.sk p{margin:0;max-width:66ch;color:var(--mdk);font-size:17px}
+.sk .knopf{margin-top:26px;display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.sk .knopf .meta{font:700 10px/1.4 var(--mono);letter-spacing:.12em;color:var(--ddk);text-transform:uppercase}
+.brot{font:700 10px/1 var(--mono);letter-spacing:.13em;color:var(--ddk);margin-top:22px}
+.brot a{color:rgba(236,230,214,.55)}
+.brot a:hover{color:var(--gdh)}
+
+section{padding:64px 0}
+.sec-creme{background:var(--cream2)}
+.kz{max-width:800px;margin-bottom:26px}
+.kz .kick{font:700 10px/1 var(--mono);letter-spacing:.26em;text-transform:uppercase;
+  color:var(--gdi);display:flex;align-items:center;gap:11px}
+.kz .kick::before{content:'';width:24px;height:1px;background:var(--gd);flex:none}
+.kz h2{font-size:clamp(23px,3vw,34px);margin:13px 0 0}
+
+/* Inhaltsverzeichnis */
+.toc{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,1fr);
+  border:1px solid var(--cream-line);background:#fff}
+.toc li{border-bottom:1px solid var(--cream-line)}
+.toc li:nth-child(odd){border-right:1px solid var(--cream-line)}
+.toc a{display:flex;gap:14px;align-items:baseline;padding:13px 18px;color:var(--ink);font-size:15px;line-height:1.35}
+.toc a:hover{background:var(--cream);color:var(--gdi)}
+.toc .n{font:700 11px/1 var(--mono);color:var(--gdi);letter-spacing:.08em;flex:none;width:20px}
+
+/* Fliesstext */
+.m-text{color:var(--inkm);font-size:15.5px;line-height:1.7}
+.m-text p{margin:0 0 14px}
+.m-text b{color:var(--ink)}
+.m-text h3{font-size:19px;margin:34px 0 12px;color:var(--ink);scroll-margin-top:90px}
+.m-text a{color:var(--gdi);border-bottom:1px solid rgba(138,108,30,.35);overflow-wrap:anywhere}
+.m-liste{margin:0 0 16px;padding-left:22px}
+.m-liste li{margin:0 0 8px;padding-left:4px}
+.m-liste .m-liste{margin:8px 0 4px}
+.formel{background:#fff;border-left:3px solid var(--gd);padding:14px 18px;margin:4px 0 16px;
+  font:500 14px/1.6 var(--mono);color:var(--ink);overflow-wrap:anywhere}
+.tab-wrap{margin:6px 0 20px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tab-d{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--cream-line);font-size:14px}
+.tab-d th,.tab-d td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--cream-line);vertical-align:top}
+.tab-d th.r,.tab-d td.r{text-align:right;white-space:nowrap}
+.tab-d thead th{background:var(--runway);color:var(--gold-on);
+  font:700 10px/1.3 var(--mono);letter-spacing:.07em;text-transform:uppercase}
+.tab-d td{color:var(--inkm);line-height:1.5}
+.tab-d td:first-child{color:var(--ink);font-weight:500}
+.tab-d tbody tr:nth-child(even){background:#FCFBF8}
+.tab-d tbody tr:last-child td{border-bottom:0}
+section[id]{scroll-margin-top:70px}
+.nach-oben{margin:18px 0 0;font:700 10px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase}
+.nach-oben a{color:var(--gdi)}
+.hinweis{background:#fff;border-left:3px solid var(--gd);padding:17px 21px;
+  font-size:14.4px;color:var(--inkm);margin:22px 0 0;line-height:1.6}
+.hinweis b{color:var(--ink)}
+
+@media(max-width:760px){
+  .toc{grid-template-columns:1fr}
+  .toc li:nth-child(odd){border-right:0}
+}
+@media(max-width:640px){
+  .w, .w-schmal{padding:0 16px}
+  section{padding:44px 0}
+  .m-text{font-size:15px}
+  .tab-d{font-size:12.5px;table-layout:fixed}
+  .tab-d th,.tab-d td{padding:9px 7px;hyphens:auto;-webkit-hyphens:auto;overflow-wrap:anywhere}
+  .tab-d th.r,.tab-d td.r{white-space:normal}
+  .tab-d thead th{font-size:9px;letter-spacing:.03em}
+  /* Handy: jede Zeile als Karte, Spaltenname aus data-l */
+  .tab-m,.tab-m tbody,.tab-m tr,.tab-m td{display:block;width:100%}
+  .tab-m thead{display:none}
+  .tab-m{border:0;background:none}
+  .tab-m tbody tr{background:#fff!important;border:1px solid var(--cream-line);border-left:3px solid var(--gd);margin:0 0 10px;padding:6px 0}
+  .tab-m td,.tab-m td.r{display:grid;grid-template-columns:42% 1fr;gap:10px;padding:6px 12px;border:0;text-align:left;font-size:13.5px}
+  .tab-m td::before{content:attr(data-l);font:700 9.5px/1.5 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--gdi);padding-top:2px}
+  .tab-m td:first-child{font-size:15px}
+  .sk .knopf .btn-p{width:100%;text-align:center}
+}
+
+/* landing-methodik-3 · Registerstand als Karten (Zahlen aus register-stand.js) */
+.reg-karten{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0 8px}
+.reg-karten .rk{background:#fff;border:1px solid var(--cream-line);border-top:3px solid var(--gd);padding:14px 14px 12px;display:flex;flex-direction:column;gap:4px}
+.reg-karten .rk b{font:700 30px/1.05 var(--disp,'Space Grotesk'),sans-serif;color:var(--ink);letter-spacing:-.01em}
+.reg-karten .rk{min-width:0}.reg-karten .rk span{font-size:12.5px;line-height:1.4;color:var(--inkm);hyphens:auto;-webkit-hyphens:auto;overflow-wrap:anywhere}
+.reg-karten .rk.gross{grid-column:span 2;grid-row:span 2;justify-content:flex-end;background:var(--ink);border-color:var(--ink);border-top-color:var(--gd)}
+.reg-karten .rk.gross b{font-size:44px;color:var(--gd)}
+.reg-karten .rk.gross span{color:#E9E4D8;font-size:13.5px}
+.rk-stand{font:500 11px/1.6 var(--mono);letter-spacing:.03em;color:var(--inkm);margin:4px 0 18px}
+@media(max-width:760px){.reg-karten{grid-template-columns:1fr 1fr}.reg-karten .rk.gross{grid-row:auto}.reg-karten .rk b{font-size:26px}.reg-karten .rk.gross b{font-size:36px}}
+</style>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Article","headline":"Immobilienbewertung nach ImmoWertV online: Vergleichswert, Ertragswert und Sachwert","description":"Immobilienbewertung nach ImmoWertV online verstehen: Vergleichswert, Ertragswert und Sachwert mit Rechenweg und Beispiel. Was ein Online-Wert leistet und was ein Gutachten.","url":"https://dealpilot.immo/immobilienbewertung-immowertv.html","inLanguage":"de","datePublished":"2026-11-26","dateModified":"2026-11-26","author":{"@type":"Organization","name":"DealPilot"},"publisher":{"@type":"Organization","name":"Junker Solution","url":"https://dealpilot.immo/"},"mainEntityOfPage":"https://dealpilot.immo/immobilienbewertung-immowertv.html"}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"DealPilot","item":"https://dealpilot.immo/"},{"@type":"ListItem","position":2,"name":"Immobilienbewertung nach ImmoWertV","item":"https://dealpilot.immo/immobilienbewertung-immowertv.html"}]}
+</script>
+<script type="application/ld+json">
+{"@context": "https://schema.org", "@type": "HowTo", "name": "Ertragswert einer Immobilie nach ImmoWertV berechnen", "inLanguage": "de", "step": [{"@type": "HowToStep", "position": 1, "name": "Rohertrag bestimmen", "text": "Marktüblich erzielbare Jahresnettokaltmiete ansetzen."}, {"@type": "HowToStep", "position": 2, "name": "Bewirtschaftungskosten abziehen", "text": "Verwaltung, Instandhaltung und Mietausfallwagnis vom Rohertrag abziehen, das ergibt den Reinertrag."}, {"@type": "HowToStep", "position": 3, "name": "Bodenwertverzinsung abziehen", "text": "Bodenwert mal Liegenschaftszinssatz vom Reinertrag abziehen, das ergibt den Gebäudereinertrag."}, {"@type": "HowToStep", "position": 4, "name": "Gebäudereinertrag kapitalisieren", "text": "Gebäudereinertrag mit dem Barwertfaktor aus Restnutzungsdauer und Liegenschaftszinssatz multiplizieren."}, {"@type": "HowToStep", "position": 5, "name": "Bodenwert addieren", "text": "Bodenwert zum Gebäudeertragswert addieren und besondere objektspezifische Merkmale berücksichtigen."}]}
+</script>
+<!-- faq-schema:anfang · erzeugt von tools/faq-schema.mjs, nicht von Hand ändern -->
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Was ist die ImmoWertV?","acceptedAnswer":{"@type":"Answer","text":"Die Immobilienwertermittlungsverordnung regelt, wie der Verkehrswert von Grundstücken und Gebäuden in Deutschland ermittelt wird. Die aktuelle Fassung gilt seit dem 1. Januar 2022 und beschreibt das Vergleichswert-, Ertragswert- und Sachwertverfahren."}},{"@type":"Question","name":"Welches Verfahren gilt für welche Immobilie?","acceptedAnswer":{"@type":"Answer","text":"Für Eigentumswohnungen führt meist das Vergleichswertverfahren, für Mehrfamilienhäuser und vermietete Objekte das Ertragswertverfahren, für selbst genutzte Ein- und Zweifamilienhäuser das Sachwertverfahren. Die anderen Verfahren können das Ergebnis stützen."}},{"@type":"Question","name":"Kann man eine Immobilie nach ImmoWertV online bewerten?","acceptedAnswer":{"@type":"Answer","text":"Ja, als Wertindikation. Sie ist belastbar, wenn sie das passende Verfahren mit den Daten des zuständigen Gutachterausschusses rechnet und jede Zahl mit Herkunft zeigt. Ein Verkehrswertgutachten mit Ortsbesichtigung ersetzt sie nicht."}},{"@type":"Question","name":"Was ist der Liegenschaftszinssatz?","acceptedAnswer":{"@type":"Answer","text":"Der Liegenschaftszinssatz ist der Zins, mit dem der Markt Immobilienerträge verzinst. Der Gutachterausschuss leitet ihn aus Kaufpreisen ab. Er ist die wichtigste Stellschraube im Ertragswertverfahren, schon kleine Unterschiede verschieben den Wert deutlich."}},{"@type":"Question","name":"Was ist ein Sachwertfaktor?","acceptedAnswer":{"@type":"Answer","text":"Der Sachwertfaktor passt den vorläufigen Sachwert an den Markt an. Liegt er über 1, zahlen Käufer mehr als die Kosten von Gebäude und Boden, liegt er darunter, weniger. Er gilt nur im Modell, in dem der Ausschuss ihn abgeleitet hat."}},{"@type":"Question","name":"Warum unterscheidet sich der Wert vom Angebotspreis?","acceptedAnswer":{"@type":"Answer","text":"Angebotspreise sind Wünsche der Verkäufer, Kaufpreise sind das Ergebnis der Verhandlung. Die Verfahren der ImmoWertV stützen sich auf echte Kaufpreise. Ein Angebot über dem Ertrags- oder Sachwert ist ein Hinweis, genauer zu verhandeln."}}]}
+</script>
+<!-- faq-schema:ende -->
+</head><body>
+
+<svg style="display:none" aria-hidden="true">
+<symbol id="i-haus" viewBox="0 0 24 24"><path d="M3 21V10l9-7 9 7v11"/><path d="M9 21v-6h6v6"/><path d="M3 21h18"/></symbol>
+<symbol id="i-blitz" viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7l1-8Z"/></symbol>
+<symbol id="i-schild" viewBox="0 0 24 24"><path d="M12 2 4 5.5v6c0 5 3.4 8.9 8 10.5 4.6-1.6 8-5.5 8-10.5v-6L12 2Z"/><path d="m9 12 2.2 2.2L15.5 10"/></symbol>
+<symbol id="i-pokal" viewBox="0 0 24 24"><path d="M7 3h10v6a5 5 0 0 1-10 0V3Z"/><path d="M7 5H4v2a3 3 0 0 0 3 3M17 5h3v2a3 3 0 0 1-3 3M9 21h6M12 14v7"/></symbol>
+<symbol id="i-ebenen" viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5 9-5Z"/><path d="m3 13 9 5 9-5M3 18l9 5 9-5"/></symbol>
+<symbol id="i-pfeil" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></symbol>
+<symbol id="i-code" viewBox="0 0 24 24"><path d="m8 7-5 5 5 5M16 7l5 5-5 5M14 4l-4 16"/></symbol>
+<symbol id="i-buch" viewBox="0 0 24 24"><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v18H6.5A2.5 2.5 0 0 0 4 22.5V4.5Z"/><path d="M8 7h8M8 11h6"/></symbol>
+<symbol id="i-ziel" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.4"/></symbol>
+<symbol id="i-bank" viewBox="0 0 24 24"><path d="M3 10 12 4l9 6"/><path d="M5 10v8m5-8v8m4-8v8m5-8v8M3 21h18"/></symbol>
+<symbol id="i-frage" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.2 9.3a2.9 2.9 0 0 1 5.6 1c0 1.9-2.8 2.4-2.8 4M12 17.5h.01"/></symbol>
+</svg>
+
+<div class="tb"><div class="wrap">
+  <span class="pkt"><i></i>4 WOCHEN PRO, OHNE ZAHLUNGSDATEN</span>
+  <span class="pkt"><i></i>MONATLICH KÜNDBAR</span>
+  <span class="pkt hidemid"><i></i>KEINE BEWERTUNG VERFÄLLT</span>
+  <div class="rechts">
+    <span class="nz">&gt; <b data-nutzer data-umfang="nutzer_rund" data-zaehl>880</b> NUTZER</span><a href="mailto:info@dealpilot.immo">INFO@DEALPILOT.IMMO</a>
+    <a href="mailto:support@dealpilot.immo">SUPPORT</a>
+  </div>
+</div></div>
+
+<nav class="nav"><div class="wrap">
+  <a class="mark mark-gross" href="/"><span class="wort">Deal<b>Pilot</b></span></a>
+  <button class="burger" aria-label="Menü"><span></span><span></span><span></span></button>
+  <ul>
+    <li><a href="/#workflow">So funktioniert's</a></li>
+    <li><a href="/#features">Funktionen<i class="kar"></i></a>
+      <ul class="sub">
+        <li><a href="/#features"><svg class="ico si"><use href="#i-blitz"/></svg><span><b>Die 19 Module</b><span>Von Boarding über Deal Score bis Bankexport</span></span></a></li>
+        <li><a href="leistungsumfang.html"><svg class="ico si"><use href="#i-buch"/></svg><span><b>Leistungsumfang</b><span>Alle 22 Kapitel ausführlich, was jedes Modul kann</span></span></a></li>
+        <li><a href="preise.html#feature-matrix"><svg class="ico si"><use href="#i-ziel"/></svg><span><b>Cockpit-Matrix</b><span>Jede Funktion, jeder Tarif im Vergleich</span></span></a></li>
+        <li><a href="api.html"><svg class="ico si"><use href="#i-code"/></svg><span><b>API</b><span>REST-Schnittstelle, voller CRUD, im Pro-Plan</span></span></a></li>
+        <li><a href="forschung.html"><svg class="ico si"><use href="#i-ziel"/></svg><span><b>Forschung &amp; Entwicklung</b><span>Bescheinigtes Vorhaben: das ganze Portfolio im Blick</span></span></a></li>
+      </ul></li>
+    <li><a href="geschichten.html">Geschichten</a></li>
+    <li><a href="videothek.html">Videothek</a></li>
+    <li><a href="/#pricing">Preise<i class="kar"></i></a>
+      <ul class="sub">
+        <li><a href="preise.html"><svg class="ico si"><use href="#i-bank"/></svg><span><b>Alle Preise</b><span>Vier Pakete von kostenlos bis Pro, im Detail</span></span></a></li>
+        <li><a href="preise.html#partner-plan"><svg class="ico si"><use href="#i-ebenen"/></svg><span><b>Partner &amp; Whitelabel</b><span>Deine Mandanten unter deiner Marke</span></span></a></li>
+        <li><a href="preise.html#feature-matrix"><svg class="ico si"><use href="#i-ziel"/></svg><span><b>Alles im Vergleich</b><span>Die vollständige Matrix</span></span></a></li>
+        <li><a href="preise.html#nachkauf"><svg class="ico si"><use href="#i-blitz"/></svg><span><b>Kontingent nachlegen</b><span>Bewertungen einzeln oder im Paket</span></span></a></li>
+      </ul></li>
+    <li><a href="partner.html">Für Partner<i class="kar"></i></a>
+      <ul class="sub"><!-- landing-loesungen-1 -->
+        <li><a href="loesungen.html"><svg class="ico si"><use href="#i-ziel"/></svg><span><b>Individuelle Lösungen</b><span>Prozesse, Automatisierung, Homepage &amp; iFrame</span></span></a></li>
+        <li><a href="partner.html"><svg class="ico si"><use href="#i-ebenen"/></svg><span><b>Partner-Programm</b><span>Cockpit, eigene Marke und der Ablauf</span></span></a></li><!-- landing-partner-1 -->
+        <li><a href="preise.html#module"><svg class="ico si"><use href="#i-code"/></svg><span><b>Module &amp; Schnittstellen</b><span>Rechenkerne als Schnittstelle, auf Anfrage</span></span></a></li>
+        <li><a href="loesungen.html#makler-hub"><svg class="ico si"><use href="#i-haus"/></svg><span><b>Makler-Hub</b><span>Der Maklerprozess bis zum Notar · für Makler</span></span></a></li>
+        <li><a href="/#partner"><svg class="ico si"><use href="#i-pokal"/></svg><span><b>Unsere Partner</b><span>Wer mit uns zusammenarbeitet</span></span></a></li>
+      </ul></li>
+    <li><a href="sicherheit.html">Sicherheit<i class="kar"></i></a>
+      <ul class="sub">
+        <li><a href="sicherheit.html"><svg class="ico si"><use href="#i-schild"/></svg><span><b>Daten &amp; Server</b><span>Hetzner, DSGVO, was gespeichert wird</span></span></a></li>
+        <li><a href="fragen.html"><svg class="ico si"><use href="#i-frage"/></svg><span><b>Häufige Fragen</b><span>Die Antworten, die wir sonst am Telefon geben</span></span></a></li>
+        <li><a href="methodik.html"><svg class="ico si"><use href="#i-buch"/></svg><span><b>Datenbasis &amp; Prüfung</b><span>Amtliche Daten, Herkunft je Wert, Prüfung</span></span></a></li><!-- landing-methodik-1 -->
+      </ul></li>
+  </ul>
+  <a class="b-log" href="https://app.dealpilot.immo/">Anmelden</a>
+  <a class="b-cta" href="https://app.dealpilot.immo/?register=1"><span class="b-cta-voll">Kostenlos starten</span><span class="b-cta-kurz">Starten</span></a>
+</div></nav>
+
+<main>
+<!-- zz5 · 26.11.2026 (SEO, Begriff „immobilienbewertung nach immowertv online“): Ratgeber, Demo-first nur Staging.
+     Fachlich nach CLAUDE.md Wertermittlung: kein Verfahren rechnet halb, nur rentierlicher Bodenwert verzinst, eine RND für alle Verfahren.
+     Beispielzahlen erfunden. Kundentext ohne Gedankenstrich und Semikolon, keine Datenquellennamen. -->
+<div class="sk"><div class="raster"></div><div class="w">
+  <div class="kick">Ratgeber · Wertermittlung</div>
+  <h1>Immobilienbewertung nach ImmoWertV. <em>Online gerechnet, Schritt für Schritt erklärt.</em></h1>
+  <p>Die Immobilienwertermittlungsverordnung regelt, wie der Wert einer Immobilie in Deutschland ermittelt wird. Hier stehen die drei Verfahren mit Rechenweg und Beispiel, und was eine Online-Bewertung nach ImmoWertV leisten kann und was nicht.</p>
+  <div class="brot"><a href="/">DEALPILOT</a> › <a href="leistungsumfang.html">FUNKTIONEN</a> › IMMOWERTV</div>
+</div></div>
+
+<section class="sec-creme" id="grundlagen"><div class="w-schmal">
+<div class="kz"><div class="kick">Grundlagen</div><h2>Was die ImmoWertV regelt</h2></div>
+<div class="m-text">
+<p>Die <b>Immobilienwertermittlungsverordnung (ImmoWertV)</b> gilt in ihrer neuen Fassung seit dem 1. Januar 2022. Sie beschreibt, wie der <b>Verkehrswert</b> nach § 194 BauGB ermittelt wird: der Preis, der zum Stichtag im gewöhnlichen Geschäftsverkehr zu erzielen wäre. Nach ihr arbeiten Gutachterausschüsse und Sachverständige, und an ihr orientieren sich Banken und Finanzämter.</p>
+<p>Die Verordnung kennt drei Verfahren. Welches <b>führt</b>, hängt von der Objektart ab, die anderen können <b>stützen</b>:</p>
+<div class="tab-wrap"><table class="tab-d"><thead><tr><th>Verfahren</th><th>Grundgedanke</th><th>Typisch für</th></tr></thead><tbody>
+<tr><td>Vergleichswertverfahren</td><td>Was zahlen Käufer für vergleichbare Objekte?</td><td>Eigentumswohnungen, Reihenhäuser, Bauland</td></tr>
+<tr><td>Ertragswertverfahren</td><td>Was ist der dauerhafte Ertrag wert?</td><td>Mehrfamilienhäuser, Wohn- und Geschäftshäuser, Gewerbe</td></tr>
+<tr><td>Sachwertverfahren</td><td>Was kostet es, Gebäude und Grundstück neu zu schaffen, abzüglich Alter?</td><td>Ein- und Zweifamilienhäuser, die selbst genutzt werden</td></tr>
+</tbody></table></div>
+<p>Alle drei Verfahren brauchen Daten, die der örtliche Gutachterausschuss aus echten Kaufpreisen ableitet: Vergleichsfaktoren, Liegenschaftszinssätze und Sachwertfaktoren. Ein Wert nach ImmoWertV ist deshalb nur so gut wie diese Daten und ihr Bezug zum Ort.</p>
+</div>
+</div></section>
+
+<section id="ertragswert"><div class="w-schmal">
+<div class="kz"><div class="kick">Verfahren 1</div><h2>Ertragswert berechnen: Rechenweg mit Beispiel</h2></div>
+<div class="m-text">
+<p>Das Ertragswertverfahren fragt, was die Mieteinnahmen auf Dauer wert sind. Im allgemeinen Verfahren nach § 28 ImmoWertV wird der Ertrag in einen Teil für den Boden und einen Teil für das Gebäude getrennt:</p>
+<ul class="m-liste">
+<li><b>Rohertrag:</b> die marktüblich erzielbare Jahresnettokaltmiete.</li>
+<li><b>Bewirtschaftungskosten:</b> Verwaltung, Instandhaltung und Mietausfallwagnis, soweit sie der Eigentümer trägt. Sie werden vom Rohertrag abgezogen, das Ergebnis ist der <b>Reinertrag</b>.</li>
+<li><b>Bodenwertverzinsung:</b> Bodenwert mal Liegenschaftszinssatz. Der Boden verbraucht sich nicht, sein Anteil am Ertrag wird deshalb abgezogen.</li>
+<li><b>Gebäudereinertrag mal Barwertfaktor:</b> Der Rest wird über die Restnutzungsdauer des Gebäudes mit dem Liegenschaftszinssatz kapitalisiert.</li>
+<li>Dazu kommt der <b>Bodenwert</b>. Besondere objektspezifische Grundstücksmerkmale wie ein Instandhaltungsstau oder eine Mietabweichung werden danach berücksichtigt.</li>
+</ul>
+<p class="formel">Ertragswert = (Reinertrag − Bodenwert × Liegenschaftszins) × Barwertfaktor + Bodenwert ± besondere Merkmale</p>
+<p class="formel">Barwertfaktor = (1 − (1 + Liegenschaftszins)<sup>−Restnutzungsdauer</sup>) ÷ Liegenschaftszins</p>
+<h3>Beispiel: Mehrfamilienhaus</h3>
+<p>Ein Mehrfamilienhaus bringt marktüblich 36.000 € Nettokaltmiete im Jahr. Die Bewirtschaftungskosten liegen bei 20 Prozent, der Bodenwert bei 120.000 €, der Liegenschaftszinssatz des Ausschusses bei 3,0 Prozent und die Restnutzungsdauer bei 35 Jahren. Alle Zahlen sind ein erfundenes Beispiel.</p>
+<div class="tab-wrap"><table class="tab-d"><thead><tr><th>Schritt</th><th>Rechnung</th><th class="r">Betrag</th></tr></thead><tbody>
+<tr><td>Rohertrag</td><td>Jahresnettokaltmiete</td><td class="r">36.000 €</td></tr>
+<tr><td>Bewirtschaftungskosten</td><td>20 % von 36.000 €</td><td class="r">−7.200 €</td></tr>
+<tr><td>Reinertrag</td><td>36.000 € − 7.200 €</td><td class="r">28.800 €</td></tr>
+<tr><td>Bodenwertverzinsung</td><td>120.000 € × 3,0 %</td><td class="r">−3.600 €</td></tr>
+<tr><td>Gebäudereinertrag</td><td>28.800 € − 3.600 €</td><td class="r">25.200 €</td></tr>
+<tr><td>Barwertfaktor</td><td>35 Jahre, 3,0 %</td><td class="r">21,487</td></tr>
+<tr><td>Gebäudeertragswert</td><td>25.200 € × 21,487</td><td class="r">541.478 €</td></tr>
+<tr><td>Vorläufiger Ertragswert</td><td>541.478 € + 120.000 €</td><td class="r">661.478 €</td></tr>
+</tbody></table></div>
+<p>Rund 661.000 € sind der vorläufige Ertragswert. Ein Instandhaltungsstau oder eine Miete deutlich unter dem Markt würden danach als besondere objektspezifische Merkmale abgezogen. Schon ein halber Prozentpunkt beim Liegenschaftszins verschiebt das Ergebnis um mehrere zehntausend Euro. Darum zählt, dass der Zins vom zuständigen Ausschuss stammt und zum Modell passt, in dem er abgeleitet wurde.</p>
+</div>
+</div></section>
+
+<section class="sec-creme" id="sachwert"><div class="w-schmal">
+<div class="kz"><div class="kick">Verfahren 2</div><h2>Sachwert berechnen: Rechenweg mit Beispiel</h2></div>
+<div class="m-text">
+<p>Das Sachwertverfahren fragt, was Gebäude und Grundstück in diesem Zustand kosten würden. Es geht von den Normalherstellungskosten (NHK 2010) aus, rechnet sie mit dem Baupreisindex auf heute hoch und zieht das Alter ab. Erst der <b>Sachwertfaktor</b> des Gutachterausschusses passt das Ergebnis an den Markt an.</p>
+<p class="formel">Sachwert = (Gebäudesachwert + Außenanlagen + Bodenwert) × Sachwertfaktor ± besondere Merkmale</p>
+<h3>Beispiel: Einfamilienhaus</h3>
+<p>Ein Einfamilienhaus hat 220 m² Bruttogrundfläche. Der Kostenkennwert liegt im Beispiel bei 800 € je m², der Baupreisindex bei 2,00. Die Gesamtnutzungsdauer beträgt 80 Jahre, die Restnutzungsdauer 40 Jahre. Außenanlagen sind mit 4 Prozent angesetzt, der Bodenwert mit 100.000 €, der Sachwertfaktor mit 1,15. Auch das sind erfundene Zahlen.</p>
+<div class="tab-wrap"><table class="tab-d"><thead><tr><th>Schritt</th><th>Rechnung</th><th class="r">Betrag</th></tr></thead><tbody>
+<tr><td>Herstellungskosten heute</td><td>220 m² × 800 € × 2,00</td><td class="r">352.000 €</td></tr>
+<tr><td>Alterswertminderung</td><td>40 von 80 Jahren übrig, also 50 %</td><td class="r">−176.000 €</td></tr>
+<tr><td>Gebäudesachwert</td><td></td><td class="r">176.000 €</td></tr>
+<tr><td>Außenanlagen</td><td>4 % von 176.000 €</td><td class="r">7.040 €</td></tr>
+<tr><td>Bodenwert</td><td></td><td class="r">100.000 €</td></tr>
+<tr><td>Vorläufiger Sachwert</td><td>Summe</td><td class="r">283.040 €</td></tr>
+<tr><td>Marktangepasster Sachwert</td><td>283.040 € × 1,15</td><td class="r">325.496 €</td></tr>
+</tbody></table></div>
+<p>Der Sachwertfaktor kann über oder unter 1 liegen. In gefragten Lagen zahlen Käufer mehr als die Kosten, in schwachen weniger. Er gilt nur in dem Modell, in dem der Ausschuss ihn abgeleitet hat, mit dessen Gesamtnutzungsdauer und Baupreisindex.</p>
+</div>
+</div></section>
+
+<section id="vergleichswert"><div class="w-schmal">
+<div class="kz"><div class="kick">Verfahren 3</div><h2>Vergleichswert: Preise vergleichbarer Objekte</h2></div>
+<div class="m-text">
+<p>Das Vergleichswertverfahren stützt sich auf Kaufpreise vergleichbarer Objekte. Wo genug Verkäufe vorliegen, leitet der Gutachterausschuss <b>Vergleichsfaktoren</b> ab, etwa in Euro je m² Wohnfläche für Eigentumswohnungen einer Baujahresklasse, oder <b>Immobilienrichtwerte</b> für eine Zone. Abweichungen des Objekts, zum Beispiel bei Größe, Baujahr oder Ausstattung, werden über Umrechnungskoeffizienten angepasst.</p>
+<p class="formel">Vergleichswert = Vergleichsfaktor × Wohnfläche × Umrechnungskoeffizienten ± besondere Merkmale</p>
+<p>Angebotspreise aus Inseraten sind keine Kaufpreise. Sie liegen meist über dem, was am Ende bezahlt wird. Eine Bewertung, die nur auf Angeboten steht, sollte das sagen und einen Abschlag zeigen.</p>
+</div>
+</div></section>
+
+<section class="sec-creme" id="online"><div class="w-schmal">
+<div class="kz"><div class="kick">Online oder Gutachten</div><h2>Was eine Immobilienbewertung online leisten kann</h2></div>
+<div class="m-text">
+<p>Viele Online-Rechner geben in Sekunden einen Wert aus. Meist ist das ein Durchschnitt aus Angebotspreisen der Umgebung. Für eine erste Orientierung reicht das, mit der ImmoWertV hat es wenig zu tun.</p>
+<p>Eine Online-Bewertung, die der Verordnung folgt, sollte mindestens:</p>
+<ul class="m-liste">
+<li><b>das passende Verfahren wählen</b> und sagen, welches führt und welches stützt,</li>
+<li><b>Daten des zuständigen Ausschusses verwenden</b> und je Zahl zeigen, woher sie stammt und von wann sie ist,</li>
+<li><b>kein Verfahren halb rechnen:</b> fehlt eine Pflichtangabe, erscheint das Verfahren nicht,</li>
+<li><b>eine Restnutzungsdauer für alle Verfahren</b> verwenden und ihren Rechenweg zeigen,</li>
+<li><b>offenlegen, wo kein amtlicher Wert vorliegt,</b> und den Weg zur Quelle nennen.</li>
+</ul>
+<p>Ein Verkehrswertgutachten ersetzt das nicht. Für Gericht, Erbschaft, Scheidung oder das Finanzamt braucht es ein Gutachten mit Ortsbesichtigung. Für die Frage, ob ein Kaufpreis zum Objekt passt, ist eine sauber hergeleitete Wertindikation aber ein starkes Werkzeug.</p>
+<h3>So rechnet DealPilot</h3>
+<p>Der Marktbericht in DealPilot rechnet Ertragswert und Sachwert nach ImmoWertV, mit Liegenschaftszinssätzen, Sachwertfaktoren und Vergleichsfaktoren der Gutachterausschüsse, soweit sie vorliegen. Jede Zahl trägt ihre Herkunft. Wo der örtliche Wert fehlt oder kostenpflichtig ist, steht im Bericht, welcher Ausschuss zuständig ist und wie du an den Wert kommst. Das Ergebnis ist eine <b>Wertindikation</b>, kein Gutachten. Wie DealPilot die Daten prüft, steht unter <a href="methodik.html">Datenbasis und Prüfung</a>.</p>
+</div>
+</div></section>
+
+<section id="fragen"><div class="w-schmal">
+<div class="kz"><div class="kick">Häufige Fragen</div><h2>Fragen zur Immobilienbewertung nach ImmoWertV</h2></div>
+  <details class="fq" open><summary>Was ist die ImmoWertV?</summary><div class="ant"><p>Die Immobilienwertermittlungsverordnung regelt, wie der Verkehrswert von Grundstücken und Gebäuden in Deutschland ermittelt wird. Die aktuelle Fassung gilt seit dem 1. Januar 2022 und beschreibt das Vergleichswert-, Ertragswert- und Sachwertverfahren.</p></div></details>
+  <details class="fq"><summary>Welches Verfahren gilt für welche Immobilie?</summary><div class="ant"><p>Für Eigentumswohnungen führt meist das Vergleichswertverfahren, für Mehrfamilienhäuser und vermietete Objekte das Ertragswertverfahren, für selbst genutzte Ein- und Zweifamilienhäuser das Sachwertverfahren. Die anderen Verfahren können das Ergebnis stützen.</p></div></details>
+  <details class="fq"><summary>Kann man eine Immobilie nach ImmoWertV online bewerten?</summary><div class="ant"><p>Ja, als Wertindikation. Sie ist belastbar, wenn sie das passende Verfahren mit den Daten des zuständigen Gutachterausschusses rechnet und jede Zahl mit Herkunft zeigt. Ein Verkehrswertgutachten mit Ortsbesichtigung ersetzt sie nicht.</p></div></details>
+  <details class="fq"><summary>Was ist der Liegenschaftszinssatz?</summary><div class="ant"><p>Der Liegenschaftszinssatz ist der Zins, mit dem der Markt Immobilienerträge verzinst. Der Gutachterausschuss leitet ihn aus Kaufpreisen ab. Er ist die wichtigste Stellschraube im Ertragswertverfahren, schon kleine Unterschiede verschieben den Wert deutlich.</p></div></details>
+  <details class="fq"><summary>Was ist ein Sachwertfaktor?</summary><div class="ant"><p>Der Sachwertfaktor passt den vorläufigen Sachwert an den Markt an. Liegt er über 1, zahlen Käufer mehr als die Kosten von Gebäude und Boden, liegt er darunter, weniger. Er gilt nur im Modell, in dem der Ausschuss ihn abgeleitet hat.</p></div></details>
+  <details class="fq"><summary>Warum unterscheidet sich der Wert vom Angebotspreis?</summary><div class="ant"><p>Angebotspreise sind Wünsche der Verkäufer, Kaufpreise sind das Ergebnis der Verhandlung. Die Verfahren der ImmoWertV stützen sich auf echte Kaufpreise. Ein Angebot über dem Ertrags- oder Sachwert ist ein Hinweis, genauer zu verhandeln.</p></div></details>
+</div></section>
+
+<section class="sec-creme" id="weiter"><div class="w-schmal">
+<div class="kz"><div class="kick">In der App weiterrechnen</div><h2>Den Wert neben den Kaufpreis stellen.</h2></div>
+<div class="m-text">
+<p>In DealPilot legst du ein Objekt an und bekommst im Marktbericht Ertragswert und Sachwert nach ImmoWertV mit Rechenweg, dazu Rendite, Cashflow und den Investor Deal Score. So siehst du vor dem Kauf, ob Preis und Wert zusammenpassen.</p>
+</div>
+<div class="sk-knopf" style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:18px 0 30px">
+  <a class="btn-p" href="https://app.dealpilot.immo/?register=1">Vier Wochen als Pro, kostenlos</a>
+  <span style="font:700 10px/1.4 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--mut)">Keine Zahlungsdaten · danach automatisch Free</span>
+</div>
+<div class="rr-mehr">
+  <a href="immobilien-rendite-berechnen.html">Immobilien Rendite berechnen</a>
+  <a href="immobilien-investment-rechner.html">Immobilien Investment Analyse Tool</a>
+  <a href="cashflow-immobilie-berechnen.html">Cashflow Kalkulation einer Immobilie</a>
+  <a href="immobilien-ankauf-checkliste.html">Checkliste für den Immobilienankauf</a>
+  <a href="immobilienbewertung-immowertv.html">Immobilienbewertung nach ImmoWertV</a>
+  <a href="renditeobjekt-pruefen.html">Renditeobjekt vor dem Kauf prüfen</a>
+</div>
+</div></section>
+</main>
+
+<footer class="footer"><div class="wrap">
+  <div class="footer-grid"><!-- landing-pruefung-1 · Fuss gleich der Startseite (sechs Spalten, Ratgeber, AGB) -->
+    <div>
+      <div class="mark mark-gross" style="color:#fff"><span class="wort">Deal<b>Pilot</b></span></div>
+      <p class="footer-tag">Immobilien-Investmentanalyse für strukturierte Entscheidungen.
+        DealPilot ist eine Marke von Junker Solution.<!-- landing-kern-1 · Betreiber Junker Solution (Einzelunternehmen), das Sachverständigenbüro ist eine eigene Marke und nur verlinkt --></p>
+    </div>
+    <div><h4>Produkt</h4>
+      <a href="/#workflow">So funktioniert's</a><a href="/#features">Funktionen</a>
+      <a href="leistungsumfang.html">Leistungsumfang</a><a href="preise.html">Preise</a>
+      <a href="api.html">API</a><a href="videothek.html">Videothek</a><a href="partner.html">Für Partner</a><a href="forschung.html">Forschung &amp; Entwicklung</a></div>
+    <div><h4>Vertrauen</h4>
+      <a href="sicherheit.html">Sicherheit &amp; Server</a><a href="fragen.html">Häufige Fragen</a>
+      <a href="/#daten">Datenbasis</a><a href="/#partner">Wegbegleiter</a><a href="preise.html#feature-matrix">Cockpit-Matrix</a></div>
+    <div><h4>Ratgeber</h4>
+      <a href="immobilien-rendite-berechnen.html">Immobilien Rendite berechnen</a>
+      <a href="cashflow-immobilie-berechnen.html">Cashflow einer Immobilie berechnen</a>
+      <a href="immobilien-investment-rechner.html">Investment-Rechner für Kapitalanleger</a>
+      <a href="renditeobjekt-pruefen.html">Renditeobjekt vor dem Kauf prüfen</a>
+      <a href="kaufpreisfaktor-berechnen.html">Kaufpreisfaktor berechnen</a>
+      <a href="immobilien-ankauf-checkliste.html">Ankauf Checkliste</a>
+      <a href="immobilienbewertung-immowertv.html">Bewertung nach ImmoWertV online</a>
+      <a href="methodik.html">Immobilienbewertung nach ImmoWertV</a>
+      <a href="prozesskarte.html">Der ganze Weg auf einer Karte</a></div>
+    <div><h4>Junker Immobilien</h4>
+      <a href="https://junker-immobilien.io" target="_blank" rel="noopener">Sachverständigenbüro</a>
+      <a href="https://junker-immobilien.io" target="_blank" rel="noopener">Kapitalanlage</a>
+      <a href="https://junker-immobilien.io" target="_blank" rel="noopener">Projektentwicklung</a></div>
+    <div><h4>Kontakt</h4>
+      <a href="mailto:support@dealpilot.immo">support@dealpilot.immo</a>
+      <a href="mailto:info@dealpilot.immo">info@dealpilot.immo</a>
+      <a href="/impressum.html">Impressum</a><a href="/datenschutz.html">Datenschutz</a>
+      <a href="/agb.html">AGB</a></div>
+  </div>
+  <div class="footer-bottom">
+    <div>© 2026 Junker Solution · DealPilot</div>
+    <div>Keine Steuer- oder Finanzberatung. Analyse-Werkzeug für eigene Kalkulationen.</div>
+  </div>
+</div></footer>
+
+<script src="dp2.js?v=landing-zaehlen-1"></script>
+<script src="landing-zahlen.js?v=landing-zahlen-live-1"></script><!-- landing-zahlen-live-1 · Zahlen live aus GET /api/v1/public/datenumfang, das HTML bleibt Rückfall -->
+  <script src="assets/umgebung.js?v=v1644"></script><!-- v1644 · Landing zeigt auf DIE App, in der sie steht -->
+</body></html>
