@@ -1,0 +1,418 @@
+{
+ "ags": "05558024",
+ "gemeinde": "Lüdinghausen",
+ "art": "qualifiziert",
+ "stand": "2024-12-01",
+ "erhebungsstichtag": null,
+ "gueltig_ab": "2024-12-01",
+ "gueltig_bis": "2026-11-30",
+ "quelle": {
+  "url": "https://www.kreis-coesfeld.de/media/GAA/Downloads/Luedinghausen2024.pdf",
+  "dokument": "Mietspiegel Stadt Lüdinghausen für nicht preisgebundene Wohnungen (Qualifizierter Mietspiegel i.S. § 558 d BGB), Stand 01. Dezember 2024, bearbeitet durch die Geschäftsstelle des Gutachterausschusses für Grundstückswerte im Kreis Coesfeld im Auftrag der Stadt Lüdinghausen (Herausgeber), mit Zustimmung der Vermieter- und Mieterverbände",
+  "seite": "S. 1 (Titel, § 558d, Laufzeit zwei Jahre, Kovarianzanalyse), S. 2 (Tabelle U/M/O, Art, Größe), S. 3–4 (Ausstattung, Beschaffenheit, Lage)",
+  "lizenz": "kein Rechtevorbehalt im Dokument (kein Nachdruck- oder Speicherverbot, kein Urheberrechtsvermerk), geprüft am 2026-11-26",
+  "abgerufen": "2026-11-26"
+ },
+ "einheit": "eur_qm_nettokalt",
+ "form": "tabelle",
+ "rundung": 2,
+ "hinweis": "Qualifizierter Mietspiegel (§ 558d BGB, Kovarianzanalyse, Vermieterbefragung 2024), einer von elf Mietspiegeln im Kreis Coesfeld (Arbeitskreis Mietspiegel, Dokumentation https://www.nottuln.de/fileadmin/media/PDF/Fachbereich_3/Mietspiegel/Mietspiegeldokumentation_2024.pdf). Stand 01.12.2024, „Laufzeit von zwei Jahren“ → gueltig_bis 30.11.2026 abgeleitet (Nachfolger zum 01.12.2026 zu erwarten, am 26.11.2026 noch nicht veröffentlicht). Tabelle S. 2: Unterer Wert / Mittelwert / Oberer Wert je Baujahrklasse × Wohnfläche; Werte aus der Textschicht (Koordinaten, Spaltenzuordnung U/M/O), Wohnflächenklassen am Druckbild geprüft. Ganzzahlige Wohnflächenklassen als stetige Grenzen; über 120 m² bis 180 m² gilt die letzte Zeile mit dem Übergrößenabschlag (S. 2 Größe: „Für freistehende Einfamilienhäuser, Doppelhaushälften und Reihenhäuser ist der Mietspiegel bis zu einer Wohnfläche von 120 m² anwendbar“, danach Abschläge) — die Abschläge gelten laut Dokument für übergroße Wohneinheiten allgemein. Zu-/Abschläge beziehen sich laut Dokument auf den Mittelwert, der Kern wendet % auf U, M und O an. Baujahr 1900–1949: −2 % auf die älteste Klasse (S. 2). NICHT abgebildet: Zu-/Abschläge für Ausstattung, Beschaffenheit/Modernisierung und Lage (S. 3–4), Einliegerwohnung/Wohn- und Geschäftshaus sind Tabellenbasis.",
+ "haus": {
+  "regel": "zuschlag",
+  "merkmal": {
+   "efh": "haus_efh",
+   "dhh": "haus_dhh",
+   "rh": "haus_rh"
+  },
+  "gilt_fuer": [
+   "efh",
+   "dhh",
+   "rh"
+  ],
+  "gilt_fuer_herkunft": "wortlaut",
+  "hinweis": "Einfamilienhaus +10 %, Doppelhaushälfte +3 %, Reihenhaus +3 % auf den Mittelwert",
+  "beleg": "S. 2 Art"
+ },
+ "tabelle": {
+  "achsen": {
+   "baujahr": [
+    {
+     "von": null,
+     "bis": 1964,
+     "label": "1950 – 1964 (1900–1949 mit −2 %)"
+    },
+    {
+     "von": 1965,
+     "bis": 1979,
+     "label": "1965 – 1979"
+    },
+    {
+     "von": 1980,
+     "bis": 1995,
+     "label": "1980 – 1995"
+    },
+    {
+     "von": 1996,
+     "bis": 2008,
+     "label": "1996 – 2008"
+    },
+    {
+     "von": 2009,
+     "bis": 2016,
+     "label": "2009 – 2016"
+    },
+    {
+     "von": 2017,
+     "bis": 2021,
+     "label": "2017 – 2021"
+    }
+   ],
+   "wfl": [
+    {
+     "von": 25,
+     "von_inkl": true,
+     "bis": 50,
+     "label": "25 – 50 m²"
+    },
+    {
+     "von": 50,
+     "von_inkl": false,
+     "bis": 65,
+     "label": "51 – 65 m²"
+    },
+    {
+     "von": 65,
+     "von_inkl": false,
+     "bis": 85,
+     "label": "66 – 85 m²"
+    },
+    {
+     "von": 85,
+     "von_inkl": false,
+     "bis": 180,
+     "label": "86 – 120 m² (darüber bis 180 m² mit Abschlag)"
+    }
+   ]
+  },
+  "geltung": {
+   "baujahr_von": null,
+   "baujahr_bis": null,
+   "wfl_von": 25,
+   "wfl_bis": 180
+  },
+  "zellen": [
+   {
+    "baujahr": 0,
+    "wfl": 0,
+    "unten": 7.2,
+    "mittel": 7.6,
+    "oben": 7.95,
+    "seite": "2"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 0,
+    "unten": 7.2,
+    "mittel": 7.8,
+    "oben": 8.4,
+    "seite": "2"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 0,
+    "unten": 7.55,
+    "mittel": 8.1,
+    "oben": 8.7,
+    "seite": "2"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 0,
+    "unten": 7.95,
+    "mittel": 8.55,
+    "oben": 9.15,
+    "seite": "2"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 0,
+    "unten": 8.5,
+    "mittel": 9.15,
+    "oben": 9.75,
+    "seite": "2"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 0,
+    "unten": 9.45,
+    "mittel": 10.05,
+    "oben": 10.65,
+    "seite": "2"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 1,
+    "unten": 6.85,
+    "mittel": 7.2,
+    "oben": 7.55,
+    "seite": "2"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 1,
+    "unten": 6.85,
+    "mittel": 7.45,
+    "oben": 7.95,
+    "seite": "2"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 1,
+    "unten": 7.15,
+    "mittel": 7.75,
+    "oben": 8.3,
+    "seite": "2"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 1,
+    "unten": 7.6,
+    "mittel": 8.1,
+    "oben": 8.7,
+    "seite": "2"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 1,
+    "unten": 8.1,
+    "mittel": 8.7,
+    "oben": 9.35,
+    "seite": "2"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 1,
+    "unten": 9.1,
+    "mittel": 9.65,
+    "oben": 10.25,
+    "seite": "2"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 2,
+    "unten": 6.35,
+    "mittel": 6.7,
+    "oben": 7.05,
+    "seite": "2"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 2,
+    "unten": 6.45,
+    "mittel": 6.9,
+    "oben": 7.45,
+    "seite": "2"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 2,
+    "unten": 6.75,
+    "mittel": 7.25,
+    "oben": 7.8,
+    "seite": "2"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 2,
+    "unten": 7.1,
+    "mittel": 7.65,
+    "oben": 8.2,
+    "seite": "2"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 2,
+    "unten": 7.7,
+    "mittel": 8.25,
+    "oben": 8.8,
+    "seite": "2"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 2,
+    "unten": 8.6,
+    "mittel": 9.15,
+    "oben": 9.7,
+    "seite": "2"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 3,
+    "unten": 6.15,
+    "mittel": 6.3,
+    "oben": 6.55,
+    "seite": "2"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 3,
+    "unten": 6.15,
+    "mittel": 6.55,
+    "oben": 6.9,
+    "seite": "2"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 3,
+    "unten": 6.5,
+    "mittel": 6.85,
+    "oben": 7.25,
+    "seite": "2"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 3,
+    "unten": 6.9,
+    "mittel": 7.25,
+    "oben": 7.65,
+    "seite": "2"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 3,
+    "unten": 7.45,
+    "mittel": 7.85,
+    "oben": 8.3,
+    "seite": "2"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 3,
+    "unten": 8.4,
+    "mittel": 8.75,
+    "oben": 9.2,
+    "seite": "2"
+   }
+  ],
+  "zuschlaege": [
+   {
+    "merkmal": "uebergroesse",
+    "art": "pct",
+    "label": "Übergroße Wohneinheiten",
+    "beleg": "S. 2–3 Größe",
+    "wfl_klassen": [
+     {
+      "von": 120,
+      "von_inkl": false,
+      "bis": 140,
+      "wert": -5
+     },
+     {
+      "von": 140,
+      "von_inkl": false,
+      "bis": 180,
+      "wert": -11
+     }
+    ]
+   },
+   {
+    "merkmal": "haus_efh",
+    "art": "pct",
+    "wert": 10,
+    "label": "Einfamilienhaus",
+    "beleg": "S. 2 Art"
+   },
+   {
+    "merkmal": "haus_dhh",
+    "art": "pct",
+    "wert": 3,
+    "label": "Doppelhaushälfte",
+    "beleg": "S. 2 Art"
+   },
+   {
+    "merkmal": "haus_rh",
+    "art": "pct",
+    "wert": 3,
+    "label": "Reihenhaus",
+    "beleg": "S. 2 Art"
+   },
+   {
+    "merkmal": "eigentumswohnung",
+    "art": "pct",
+    "wert": 3,
+    "label": "Eigentumswohnung",
+    "beleg": "S. 2 Art"
+   },
+   {
+    "merkmal": "baujahr_1900_1949",
+    "art": "pct",
+    "label": "Jahr der Bezugsfertigkeit 1900 bis 1949 (−2 % auf die älteste Klasse)",
+    "wfl_klassen": [
+     {
+      "von": null,
+      "bis": null,
+      "wert": -2
+     }
+    ],
+    "bedingung": {
+     "baujahr_bis": 1949
+    },
+    "beleg": "S. 2 unter der Tabelle"
+   }
+  ]
+ },
+ "pruefbeispiele": [
+  {
+   "eingabe": {
+    "baujahr": 2021,
+    "wfl": 50
+   },
+   "erwartet": {
+    "unten": 9.45,
+    "mittel": 10.05,
+    "oben": 10.65
+   },
+   "seite": "2",
+   "art": "tabellenzelle",
+   "anmerkung": "2017 – 2021 / 25–50 m²"
+  },
+  {
+   "eingabe": {
+    "baujahr": 1964,
+    "wfl": 180
+   },
+   "erwartet": {
+    "unten": 5.47,
+    "mittel": 5.61,
+    "oben": 5.83
+   },
+   "seite": "2",
+   "art": "rechenweg",
+   "anmerkung": "letzte Zeile, 141–180 m² -11 %"
+  },
+  {
+   "eingabe": {
+    "baujahr": 1990,
+    "wfl": 200
+   },
+   "erwartet": null,
+   "seite": "2",
+   "art": "tabellenzelle",
+   "anmerkung": "über 180 m²"
+  },
+  {
+   "eingabe": {
+    "baujahr": 1930,
+    "wfl": 50
+   },
+   "erwartet": {
+    "unten": 7.06,
+    "mittel": 7.45,
+    "oben": 7.79
+   },
+   "seite": "2",
+   "art": "rechenweg",
+   "anmerkung": "1900–1949: −2 %"
+  }
+ ]
+}
