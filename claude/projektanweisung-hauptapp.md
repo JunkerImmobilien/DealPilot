@@ -45778,3 +45778,9 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** staging 0ba16f76, 6d5716e6, 4977d183, 014a7814 · main c2f5094d, 7ed08e9a, 5b495f09, f82d5c4c, afeb7765 (Buster v5000m), b9b6dc0b (Version).
 - **Nachweis:** Messkabine Staging, alle neun Vorlagen bei 390 und 822 px: kein Überlauf, keine Scrollleiste, keine Schrift unter 8,5 px; buster-ebenen, vorschau-pruefen, gold-audit (beide Server) grün. Prod liefert v5000m, version 228, 15 Feldtipps aktiv; Portfolio auf Prod nicht angemeldet nachgemessen.
 - **Rest:** Kartenbeschriftungen der Tabellen (tabellen-karten.js) bleiben JetBrains Mono, app-weit einheitlich.
+
+### Rollout 1.0.229 · v5050ss5 Zielbild-Marktpreisindikation mit Zusatz (26.11.2026)
+- **Was:** Pilot-Analyse/Objekt-Cockpit, Tabelle Ankauf · Heute · nach Mieterhöhung · Zielbild: die Marktpreisindikation im Zielbild trägt „Angebote im modernisierten Zustand“ (PotenzialService rechnet sie mit `ZIELBILD_REF`). Anlass Marcel M26: Sprung 945.000 → 1.045.000 € ohne Erklärung. Dazu Demo-Daten Westerfeldstr. 140 (Staging, eingefrorener Ankauf-Stand 3.195 → 2.650 € Nettokaltmiete), kein Logikfehler.
+- **Commit:** staging 65800543 · main cfc0903c, f414b3eb (Version).
+- **Nachweis:** Prod curl `pilot-analyse-v4.js?v=v5050ss5m` mit dem Zusatz, version.json patch 229, gold-audit Prod RC 0, buster-ebenen, vorschau-pruefen grün.
+- **Rest:** keiner.
