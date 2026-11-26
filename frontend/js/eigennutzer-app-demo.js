@@ -112,7 +112,8 @@
     if (k === 'fin') {
       return demo + '<div class="eig-grid">' + karte('Rate im Monat', wertzeile('Zins ' + r.zins.toFixed(2).replace('.', ',') + ' %, Tilgung 2 %', eur(r.rate), 'Darlehen ' + eur(r.darlehen) + ', Beleihung ' + Math.round(r.ltv) + ' %'))
         + karte('Leistbarkeit', '<label class="lbl" for="eig_netto_app">Netto-Haushaltseinkommen im Monat</label><input id="eig_netto_app" inputmode="decimal" placeholder="5.200" value="' + esc(val('eig_netto_app')) + '" style="width:100%;margin:6px 0;padding:8px;border-radius:8px;border:1px solid rgba(127,127,127,.4)">'
-          + '<p>' + (r.quote == null ? 'Einkommen eintragen, dann rechnen wir die Belastung.' : 'Wohnkosten ' + Math.round(r.quote) + ' % vom Netto-Einkommen. Gut sind bis 35 %.') + '</p>')
+          + '<p>' + (r.quote == null ? 'Einkommen eintragen, dann rechnen wir die Belastung.' : 'Rate und alle Wohnkosten ' + Math.round(r.quote) + ' % vom Netto-Einkommen. Grün bis 40 %, gelb bis 50 %.') + '</p>'
+          + ((r.kern && r.kern.leistbarkeit.aufstellung) ? '<ul>' + r.kern.leistbarkeit.aufstellung.map(function (x) { return '<li>' + (x.summe ? '<b>' : '') + esc(x.l.replace(/ \(.*\)$/, '')) + ': ' + eur(x.eur) + (x.summe ? '</b>' : '') + '</li>'; }).join('') + '</ul>' : ''))
         + karte('Zinsbindung', '<p>Anschluss nach 10 Jahren prüfen. Restschuld und Anschlusszins aus dem Reiter Finanzierung.</p>') + '</div>';
     }
     if (k === 'kaufen') {

@@ -69,6 +69,7 @@
         { name: 'Kaufen: Wert minus Restschuld', klasse: 'l1', werte: KM.reihe.map(function (p) { return { x: p.jahr, y: p.kaufen }; }) },
         { name: 'Mieten und Geld anlegen', klasse: 'l3', werte: KM.reihe.map(function (p) { return { x: p.jahr, y: p.mieten }; }) }
       ], { h: 150, titel: 'Vermögen nach Jahren', fmt: function (v) { return B.zahl(v / 1000, 0) + ' T€'; } }) + '</div>' : '')
+      + '<p class="det">Heizung, Grundsteuer, Wasser, Müll und Versicherung zahlst du als Mieter genauso wie als Eigentümer. Sie heben sich auf und stehen deshalb nicht in diesem Vergleich, wohl aber in der Haushaltsrechnung.</p>'
       + '<p class="det">Annahmen: Wertentwicklung ' + B.pct(KM.annahmen.wertsteigerung_pct, 1) + ', Mietsteigerung ' + B.pct(KM.annahmen.mietsteigerung_pct, 1) + ' und Anlagezins ' + B.pct(KM.annahmen.anlagezins_pct, 1) + ' im Jahr. Beispielrechnung, keine Garantie.</p>');
 
     /* 4 · Zustand und Energie */
@@ -93,9 +94,17 @@
     var bank = B.kacheln([
       { l: 'Darlehen', v: B.eur(F.darlehen), s: 'Beleihungsauslauf zum Kaufpreis ' + B.pct(F.ltv_pct, 0) },
       { l: 'Rate im Monat', v: B.eur(F.rate), s: 'Zins ' + B.pct(F.zins_pct, 2) + ' plus ' + B.pct(F.tilgung_pct, 0) + ' Tilgung' },
-      { l: 'Wohnkosten im Monat', v: B.eur(H.leistbarkeit.wohnkosten), s: 'Rate plus Kosten, die ein Mieter nicht trägt' },
+      { l: 'Wohnkosten im Monat', v: B.eur(H.leistbarkeit.wohnkosten), s: 'Rate, Eigentümer- und Betriebskosten' },
       { l: 'Belastung', v: H.leistbarkeit.quote == null ? 'ohne Einkommen' : B.pct(H.leistbarkeit.quote, 0) + ' vom Netto', art: H.leistbarkeit.ampel === 'gruen' ? 'gut' : H.leistbarkeit.ampel === 'rot' ? 'schlecht' : '' }
     ]);
+    /* v5130j · Haushaltsrechnung: Rate, Eigentümerkosten, Heizung, übrige Nebenkosten, Summe und Anteil vom Netto */
+    var AU = H.leistbarkeit.aufstellung || [];
+    if (AU.length) {
+      var zeilen = AU.map(function (x) { return [x.l + (x.herkunft ? ' (' + x.herkunft + ')' : ''), B.eur(x.eur), x.summe ? { art: 'summe' } : null].filter(function (y) { return y !== null; }); });
+      zeilen.push(['Anteil vom Netto-Einkommen', H.leistbarkeit.quote == null ? 'ohne Einkommen' : B.pct(H.leistbarkeit.quote, 0) + ' von ' + B.eur(H.leistbarkeit.netto)]);
+      bank += '<div class="block"><h3>Haushaltsrechnung</h3>' + B.liste(zeilen)
+        + '<p class="det">Grün bis ' + H.leistbarkeit.grenzen.gruen + ' %, gelb bis ' + H.leistbarkeit.grenzen.gelb + ' % vom Netto. Banken rechnen meist nur die Rate gegen höchstens 40 % vom Netto, die Nebenkosten kommen hier dazu. Heizung aus dem Energieausweis bzw. der Annahme, übrige Nebenkosten aus den Unterlagen oder pauschal.</p></div>';
+    }
     if (L && L.verfuegbar !== false && L.beleihungswert) {
       bank += '<div class="block"><h3>Indikativer Beleihungswert</h3>' + B.liste([
         ['Beleihungswert (indikativ)', B.eur(L.beleihungswert)],
