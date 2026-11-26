@@ -245,6 +245,41 @@ const param = {
   kalibrierung: staedte.map((s) => ({ ags: s.ags, gemeinde: s.gemeinde, land: s.land, stand: s.stand, marktlage: s.lage, punkte: s.punkte.length,
     ...(s.lage_angenommen ? { lage: s.lage_angenommen } : {}), quotient_median: r3(med(s.punkte.map((p) => p.ms / basisVon[wahl](s, p)))) }))
 };
+/* MM6 · 26.11.2026 · Modernisierung (Marcel: „teils 10,50 bei Neuvermietung“). Gemessen an den freien Mietspiegeln, die
+   einen Zuschlag für den Modernisierungsgrad führen: Zuschlag in % des Mittelwerts (Baujahr 1975, 70 m²), je Dokument
+   einmal (Kreis-Mietspiegel mit gleichem Dokument zählen einmal). Die Verschiebung des Baujahrs über die Anlage 2 (RND)
+   trägt dagegen nur gut die Hälfte (gemessen 13 % gegen 22 %) und wird deshalb nicht genommen. */
+{
+  const { mietspiegelWerteFuer } = await import(pathToFileURL(path.join(MS, 'werte.js')).href);
+  const WD = path.join(MS, 'werte');
+  const STUFEN = [{ ab: 14, re: /modernisierung_ueberwiegend|energetische_vollmodernisierung|vollmodernis|kernsanierung|komplettsanier/i, name: 'überwiegend bzw. umfassend modernisiert' },
+    { ab: 6, re: /modernisierung_mittel/i, name: 'mittlerer Modernisierungsgrad' }];
+  const je = STUFEN.map(() => new Map());
+  for (const f of fs.readdirSync(WD).filter((x) => x.endsWith('.json')).sort()) {
+    let w; try { w = JSON.parse(fs.readFileSync(path.join(WD, f), 'utf8')); } catch (e) { continue; }
+    if (w.freigabe === 'gesperrt') continue;
+    const zs = [].concat((w.tabelle || {}).zuschlaege || [], (w.regression || {}).faktoren || []);
+    const base = mietspiegelWerteFuer(w, { baujahr: 1975, wfl: 70, merkmale: {} });
+    if (!base || !(base.mittel > 0)) continue;
+    const dok = String(w.url || w.dokument || f);
+    STUFEN.forEach((st, i) => {
+      const z = zs.find((x) => st.re.test(String(x.merkmal || '')) && Number(x.wert) > 0);
+      if (!z || je[i].has(dok)) return;
+      const pct = /pct|prozent|%/i.test(String(z.einheit || '')) ? Number(z.wert) : Number(z.wert) / base.mittel * 100;
+      if (pct > 0 && pct < 60) je[i].set(dok, { pct, ags: f.slice(0, 8), gemeinde: w.gemeinde || null });
+    });
+  }
+  const loso = (arr) => { if (arr.length < 3) return null; let fm = 0, f0 = 0;
+    arr.forEach((x, i) => { const m = med(arr.filter((_, j) => j !== i)); fm += Math.abs(x - m); f0 += Math.abs(x); });
+    return { mae_mit_pp: r3(fm / arr.length), mae_ohne_pp: r3(f0 / arr.length) }; };
+  const stufen = STUFEN.map((st, i) => { const a = [...je[i].values()].map((x) => x.pct);
+    return a.length ? { ab_punkte: st.ab, pct: Math.round(med(a) * 10) / 10, n_dokumente: a.length, name: st.name, loso: loso(a),
+      dokumente: [...je[i].values()].map((x) => ({ ags: x.ags, gemeinde: x.gemeinde, pct: Math.round(x.pct * 10) / 10 })) } : null; }).filter(Boolean);
+  if (stufen.length) param.modernisierung = { stufen, bezug: 'Zuschlag in % auf Mittel, oben und unten der Näherung, Punkte nach Anlage 2 ImmoWertV (Feld mod_punkte)',
+    verfahren: 'Median der Modernisierungs-Zuschläge freier Mietspiegel (Baujahr 1975, 70 m²), je Dokument einmal; Leave-one-Dokument-out',
+    nicht_genommen: 'Baujahr-Verschiebung über die Restnutzungsdauer (Anlage 2): trägt an denselben Mietspiegeln nur rund 13 % statt 22 %' };
+  if (stufen.length) console.log('Modernisierung: ' + stufen.map((s) => 'ab ' + s.ab_punkte + ' Punkten +' + s.pct + ' % (n ' + s.n_dokumente + ', LOO ' + (s.loso ? s.loso.mae_mit_pp + ' statt ' + s.loso.mae_ohne_pp + ' Pp' : '–') + ')').join(' · '));
+}
 const neu = JSON.stringify(param, null, 1) + '\n';
 const alt = fs.existsSync(NAEHERUNG_DATEI) ? fs.readFileSync(NAEHERUNG_DATEI, 'utf8') : '';
 if (ARG.has('--pruefen')) {

@@ -1955,5 +1955,151 @@
    "punkte": 18,
    "quotient_median": 1.073
   }
- ]
+ ],
+ "modernisierung": {
+  "stufen": [
+   {
+    "ab_punkte": 14,
+    "pct": 21.7,
+    "n_dokumente": 15,
+    "name": "überwiegend bzw. umfassend modernisiert",
+    "loso": {
+     "mae_mit_pp": 4.096,
+     "mae_ohne_pp": 20.063
+    },
+    "dokumente": [
+     {
+      "ags": "05758004",
+      "gemeinde": "Bünde",
+      "pct": 16.2
+     },
+     {
+      "ags": "05758008",
+      "gemeinde": "Enger",
+      "pct": 17.1
+     },
+     {
+      "ags": "05758012",
+      "gemeinde": "Herford",
+      "pct": 17
+     },
+     {
+      "ags": "05758016",
+      "gemeinde": "Hiddenhausen",
+      "pct": 16.9
+     },
+     {
+      "ags": "05758024",
+      "gemeinde": "Löhne",
+      "pct": 17.8
+     },
+     {
+      "ags": "05758028",
+      "gemeinde": "Rödinghausen",
+      "pct": 18.5
+     },
+     {
+      "ags": "05758036",
+      "gemeinde": "Vlotho",
+      "pct": 12.8
+     },
+     {
+      "ags": "05978004",
+      "gemeinde": "Bergkamen",
+      "pct": 22.9
+     },
+     {
+      "ags": "05978008",
+      "gemeinde": "Bönen",
+      "pct": 24.8
+     },
+     {
+      "ags": "05978012",
+      "gemeinde": "Fröndenberg/Ruhr",
+      "pct": 24.5
+     },
+     {
+      "ags": "05978016",
+      "gemeinde": "Holzwickede",
+      "pct": 22.2
+     },
+     {
+      "ags": "05978020",
+      "gemeinde": "Kamen",
+      "pct": 23.2
+     },
+     {
+      "ags": "05978032",
+      "gemeinde": "Selm",
+      "pct": 22.9
+     },
+     {
+      "ags": "05978036",
+      "gemeinde": "Unna",
+      "pct": 21.7
+     },
+     {
+      "ags": "05978040",
+      "gemeinde": "Werne",
+      "pct": 22.6
+     }
+    ]
+   },
+   {
+    "ab_punkte": 6,
+    "pct": 5.1,
+    "n_dokumente": 8,
+    "name": "mittlerer Modernisierungsgrad",
+    "loso": {
+     "mae_mit_pp": 0.168,
+     "mae_ohne_pp": 5.133
+    },
+    "dokumente": [
+     {
+      "ags": "05978004",
+      "gemeinde": "Bergkamen",
+      "pct": 5.1
+     },
+     {
+      "ags": "05978008",
+      "gemeinde": "Bönen",
+      "pct": 5.5
+     },
+     {
+      "ags": "05978012",
+      "gemeinde": "Fröndenberg/Ruhr",
+      "pct": 5.4
+     },
+     {
+      "ags": "05978016",
+      "gemeinde": "Holzwickede",
+      "pct": 4.9
+     },
+     {
+      "ags": "05978020",
+      "gemeinde": "Kamen",
+      "pct": 5.1
+     },
+     {
+      "ags": "05978032",
+      "gemeinde": "Selm",
+      "pct": 5.1
+     },
+     {
+      "ags": "05978036",
+      "gemeinde": "Unna",
+      "pct": 4.8
+     },
+     {
+      "ags": "05978040",
+      "gemeinde": "Werne",
+      "pct": 5
+     }
+    ]
+   }
+  ],
+  "bezug": "Zuschlag in % auf Mittel, oben und unten der Näherung, Punkte nach Anlage 2 ImmoWertV (Feld mod_punkte)",
+  "verfahren": "Median der Modernisierungs-Zuschläge freier Mietspiegel (Baujahr 1975, 70 m²), je Dokument einmal; Leave-one-Dokument-out",
+  "nicht_genommen": "Baujahr-Verschiebung über die Restnutzungsdauer (Anlage 2): trägt an denselben Mietspiegeln nur rund 13 % statt 22 %"
+ }
 }
