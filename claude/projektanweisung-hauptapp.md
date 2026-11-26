@@ -45359,3 +45359,9 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Sicherungen:** `/root/backups/haupt-vor-kk6-20261126-1708.sql.gz` (7,1 MB), `mb-vor-kk6-20261126-1708.sql.gz` (31 MB), Köpfe gelesen.
 - **Prüfer auf dem Prod-Stand:** hauscheck 37, eigennutzer 38, verkauf-schalter 32, beleihungswert, einzelcheck, vorschau (4 Funktionen), buster-ebenen, score-ketten, wertermittlung grün.
 - **Rest:** Abnahmekauf mit Erstattung (Marcel). Nebenkosten-Pauschale 2,00 €/m² bis zur ortsgenauen Datenbank (Schnittstelle `e.nebenkosten_qm`). App-Eigennutzer-Modus bleibt Vorschau auf Staging.
+
+### Rollout 1.0.253 · v5140oo6/v5140aoo6 · Quick-Check Mietkette wie App (OO6, 26.11.2026)
+- **Was:** Quick-Check nimmt die Vergleichsmiete aus `/marktbericht/mietspiegel` (Mietspiegel oberer Spannenwert, sonst DealPilot-Näherung oberer Wert mit Haus-/Modernisierungszuschlag und amtlicher Marktmiete; Vorbehalt auf Prod über nur_frei aus). Angebotsmiete minus Abschlag nur noch Rückfall. Neuvermietung = Vergleichsmiete × 1,10 (Bremse) bzw. × DpMieteRegel (1,20). Neue Karte „Miete“ (im KI-Bereich), Mietpotenzial-Balken mit Kette; Fehler „Mieterwechsel 0 € (+-…)“ ohne Marktbewertung behoben; Gedankenstriche im Mietpotenzial-Text raus.
+- **Commits main:** 29a84f8fd, 984f4c0ed, 2d70e238d (1.0.253). Buster IFRAME_SRC qc-v5140am, qc-bridge.js v5140aoo6m.
+- **Nachweis:** beide App-Domains liefern 253, qc-bridge v5140aoo6m, quickcheck-app mit Kette. Route Prod: Kirchlengern 1975/88 ETW Näherung oben 6,46; Bielefeld 1965/70 ETW Mietspiegel oben 8,43. Prüfer buster-ebenen, einzelcheck, score-ketten, mietpotenzial, qc-uebergabe RC 0. Score-Verschiebung an 5 Fällen ≤ 1 Punkt (Staging gemessen).
+- **Rest:** Prod nicht im Browser angemeldet nachgemessen (kein Prod-Testkonto); Karte „Miete“ erscheint erst nach KI-Abruf.
