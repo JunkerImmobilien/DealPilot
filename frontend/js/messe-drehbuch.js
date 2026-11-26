@@ -460,7 +460,7 @@
           await zeige('.ank-ansicht-kopf', 8);
           var A = window.DealPilotAnkauf && DealPilotAnkauf.stand();
           var kp = A && A.kurz ? eur(A.kurz.kp) : null;
-          s.zeile('Gekauft', 'Gekauft am <b>' + datum(A && A.stichtag) + '</b>' + (kp ? ' für <b>' + kp + '</b>' : '') + ' — im Bestand.');
+          s.zeile('Gekauft', 'Gekauft am <b>' + datum(A && A.stichtag) + '</b>' + (kp ? ' für <b>' + kp + '</b>' : '') + ', im Bestand.');
           await warte(5200);
         },
         async function (s) {
@@ -524,7 +524,7 @@
           bar = balken2025() || bar;
           var betrag = bar ? (bar.querySelector('.tax-tl-amount') || {}).textContent : null;
           await zeige(bar ? balken2025 : '#s3-tax .tax-timeline-card', 8);
-          s.zeile('Steuer 2025', 'Die Sanierung als Erhaltungsaufwand sofort abgesetzt' + (betrag ? ' — Erstattung <b>' + String(betrag).replace(/^\+/, '').trim() + '</b>' : '') + '.');
+          s.zeile('Steuer 2025', 'Die Sanierung als Erhaltungsaufwand sofort abgesetzt' + (betrag ? ', Erstattung <b>' + String(betrag).replace(/^\+/, '').trim() + '</b>' : '') + '.');
           await warte(7500);   /* v2219e: der Weg zum Balken 2025 kostet gemessen gut 2 s Scrollen */
         }
       ],
@@ -548,7 +548,7 @@
           await warte(900);
           var m = q('.main-col'); if (m) m.scrollTop = 0;
           await zeige(function () { return qcGruppe('adr'); }, 6);
-          s.zeile('Exposé auf dem Tisch', 'Eine Eigentumswohnung in Bielefeld — die Eckdaten aus dem Exposé.');
+          s.zeile('Exposé auf dem Tisch', 'Eine Eigentumswohnung in Bielefeld, die Eckdaten aus dem Exposé.');
           await tippe('qc_str', 'Musterweg'); await tippe('qc_hnr', '7'); await tippe('qc_plz', '33602'); await tippe('qc_ort', 'Bielefeld');
           await zeige(function () { return qcGruppe('obj'); }, 6);
           await tippe('qc_objektart', 'ETW'); await tippe('qc_wfl', '72'); await tippe('qc_bj', '1994');
@@ -566,7 +566,7 @@
           await warteAuf(function () { return /\d/.test(qcText('sb-num')); }, 5000);
           await warte(900);
           var sc = qcText('sb-num'), st = qcText('sb-tier'), dscr = qcKpi('kpi-dscr', 'DSCR'), cf = qcKpi('kpi-cf', 'Cashflow/Mo');
-          s.zeile('Das Urteil · in Sekunden', 'Score <b>' + sc + '</b> · ' + st + (dscr ? ' — DSCR <b>' + dscr + '</b>' : '') + (cf ? ', Cashflow <b>' + cf + '</b> im Monat' : '') + '.');
+          s.zeile('Das Urteil · in Sekunden', 'Score <b>' + sc + '</b> · ' + st + (dscr ? ', DSCR <b>' + dscr + '</b>' : '') + (cf ? ', Cashflow <b>' + cf + '</b> im Monat' : '') + '.');
           await warte(6500);
         },
         async function (s) {
@@ -577,7 +577,7 @@
           await zeige(function () { return qcEl('score-block'); }, 4);
           await warte(1200);
           var sc = qcText('sb-num'), st = qcText('sb-tier'), dscr = qcKpi('kpi-dscr', 'DSCR'), cf = qcKpi('kpi-cf', 'Cashflow/Mo');
-          s.zeile('Und wenn der Preis fällt?', 'Bei 129.000 €: Score <b>' + sc + '</b> · ' + st + (dscr ? ' — DSCR <b>' + dscr + '</b>' : '') + (cf ? ', Cashflow <b>' + cf + '</b>' : '') + '. Jetzt lohnt die Besichtigung.');
+          s.zeile('Und wenn der Preis fällt?', 'Bei 129.000 €: Score <b>' + sc + '</b> · ' + st + (dscr ? ', DSCR <b>' + dscr + '</b>' : '') + (cf ? ', Cashflow <b>' + cf + '</b>' : '') + '. Jetzt lohnt die Besichtigung.');
           await warte(7500);
         }
       ],
@@ -626,7 +626,7 @@
           var set = q('#settings-modal .swk-set.an');
           await zeige(function () { return q('#settings-modal .swk-set.an'); }, 8);
           var setName = ''; try { var _sid = set && set.getAttribute('data-set'); var _so = (window.DpStandardKarten && DpStandardKarten.SETS || []).filter(function (x) { return x.id === _sid; })[0]; setName = _so ? _so.name : ''; } catch (e) {}
-          s.zeile('Deine Vorgaben', 'Einmal eingestellt: dein Standardwerte-Set' + (setName ? ' <b>„' + setName + '“</b>' : '') + ' — Tilgung, Eigenkapital, Mietausfall, Mindest-DSCR.');
+          s.zeile('Deine Vorgaben', 'Einmal eingestellt: dein Standardwerte-Set' + (setName ? ' <b>„' + setName + '“</b>' : '') + ', Tilgung, Eigenkapital, Mietausfall, Mindest-DSCR.');
           await warte(4200);
           var karte = [].filter.call(document.querySelectorAll('#settings-modal .swk-karte'), function (k) { return /Lageklassen/.test(k.textContent); })[0];
           if (karte) { karte.click(); await warte(800); }
@@ -650,7 +650,7 @@
           var lk = (qcEl('qc_lageklasse') || {}).value;
           if (lk) {
             await zeige(function () { var e = qcEl('qc_lageklasse'); return e && (e.closest('.field,.f,.fg') || e.parentElement); }, 8);
-            s.zeile('Schon vorbelegt', 'Und die Lage <b>' + lk + '</b> als Vorgabe aus deinem Profil — überschreibbar.');
+            s.zeile('Schon vorbelegt', 'Und die Lage <b>' + lk + '</b> als Vorgabe aus deinem Profil, überschreibbar.');
             await warte(3600);
           }
         },
@@ -664,7 +664,7 @@
           await warte(700);
           ObjectActions._voice.wiedergabe(QC_IMPORT);
           await zeige('#oabi-files', 8);
-          s.zeile('Datenaufnahme', 'Beide auf einmal eingelesen — DealPilot erkennt selbst, was Exposé und was Marktbericht ist.');
+          s.zeile('Datenaufnahme', 'Beide auf einmal eingelesen, DealPilot erkennt selbst, was Exposé und was Marktbericht ist.');
           await warte(3600);
           var kasten = function () {
             return [].filter.call(document.querySelectorAll('#oabi-result div'), function (d) {
@@ -672,13 +672,13 @@
             }).sort(function (x, y) { return x.getBoundingClientRect().height - y.getBoundingClientRect().height; })[0] || null;
           };
           await zeige(kasten, 8);
-          s.zeile('Zwei Adressen?', 'Die PDFs nennen zwei verschiedene Adressen — DealPilot merkt es und fragt, welche gilt.');
+          s.zeile('Zwei Adressen?', 'Die PDFs nennen zwei verschiedene Adressen, DealPilot merkt es und fragt, welche gilt.');
           await warte(3200);
           var r = [].filter.call(document.querySelectorAll('#oabi-result input[type=radio]'), function (x) { return /Exposé/.test(x.parentElement.textContent); })[0];
           if (r) r.click();
           await warte(1300);
           await zeige(function () { return q('#oabi-ov .oabi-body') || q('#oabi-result'); }, 4);
-          s.zeile('Jeder Wert mit Quelle', 'Das Exposé gilt — die Werte der anderen Wohnung bleiben draußen. Jeder Wert mit Quelle, ein Klick übernimmt.');   /* v2236 */
+          s.zeile('Jeder Wert mit Quelle', 'Das Exposé gilt, die Werte der anderen Wohnung bleiben draußen. Jeder Wert mit Quelle, ein Klick übernimmt.');   /* v2236 */
           await warte(4400);
           var ap = q('#oabi-apply'); if (ap) ap.click();
           await warte(1300);
@@ -692,12 +692,12 @@
           await warte(900);
           await zeige(function () { return qcEl('oab-results'); }, 6);
           var mw = _mbAkt.mw, mm = _mbAkt.mm;
-          s.zeile('Marktwertindikation', 'Die Wohnung ist leer — DealPilot schätzt den Markt: Marktwert <b>' + eur(mw.low) + ' – ' + eur(mw.high) + '</b>, Miete <b>' + eur(mm.low) + ' – ' + eur(mm.high) + '</b> kalt.');
+          s.zeile('Marktwertindikation', 'Die Wohnung ist leer, DealPilot schätzt den Markt: Marktwert <b>' + eur(mw.low) + ' – ' + eur(mw.high) + '</b>, Miete <b>' + eur(mm.low) + ' – ' + eur(mm.high) + '</b> kalt.');
           await warte(5200);
         },
         async function (s) {   /* 5 · Spanne Unten -> sofort eine Einschätzung */
           await zeige(function () { return qcSel('.avs-spanne'); }, 8);
-          s.zeile('Die Spanne', 'Ein Klick auf „Unten“ — die vorsichtige Marktmiete geht in die Rechnung …');
+          s.zeile('Die Spanne', 'Ein Klick auf „Unten“, die vorsichtige Marktmiete geht in die Rechnung …');
           await warte(1800);
           var t = qcSel('.avs-spanne [data-spanne="low"]'); if (t) t.click();
           await qcMmFrage(s);   /* v3730 */
@@ -705,7 +705,7 @@
           await zeige(function () { return qcEl('score-block'); }, 4);
           await warte(900);
           var sc = qcScore();
-          s.zeile('Sofort eine Einschätzung', 'Miete <b>' + eur(MB_KARTE.mm.low) + '</b> → Score <b>' + sc.n + '</b> · ' + sc.stufe + ' — „' + sc.urteil + '“.');
+          s.zeile('Sofort eine Einschätzung', 'Miete <b>' + eur(MB_KARTE.mm.low) + '</b> → Score <b>' + sc.n + '</b> · ' + sc.stufe + ': „' + sc.urteil + '“.');
           await warte(4600);
         },
         async function (s) {   /* 6 · Mehr Eigenkapital */
@@ -718,7 +718,7 @@
           await zeige(function () { return qcEl('score-block'); }, 4);
           await warte(900);
           var sc = qcScore();
-          s.zeile('Mehr Eigenkapital', 'Mit 20 % Eigenkapital: Score <b>' + sc.n + '</b> · ' + sc.stufe + ' — „' + sc.urteil + '“.');
+          s.zeile('Mehr Eigenkapital', 'Mit 20 % Eigenkapital: Score <b>' + sc.n + '</b> · ' + sc.stufe + ': „' + sc.urteil + '“.');
           await warte(4600);
         },
         async function (s) {   /* 7 · Gegen deine Lage: B passt, C kippt das Urteil (v2226) */
@@ -732,17 +732,17 @@
           await warte(800);
           await zeige(qcUrteilEl, 10);   /* v3730 */
           var lb = lagesatz();
-          s.zeile('Gegen deine Lage', 'In der <b>B-Lage</b> verlangst du ' + (lb ? lb[3] : '–') + ' — die Wohnung bringt ' + (lb ? lb[1] : '–') + ': „' + qcText('ai-verdict-headline') + '“.');
+          s.zeile('Gegen deine Lage', 'In der <b>B-Lage</b> verlangst du ' + (lb ? lb[3] : '–') + ', die Wohnung bringt ' + (lb ? lb[1] : '–') + ': „' + qcText('ai-verdict-headline') + '“.');
           await warte(5200);
           var lf = function () { var e = qcEl('qc_lageklasse'); return e && (e.closest('.field,.f,.fg') || e.parentElement); };
           await zeige(lf, 8);
-          s.zeile('Gegen deine Lage', 'Dieselbe Wohnung — aber du stufst die Lage als <b>C</b> ein …');
+          s.zeile('Gegen deine Lage', 'Dieselbe Wohnung, aber du stufst die Lage als <b>C</b> ein …');
           await warte(1800);
           qcSetze('qc_lageklasse', 'C');
           await warte(1100);
           await zeige(qcUrteilEl, 10);   /* v3730 */
           var lc = lagesatz();
-          s.zeile('Gegen deine Lage', 'Ganz oben: <b>„' + qcText('ai-verdict-headline') + '“</b>' + (lc ? ' — ' + lc[1] + ' statt deiner ' + lc[3] : '') + '. Der Score bleibt, das Urteil nicht.');
+          s.zeile('Gegen deine Lage', 'Ganz oben: <b>„' + qcText('ai-verdict-headline') + '“</b>' + (lc ? ', ' + lc[1] + ' statt deiner ' + lc[3] : '') + '. Der Score bleibt, das Urteil nicht.');
           await warte(6500);
           await zeige(function () { var n = qcEl('ai-negotiate-v'); return n && (n.closest('.ai-negotiate,.ai-box,div') || n); }, 8);
           var tz = (qcText('ai-negotiate-v').match(/Rechnerisch trägt[^—]*/) || [''])[0].trim();
@@ -762,7 +762,7 @@
           var sc = qcScore();
           /* v3730 · gemessen 18.11.: auch mit „Oben“ bleibt das Urteil in der C-Lage „Nicht kaufen“ - „und auch“ las sich wie ein Ja */
           var cNein = /^Nicht kaufen/.test(sc.urteil);
-          s.zeile('Und wenn die Miete stimmt?', 'Miete ' + eur(MB_KARTE.mm.high) + ': Score <b>' + sc.n + '</b> · ' + sc.stufe + (cNein ? '. In der C-Lage bleibt es bei „' + sc.urteil + '“: die Rendite muss zu deinem Ziel passen.' : ' — und auch in der C-Lage „' + sc.urteil + '“.'));
+          s.zeile('Und wenn die Miete stimmt?', 'Miete ' + eur(MB_KARTE.mm.high) + ': Score <b>' + sc.n + '</b> · ' + sc.stufe + (cNein ? '. In der C-Lage bleibt es bei „' + sc.urteil + '“: die Rendite muss zu deinem Ziel passen.' : ', und auch in der C-Lage „' + sc.urteil + '“.'));
           await warte(5600);
         },
         async function (s) {   /* 8 · Pilot-Analyse (Mitschnitt für genau diesen Stand) */
@@ -775,10 +775,10 @@
           /* v2227 · Marcel: nach „Starker Kauf" kam im Satz direkt „verhandeln" -
              jetzt zeigt die Szene die Brücke: guter Deal, und warum trotzdem */
           await zeige(function () { var n = qcEl('ai-negotiate-v'); return n && (n.parentElement || n); }, 8);
-          s.zeile('Die Pilot-Analyse', 'Ein guter Deal — und der Pilot sagt dir, warum du <b>trotzdem verhandeln</b> solltest: Zins über Marktzins, Hausgeld hoch.');
+          s.zeile('Die Pilot-Analyse', 'Ein guter Deal, und der Pilot sagt dir, warum du <b>trotzdem verhandeln</b> solltest: Zins über Marktzins, Hausgeld hoch.');
           await warte(7500);
           await zeige(function () { return qcEl('ai-card'); }, 6);
-          s.zeile('Die Pilot-Analyse', 'Dazu Pro und Contra und eine Experten-Meinung — gemessen an deiner C-Lage.');
+          s.zeile('Die Pilot-Analyse', 'Dazu Pro und Contra und eine Experten-Meinung, gemessen an deiner C-Lage.');
           await warte(5500);
           _kiFrei = null;
         }
@@ -825,7 +825,7 @@
           await warte(800);
           var m = q('.main-col'); if (m) m.scrollTop = 0;
           await zeige(function () { return qcEl('qc7-sources'); }, 6);
-          s.zeile('Datenaufnahme', 'ImmoMetrica sammelt Inserate aus allen Portalen — deine gespeicherte Suche liegt schon bereit.');
+          s.zeile('Datenaufnahme', 'ImmoMetrica sammelt Inserate aus allen Portalen, deine gespeicherte Suche liegt schon bereit.');
           await warte(3600);
         },
         async function (s) {   /* 2 · ImmoMetrica-Fenster: Suche, Inserat, übernehmen */
@@ -848,7 +848,7 @@
           await warte(900);
           await zeige('#imo-detail', 6);
           var d = IMO_MIT.suche.items[3].dp;
-          s.zeile('Ein Treffer', 'Ein 2,5-Familienhaus in ' + d.ort + ': <b>' + d.einheiten + ' Einheiten</b>, ' + de(d.wfl) + ' m², Baujahr ' + d.baujahr + ', <b>' + eur(d.kp) + '</b> — leer, Straße nicht veröffentlicht.');
+          s.zeile('Ein Treffer', 'Ein 2,5-Familienhaus in ' + d.ort + ': <b>' + d.einheiten + ' Einheiten</b>, ' + de(d.wfl) + ' m², Baujahr ' + d.baujahr + ', <b>' + eur(d.kp) + '</b>, leer, Straße nicht veröffentlicht.');
           await warte(5200);
           var ok = q('#imo-confirm'); if (ok) ok.click();
           await warte(1400);
@@ -856,7 +856,7 @@
         async function (s) {   /* 3 · Ortskern */
           await zeige(function () { return qcGruppe('adr'); }, 6);
           var h = qcText('qc-ortskern-hinweis');
-          s.zeile('Ohne Straße', h ? h.replace(/\.\s*Straße nachtragen.*$/, '') + ' — Straße nachtragen macht es genauer.' : 'Ohne Straße rechnet Quick Boarding mit dem Ortskern.');
+          s.zeile('Ohne Straße', h ? h.replace(/\.\s*Straße nachtragen.*$/, '') + ', Straße nachtragen macht es genauer.' : 'Ohne Straße rechnet Quick Boarding mit dem Ortskern.');
           await warte(4600);
         },
         async function (s) {   /* 4 · DealPilot-Marktbewertung (Mitschnitt) */
@@ -874,7 +874,7 @@
           var stufen = [['low', 'Unten', 'die vorsichtige Miete'], ['mid', 'Ø', 'die mittlere Miete'], ['high', 'Oben', 'die gute Miete']];
           for (var k = 0; k < stufen.length; k++) {
             await zeige(function () { return qcSel('.avs-spanne'); }, 8);
-            s.zeile('Die Spanne', '„' + stufen[k][1] + '“ — ' + stufen[k][2] + ' geht in die Rechnung …');
+            s.zeile('Die Spanne', '„' + stufen[k][1] + '“, ' + stufen[k][2] + ' geht in die Rechnung …');
             await warte(1400);
             var t = qcSel('.avs-spanne [data-spanne="' + stufen[k][0] + '"]'); if (t) t.click();
             await qcMmFrage(k === 0 ? s : null);   /* v3730 */
@@ -882,7 +882,7 @@
             await zeige(function () { return qcEl('score-block'); }, 4);
             await warte(900);
             var sc = qcScore();
-            s.zeile('Die Spanne', stufen[k][1] + ': Miete <b>' + eur(IMO_KARTE.mm[stufen[k][0] === 'mid' ? 'med' : stufen[k][0]]) + '</b> → Score <b>' + sc.n + '</b> · ' + sc.stufe + ' — „' + sc.urteil + '“.');
+            s.zeile('Die Spanne', stufen[k][1] + ': Miete <b>' + eur(IMO_KARTE.mm[stufen[k][0] === 'mid' ? 'med' : stufen[k][0]]) + '</b> → Score <b>' + sc.n + '</b> · ' + sc.stufe + ': „' + sc.urteil + '“.');
             await warte(4200);
           }
         },
@@ -896,10 +896,10 @@
           await zeige(function () { return qcEl('score-block'); }, 4);
           await warte(900);
           var sc = qcScore();
-          s.zeile('Mehr Eigenkapital', 'Score <b>' + sc.n + '</b> · ' + sc.stufe + ' — „' + sc.urteil + '“.');
+          s.zeile('Mehr Eigenkapital', 'Score <b>' + sc.n + '</b> · ' + sc.stufe + ': „' + sc.urteil + '“.');
           await warte(3800);
           await zeige(qcUrteilEl, 10);   /* v3730 */
-          s.zeile('Die Bewertung', 'Unten steht, warum: Rendite, Cashflow, DSCR — und was vor dem Kaufvertrag noch zu prüfen ist.');
+          s.zeile('Die Bewertung', 'Unten steht, warum: Rendite, Cashflow, DSCR, und was vor dem Kaufvertrag noch zu prüfen ist.');
           await warte(5200);
         }
       ],
@@ -945,7 +945,7 @@
           await warteAuf(function () { return q('#oabi-ov #vi-live'); }, 6000);
           await warte(600);
           await zeige(function () { return q('#oabi-ov .oabi-modal'); }, 4);
-          s.zeile('Freisprechen', 'DealPilot hört mit — die Mitschrift läuft, erkannte Werte leuchten grün.');
+          s.zeile('Freisprechen', 'DealPilot hört mit, die Mitschrift läuft, erkannte Werte leuchten grün.');
           /* v2231b · die Mitschrift ist eingeklappt (<details>) - im Video soll
              man mitlesen können, was gesagt wird */
           var det = q('#oabi-ov details.vi-transcript'); if (det) det.open = true;
@@ -959,7 +959,7 @@
           await warteAuf(function () { return q('#oabi-result .oabi-tbl'); }, 10000);
           await warte(700);
           await zeige(function () { return q('#oabi-ov .oabi-body') || q('#oabi-result'); }, 4);
-          s.zeile('Ausgewertet', '<b>' + Object.keys(SPR_FELDER).length + ' Werte</b> aus dem Gesagten — Adresse, Fläche, Lage, Miete, Kaufpreis und Finanzierung.');
+          s.zeile('Ausgewertet', '<b>' + Object.keys(SPR_FELDER).length + ' Werte</b> aus dem Gesagten, Adresse, Fläche, Lage, Miete, Kaufpreis und Finanzierung.');
           await warte(4800);
           var ap = q('#oabi-apply'); if (ap) ap.click();
           await warte(1400);
@@ -969,7 +969,7 @@
           await warteAuf(function () { return /\d/.test(qcText('sb-num')); }, 5000);
           await warte(800);
           var sc = qcScore();
-          s.zeile('Erstes Urteil', 'Mit deiner Miete von <b>' + eur(+SPR_FELDER.nkm) + '</b>: Score <b>' + sc.n + '</b> · ' + sc.stufe + ' — „' + sc.urteil + '“.');
+          s.zeile('Erstes Urteil', 'Mit deiner Miete von <b>' + eur(+SPR_FELDER.nkm) + '</b>: Score <b>' + sc.n + '</b> · ' + sc.stufe + ': „' + sc.urteil + '“.');
           await warte(4800);
         },
         async function (s) {   /* 4 · DealPilot-Marktbewertung */
@@ -980,7 +980,7 @@
           try { qcWin()._oabFeedTrigger(); } catch (e) {}
           await warte(900);
           await zeige(function () { return qcEl('oab-results'); }, 6);
-          s.zeile('Marktbewertung', 'Marktwert <b>' + eur(SPR_KARTE.mw.low) + ' – ' + eur(SPR_KARTE.mw.high) + '</b> — der Kaufpreis liegt darunter. Marktmiete <b>' + eur(SPR_KARTE.mm.low) + ' – ' + eur(SPR_KARTE.mm.high) + '</b>.');
+          s.zeile('Marktbewertung', 'Marktwert <b>' + eur(SPR_KARTE.mw.low) + ' – ' + eur(SPR_KARTE.mw.high) + '</b>, der Kaufpreis liegt darunter. Marktmiete <b>' + eur(SPR_KARTE.mm.low) + ' – ' + eur(SPR_KARTE.mm.high) + '</b>.');
           await warte(5600);
         },
         async function (s) {   /* 5 · Spanne Ø und Oben */
@@ -995,7 +995,7 @@
             await zeige(function () { return qcEl('score-block'); }, 4);
             await warte(900);
             var sc = qcScore();
-            s.zeile('Die Spanne', stufen[k][1] + ': Miete <b>' + eur(SPR_KARTE.mm[stufen[k][2]]) + '</b> → Score <b>' + sc.n + '</b> · ' + sc.stufe + ' — „' + sc.urteil + '“.');
+            s.zeile('Die Spanne', stufen[k][1] + ': Miete <b>' + eur(SPR_KARTE.mm[stufen[k][2]]) + '</b> → Score <b>' + sc.n + '</b> · ' + sc.stufe + ': „' + sc.urteil + '“.');
             await warte(4300);
           }
         },
@@ -1009,7 +1009,7 @@
           await zeige(function () { return qcEl('score-block'); }, 4);
           await warte(900);
           var sc = qcScore();
-          s.zeile('Mehr Eigenkapital', 'Eigenkapital ' + eur(parseFloat(String((qcEl('qc_ek') || {}).value || '0'))) + ': Score <b>' + sc.n + '</b> · ' + sc.stufe + ' — „' + sc.urteil + '“.');
+          s.zeile('Mehr Eigenkapital', 'Eigenkapital ' + eur(parseFloat(String((qcEl('qc_ek') || {}).value || '0'))) + ': Score <b>' + sc.n + '</b> · ' + sc.stufe + ': „' + sc.urteil + '“.');
           await warte(5200);
         }
       ],
@@ -1132,17 +1132,17 @@
         var m = q('.main-col'); if (m) m.scrollTop = 0;
         await warte(600);
         await zeige(function () { return qcEl('qc7-sources'); }, 6);
-        s.zeile('Die Datenaufnahme', 'Oben die Datenaufnahme: <b>fünf Wege</b>, wie ein Objekt in DealPilot kommt — einer reicht.');
+        s.zeile('Die Datenaufnahme', 'Oben die Datenaufnahme: <b>fünf Wege</b>, wie ein Objekt in DealPilot kommt, einer reicht.');
         await warte(4600);
       },
       async function (s) {   /* 2 · Exposé / Marktbericht */
         await zeige(qcTile('expose'), 8);
-        s.zeile('Exposé & Marktbericht', 'PDFs hineinziehen — Exposé, Marktbericht, Mietaufstellung. DealPilot liest jeden Wert <b>mit Quelle</b>.');
+        s.zeile('Exposé & Marktbericht', 'PDFs hineinziehen, Exposé, Marktbericht, Mietaufstellung. DealPilot liest jeden Wert <b>mit Quelle</b>.');
         await warte(5000);
       },
       async function (s) {   /* 3 · Sprache */
         await zeige(qcTile('voice'), 8);
-        s.zeile('Sprache', 'Bei der Besichtigung einfach <b>erzählen</b> — Fläche, Miete, Zustand. DealPilot schreibt mit und füllt die Felder.');
+        s.zeile('Sprache', 'Bei der Besichtigung einfach <b>erzählen</b>, Fläche, Miete, Zustand. DealPilot schreibt mit und füllt die Felder.');
         await warte(5000);
       },
       async function (s) {   /* 4 · ImmoMetrica */
@@ -1152,12 +1152,12 @@
       },
       async function (s) {   /* 5 · DealPilot-Marktbewertung */
         await zeige(qcTile('dpmb'), 8);
-        s.zeile('DealPilot-Marktbewertung', 'Kein Exposé zur Hand? <b>Abrufen</b> — Marktwert und Marktmiete für die Adresse, aus DealPilots eigener Bewertung.');
+        s.zeile('DealPilot-Marktbewertung', 'Kein Exposé zur Hand? <b>Abrufen</b>, Marktwert und Marktmiete für die Adresse, aus DealPilots eigener Bewertung.');
         await warte(5200);
       },
       async function (s) {   /* 6 · Von Hand */
         await zeige(function () { return qcGruppe('obj'); }, 6);
-        s.zeile('Oder von Hand', 'Oder einfach <b>tippen</b> — jedes Feld rechnet sofort mit, Score und Urteil laufen mit.');
+        s.zeile('Oder von Hand', 'Oder einfach <b>tippen</b>, jedes Feld rechnet sofort mit, Score und Urteil laufen mit.');
         await warte(4600);
       },
       QC[2],   /* 7 · Weiter mit den PDFs (Exposé + Marktbericht) */
@@ -1165,7 +1165,7 @@
       async function (s) {   /* 9 · Angebotspreise -> realistischer Wert */
         await zeige(function () { return qcEl('oab-results'); }, 6);
         var ab = _mbAkt.abschlag || {}, pz = String(ab.pct || '').replace('.', ',');
-        s.zeile('Achtung: Angebotspreise', 'Vergleichswerte aus Inseraten sind <b>Angebotspreise</b>. DealPilot zieht deinen Abschlag gleich ab: <b>' + pz + ' %</b>, den aktuellen Marktdurchschnitt — Ø ' + eur(ab.roh && ab.roh.med) + ' → realistisch <b>' + eur(_mbAkt.mw.med) + '</b>.');
+        s.zeile('Achtung: Angebotspreise', 'Vergleichswerte aus Inseraten sind <b>Angebotspreise</b>. DealPilot zieht deinen Abschlag gleich ab: <b>' + pz + ' %</b>, den aktuellen Marktdurchschnitt, Ø ' + eur(ab.roh && ab.roh.med) + ' → realistisch <b>' + eur(_mbAkt.mw.med) + '</b>.');
         await warte(7000);
       },
       async function (s) {   /* 10 · Miete Ø -> erste Einschätzung */
@@ -1178,7 +1178,7 @@
         await zeige(function () { return qcEl('score-block'); }, 4);
         await warte(900);
         var sc = qcScore();
-        s.zeile('Sofort eine Einschätzung', 'Voll finanziert: Score <b>' + sc.n + '</b> · ' + sc.stufe + ' — „' + sc.urteil + '“.');
+        s.zeile('Sofort eine Einschätzung', 'Voll finanziert: Score <b>' + sc.n + '</b> · ' + sc.stufe + ': „' + sc.urteil + '“.');
         await warte(4800);
       },
       QC[5],   /* 11 · Mehr Eigenkapital */
@@ -1193,10 +1193,10 @@
         await zeige(function () { var n = qcEl('ai-negotiate-v'); return n && (n.parentElement || n); }, 8);
         /* v2370 · die Zahlen kamen hier als Text ins Drehbuch - jetzt aus der angezeigten Analyse gelesen (Regel 1) */
         var kiT = qcText('ai-card') || '', kiZiel = /Kaufpreis von ([\d.]+ ?€)/.exec(qcText('ai-negotiate-v') || kiT), kiUnter = /([\d.]+ ?€)[^.\n]{0,20}unter de[rm] (?:geschätzten Marktwert|DealPilot-Marktbewertung)/.exec(kiT);
-        s.zeile('Die Pilot-Analyse', 'Der Pilot bleibt ehrlich: für deine <b>C-Lage</b> zu wenig Rendite' + (kiZiel ? ' — dein Ziel gäbe es erst bei <b>' + kiZiel[1] + '</b>' : '') + '.');
+        s.zeile('Die Pilot-Analyse', 'Der Pilot bleibt ehrlich: für deine <b>C-Lage</b> zu wenig Rendite' + (kiZiel ? ', dein Ziel gäbe es erst bei <b>' + kiZiel[1] + '</b>' : '') + '.');
         await warte(6500);
         await zeige(function () { return qcEl('ai-card'); }, 6);
-        s.zeile('Die Pilot-Analyse', 'Und er sieht mehr: ' + (kiUnter ? '<b>' + kiUnter[1] + ' unter Marktwert</b>' : 'einen Preis <b>unter Marktwert</b>') + ' — als Renditeobjekt nein, als <b>Substanzkauf</b> interessant.');
+        s.zeile('Die Pilot-Analyse', 'Und er sieht mehr: ' + (kiUnter ? '<b>' + kiUnter[1] + ' unter Marktwert</b>' : 'einen Preis <b>unter Marktwert</b>') + ', als Renditeobjekt nein, als <b>Substanzkauf</b> interessant.');
         await warte(5500);
         _kiFrei = null;
       },
@@ -1204,7 +1204,7 @@
          Marktpreisindikation, und die gilt in der App seit v2996 nicht als Wertpuffer. */
       async function (s) {   /* 15 · Als Objekt speichern - gezeigt, nicht geklickt */
         await zeige(function () { var b = qcEl('save-btn'); return b && b.getBoundingClientRect().width ? b : null; }, 12);
-        s.zeile('Als Objekt speichern', 'Passt er zu dir? <b>Ein Klick</b> — als Objekt gespeichert, mit allen Werten, Quellen und der Pilot-Analyse.');
+        s.zeile('Als Objekt speichern', 'Passt er zu dir? <b>Ein Klick</b>, als Objekt gespeichert, mit allen Werten, Quellen und der Pilot-Analyse.');
         await warte(6000);
       }
     ]
@@ -1354,7 +1354,7 @@
         var m = q('.main-col'); if (m) m.scrollTop = 0;
         await warte(600);
         await zeige(function () { return qcGruppe('adr'); }, 6);
-        s.zeile('Weg 1 · Quick Boarding', 'Eine Eigentumswohnung in Herford — die Eckdaten kurz eingetippt.');
+        s.zeile('Weg 1 · Quick Boarding', 'Eine Eigentumswohnung in Herford, die Eckdaten kurz eingetippt.');
         await tippe('qc_str', 'Sachsenstraße', 70); await tippe('qc_hnr', '18'); await tippe('qc_plz', '32052'); await tippe('qc_ort', 'Herford');
         await zeige(function () { return qcGruppe('obj'); }, 6);
         await tippe('qc_objektart', 'ETW'); await tippe('qc_wfl', '100'); await tippe('qc_bj', '1998');
@@ -1909,7 +1909,7 @@
       async function (s) {   /* 3 · Exposé / Marktbericht */
         rhNur(['import']);
         await zeige(rhKachel('import'), 8);
-        s.zeile('Weg 1 · ' + rhNameKachel('import'), 'Kachel anhaken, <b>Abrufen</b> — das Fenster öffnet sich.');
+        s.zeile('Weg 1 · ' + rhNameKachel('import'), 'Kachel anhaken, <b>Abrufen</b>, das Fenster öffnet sich.');
         await warte(2900);
         var r = q('#oab-run'); if (r) r.click();
         await warteAuf(function () { return q('#oabi-ov #oabi-drop'); }, 5000);
@@ -1929,7 +1929,7 @@
       async function (s) {   /* 4 · Sprache */
         rhNur(['voice']);
         await zeige(rhKachel('voice'), 8);
-        s.zeile('Weg 2 · ' + rhNameKachel('voice'), 'Kachel anhaken, <b>Abrufen</b> — das Fenster öffnet sich.');
+        s.zeile('Weg 2 · ' + rhNameKachel('voice'), 'Kachel anhaken, <b>Abrufen</b>, das Fenster öffnet sich.');
         await warte(2900);
         var r = q('#oab-run'); if (r) r.click();
         await warteAuf(function () { return q('#oabi-ov #vi-live'); }, 6000);
@@ -1949,7 +1949,7 @@
       async function (s) {   /* 5 · ImmoMetrica */
         rhNur(['immometrica']);
         await zeige(rhKachel('immometrica'), 8);
-        s.zeile('Weg 3 · ' + rhNameKachel('immometrica'), 'Kachel anhaken, <b>Abrufen</b> — das Fenster öffnet sich.');
+        s.zeile('Weg 3 · ' + rhNameKachel('immometrica'), 'Kachel anhaken, <b>Abrufen</b>, das Fenster öffnet sich.');
         await warte(2900);
         var r = q('#oab-run'); if (r) r.click();
         await warteAuf(function () { return q('#imo-src .imo-pill'); }, 6000);
@@ -1974,7 +1974,7 @@
       async function (s) {   /* 6 · Geführte Eingabe */
         rhNur(['gefuehrt']);
         await zeige(rhKachel('gefuehrt'), 8);
-        s.zeile('Weg 4 · ' + rhNameKachel('gefuehrt'), 'Kachel anhaken, <b>Abrufen</b> — das Fenster öffnet sich.');
+        s.zeile('Weg 4 · ' + rhNameKachel('gefuehrt'), 'Kachel anhaken, <b>Abrufen</b>, das Fenster öffnet sich.');
         await warte(2900);
         var r = q('#oab-run'); if (r) r.click();
         await warteAuf(function () { return q('#oabi-ov #vi-rf-in'); }, 6000);
@@ -2042,7 +2042,7 @@
         await zeige(stufeZeile(1), 8);
         await b2oZeile(s, 'Stufe 1 · Einfach', fehlt(1).length ? 'Noch offen: ' + feldNamen(fehlt(1)).join(', ') + '.'
           : '<b>' + wert('str') + ' ' + wert('hnr') + '</b>, ' + wert('wfl') + ' m², Baujahr ' + wert('baujahr') + ' — <b>bereit</b>.');
-        await rhStufeAbrufen(1, function () { s.zeile('Stufe 1 · Marktpreisindikation', 'Standort, Vergleichspreise, Mieten, Lage — Etappe für Etappe.'); });
+        await rhStufeAbrufen(1, function () { s.zeile('Stufe 1 · Marktpreisindikation', 'Standort, Vergleichspreise, Mieten, Lage, Etappe für Etappe.'); });
       },
       async function (s) {   /* 4 · Ergebnis Stufe 1, Abschlag */
         var k = mbKarteH() || {};
@@ -2067,7 +2067,7 @@
         var l = feldNamen(fehlt(2));
         await b2oZeile(s, 'Stufe 2 · Mittel', 'Dazu <b>' + l.length + ' Angaben</b>: ' + l.join(', ') + '.');
         await zeigeGruppe(feldVon('zimmer'), feldVon('standardstufe'), 8);
-        s.zeile('Stufe 2 · Mittel', 'Eingetippt — Kaufpreis und Miete stehen in den Reitern Investition und Miete.');
+        s.zeile('Stufe 2 · Mittel', 'Eingetippt, Kaufpreis und Miete stehen in den Reitern Investition und Miete.');
         await tippeH('kp', '180000', 40); await tippeH('nkm', '900', 40);
         await tippeH('zimmer', '3'); await tippeH('etage', '1');
         await tippeH('ds2_zustand', 'gut'); await tippeH('ds2_energie', 'C'); await tippeH('standardstufe', '3');
@@ -2110,7 +2110,7 @@
         await zeige(stufeZeile(3), 8);
         await b2oZeile(s, 'Stufe 3 · Ausgiebig', fehlt(3).length ? 'Noch offen: ' + feldNamen(fehlt(3)).join(', ') + '.'
           : 'Grundstück ' + de(zahl('gsfl')) + ' m², Anteil ' + wert('mea') + ' %, BGF ' + wert('bgf') + ' m² — <b>bereit</b>.');
-        await rhStufeAbrufen(3, function () { s.zeile('Stufe 3 · Wertermittlung', 'Bodenwert, Liegenschaftszins, Restnutzungsdauer — nach ImmoWertV.'); });
+        await rhStufeAbrufen(3, function () { s.zeile('Stufe 3 · Wertermittlung', 'Bodenwert, Liegenschaftszins, Restnutzungsdauer, nach ImmoWertV.'); });
       },
       async function (s) {   /* 8 · Ergebnis Stufe 3: Verkehrswert */
         await warteAuf(function () { var w = q('#oe-vw-wahl'); return w && w.options.length >= 2; }, 8000);
@@ -2169,10 +2169,10 @@
         var det = q('#oabi-ov details.vi-transcript'); if (det) det.open = true;
         await warte(500);
         await zeige(function () { return q('#oabi-ov .oabi-modal'); }, 4);
-        s.zeile('Das Fenster hört zu', 'Sprich einfach los — die Mitschrift läuft live mit.');
+        s.zeile('Das Fenster hört zu', 'Sprich einfach los, die Mitschrift läuft live mit.');
         await warteAuf(function () { return _rh && _rh.spr >= 2; }, 20000);
         await zeige(function () { return q('#oabi-ov details.vi-transcript') || q('#oabi-ov .oabi-modal'); }, 6);
-        s.zeile('Eingesprochen', 'Adresse, Fläche, Baujahr, Zimmer, Etage — erkannte Angaben werden grün.');
+        s.zeile('Eingesprochen', 'Adresse, Fläche, Baujahr, Zimmer, Etage, erkannte Angaben werden grün.');
         await warteAuf(function () { return _rh && _rh.spr >= 5 && ((q('#vi-live') || {}).value || '').length >= window.DPM_REIHE_DATEN.sprache.text.join(' ').length; }, 40000);
         await warte(2800);
         var z = rhIm('#oabi-ov', /\d+\s*von\s*\d+\s*Angaben/i), m = z && /(\d+)\s*von\s*(\d+)\s*Angaben/i.exec(z.textContent);
@@ -2220,7 +2220,7 @@
         if (mod) {
           kegelHoch(true);
           await zeige(function () { return q('#dp-mba .k'); }, 8);
-          s.zeile('Stufe 2 läuft', 'Erweiterte Marktpreisindikation — mit allem, was du gerade erzählt hast.');
+          s.zeile('Stufe 2 läuft', 'Erweiterte Marktpreisindikation, mit allem, was du gerade erzählt hast.');
         }
         await warteAuf(function () { return _rh && _rh.berichte.length >= 1 && !q('#dp-mba .k') && mbKarteH() && mbKarteH().stufe === 2; }, 30000);
         kegelHoch(false);
@@ -2872,14 +2872,29 @@
   function r6TaxItem(re) { return [].filter.call(document.querySelectorAll('#s3-tax .tax-item'), function (x) { var l = x.querySelector('.tax-label'); return x.offsetWidth && l && re.test(r6Text(l)); })[0] || null; }
   function r6TaxWert(re) { var i = r6TaxItem(re); return i ? r6Text(i.querySelector('.tax-val')).replace(/\s*▸$/, '') : null; }
   function r6WizTitel() { var h = r6Wiz() && r6Wiz().querySelector('h2,h3'); return h ? r6Text(h) : ''; }
+  var R6_MUSTER = [['auftraggeber_name', 'Max Mustermann'], ['auftraggeber_strasse', 'Musterweg 5'], ['auftraggeber_plz', '32052'], ['auftraggeber_ort', 'Herford'],
+    ['eigentuemer_name', 'Max Mustermann'], ['eigentuemer_strasse', 'Musterweg 5'], ['eigentuemer_plz', '32052'], ['eigentuemer_ort', 'Herford'],
+    ['sv_name', 'Erika Musterfrau'], ['sv_unternehmen', 'Musterbüro'], ['sv_email', 'kontakt@example.com'], ['erstellungsort', 'Herford']];
+  /* Sobald der Assistent ein Feld mit Personendaten zeigt, sofort Musterdaten hinein (vor dem nächsten Bild),
+     nicht erst beim Weiterklicken: sonst ist der vorbelegte Name einen Schritt lang im Bild. */
+  function r6MusterSetzen() {
+    R6_MUSTER.forEach(function (p) {
+      [].forEach.call(document.querySelectorAll('.rnd-wiz-overlay input[data-state="' + p[0] + '"]'), function (x) {
+        if (String(x.value || '') !== p[1]) { x.value = p[1]; x.dispatchEvent(new Event('input', { bubbles: true })); x.dispatchEvent(new Event('change', { bubbles: true })); }
+      });
+    });
+  }
+  /* nur im Videolauf (?messe=), nie in der normalen App */
+  if (/[?&]messe=/.test(location.search)) try { new MutationObserver(function () { if (document.querySelector('.rnd-wiz-overlay')) r6MusterSetzen(); }).observe(document.documentElement, { childList: true, subtree: true }); } catch (e) {}
   async function r6WizWeiter() {
     var w = r6Wiz(); if (!w) return false;
     [].forEach.call(w.querySelectorAll('select'), function (x) { if (x.offsetWidth && !x.value && x.options.length > 1) { x.selectedIndex = 1; x.dispatchEvent(new Event('change', { bubbles: true })); } });
-    /* v3730 · Schritt 2 verlangt die Anschrift des Auftraggebers (sonst „Bitte ergänzen“, der Rechner bleibt stehen).
-       Im Videokonto ist keine hinterlegt: erfundene Musteranschrift, nur wenn das Feld leer ist. */
-    [['auftraggeber_strasse', 'Musterweg 5'], ['auftraggeber_plz', '32052'], ['auftraggeber_ort', 'Herford']].forEach(function (p) {
+    /* v5160v1 · Der Assistent belegt Auftraggeber und Sachverständigen aus den Einstellungen des angemeldeten Kontos vor
+       (deal-action.js). Im Video stand dadurch ein echter Name mit Anschrift im Bild. Im Video IMMER Musterdaten,
+       auch wenn das Feld schon gefüllt ist. */
+    R6_MUSTER.forEach(function (p) {
       var x = w.querySelector('input[data-state="' + p[0] + '"]');
-      if (x && x.offsetWidth && !String(x.value || '').trim()) { x.value = p[1]; x.dispatchEvent(new Event('input', { bubbles: true })); x.dispatchEvent(new Event('change', { bubbles: true })); }
+      if (x && String(x.value || '') !== p[1]) { x.value = p[1]; x.dispatchEvent(new Event('input', { bubbles: true })); x.dispatchEvent(new Event('change', { bubbles: true })); }
     });
     var b = [].filter.call(w.querySelectorAll('button'), function (x) { return x.offsetWidth && /Weiter|Berechnen/.test(x.textContent); }).slice(-1)[0];
     if (!b) return false;
@@ -2961,7 +2976,7 @@
         var e = rhIm(r6Wiz(), /^AfA-Vergleich$/i); if (e) e.scrollIntoView({ block: 'start' });
         await warte(500);
         await zeige(function () { var x = rhIm(r6Wiz(), /^AfA-Vergleich$/i); return x && (x.closest('table') || x.parentElement); }, 8);
-        await b2oZeile(s, 'Was das Gutachten bringt', 'AfA <b>' + (red ? red[1] : '–') + '</b> statt 2 %: ' + (mehr ? mehr[1] : '–') + ' AfA und ' + (spar ? spar[1] : '–') + ' weniger Steuer im Jahr. Netto-Vorteil über die Restnutzungsdauer: <b>' + (net ? net[1] : '–') + '</b>.');
+        await b2oZeile(s, 'Was das Gutachten bringt', 'AfA <b>' + (red ? red[1] : '–') + '</b> statt 2 %: ' + (mehr ? mehr[1] : '–') + ' AfA und ' + (spar ? spar[1] : '–') + ' weniger Steuer im Jahr. Netto-Vorteil als Barwert bis zum Verkauf: <b>' + (net ? net[1] : '–') + '</b>.');
       },
       async function (s) {   /* 8 · Anfrage: nur zeigen (NIE klicken) */
         /* v3272 · ohne Gutachten-Anfrage (Marcel 09.11.2026: ohne Sachverständigen; der Knopf „Anfrage senden“ steht nicht mehr im Rechner) */
@@ -3763,7 +3778,7 @@
         await stufeWaehlen(2);
         await zeige(stufeZeile(2), 8);
         await b2oZeile(s, 'Marktbewertung · Stufe 2', 'Mit Kaufpreis und Miete: <b>bereit</b>. Ein Klick — DealPilot holt Lage, Vergleichspreise und Mieten.');
-        await rhStufeAbrufen(2, function () { s.zeile('Marktbewertung · Stufe 2', 'Standort, Vergleichsdaten, Bodenrichtwert — Schritt für Schritt.'); });
+        await rhStufeAbrufen(2, function () { s.zeile('Marktbewertung · Stufe 2', 'Standort, Vergleichsdaten, Bodenrichtwert, Schritt für Schritt.'); });
         var k = mbKarteH() || {};
         if (m) m.scrollTop = 0;
         await zeige(function () { return q('#avsec'); }, 8);
@@ -4303,7 +4318,7 @@
         var m = q('.main-col'); if (m) m.scrollTop = 0;
         await zeige(stufeZeile(3), 8);
         await warte(900);   /* v2273i: Zeile „Jetzt abrufen“ gestrichen (Länge) - die Etappen erklären es */
-        await rhStufeAbrufen(3, function () { s.zeile('Stufe 3 · Wertermittlung', 'Bodenwert, Liegenschaftszins, Ertrags- und Sachwert — Schritt für Schritt.'); });
+        await rhStufeAbrufen(3, function () { s.zeile('Stufe 3 · Wertermittlung', 'Bodenwert, Liegenschaftszins, Ertrags- und Sachwert, Schritt für Schritt.'); });
         await warteAuf(function () { var w = q('#oe-vw-wahl'); return w && w.options.length >= 1; }, 8000);
         await warteAuf(function () { var v = q('#oe-vw'); return v && v.offsetHeight > 20; }, 6000);   /* Prüflauf 16: Kegel 69 % */
         await zeige(function () { return q('#oe-vw'); }, 10);
@@ -5084,7 +5099,7 @@
   function r21T(sel) { return r6Inner(r21(sel)).replace(/\s+/g, ' '); }
   function r21Zu() { try { if (typeof setMainView === 'function') setMainView('single'); } catch (e) {} }
   DREHBUECHER['reihe-cockpit'] = {
-    titel: 'Portfolio-Cockpit und Pilot', unterzeile: 'Alle Objekte auf einer Seite — und ein Pilot, der sie kennt', objekt: null,
+    titel: 'Portfolio-Cockpit und Baukasten', unterzeile: 'Alle Objekte auf einer Seite, jedes als Karte', objekt: null,
     abspann: [{ ms: 6200, html: ABSPANN_LOGO }],
     /* v3730 · gemessen 18.11.: das Cockpit hat einen Umschalter Einfach | Genau (v2951, Merker dp_cockpit_ansicht, Vorgabe
        Einfach). In Einfach fehlen die Abschnitte Kennzahlen, Zielbild und Steuer - Szenen 4-6 standen ohne Kegel und mit „–“.
@@ -5774,7 +5789,7 @@
       },
       async function (s) {   /* 11 · die Übersicht */
         await zeige(r25Uebersicht, 8);
-        s.zeile('Zur Übersicht', 'Ein Klick — und alles steht in einer Tabelle.');
+        s.zeile('Zur Übersicht', 'Ein Klick, und alles steht in einer Tabelle.');
         await warte(2600);
         var u = r25Uebersicht(); if (u) u.click();
         await warteAuf(function () { return q('#oabi-ov #oabi-result tr'); }, 6000);
@@ -5801,7 +5816,7 @@
           await warte(1400);
         }
         await zeige(function () { return q('#oabi-apply'); }, 8);
-        s.zeile('Übernehmen', '<b>' + (((q('#oabi-apply') || {}).textContent || 'Übernehmen').trim()) + '</b> — die Werte gehen ins Objekt.');
+        s.zeile('Übernehmen', '<b>' + (((q('#oabi-apply') || {}).textContent || 'Übernehmen').trim()) + '</b>, die Werte gehen ins Objekt.');
         await warte(3200);
         var ap = q('#oabi-apply'); if (ap) ap.click();
         kegelHoch(false);
@@ -7275,7 +7290,7 @@
           fehlt3 && fehlt3.length ? 'Für Stufe drei fehlen noch: ' + feldNamen(fehlt3) + '.' : 'Die Liste ist leer: alle Angaben für die amtliche Wertermittlung sind da. Wir rufen den Marktbericht in Stufe drei ab.', null,
           { was: 'Ein Klick auf „Abrufen“ in Stufe 3.', warum: 'Stufe 3 rechnet nach den Verfahren der ImmoWertV.', folge: 'Marktwert, Ertragswert und Sachwert mit Rechenweg.' });
         kegelHoch(true);
-        await rhStufeAbrufen(3, function () { s.zeile('Der Bericht entsteht', 'Standort, Vergleichsdaten, Bodenrichtwert, Liegenschaftszins — Schritt für Schritt.'); kmMerke('Der Bericht entsteht: DealPilot ermittelt den Standort, lädt Vergleichsdaten und Strukturdaten, den Bodenrichtwert und den Liegenschaftszins des zuständigen Gutachterausschusses.'); });
+        await rhStufeAbrufen(3, function () { s.zeile('Der Bericht entsteht', 'Standort, Vergleichsdaten, Bodenrichtwert, Liegenschaftszins, Schritt für Schritt.'); kmMerke('Der Bericht entsteht: DealPilot ermittelt den Standort, lädt Vergleichsdaten und Strukturdaten, den Bodenrichtwert und den Liegenschaftszins des zuständigen Gutachterausschusses.'); });
         kegelHoch(false);
         kmRefPruefen();
         await kmPause(1500);
@@ -7895,7 +7910,7 @@
             { was: 'Nichts.', warum: 'Ein Haus ist die Summe seiner Wohnungen.', folge: 'Die Einheiten-Erfassung öffnet sich gleich.' });
         }
         await zeige(function () { return q('#oabi-apply'); }, 10);
-        s.zeile('Ausgewählte übernehmen', 'Ein Klick — und alles Ausgewählte steht im Objekt.'); kmMerke('Ein Klick auf Ausgewählte übernehmen …');
+        s.zeile('Ausgewählte übernehmen', 'Ein Klick, und alles Ausgewählte steht im Objekt.'); kmMerke('Ein Klick auf Ausgewählte übernehmen …');
         kmTafel({ was: 'Ein Klick auf „Ausgewählte übernehmen“.', warum: 'Du entscheidest, was ins Objekt geht.', folge: 'Felder, Risiken und These stehen im Objekt.' });
         await kmPause(2200);
         var ap = q('#oabi-apply'); if (ap) ap.click();
@@ -8223,7 +8238,7 @@
     }
     var ueb2 = luReiter(/^Übernahme/)(); if (ueb2) ueb2.click(); await warte(600);
     await zeige(function () { return q('#oabi-apply'); }, 10);
-    s.zeile('Ausgewählte übernehmen', 'Ein Klick — und alles Ausgewählte steht im Objekt.'); kmMerke('Ein Klick auf Ausgewählte übernehmen …');
+    s.zeile('Ausgewählte übernehmen', 'Ein Klick, und alles Ausgewählte steht im Objekt.'); kmMerke('Ein Klick auf Ausgewählte übernehmen …');
     kmTafel({ was: 'Ein Klick auf „Ausgewählte übernehmen“.', warum: 'Du entscheidest, was ins Objekt geht.', folge: 'Felder, Einheiten, Risiken und These stehen im Objekt.' });
     await kmPause(2200);
     var ap = q('#oabi-apply'); if (ap) ap.click();
@@ -8254,7 +8269,7 @@
     reiter('s5'); await warte(900);
     var ab = function () { return qs('#ai-btn'); };
     await zeige(ab, 10);
-    s.zeile('Pilot-Analyse', 'Ein Klick — die Analyse liest jetzt auch die <b>Unterlagen</b>.'); kmMerke('Jetzt die Pilot-Analyse. Sie bekommt die Auswertung der Unterlagen mit — Risiken, Beschlüsse, Rücklage — und bezieht sie in ihr Urteil ein.');
+    s.zeile('Pilot-Analyse', 'Ein Klick, die Analyse liest jetzt auch die <b>Unterlagen</b>.'); kmMerke('Jetzt die Pilot-Analyse. Sie bekommt die Auswertung der Unterlagen mit, Risiken, Beschlüsse, Rücklage, und bezieht sie in ihr Urteil ein.');
     kmTafel({ was: 'Ein Klick auf „Pilot-Analyse“.', warum: 'Die Analyse soll kennen, was in den Unterlagen steht.', folge: 'Ein eigener Reiter „Unterlagen & WEG“.' });
     var t0 = Date.now(), soll = kmDauer('Pilot-Analyse', 'Ein Klick — die Analyse liest jetzt auch die Unterlagen.', 'Jetzt die Pilot-Analyse. Sie bekommt die Auswertung der Unterlagen mit — Risiken, Beschlüsse, Rücklage — und bezieht sie in ihr Urteil ein.') * TEMPO;
     await kmPause(1800);
@@ -8381,7 +8396,7 @@
         { was: 'Nichts — prüfen.', warum: 'Hausverwaltung, nicht umlagefähige Kosten und Erhaltung sind Werbungskosten.', folge: 'Sie landen im Steuer-Reiter des Jahres.' });
     }
     await zeige(function () { return q('#oabi-apply'); }, 10);
-    s.zeile('Übernehmen', 'Ausgewählte übernehmen — die Auswertung wird ergänzt.'); kmMerke(null);
+    s.zeile('Übernehmen', 'Ausgewählte übernehmen, die Auswertung wird ergänzt.'); kmMerke(null);
     await kmPause(2000);
     var ap = q('#oabi-apply'); if (ap) ap.click();
     await warte(1500);
@@ -8708,7 +8723,7 @@
         var lf = function () { var e = qcEl('qc_lageklasse'); return e && (e.closest('.field,.f,.fg') || e.parentElement); };
         await qcHole(lf());
         await zeige(lf, 8);
-        s.zeile('Gegen deine Lage', 'Dieselbe Wohnung — aber du stufst die Lage als <b>C</b> ein …');
+        s.zeile('Gegen deine Lage', 'Dieselbe Wohnung, aber du stufst die Lage als <b>C</b> ein …');
         await warte(2200);
         qcSetze('qc_lageklasse', 'C');
         await warte(1400);
@@ -8785,7 +8800,7 @@
       await b2oZeile(s, UL_DATEIEN.length + ' Dateien', 'Exposé, Mietaufstellung, Grundbuch, Teilungserklärung, Energieausweis, zwei Protokolle, Wirtschaftsplan, Baulasten, Marktbericht und <b>drei Mietverträge</b>.');
       await ulLesen(s, UL_DATEIEN.length);
     } else {
-      s.zeile('Erneut einlesen', 'Dieselben ' + UL_DATEIEN.length + ' Dateien — jetzt mit Detailgrad <b>Experte</b>.');
+      s.zeile('Erneut einlesen', 'Dieselben ' + UL_DATEIEN.length + ' Dateien, jetzt mit Detailgrad <b>Experte</b>.');
       var t0 = Date.now(); while (!kuFertig(UL_DATEIEN.length) && Date.now() - t0 < 5 * 60 * 1000) await warte(400);
     }
   }
@@ -9046,7 +9061,7 @@
         kuEinlegen(QG_DATEIEN, _qg.bl);
         await warteAuf(function () { return luDateiZeilen().length >= QG_DATEIEN.length; }, 8000);
         await zeige(function () { return q('#oabi-files'); }, 8);
-        s.zeile('DealPilot liest', 'Jede Datei für sich — die <b>Art</b> erkennt DealPilot selbst.');
+        s.zeile('DealPilot liest', 'Jede Datei für sich, die <b>Art</b> erkennt DealPilot selbst.');
         var t0 = Date.now(); while (!kuFertig(QG_DATEIEN.length) && Date.now() - t0 < 90000) await warte(400);
         await warte(Math.max(0, lies('DealPilot liest', 'Jede Datei für sich — die Art erkennt DealPilot selbst.') - (Date.now() - t0)));
         var arten = luDateiZeilen().map(luArt).filter(Boolean);
@@ -9233,7 +9248,7 @@
         var t1 = Date.now();
         try { _r19.wahl = localStorage.getItem('dp_pdf_wahl'); localStorage.removeItem('dp_pdf_wahl'); } catch (e) {}
         await zeige(function () { return qs('.sb-act-item[onclick*="bank"]') || qs('[onclick*="exportPDFBank"]') || q('nav.tabs'); }, 8);
-        s.zeile('Das Bank-PDF', 'Ein Klick — die <b>Bankfassung</b> mit allen Kennzahlen.');
+        s.zeile('Das Bank-PDF', 'Ein Klick, die <b>Bankfassung</b> mit allen Kennzahlen.');
         var bank = await kmBankPdf();
         DPM_QG.pdf = bank ? { bytes: bank.size, seiten: _r19.seiten } : null;
         if (bank) {
@@ -9305,7 +9320,7 @@
         if (gf()) {
           r6BmfOben(gf()); await warte(500);
           await zeige(function () { var e = gf(); return e && (e.closest('label') || e); }, 8);
-          s.zeile('Die Begründung', 'Die Abweichung wird begründet — der Satz steht im <b>Text für den Steuerberater</b>.');
+          s.zeile('Die Begründung', 'Die Abweichung wird begründet, der Satz steht im <b>Text für den Steuerberater</b>.');
           var GR = 'Bodenwert nach Lage und Grundstückszuschnitt unter dem Richtwert, Gebäudeanteil nach Sachwertverfahren.';
           var ge = gf(); ge.value = '';
           for (var gi = 1; gi <= GR.length; gi++) { ge.value = GR.slice(0, gi); if (gi % 4 === 0 || gi === GR.length) ge.dispatchEvent(new Event('input', { bubbles: true })); await warte(45); }
@@ -9336,7 +9351,7 @@
         for (var i = 0; i < 4 && !/Schritt 5/.test(r6WizTitel()); i++) { if (!(await r6WizWeiter())) break; await warte(700); }
         var M = { dach: '10 - 20 Jahre', fenster: '10 - 20 Jahre', leitungen: '10 - 20 Jahre', heizung: '10 - 20 Jahre', baeder: '5 - 10 Jahre' };
         await zeige(function () { var w = r6Wiz(); return w && (w.querySelector('.rnd-wiz-mod-list') || w.querySelector('.rnd-wiz-modal')); }, 6);
-        s.zeile('Restnutzungsdauer', 'Heizung, Dach, Leitungen, Fenster, Bäder — was modernisiert ist.');
+        s.zeile('Restnutzungsdauer', 'Heizung, Dach, Leitungen, Fenster, Bäder, was modernisiert ist.');
         for (var k in M) { var r = q('.rnd-wiz-overlay input[name="mod_' + k + '"][value="' + M[k] + '"]'); if (r) { r.closest('label').click(); await warte(520); } }
         await warte(1400);
         for (var j = 0; j < 4 && !/Schritt 8 von 8/.test(r6WizTitel()); j++) { if (!(await r6WizWeiter())) break; await warte(800); }
@@ -10817,7 +10832,7 @@
       async function (s) {   /* 2 · Übersicht */
         await l6Tab(/^Übersicht/);
         await zeige(function () { var e = qs('#s5 [data-dp-ekr]'); return (e && e.parentNode) || k5Karte(/führend/)(); }, 8);
-        await b2oZeile(s, 'Übersicht', 'Kaufpreis, maßgebender Wert mit führendem Verfahren, DSCR, Cashflow und EK-Rendite auf einen Blick.');
+        await b2oZeile(s, 'Übersicht', 'Kaufpreis, Verkehrswert, DSCR, Cashflow und EK-Rendite auf einen Blick.');
       },
       async function (s) {   /* 3 · Ankauf · Bestand · Zielbild */
         await l6Tab(/Ankauf · Bestand/);
@@ -11050,7 +11065,7 @@
         l6Modus(/^Einfach$/); await warte(700);
         await l6Tab(/^Übersicht/);
         await zeige(function () { var e = qs('#s5 [data-dp-ekr]'); return (e && k5Eng(e, 260)) || l6Karte(/führend|Kaufpreis/)(); }, 8);
-        await b2oZeile(s, 'Die Übersicht', 'Kaufpreis, maßgebender Wert mit führendem Verfahren, DSCR, Cashflow und EK-Rendite. Dazu der Investor Deal Score in zwei Teilen.');
+        await b2oZeile(s, 'Die Übersicht', 'Kaufpreis, Verkehrswert, DSCR, Cashflow und EK-Rendite. Dazu der Investor Deal Score in zwei Teilen.');
       },
       async function (s) {   /* 2 · Ankauf · Soll · Zielbild */
         await l6Tab(/Ankauf · Soll|Ankauf · Bestand/);
