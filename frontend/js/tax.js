@@ -1321,7 +1321,11 @@ function renderTaxTimeline() {
     }
     /* v3257 · im Reiter Steuer ist das Diagramm einklappbar, standardmäßig zu (steuer-verlauf.js) */
     if (_stvH) _stvH.setAttribute('data-dp-stv-klappbar', '1');
-    if (_stvH && window.DpSteuerVerlauf) window.DpSteuerVerlauf.mount(_stvH);
+    /* v5120 GG6 · Marcel 26.11.2026: EINE Grafik im Reiter Steuer. Ist die Cockpit-Grafik frei, zeigt sie alles (Säulen je Jahr,
+       Wendepunkt, Zinsbindung, § 23, Summen) und der alte Steuerverlauf bleibt leer. Sonst wie bisher. */
+    var _gxFrei = !!(window.DpGrafikenPremium && DpGrafikenPremium.steuerVerlauf && DpGrafikenPremium.frei && DpGrafikenPremium.frei());
+    if (_stvH && _gxFrei) { _stvH.innerHTML = ''; _stvH.style.display = 'none'; }
+    else if (_stvH && window.DpSteuerVerlauf) { _stvH.style.display = ''; window.DpSteuerVerlauf.mount(_stvH); }
     /* v4570 · Marcel 24.11.2026: „im Objektcockpit unter Steuer haben wir ein Diagramm Verlauf mit Steuern. Vielleicht können
        wir dieses nehmen und auch im Tab Steuern reinpacken … einheitlich“. Dieselbe Karte (grafiken-premium.js, State.cfRows)
        über dem Steuerverlauf. Gemessen Westerfeldstr. 146: alle 20 Jahre Ergebnis V+V und Erstattung/Steuer gleich wie hier
@@ -1329,7 +1333,7 @@ function renderTaxTimeline() {
     if (_stvH && _stvH.parentNode && window.DpGrafikenPremium && DpGrafikenPremium.steuerVerlauf && DpGrafikenPremium.frei && DpGrafikenPremium.frei()) {
       var _gxS = document.getElementById('tax-gx-verlauf');
       if (!_gxS) { _gxS = document.createElement('div'); _gxS.id = 'tax-gx-verlauf'; _gxS.style.margin = '0 0 16px'; _stvH.parentNode.insertBefore(_gxS, _stvH); }
-      DpGrafikenPremium.steuerVerlauf(_gxS);
+      DpGrafikenPremium.steuerVerlauf(_gxS, { voll: true });
     }
   } catch (_stvE) {}
   // Render as visual timeline

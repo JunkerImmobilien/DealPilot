@@ -154,7 +154,8 @@
       '@media (max-width:700px){.dp-gx .gx-seite{grid-template-columns:repeat(2,minmax(0,1fr))}}',
       '.dp-gx .gx-seite>div{border:1px solid ' + F.linie + ';border-radius:10px;padding:10px 12px;min-width:0}',
       '.dp-gx .gx-seite span{display:block;font:500 9.5px "JetBrains Mono",monospace;letter-spacing:.12em;text-transform:uppercase;color:' + F.tinte3 + '}',
-      '.dp-gx .gx-seite b{display:block;font:600 24px/1.15 "Space Grotesk",Inter,sans-serif;letter-spacing:-.02em;color:' + F.tinte + ';margin:4px 0 2px}',
+      '.dp-gx .gx-seite b{display:block;font:600 24px/1.15 "Space Grotesk",Inter,sans-serif;letter-spacing:-.02em;color:' + F.tinte + ';margin:4px 0 2px;white-space:nowrap}',
+      '@media (max-width:480px){.dp-gx .gx-seite b{font-size:19px}}',   /* v5120 GG6 · „+4.059 €“ brach am Handy um */
       '.dp-gx .gx-seite small{display:block;font:400 11px/1.35 Inter,sans-serif;color:' + F.tinte2 + '}',
       '.dp-gx-reihe{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:16px;margin:0 0 16px}',
       '.dp-gx-reihe>.dp-gx{margin:0!important}',
@@ -280,6 +281,7 @@
     var BAENDER = d.baender || (d.band ? [d.band] : []);   /* v4310 · mehrere Bänder, je mit eigener Farbe (band.farbe) */
     BAENDER.forEach(function (bd) { bd.lo.concat(bd.hi).forEach(function (v) { if (v != null && isFinite(v)) alle.push(v); }); });
     (d.streu || []).forEach(function (q) { if (q.v != null && isFinite(q.v)) alle.push(q.v); });
+    if (d.saeulen) d.saeulen.werte.forEach(function (v) { if (v != null && isFinite(v)) alle.push(v); });   /* v5120 GG6 · Säulen je Jahr (Steuerwirkung) */
     /* v4570 · o.yFrei: Achse um die Werte statt ab null (Index um 100), d.xText: eigene Beschriftung je Punkt (Berichtsdatum) */
     var aMin = Math.min.apply(null, alle), aMax = Math.max.apply(null, alle), aPad = Math.max(4, (aMax - aMin) * 0.18);
     var tk = o.yFrei ? ticks(aMin - aPad, aMax + aPad, 4) : ticks(Math.min(0, aMin), Math.max(0, aMax), 4), y0 = tk[0], y1 = tk[tk.length - 1];
@@ -289,6 +291,9 @@
     if (y0 < 0) out.push('<line x1="' + m.l + '" x2="' + (W - m.r) + '" y1="' + f1(ys(0)) + '" y2="' + f1(ys(0)) + '" style="stroke:' + F.linie2 + ';stroke-width:1.2"/>');
     var schritt = Math.max(1, Math.ceil(n / Math.max(2, Math.floor((W - m.l - m.r) / (d.xText ? (W < 560 ? 70 : 96) : 52)))));
     X.forEach(function (j, i) { if (i % schritt === 0 || (i === n - 1 && (n - 1) % schritt >= schritt / 2)) out.push('<text class="gx-ax" x="' + f1(xs(j)) + '" y="' + (H - 6) + '" text-anchor="' + (d.xText ? (i === 0 ? 'start' : i === n - 1 ? 'end' : 'middle') : 'middle') + '"' + (j === d.heute ? ' style="fill:' + F.goldH + '"' : '') + '>' + esc(d.xText ? d.xText[i] : j) + '</text>'); });
+    if (d.saeulen) { var sbw = Math.min(16, (W - m.l - m.r) / Math.max(1, n - 1) * 0.5);
+      d.saeulen.werte.forEach(function (v, i) { if (v == null || !isFinite(v) || Math.abs(v) < 0.5) return; var ya = ys(Math.max(0, v)), yb = ys(Math.min(0, v));
+        out.push('<rect class="gx-fade" x="' + f1(xs(X[i]) - sbw / 2) + '" y="' + f1(ya) + '" width="' + f1(sbw) + '" height="' + f1(Math.max(1, yb - ya)) + '" rx="2" style="fill:' + d.saeulen.farbe(v) + ';opacity:.55"/>'); }); }
     BAENDER.forEach(function (bd) {
       var pts = X.map(function (j, i) { return bd.hi[i] == null ? null : f1(xs(j)) + ',' + f1(ys(bd.hi[i])); }).filter(Boolean)
         .concat(X.slice().reverse().map(function (j, k) { var i = n - 1 - k; return bd.lo[i] == null ? null : f1(xs(j)) + ',' + f1(ys(bd.lo[i])); }).filter(Boolean));
@@ -307,19 +312,21 @@
     /* v4740 · Markenbeschriftungen kollisionsfrei: jede Marke bekommt die erste Zeile, in der sie keine schon gesetzte
        überdeckt (Breite geschätzt 6,9 px je Zeichen bei 11 px Mono), Zeilenabstand 16 statt 14. Gemessen bis v4739 bei
        340 px: „ab hier Steuer“, „nach Steuer im Plus“ und „Ende Zinsbindung“ lagen übereinander (Textbox 15 px hoch). */
-    var mkBel = [];
+    var mkBel = [], mkUnten = W < 560 ? [] : null;   /* v5120 GG6 · am Handy Markentexte unter der Grafik statt übereinander */
     (d.marken || []).forEach(function (mk) { if (mk.j < X[0] || mk.j > X[n - 1]) return; var x = xs(mk.j);
       var bw = String(mk.text || '').length * 6.9, ende = x > W - 140, tx = ende ? Math.min(x - 5, W - m.r - 4) : Math.min(x + 5, W - m.r - 4 - bw);
       var lo = ende ? tx - bw : tx, hi = ende ? tx : tx + bw, z = 0;
       while (mkBel.some(function (b) { return b.z === z && lo < b.hi + 6 && b.lo - 6 < hi; }) && z < 6) z++;
       mkBel.push({ z: z, lo: lo, hi: hi });
+      if (mkUnten) { mkUnten.push(mk); out.push('<line x1="' + f1(x) + '" x2="' + f1(x) + '" y1="' + m.t + '" y2="' + (H - m.b) + '" style="stroke:' + (mk.farbe || F.gold) + ';stroke-dasharray:3 3;opacity:.8"/>'); return; }
       out.push('<line x1="' + f1(x) + '" x2="' + f1(x) + '" y1="' + m.t + '" y2="' + (H - m.b) + '" style="stroke:' + (mk.farbe || F.gold) + ';stroke-dasharray:3 3;opacity:.8"/><text class="gx-ax" x="' + f1(tx) + '" y="' + (m.t + 26 + z * 16) + '" text-anchor="' + (ende ? 'end' : 'start') + '" style="fill:' + (mk.farbe || F.goldH) + '">' + esc(mk.text) + '</text>'); });
     /* Treffer je Jahr */
     var dx = (W - m.l - m.r) / Math.max(1, n - 1);
     X.forEach(function (j, i) { if (!d.tip) return; out.push('<rect x="' + f1(xs(j) - dx / 2) + '" y="' + m.t + '" width="' + f1(dx) + '" height="' + (H - m.t - m.b) + '" style="fill:transparent"' + tipA(d.tip(i, j)) + '/>'); });
     (d.streu || []).forEach(function (q) { if (q.v == null || !q.tip || q.j < X[0] || q.j > X[n - 1]) return; out.push('<circle cx="' + f1(xs(q.j)) + '" cy="' + f1(ys(q.v)) + '" r="12" style="fill:transparent"' + tipA(q.tip) + '/>'); });
     out.push('</svg>');
-    host.innerHTML = out.join('') + (d.legende ? legende(d.legende) : '');
+    host.innerHTML = out.join('') + (d.legende ? legende(d.legende) : '')
+      + (mkUnten && mkUnten.length ? '<div class="gx-leg gx-marken">' + mkUnten.map(function (mk) { return '<span><i style="background:' + (mk.farbe || F.gold) + ';width:2px;height:12px;border-radius:0"></i>' + esc(String(Math.floor(mk.j)) + ' ' + mk.text) + '</span>'; }).join('') + '</div>' : '');
     ziehen(host);
     return host;
   }
@@ -866,7 +873,11 @@
     var J = P.J, r = J.filter(function (x) { return x.j >= P.heute && x.steuer > 0.5 && x.vuv > 0; })[0];
     return r ? { j: r.j, vuv: r.vuv, steuer: r.steuer } : null;
   }
-  function karteVerlaufSteuer(k, w, P) {
+  function karteVerlaufSteuer(k, w, P, opt) {
+    /* v5120 GG6 · Marcel 26.11.2026 („wenn es sinnvoll ist, gerne“): im Reiter Steuer EINE Grafik statt zwei. opt.voll ergänzt
+       Säulen der Steuerwirkung je Jahr (grün = Steuer sinkt, rot = Steuer kostet), die Marke § 23 und die Summen bis bzw. ab
+       Wendepunkt (vorher steuer-verlauf.js). Cockpit und Pilot-Analyse rufen ohne opt und bleiben wie bisher. */
+    opt = opt || {};
     var J = P.J, X = J.map(function (r) { return r.j; }), nach = J.filter(function (r) { return r.j > P.heute && r.cfns > 0; })[0], vor = J.filter(function (r) { return r.j > P.heute && r.cfop > 0; })[0];
     var be = steuerBreakEven(P), ende = J[J.length - 1], zb = J.filter(function (r) { return r.j === P.bindEnde; })[0];
     var titel = be ? 'Ab ' + be.j + ' zahlst du Steuer auf das Objekt' + (nach ? ', nach Steuer im Plus ab ' + nach.j : '') : (nach ? 'Nach Steuer im Plus ab ' + nach.j + (vor && vor.j !== nach.j ? ', vor Steuer ab ' + vor.j : '') : 'In den nächsten Jahren hilft die Steuer, den Cashflow zu tragen');
@@ -878,18 +889,24 @@
     if (be) marken.push({ j: be.j, text: 'ab hier Steuer', farbe: F.rot, zeile: 0 });
     if (nach && (!be || nach.j !== be.j)) marken.push({ j: nach.j, text: 'nach Steuer im Plus', farbe: F.gruen, zeile: 1 });
     if (zb && P.bindEnde > P.heute) marken.push({ j: P.bindEnde, text: 'Ende Zinsbindung', farbe: F.goldD, zeile: 2 });
-    verlauf(ziel, { x: X, heute: P.heute,
+    var frei23 = (opt.voll && P.privat && P.kaufJ) ? P.kaufJ + 10 : null;
+    if (frei23 && frei23 >= X[0] && frei23 <= X[X.length - 1]) marken.push({ j: frei23, text: 'Verkauf steuerfrei ab ' + String(P.kaufM || 1).padStart(2, '0') + '/' + frei23, farbe: F.tinte3, zeile: 3 });
+    var wirk = J.map(function (r) { return (r.cfns != null && r.cfop != null) ? r.cfns - r.cfop : null; });
+    verlauf(ziel, { x: X, heute: P.heute, saeulen: opt.voll ? { werte: wirk, farbe: function (v) { return v >= 0 ? F.gruen : F.rot; } } : null,
       /* v4310 · Marcel 24.11.2026: Farbschema wie Bewertung. Steuerwirkung grün, wo die Steuer Geld bringt, rot, wo sie Geld kostet */
       baender: [{ ohneRand: true, farbe: 'color-mix(in srgb,' + F.gruen + ' 16%,transparent)', lo: J.map(function (r) { return r.cfns >= r.cfop ? r.cfop : null; }), hi: J.map(function (r) { return r.cfns >= r.cfop ? r.cfns : null; }) },
         { ohneRand: true, farbe: 'color-mix(in srgb,' + F.rot + ' 18%,transparent)', lo: J.map(function (r) { return r.cfns < r.cfop ? r.cfns : null; }), hi: J.map(function (r) { return r.cfns < r.cfop ? r.cfop : null; }) }],
       reihen: [{ name: 'vor Steuer', werte: J.map(function (r) { return r.cfop; }), farbe: F.tinte3, dick: 2, gestrichelt: true }, { name: 'nach Steuer', werte: J.map(function (r) { return r.cfns; }), farbe: F.tinte, dick: 2.6, punkte: true }],
       marken: marken,
       tip: function (q, j) { var r = J[q]; return '<div class="t">' + j + (j > P.heute ? ' · Projektion' : '') + '</div>Ergebnis aus Vermietung <b>' + eurV(r.vuv) + '</b><br>vor Steuer <b>' + eurV(r.cfop) + '</b><br>Steuer <b>' + eurV(r.cfns - r.cfop) + '</b><br>nach Steuer <b>' + eurV(r.cfns) + '</b>'; },
-      legende: [{ n: 'vor Steuer', f: F.tinte3 }, { n: 'nach Steuer', f: F.tinte }, { n: 'Steuer bringt Geld', f: 'color-mix(in srgb,' + F.gruen + ' 16%,transparent)' }, { n: 'Steuer kostet Geld', f: 'color-mix(in srgb,' + F.rot + ' 18%,transparent)' }].concat(be ? [{ n: 'ab hier Steuer', f: F.rot }] : []) }, { breite: w - 2, aria: 'Cashflow vor und nach Steuer' });
+      legende: (opt.voll ? [{ n: 'Steuerwirkung je Jahr', f: 'linear-gradient(90deg,' + F.gruen + ' 50%,' + F.rot + ' 50%)' }] : []).concat([{ n: 'vor Steuer', f: F.tinte3 }, { n: 'nach Steuer', f: F.tinte }, { n: 'Steuer bringt Geld', f: 'color-mix(in srgb,' + F.gruen + ' 16%,transparent)' }, { n: 'Steuer kostet Geld', f: 'color-mix(in srgb,' + F.rot + ' 18%,transparent)' }].concat(be ? [{ n: 'ab hier Steuer', f: F.rot }] : [])) }, { breite: w - 2, aria: 'Cashflow vor und nach Steuer' });
     /* Werte an Ende Zinsbindung und Ende der Projektion */
     var zelle = function (r, t) { return r ? '<div><span>' + esc(t) + '</span><b>' + eurV(r.cfns) + '</b><small>nach Steuer, vor Steuer ' + eurV(r.cfop) + '</small></div>' : ''; };
     var sx = document.createElement('div'); sx.className = 'gx-seite';
+    var sumVor = 0, sumAb = 0; if (opt.voll) wirk.forEach(function (v, q) { if (v == null) return; if (!be || J[q].j < be.j) { if (v > 0) sumVor += v; } else if (v < 0) sumAb += v; });
     sx.innerHTML = (be ? '<div><span>Steuer ab</span><b>' + be.j + '</b><small>Ergebnis aus Vermietung ' + eurV(be.vuv) + '</small></div>' : '')
+      + (opt.voll ? '<div><span>Erstattungen' + (be ? ' bis ' + (be.j - 1) : '') + '</span><b>' + eurV(sumVor) + '</b><small>Steuer, die das Objekt dir spart</small></div>' : '')
+      + (opt.voll && be ? '<div><span>Steuern ab ' + be.j + '</span><b>' + eurV(sumAb) + '</b><small>bis ' + J[J.length - 1].j + ' zusammen</small></div>' : '')
       + zelle(J.filter(function (r) { return r.j === P.heute; })[0], 'Heute ' + P.heute)
       + (zb && P.bindEnde > P.heute ? zelle(zb, 'Ende Zinsbindung ' + P.bindEnde) : '')
       + zelle(ende, 'Ende ' + ende.j);
@@ -1124,14 +1141,15 @@
     breitWache(host, function (w) { wBreite = w; zeichnen(w); });
     return host;
   }
-  function steuerVerlauf(host) {
+  function steuerVerlauf(host, opt) {   /* v5120 GG6 · opt.voll im Reiter Steuer */
     if (!host || !FREI) return false; stil();
     var P = MODELL.basis(); if (!P) { host.innerHTML = ''; host.style.display = 'none'; return false; }
     host.style.display = ''; if (!host.classList.contains('dp-gx')) host.className = 'dp-gn dp-gx';
     host._gxP = P;
-    if (host._gxGezeichnet) { karteVerlaufSteuer(host, host.clientWidth || breiteVon(host), P); return true; }
+    host._gxOpt = opt || host._gxOpt || null;
+    if (host._gxGezeichnet) { karteVerlaufSteuer(host, host.clientWidth || breiteVon(host), P, host._gxOpt); return true; }
     host._gxGezeichnet = true;
-    breitWache(host, function (w) { karteVerlaufSteuer(host, w, host._gxP || P); });
+    breitWache(host, function (w) { karteVerlaufSteuer(host, w, host._gxP || P, host._gxOpt); });
     return true;
   }
 
