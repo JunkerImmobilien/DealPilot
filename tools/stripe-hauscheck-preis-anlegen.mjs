@@ -5,6 +5,7 @@
  *
  *   Produkt  „DealPilot Haus-Check“ (metadata.dp_key = hauscheck), wird wiederverwendet, wenn es schon da ist
  *   Preis    lookup_key dp_hauscheck_999   EUR, einmalig, 999 Cent
+ *   Coupon   dp_hauscheck_anrechnung       9,99 € einmal (Anrechnung aufs Abo, Webhook legt je Kauf einen Code darauf an)
  *
  * Das Backend (services/hausCheck.js LOOKUP_KEY) findet den Preis über den lookup_key, in beiden Konten gleich.
  * Steuer ohne automatic_tax (Kleinunternehmer § 19 UStG).
@@ -27,6 +28,9 @@ export const PRODUKT = { name: 'DealPilot Haus-Check', dp_key: 'hauscheck',
   beschreibung: 'Haus-Check für Eigennutzer: Haus-Score, Wert nach ImmoWertV, Beleihungswert, Umfeld und PDF für die Bank. Einmalig, ohne Abo.' };
 export const PREIS = { currency: 'eur', unit_amount: 999, lookup_key: 'dp_hauscheck_999', nickname: 'Haus-Check einmalig 9,99 EUR',
   metadata: { dp_key: 'hauscheck', dp_quelle: 'tools/stripe-hauscheck-preis-anlegen.mjs v5130kk6' } };
+
+export const COUPON = { id: 'dp_hauscheck_anrechnung', name: 'Haus-Check angerechnet', amount_off: 999, currency: 'eur', duration: 'once' };
+export function couponGleich(c) { return !!c && c.amount_off === COUPON.amount_off && c.currency === COUPON.currency && c.duration === COUPON.duration && c.valid !== false; }
 
 export function formular(obj, pre, out) {
   out = out || [];
@@ -73,6 +77,8 @@ async function main() {
         const da = await stripe(schluessel, 'GET', 'prices?active=true&limit=1&lookup_keys[]=' + PREIS.lookup_key);
         const konto = await stripe(schluessel, 'GET', 'account');
         console.log('  Konto ' + konto.id + (/_test_/.test(schluessel) ? ' (Test)' : ' (LIVE)') + ': ' + (da.data && da.data[0] ? 'Preis vorhanden ' + da.data[0].id + (gleich(da.data[0]) ? ', gleich' : ', ABWEICHEND') : 'Preis fehlt, würde angelegt'));
+        let c = null; try { c = await stripe(schluessel, 'GET', 'coupons/' + COUPON.id); } catch (e) { c = null; }
+        console.log('  Coupon ' + COUPON.id + ': ' + (c ? 'vorhanden' + (couponGleich(c) ? ', gleich' : ', ABWEICHEND') : 'fehlt, würde angelegt'));
       } catch (e) { console.log('  Lesen nicht möglich: ' + e.message); }
     }
     console.log(s.grund); process.exit(s.rc);
@@ -93,9 +99,14 @@ async function main() {
     const neu = await stripe(schluessel, 'POST', 'prices', Object.assign({ product: produkt.id }, PREIS));
     console.log('  Preis angelegt: ' + neu.id);
   }
+  let cp = null; try { cp = await stripe(schluessel, 'GET', 'coupons/' + COUPON.id); } catch (e) { cp = null; }
+  if (cp && !couponGleich(cp)) { console.log('ABBRUCH: Coupon ' + COUPON.id + ' existiert mit anderen Werten.'); process.exit(4); }
+  if (!cp) { cp = await stripe(schluessel, 'POST', 'coupons', COUPON); console.log('  Coupon angelegt: ' + cp.id); }
+  else console.log('  Coupon schon da, gleich, übersprungen');
   const nach = await stripe(schluessel, 'GET', 'prices?active=true&limit=1&lookup_keys[]=' + PREIS.lookup_key);
-  const ok = gleich(nach.data && nach.data[0]);
-  console.log('  Nachmessung: ' + (ok ? 'gleich der Quelle (999 Cent, einmalig)' : 'ABWEICHUNG'));
+  const cNach = await stripe(schluessel, 'GET', 'coupons/' + COUPON.id);
+  const ok = gleich(nach.data && nach.data[0]) && couponGleich(cNach);
+  console.log('  Nachmessung: ' + (ok ? 'Preis 999 Cent einmalig und Coupon 9,99 € einmal, gleich der Quelle' : 'ABWEICHUNG'));
   process.exit(ok ? 0 : 5);
 }
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {

@@ -17,6 +17,7 @@ const W = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const require = createRequire(import.meta.url);
 process.env.EINZELCHECK_SIEGEL_GEHEIM = process.env.EINZELCHECK_SIEGEL_GEHEIM || 'pruefer';
 const hc = require(path.join(W, 'backend/src/services/hausCheck.js'));
+require(path.join(W, 'backend/src/services/verkaufSchalter.js'))._setzeDeps({ query: async () => ({ rowCount: 1, rows: [] }) });   /* Tageszähler ohne DB */
 const S = await import(pathToFileURL(path.join(W, 'tools/stripe-hauscheck-preis-anlegen.mjs')).href);
 
 let rot = 0, gruen = 0;
@@ -29,17 +30,19 @@ const deps = {
   jetzt: () => Date.parse('2026-11-26T12:00:00Z'),
   query: async (sql, p) => {
     if (/^INSERT INTO einzelcheck_kaeufe/.test(sql)) { const id = 'k' + (db.length + 1); db.push({ id, token_hash: p[0], status: 'offen', zahlen: JSON.parse(p[1]), produkt: /'hauscheck'/.test(sql) ? 'hauscheck' : 'einzelcheck', gueltig_bis: p[5] }); return { rows: [{ id }] }; }
+    if (/^UPDATE einzelcheck_kaeufe SET anrechnung_code/.test(sql)) { const z = db.find((x) => x.id === p[2]); z.anrechnung_code = p[0]; return { rowCount: 1 }; }
     if (/^UPDATE einzelcheck_kaeufe SET stripe_session_id/.test(sql)) { db.find((z) => z.id === p[1]).stripe_session_id = p[0]; return { rowCount: 1 }; }
     if (/^UPDATE einzelcheck_kaeufe SET status = 'bezahlt'/.test(sql)) {
       ok(/produkt = 'hauscheck'/.test(sql), 'C  Webhook setzt nur hauscheck-Zeilen auf bezahlt');
       const z = db.find((x) => x.stripe_session_id === p[1] && x.status === 'offen' && x.produkt === 'hauscheck');
-      if (!z) return { rowCount: 0, rows: [] }; z.status = 'bezahlt'; return { rowCount: 1, rows: [{ id: z.id }] };
+      if (!z) return { rowCount: 0, rows: [] }; z.status = 'bezahlt'; return { rowCount: 1, rows: [{ id: z.id, gueltig_bis: z.gueltig_bis, amount_cents: 999 }] };
     }
     if (/^SELECT status FROM einzelcheck_kaeufe/.test(sql)) { const z = db.find((x) => x.stripe_session_id === p[0]); return { rowCount: z ? 1 : 0, rows: z ? [{ status: z.status }] : [] }; }
     if (/^SELECT \* FROM einzelcheck_kaeufe/.test(sql)) { ok(/produkt = 'hauscheck'/.test(sql), 'D  kaufLesen fragt nur hauscheck-Zeilen'); return { rows: db.filter((x) => x.token_hash === p[0] && x.produkt === 'hauscheck') }; }
     throw new Error('unerwartete Abfrage: ' + sql.slice(0, 60));
   },
   stripe: () => ({
+    promotionCodes: { create: async (o) => { ok(o.coupon === 'dp_hauscheck_anrechnung' && o.max_redemptions === 1 && /^HC[0-9A-F]{10}$/.test(o.code), 'C  Anrechnungs-Code auf dp_hauscheck_anrechnung, einmal'); return { id: 'promo_t' }; } },
     prices: { list: async (o) => { ok(o.lookup_keys[0] === 'dp_hauscheck_999', 'B  Preis über lookup_key dp_hauscheck_999'); return { data: [{ id: 'price_t', unit_amount: 999, currency: 'eur', type: 'one_time', lookup_key: 'dp_hauscheck_999', product: { name: 'DealPilot Haus-Check' } }] }; } },
     checkout: { sessions: {
       create: async (o) => { sitzung = o; nr++; return { id: 'cs_t' + nr, url: 'https://checkout.stripe.test/x' }; },
@@ -80,7 +83,7 @@ r = await hc.handlePaid({ id: 'cs_t1', mode: 'payment', payment_status: 'paid', 
 ok(r.ok === false && r.reason === 'not_hauscheck', 'C  Einzel-Check-Sitzung wird hier nicht verbucht');
 items = [{ price: { lookup_key: 'dp_hauscheck_999' } }];
 r = await hc.handlePaid({ id: 'cs_t1', mode: 'payment', payment_status: 'paid', metadata: { type: 'hauscheck' } });
-ok(r.ok === true && db[0].status === 'bezahlt', 'C  richtiger Preis: bezahlt');
+ok(r.ok === true && db[0].status === 'bezahlt' && r.anrechnung === true && /^HC/.test(db[0].anrechnung_code || ''), 'C  richtiger Preis: bezahlt, Anrechnungs-Code angelegt');
 r = await hc.handlePaid({ id: 'cs_t1', mode: 'payment', payment_status: 'paid', metadata: { type: 'hauscheck' } });
 ok(r.ok === true && r.reason === 'already_processed', 'C  doppelt: already_processed');
 
@@ -88,7 +91,11 @@ ok(r.ok === true && r.reason === 'already_processed', 'C  doppelt: already_proce
 const z = await hc.kaufLesen(k.token);
 ok(z && z.status === 'bezahlt', 'D  Kauf lesbar');
 const st = hc.statusAus(Object.assign({}, z, { gueltig_bis: new Date(Date.now() + 864e5) }));
-ok(!('anrechnung' in st) && !('mails_rest' in st), 'D  Status ohne Anrechnung und Mailzähler');
+ok(st.anrechnung && /^HC/.test(st.anrechnung.code) && !('mails_rest' in st), 'D  Status mit Anrechnung, ohne Mailzähler');
+const _alt = process.env.HAUSCHECK_AKTIV, _ec = process.env.EINZELCHECK_AKTIV;
+process.env.EINZELCHECK_AKTIV = '1'; process.env.HAUSCHECK_AKTIV = '0'; ok(hc.aktiv() === false, 'D  eigener Schalter: HAUSCHECK_AKTIV=0 sperrt trotz EINZELCHECK_AKTIV=1');
+process.env.EINZELCHECK_AKTIV = '0'; process.env.HAUSCHECK_AKTIV = '1'; ok(hc.aktiv() === true, 'D  eigener Schalter: HAUSCHECK_AKTIV=1 frei trotz EINZELCHECK_AKTIV=0');
+if (_alt === undefined) delete process.env.HAUSCHECK_AKTIV; else process.env.HAUSCHECK_AKTIV = _alt; if (_ec === undefined) delete process.env.EINZELCHECK_AKTIV; else process.env.EINZELCHECK_AKTIV = _ec;
 
 /* E */
 const voll = hc.hausWert({ verfuegbar: true, wertindikation: { wert_eur: 410245, verfahren: 'sachwert' },
@@ -110,6 +117,7 @@ ok(S.sicherung({ ausfuehren: false }).rc === 2, 'F  Stripe-Skript Trockenlauf RC
 ok(S.sicherung({ ausfuehren: true, live: true, schluessel: 'sk_test_x' }).rc === 3, 'F  --live mit Testschlüssel abgelehnt');
 ok(S.sicherung({ ausfuehren: true, live: false, schluessel: 'sk_live_x' }).rc === 3, 'F  ohne --live kein Live-Schlüssel');
 ok(S.PREIS.unit_amount === 999 && S.PREIS.lookup_key === hc.LOOKUP_KEY, 'F  Skript und Dienst nennen denselben lookup_key, 999 Cent');
+ok(S.COUPON.id === hc.ANRECHNUNG_COUPON && S.COUPON.amount_off === 999 && S.COUPON.duration === 'once', 'F  Skript legt den Anrechnungs-Coupon 9,99 € einmal an, gleiche ID wie der Dienst');
 
 console.log((rot ? 'ROT' : 'sauber') + ' · ' + gruen + ' grün, ' + rot + ' rot');
 process.exit(rot ? 1 : 0);
