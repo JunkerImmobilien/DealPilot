@@ -59,7 +59,8 @@
     '.check{padding:0;margin:1mm 0 3mm}.check li{list-style:none;position:relative;padding-left:6mm;margin:1.4mm 0;font-size:9pt}',
     '.check li::before{content:"";position:absolute;left:0;top:.6mm;width:3.2mm;height:3.2mm;border:.8px solid var(--ink);border-radius:.6mm}.check li small{color:var(--mut)}',
     '.toc td{padding:2.6mm 0;font-size:10.5pt}.toc td.n{width:10mm;font-family:"JetBrains Mono",monospace;color:var(--gold-d)}',
-    '.quelle{font-size:7.6pt;color:var(--mut)}.chart{width:100%;height:auto;margin:2mm 0 0}'
+    '.quelle{font-size:7.6pt;color:var(--mut)}.chart{width:100%;height:auto;margin:2mm 0 0}',
+    'table,.kacheln,.kachel,.box,.gr,.zwei,svg,.lagekarte,tr{break-inside:avoid;page-break-inside:avoid}h2,h3,.ober{break-after:avoid;page-break-after:avoid}p,li{orphans:3;widows:3}'
   ].join('');
 
   function bauen(e, D, logo) {
@@ -131,15 +132,15 @@
       + (O.zustand_text ? zeile('Zustand', 'deine Angabe', esc(O.zustand_text)) : '')
       + zeile('Kaufpreis', 'deine Angabe', eur(O.kaufpreis)) + zeile('Eigenkapital', 'deine Angabe', eur(O.ek || 0));
     seite('Grundangaben', '<p class="ober">' + kapNr() + ' · Grundangaben</p><h2>Womit dieser Bericht rechnet</h2>'
-      + '<p class="unter">Deine Angaben beim Kauf, dazu die Daten, die DealPilot für diese Anschrift geholt hat.</p>'
-      + '<table><tr><th>Merkmal</th><th class="z">Wert</th></tr>' + ga + '</table>'
+      + '<p class="unter">Alle Merkmale stammen aus deiner Angabe beim Kauf. Dazu die Daten, die DealPilot für diese Anschrift geholt hat.</p>'
+      + '<table class="eng"><tr><th>Merkmal</th><th class="z">Wert</th></tr>' + ga.replace(/<small>deine Angabe<\/small>/g, '') + '</table>'
       + '<h3>Was DealPilot dazu geholt hat</h3><table class="eng">'
       + zeile('Bodenrichtwert und Sachwertfaktor', 'des zuständigen Gutachterausschusses', W ? 'ja' : 'nicht vollständig')
       + zeile('Ortsübliche Vergleichsmiete', e.vmiete && e.vmiete.art === 'mietspiegel' ? 'Mietspiegel der Gemeinde' : 'DealPilot-Näherung', e.vmiete && e.vmiete.mittel ? eur(e.vmiete.mittel, 2) + ' je m²' : 'ja')
       + zeile('Bauzins', 'tagesaktuell je Beleihung und Zinsbindung', pct(F.zins_pct, 2))
       + zeile('Angebote am Ort', 'aktueller Marktdurchschnitt', M && M.kauf && M.kauf.n ? zahl(M.kauf.n) + ' Angebote' : 'keine')
       + zeile('Grundsteuer und Trinkwasser', 'je Gemeinde', 'ja') + zeile('Umfeld', 'Nahversorgung, Schulen, Verkehr', U && U.ok ? zahl(U.kategorien.length) + ' Kategorien' : 'nicht abrufbar') + '</table>'
-      + '<div class="box"><b>Mit Unterlagen wird es genauer.</b> Exposé, Energieausweis und die Liste der Modernisierungen ändern Zustand, Heizkosten und Wert. Abweichungen zur Wohnfläche lohnen eine Nachfrage beim Makler.</div>', 'Deine Grundangaben');
+      + '<p class="quelle">Mit Unterlagen wird es genauer: Exposé, Energieausweis und die Liste der Modernisierungen ändern Zustand, Heizkosten und Wert.</p>', 'Deine Grundangaben');
 
     /* 5 · Preis gegen Wert */
     var ab = g.preis ? g.preis.abweichung_pct : null;
@@ -286,6 +287,35 @@
       return '<tr><td>' + esc(k.label) + (n && n.name ? '<small>' + esc(n.name) + '</small>' : '') + '</td><td class="z">' + (k.nicht_ermittelt ? 'nicht ermittelt' : n ? (n.luftlinie_m < 1000 ? zahl(n.luftlinie_m) + ' m' : zahl(n.luftlinie_m / 1000, 1) + ' km') : 'nicht im Umkreis') + '</td><td class="z">' + (n ? 'ca. ' + n.fuss_min + ' Min.' : '–') + '</td></tr>';
     }).join('') + '</table><p class="quelle">' + esc(U.hinweis || '') + '</p>' : '<p>Das Umfeld war beim Erstellen nicht abrufbar.</p>';
     seite('Umfeld', '<p class="ober">' + lageNr + ' · Lage und Umfeld</p><h2>Was ist in der Nähe?</h2><p class="unter">Supermarkt, Schule, Arzt, Bus und Bahn rund um die Anschrift.</p>' + ut);
+
+    /* 11b · Region wie im Marktbericht (pp6): Bevölkerung, Wanderung, Kaufkraft, Arbeitsmarkt, Wohnen (Zensus 2022), Bodenrichtwert.
+       Dieselben Werte und Bezeichnungen wie der Marktbericht, jede Zahl mit Stand und Gebiet, Quellen nur im Kapitel Quellen. */
+    var RG = e.region || null;
+    if (RG && (RG.werte && RG.werte.length || RG.zensus || RG.brw)) {
+      var fmtW = function (w) { var n = w.nachkomma != null ? w.nachkomma : 1, v = Number(w.wert); return (w.vorzeichen && v > 0 ? '+ ' : w.vorzeichen && v < 0 ? '− ' : '') + zahl(w.vorzeichen ? Math.abs(v) : v, n); };
+      var EINH = function (w) { return String(w.einheit || '').replace(/p\. ?a\./, 'im Jahr').replace(/\((Deutschland = 100)\)/, '$1').trim(); };
+      var rk = (RG.werte || []).slice(0, 4).map(function (w) {
+        return kachel(esc(w.label), fmtW(w) + ' <span style="font-size:8pt;display:inline;letter-spacing:0;text-transform:none">' + esc(EINH(w)) + '</span>', esc((w.ebene ? w.ebene + ' ' : '') + (w.gebiet || '')) + (w.jahr ? ', Stand ' + w.jahr : ''));
+      }).join('');
+      var zz = RG.zensus, zg = zz && zz.gemeinde, zk = zz && zz.kreis;
+      var zt = function (l, klein, k) { return zeile(l, klein, (zg && zg[k] != null ? pct(zg[k], 1) : '–') + (zk && zk[k] != null ? ' <span style="color:var(--mut)">(Kreis ' + pct(zk[k], 1) + ')</span>' : '')); };
+      var reg = '<p class="ober">' + lageNr + ' · Lage und Umfeld</p><h2>Region' + (zg && zg.name ? ' ' + esc(zg.name) : '') + '</h2>'
+        + '<p class="unter">Wie sich Ort und Kreis entwickeln. Dieselben Kennzahlen wie im DealPilot-Marktbericht, jeweils mit Stand.</p>'
+        + (rk ? '<div class="kacheln">' + rk + '</div>' : '')
+        + (RG.makro_score != null ? '<p class="quelle">Makrolage ' + RG.makro_score + ' von 100, gebildet aus diesen Kennzahlen.</p>' : '');
+      if (zz) reg += '<h3>Wohnen am Ort</h3><table class="eng"><tr><th>Kennzahl</th><th class="z">' + esc(zg && zg.name ? zg.name : 'Gemeinde') + '</th></tr>'
+        + zt('Leerstand', 'Anteil leer stehender Wohnungen', 'leerstand_pct') + zt('Marktaktiver Leerstand', 'sofort vermietbar, kürzer als ein Jahr leer', 'leerstand_markt_pct')
+        + zt('Eigentumsquote', 'Wohnungen, die vom Eigentümer selbst bewohnt werden', 'eigentum_pct')
+        + zeile('Durchschnittliche Nettokaltmiete', 'alle Mietwohnungen im Bestand', zg && zg.miete_qm ? eur(zg.miete_qm, 2) + ' je m²' : '–')
+        + '</table><p class="quelle">Stand Zensus ' + D.datum(zz.stichtag) + '. Die Bestandsmiete aller Wohnungen liegt meist unter der Miete bei Neuvermietung.</p>';
+      if (RG.brw) { var bw = RG.brw, dv = bw.vor_qm && bw.vor_stichtag ? (bw.qm / bw.vor_qm - 1) * 100 : null;
+        reg += '<h3>Bodenrichtwert</h3><table class="eng">' + zeile('Bodenrichtwert', 'Richtwertzone der Anschrift, Stichtag ' + D.datum(bw.stichtag), eur(bw.qm) + ' je m²')
+          + (dv != null ? zeile('Entwicklung', 'seit ' + D.datum(bw.vor_stichtag) + ' (' + eur(bw.vor_qm) + ' je m²)', (dv >= 0 ? '+ ' : '− ') + pct(Math.abs(dv), 1)) : '') + '</table>'; }
+      if (M && M.reihe && M.reihe.preis && M.reihe.preis.length > 1) { var p0 = M.reihe.preis[0], p1 = M.reihe.preis[M.reihe.preis.length - 1], m0 = M.reihe.miete && M.reihe.miete[0], m1 = M.reihe.miete && M.reihe.miete[M.reihe.miete.length - 1];
+        reg += '<h3>Preise und Mieten am Ort</h3><table class="eng">' + zeile('Angebotspreise', p0.jahr + ' bis ' + p1.jahr + ', je m²', eur(p0.median) + ' auf ' + eur(p1.median))
+          + (m0 && m1 ? zeile('Angebotsmieten', m0.jahr + ' bis ' + m1.jahr + ', je m²', eur(m0.median, 2) + ' auf ' + eur(m1.median, 2)) : '') + '</table><p class="quelle">Verlauf als Diagramm im Kapitel Markt am Ort.</p>'; }
+      seite('Region', reg);
+    }
 
     /* 12 · Checkliste */
     var BS = window.DpBesichtigung, grp = [];

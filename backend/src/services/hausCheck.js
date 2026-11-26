@@ -248,6 +248,21 @@ function marktAmOrt(j, m) {
     reihe: { preis: reihe(mh.price), miete: reihe(mh.rent) }, angebote,
     aus_markt: !!(_z(sale.median_per_sqm) || angebote.length || (mh.price && mh.price.length)) };
 }
+/* pp6 · Regionale Daten wie im Marktbericht, aus derselben Antwort (keine zweite Rechnung), nur Weißliste ohne Quellennamen:
+   Makro-Kennzahlen (Bevölkerung, Wanderung, Kaufkraft, Arbeitslosigkeit mit Jahr und Ebene), Zensus 2022 (Leerstand,
+   marktaktiver Leerstand, Eigentumsquote, Zensus-Miete) für Gemeinde und Kreis, Bodenrichtwert mit Stichtag und Vorwert. */
+function regionAus(j) {
+  const d = (j && j.data) || {}, mk = d.makro_kennzahlen || {}, z = d.zensus || {}, lv = d.land_value || {};
+  const werte = (Array.isArray(mk.werte) ? mk.werte : []).filter((w) => _z(w.wert) != null).slice(0, 8).map((w) => ({
+    k: String(w.schluessel || '').slice(0, 30), label: String(w.label || '').slice(0, 60), wert: _z(w.wert), einheit: String(w.einheit || '').slice(0, 40),
+    nachkomma: _z(w.nachkomma), vorzeichen: !!w.vorzeichen, jahr: _z(w.jahr), von_jahr: _z(w.von_jahr), ebene: String(w.ebene || '').slice(0, 20), gebiet: String(w.gebiet || '').slice(0, 60) }));
+  const zs = (o) => (o && typeof o === 'object' ? { name: String(o.name || '').slice(0, 60), leerstand_pct: _z(o.leerstandsquote), leerstand_markt_pct: _z(o.leerstandsquote_marktaktiv),
+    eigentum_pct: _z(o.eigentuemerquote), miete_qm: _z(o.nettokaltmiete_qm) } : null);
+  const raw = lv.properties_raw || {};
+  const brw = lv.available && _z(lv.value_sqm) ? { qm: _z(lv.value_sqm), stichtag: String(lv.stichtag || '').slice(0, 10), nutzung: String(lv.nutzung || '').slice(0, 10),
+    vor_qm: _z(String(raw.HBRW || '').trim()) || null, vor_stichtag: /^\d{4}-\d{2}-\d{2}$/.test(String(raw.HTAG || '')) ? String(raw.HTAG) : null } : null;
+  return { werte, makro_score: d.macro ? _z(d.macro.score) : null, zensus: z.available ? { stichtag: String(z.stichtag || '').slice(0, 10), gemeinde: zs(z.gemeinde), kreis: zs(z.kreis) } : null, brw };
+}
 async function bericht(zeile, adresse, darlehen, nhk) {
   if (!zeile) throw _fehler('Der Kauf ist unbekannt.', 403, 'kauf_unbekannt');
   const darf = ec.berichtErlaubt(zeile);
@@ -272,8 +287,9 @@ async function bericht(zeile, adresse, darlehen, nhk) {
   try { const kt = await ec.karteHolen(j.data && j.data.address); if (kt) karte = kt.bild; } catch (e) { karte = null; }
   return { verfuegbar: true, zahlen: z, wert: hausWert(m.wert), belw: belwAus(j.beleihungswert), umfeld: umfeldAus(j.umfeld),
     lage: m.lage, vergleichsmiete: m.vergleichsmiete, markt: { qm: m.markt.qm, miete_qm: m.markt.miete_qm }, stichtag: m.stichtag, karte,
-    am_ort: (function () { try { return marktAmOrt(j, m); } catch (e) { return null; } })() };
+    am_ort: (function () { try { return marktAmOrt(j, m); } catch (e) { return null; } })(),
+    region: (function () { try { return regionAus(j); } catch (e) { return null; } })() };
 }
 
 module.exports = { VERSION, PRODUKT, LOOKUP_KEY, ANRECHNUNG_COUPON, aktiv, anrechnungAnlegen, ARTEN, PFLICHT, MFH_HINWEIS, grundSauber, grundFehlt, artErlaubt, preis, kaufAnlegen, kaufLesen,
-  statusAus, handlePaid, hausWert, belwAus, umfeldAus, nhkSauber, marktAmOrt, bericht, _setzeDeps };
+  statusAus, handlePaid, hausWert, belwAus, umfeldAus, nhkSauber, marktAmOrt, regionAus, bericht, _setzeDeps };
