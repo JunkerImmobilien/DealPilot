@@ -708,7 +708,16 @@
     var stichtag = (p.wertermittlungsstichtag && typeof p.wertermittlungsstichtag === 'object' ? p.wertermittlungsstichtag.datum : p.wertermittlungsstichtag) || (p.ref && p.ref.wertermittlungsstichtag) || d.erstellt;
     var ergebnis = v.fuehrend ? v.fuehrend.wert : null;
     /* bb6 · Marcel 26.11.2026: Wert aus Angebotspreisen heisst Marktpreisindikation, das Ergebnis eines amtlichen Verfahrens (Stufe 3) bleibt Verkehrswert */
-    var ergName = (!v.fuehrend || v.fuehrend.id === 'angebote') ? 'Marktpreisindikation' : 'Verkehrswert';
+    /* bb6b · „Verkehrswert" nur nach ImmoWertV: Stufe 3, Ertragswert ohne offene boG und mit Zins Stufe A, Sachwert marktangepasst,
+       Vergleichswert amtlich; sonst „Wertindikation aus dem …“ bzw. „vorläufiger Ertragswert“ (gleiche Regel wie ki_text_pruefung.textFakten) */
+    var _cc = p.cross_check || {}, _ewB = _cc.ertragswert || {}, _swB = _cc.sachwert || {};
+    var _st3 = Number(r.wert_stufe) >= 3, _lzsA = String((_cc.assumptions && _cc.assumptions.liegenschaftszins_stufe) || '').toUpperCase() === 'A';
+    var _fid = v.fuehrend ? v.fuehrend.id : null;
+    var _vorl = _fid === 'ertragswert' ? (!!(_ewB.vorlaeufig_vor_bog || _ewB.vorlaeufig) || !_lzsA) : _fid === 'sachwert' ? !!_swB.vorlaeufig : _fid !== 'vergleichswert';
+    var ergName = (!_fid || _fid === 'angebote') ? 'Marktpreisindikation'
+      : (_st3 && !_vorl) ? 'Verkehrswert'
+      : (_fid === 'ertragswert' && _ewB.vorlaeufig_vor_bog) ? 'Vorläufiger Ertragswert'
+      : 'Wertindikation aus dem ' + ({ ertragswert: 'Ertragswert', sachwert: 'Sachwert', vergleichswert: 'Vergleichswert' })[_fid];
     var art = OBJART[String(od.objart || r.property_type || '').toLowerCase()] || OBJART[String(r.property_type || '').toLowerCase()] || (od.objart || r.property_type || 'Immobilie');
     var b = d.marke || {};
     var teile = [];

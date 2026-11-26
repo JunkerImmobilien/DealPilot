@@ -127,6 +127,28 @@ console.log('8) v3207 · „Marktwert" im Text = Kopfzahl des fuehrenden Verfahr
   ok(!K.pruefeText(echt, K.textFakten(pm)).some((x) => x.art === 'marktwert_bezug'), 'ohne fuehrendes Verfahren (Kopf = Angebote) -> kein Befund');
 }
 
+console.log('8b) bb6 · „Verkehrswert" nur nach ImmoWertV (Stufe 3, Ertragswert nicht vorlaeufig, Zins Stufe A) (Marcel 26.11.2026)');
+{
+  const basis = { ref: { purchase_price: 545000, wert_stufe: 3 }, valuation: { market_value: { estimated: 875000 } },
+    cross_check: { verfahrenswahl: { verfahren: 'ertragswert' }, ertragswert: { available: true, value_eur: 735000 }, assumptions: { liegenschaftszins_stufe: 'A' } } };
+  const kopie = () => JSON.parse(JSON.stringify(basis));
+  const F3 = K.textFakten(kopie());
+  ok(F3.verkehrswert === true && F3.kopfbegriff === 'Verkehrswert', 'Stufe 3, Zins A, nicht vorlaeufig -> Verkehrswert');
+  ok(/Der Verkehrswert nach ImmoWertV dieses Berichts ist der Ertragswert/.test(K.faktenAnweisung(F3)), 'Anweisung nennt Verkehrswert');
+  ok(!K.pruefeText('Der Verkehrswert liegt bei 735.000 €.', F3).some((x) => x.art === 'verkehrswert_ohne_immowertv'), 'Verkehrswert in Stufe 3 erlaubt');
+  const p2 = kopie(); p2.ref.wert_stufe = 2; const F2 = K.textFakten(p2);
+  ok(F2.verkehrswert === false && /^Wertindikation aus dem Ertragswert$/.test(F2.kopfbegriff), 'Stufe 2 -> Wertindikation aus dem Ertragswert');
+  ok(/KEINEN Verkehrswert/.test(K.faktenAnweisung(F2)), 'Anweisung verbietet Verkehrswert in Stufe 2');
+  ok(K.pruefeText('Der Verkehrswert liegt bei 735.000 €.', F2).some((x) => x.art === 'verkehrswert_ohne_immowertv'), 'Verkehrswert in Stufe 2 -> Befund');
+  ok(!K.pruefeText('Die Marktpreisindikation aus Angeboten ist kein Verkehrswert.', F2).some((x) => x.art === 'verkehrswert_ohne_immowertv'), 'Verneinung -> kein Befund');
+  const pv = kopie(); pv.cross_check.ertragswert.vorlaeufig_vor_bog = true; const Fv = K.textFakten(pv);
+  ok(Fv.verkehrswert === false && Fv.kopfbegriff === 'vorläufiger Ertragswert', 'boG offen -> vorläufiger Ertragswert');
+  const pn = kopie(); pn.cross_check.assumptions.liegenschaftszins_stufe = 'N'; const Fn = K.textFakten(pn);
+  ok(Fn.verkehrswert === false, 'Zins aus der DealPilot-Formel (Stufe N) -> kein Verkehrswert');
+  const pa = kopie(); pa.cross_check.verfahrenswahl = { verfahren: null }; const Fa = K.textFakten(pa);
+  ok(Fa.verkehrswert === false && Fa.kopfbegriff === 'Marktpreisindikation', 'ohne fuehrendes Verfahren -> Marktpreisindikation');
+}
+
 console.log('9) v3326 · kein Score in Wert & Verlauf (Marcel 12.11.2026)');
 {
   /* Saetze nach dem Muster der Einordnung vor v3326 (Westerfeldstr. 140) */
