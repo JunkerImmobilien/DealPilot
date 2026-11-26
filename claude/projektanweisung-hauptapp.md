@@ -45859,3 +45859,8 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** main 2322e669 (Cherry-Pick von staging 545b853c) und b24437cc (Version).
 - **Nachweis:** Prod 390 px: Hero 114, Slider 1393, Laufband 1665, Deal-Check 1705, Preise 3027. 1440 px: 114 / 865 / 1145 / 1185 / 2078. Knopf → Deal-Check-Oberkante 70 px, kein Vollbild-Fenster, keine waagerechte Scrollleiste bei 360/390/1440. `version.json` 241 auf beiden App-Adressen.
 - **Rest:** Cockpit-Deal-Check (Demo 3) wartet auf Marcels OK.
+
+### Rollout 1.0.243 · 26.11.2026 · landing-deal-sprung-3 Strecke zwischen Laufband und Deal-Check (YY5, Marcel: „Zwischen Deal-Check und Hero-Bereich wollte ich die Slider-Videos und die Laufschrift“)
+- **Was:** Startseite Hero, Ansichten-Band, Laufband, Strecke `#workflow` (neun Etappen mit Videos, Fuß und CTA), Deal-Check, Preise, Fächer, Videothek und Rest. Weitere Laufschrift unter dem Deal-Check gibt es nicht (das Partner-Logoband in `#partner` ist ein Logo-Lauf und bleibt). Hauptknopf springt weiter zu `#dealcheck`. Nur `frontend/landing/index.html`.
+- **Commit:** main 74194c7f (Cherry-Pick von staging 4431e5bb), 6c454e16 (Version).
+- **Nachweis:** Prod 390 px: Hero 114, Band 1393, Laufband 1665, Strecke 1705, Deal-Check 5743, Preise 6710. 1440 px: 114 / 865 / 1145 / 1185 / 4628 / 5521. Aufzug der Strecke schaltet beim Scrollen Etappe 1 bis 9 weiter (360/390/1440 Prod, 360–1440 Staging), keine Skriptfehler, keine waagerechte Scrollleiste. Knopf → Deal-Check-Oberkante 70 px. Black-Week-Leiste unverändert. version.json 243 auf beiden App-Adressen.
