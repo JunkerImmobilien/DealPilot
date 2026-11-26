@@ -86,7 +86,7 @@
           + (k.nicht_ermittelt ? 'nicht ermittelt' : n ? (n.luftlinie_m < 1000 ? B.zahl(n.luftlinie_m) + ' m' : B.zahl(n.luftlinie_m / 1000, 1) + ' km') : 'nicht im Umkreis') + '</td><td class="r num">' + (n ? 'ca. ' + n.fuss_min + ' Min.' : '–') + '</td></tr>';
       }).join('') + '</tbody></table><p class="det">' + B.esc(U.hinweis) + ' Kartendaten ' + B.esc(U.vermerk) + '.</p>';
     } else uHtml = '<p>Das Umfeld war beim Erstellen nicht abrufbar.</p>';
-    add('Lage und Umfeld', 'Was ist in der Nähe?', (e.karte ? '<img class="karte" src="' + e.karte + '" alt="Karte">' : '') + uHtml);
+    add('Lage und Umfeld', 'Was ist in der Nähe?', (e.karte ? '<img class="karte" src="' + e.karte + '" alt="Karte" style="width:100%;height:58mm;object-fit:cover">' : '') + uHtml);
 
     /* 6 · Finanzierung, Leistbarkeit und Bank */
     var F = H.finanzierung;
