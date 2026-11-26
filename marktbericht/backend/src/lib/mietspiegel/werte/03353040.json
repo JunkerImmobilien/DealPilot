@@ -1,0 +1,251 @@
+{
+ "ags": "03353040",
+ "gemeinde": "Winsen (Luhe)",
+ "haus": {
+  "regel": "ausgeschlossen",
+  "beleg": "S. 5 Geltungsbereich: gilt nicht für „Wohnungen in Ein- und Zweifamilienhäusern“; S. 7: nur Mehrfamilienhäuser mit drei oder mehr Wohnungen"
+ },
+ "art": "einfach",
+ "stand": "2026-02-01",
+ "erhebungsstichtag": "2025-09-01",
+ "gueltig_ab": "2026-02-01",
+ "gueltig_bis": null,
+ "quelle": {
+  "url": "https://www.winsen.de/downloads/datei/NzYzMzg2ZTQyM2RkMjRjZmNWUDkyK0NrR3g0QlovM2ZEa3hhOUsvYWNTejdqVkEyVDlDNnpXa3dJTEh6K2wzSFJPZy8rSXVCZkRGZWtIZU9aRzNxZWV4bUMxeU9UWSsxdDdoWXFYQjhZNjRGVlpHSE4yL2kzUEkwOGNGNDZxYit3K3lURS81ZUVLNndaQUJCTFRSaWlrMFVWU1ppNk91MlU1SGo0QT09",
+  "dokument": "Mietspiegel Winsen (Luhe) 2026 (Broschüre, Herausgeber Stadt Winsen (Luhe), Auswertung Koopmann Analytics)",
+  "seite": "S. 9 Tab. 1, S. 2 (Anerkennung, Gültigkeit), S. 4 (Stichtag, einfacher Mietspiegel), S. 5–8 Geltung und Gliederung, S. 13 Berechnungsbeispiele",
+  "lizenz": "kein Rechtevorbehalt und kein Speicherverbot im Dokument (alle 15 Seiten durchgesehen, 26.11.2026); amtliche Veröffentlichung der Stadt Winsen (Luhe)",
+  "abgerufen": "2026-11-26"
+ },
+ "einheit": "eur_qm_nettokalt",
+ "form": "tabelle",
+ "rundung": 2,
+ "hinweis": "Erster Mietspiegel der Stadt (S. 4), herausgegeben von der Stadt Winsen (Luhe), Arbeitskreis mit Deutscher Mieterbund Lüneburg-Winsen, KWG Landkreis Harburg, Hausverwaltung; „Als einfacher Mietspiegel nach § 558c BGB anerkannt durch die Interessenvertreter der Vermieter und der Mieter“ (S. 2). Die Titelseite schreibt widersprüchlich „Gültigkeit des qualifizierten Mietspiegels: 01.02.2026“ – maßgeblich ist die Anerkennung als einfacher Mietspiegel (S. 2, S. 4); gueltig_ab daraus. Stichtag 01.09.2025. Tabelle S. 9 am Druckbild geprüft (Textschicht stimmt in den Werten, Zuordnung verschoben). Mittelwert und 3/4-Spanne; Felder mit * (15–29 Mietwerte) eingetragen. Größe 25 bis 50 / über 50 bis 70 / über 70 bis 90 / über 90 m², unter 25 m² kein Wert. Baualter bis Sept. 2025. Keine Wohnlagen. Orientierungshilfe zur Spanneneinordnung (Punkte in %, S. 10–13) nicht abgebildet. Nur Geschosswohnungsbau mit WC, Bad/Dusche, Sammelheizung; nicht für Penthouse, Maisonette, Appartements (S. 5).",
+ "tabelle": {
+  "geltung": {
+   "wfl_von": 25,
+   "baujahr_bis": 2025
+  },
+  "achsen": {
+   "baujahr": [
+    {
+     "von": null,
+     "bis": 1969,
+     "label": "bis 1969"
+    },
+    {
+     "von": 1970,
+     "bis": 1989,
+     "label": "1970 bis 1989"
+    },
+    {
+     "von": 1990,
+     "bis": 2009,
+     "label": "1990 bis 2009"
+    },
+    {
+     "von": 2010,
+     "bis": 2025,
+     "label": "2010 bis Sept. 2025"
+    }
+   ],
+   "wfl": [
+    {
+     "von": 25,
+     "bis": 50,
+     "label": "A: 25 bis 50 m²"
+    },
+    {
+     "von": 50,
+     "von_inkl": false,
+     "bis": 70,
+     "label": "B: über 50 bis 70 m²"
+    },
+    {
+     "von": 70,
+     "von_inkl": false,
+     "bis": 90,
+     "label": "C: über 70 bis 90 m²"
+    },
+    {
+     "von": 90,
+     "von_inkl": false,
+     "bis": null,
+     "label": "D: über 90 m²"
+    }
+   ]
+  },
+  "zellen": [
+   {
+    "baujahr": 0,
+    "wfl": 0,
+    "unten": 7.0,
+    "mittel": 9.31,
+    "oben": 11.63,
+    "seite": "9"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 0,
+    "unten": 8.06,
+    "mittel": 9.32,
+    "oben": 10.5,
+    "seite": "9"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 0,
+    "unten": 7.58,
+    "mittel": 10.37,
+    "oben": 12.74,
+    "seite": "9"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 0,
+    "unten": 9.1,
+    "mittel": 11.74,
+    "oben": 14.75,
+    "seite": "9",
+    "anmerkung": "* bedingte Aussagekraft (15 bis 29 Mietwerte)"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 1,
+    "unten": 7.33,
+    "mittel": 9.33,
+    "oben": 11.45,
+    "seite": "9"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 1,
+    "unten": 7.86,
+    "mittel": 9.03,
+    "oben": 10.41,
+    "seite": "9"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 1,
+    "unten": 7.27,
+    "mittel": 9.18,
+    "oben": 10.97,
+    "seite": "9"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 1,
+    "unten": 9.54,
+    "mittel": 11.23,
+    "oben": 12.88,
+    "seite": "9"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 2,
+    "unten": 7.16,
+    "mittel": 9.05,
+    "oben": 10.7,
+    "seite": "9"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 2,
+    "unten": 6.57,
+    "mittel": 8.42,
+    "oben": 10.0,
+    "seite": "9"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 2,
+    "unten": 7.11,
+    "mittel": 8.78,
+    "oben": 10.55,
+    "seite": "9"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 2,
+    "unten": 9.94,
+    "mittel": 11.45,
+    "oben": 13.09,
+    "seite": "9"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 3,
+    "unten": 7.63,
+    "mittel": 9.54,
+    "oben": 11.42,
+    "seite": "9",
+    "anmerkung": "* bedingte Aussagekraft (15 bis 29 Mietwerte)"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 3,
+    "unten": 6.86,
+    "mittel": 8.36,
+    "oben": 10.1,
+    "seite": "9"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 3,
+    "unten": 6.64,
+    "mittel": 8.42,
+    "oben": 10.2,
+    "seite": "9"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 3,
+    "unten": 9.55,
+    "mittel": 11.12,
+    "oben": 12.95,
+    "seite": "9"
+   }
+  ]
+ },
+ "pruefbeispiele": [
+  {
+   "eingabe": {
+    "baujahr": 1965,
+    "wfl": 65
+   },
+   "erwartet": {
+    "unten": 7.33,
+    "mittel": 9.33,
+    "oben": 11.45
+   },
+   "seite": "13",
+   "art": "anwendungsbeispiel",
+   "anmerkung": "Beispiel 1 „Feld B1, Baujahr bis 1969“: Spanne 7,33–11,45, Mittelwert 9,33; mit −20 % Orientierungshilfe 8,93 (nicht abgebildet)"
+  },
+  {
+   "eingabe": {
+    "baujahr": 2015,
+    "wfl": 100
+   },
+   "erwartet": {
+    "unten": 9.55,
+    "mittel": 11.12,
+    "oben": 12.95
+   },
+   "seite": "13–14",
+   "art": "anwendungsbeispiel",
+   "anmerkung": "Beispiel 2 „Feld D4, Baujahr 2010 bis Sept. 2025, > 90 m²“: 9,55–12,95, Mittelwert 11,12; mit +60 % 12,22"
+  },
+  {
+   "eingabe": {
+    "baujahr": 1980,
+    "wfl": 20
+   },
+   "erwartet": null,
+   "seite": "9",
+   "art": "tabellenzelle",
+   "anmerkung": "unter 25 m²"
+  }
+ ]
+}
