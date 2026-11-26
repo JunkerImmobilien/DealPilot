@@ -2048,7 +2048,7 @@
         var k = mbKarteH() || {};
         var m = q('.main-col'); if (m) m.scrollTop = 0;
         await zeige(function () { return q('#avsec'); }, 8);
-        await b2oZeile(s, 'Ergebnis Stufe 1', 'Marktwert <b>' + eur(k.mw && k.mw.med) + '</b> (Spanne ' + eur(k.mw && k.mw.low) + ' – ' + eur(k.mw && k.mw.high) + '), Marktmiete <b>' + eur(k.mm && k.mm.med) + '</b> kalt.');
+        await b2oZeile(s, 'Ergebnis Stufe 1', 'Marktpreisindikation <b>' + eur(k.mw && k.mw.med) + '</b> (Spanne ' + eur(k.mw && k.mw.low) + ' – ' + eur(k.mw && k.mw.high) + '), Marktmiete <b>' + eur(k.mm && k.mm.med) + '</b> kalt.');
         if (k.abschlag && k.abschlag.roh) {
           await zeige(function () { return q('#avsec .dp-abschlag') || q('#avsec .legal') || q('#avsec'); }, 10);
           await b2oZeile(s, 'Der Abschlag', 'Geschätzt aus <b>Angebotspreisen</b> (' + eur(k.abschlag.roh.med) + ') — DealPilot zieht <b>' + String(k.abschlag.pct).replace('.', ',') + ' %</b> ab (' + k.abschlag.quelle + ').');
@@ -2083,7 +2083,7 @@
         var m = q('.main-col'); if (m) m.scrollTop = 0;
         await zeige(function () { return q('#avsec'); }, 8);
         var ein = kartenText(/EINORDNUNG\s+(.+?)\s+GENAUIGKEIT/i), gen = kartenText(/GENAUIGKEIT\s+(\S+)/i);
-        await b2oZeile(s, 'Ergebnis Stufe 2', 'Marktwert <b>' + eur(k.mw && k.mw.med) + '</b> nach Abschlag' + (ein ? ' — gegen deinen Kaufpreis von ' + eur(zahl('kp')) + ': <b>' + ein + '</b>' : '') + (gen ? ', Genauigkeit ' + gen : '') + '.');
+        await b2oZeile(s, 'Ergebnis Stufe 2', 'Marktpreisindikation <b>' + eur(k.mw && k.mw.med) + '</b> nach Abschlag' + (ein ? ' — gegen deinen Kaufpreis von ' + eur(zahl('kp')) + ': <b>' + ein + '</b>' : '') + (gen ? ', Genauigkeit ' + gen : '') + '.');
         kartenUebernehmen();
         await warte(900);
         await zeige(feldVon('svwert'), 10);
@@ -2118,7 +2118,7 @@
         var opts = [].map.call((q('#oe-vw-wahl') || { options: [] }).options, function (o) { return o.textContent; });
         var ew = opts.filter(function (t) { return /^Ertragswert/.test(t); })[0], sw = opts.filter(function (t) { return /^Sachwert/.test(t); })[0];
         function betrag(t) { var m = t && /·\s*([\d.]+ €)/.exec(t); return m ? m[1] : null; }
-        await b2oZeile(s, 'Ergebnis Stufe 3', 'Nach ImmoWertV gerechnet: Ertragswert <b>' + betrag(ew) + '</b>' + (sw ? ', vorläufiger Sachwert ' + betrag(sw) : '') + '. Welchen Wert du ansetzt, entscheidest du.');
+        await b2oZeile(s, 'Ergebnis Stufe 3', 'Nach ImmoWertV gerechnet: Ertragswert <b>' + betrag(ew) + '</b>' + (sw ? ', vorläufiger Sachwert ' + betrag(sw) : '') + '. Das führende Verfahren ergibt den maßgebenden Wert, das andere stützt ihn.');
         var sel = q('#oe-vw-wahl');
         if (sel) { var ix = [].findIndex.call(sel.options, function (o) { return /^Ertragswert/.test(o.textContent); }); if (ix >= 0) { sel.selectedIndex = ix; sel.dispatchEvent(new Event('change', { bubbles: true })); } }
         await warte(900);
@@ -2129,7 +2129,7 @@
         await zeige(feldVon('svwert'), 10);
         await warte(1200);
         var b = svBeschriftung();
-        await b2oZeile(s, 'Erst jetzt: Verkehrswert', '„<b>' + b.titel + '</b> ' + b.hinweis + '“ — <b>' + eur(zahl('svwert')) + '</b>, der Ertragswert aus Stufe 3.', 1200);
+        await b2oZeile(s, 'Erst jetzt: maßgebender Wert', '„<b>' + b.titel + '</b> ' + b.hinweis + '“ — <b>' + eur(zahl('svwert')) + '</b>, aus dem führenden Verfahren der Stufe 3. Die Marktpreisindikation davor kam aus Angeboten, kein Verkehrswert.', 1200);
       }
     ]
   };
@@ -2235,7 +2235,7 @@
         var m = q('.main-col'); if (m) m.scrollTop = 0;
         await zeige(function () { return q('#avsec'); }, 8);
         var ein = kartenText(/EINORDNUNG\s+(.+?)\s+GENAUIGKEIT/i);
-        await b2oZeile(s, 'Die Einschätzung', 'Marktwert <b>' + eur(k.mw && k.mw.med) + '</b>' + (k.abschlag ? ' (nach ' + String(k.abschlag.pct).replace('.', ',') + ' % Abschlag auf Angebotspreise)' : '') + (ein ? ' — dein Kaufpreis ' + eur(zahl('kp')) + ': <b>' + ein + '</b>' : '') + '. Marktmiete ' + eur(k.mm && k.mm.med) + '.');
+        await b2oZeile(s, 'Die Einschätzung', 'Marktpreisindikation <b>' + eur(k.mw && k.mw.med) + '</b>' + (k.abschlag ? ' (nach ' + String(k.abschlag.pct).replace('.', ',') + ' % Abschlag auf Angebotspreise)' : '') + (ein ? ' — dein Kaufpreis ' + eur(zahl('kp')) + ': <b>' + ein + '</b>' : '') + '. Marktmiete ' + eur(k.mm && k.mm.med) + '.');
         kartenUebernehmen();
         await warte(900);
         await zeige(feldVon('svwert'), 10);
@@ -3768,7 +3768,7 @@
         if (m) m.scrollTop = 0;
         await zeige(function () { return q('#avsec'); }, 8);
         var ein = kartenText(/EINORDNUNG\s+(.+?)\s+GENAUIGKEIT/i);
-        await b2oZeile(s, 'Marktwert und Lage', 'Marktwertindikation <b>' + (eur(k.mw && k.mw.med) || '–') + '</b>' + (ein ? ' — dein Preis: <b>' + ein + '</b>' : '') + '. Mikrolage ' + (k.mikro || '–') + ', Makrolage ' + (k.makro || '–') + '.');
+        await b2oZeile(s, 'Marktpreis und Lage', 'Marktpreisindikation <b>' + (eur(k.mw && k.mw.med) || '–') + '</b>' + (ein ? ' — dein Preis: <b>' + ein + '</b>' : '') + '. Mikrolage ' + (k.mikro || '–') + ', Makrolage ' + (k.makro || '–') + '.');
       },
       async function (s) {   /* 3 · Investition */
         reiter('s1'); await warte(900);
@@ -3853,6 +3853,16 @@
         var zeileFn = function () { var e = rhIm('#s8', /^\s*Investment-PDF/); return e && (e.closest('[class*=row]') || e.parentElement); };
         await warteAuf(zeileFn, 5000);
         await zeige(zeileFn, 8);
+        /* M11 26.11.2026 · drei Fassungen zur Auswahl (v5060): das Fenster zeigen, Kombi bleibt markiert, dann schliessen */
+        try {
+          if (window.DealPilotPdfWahl && DealPilotPdfWahl.zeige) {
+            DealPilotPdfWahl.zeige('kombi');
+            var wk = function () { return q('#dp-pdf-wahl .dpw-kasten'); };
+            await warteAuf(wk, 3000);
+            if (wk()) { await zeige(wk, 8); await b2oZeile(s, 'Drei Fassungen', 'Beim Klick fragt DealPilot: <b>Kombi</b>, <b>Kurzfassung</b> oder <b>Bankfassung</b>. Vorausgewählt ist die Kombi.', 1200); }
+            var ov = q('#dp-pdf-wahl'); if (ov) ov.remove(); zeige(null);
+          }
+        } catch (e) { var ov2 = q('#dp-pdf-wahl'); if (ov2) ov2.remove(); }
         var zb = r6Beginn(s, 'Das Investment-PDF', 'Ein Klick — der Business-Case für die Bank: Kaufpreis, Finanzierung, Cashflow, DSCR und LTV, Stresstest.');
         try { _ue2Brand = DealPilotConfig.branding.get; DealPilotConfig.branding.get = function () { var b = _ue2Brand.apply(this, arguments) || {}; var c = {}; Object.keys(b).forEach(function (k) { c[k] = b[k]; }); ['name', 'role', 'address', 'plz', 'city', 'phone', 'email', 'website'].forEach(function (k) { c[k] = ''; }); return c; }; } catch (e) {}
         /* GEMESSEN (Prueflauf Ü2): exportPDFBlob ruft exportPDF - das ist seit
@@ -6480,7 +6490,7 @@
         var R = r27Reihe() || [];
         r27Oben(r27Sel('.dp-stv-leg')(), 90); await warte(400);
         await zeige(r27Sel('.dp-stv-ch svg'), 6);
-        await b2oZeile(s, 'Ein Balken je Jahr', (R.length ? '<b>' + R[0].jahr + ' bis ' + R[R.length - 1].jahr + '</b>, die ganze Haltedauer. ' : '') + 'Grün: Verlust, das Finanzamt erstattet. Gold: Gewinn, Steuer fällig. Die Linie: Cashflow nach Steuern.', 1000);
+        await b2oZeile(s, 'Ein Balken je Jahr', (R.length ? '<b>' + R[0].jahr + ' bis ' + R[R.length - 1].jahr + '</b>, die ganze Haltedauer. ' : '') + 'Grün: Verlust, das Finanzamt erstattet. Rot: Überschuss, Steuer fällig. Die Linie: Cashflow nach Steuern.', 1000);
       },
       async function (s) {   /* 3 · der Wendepunkt */
         var R = r27Reihe() || [], A = window.DpSteuerVerlauf ? DpSteuerVerlauf.auswerten(R) : {};
@@ -6490,7 +6500,7 @@
         await zeige(r27Zahl(0), 8);
         await b2oZeile(s, z0.t.charAt(0) + z0.t.slice(1).toLowerCase() + ' ' + z0.w, 'Erst ' + z0.u + ' dreht das Ergebnis ins Plus. Ab hier zahlst du auf dieses Objekt Steuern.');
         await zeigeGruppe(r27Sel('text.wpt'), r27Sel('line.wp'), 8);
-        await b2oZeile(s, 'Die Linie', '„' + r6Text(r27Sel('text.wpt')()) + '“ — gestrichelt im Bild, links grün, rechts gold.');
+        await b2oZeile(s, 'Die Linie', '„' + r6Text(r27Sel('text.wpt')()) + '“ — gestrichelt im Bild, links grün, rechts rot.');
         if (A.wende > 0) {
           await zeigeGruppe(r27Hit(R[0].jahr), r27Hit(R[A.wende - 1].jahr), 4);
           var j1 = R[A.wende - 1].jahr, rz = r15Zellen(j1);
@@ -6638,7 +6648,7 @@
           r27Oben(r27Host(), 110); await warte(400);
           if (k1 + 1 < R.length && R[k1 + 1].steuer < 0) {
             await zeige(r27Hit(R[k1 + 1].jahr), 4);
-            await b2oZeile(s, 'Ab ' + R[k1 + 1].jahr + ' wieder Steuer', 'Steuer <b>' + eur(-R[k1 + 1].steuer) + '</b> im Jahr ' + R[k1 + 1].jahr + ' — der Balken ist wieder gold.');
+            await b2oZeile(s, 'Ab ' + R[k1 + 1].jahr + ' wieder Steuer', 'Steuer <b>' + eur(-R[k1 + 1].steuer) + '</b> im Jahr ' + R[k1 + 1].jahr + ' — der Balken ist wieder rot.');
           }
           await zeigeGruppe(r27Hit(R[k0].jahr), r27Hit(R[k1].jahr), 4);
           await b2oZeile(s, 'Geplant, nicht zufällig', 'Die Maßnahmen liegen in den Jahren mit Steuerlast — nach der Drei-Jahres-Frist, sonst griffe die 15-%-Grenze. Die Grafik zeigt, wo eine Maßnahme die Kurve dreht.', 1500);
