@@ -96,6 +96,23 @@
     return h;
   }
 
+  /* v5090 · zusammengefasste Angebotsmieten je Marktbericht (nur Median und n, noch nicht in der Rechnung) */
+  function angebotMiete(d) {
+    var a = (d.automatisch && d.automatisch.angebot_miete) || {};
+    var h = '<h3 class="rg-h" style="margin-top:14px">Angebotsmieten je Abruf</h3>';
+    if (a.fehler) return h + '<p class="rg-hint rg-rot">' + esc(a.fehler) + '</p>';
+    h += '<p class="rg-hint">Je Marktbericht eine Zeile aus der ohnehin abgerufenen Kennzahl (Median, n). Keine Rohangebote, keine Adressen. '
+      + 'Bisher ' + (a.gesamt || 0) + ' Messungen an ' + (a.orte || 0) + ' Orten' + (a.seit ? ', seit ' + datum(a.seit) : '') + '. In die Näherung erst ab 20 Messungen je Kreis und Klasse.</p>';
+    var l = a.je_land || [];
+    if (!l.length) return h + '<p class="rg-sub">Noch keine Messung protokolliert.</p>';
+    h += '<table class="data-table rg-tab"><thead><tr><th>Land</th><th>Messungen</th><th>Orte</th></tr></thead><tbody>'
+      + l.map(function (x) { return '<tr><td>' + esc(x.land) + '</td><td>' + x.n + '</td><td>' + x.orte + '</td></tr>'; }).join('') + '</tbody></table>';
+    var k = a.je_klasse || [];
+    if (k.length) h += '<table class="data-table rg-tab" style="margin-top:8px"><thead><tr><th>Land</th><th>Objektart</th><th>Größe</th><th>Messungen</th><th>Median €/m²</th></tr></thead><tbody>'
+      + k.map(function (x) { return '<tr><td>' + esc(x.land) + '</td><td>' + esc(x.objektart) + '</td><td>' + esc(x.wfl_klasse) + '</td><td>' + x.n + '</td><td>' + zahl(x.median) + '</td></tr>'; }).join('') + '</tbody></table>';
+    return h;
+  }
+
   function zeichne(d) {
     var box = document.getElementById('rg-jahreswerte');
     if (!box) return;
@@ -109,7 +126,8 @@
       + tabelleWerte(werte)
       + '<h3 class="rg-h" style="margin-top:14px">Automatisch geholte Reihen <a href="#" id="jw-holen" class="range-btn">jetzt holen</a></h3>'
       + reihen(d.automatisch)
-      + abschlag(d);
+      + abschlag(d)
+      + angebotMiete(d);
     var b = document.getElementById('jw-holen');
     if (b) b.addEventListener('click', function (ev) {
       ev.preventDefault(); b.textContent = 'holt …';
