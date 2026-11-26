@@ -231,6 +231,10 @@ body.mit-tafel #tafel{display:flex;flex-direction:column;gap:18px}
             titel: 'Mit deinem Partner arbeiten', unter: 'Verbinden, Objekte senden, Anmerkungen bearbeiten.',
             spruch: 'Gemeinsam an Bord.', spruch2: 'Du behältst das Steuer.', weiter: '' };
   REIHE.ue1 = REIHE['01'];   /* v2370 · Alias */
+  /* M8 26.11.2026 · Video Deal-Check auf der Landing: seite statt App, Drehbuch js/messe-landing.js (wird ins iframe gehängt) */
+  REIHE.dc = { art: 'Video', nr: 'Deal-Check', hinweis: 'Vorführung · erfundene Muster-Unterlagen · nichts gekauft', messe: 'landing-dealcheck', seite: 'landing/index.html',
+            titel: 'Der Deal-Check', unter: 'Unterlagen rein, Urteil raus. Ohne Anmeldung.',
+            spruch: 'Erst prüfen,', spruch2: 'dann boarden.', weiter: '' };
   var MODUL = P.get('modul'), M = null;
   if (MODUL && REIHE[MODUL]) M = REIHE[MODUL];
   else Object.keys(REIHE).forEach(function (k) { if (!M && REIHE[k].messe === P.get('messe')) { M = REIHE[k]; MODUL = k; } });
@@ -312,7 +316,8 @@ body.mit-tafel #tafel{display:flex;flex-direction:column;gap:18px}
     /* v2255d · mit Zeitstempel: index.html kommt ohne Cache-Control (gemessen,
        nur ETag/Last-Modified) - dieselbe Adresse durfte der Browser aus dem
        Speicher holen, samt alter Buster */
-    app.src = 'index.html?messe=' + encodeURIComponent(NAME) + '&studio=1' + ['sprechtempo', 'sprechvor', 'lukurz', 'tempo', 'halt', 'kumit'].map(function (k) { return P.has(k) ? '&' + k + '=' + encodeURIComponent(P.get(k)) : ''; }).join('') + '&_=' + Date.now();   /* v3016s · Tempo-Schalter an die App durchreichen */
+    if (M && M.seite) app.addEventListener('load', function () { try { var d = app.contentDocument, s = d.createElement('script'); s.src = '/js/messe-landing.js?_=' + Date.now(); d.body.appendChild(s); } catch (e) {} });
+    app.src = ((M && M.seite) || 'index.html') + '?messe=' + encodeURIComponent(NAME) + '&studio=1' + ['sprechtempo', 'sprechvor', 'lukurz', 'tempo', 'halt', 'kumit'].map(function (k) { return P.has(k) ? '&' + k + '=' + encodeURIComponent(P.get(k)) : ''; }).join('') + '&_=' + Date.now();   /* v3016s · Tempo-Schalter an die App durchreichen */
     await warte(fx ? fx.dauer : 4000);
     /* warten, bis das Drehbuch in der App bereitsteht (Anmeldung, Plan) */
     var t0 = Date.now();
