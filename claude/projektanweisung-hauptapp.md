@@ -45877,3 +45877,10 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** staging `edd443f7`, main `89d3e951`.
 - **Nachweis:** Westerfeld-Kopie (btj leer) Staging 390/1440: Feld 20, Grafiken und 20 Karten enden 2044, kein Überlauf. steuerjahr-pruefen 36/0, buster-ebenen sauber, gold-audit Prod RC 0, beide App-Domains patch 246.
 - **Rest:** Variante 1 (Schalter „ganze Haltedauer“) nicht gebaut: es gibt keine Jahre jenseits von btj (cfRows = btj). 76 Staging-Objekte haben leeres btj = 20 Jahre, neue Objekte 15. Entscheidung Marcel: Fallback auf 15 setzen (ändert IRR/Exit dieser Objekte) oder 20 lassen.
+
+### Rollout 1.0.247 · v5110/v5110a DealPilot-Näherung mit oberem Wert und amtlichen Marktmieten (Fork EE6, 26.11.2026)
+- **Was:** Die Näherung der Vergleichsmiete liefert jetzt oben/unten (Spanne ×1,132/×0,871 aus 3.313 Mietspiegel-Rasterpunkten). Die App rechnet mit dem oberen Wert und fiel bisher mangels `oben` auf den Mittelwert zurück (Verzerrung zum oberen Mietspiegelwert −12,1 % → −0,2 %). Amtliche Marktmieten der Gutachterausschüsse (Register + NRW Open Data, `lib/mietspiegel/marktmiete-amtlich.json`, 42 Gemeinden, 66 Kreise) gehen mit 25 % ins örtliche Niveau (LOO 8,5 → 8,4 %). Rechenweg „1960 bis 1969“ statt Bindestrich. Neuvermietung bleibt ×1,20/×1,10 (Marcel).
+- **Commits main:** `26db73cc1`, `bfd7ed901`, `b7f852d98` (Version 1.0.247), `38ecb497c` + `71c4d761f` (Prüfer N1 auf „bis“). Staging: `9e9e8408d`, `c1e9da5a7`, `f64d1e079`.
+- **Nachweis Prod (Route /mietspiegel):** Hüllhorst 1962/100 m² Mittel 5,54 oben 6,27 · Kirchlengern 1965/88 m² oben 6,54 · Stuttgart 1975/70 m² oben 11,68, Tooltip ±10,8 %. Sicherungen `/root/backups/*-vor-ee6-20261126-1535.sql.gz` (Köpfe gelesen).
+- **Prüfer:** mietspiegel-werte (Abschnitt Näherung neu), mietpotenzial 312/312, wertermittlung, einzelcheck, flow-berechnen, buster-ebenen grün. Panne: mietpotenzial war beim ersten Push auf main kurz rot (N1 erwartete noch „1970 - 1979“), nach zwei Minuten behoben.
+- **Rest:** Nummer v5110 doppelt vergeben (auch Steuer GG6). Neuvermietungs-Aufschlag erneut prüfen, sobald mb.angebot_miete_messung Daten hat.
