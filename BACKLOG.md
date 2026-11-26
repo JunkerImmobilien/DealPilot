@@ -9,6 +9,11 @@ Punkte werden fortlaufend neu durchnummeriert. Hängt etwas, kommt `**BLOCKIERT:
 direkt unter den Punkt — nicht kommentarlos liegenlassen.
 
 ## → Mietspiegel (VV5, 26.11.2026)
+- **Vor Prod: anwaltliche Kurzbestätigung zu § 44b UrhG** (Text- und Data-Mining an Mietspiegeln mit Speicherverbot oder Rechtevorbehalt, Nutzungsvorbehalt?). Bis dahin TDM nur Staging, nichts davon in naeherung.json.
+- TDM mit Faktoren je Region/Marktlage erneut messen (mit einem Faktor kein Gewinn), Werkzeug `tools/mietspiegel-naeherung-tdm.mjs`.
+- Rückfall Angebotsmiete: Abschläge 22/10/5 % liegen gemessen 25 % daneben (Abstand real 17 bis 47 %), neu kalibrieren; Angebotsmieten je Kreis aus öffentlicher Quelle nach Lizenzprüfung als erklärende Größe testen.
+- Genauigkeit der Näherung im Investment-PDF und Marktbericht-PDF auf der Quellenseite ergänzen (App-Tooltip und Deal-Check erledigt).
+- Darmstadt über 30 €/m² und Velbert unter 3 €/m²: von der alten Prüfgrenze verdrängte Zellen am Dokument nachtragen.
 - Saarbrücken: Tabellen am Druckbild ablesen (Textschicht verfälscht), dann Wertedatei (SL hat sonst keine).
 - Darmstadt, Frankfurt, Karlsruhe, Heidelberg, Ulm, Essen, Münster, Koblenz, Hamm: frei, noch nicht geerntet.
 - Punkte-Mietspiegel (Pforzheim, Magdeburg, Schweinfurt, Gera, Siegen) rechnet werte.js noch nicht.
