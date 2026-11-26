@@ -77,6 +77,7 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
 <link rel="stylesheet" href="dp2-module.css?v=landing-module-2">
 <link rel="stylesheet" href="dp2-kern.css?v=landing-strecke-3">
 <link rel="stylesheet" href="dp2-dealcheck.css?v=einzelcheck-2">
+<link rel="stylesheet" href="dp2-dealcheck-d3.css?v=landing-dealcheck-d3-1">
 <link rel="stylesheet" href="landing-deal-sprung.css?v=landing-deal-sprung-1">
 <link rel="stylesheet" href="landing-faecher.css?v=zahlen-raus-1"><!-- landing-faecher-1 · Streifen, Riss, Startbahn „Fächer“, Videothek als Slider · landing-faecher-2 Gesamturteil, Datenbasis, Partnerkarten -->
 <link rel="stylesheet" href="seo.css?v=landing-seo-5">
@@ -255,7 +256,128 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
   <span>◆ SERVER IN DEUTSCHLAND · DSGVO-KONFORM</span>
 </div></div>
 
-<!-- landing-deal-sprung-3 · Marcel 26.11.2026: die Strecke mit den Videos steht zwischen Laufband und Deal-Check -->
+
+<!-- landing-deal-sprung-2 · Marcel 26.11.2026: erst Hero, dann Slider-Videos und Laufband, dann der Deal-Check -->
+<!-- landing-dealcheck-d3-1 · Marcel 26.11.2026: Deal-Check im Cockpit-Look, Gestaltung in dp2-dealcheck-d3.css/.js, Rechnung unverändert in dp2-dealcheck.js -->
+<section class="sec sec-dark dealcheck dk dk-d3" id="dealcheck"><div class="wrap dk-g">
+  <div class="dk-text rv"><div class="eye">Deal-Check · 20 Sekunden</div>
+    <h2>Rechnet sich das? <span class="ac">Dreh die Karte um.</span></h2>
+    <p>Zwei Zahlen, Zinsbindung und Tilgung. DealPilot rechnet mit denselben Kernen wie in der App und sagt dir sofort, wo der Deal steht.</p>
+    <ul class="dk-pkt"><li>Echter Deal Score, keine Schätzformel</li><li>Zins tagesaktuell je Zinsbindung</li><li>Mit PLZ: Lage &amp; Markt aus amtlichen Daten</li></ul>
+    <div class="d3-leiste" aria-hidden="true"><div><b>2 Zahlen</b><span>genügen zum Start</span></div><div><b>Tageszins</b><span>je Zinsbindung</span></div><div><b>20 s</b><span>bis zum Urteil</span></div></div></div>
+  <div class="dk-szene rv"><div class="dk-karte" id="dkKarte"><!-- landing-seo-3 · Inhalt baut dp2-dealcheck.js (eine Komponente für Startseite und Rechner-Seiten) --></div></div>
+</div></section>
+
+<!-- ══ PREISE (kompakt) ═══════════════════════════════════════════════
+     landing-kern-1 · Marcel 11.11.2026: „Die Preisstufen müssen auf die Startseite und schnell zu finden sein."
+     Gleiches Markup wie auf preise.html (.tkg/.tk-price[data-m]), damit Jahrespreis-Umschalter und
+     promo-erstflug.js (Rabatt aus Stripe) hier genauso greifen. Partner, Kontingent, Matrix: preise.html. -->
+<section class="sec sec-dark tarif-kompakt" id="pricing"><div class="wrap">
+  <div class="head ctr rv"><div class="eye ctr">Preise</div>
+    <h2>Vier Pakete. <span class="ac">Ab 0 €.</span></h2></div>
+  <div class="pseg rv">
+    <div class="seg" id="segZeit">
+      <button class="on" data-zeit="m">Monatlich</button>
+      <button data-zeit="j">Jährlich<span class="spar">−17 %</span></button>
+    </div>
+  </div>
+
+  <div class="ebox" id="boxEinzel"><div class="tkg">
+      <div class="tk rv">
+        <div class="tk-stub">
+          <div class="tk-stars">★</div>
+          <div class="tk-tag">Einstieg · Testflug</div>
+          <div class="tk-name">Free</div>
+          <div class="tk-class">Economy</div>
+        </div>
+        <div class="tkperf"></div>
+        <div class="tk-body">
+          <div class="tk-price"><b>0</b><span class="cur">€</span><span class="per">/ Monat</span></div>
+          <div class="tk-note">4 Wochen Pro · keine Kreditkarte</div>
+          <div class="tk-ker"><span>◗</span>4 Wochen Pro&nbsp;·&nbsp;dann 1&nbsp;/&nbsp;Monat</div>
+          <ul class="tk-feat"><li>1 Objekt</li><li>4 Wochen voller Pro-Umfang</li><li>Co-Pilot: 10 Fragen am Tag</li></ul>
+          <a class="tk-cta" href="https://app.dealpilot.immo/?register=1&plan=free">Kostenlos starten</a>
+        </div>
+        <div class="tk-rip"><span>✈ BOARDING PASS</span><b>DP-01</b></div>
+      </div>
+      <div class="tk rv">
+        <div class="tk-stub">
+          <div class="tk-stars">★★</div>
+          <div class="tk-tag">Privat-Investor</div>
+          <div class="tk-name">Starter</div>
+          <div class="tk-class">Premium Economy</div>
+        </div>
+        <div class="tkperf"></div>
+        <div class="tk-body">
+          <div class="tk-price" data-m="19.99" data-y="219"><b>19,99</b><span class="cur">€</span><span class="per">/ Monat</span></div>
+          <div class="tk-note" data-save="21">oder 219 €/Jahr</div>
+          <div class="tk-ker"><span>◗</span>5 Bewertungen&nbsp;/&nbsp;Monat</div>
+          <ul class="tk-feat"><li>5 Objekte</li><li>Investment-PDF ohne Wasserzeichen</li><li>Co-Pilot: 20 Fragen am Tag</li></ul>
+          <a class="tk-cta" href="https://app.dealpilot.immo/?register=1&plan=starter">Starter wählen</a>
+        </div>
+        <div class="tk-rip"><span>✈ BOARDING PASS</span><b>DP-02</b></div>
+      </div>
+      <div class="tk best rv">
+        <div class="tk-stub">
+          <div class="tk-stars">★★★</div>
+          <span class="tk-bs">★ Bestseller</span>
+          <div class="tk-tag">Aktiver Investor</div>
+          <div class="tk-name">Investor</div>
+          <div class="tk-class">Business</div>
+        </div>
+        <div class="tkperf"></div>
+        <div class="tk-body">
+          <div class="tk-price" data-m="34.99" data-y="384"><b>34,99</b><span class="cur">€</span><span class="per">/ Monat</span></div>
+          <div class="tk-note" data-save="36">oder 384 €/Jahr</div>
+          <div class="tk-ker"><span>◗</span>10 Bewertungen&nbsp;/&nbsp;Monat</div>
+          <ul class="tk-feat"><li>25 Objekte</li><li>Investor Deal Score (24 KPIs)</li><li>Track-Record-PDF · Bankexport</li></ul>
+          <a class="tk-cta" href="https://app.dealpilot.immo/?register=1&plan=investor">Investor wählen</a>
+        </div>
+        <div class="tk-rip"><span>✈ BOARDING PASS</span><b>DP-03</b></div>
+      </div>
+      <div class="tk rv">
+        <div class="tk-stub">
+          <div class="tk-stars">★★★★</div>
+          <div class="tk-tag">Profi</div>
+          <div class="tk-name">Pro</div>
+          <div class="tk-class">First</div>
+        </div>
+        <div class="tkperf"></div>
+        <div class="tk-body">
+          <div class="tk-price" data-m="49.99" data-y="549"><b>49,99</b><span class="cur">€</span><span class="per">/ Monat</span></div>
+          <div class="tk-note" data-save="51">oder 549 €/Jahr</div>
+          <div class="tk-ker"><span>◗</span>15 Bewertungen&nbsp;/&nbsp;Monat</div>
+          <ul class="tk-feat"><li>Unbegrenzte Objekte</li><li>Alle Investor-Funktionen</li><li>API-Zugang</li></ul>
+          <a class="tk-cta" href="https://app.dealpilot.immo/?register=1&plan=pro">Pro wählen</a>
+        </div>
+        <div class="tk-rip"><span>✈ BOARDING PASS</span><b>DP-04</b></div>
+      </div>
+  </div></div>
+  <div class="tarif-mehr">
+    <p class="cta-haken ctr"><span>Keine Zahlungsdaten</span><span>4 Wochen voller Pro-Umfang</span><span>Danach automatisch Free, ohne Kündigung</span></p>
+    <p class="tarif-links"><a href="preise.html">Alle Leistungen der Pakete</a><a href="preise.html#feature-matrix">Cockpit-Matrix</a>
+      <a href="preise.html#partner-plan">Partner &amp; Whitelabel</a><a href="preise.html#nachkauf">Kontingent nachlegen</a></p>
+  </div>
+</div></section>
+
+<!-- landing-videos-1 · Marcel 27.10.2026: "wo sind eigentlich auf der Landingpage meine videos geblieben? Das muss direkt auf der Hauptseite nach dem Hero-Bereich richtig cool in Szene gesetzt werden." Seit v2968 war der Abschnitt unsichtbar: dp2-live.js warf (bild is not a function, lokale Variable ueberdeckte die Funktion) und der catch blendete die Section aus. Jetzt direkt hinter Hero, Laufband und Vertrauensband. -->
+<!-- ══ VERTRAUEN — direkt unter dem Laufband, wie in der Fassung davor ══ -->
+<div class="tband"><div class="wrap"><div class="tband-in">
+  <div><svg class="ico"><use href="#i-server"/></svg>
+    <div><b>Server in Deutschland</b><span>Hosting bei Hetzner · DSGVO-konform</span></div></div>
+  <div><svg class="ico"><use href="#i-pokal"/></svg>
+    <div><b>Amtliche Daten</b><span>Herkunft je Wert, nichts erfunden</span></div></div>
+  <div><svg class="ico"><use href="#i-schild"/></svg>
+    <div><b>Deine Daten bleiben deine</b><span>Kein Weiterverkauf, keine Profilbildung</span></div></div>
+  <div><svg class="ico"><use href="#i-globus"/></svg>
+    <div><b>Made in Germany</b><span>Entwickelt in Nordrhein-Westfalen</span></div></div>
+  <!-- v1873 · FuE-Siegel 2026 der Bescheinigungsstelle Forschungszulage (BSFZ) — Marcel: "ergänze das auf der Landingpage" -->
+  <div class="tband-siegel"><a href="forschung.html" aria-label="Forschung und Entwicklung"><img src="assets/bsfz-siegel-2026.svg" alt="FuE-Siegel 2026 der Bescheinigungsstelle Forschungszulage" width="64" height="64" loading="lazy">
+    <div><b>FuE-Siegel 2026</b><span>Bescheinigungsstelle Forschungszulage (BSFZ)</span></div></a></div>
+</div></div></div>
+<!-- landing-kern-1 · Vertrauensband hinter die Tarife gerückt, damit die Preise auch auf dem Handy in den ersten zwei Bildschirmhöhen stehen -->
+
+<!-- landing-deal-sprung-4 · Marcel 26.11.2026: die Strecke steht direkt hinter den Preisen (und dem Vertrauensband) -->
 <!-- ══ DIE STRECKE (Aufzug) · landing-strecke-1 ════════════════════════
      Marcel 17.11.2026: „dieselbe grafische Art für die Hauptseite … eine Strecke, die den Ablauf von
      DealPilot zeigt, mit echten App-Auszügen“. Seit landing-strecke-3 (Marcel 18.11.2026) die Startseite.
@@ -398,124 +520,6 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
       <span>Keine Zahlungsdaten · 4 Wochen voller Pro-Umfang · danach automatisch Free, ohne Kündigung</span></div>
   </div>
 </div></section>
-
-<!-- landing-deal-sprung-2 · Marcel 26.11.2026: erst Hero, dann Slider-Videos und Laufband, dann der Deal-Check -->
-<section class="sec sec-cream dealcheck dk" id="dealcheck"><div class="wrap dk-g">
-  <div class="dk-text rv"><div class="eye">Deal-Check · 20 Sekunden</div>
-    <h2>Rechnet sich das? <span class="ac">Dreh die Karte um.</span></h2>
-    <p>Zwei Zahlen, Zinsbindung und Tilgung. DealPilot rechnet mit denselben Kernen wie in der App und sagt dir sofort, wo der Deal steht.</p>
-    <ul class="dk-pkt"><li>Echter Deal Score, keine Schätzformel</li><li>Zins tagesaktuell je Zinsbindung</li><li>Mit PLZ: Lage &amp; Markt aus amtlichen Daten</li></ul></div>
-  <div class="dk-szene rv"><div class="dk-karte" id="dkKarte"><!-- landing-seo-3 · Inhalt baut dp2-dealcheck.js (eine Komponente für Startseite und Rechner-Seiten) --></div></div>
-</div></section>
-
-<!-- ══ PREISE (kompakt) ═══════════════════════════════════════════════
-     landing-kern-1 · Marcel 11.11.2026: „Die Preisstufen müssen auf die Startseite und schnell zu finden sein."
-     Gleiches Markup wie auf preise.html (.tkg/.tk-price[data-m]), damit Jahrespreis-Umschalter und
-     promo-erstflug.js (Rabatt aus Stripe) hier genauso greifen. Partner, Kontingent, Matrix: preise.html. -->
-<section class="sec sec-dark tarif-kompakt" id="pricing"><div class="wrap">
-  <div class="head ctr rv"><div class="eye ctr">Preise</div>
-    <h2>Vier Pakete. <span class="ac">Ab 0 €.</span></h2></div>
-  <div class="pseg rv">
-    <div class="seg" id="segZeit">
-      <button class="on" data-zeit="m">Monatlich</button>
-      <button data-zeit="j">Jährlich<span class="spar">−17 %</span></button>
-    </div>
-  </div>
-
-  <div class="ebox" id="boxEinzel"><div class="tkg">
-      <div class="tk rv">
-        <div class="tk-stub">
-          <div class="tk-stars">★</div>
-          <div class="tk-tag">Einstieg · Testflug</div>
-          <div class="tk-name">Free</div>
-          <div class="tk-class">Economy</div>
-        </div>
-        <div class="tkperf"></div>
-        <div class="tk-body">
-          <div class="tk-price"><b>0</b><span class="cur">€</span><span class="per">/ Monat</span></div>
-          <div class="tk-note">4 Wochen Pro · keine Kreditkarte</div>
-          <div class="tk-ker"><span>◗</span>4 Wochen Pro&nbsp;·&nbsp;dann 1&nbsp;/&nbsp;Monat</div>
-          <ul class="tk-feat"><li>1 Objekt</li><li>4 Wochen voller Pro-Umfang</li><li>Co-Pilot: 10 Fragen am Tag</li></ul>
-          <a class="tk-cta" href="https://app.dealpilot.immo/?register=1&plan=free">Kostenlos starten</a>
-        </div>
-        <div class="tk-rip"><span>✈ BOARDING PASS</span><b>DP-01</b></div>
-      </div>
-      <div class="tk rv">
-        <div class="tk-stub">
-          <div class="tk-stars">★★</div>
-          <div class="tk-tag">Privat-Investor</div>
-          <div class="tk-name">Starter</div>
-          <div class="tk-class">Premium Economy</div>
-        </div>
-        <div class="tkperf"></div>
-        <div class="tk-body">
-          <div class="tk-price" data-m="19.99" data-y="219"><b>19,99</b><span class="cur">€</span><span class="per">/ Monat</span></div>
-          <div class="tk-note" data-save="21">oder 219 €/Jahr</div>
-          <div class="tk-ker"><span>◗</span>5 Bewertungen&nbsp;/&nbsp;Monat</div>
-          <ul class="tk-feat"><li>5 Objekte</li><li>Investment-PDF ohne Wasserzeichen</li><li>Co-Pilot: 20 Fragen am Tag</li></ul>
-          <a class="tk-cta" href="https://app.dealpilot.immo/?register=1&plan=starter">Starter wählen</a>
-        </div>
-        <div class="tk-rip"><span>✈ BOARDING PASS</span><b>DP-02</b></div>
-      </div>
-      <div class="tk best rv">
-        <div class="tk-stub">
-          <div class="tk-stars">★★★</div>
-          <span class="tk-bs">★ Bestseller</span>
-          <div class="tk-tag">Aktiver Investor</div>
-          <div class="tk-name">Investor</div>
-          <div class="tk-class">Business</div>
-        </div>
-        <div class="tkperf"></div>
-        <div class="tk-body">
-          <div class="tk-price" data-m="34.99" data-y="384"><b>34,99</b><span class="cur">€</span><span class="per">/ Monat</span></div>
-          <div class="tk-note" data-save="36">oder 384 €/Jahr</div>
-          <div class="tk-ker"><span>◗</span>10 Bewertungen&nbsp;/&nbsp;Monat</div>
-          <ul class="tk-feat"><li>25 Objekte</li><li>Investor Deal Score (24 KPIs)</li><li>Track-Record-PDF · Bankexport</li></ul>
-          <a class="tk-cta" href="https://app.dealpilot.immo/?register=1&plan=investor">Investor wählen</a>
-        </div>
-        <div class="tk-rip"><span>✈ BOARDING PASS</span><b>DP-03</b></div>
-      </div>
-      <div class="tk rv">
-        <div class="tk-stub">
-          <div class="tk-stars">★★★★</div>
-          <div class="tk-tag">Profi</div>
-          <div class="tk-name">Pro</div>
-          <div class="tk-class">First</div>
-        </div>
-        <div class="tkperf"></div>
-        <div class="tk-body">
-          <div class="tk-price" data-m="49.99" data-y="549"><b>49,99</b><span class="cur">€</span><span class="per">/ Monat</span></div>
-          <div class="tk-note" data-save="51">oder 549 €/Jahr</div>
-          <div class="tk-ker"><span>◗</span>15 Bewertungen&nbsp;/&nbsp;Monat</div>
-          <ul class="tk-feat"><li>Unbegrenzte Objekte</li><li>Alle Investor-Funktionen</li><li>API-Zugang</li></ul>
-          <a class="tk-cta" href="https://app.dealpilot.immo/?register=1&plan=pro">Pro wählen</a>
-        </div>
-        <div class="tk-rip"><span>✈ BOARDING PASS</span><b>DP-04</b></div>
-      </div>
-  </div></div>
-  <div class="tarif-mehr">
-    <p class="cta-haken ctr"><span>Keine Zahlungsdaten</span><span>4 Wochen voller Pro-Umfang</span><span>Danach automatisch Free, ohne Kündigung</span></p>
-    <p class="tarif-links"><a href="preise.html">Alle Leistungen der Pakete</a><a href="preise.html#feature-matrix">Cockpit-Matrix</a>
-      <a href="preise.html#partner-plan">Partner &amp; Whitelabel</a><a href="preise.html#nachkauf">Kontingent nachlegen</a></p>
-  </div>
-</div></section>
-
-<!-- landing-videos-1 · Marcel 27.10.2026: "wo sind eigentlich auf der Landingpage meine videos geblieben? Das muss direkt auf der Hauptseite nach dem Hero-Bereich richtig cool in Szene gesetzt werden." Seit v2968 war der Abschnitt unsichtbar: dp2-live.js warf (bild is not a function, lokale Variable ueberdeckte die Funktion) und der catch blendete die Section aus. Jetzt direkt hinter Hero, Laufband und Vertrauensband. -->
-<!-- ══ VERTRAUEN — direkt unter dem Laufband, wie in der Fassung davor ══ -->
-<div class="tband"><div class="wrap"><div class="tband-in">
-  <div><svg class="ico"><use href="#i-server"/></svg>
-    <div><b>Server in Deutschland</b><span>Hosting bei Hetzner · DSGVO-konform</span></div></div>
-  <div><svg class="ico"><use href="#i-pokal"/></svg>
-    <div><b>Amtliche Daten</b><span>Herkunft je Wert, nichts erfunden</span></div></div>
-  <div><svg class="ico"><use href="#i-schild"/></svg>
-    <div><b>Deine Daten bleiben deine</b><span>Kein Weiterverkauf, keine Profilbildung</span></div></div>
-  <div><svg class="ico"><use href="#i-globus"/></svg>
-    <div><b>Made in Germany</b><span>Entwickelt in Nordrhein-Westfalen</span></div></div>
-  <!-- v1873 · FuE-Siegel 2026 der Bescheinigungsstelle Forschungszulage (BSFZ) — Marcel: "ergänze das auf der Landingpage" -->
-  <div class="tband-siegel"><a href="forschung.html" aria-label="Forschung und Entwicklung"><img src="assets/bsfz-siegel-2026.svg" alt="FuE-Siegel 2026 der Bescheinigungsstelle Forschungszulage" width="64" height="64" loading="lazy">
-    <div><b>FuE-Siegel 2026</b><span>Bescheinigungsstelle Forschungszulage (BSFZ)</span></div></a></div>
-</div></div></div>
-<!-- landing-kern-1 · Vertrauensband hinter die Tarife gerückt, damit die Preise auch auf dem Handy in den ersten zwei Bildschirmhöhen stehen -->
 
 <!-- ══ STARTBAHN „FÄCHER“ · landing-faecher-1 ═════════════════════════
      Marcel 20.11.2026: acht belegte Unterlagen liegen als Fächer, jede hebt sich heraus, wird gelesen und dreht sich
@@ -763,6 +767,7 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
      (tools/buster-ebenen-pruefen.mjs liest die Zeilen unten). Die App-Domain folgt umgebung.js:
      staging.dealpilot.immo -> app.staging.dealpilot.immo, sonst app.dealpilot.immo. -->
 <script src="dealcheck-laden.js?v=v4760"></script><!-- landing-seo-3 · Kerne + Deal-Check, Buster dort (buster-ebenen-pruefen liest die Datei) -->
+<script src="dp2-dealcheck-d3.js?v=landing-dealcheck-d3-1"></script><!-- landing-dealcheck-d3-1 · ordnet die Karte nur um, rechnet nichts -->
 <script src="dp2-live.js?v=landing-pruefung-1"></script><!-- landing-faecher-1 · gibt window.DpVideoQuelle für den Slider heraus -->
 <script src="landing-faecher.js?v=zahlen-raus-1-v5080m"></script>
 <script src="partner.js?v=landing-strecke-5"></script><!-- landing-strecke-1 · Aufzug der Strecke --><!-- landing-videothek-1, landing-partner-1 -->
