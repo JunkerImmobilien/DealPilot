@@ -1,0 +1,457 @@
+{
+ "ags": "05754024",
+ "gemeinde": "Langenberg",
+ "art": "qualifiziert",
+ "stand": "2026-01",
+ "erhebungsstichtag": "2024-01-01",
+ "gueltig_ab": "2026-07-01",
+ "gueltig_bis": null,
+ "naechste_ausgabe": "2028",
+ "quelle": {
+  "url": "https://www.langenberg.de/startseite/leben-in-langenberg/bauen-wohnen/mietspiegel/mietspiegel-langenberg-2026.pdf?cid=gon",
+  "dokument": "Mietspiegel der Stadt/Gemeinde Langenberg 2026, gültig ab 1. Juli 2026, ortsübliche Vergleichsmiete Stichtag 1. Januar 2026 (Fortschreibung des qualifizierten Mietspiegels 2024 nach dem Verbraucherpreisindex); Tabelle gegen Dokumentation „Qualifizierte Mietspiegel 2026 der 13 Städte und Gemeinden im Kreis Gütersloh“ (IGES Mobility GmbH, Hamburg, Mai 2026, im Auftrag des Kreises Gütersloh und des Arbeitskreises Mietspiegel), Tabelle 7, geprüft",
+  "seite": "PDF-S. 21 (Mietspiegeltabelle), PDF-S. 19 (Beispiel); Dokumentation S. 17 Tabelle 7",
+  "lizenz": "kein Rechtevorbehalt im Dokument (kein Nachdruck- oder Speicherverbot, kein Urheberrechtsvermerk), geprüft am 2026-11-26",
+  "abgerufen": "2026-11-26"
+ },
+ "einheit": "eur_qm_nettokalt",
+ "form": "tabelle",
+ "rundung": 2,
+ "hinweis": "Qualifizierter Mietspiegel 2026 (§ 558d BGB), einer von 13 gemeinsam erstellten Mietspiegeln im Kreis Gütersloh (Arbeitskreis Mietspiegel, anerkannt 28.04.2026, IGES Mobility); Fortschreibung des Mietspiegels 2024 per VPI, Erhebungsstichtag 1. Januar 2024, Werte-Stichtag 1. Januar 2026, gültig ab 1. Juli 2026 (PDF-S. 21). Tabelle aus der Textschicht der Stadt-PDF, Feld für Feld gleich mit der Dokumentation (Koordinaten der Textschicht, an Gütersloh 40/40 geprüft). Mittelwert und 2/3-Spanne je Feld; gilt für Standardwohnungen mit Bad, WC und Sammelheizung in mittlerer Wohnlage; gute Wohnlage und weitere Merkmale nur INNERHALB der Spanne (keine bezifferten Zu-/Abschläge). Baualter bis 2023. Graue Felder (10–29 Fälle) eingeschränkt aussagekräftig — nur an der Farbe erkennbar. Einbezogen sind auch Mietwohnungen aus Ein- und Zweifamilienhäusern (Stadt-PDFs, Abschnitt Wohnungsart); zu ganzen vermieteten Häusern sagt das Dokument nichts.",
+ "tabelle": {
+  "achsen": {
+   "baujahr": [
+    {
+     "von": null,
+     "bis": 1960,
+     "label": "bis 1960"
+    },
+    {
+     "von": 1961,
+     "bis": 1967,
+     "label": "1961 bis 1967"
+    },
+    {
+     "von": 1968,
+     "bis": 1977,
+     "label": "1968 bis 1977"
+    },
+    {
+     "von": 1978,
+     "bis": 1994,
+     "label": "1978 bis 1994"
+    },
+    {
+     "von": 1995,
+     "bis": 2002,
+     "label": "1995 bis 2002"
+    },
+    {
+     "von": 2003,
+     "bis": 2012,
+     "label": "2003 bis 2012"
+    },
+    {
+     "von": 2013,
+     "bis": 2019,
+     "label": "2013 bis 2019"
+    },
+    {
+     "von": 2020,
+     "bis": 2023,
+     "label": "2020 bis 2023"
+    }
+   ],
+   "wfl": [
+    {
+     "von": 25,
+     "bis": 50,
+     "label": "25 m² bis 50 m²"
+    },
+    {
+     "von": 50,
+     "von_inkl": false,
+     "bis": 65,
+     "label": "über 50 m² bis 65 m²"
+    },
+    {
+     "von": 65,
+     "von_inkl": false,
+     "bis": 80,
+     "label": "über 65 m² bis 80 m²"
+    },
+    {
+     "von": 80,
+     "von_inkl": false,
+     "bis": 95,
+     "label": "über 80 m² bis 95 m²"
+    },
+    {
+     "von": 95,
+     "von_inkl": false,
+     "bis": null,
+     "label": "über 95 m²"
+    }
+   ]
+  },
+  "zellen": [
+   {
+    "baujahr": 0,
+    "wfl": 0,
+    "unten": 6.03,
+    "mittel": 7.51,
+    "oben": 9.31,
+    "seite": "21"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 0,
+    "unten": 5.6,
+    "mittel": 7.01,
+    "oben": 8.28,
+    "seite": "21"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 0,
+    "unten": 5.39,
+    "mittel": 7.17,
+    "oben": 8.87,
+    "seite": "21"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 0,
+    "unten": 6.21,
+    "mittel": 7.45,
+    "oben": 8.75,
+    "seite": "21"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 0,
+    "unten": 6.16,
+    "mittel": 7.23,
+    "oben": 8.25,
+    "seite": "21"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 0,
+    "unten": 5.96,
+    "mittel": 7.22,
+    "oben": 8.52,
+    "seite": "21"
+   },
+   {
+    "baujahr": 6,
+    "wfl": 0,
+    "unten": 7.05,
+    "mittel": 8.33,
+    "oben": 9.6,
+    "seite": "21"
+   },
+   {
+    "baujahr": 7,
+    "wfl": 0,
+    "unten": 8.06,
+    "mittel": 9.63,
+    "oben": 11.31,
+    "seite": "21"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 1,
+    "unten": 5.93,
+    "mittel": 7.04,
+    "oben": 8.03,
+    "seite": "21"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 1,
+    "unten": 5.82,
+    "mittel": 6.87,
+    "oben": 8,
+    "seite": "21"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 1,
+    "unten": 5.43,
+    "mittel": 6.63,
+    "oben": 7.75,
+    "seite": "21"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 1,
+    "unten": 5.81,
+    "mittel": 6.84,
+    "oben": 7.83,
+    "seite": "21"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 1,
+    "unten": 5.53,
+    "mittel": 6.5,
+    "oben": 7.54,
+    "seite": "21"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 1,
+    "unten": 6.29,
+    "mittel": 7.35,
+    "oben": 8.31,
+    "seite": "21"
+   },
+   {
+    "baujahr": 6,
+    "wfl": 1,
+    "unten": 6.6,
+    "mittel": 7.63,
+    "oben": 8.53,
+    "seite": "21"
+   },
+   {
+    "baujahr": 7,
+    "wfl": 1,
+    "unten": 8.37,
+    "mittel": 9.84,
+    "oben": 11.26,
+    "seite": "21"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 2,
+    "unten": 5.62,
+    "mittel": 6.79,
+    "oben": 8.22,
+    "seite": "21"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 2,
+    "unten": 5.91,
+    "mittel": 6.91,
+    "oben": 7.97,
+    "seite": "21"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 2,
+    "unten": 5.28,
+    "mittel": 6.4,
+    "oben": 7.48,
+    "seite": "21"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 2,
+    "unten": 5.73,
+    "mittel": 6.6,
+    "oben": 7.45,
+    "seite": "21"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 2,
+    "unten": 5.49,
+    "mittel": 6.31,
+    "oben": 7.1,
+    "seite": "21"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 2,
+    "unten": 5.96,
+    "mittel": 7.05,
+    "oben": 8.12,
+    "seite": "21"
+   },
+   {
+    "baujahr": 6,
+    "wfl": 2,
+    "unten": 6.67,
+    "mittel": 7.52,
+    "oben": 8.31,
+    "seite": "21"
+   },
+   {
+    "baujahr": 7,
+    "wfl": 2,
+    "unten": 7.98,
+    "mittel": 8.96,
+    "oben": 10.01,
+    "seite": "21"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 3,
+    "unten": 5.76,
+    "mittel": 6.93,
+    "oben": 8,
+    "seite": "21"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 3,
+    "unten": 5.91,
+    "mittel": 6.86,
+    "oben": 7.81,
+    "seite": "21"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 3,
+    "unten": 5.4,
+    "mittel": 6.47,
+    "oben": 7.68,
+    "seite": "21"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 3,
+    "unten": 5.51,
+    "mittel": 6.5,
+    "oben": 7.46,
+    "seite": "21"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 3,
+    "unten": 5.32,
+    "mittel": 6.21,
+    "oben": 7.16,
+    "seite": "21"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 3,
+    "unten": 6.19,
+    "mittel": 7.01,
+    "oben": 7.86,
+    "seite": "21"
+   },
+   {
+    "baujahr": 6,
+    "wfl": 3,
+    "unten": 6.66,
+    "mittel": 7.75,
+    "oben": 8.97,
+    "seite": "21"
+   },
+   {
+    "baujahr": 7,
+    "wfl": 3,
+    "unten": 8.41,
+    "mittel": 9.4,
+    "oben": 10.68,
+    "seite": "21"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 4,
+    "unten": 5.09,
+    "mittel": 6.42,
+    "oben": 7.66,
+    "seite": "21"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 4,
+    "unten": 5.62,
+    "mittel": 7.14,
+    "oben": 8.52,
+    "seite": "21"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 4,
+    "unten": 5.23,
+    "mittel": 6.41,
+    "oben": 7.61,
+    "seite": "21"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 4,
+    "unten": 5.18,
+    "mittel": 6.25,
+    "oben": 7.29,
+    "seite": "21"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 4,
+    "unten": 5.04,
+    "mittel": 6.04,
+    "oben": 6.91,
+    "seite": "21"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 4,
+    "unten": 5.58,
+    "mittel": 6.85,
+    "oben": 8.13,
+    "seite": "21"
+   },
+   {
+    "baujahr": 6,
+    "wfl": 4,
+    "unten": 5.93,
+    "mittel": 7.24,
+    "oben": 8.61,
+    "seite": "21"
+   },
+   {
+    "baujahr": 7,
+    "wfl": 4,
+    "unten": 7.54,
+    "mittel": 9.11,
+    "oben": 10.25,
+    "seite": "21"
+   }
+  ]
+ },
+ "pruefbeispiele": [
+  {
+   "eingabe": {
+    "baujahr": 2000,
+    "wfl": 52
+   },
+   "erwartet": {
+    "unten": 5.53,
+    "mittel": 6.5,
+    "oben": 7.54
+   },
+   "art": "anwendungsbeispiel",
+   "seite": "PDF-S. 19 Beispiel: bezugsfertig 1995–2002, Normalausstattung, 52 m², mittlere Wohnlage"
+  },
+  {
+   "eingabe": {
+    "baujahr": 1985,
+    "wfl": 70
+   },
+   "erwartet": {
+    "unten": 5.73,
+    "mittel": 6.6,
+    "oben": 7.45
+   },
+   "art": "tabellenzelle",
+   "seite": "21, Feld 1978 bis 1994 / über 65 m² bis 80 m²"
+  },
+  {
+   "eingabe": {
+    "baujahr": 2024,
+    "wfl": 70
+   },
+   "erwartet": null,
+   "art": "tabellenzelle",
+   "seite": "nach 2023 bezugsfertig: keine Tabellenspalte"
+  }
+ ]
+}
