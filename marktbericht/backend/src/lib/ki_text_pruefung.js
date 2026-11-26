@@ -84,7 +84,23 @@ export function textFakten(p) {
   const vf = cc.verfahrenswahl && cc.verfahrenswahl.verfahren;
   const fuehrend = vf && werte[vf] ? vf : null;
   const kopfwert = fuehrend ? werte[fuehrend] : werte.mpi;
-  return { werte, verhaeltnis, zaehl, ertragswert_im_umfang: !!ew, sachwert_im_umfang: !!sw, bodenwert_nicht_angepasst, fuehrend, kopfwert };
+  /* bb6 · Marcel 26.11.2026: „Verkehrswert, wenn das auch so angegeben ist nach ImmoWertV."
+     Nur Stufe 3 mit amtlich gerechnetem fuehrendem Verfahren: Ertragswert nicht vorlaeufig (boG offen) und
+     mit amtlichem Liegenschaftszins (Stufe A), Sachwert marktangepasst (nicht vorlaeufig), Vergleichswert
+     aus amtlicher Grundlage (nicht aus Angeboten). Sonst „Wertindikation", bei Angeboten „Marktpreisindikation". */
+  const stufe3 = Number(p.ref && p.ref.wert_stufe) >= 3;
+  const lzsA = String((cc.assumptions && cc.assumptions.liegenschaftszins_stufe) || '').toUpperCase() === 'A';
+  const vorlaeufig = fuehrend === 'ertragswert' ? !!(ew && (ew.vorlaeufig_vor_bog || ew.vorlaeufig)) || !lzsA
+    : fuehrend === 'sachwert' ? !!(sw && sw.vorlaeufig)
+    : fuehrend === 'vergleichswert' ? !!(_vwa.basis === 'angebote' || (cc.comparison && cc.comparison.basis === 'angebote'))
+    : true;
+  const verkehrswert = !!(stufe3 && fuehrend && !vorlaeufig);
+  const kopfbegriff = !fuehrend ? 'Marktpreisindikation'
+    : verkehrswert ? 'Verkehrswert'
+    : (fuehrend === 'ertragswert' && ew && ew.vorlaeufig_vor_bog) ? 'vorläufiger Ertragswert'
+    : 'Wertindikation aus dem ' + NAME[fuehrend];
+  return { werte, verhaeltnis, zaehl, ertragswert_im_umfang: !!ew, sachwert_im_umfang: !!sw, bodenwert_nicht_angepasst, fuehrend, kopfwert,
+    verkehrswert, kopfbegriff };
 }
 
 /* Benannte Pruefzahlen fuer den Prompt: kaufpreis_ueber_mpi_pct = 58.6 usw. */
@@ -122,11 +138,15 @@ export function faktenAnweisung(F) {
     s.push('Der Ertragswert ist in diesem Bericht ENTHALTEN' + (F.sachwert_im_umfang ? ', der Sachwert ebenfalls' : '') + ' - schreibe nie, er sei nicht enthalten.');
   }
   if (F.fuehrend && F.fuehrend !== 'mpi' && F.werte.mpi && F.kopfwert && Math.abs(F.werte.mpi / F.kopfwert - 1) > 0.02) {
-    s.push('Die Marktwert-Indikation dieses Berichts ist der ' + NAME[F.fuehrend] + ' mit ' + Math.round(F.kopfwert).toLocaleString('de-DE')
+    s.push((F.verkehrswert ? 'Der Verkehrswert nach ImmoWertV dieses Berichts ist der ' : 'Die Wertindikation dieses Berichts (' + (F.kopfbegriff || 'Wertindikation') + ') ist der ')
+      + NAME[F.fuehrend] + ' mit ' + Math.round(F.kopfwert).toLocaleString('de-DE')
       + ' € (führendes Verfahren). Die ' + Math.round(F.werte.mpi).toLocaleString('de-DE') + ' € heißen „Marktpreisindikation aus Angeboten" - nenne sie NIE „Marktwert".');
   }
   if (F.bodenwert_nicht_angepasst) s.push('Der Bodenwert ist NICHT an die Grundstücksgröße angepasst - das ist eine offene Prüfung, '
     + 'kein vorsichtiger Ansatz. Nenne ihn nie „konservativ", „vorsichtig" oder „zurückhaltend".');
+  /* bb6 · Verkehrswert nur, wenn nach ImmoWertV ermittelt (textFakten.verkehrswert) */
+  if (!F.verkehrswert && (F.fuehrend || (F.werte && F.werte.mpi))) s.push('Dieser Bericht ermittelt KEINEN Verkehrswert nach ImmoWertV. Nenne keinen Wert „Verkehrswert", sondern '
+    + (F.fuehrend ? '„' + (F.kopfbegriff || 'Wertindikation') + '"' : '„Marktpreisindikation aus Angeboten"') + '.');
   if (!s.length) return '';
   return '\n\nPRÜFZAHLEN (fertig gerechnet, verbindlich): ' + s.join(' ')
     + ' Als Feldnamen: ' + JSON.stringify(pruefzahlen(F)) + '. '
@@ -225,6 +245,11 @@ export function pruefeText(md, F) {
       befunde.push({ art: 'bodenwert_wertung', satz: t.trim(), zeile: s.zeile, ist: 'Bodenwert als vorsichtig/konservativ gewertet',
         soll: 'nicht an die Grundstücksgröße angepasst, insoweit vorläufig (Richtung offen)' });
     }
+    /* 7) bb6 · „Verkehrswert" ohne Ermittlung nach ImmoWertV (Verneinungen wie „kein Verkehrswert" zaehlen nicht) */
+    if (F.verkehrswert === false && /Verkehrswert/i.test(t) && !/(kein|keine|keinen|nicht|ersetzt nicht|statt)[^.]{0,40}Verkehrswert/i.test(t)) {
+      befunde.push({ art: 'verkehrswert_ohne_immowertv', satz: t.trim(), zeile: s.zeile, ist: 'Verkehrswert genannt',
+        soll: (F.kopfbegriff || 'Marktpreisindikation') + ' (kein Verkehrswert nach ImmoWertV in diesem Bericht)' });
+    }
     /* 6) v3207 · „Marktwert" mit einem Betrag, der nicht die Kopfzahl ist (Bericht 549).
           Nur wenn die Angebotsindikation von der Kopfzahl abweicht und der Betrag zur
           Angebotsindikation passt - ein anderer Betrag ist keine sichere Zuordnung. */
@@ -235,7 +260,7 @@ export function pruefeText(md, F) {
         const betrag = Number(w[1].replace(/\./g, ''));
         if (Math.abs(betrag / F.werte.mpi - 1) <= 0.01 && Math.abs(betrag / F.kopfwert - 1) > 0.02) {
           befunde.push({ art: 'marktwert_bezug', satz: t.trim(), zeile: s.zeile, ist: 'Marktwert ' + w[1] + ' €',
-            soll: 'Marktwert-Indikation ' + Math.round(F.kopfwert).toLocaleString('de-DE') + ' € (' + NAME[F.fuehrend] + '); '
+            soll: (F.kopfbegriff || 'Wertindikation') + ' ' + Math.round(F.kopfwert).toLocaleString('de-DE') + ' € (' + NAME[F.fuehrend] + '); '
               + w[1] + ' € ist die Marktpreisindikation aus Angeboten' });
         }
       }
