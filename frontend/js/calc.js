@@ -2664,6 +2664,9 @@ function _calcImmediate(){
      Wertpuffer und Investment-PDF nannten trotzdem +22.000 € und „Marktwert (eigene Schätzung)“. */
   try { var _waE = State.wert_anker; if (_waE && _waE.wert > 0 && svw > 0 && !/^mpi/.test(_waE.art || '') && (_svwHerk === 'eigene' || !_svwHerkExpl)) wp_kpi = _waE.wert - kp; } catch (_eWe) {}
   var btj=parseInt(g('btj')||'20');
+  /* v5110 GG6 · Marcel 26.11.2026 (Betrachtungszeitraum 15, die Steuer wird laenger angezeigt): bei leerem Feld rechnete die
+     App still mit 20 Jahren, das Feld zeigte nichts. Jetzt steht der gerechnete Wert im Feld. Keine Rechenaenderung. */
+  try { var _btjF = document.getElementById('btj'); if (_btjF && !String(_btjF.value || '').trim() && document.activeElement !== _btjF) _btjF.value = String(btj); } catch (_eBtj) {}
   /* v816-CUT: Privat-Objekt-Cut bei Ueberfuehrung. Gated ueber Feld 'ueberf_ende' (Datum).
      Kappt btj auf volle Jahre bis zum Stichtagsjahr; letztes Jahr wird anteilig (Monat/12) gerechnet.
      OHNE ueberf_ende bleibt alles unveraendert (active=false, factor=1). */

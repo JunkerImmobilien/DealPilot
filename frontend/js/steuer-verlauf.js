@@ -179,7 +179,7 @@
       ? 'Bis ' + R[w - 1].jahr + (A.vorherSteuer < 0
           ? ' wechseln Verlust- und Gewinnjahre (Erstattungen ' + sgn(A.erstattung) + ', Steuer ' + eur(A.vorherSteuer) + ', zusammen ' + sgn(A.netto) + '). <b>Ab ' + A.jahr + ' bleibt das Ergebnis positiv</b>'
           : ' senkt das Objekt deine Steuer (Erstattungen ' + sgn(A.erstattung) + '). <b>Ab ' + A.jahr + ' wird das Ergebnis positiv</b>')
-        + ' – ab hier zahlst du auf dieses Objekt Steuern. Das ist der Zeitpunkt, an dem ein weiteres Investment mit Anfangsverlusten (Zinsen, AfA, Sanierung) die Steuerlast wieder ausgleichen kann.'
+        + '. Ab hier zahlst du auf dieses Objekt Steuern. Das ist der Zeitpunkt, an dem ein weiteres Investment mit Anfangsverlusten (Zinsen, AfA, Sanierung) die Steuerlast wieder ausgleichen kann.'
       : (w === 0 ? 'Dieses Objekt ist <b>vom ersten Jahr an steuerlich positiv</b>, es bringt keine Erstattung, die Steuer steigt mit der Miete (' + R[0].jahr + ': ' + eur(Math.max(0, -R[0].steuer)) + ', ' + R[n - 1].jahr + ': ' + eur(Math.max(0, -R[n - 1].steuer)) + ' im Jahr). Ein Objekt mit Anfangsverlusten daneben würde die Last senken.'
         : (function () {
             /* v3273 · Ravensberger Weg 38: 2026–2029 positiv, ab 2030 (Anschluss 5 % statt 4 %) wieder

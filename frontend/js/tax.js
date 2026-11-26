@@ -1229,7 +1229,7 @@ function renderTaxTimeline() {
       erh: totals.values ? (Number(totals.values.erhaltungsaufwand) || 0) : 0   /* v2992 */
     };
   });
-  var timeline = timelineVoll.slice(0, 15);   /* die Karten */
+  var timeline = timelineVoll.slice();   /* die Karten · v5110 GG6: ganzer Betrachtungszeitraum wie die beiden Steuergrafiken (vorher fest 15 Karten, bei 20 Jahren endeten die Karten 2039, die Grafiken 2044) */
 
   /* v2890 · DIE REIHE WIRD GESPEICHERT, BEVOR EIN ZWEIG ZURUECKKEHRT.
      Der GmbH/UG-Zweig unten endet mit return - bis v2889 VOR dieser Stelle.
