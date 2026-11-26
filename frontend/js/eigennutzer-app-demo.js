@@ -30,15 +30,16 @@
   function farbe(s) { return s == null ? '#888' : s >= 70 ? '#3FA56C' : s >= 50 ? 'var(--wl-c9a84c,#C9A84C)' : '#B8625C'; }
 
   var REITER = [
-    ['ueberblick', 'Überblick', 'house'], ['haus', 'Haus und Zustand', 'settings'], ['preis', 'Preis und Wert', 'coins'],
-    ['lage', 'Lage und Markt', 'barChart'], ['fin', 'Finanzierung und Leistbarkeit', 'bank'], ['kaufen', 'Kaufen oder mieten', 'euro'],
-    ['foerder', 'Förderung', 'handshake'], ['unterlagen', 'Unterlagen und Besichtigung', 'fileText']
+    ['ueberblick', 'Überblick', 'house'], ['haus', 'Haus', 'settings'], ['preis', 'Preis und Wert', 'coins'],
+    ['lage', 'Lage und Markt', 'barChart'], ['fin', 'Finanzierung', 'bank'], ['kaufen', 'Kaufen oder mieten', 'euro'],
+    ['foerder', 'Förderung', 'handshake'], ['unterlagen', 'Unterlagen', 'fileText']
   ];
   var aktiv = 'ueberblick', ergebnis = null, daten = null, zuletzt = '';
 
   var CSS = ''
     + 'body.eig-obj nav.tabs:not(.eig-tabs){display:none!important}'
     + 'body.eig-obj .sec{display:none!important}'
+    + 'body.eig-obj #hdr-badges,body.eig-obj .dpl-teil-score,body.eig-obj #hdr-ziel-mini,body.eig-obj #ank-ansicht-host{display:none!important}'   /* Investor Deal Score, Renditeziel, Ist/Soll-Pille: gibt es für Selbstnutzer nicht */
     + 'nav.tabs.eig-tabs{display:none}body.eig-obj nav.tabs.eig-tabs{display:flex!important;flex-wrap:wrap}'
     + 'body.eig-obj #eig-panel{display:block!important}#eig-panel{display:none;padding:18px 0}'
     + '.eig-nutz{margin-left:auto;display:flex;gap:4px;align-items:center;font:600 11px "JetBrains Mono",monospace;color:var(--muted,#8a826f)}'
