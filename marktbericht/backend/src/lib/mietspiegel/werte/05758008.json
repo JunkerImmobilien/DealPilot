@@ -1,0 +1,229 @@
+{
+ "ags": "05758008",
+ "gemeinde": "Enger",
+ "art": "einfach",
+ "stand": "2024-11-01",
+ "erhebungsstichtag": null,
+ "gueltig_ab": "2024-11-01",
+ "gueltig_bis": null,
+ "quelle": {
+  "url": "https://www.enger.de/loadDocument.phtml?ObjSvrID=1470&ObjID=6005&ObjLa=1&Ext=PDF",
+  "dokument": "Mietspiegel der Stadt Enger für freifinanzierte Wohnungen, gültig ab 01. November 2024 (Herausgeberin Stadt Enger, Fachbereich II – Soziales; erstellt und beschlossen vom Gutachterausschuss für Grundstückswerte im Kreis Herford und in der Stadt Herford; anerkannt von Verband der Haus-, Wohnungs- und Grundeigentümer OWL, Mieterbund OWL, VHWG Herford, Mieterverein Herford, Haus & Grund Herford)",
+  "seite": "S. 1 (Tabelle), S. 2 (Erläuterungen, § 558c, Lage, Ausstattung, Vollmodernisierung)",
+  "lizenz": "kein Rechtevorbehalt im Dokument (kein Nachdruck- oder Speicherverbot, kein Urheberrechtsvermerk), geprüft am 2026-11-26",
+  "abgerufen": "2026-11-26"
+ },
+ "einheit": "eur_qm_nettokalt",
+ "form": "tabelle",
+ "rundung": 2,
+ "hinweis": "Einfacher Mietspiegel (§ 558c BGB, S. 2), Mieten der letzten sechs Jahre in Enger. Tabelle S. 1 aus der Textschicht, am Druckbild (110 dpi) geprüft (Textschicht verschiebt die Zeilen 1961–1980 / 1981–2000). Baujahr 2001–2023: Größenklassen bis 60 und über 60 bis 80 m² im Dokument zu „Bis 80 m² *“ zusammengefasst („Aufgrund zu geringer Fallzahlen“) — hier beide Klassen mit demselben Feld. Bezieht sich auf normale bzw. gute Wohnlage; Lage, fehlende Merkmale und Sonderausstattung nur innerhalb der Spanne (S. 2). Vollmodernisierungszuschlag 1,00 €/m² nur bei allen vier Maßnahmen, sonst anteilig — hier nur ganz; keine Baujahrsgrenze genannt. Dieselbe Ausgabe liegt als Pflichtexemplar bei der ULB Münster (https://epflicht.ulb.uni-muenster.de/download/pdf/1036847), Zahlen gleich.",
+ "haus": {
+  "regel": "orientierung",
+  "beleg": "S. 2 Allgemeine Erläuterungen: „Für die Vermietung von Einfamilienhäusern kann der Mietspiegel als Orientierungshilfe dienen.“"
+ },
+ "tabelle": {
+  "achsen": {
+   "baujahr": [
+    {
+     "von": null,
+     "bis": 1960,
+     "label": "Bis 1960"
+    },
+    {
+     "von": 1961,
+     "bis": 1980,
+     "label": "1961 bis 1980"
+    },
+    {
+     "von": 1981,
+     "bis": 2000,
+     "label": "1981 bis 2000"
+    },
+    {
+     "von": 2001,
+     "bis": 2023,
+     "label": "2001 bis 2023"
+    }
+   ],
+   "wfl": [
+    {
+     "von": null,
+     "bis": 60,
+     "label": "Bis 60 m²"
+    },
+    {
+     "von": 60,
+     "bis": 80,
+     "label": "Über 60 bis 80 m²",
+     "von_inkl": false
+    },
+    {
+     "von": 80,
+     "bis": 100,
+     "label": "Über 80 bis 100 m²",
+     "von_inkl": false
+    },
+    {
+     "von": 100,
+     "bis": null,
+     "label": "Über 100 m²",
+     "von_inkl": false
+    }
+   ]
+  },
+  "zellen": [
+   {
+    "baujahr": 0,
+    "wfl": 0,
+    "unten": 5,
+    "mittel": 6.57,
+    "oben": 8,
+    "seite": "1"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 1,
+    "unten": 4.5,
+    "mittel": 5.96,
+    "oben": 7.5,
+    "seite": "1"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 2,
+    "unten": 4.5,
+    "mittel": 6.09,
+    "oben": 7.5,
+    "seite": "1"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 3,
+    "unten": 4,
+    "mittel": 5.25,
+    "oben": 7,
+    "seite": "1"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 0,
+    "unten": 5,
+    "mittel": 5.6,
+    "oben": 7,
+    "seite": "1"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 1,
+    "unten": 5,
+    "mittel": 5.84,
+    "oben": 7,
+    "seite": "1"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 2,
+    "unten": 5,
+    "mittel": 5.74,
+    "oben": 7,
+    "seite": "1"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 3,
+    "unten": 5,
+    "mittel": 5.92,
+    "oben": 7.5,
+    "seite": "1"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 0,
+    "unten": 6,
+    "mittel": 6.83,
+    "oben": 8,
+    "seite": "1"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 1,
+    "unten": 5,
+    "mittel": 5.73,
+    "oben": 7,
+    "seite": "1"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 2,
+    "unten": 5,
+    "mittel": 5.5,
+    "oben": 7,
+    "seite": "1"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 3,
+    "unten": 5,
+    "mittel": 6,
+    "oben": 7.5,
+    "seite": "1"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 0,
+    "unten": 6,
+    "mittel": 7.71,
+    "oben": 10,
+    "seite": "1"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 1,
+    "unten": 6,
+    "mittel": 7.71,
+    "oben": 10,
+    "seite": "1"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 2,
+    "unten": 5.5,
+    "mittel": 7.63,
+    "oben": 10,
+    "seite": "1"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 3,
+    "unten": 5.5,
+    "mittel": 7.29,
+    "oben": 9,
+    "seite": "1"
+   }
+  ],
+  "zuschlaege": [
+   {
+    "merkmal": "energetische_vollmodernisierung",
+    "label": "energetische Vollmodernisierung (alle vier Maßnahmen)",
+    "art": "eur_qm",
+    "wert": 1,
+    "beleg": "S. 2 „Der Zuschlagswert für eine energetische Vollmodernisierungen wird mit 1,00 €/m² angegeben“"
+   }
+  ]
+ },
+ "pruefbeispiele": [
+  {
+   "eingabe": {
+    "baujahr": 1975,
+    "wfl": 70
+   },
+   "erwartet": {
+    "unten": 5,
+    "mittel": 5.84,
+    "oben": 7
+   },
+   "seite": "1",
+   "art": "tabellenzelle"
+  }
+ ]
+}
