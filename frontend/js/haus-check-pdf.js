@@ -295,7 +295,8 @@
       var fmtW = function (w) { var n = w.nachkomma != null ? w.nachkomma : 1, v = Number(w.wert); return (w.vorzeichen && v > 0 ? '+ ' : w.vorzeichen && v < 0 ? '− ' : '') + zahl(w.vorzeichen ? Math.abs(v) : v, n); };
       var EINH = function (w) { return String(w.einheit || '').replace(/p\. ?a\./, 'im Jahr').replace(/\((Deutschland = 100)\)/, '$1').trim(); };
       var rk = (RG.werte || []).slice(0, 4).map(function (w) {
-        return kachel(esc(w.label), fmtW(w) + ' <span style="font-size:8pt;display:inline;letter-spacing:0;text-transform:none">' + esc(EINH(w)) + '</span>', esc((w.ebene ? w.ebene + ' ' : '') + (w.gebiet || '')) + (w.jahr ? ', Stand ' + w.jahr : ''));
+        var einh = EINH(w), kurz = einh === '%' || einh === '% im Jahr' ? ' %' : '';
+        return kachel(esc(w.label), fmtW(w) + kurz, esc((kurz ? einh.replace(/^%\s*/, '') : einh) + (einh && einh !== '%' ? ', ' : '') + (w.ebene ? w.ebene + ' ' : '') + (w.gebiet || '')) + (w.jahr ? ', Stand ' + w.jahr : ''));
       }).join('');
       var zz = RG.zensus, zg = zz && zz.gemeinde, zk = zz && zz.kreis;
       var zt = function (l, klein, k) { return zeile(l, klein, (zg && zg[k] != null ? pct(zg[k], 1) : '–') + (zk && zk[k] != null ? ' <span style="color:var(--mut)">(Kreis ' + pct(zk[k], 1) + ')</span>' : '')); };
