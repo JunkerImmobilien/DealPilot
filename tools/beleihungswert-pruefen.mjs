@@ -150,6 +150,29 @@ ok('V', 'Vervielfaeltiger 5 % / 20 J (Tabellenwert 12,4622)', Math.round(K.vervi
   ok('11', 'MFH ohne Ertragswert: kein Check', m.verfuegbar, false);
 }
 
+{ // 13 v5130 KK6 · § 4 Abs. 2 bei Eigennutzung: Haus -> Sachwert fuehrt, ETW -> Vergleichswert fuehrt, MFH nie
+  const sw = { hk_gebaeude: 200000, alterswertminderung: -100000, aussenanlagen: 0, gebaeude_sachwert: 100000, bodenwert: 20000 };
+  const haus = basis({ objektart: 'haus', eigennutzung: true, sachwert: sw, vergleichswert: { wert: 150000, amtlich: true }, darlehen: 66000 });
+  const r = K.beleihungswert(haus, P);
+  ok('13', 'Haus selbst genutzt: Sachwert 90.000 + 20.000 statt Ertragsweg', r.beleihungswert, 110000);
+  ok('13', 'Haus: basis sachwert_4_2', r.basis, 'sachwert_4_2');
+  ok('13', 'Haus: Vergleichswert als Kontrollwert', r.kontrolle && r.kontrolle.art, 'vergleichswert');
+  ok('13', 'Haus: Auslauf 66.000 / 110.000 = 60 %', r.auslauf && r.auslauf.auslauf_pct, 60);
+  const vermietet = K.beleihungswert(basis({ objektart: 'haus', sachwert: sw }), P);
+  ok('13', 'Haus ohne Eigennutzung: Ertragsweg bleibt', vermietet.basis, 'ertragswert');
+  const etw = K.beleihungswert(basis({ objektart: 'etw', eigennutzung: true, sachwert: sw, vergleichswert: { wert: 150000, amtlich: true } }), P);
+  ok('13', 'ETW selbst genutzt: Vergleichswert fuehrt', etw.basis, 'vergleichswert_4_2');
+  ok('13', 'ETW: Wert unter dem Vergleichswert (Abschlag)', etw.beleihungswert < 150000, true);
+  const etwOhneVg = K.beleihungswert(basis({ objektart: 'etw', eigennutzung: true, sachwert: sw }), P);
+  ok('13', 'ETW ohne Vergleichswert: Sachwert', etwOhneVg.basis, 'sachwert_4_2');
+  const mfh = K.beleihungswert(basis({ objektart: 'mfh', eigennutzung: true, sachwert: sw }), P);
+  ok('13', 'MFH mit Eigennutzung: Ertragsweg', mfh.basis, 'ertragswert');
+  const deckel = K.beleihungswert(basis({ objektart: 'efh', eigennutzung: true, sachwert: sw, verkehrswert: 100000 }), P);
+  ok('13', 'Eigennutzung auf Verkehrswert gedeckelt', deckel.beleihungswert, 100000);
+  const ein = K.eingabenAusBericht({ sachwert: { available: true, value_eur: 1 } }, { objektart: 'efh', eigennutzung: true });
+  ok('13', 'eingabenAusBericht reicht eigennutzung durch', ein.eigennutzung, true);
+}
+
 { // 12 aelterer Bericht: BWK nur als Quote, keine Miete je m2 (gemessen an Bericht 74, Loehner Str.)
   const cc = { ertragswert: { value_eur: 300000, rohertrag_pa_eur: 20000, bwk_pa_eur: 4800, bodenwert_eur: 100000, restnutzungsdauer_jahre: 18, liegenschaftszins_pct: 1.7,
     staffel: [{ pos: 'Rohertrag Wohnen (marktüblich erzielbar)', wert: 20000 }, { pos: '= Rohertrag', wert: 20000 }, { pos: 'Bewirtschaftungskosten (24 % · Angabe des Gutachterausschusses)', wert: 4800 }] } };
