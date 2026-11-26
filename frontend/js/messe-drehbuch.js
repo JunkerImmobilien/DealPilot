@@ -10911,9 +10911,16 @@
         await b2oZeile(s, 'Eingelesen und aufbewahrt', 'Jede eingelesene Unterlage mit Zuordnung, die Originale nach Jahr, dazu die Belegung deiner Ablage.');
       },
       async function (s) {   /* 2 · Belege einlesen */
-        var k = function () { return rhIm(k5Panel(), /Belege, Unterlagen|Unterlagen einlesen/); };
-        await zeige(k, 8);
+        /* M8 26.11.: Knopf zeigen, dann das Fenster wirklich öffnen (nur ansehen, nichts hochladen) und wieder schließen */
+        var k = function () { return [].filter.call(k5Panel().querySelectorAll('button'), function (x) { return x.offsetWidth && /Unterlagen hochladen|Belege, Unterlagen|Unterlagen einlesen/.test(x.textContent || ''); })[0] || null; };
+        if (k()) { await zeige(k, 8); await warte(900); }
+        try { if (window.DpEingang && DpEingang.oeffnen) DpEingang.oeffnen(); } catch (e) {}
+        await warteAuf(function () { return q('#oabi-ov'); }, 5000);
+        await warte(500);
+        if (q('#oabi-ov')) await zeige(function () { var o = q('#oabi-ov'); return o && (o.firstElementChild || o); }, 8);
         await b2oZeile(s, 'Ein Fenster für alles', 'Belege, Abrechnungen und Protokolle einlesen. Die Zuordnung zur Anlage V schlägt DealPilot vor.');
+        var ov = q('#oabi-ov');
+        if (ov) { var zu = [].filter.call(ov.querySelectorAll('button'), function (x) { return x.offsetWidth && /^(×|✕|Schließen|Abbrechen)$/.test((x.textContent || '').trim()); })[0]; if (zu) zu.click(); else ov.remove(); await warte(700); }
       },
       async function (s) {   /* 3 · Adressprüfung (nur erklärt, kein Upload) */
         await b2oZeile(s, 'Falsche Adresse, kein Eintrag', 'Gehört eine Unterlage zu einer anderen Adresse, lehnt DealPilot sie ab. Vorhandene Werte überschreibt nichts still.');
