@@ -66,11 +66,19 @@
       + '<p>Für dich und für das Gespräch mit der Bank. Einmalig, ohne Abo.</p>'
       + '<ul><li>Wert nach ImmoWertV mit Rechenweg aus den Daten des Gutachterausschusses</li><li>Indikativer Beleihungswert und Haushaltsrechnung</li>'
       + '<li>Zustand, Umfeld und Unterlagenliste für die Bank</li></ul>'
-      + (e.str && (e.objektart === 'etw' || e.gsfl > 0) ? '' : '<p>Für den Wert braucht es die Straße mit Hausnummer' + (e.objektart === 'etw' ? '' : ' und die Grundstücksfläche') + '.</p>')
+      + (e.str && (e.objektart === 'etw' || e.gsfl > 0) ? '' : '<p>Für den Wert braucht es die Straße mit Hausnummer' + (e.objektart === 'etw' ? '' : ' und die Grundstücksfläche') + '. <a href="#" id="hcMehr">Jetzt eintragen</a></p>')
       + '<label><input type="checkbox" id="hcWv"> Ich möchte, dass der Bericht sofort entsteht. Mir ist bekannt, dass mein Widerrufsrecht damit erlischt.</label>'
       + (verkauf ? '<button type="button" id="hcKaufen">Haus-Check kaufen · ' + preisText + '</button>' : '<button type="button" id="hcKaufen" disabled>Bald verfügbar</button>') + '<div class="hc-msg" id="hcMsg"></div>';
     erg.appendChild(box);
     $('hcKaufen').addEventListener('click', kaufen);
+    /* pp6 · die Karte ist umgedreht, Straße und Grundstück liegen vorne unter „Weitere Angaben“ */
+    var mehr = $('hcMehr');
+    if (mehr) mehr.addEventListener('click', function (ev) { ev.preventDefault(); mehrOeffnen(); });
+  }
+  function mehrOeffnen() {
+    if (window.DemoEgDrehe) window.DemoEgDrehe(false);
+    var d = $('egMehr'); if (d) d.open = true;
+    var f = $('egStr'); if (f) setTimeout(function () { try { f.focus(); } catch (x) {} }, 260);
   }
   function meldung(t, fehler) { var m = $('hcMsg'); if (m) { m.className = 'hc-msg' + (fehler ? ' hc-fehler' : ''); m.innerHTML = '<p' + (fehler ? ' class="hc-fehler"' : '') + '>' + esc(t) + '</p>'; } }
 

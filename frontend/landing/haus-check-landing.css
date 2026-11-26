@@ -88,3 +88,45 @@
 .eg-felder>*{min-width:0}
 .eg-f select{width:100%;max-width:100%;min-width:0;background:transparent;border:0;color:#fff;font:600 14px/1.3 var(--body,Inter,sans-serif);padding:6px 0 2px;outline:0}
 .eg-f select option{color:#050505}
+
+/* pp6 · Karte zum Umdrehen (Objektmatrix-Prinzip), kompakte Eingaben, Erklärung „Netto im Monat“ */
+.eg-flip{transform-origin:50% 50%;transition:transform .23s cubic-bezier(.4,0,.6,1),opacity .23s;will-change:transform}
+.eg-flip.eg-dreht-weg{transform:perspective(1400px) rotateY(90deg);opacity:.35}
+.eg-flip.eg-dreht-her{transform:perspective(1400px) rotateY(-90deg);opacity:.35;transition:none}
+.eg-vorne[hidden],.eg-hinten[hidden]{display:none!important}
+.eg-hinten .eg-erg{margin-top:0;padding-top:0;border-top:0}
+.eg-felder .eg-breit{grid-column:1/-1}
+.eg-mehr{margin-top:10px;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:rgba(255,255,255,.02)}
+.eg-mehr>summary{cursor:pointer;list-style:none;padding:12px 14px;font:600 11px/1.3 var(--mono,'JetBrains Mono',monospace);letter-spacing:.1em;text-transform:uppercase;color:var(--wl-e8cc7a,#E8CC7A);display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.eg-mehr>summary::-webkit-details-marker{display:none}
+.eg-mehr>summary::before{content:"+";display:inline-block;width:12px;font-weight:700}
+.eg-mehr[open]>summary::before{content:"\2212"}
+.eg-mehr>summary small{font:400 11px/1.3 var(--body,Inter,sans-serif);letter-spacing:0;text-transform:none;color:rgba(236,230,214,.5)}
+.eg-mehr>.eg-felder{padding:0 10px 10px}
+.eg-zurueck{appearance:none;cursor:pointer;border:1px solid color-mix(in srgb,var(--wl-e8cc7a,#E8CC7A) 40%,transparent);background:transparent;color:var(--wl-e8cc7a,#E8CC7A);border-radius:999px;padding:7px 12px;min-height:32px;font:600 10.5px/1 var(--mono,'JetBrains Mono',monospace);letter-spacing:.1em;text-transform:uppercase}
+.eg-zurueck:hover{background:color-mix(in srgb,var(--wl-c9a84c,#C9A84C) 14%,transparent)}
+.eg-zurueck:focus-visible,.eg-i:focus-visible,.eg-mehr>summary:focus-visible{outline:2px solid var(--wl-e8cc7a,#E8CC7A);outline-offset:2px}
+.eg-mit-tip{position:relative}
+.eg-mit-tip>label{display:inline}
+.eg-mit-tip>label span{display:inline}
+.eg-i{appearance:none;border:0;background:transparent;cursor:help;color:var(--wl-e8cc7a,#E8CC7A);font:600 13px/1 var(--body,Inter,sans-serif);padding:0 2px;margin-left:4px;vertical-align:baseline}
+.eg-tip{position:absolute;left:auto;right:0;width:min(300px,calc(100vw - 56px));bottom:calc(100% + 6px);z-index:5;display:none;padding:10px 12px;border-radius:10px;background:#050505;border:1px solid color-mix(in srgb,var(--wl-e8cc7a,#E8CC7A) 35%,transparent);box-shadow:0 14px 30px -12px rgba(0,0,0,.9);font:400 12px/1.45 var(--body,Inter,sans-serif);color:#ECE6D6;text-transform:none;letter-spacing:0}
+.eg-mit-tip:hover .eg-tip,.eg-i:focus-visible+.eg-tip,.eg-mit-tip.eg-tip-an .eg-tip{display:block}
+.eg-mon{display:grid;gap:4px;margin-top:6px}
+.eg-mon div,.eg-teile div{display:flex;justify-content:space-between;gap:12px}
+.eg-mon b,.eg-teile b{font-weight:600;color:#e9e4d8;font-variant-numeric:tabular-nums;white-space:nowrap}
+.eg-mon .eg-sum{border-top:1px solid rgba(255,255,255,.1);padding-top:5px;margin-top:2px}
+.eg-mon .eg-sum span,.eg-mon .eg-sum b{font-weight:700;color:#fff}
+.eg-teile{margin-top:6px}
+.eg-teile summary{cursor:pointer;color:var(--wl-e8cc7a,#E8CC7A);font:500 11.5px/1.4 var(--body,Inter,sans-serif)}
+.eg-teile div{padding:3px 0 0 12px;font-size:11.5px}
+.eg-teile small{color:rgba(236,230,214,.45)}
+.eg-bericht{font:500 12px/1.45 var(--body,Inter,sans-serif);color:rgba(236,230,214,.7);padding:9px 12px;border-radius:10px;border:1px dashed color-mix(in srgb,var(--wl-e8cc7a,#E8CC7A) 25%,transparent)}
+@media (max-width:640px){
+  .eg-karte{padding:16px 14px}
+  .eg-kopf{gap:8px;flex-wrap:wrap}
+  .eg-f input{font-size:18px}
+  .eg-tip{right:-4px}
+}
+@media (max-width:380px){ .eg-felder{gap:8px} .eg-f{padding:9px 10px 7px} }
+@media (prefers-reduced-motion:reduce){ .eg-flip{transition:none}.eg-start::after{animation:none} }

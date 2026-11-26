@@ -11,27 +11,43 @@
   szene.insertBefore(um, szene.firstChild);
 
   var k = document.createElement('div'); k.className = 'eg-karte';
+  /* pp6 · Karte zum Umdrehen (Marcel 26.11.2026): vorne die Eingaben, hinten das Ergebnis. Pflichtfelder zuerst,
+     der Rest unter „Weitere Angaben“. IDs bleiben, haus-check-kauf.js liest sie. */
+  var TIP = 'Dein monatliches Netto-Haushaltseinkommen, also alles, was nach Steuern und Sozialabgaben auf dem Konto ankommt, von allen Personen, die mitfinanzieren. Freiwillig. Wir nutzen es nur für die Leistbarkeit und speichern es nicht.';
   k.innerHTML =
+    '<div class="eg-flip" id="egFlip">' +
+    '<div class="eg-vorne" id="egVorne">' +
     '<div class="eg-kopf"><span>Haus-Check · Selbst nutzen</span><span>Beispielrechnung</span></div>' +
     '<div class="eg-felder">' +
       '<label class="eg-f"><span>Kaufpreis</span><input id="egKp" inputmode="numeric" value="310.000"></label>' +
       '<label class="eg-f"><span>Wohnfläche m²</span><input id="egWfl" inputmode="numeric" value="130"></label>' +
+      '<label class="eg-f klein"><span>Baujahr</span><input id="egBj" inputmode="numeric" value="1998"></label>' +
+      '<label class="eg-f klein"><span>PLZ</span><input id="egPlz" inputmode="numeric" value="33602"></label>' +
+      '<label class="eg-f klein eg-breit"><span>Objekt</span><select id="egArt"><option value="efh">Einfamilienhaus</option><option value="zfh">Zweifamilienhaus</option><option value="dhh">Doppelhaushälfte</option><option value="rh">Reihenhaus</option><option value="etw">Eigentumswohnung</option><option value="mfh">Mehrfamilienhaus</option></select></label>' +
+    '</div>' +
+    '<details class="eg-mehr" id="egMehr"><summary>Weitere Angaben <small>Eigenkapital, Einkommen, Adresse und Haus</small></summary>' +
+    '<div class="eg-felder">' +
+      '<label class="eg-f klein"><span>Eigenkapital</span><input id="egEk" inputmode="numeric" value="100.000"></label>' +
+      '<div class="eg-f klein eg-mit-tip"><label for="egNetto"><span>Netto im Monat</span></label>' +
+        '<button type="button" class="eg-i" id="egNettoI" aria-label="Was heißt Netto im Monat?" aria-describedby="egNettoTip" aria-expanded="false">ⓘ</button>' +
+        '<span class="eg-tip" id="egNettoTip" role="tooltip">' + TIP + '</span>' +
+        '<input id="egNetto" inputmode="numeric" value="5.200"></div>' +
+      '<label class="eg-f eg-breit"><span>Straße und Nr.</span><input id="egStr" placeholder="Musterstraße 1"></label>' +
       '<label class="eg-f klein" id="egGsflF"><span>Grundstück m²</span><input id="egGsfl" inputmode="numeric" value="600"></label>' +
       /* v5130 KK6 · für den Sachwert nach NHK 2010 (Gebäudetyp und Standardstufe), beim Haus */
       '<label class="eg-f klein"><span>Keller</span><select id="egKeller"><option value="ja">unterkellert</option><option value="nein">ohne Keller</option></select></label>' +
       '<label class="eg-f klein"><span>Geschosse</span><select id="egGeschosse"><option value="2">Erd- und Obergeschoss</option><option value="1">nur Erdgeschoss</option></select></label>' +
       '<label class="eg-f klein"><span>Dach</span><select id="egDach"><option value="1">Dachgeschoss ausgebaut</option><option value="2">Dachgeschoss nicht ausgebaut</option><option value="3">Flachdach</option></select></label>' +
-      '<label class="eg-f klein"><span>Ausstattung</span><select id="egAusst"><option value="normal">normal</option><option value="einfach">einfach</option><option value="gehoben">gehoben</option></select></label>' +
-      '<label class="eg-f klein"><span>Baujahr</span><input id="egBj" inputmode="numeric" value="1998"></label>' +
-      '<label class="eg-f klein"><span>Objekt</span><select id="egArt"><option value="efh">Einfamilienhaus</option><option value="zfh">Zweifamilienhaus</option><option value="dhh">Doppelhaushälfte</option><option value="rh">Reihenhaus</option><option value="etw">Eigentumswohnung</option><option value="mfh">Mehrfamilienhaus</option></select></label>' +
-      '<label class="eg-f klein"><span>PLZ</span><input id="egPlz" inputmode="numeric" value="33602"></label>' +
-      '<label class="eg-f"><span>Straße und Nr. (für das Umfeld)</span><input id="egStr" placeholder="Musterstraße 1"></label>' +
-      '<label class="eg-f klein"><span>Eigenkapital</span><input id="egEk" inputmode="numeric" value="100.000"></label>' +
-      '<label class="eg-f klein"><span>Netto im Monat</span><input id="egNetto" inputmode="numeric" value="5.200"></label>' +
-      '<div class="eg-opt">Eigenkapital und Einkommen sind freiwillig. Ohne Einkommen fehlt nur die Leistbarkeit.</div>' +
-    '</div>' +
+      '<label class="eg-f klein eg-breit"><span>Ausstattung</span><select id="egAusst"><option value="normal">normal</option><option value="einfach">einfach</option><option value="gehoben">gehoben</option></select></label>' +
+      '<div class="eg-opt">Eigenkapital und Einkommen sind freiwillig. Straße und Grundstück braucht der Bericht für den Wert.</div>' +
+    '</div></details>' +
     '<button type="button" class="eg-start" id="egStart">Startfreigabe · Haus prüfen</button>' +
-    '<div class="eg-erg" id="egErg"></div>';
+    '</div>' +
+    '<div class="eg-hinten" id="egHinten" hidden>' +
+    '<div class="eg-kopf"><span>Haus-Check · Ergebnis</span><button type="button" class="eg-zurueck" id="egZurueck">Eingaben ändern</button></div>' +
+    '<div class="eg-erg" id="egErg"></div>' +
+    '</div>' +
+    '</div>';
   szene.appendChild(k);
 
   function zahl(id) { return Number(String(document.getElementById(id).value).replace(/\./g, '').replace(',', '.')) || 0; }
@@ -39,7 +55,7 @@
 
   function zeige(r) {
     var U = 2 * Math.PI * 54, voll = U * r.gesamt / 100;
-    var g = r.gruppen.map(function (x) {
+    var g = r.gruppen.filter(function (x) { return x.k !== 'Lage'; }).map(function (x) {   /* pp6 · Lage steht im Bericht */
       return '<div class="eg-g"><span>' + x.k + '</span><i><em data-w="' + (x.s == null ? 0 : x.s) + '" style="background:' + farbe(x.s) + '"></em></i><b>' + (x.s == null ? '–' : x.s) + '</b><small>' + x.t + '</small></div>';
     }).join('');
     var satz = r.jahr ? 'Kaufen ist nach ' + r.jahr + ' Jahren günstiger als mieten.' : 'In 20 Jahren wird Kaufen hier nicht günstiger als mieten.';
@@ -67,35 +83,55 @@
     var a = r.ampel ? AMPEL[r.ampel] : null;
     var h = '<div class="eg-amp"><i style="background:' + (a ? a[0] : 'rgba(255,255,255,.2)') + '"></i><b>Passt es zu mir?</b> '
       + (a ? 'Wohnkosten ' + Math.round(r.quote) + ' % vom Netto, ' + a[1] + '.' : 'Netto-Einkommen eintragen, dann zeigen wir die Belastung.') + '</div>';
+    /* pp6 · Monatsrechnung: Rate, Eigentümerkosten, Heizung, Nebenkosten als Summe, die Posten einzeln eingeklappt.
+       Lage, Umfeld und Wert stehen nur im Bericht (Marcel 26.11.2026), nicht auf der Karte. */
     var AU = r.kern && r.kern.leistbarkeit && r.kern.leistbarkeit.aufstellung;
-    if (AU && AU.length) h += '<div class="eg-nk"><b>Im Monat</b><br>' + AU.map(function (x) {
-        /* pp6 · Posten der übrigen Nebenkosten eingerückt, klein, mit Herkunft */
-        if (x.teil) return '<span style="display:block;padding-left:14px;font-size:.88em;opacity:.8">' + x.l + ' ' + E.eur(x.eur) + ' · ' + x.herkunft + '</span>';
-        return (x.summe ? '<b>' : '') + x.l.replace(/ \(.*\)$/, '') + ' ' + E.eur(x.eur) + (x.summe ? '</b>' : ''); }).join('<br>').replace(/<br><span/g, '<span')
-      + (r.quote != null ? '<br>Anteil vom Netto ' + Math.round(r.quote) + ' %' : '') + '</div>';
-    if (r.urteil && r.urteil.length) h += '<ul class="eg-urt">' + r.urteil.slice(1, 6).map(function (t) { return '<li>' + t + '</li>'; }).join('') + '</ul>';
-    if (r.nebenkosten) h += '<div class="eg-nk">Kaufnebenkosten ' + E.eur(r.nebenkosten.summe) + ' (' + String(r.nebenkosten.pct).replace('.', ',') + ' %): Grunderwerbsteuer ' + E.eur(r.nebenkosten.grest) + ', Notar ' + E.eur(r.nebenkosten.notar) + ', Grundbuch ' + E.eur(r.nebenkosten.grundbuch) + ', Makler ' + E.eur(r.nebenkosten.makler) + '.</div>';
-    h += '<div class="eg-umf" id="egUmf"><b>Was ist in der Nähe?</b><p>Umfeld wird geladen …</p></div>';
+    if (AU && AU.length) {
+      var haupt = AU.filter(function (x) { return !x.teil; }), teile = AU.filter(function (x) { return x.teil; });
+      h += '<div class="eg-nk"><b>Im Monat</b><div class="eg-mon">' + haupt.map(function (x) {
+        var l = x.k === 'uebrige' ? 'Nebenkosten ohne Heizung' : x.l.replace(/ \(.*\)$/, '');
+        return '<div' + (x.summe ? ' class="eg-sum"' : '') + '><span>' + l + '</span><b>' + E.eur(x.eur) + '</b></div>';
+      }).join('') + '</div>'
+        + (teile.length ? '<details class="eg-teile"><summary>Nebenkosten einzeln</summary>' + teile.map(function (x) {
+          return '<div><span>' + x.l.replace(/^davon /, '') + ' <small>' + x.herkunft + '</small></span><b>' + E.eur(x.eur) + '</b></div>'; }).join('') + '</details>' : '')
+        + (r.quote != null ? '<div class="eg-klein">Anteil vom Netto ' + Math.round(r.quote) + ' %</div>' : '') + '</div>';
+    }
+    h += '<div class="eg-bericht">Lage, Umfeld und der Wert nach ImmoWertV stehen im Bericht.</div>';
     box.innerHTML = h; erg.appendChild(box);
-    var str = document.getElementById('egStr').value.trim();
-    var adr = (str ? str + ', ' : '') + e.plz + ' ' + (d.gebiet || '').replace(/,.*$/, '');
-    E.umfeld(adr).then(function (u) {
-      var el = document.getElementById('egUmf'); if (!el) return;
-      if (!u || !u.ok) { el.innerHTML = '<b>Was ist in der Nähe?</b><p>Umfeld gerade nicht abrufbar.</p>'; return; }
-      el.innerHTML = '<b>Was ist in der Nähe?</b>' + (str ? '' : '<p class="eg-klein">Ohne Straße rund um die Mitte der PLZ.</p>') + '<div class="eg-umf-g">' + u.kategorien.map(function (k) {
-        var n = k.naechster;
-        return '<div><span>' + k.label + '</span><b>' + (k.nicht_ermittelt ? 'nicht ermittelt' : n ? (n.luftlinie_m < 1000 ? n.luftlinie_m + ' m' : String(Math.round(n.luftlinie_m / 100) / 10).replace('.', ',') + ' km') : 'nicht im Umkreis') + '</b>'
-          + (n ? '<small>' + (n.name ? n.name + ' · ' : '') + 'ca. ' + n.fuss_min + ' Min. zu Fuß</small>' : '') + '</div>';
-      }).join('') + '</div><p class="eg-klein">' + u.hinweis + ' Kartendaten ' + u.vermerk + '.</p>';
-    });
   }
   function start() {
     var e = { kp: zahl('egKp'), wfl: zahl('egWfl'), bj: zahl('egBj'), ek: zahl('egEk'), netto: zahl('egNetto'), plz: document.getElementById('egPlz').value.trim(),
       objektart: document.getElementById('egArt').value };
-    if (e.objektart === 'mfh') { var erg0 = document.getElementById('egErg'); erg0.innerHTML = '<div class="eg-satz">' + E.MFH_HINWEIS + '</div>'; erg0.classList.add('da'); return; }
-    E.daten(e.plz, e.bj, e.wfl).then(function (d) { var r = E.rechne(e, d); if (!r.ok) return; zeige(r); zusatz(r, d, e); });
+    if (e.objektart === 'mfh') { var erg0 = document.getElementById('egErg'); erg0.innerHTML = '<div class="eg-satz">' + E.MFH_HINWEIS + '</div>'; erg0.classList.add('da'); drehe(true); return; }
+    E.daten(e.plz, e.bj, e.wfl).then(function (d) { var r = E.rechne(e, d); if (!r.ok) return; zeige(r); zusatz(r, d, e); drehe(true); });
   }
   document.getElementById('egStart').addEventListener('click', start);
+
+  /* pp6 · Umdrehen wie die Karten der Objektmatrix: halbe Drehung, Seite tauschen, zurück. Die Höhe folgt der sichtbaren Seite.
+     Mit prefers-reduced-motion nur der Wechsel. */
+  var flip = document.getElementById('egFlip'), vorne = document.getElementById('egVorne'), hinten = document.getElementById('egHinten'), hintenAn = false;
+  var still = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  function drehe(zurErg) {
+    if (zurErg === hintenAn) return; hintenAn = zurErg;
+    var fokus = function () { var z = document.getElementById(zurErg ? 'egZurueck' : 'egStart'); if (z) try { z.focus({ preventScroll: true }); } catch (x) {} };
+    var tausch = function () { vorne.hidden = zurErg; hinten.hidden = !zurErg; k.classList.toggle('eg-gedreht', zurErg); };
+    var hoch = function () { var o = k.getBoundingClientRect().top; if (o < 0) k.scrollIntoView({ block: 'start', behavior: still ? 'auto' : 'smooth' }); };
+    if (still) { tausch(); hoch(); fokus(); return; }
+    flip.classList.add('eg-dreht-weg');
+    setTimeout(function () {
+      tausch(); flip.classList.remove('eg-dreht-weg'); flip.classList.add('eg-dreht-her');
+      void flip.offsetWidth; flip.classList.remove('eg-dreht-her'); hoch(); fokus();
+    }, 230);
+  }
+  document.getElementById('egZurueck').addEventListener('click', function () { drehe(false); });
+  window.DemoEgDrehe = drehe;
+
+  /* pp6 · Erklärung zu „Netto im Monat“: Maus darüber zeigt sie (CSS), Tippen auf ⓘ schaltet sie */
+  var ib = document.getElementById('egNettoI');
+  function tipAus() { ib.setAttribute('aria-expanded', 'false'); ib.parentNode.classList.remove('eg-tip-an'); }
+  ib.addEventListener('click', function (ev) { ev.preventDefault(); ev.stopPropagation(); var an = ib.getAttribute('aria-expanded') !== 'true'; ib.setAttribute('aria-expanded', String(an)); ib.parentNode.classList.toggle('eg-tip-an', an); });
+  document.addEventListener('click', function (ev) { if (!ev.target.closest('.eg-mit-tip')) tipAus(); });
+  document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') tipAus(); });
 
   function setze(m) {
     [].forEach.call(um.querySelectorAll('button'), function (b) { var an = b.getAttribute('data-m') === m; b.classList.toggle('an', an); b.setAttribute('aria-selected', an); });
