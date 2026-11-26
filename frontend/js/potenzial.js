@@ -804,7 +804,7 @@
             + (vglHer ? ', ' + vglHer : '') + ')' : 'Trag die Vergleichsmiete ein. Dann rechnet DealPilot die Obergrenze')
         : br.gilt === false ? (br.neubau ? br.text + '. ' : '') + 'Neuvermietung frei vereinbar' + (vglQm > 0 ? '. ' + (window.DpMieteRegel ? DpMieteRegel.satz() : '') + ' Das sind ca. ' + eur2(vglQm * (window.DpMieteRegel ? DpMieteRegel.faktorOhne() : 1.2)) + '/m² (§ 5 WiStG)' : '') : '',   /* v3356 · B3 */
       warn: br.gilt === null || !!br.pruefen || (br.gilt === true && markt), lang: br.text
-        + (br.gilt === true && naeh ? ' Die Obergrenze ist auf der DealPilot-Näherung der ortsüblichen Vergleichsmiete gerechnet: sie leitet die Vergleichsmiete aus der amtlichen Zensus-Bestandsmiete ab und ist an den freien Mietspiegeln kalibriert (mittlere Abweichung rund 7,5 %). Maßgeblich bleibt die Vergleichsmiete laut Mietspiegel, liegt sie niedriger, ist auch die zulässige Miete niedriger, vor der Neuvermietung mit dem Mietspiegel prüfen.' : '')
+        + (br.gilt === true && naeh ? ' Die Obergrenze ist auf der ' + ((vgO && vgO.naeherung && vgO.naeherung.text) || 'DealPilot-Näherung') + ' gerechnet. Maßgeblich bleibt die Vergleichsmiete laut Mietspiegel, liegt sie niedriger, ist auch die zulässige Miete niedriger, vor der Neuvermietung mit dem Mietspiegel prüfen.' : '')
         + (br.gilt === true && markt && !naeh ? ' Die Obergrenze ist auf einer Schätzung aus Angebotsmieten gerechnet, nicht auf der ortsüblichen Vergleichsmiete (Mietspiegel), die kann niedriger liegen.' : '')
         + (br.gilt === true ? ' Ausnahmen: höhere Vormiete (§ 556e BGB), erste Vermietung nach umfassender Modernisierung oder Neubau (§ 556f BGB).' : '') });
     /* v3286 · 3b · RECHENWEG der Höchstmiete mit den Zahlen des Objekts (Marcel 11.11.2026: „woher der
@@ -1313,7 +1313,7 @@
       /* v3356 · A1: wie beim Mietspiegel der gewählte Wert (Standard oben), Mittelwert daneben */
       var _w = msWahl(), _qmN = (_w === 'oben' && nz.oben > 0) ? nz.oben : (_w === 'unten' && nz.unten > 0) ? nz.unten : nz.qm;
       var _txtN = _qmN !== nz.qm ? nz.text + ', ' + (K.MS_WAHL[_w] || _w) + ' ca. ' + String(Math.round(_qmN * 100) / 100).replace('.', ',') + ' €/m² (Mittelwert ' + String(Math.round(nz.qm * 100) / 100).replace('.', ',') + ' €/m²)' : nz.text;
-      return { qm: _qmN, herkunft: _txtN, art: 'dealpilot_naeherung', quelle_art: 'dealpilot_naeherung', schaetzung: true,
+      return { qm: _qmN, herkunft: _txtN, herkunft_detail: nz.text_detail || null, art: 'dealpilot_naeherung', quelle_art: 'dealpilot_naeherung', schaetzung: true,
         naeherung: nz, mittel_qm: nz.qm, wahl: _w, hinweise: (nz.hinweise || []).slice() };
     }
     v = zahl(wert('ds2_marktmiete'));

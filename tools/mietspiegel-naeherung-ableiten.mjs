@@ -154,6 +154,18 @@ console.log('Gewählt: ' + wahl + ' (' + String(ergebnis[wahl].raster.mape_pct).
 if (!gut) process.exit(1);
 
 const alle = staedte.flatMap((s) => s.punkte.map((p) => p.ms / basisVon[wahl](s, p)));
+/* v5080 · Güte je Region (Leave-one-Stadt-out mit der gewählten Form) für die knappe Genauigkeitsangabe im Kundentext */
+const { REGION_JE_LAND } = await imp(path.join(MS, 'naeherung.js'));
+const jeRegion = {};
+for (const s of staedte) {
+  const r = REGION_JE_LAND[s.ags.slice(0, 2)] || 'unbekannt';
+  const f = faktor(wahl, staedte.filter((o) => o !== s), s.lage);
+  const e = jeRegion[r] = jeRegion[r] || { punkte: [], staedte: 0 };
+  e.staedte++;
+  for (const p of s.punkte) e.punkte.push({ ist: p.ms, p: basisVon[wahl](s, p) * f });
+}
+const guete_region = Object.fromEntries(Object.entries(jeRegion).sort().map(([r, e]) => [r, Object.assign({ staedte: e.staedte }, guete(e.punkte))]));
+console.log('Je Region (LOO, ' + wahl + '): ' + Object.entries(guete_region).map(([r, g]) => r + ' ' + String(g.mape_pct).replace('.', ',') + ' % (n ' + g.staedte + ')').join(' · '));
 const param = {
   titel: 'DealPilot-Näherung der ortsüblichen Vergleichsmiete (nie amtlich, nicht der Mietspiegel)',
   version: 'v3266',
@@ -167,6 +179,7 @@ const param = {
   n_punkte: staedte.reduce((a, s) => a + s.punkte.length, 0),
   guete: Object.assign({ verfahren: 'Leave-one-Stadt-out über das Raster (Baujahr 1955–2005 × 50/70/90 m²)' }, ergebnis[wahl].raster),
   guete_normwohnung: Object.assign({ objekt: 'Baujahr 1975, 70 m²' }, ergebnis[wahl].normwohnung),
+  guete_region,   /* v5080 · Kundentext nimmt die Region ab 5 Städten (naeherung.js genauigkeit) */
   vergleich: Object.assign(Object.fromEntries(Object.entries(ergebnis).map(([f, e]) => [f, { raster_mape_pct: e.raster.mape_pct, raster_10_pct: e.raster.anteil_10_pct, norm_mape_pct: e.normwohnung.mape_pct }])),
     { rueckfall_angebot_abschlag: 'nicht messbar: DealPilot führt keine Angebotsmiete je Gemeinde (sie kommt je Objekt von außen)' }),
   vpi_fortschreibung_faktor: r3(NKM_F), vpi_monat: nkmLetzt,
