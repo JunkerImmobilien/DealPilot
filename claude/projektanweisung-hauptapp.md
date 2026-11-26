@@ -45894,3 +45894,16 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** main `b40cfbde`. Staging `3927e317`, `f186320e`, `55802024`.
 - **Nachweis:** foerderung-pruefen sauber (Gegenprobe rot), vorschau-pruefen sauber (4), buster-ebenen sauber, jahreswerte RC 0, gold-audit Prod RC 0. Beide App-Domains 1.0.249, Dateien v5120bm/v5120m/v5120am ausgeliefert, mb-backend neu gebaut (Lock), Sicherungen `/root/backups/*-vor-jj6-20261126-1545.sql.gz` (Kopf gelesen). Karte auf Staging im eigenen Headless-Chrome gerendert (1440/390, kein Überlauf, kleinste Schrift 10 px).
 - **Rest:** Karte erscheint nur, wenn die Pilot-Analyse den Abschnitt #dp-pa-pot zeichnet (also mit Pilot-Analyse). Im echten Ablauf mit Analyse auf Prod nicht angesehen.
+
+### Rollout 1.0.250 · v5130 Modernisierung in der Mietnäherung (MM6, 26.11.2026)
+- **Was:** DealPilot-Näherung der Vergleichsmiete hebt mit Anlage-2-Punkten (mod_punkte) um den gemessenen Zuschlag der freien Mietspiegel: ab 6 Punkten +5,1 %, ab 14 Punkten +21,7 %. Einordnung zählt Modernisierung dann nicht doppelt. Werkzeug tools/neuvermietung-faktor-ableiten.mjs (nur Ausgabe).
+- **Commit:** b0882bab6 (v5130), f8d18d164 (Version 1.0.250).
+- **Nachweis Prod:** Kirchlengern 1975, 88 m²: 0 Punkte oben 6,46 · 8 Punkte 6,79 · 16 Punkte 7,87 €/m². Sicherung haupt/mb-vor-mm6-20261126-1559. Prüfer mietspiegel-werte, mietpotenzial, wertermittlung, einzelcheck, buster-ebenen, rnd-eingabe grün.
+- **Rest:** Zuschlag mit mehr Mietspiegeln nachmessen (bisher Kreise Unna, Herford). rnd-eingabe-pruefen braucht die ungetrackte Datei Dateien/API-Export/portfolio-20261010-1045.json, in frischen Worktrees deshalb RC 1 (kein Code-Fehler).
+
+### Rollout 1.0.251 · v5130ll6 Nachrechnen (LL6, 26.11.2026)
+- **Was:** `mietentwicklung.js` rechnet einmal neu, wenn nach dem ersten `calc()` noch Daten eintreffen (dp:potenzial → sollSprung/Mieterhöhung; Übergang/Kaufdatum → getWuMonths; dazu dp:mietspiegel-werte, dp:steuer-grundlagen/-snapshots, Kontrollen 1,5/4/10/20 s nach dp:object-ready). Bedingung: `cfRows[i].zve_steuer` passt nicht mehr zu `_computeYearTotal().ergebnis`. Entprellt 300 ms, höchstens 3 je Objekt. Kein Rechenkern geändert.
+- **Anlass:** Steuerkarten und Tabelle wichen ab (Westerfeld 140: Σ Erstattung 29.597 gegen 36.022 €, 2028–2044; Lindenallee frische Kopie 2026: 12 statt 2 Monate Miete/AfA in der Zeile).
+- **Commit:** main 19857a6d8, 8f99fc8ef, b837dfd20 · staging f360fc6b8, 93b981b23.
+- **Nachweis (Staging, Kopien im Testkonto):** nach dem Laden Tabelle == Karten in allen Jahren (Westerfeld, Lindenallee frisch, Quittengarten); Nachrechnungen 1/1/0; Speichervorgänge je Laden 1 vorher und 1 nachher; IRR Westerfeld 13,00 → 13,34 %. Prod: 1.0.251 auf beiden App-Domains, `DpNachrechnen` ausgeliefert, gold-audit RC 0. Prüfer: steuerjahr (43, neu Abschnitt E mit Gegenprobe), flow-berechnen (Basislinie unverändert), score-ketten, ek-rendite, buster-ebenen grün.
+- **Rest:** keiner.
