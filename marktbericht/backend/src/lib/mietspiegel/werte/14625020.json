@@ -1,0 +1,555 @@
+{
+ "ags": "14625020",
+ "gemeinde": "Bautzen",
+ "haus": {
+  "regel": "ausgeschlossen",
+  "beleg": "S. 3 Geltungsbereich: findet keine Anwendung, wenn „die Wohnung sich in einem 1- oder 2-Familienhaus bzw. in einem Reihenhaus befindet“"
+ },
+ "art": "einfach",
+ "stand": "2021-12-01",
+ "erhebungsstichtag": "2020-12",
+ "gueltig_ab": "2021-12-01",
+ "gueltig_bis": null,
+ "quelle": {
+  "url": "https://www.bautzen.de/fileadmin/media/statistik_wahlen/8.-bautzener-mietspiegel.pdf",
+  "dokument": "8. Bautzener Mietspiegel, gültig ab 1. Dezember 2021 (Arbeitsgruppe Mietspiegel der Stadt Bautzen)",
+  "seite": "S. 4 Tabelle, S. 3 Arbeitsgruppe, Geltungsbereich, Gültigkeit, Datenerhebung, S. 5 Ausstattung, S. 5–6 Anwendung und Beispiel, S. 6 Wohnlagen, S. 10–13 Wohnlagenverzeichnis, S. 16 Impressum",
+  "lizenz": "Impressum S. 16: „Nachdruck ausdrücklich erlaubt!“ – kein Speicherverbot (geprüft 26.11.2026)",
+  "abgerufen": "2026-11-26"
+ },
+ "einheit": "eur_qm_nettokalt",
+ "form": "tabelle",
+ "rundung": 2,
+ "hinweis": "Einvernehmlich festgestellter (einfacher) Mietspiegel der Arbeitsgruppe mit Stadtverwaltung, Mieterverein Ostsachsen, Haus und Grund Bautzen, Wohnungsunternehmen, Gutachterausschuss und Amtsgericht (S. 3); Mieten von Dezember 2020, gültig ab 01.12.2021. Die Arbeitsgruppe hat die Gültigkeit verlängert, „Somit bleibt die 8. Ausgabe weiterhin aktuell“ (https://www.bautzen.de/aktuelles/2023-373); der 9. Mietspiegel ist in Arbeit (Stichtag 31.03.2026, Fragebogen vom 30.04.2026). Tabelle S. 4 am Druckbild geprüft. Mittelwert und Spanne. Ausstattung Standard (Grundfall) oder Gehoben (5 von 11 Merkmalen, S. 5); Fußnote S. 4: „Wenn in der Ausstattungskategorie »Gehoben« kein Wert ausgewiesen ist, gilt automatisch der Wert im Bereich »Standard«“ – deshalb gelten die Standard-Felder ohne Ausstattungsbindung und die Gehoben-Felder stehen vorn. Lage 1 = überdurchschnittlich, Lage 2 = durchschnittlich (S. 6, Verzeichnis S. 10–13), ohne Angabe Lage 2; Baujahr 1991–2020 ohne Lageunterscheidung. Größe bis 45,00 / 45,01–60,00 / 60,01–75,00 / ab 75,01 m². Baujahre ab 2021 nicht erfasst. Spanneneinordnung nach %-Punkten (S. 5–6) nicht abgebildet.",
+ "tabelle": {
+  "geltung": {
+   "baujahr_bis": 2020
+  },
+  "achsen": {
+   "baujahr": [
+    {
+     "von": null,
+     "bis": 1948,
+     "label": "bis 1948"
+    },
+    {
+     "von": 1949,
+     "bis": 1970,
+     "label": "1949 bis 1970"
+    },
+    {
+     "von": 1971,
+     "bis": 1990,
+     "label": "1971 bis 1990"
+    },
+    {
+     "von": 1991,
+     "bis": 2020,
+     "label": "1991 bis 2020"
+    }
+   ],
+   "wfl": [
+    {
+     "von": null,
+     "bis": 45,
+     "label": "bis 45,00 m²"
+    },
+    {
+     "von": 45,
+     "von_inkl": false,
+     "bis": 60,
+     "label": "45,01 bis 60,00 m²"
+    },
+    {
+     "von": 60,
+     "von_inkl": false,
+     "bis": 75,
+     "label": "60,01 bis 75,00 m²"
+    },
+    {
+     "von": 75,
+     "von_inkl": false,
+     "bis": null,
+     "label": "75,01 m² und mehr"
+    }
+   ],
+   "lage": [
+    {
+     "schluessel": "1",
+     "label": "Wohnlage 1 (überdurchschnittlich)",
+     "aliase": [
+      "gut",
+      "überdurchschnittlich"
+     ]
+    },
+    {
+     "schluessel": "2",
+     "label": "Wohnlage 2 (durchschnittlich)",
+     "standard": true,
+     "aliase": [
+      "mittel",
+      "durchschnittlich",
+      "normal"
+     ]
+    }
+   ],
+   "ausstattung": [
+    {
+     "schluessel": "standard",
+     "label": "Standard",
+     "standard": true
+    },
+    {
+     "schluessel": "gehoben",
+     "label": "Gehoben (5 von 11 Merkmalen)"
+    }
+   ]
+  },
+  "zellen": [
+   {
+    "baujahr": 0,
+    "wfl": 0,
+    "lage": "1",
+    "ausstattung": "gehoben",
+    "unten": 6.05,
+    "mittel": 6.75,
+    "oben": 8.0,
+    "seite": "4"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 1,
+    "lage": "1",
+    "ausstattung": "gehoben",
+    "unten": 6.0,
+    "mittel": 6.17,
+    "oben": 6.5,
+    "seite": "4"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 2,
+    "lage": "1",
+    "ausstattung": "gehoben",
+    "unten": 5.48,
+    "mittel": 6.17,
+    "oben": 6.8,
+    "seite": "4"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 3,
+    "lage": "1",
+    "ausstattung": "gehoben",
+    "unten": 5.33,
+    "mittel": 5.93,
+    "oben": 6.28,
+    "seite": "4"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 0,
+    "lage": "2",
+    "ausstattung": "gehoben",
+    "unten": 5.6,
+    "mittel": 6.92,
+    "oben": 7.44,
+    "seite": "4"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 1,
+    "lage": "2",
+    "ausstattung": "gehoben",
+    "unten": 5.6,
+    "mittel": 6.12,
+    "oben": 6.48,
+    "seite": "4"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 2,
+    "lage": "2",
+    "ausstattung": "gehoben",
+    "unten": 5.28,
+    "mittel": 5.78,
+    "oben": 6.92,
+    "seite": "4"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 3,
+    "lage": "2",
+    "ausstattung": "gehoben",
+    "unten": 5.21,
+    "mittel": 5.75,
+    "oben": 6.36,
+    "seite": "4"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 1,
+    "lage": "1",
+    "ausstattung": "gehoben",
+    "unten": 6.55,
+    "mittel": 6.74,
+    "oben": 7.0,
+    "seite": "4"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 1,
+    "lage": "1",
+    "ausstattung": "gehoben",
+    "unten": 5.23,
+    "mittel": 5.62,
+    "oben": 5.81,
+    "seite": "4"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 1,
+    "lage": "2",
+    "ausstattung": "gehoben",
+    "unten": 6.38,
+    "mittel": 6.48,
+    "oben": 6.51,
+    "seite": "4"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 3,
+    "lage": "2",
+    "ausstattung": "gehoben",
+    "unten": 6.48,
+    "mittel": 6.52,
+    "oben": 6.58,
+    "seite": "4"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 2,
+    "ausstattung": "gehoben",
+    "unten": 6.38,
+    "mittel": 7.0,
+    "oben": 8.7,
+    "seite": "4"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 3,
+    "ausstattung": "gehoben",
+    "unten": 7.0,
+    "mittel": 7.98,
+    "oben": 8.85,
+    "seite": "4"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 0,
+    "lage": "1",
+    "unten": 5.4,
+    "mittel": 5.79,
+    "oben": 6.5,
+    "seite": "4"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 1,
+    "lage": "1",
+    "unten": 5.0,
+    "mittel": 5.36,
+    "oben": 5.9,
+    "seite": "4"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 2,
+    "lage": "1",
+    "unten": 5.0,
+    "mittel": 5.37,
+    "oben": 5.73,
+    "seite": "4"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 3,
+    "lage": "1",
+    "unten": 4.84,
+    "mittel": 5.29,
+    "oben": 5.98,
+    "seite": "4"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 0,
+    "lage": "2",
+    "unten": 4.65,
+    "mittel": 5.44,
+    "oben": 6.0,
+    "seite": "4"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 1,
+    "lage": "2",
+    "unten": 4.55,
+    "mittel": 5.14,
+    "oben": 5.69,
+    "seite": "4"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 2,
+    "lage": "2",
+    "unten": 4.6,
+    "mittel": 4.98,
+    "oben": 5.28,
+    "seite": "4"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 3,
+    "lage": "2",
+    "unten": 4.6,
+    "mittel": 5.1,
+    "oben": 5.5,
+    "seite": "4"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 0,
+    "lage": "1",
+    "unten": 5.4,
+    "mittel": 5.87,
+    "oben": 6.52,
+    "seite": "4"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 1,
+    "lage": "1",
+    "unten": 5.09,
+    "mittel": 5.35,
+    "oben": 5.9,
+    "seite": "4"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 2,
+    "lage": "1",
+    "unten": 5.06,
+    "mittel": 5.58,
+    "oben": 6.08,
+    "seite": "4"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 3,
+    "lage": "1",
+    "unten": 5.0,
+    "mittel": 5.3,
+    "oben": 6.51,
+    "seite": "4"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 0,
+    "lage": "2",
+    "unten": 5.1,
+    "mittel": 5.57,
+    "oben": 6.0,
+    "seite": "4"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 1,
+    "lage": "2",
+    "unten": 5.2,
+    "mittel": 5.37,
+    "oben": 5.59,
+    "seite": "4"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 2,
+    "lage": "2",
+    "unten": 4.6,
+    "mittel": 4.96,
+    "oben": 5.3,
+    "seite": "4"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 3,
+    "lage": "2",
+    "unten": 4.68,
+    "mittel": 5.24,
+    "oben": 5.78,
+    "seite": "4"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 0,
+    "lage": "1",
+    "unten": 5.01,
+    "mittel": 5.63,
+    "oben": 6.45,
+    "seite": "4"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 1,
+    "lage": "1",
+    "unten": 4.8,
+    "mittel": 5.07,
+    "oben": 5.31,
+    "seite": "4"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 2,
+    "lage": "1",
+    "unten": 4.6,
+    "mittel": 5.01,
+    "oben": 5.34,
+    "seite": "4"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 3,
+    "lage": "1",
+    "unten": 4.89,
+    "mittel": 5.05,
+    "oben": 5.32,
+    "seite": "4"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 0,
+    "lage": "2",
+    "unten": 4.61,
+    "mittel": 4.94,
+    "oben": 5.4,
+    "seite": "4"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 1,
+    "lage": "2",
+    "unten": 4.51,
+    "mittel": 4.79,
+    "oben": 5.15,
+    "seite": "4"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 2,
+    "lage": "2",
+    "unten": 4.35,
+    "mittel": 4.7,
+    "oben": 4.99,
+    "seite": "4"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 3,
+    "lage": "2",
+    "unten": 4.4,
+    "mittel": 4.61,
+    "oben": 5.05,
+    "seite": "4"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 0,
+    "unten": 6.0,
+    "mittel": 6.2,
+    "oben": 6.72,
+    "seite": "4"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 1,
+    "unten": 5.5,
+    "mittel": 6.0,
+    "oben": 6.1,
+    "seite": "4"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 2,
+    "unten": 5.42,
+    "mittel": 5.64,
+    "oben": 5.95,
+    "seite": "4"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 3,
+    "unten": 5.3,
+    "mittel": 5.74,
+    "oben": 6.47,
+    "seite": "4"
+   }
+  ]
+ },
+ "pruefbeispiele": [
+  {
+   "eingabe": {
+    "baujahr": 1930,
+    "wfl": 80,
+    "lage": "1",
+    "ausstattung": "standard"
+   },
+   "erwartet": {
+    "unten": 4.84,
+    "mittel": 5.29,
+    "oben": 5.98
+   },
+   "seite": "5–6",
+   "art": "anwendungsbeispiel",
+   "anmerkung": "Beispiel: Standard, bis 1948, Lage 1, 80 m²: Mittelwert 5,29, obere Grenze 5,98; mit +30 %-Punkten 5,50 (nicht abgebildet)"
+  },
+  {
+   "eingabe": {
+    "baujahr": 1960,
+    "wfl": 70,
+    "lage": "1",
+    "ausstattung": "gehoben"
+   },
+   "erwartet": {
+    "unten": 5.06,
+    "mittel": 5.58,
+    "oben": 6.08
+   },
+   "seite": "4",
+   "art": "tabellenzelle",
+   "anmerkung": "Gehoben ohne Wert → Standard-Feld (Fußnote)"
+  },
+  {
+   "eingabe": {
+    "baujahr": 2005,
+    "wfl": 80,
+    "ausstattung": "gehoben"
+   },
+   "erwartet": {
+    "unten": 7.0,
+    "mittel": 7.98,
+    "oben": 8.85
+   },
+   "seite": "4",
+   "art": "tabellenzelle"
+  },
+  {
+   "eingabe": {
+    "baujahr": 2022,
+    "wfl": 60
+   },
+   "erwartet": null,
+   "seite": "4",
+   "art": "tabellenzelle",
+   "anmerkung": "Baujahr nach 2020 nicht erfasst"
+  }
+ ]
+}
