@@ -797,3 +797,49 @@ window.setMietModus = function(mode) {
 window.setMietInclZE = function(checked) {
   window.MietEntwicklung.setAppliesToZE(checked);
 };
+
+/* v5130 · LL6 · NACHRECHNEN, WENN DATEN NACH DEM ERSTEN calc() EINTREFFEN
+   Gemessen 26.11.2026 (Staging, Kopien Westerfeld 140 und Lindenallee 14): calc() lief beim Laden einmal,
+   danach kamen noch Eingaben an, ohne dass neu gerechnet wurde:
+     - das Potenzial-Ergebnis (dp:potenzial) -> sollSprung() / Mieterhöhung ab dem Sollmietjahr (Westerfeld 2028 ff.)
+     - der wirtschaftliche Übergang bzw. das Kaufdatum im Formular -> DealPilotAnteilig.getWuMonths (Lindenallee 2026:
+       Zeile mit 12 Monaten Miete und AfA, Karte mit 2 Monaten)
+   Die Tabelle (State.cfRows) blieb beim alten Stand, die Steuerkarten (_computeYearTotal beim Anzeigen) nahmen schon den
+   neuen. Kein Rechenkern ändert sich: geprüft wird nur, ob das gespeicherte steuerliche Ergebnis je Jahr
+   (cfRows[i].zve_steuer, gesetzt in calc.js aus _computeYearTotal) noch zur heutigen Rechnung passt. Wenn nicht: einmal
+   calc(). Danach passen beide wieder (gemessen), also keine Schleife. Zusätzlich gedeckelt: höchstens 3 Nachrechnungen
+   je geladenem Objekt, entprellt 300 ms. */
+(function () {
+  'use strict';
+  var _t = null, _n = 0, _aus = false;
+  function _veraltet() {
+    var S = window.State;
+    if (!S || !Array.isArray(S.cfRows) || !S.cfRows.length || typeof window._computeYearTotal !== 'function') return false;
+    for (var i = 0; i < S.cfRows.length; i++) {
+      var r = S.cfRows[i];
+      if (!r || typeof r.zve_steuer !== 'number' || !isFinite(r.zve_steuer)) continue;
+      var t = null;
+      try { t = window._computeYearTotal(r.cal, i); } catch (e) { return false; }
+      if (!t || typeof t.ergebnis !== 'number' || !isFinite(t.ergebnis)) continue;
+      if (Math.abs(t.ergebnis - r.zve_steuer) > 1) return true;
+    }
+    return false;
+  }
+  function pruefen() {
+    if (_aus || _n >= 3) return;
+    if (typeof window.calc !== 'function') return;
+    if (!_veraltet()) return;
+    _n++;
+    try { window.calc(); } catch (e) {}
+  }
+  function bald() { if (_t) clearTimeout(_t); _t = setTimeout(function () { _t = null; pruefen(); }, 300); }
+  ['dp:potenzial', 'dp:mietspiegel-werte', 'dp:steuer-grundlagen', 'dp:steuer-snapshots'].forEach(function (ev) {
+    window.addEventListener(ev, bald);
+  });
+  window.addEventListener('dp:object-ready', function () {
+    _n = 0;
+    [1500, 4000, 10000, 20000].forEach(function (ms) { setTimeout(bald, ms); });
+  });
+  /* Für den Prüfer: Gegenprobe ohne Auslöser (DpNachrechnen.aus(true)) und Zustand abfragen. */
+  window.DpNachrechnen = { veraltet: _veraltet, pruefen: pruefen, aus: function (b) { _aus = !!b; }, anzahl: function () { return _n; }, _meta: 'v5130' };
+})();
