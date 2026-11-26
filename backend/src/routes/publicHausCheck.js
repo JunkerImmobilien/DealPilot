@@ -76,7 +76,7 @@ router.post('/bericht', bremseBericht, express.json({ limit: '8kb' }), async fun
   try {
     const b = req.body || {};
     const z = await hc.kaufLesen(String(b.token || ''));
-    res.json(await hc.bericht(z, b.adresse, b.darlehen));
+    res.json(await hc.bericht(z, b.adresse, b.darlehen, b.nhk));
   } catch (e) { fehler(res, e, 'bericht'); }
 });
 

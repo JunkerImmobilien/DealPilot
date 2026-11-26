@@ -17,6 +17,11 @@
       '<label class="eg-f"><span>Kaufpreis</span><input id="egKp" inputmode="numeric" value="310.000"></label>' +
       '<label class="eg-f"><span>Wohnfläche m²</span><input id="egWfl" inputmode="numeric" value="130"></label>' +
       '<label class="eg-f klein" id="egGsflF"><span>Grundstück m²</span><input id="egGsfl" inputmode="numeric" value="600"></label>' +
+      /* v5130 KK6 · für den Sachwert nach NHK 2010 (Gebäudetyp und Standardstufe), beim Haus */
+      '<label class="eg-f klein"><span>Keller</span><select id="egKeller"><option value="ja">unterkellert</option><option value="nein">ohne Keller</option></select></label>' +
+      '<label class="eg-f klein"><span>Geschosse</span><select id="egGeschosse"><option value="2">Erd- und Obergeschoss</option><option value="1">nur Erdgeschoss</option></select></label>' +
+      '<label class="eg-f klein"><span>Dach</span><select id="egDach"><option value="1">Dachgeschoss ausgebaut</option><option value="2">Dachgeschoss nicht ausgebaut</option><option value="3">Flachdach</option></select></label>' +
+      '<label class="eg-f klein"><span>Ausstattung</span><select id="egAusst"><option value="normal">normal</option><option value="einfach">einfach</option><option value="gehoben">gehoben</option></select></label>' +
       '<label class="eg-f klein"><span>Baujahr</span><input id="egBj" inputmode="numeric" value="1998"></label>' +
       '<label class="eg-f klein"><span>Objekt</span><select id="egArt"><option value="efh">Einfamilienhaus</option><option value="zfh">Zweifamilienhaus</option><option value="dhh">Doppelhaushälfte</option><option value="rh">Reihenhaus</option><option value="etw">Eigentumswohnung</option><option value="mfh">Mehrfamilienhaus</option></select></label>' +
       '<label class="eg-f klein"><span>PLZ</span><input id="egPlz" inputmode="numeric" value="33602"></label>' +

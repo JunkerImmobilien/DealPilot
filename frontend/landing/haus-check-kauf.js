@@ -34,10 +34,18 @@
   function eingaben() {
     var str = ($('egStr') || {}).value || '';
     return { kp: zahl('egKp'), wfl: zahl('egWfl'), gsfl: zahl('egGsfl'), bj: zahl('egBj'), ek: zahl('egEk'), netto: zahl('egNetto'),
-      plz: (($('egPlz') || {}).value || '').trim(), objektart: ($('egArt') || {}).value || 'efh', str: str.trim() };
+      plz: (($('egPlz') || {}).value || '').trim(), objektart: ($('egArt') || {}).value || 'efh', str: str.trim(),
+      keller: ($('egKeller') || {}).value || 'ja', geschosse: ($('egGeschosse') || {}).value || '2', dach: ($('egDach') || {}).value || '1', ausst: ($('egAusst') || {}).value || 'normal' };
+  }
+  /* Gebäudetyp nach NHK 2010 wie im Objekt-Formular der App (nhk_haus, nhk_geschosse, nhk_dach), Standardstufe über ausst */
+  function nhkAus(e) {
+    var haus = e.objektart === 'dhh' ? '2' : (e.objektart === 'rh' ? '3' : '1');
+    var og = String(e.geschosse) === '2';
+    var g = e.keller === 'nein' ? (og ? '3' : '2') : (og ? '1' : '0');
+    return { haus: haus, geschosse: g, dach: String(e.dach || '1'), ausst: e.ausst || 'normal' };
   }
   function setzeFelder(e) {
-    var map = { egKp: e.kp, egWfl: e.wfl, egGsfl: e.gsfl, egBj: e.bj, egEk: e.ek, egNetto: e.netto, egPlz: e.plz, egArt: e.objektart, egStr: e.str };
+    var map = { egKeller: e.keller, egGeschosse: e.geschosse, egDach: e.dach, egAusst: e.ausst, egKp: e.kp, egWfl: e.wfl, egGsfl: e.gsfl, egBj: e.bj, egEk: e.ek, egNetto: e.netto, egPlz: e.plz, egArt: e.objektart, egStr: e.str };
     Object.keys(map).forEach(function (id) { var el = $(id); if (el && map[id] != null && map[id] !== '') el.value = typeof map[id] === 'number' ? map[id].toLocaleString('de-DE') : map[id]; });
   }
 
@@ -108,7 +116,7 @@
       d = dd;
       var vor = E.rechne({ kp: e.kp, wfl: e.wfl, bj: e.bj, ek: e.ek, netto: e.netto, plz: e.plz, objektart: e.objektart }, d);
       var adresse = (e.str ? e.str + ', ' : '') + e.plz + ' ' + String(d.gebiet || '').replace(/,.*$/, '');
-      return post('/bericht', { token: t, adresse: adresse, darlehen: vor && vor.darlehen }).then(function (b) {
+      return post('/bericht', { token: t, adresse: adresse, darlehen: vor && vor.darlehen, nhk: e.objektart === 'etw' ? null : nhkAus(e) }).then(function (b) {
         if (!b || b._status >= 400) throw new Error((b && b.error) || 'Der Bericht ging gerade nicht.');
         return A.html({ e: { kp: e.kp, wfl: e.wfl, bj: e.bj, ek: e.ek, netto: e.netto, plz: e.plz, objektart: e.objektart }, d: d, bericht: b, adresse: adresse });
       });

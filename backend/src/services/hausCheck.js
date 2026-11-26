@@ -180,7 +180,18 @@ function umfeldAus(u) {
     }) };
 }
 
-async function bericht(zeile, adresse, darlehen) {
+/* Gebäudetyp nach NHK 2010 und Standardstufe aus dem Formular der Landing (nicht gespeichert, nur für diesen Lauf).
+   Dieselben Felder wie das Objekt-Formular der App (DealPilotObjectMapper: nhk_haus, nhk_geschosse, nhk_dach, ausst). */
+function nhkSauber(n) {
+  if (!n || typeof n !== 'object') return {};
+  const o = {};
+  if (/^[123]$/.test(String(n.haus))) o.nhk_haus = String(n.haus);
+  if (/^[0-3]$/.test(String(n.geschosse))) o.nhk_geschosse = String(n.geschosse);
+  if (/^[123]$/.test(String(n.dach))) o.nhk_dach = String(n.dach);
+  if (/^(einfach|normal|gehoben|luxus)$/.test(String(n.ausst))) o.ausst = String(n.ausst);
+  return o;
+}
+async function bericht(zeile, adresse, darlehen, nhk) {
   if (!zeile) throw _fehler('Der Kauf ist unbekannt.', 403, 'kauf_unbekannt');
   const darf = ec.berichtErlaubt(zeile);
   if (!darf.ok) throw _fehler('Der Bericht braucht einen bezahlten, gültigen Kauf.', darf.code === 'nicht_bezahlt' ? 402 : 403, darf.code);
@@ -188,6 +199,7 @@ async function bericht(zeile, adresse, darlehen) {
   const adr = (typeof adresse === 'string') ? adresse.replace(/[\u0000-\u001f]/g, ' ').trim().slice(0, 160) : '';
   const body = Object.assign(ec.mbEingabe(z, adr.length >= 5 ? adr : null), {
     hauscheck: { objektart: String(z.art || '').toLowerCase(), darlehen: Number(darlehen) > 0 && Number(darlehen) < 1e8 ? Math.round(Number(darlehen)) : null } });
+  if (z.art !== 'ETW') Object.assign(body.dealpilot, nhkSauber(nhk));
   let j = null;
   try {
     const r = await deps().mbFetch(MB_BASE + '/reports/einzelcheck', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
@@ -206,4 +218,4 @@ async function bericht(zeile, adresse, darlehen) {
 }
 
 module.exports = { VERSION, PRODUKT, LOOKUP_KEY, ARTEN, PFLICHT, MFH_HINWEIS, grundSauber, grundFehlt, artErlaubt, preis, kaufAnlegen, kaufLesen,
-  statusAus, handlePaid, hausWert, belwAus, umfeldAus, bericht, _setzeDeps };
+  statusAus, handlePaid, hausWert, belwAus, umfeldAus, nhkSauber, bericht, _setzeDeps };

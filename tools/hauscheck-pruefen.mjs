@@ -101,6 +101,10 @@ ok(hc.hausWert({ verfuegbar: false, text: 'Ohne Anschrift' }).verfuegbar === fal
 const b = hc.belwAus({ verfuegbar: true, beleihungswert: 381000, basis: 'sachwert_4_2', eigennutzung: true, hinweise: ['A - B; C'], auslauf: { auslauf_pct: 73.5 } });
 ok(b.beleihungswert === 381000 && b.eigennutzung && b.auslauf_pct === 73.5 && !/[–—;]| - /.test(b.hinweise[0]), 'E  Beleihungswert übernommen, Hinweise ohne Gedankenstrich und Semikolon');
 
+const nk = hc.nhkSauber({ haus: '1', geschosse: '1', dach: '1', ausst: 'normal', boese: 'x' });
+ok(nk.nhk_haus === '1' && nk.nhk_geschosse === '1' && nk.nhk_dach === '1' && nk.ausst === 'normal' && !('boese' in nk), 'E  NHK-Angaben nur über die Weißliste');
+ok(Object.keys(hc.nhkSauber({ haus: '9', dach: 'x' })).length === 0, 'E  ungültige NHK-Angaben fallen weg');
+
 /* F */
 ok(S.sicherung({ ausfuehren: false }).rc === 2, 'F  Stripe-Skript Trockenlauf RC 2');
 ok(S.sicherung({ ausfuehren: true, live: true, schluessel: 'sk_test_x' }).rc === 3, 'F  --live mit Testschlüssel abgelehnt');
