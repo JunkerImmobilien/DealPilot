@@ -26,10 +26,11 @@ direkt unter den Punkt — nicht kommentarlos liegenlassen.
 - [x] 26.11.2026 OSM-Weg entschieden (Marcel „ja mach das“): Geoapify-Rückfall mit 30 Tagen Speicher bleibt, Autobahn „nicht ermittelt“.
 - [x] 26.11.2026 Beleihungswert § 4 Abs. 2 bei Eigennutzung (Haus Sachwert, ETW Vergleichswert), Prüffall 13 (v5130dkk6).
 - [x] 26.11.2026 Bezahlter Haus-Check 9,99 € über den Einzel-Check-Kaufweg, Bericht mit Wert, Beleihungswert und Umfeld, PDF-Knopf in App und Landing (`frontend/landing/haus-check.html`), Testpreis in der Sandbox, Testkauf auf Staging (v5130d bis v5130ikk6).
-- [ ] **Prod-Livegang Haus-Check (nach Marcels Abnahme):** Checkliste in `wissen/2026-11-26.md` (Abschnitt „KK6 Prod-Livegang“). Live-Preis mit `tools/stripe-hauscheck-preis-anlegen.mjs --ausfuehren --live` erst dann.
+- [x] 26.11.2026 Prod-Livegang Haus-Check und Deal-Check-Verkauf, Version 1.0.252 (main `2faa2805e`, `4f61259e`), Stripe live, Schalter an.
+- [ ] **Abnahmekauf mit Erstattung (Marcel)** nach `Dateien/Konzepte/Eigennutzer-Bericht-Muster/Abnahme-Haus-Check-Prod.md`.
 - [ ] App-Knopf „Haus-Check als PDF“ am echten Objekt mit Stufe-3-Bericht im Browser abnehmen (Staging-Abnahmepunkt, Route ohne Anmeldung 401 gemessen).
-- [ ] Landing: das freie Ergebnis rechnet ohne Wert (Testkauf Score 50), der bezahlte Bericht mit Wert (63). Ergebnis nach dem Kauf oben angleichen oder Hinweis „mit Wert neu gerechnet“.
-- [ ] Haus-Check: Anrechnung aufs Abo (wie beim Einzel-Check) offen, Marcel entscheidet.
+- [x] 26.11.2026 Score angeglichen: nach dem Kauf rechnet das Ergebnis oben mit dem Wert (v5130kkk6).
+- [x] 26.11.2026 Haus-Check: Anrechnung aufs Abo wie beim Einzel-Check (Marcel), gebaut v5130kkk6.
 - [ ] Gemischter Fall MFH „eine Einheit selbst, Rest vermietet“: heute abgewiesen mit „Für Mehrfamilienhäuser den Modus Vermieten nutzen“. Offen, ob ein eigener Mischmodus kommt.
 - **MM6 v5130 Modernisierung in der Mietnäherung:** Prod nach Marcels OK. Faktor Neuvermietung je Kreis: `node tools/neuvermietung-faktor-ableiten.mjs --prod` monatlich, ab 20 Messungen je Kreis Schreibweg bauen (Untergrenze 1,20). Modernisierungs-Zuschlag mit mehr Mietspiegeln nachmessen (bisher nur Kreise Unna und Herford).
 
