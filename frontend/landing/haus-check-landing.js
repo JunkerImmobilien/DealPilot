@@ -103,7 +103,10 @@
     var e = { kp: zahl('egKp'), wfl: zahl('egWfl'), bj: zahl('egBj'), ek: zahl('egEk'), netto: zahl('egNetto'), plz: document.getElementById('egPlz').value.trim(),
       objektart: document.getElementById('egArt').value };
     if (e.objektart === 'mfh') { var erg0 = document.getElementById('egErg'); erg0.innerHTML = '<div class="eg-satz">' + E.MFH_HINWEIS + '</div>'; erg0.classList.add('da'); drehe(true); return; }
-    E.daten(e.plz, e.bj, e.wfl).then(function (d) { var r = E.rechne(e, d); if (!r.ok) return; zeige(r); zusatz(r, d, e); drehe(true); });
+    /* pp6 · während die Daten kommen, sagt der Knopf, dass gerechnet wird; gedreht wird erst mit dem fertigen Ergebnis */
+    var sb = document.getElementById('egStart'), sbText = sb.textContent; sb.disabled = true; sb.textContent = 'Wird geprüft …';
+    var fertig = function () { sb.disabled = false; sb.textContent = sbText; };
+    E.daten(e.plz, e.bj, e.wfl).then(function (d) { fertig(); var r = E.rechne(e, d); if (!r.ok) return; zeige(r); zusatz(r, d, e); drehe(true); }, fertig);
   }
   document.getElementById('egStart').addEventListener('click', start);
 
@@ -142,7 +145,7 @@
     var a = ev.target.closest('[data-eg-selbst]'); if (!a) return; setze('selbst');
   });
   window.DemoEgSetze = setze;
-  if (/[?&]selbst=1/.test(location.search) || document.body.getAttribute('data-hc-seite') === '1') { setze('selbst'); if (!/(?:^#|&)hc=/.test(location.hash)) start(); }
+  if (/[?&]selbst=1/.test(location.search) || document.body.getAttribute('data-hc-seite') === '1') { setze('selbst'); }   /* pp6 · kein Selbststart mehr: vorne stehen die Eingaben, gerechnet wird mit Startfreigabe */
   /* v5130 KK6 · nach dem Kauf zeichnet haus-check-kauf.js das Ergebnis mit dem Wert nach ImmoWertV neu: derselbe Score wie im PDF */
   window.DemoEgZeige = function (r, d, e) { zeige(r); zusatz(r, d, e); };
 
