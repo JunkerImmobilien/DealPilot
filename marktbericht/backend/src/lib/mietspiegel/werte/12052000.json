@@ -1,0 +1,1031 @@
+{
+ "ags": "12052000",
+ "gemeinde": "Cottbus/Chóśebuz",
+ "freigabe": "gesperrt",
+ "freigabe_grund": "„© 2024 Stadt Cottbus/Chóśebuz . Alle Rechte vorbehalten.“ (Impressum, S. 2) — Rechtevorbehalt ohne ausdrückliches Speicherverbot; auf Prod gesperrt bis zur Klärung",
+ "haus": {
+  "regel": "ausgeschlossen",
+  "beleg": "S. 7 (nicht mietspiegelrelevant: „Wohnungen in Ein- und Zweifamilienhäusern, bzw. Wohn- oder Geschäftshaus mit weniger als 3 Wohnungen“), S. 8 Nr. 2 Geltungsbereich „Wohnraum in Mehrfamilienhäusern“"
+ },
+ "art": "qualifiziert",
+ "stand": "2024-03-01",
+ "erhebungsstichtag": "2024-03-01",
+ "gueltig_ab": null,
+ "gueltig_bis": null,
+ "naechste_ausgabe": "2026",
+ "quelle": {
+  "url": "https://cottbus.de/download/13826/mietspiegel/109407/cottbuser-mietspiegel-2024-anlage-a.pdf",
+  "dokument": "Mietspiegel 2024 der kreisfreien Stadt Cottbus/Chóśebuz (Stand 26.11.2024, FB 33 Bürgerservice), Tabelle S. 15",
+  "seite": "15",
+  "lizenz": "„Alle Rechte vorbehalten“ (Impressum S. 2), kein ausdrückliches Speicherverbot; geprüft 26.11.2026",
+  "abgerufen": "2026-11-26"
+ },
+ "einheit": "eur_qm_nettokalt",
+ "form": "tabelle",
+ "rundung": 2,
+ "hinweis": "Qualifiziert nach § 558d BGB (S. 5, 7), Stichtag 01.03.2024, anerkannt durch Beschluss der StVV vom 18.12.2024 (III.1-009-24), tritt mit Bekanntmachung im Amtsblatt in Kraft (S. 7; Datum nicht im Dokument, deshalb gueltig_ab null). Die Stadt kündigt den Mietspiegel 2026 „voraussichtlich Ende 2026“ an (cottbus.de/mietspiegel, geprüft 26.11.2026). Tabellenfeld nach Wohnfläche (< 45, 45 bis < 55, 55 bis < 70, 70 bis < 90, ab 90 m²), Baujahr, Energieeffizienzklasse (A–B, C, D–H; Denkmäler zählen zu D–H, S. 12) und Modernisierung (bis 1990 getrennt; „mit Modernisierung“ = überwiegender Teil der Gewerke Fenster, Dach, Fassade, Heizung, Sanitär, Elektro seit 01.01.1991, S. 11 und 16; ab 1991 keine Unterteilung). Energie und Modernisierung stehen zusammen in der Achse „ausstattung“ (z. B. C_ohne); ab Baujahr 1991 sind ohne/mit gleich. Ohne Angabe kein Wert (kein Standard). Je Feld Mittelwert und 75-%-Spanne (S. 13). Leere Felder (unter 30 Fälle, S. 14) sind nicht eingetragen. Die Orientierungshilfe (S. 17–19, Merkmalsgruppen 30/30/40 % des Abstands zum Spannenrand) ist nicht Bestandteil des qualifizierten Mietspiegels und nicht übernommen. Textschicht der Tabelle ist verschoben (pdftotext ordnet Felder falsch zu) — am Druckbild S. 15 (gerendert 260 dpi) abgelesen.",
+ "tabelle": {
+  "achsen": {
+   "baujahr": [
+    {
+     "von": null,
+     "bis": 1948,
+     "label": "bis 1948"
+    },
+    {
+     "von": 1949,
+     "bis": 1968,
+     "label": "1949–1968"
+    },
+    {
+     "von": 1969,
+     "bis": 1990,
+     "label": "1969–1990"
+    },
+    {
+     "von": 1991,
+     "bis": 2005,
+     "label": "1991–2005"
+    },
+    {
+     "von": 2006,
+     "bis": 2016,
+     "label": "2006–2016"
+    },
+    {
+     "von": 2017,
+     "bis": 2024,
+     "label": "2017–01.03.2024"
+    }
+   ],
+   "wfl": [
+    {
+     "von": null,
+     "bis": 45,
+     "bis_inkl": false,
+     "label": "unter 45 m² (1 Zi.)"
+    },
+    {
+     "von": 45,
+     "bis": 55,
+     "bis_inkl": false,
+     "label": "45 bis unter 55 m² (2 Zi.)"
+    },
+    {
+     "von": 55,
+     "bis": 70,
+     "bis_inkl": false,
+     "label": "55 bis unter 70 m² (3 Zi.)"
+    },
+    {
+     "von": 70,
+     "bis": 90,
+     "bis_inkl": false,
+     "label": "70 bis unter 90 m² (4 Zi.)"
+    },
+    {
+     "von": 90,
+     "bis": null,
+     "label": "ab 90 m²"
+    }
+   ],
+   "ausstattung": [
+    {
+     "schluessel": "AB_ohne",
+     "label": "Energieeffizienzklasse A+ bis B, ohne Modernisierung"
+    },
+    {
+     "schluessel": "AB_mit",
+     "label": "Energieeffizienzklasse A+ bis B, mit Modernisierung nach 1991"
+    },
+    {
+     "schluessel": "C_ohne",
+     "label": "Energieeffizienzklasse C, ohne Modernisierung"
+    },
+    {
+     "schluessel": "C_mit",
+     "label": "Energieeffizienzklasse C, mit Modernisierung nach 1991"
+    },
+    {
+     "schluessel": "DH_ohne",
+     "label": "Energieeffizienzklasse D bis H (inkl. Denkmäler/Denkmalbereiche), ohne Modernisierung"
+    },
+    {
+     "schluessel": "DH_mit",
+     "label": "Energieeffizienzklasse D bis H (inkl. Denkmäler/Denkmalbereiche), mit Modernisierung nach 1991"
+    }
+   ]
+  },
+  "zellen": [
+   {
+    "baujahr": 1,
+    "wfl": 0,
+    "ausstattung": "AB_ohne",
+    "unten": 5.36,
+    "mittel": 6.08,
+    "oben": 6.72,
+    "seite": "15"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 0,
+    "ausstattung": "AB_mit",
+    "unten": 5.59,
+    "mittel": 6.33,
+    "oben": 6.91,
+    "seite": "15"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 0,
+    "ausstattung": "AB_ohne",
+    "unten": 4.84,
+    "mittel": 5.09,
+    "oben": 5.5,
+    "seite": "15"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 0,
+    "ausstattung": "AB_mit",
+    "unten": 5.9,
+    "mittel": 6.33,
+    "oben": 7,
+    "seite": "15"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 0,
+    "ausstattung": "C_mit",
+    "unten": 6.26,
+    "mittel": 7.19,
+    "oben": 7.92,
+    "seite": "15"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 0,
+    "ausstattung": "C_ohne",
+    "unten": 5.51,
+    "mittel": 5.76,
+    "oben": 5.99,
+    "seite": "15"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 0,
+    "ausstattung": "C_mit",
+    "unten": 5.61,
+    "mittel": 6.32,
+    "oben": 6.94,
+    "seite": "15"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 0,
+    "ausstattung": "C_ohne",
+    "unten": 4.84,
+    "mittel": 5.42,
+    "oben": 6,
+    "seite": "15"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 0,
+    "ausstattung": "C_mit",
+    "unten": 5.31,
+    "mittel": 6.21,
+    "oben": 7,
+    "seite": "15"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 0,
+    "ausstattung": "C_ohne",
+    "unten": 6.59,
+    "mittel": 7.88,
+    "oben": 9.51,
+    "seite": "15"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 0,
+    "ausstattung": "C_mit",
+    "unten": 6.59,
+    "mittel": 7.88,
+    "oben": 9.51,
+    "seite": "15"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 0,
+    "ausstattung": "DH_ohne",
+    "unten": 5.87,
+    "mittel": 7.16,
+    "oben": 8.8,
+    "seite": "15"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 0,
+    "ausstattung": "DH_mit",
+    "unten": 6.35,
+    "mittel": 7.37,
+    "oben": 8.71,
+    "seite": "15"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 0,
+    "ausstattung": "DH_ohne",
+    "unten": 5.01,
+    "mittel": 5.51,
+    "oben": 6.1,
+    "seite": "15"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 0,
+    "ausstattung": "DH_mit",
+    "unten": 5.97,
+    "mittel": 6.7,
+    "oben": 7.8,
+    "seite": "15"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 0,
+    "ausstattung": "DH_ohne",
+    "unten": 4.64,
+    "mittel": 5.3,
+    "oben": 6.03,
+    "seite": "15"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 0,
+    "ausstattung": "DH_mit",
+    "unten": 5.54,
+    "mittel": 6.45,
+    "oben": 8.04,
+    "seite": "15"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 0,
+    "ausstattung": "DH_ohne",
+    "unten": 6.49,
+    "mittel": 7.65,
+    "oben": 9.85,
+    "seite": "15"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 0,
+    "ausstattung": "DH_mit",
+    "unten": 6.49,
+    "mittel": 7.65,
+    "oben": 9.85,
+    "seite": "15"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 1,
+    "ausstattung": "AB_ohne",
+    "unten": 5.01,
+    "mittel": 5.73,
+    "oben": 6.55,
+    "seite": "15"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 1,
+    "ausstattung": "AB_mit",
+    "unten": 5.45,
+    "mittel": 6.22,
+    "oben": 7.05,
+    "seite": "15"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 1,
+    "ausstattung": "AB_mit",
+    "unten": 5.16,
+    "mittel": 5.84,
+    "oben": 6.52,
+    "seite": "15"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 1,
+    "ausstattung": "C_ohne",
+    "unten": 4.8,
+    "mittel": 6.05,
+    "oben": 6.85,
+    "seite": "15"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 1,
+    "ausstattung": "C_mit",
+    "unten": 6.38,
+    "mittel": 7.17,
+    "oben": 8.62,
+    "seite": "15"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 1,
+    "ausstattung": "C_ohne",
+    "unten": 4.96,
+    "mittel": 5.7,
+    "oben": 6.24,
+    "seite": "15"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 1,
+    "ausstattung": "C_mit",
+    "unten": 5.11,
+    "mittel": 5.89,
+    "oben": 6.78,
+    "seite": "15"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 1,
+    "ausstattung": "C_ohne",
+    "unten": 4.62,
+    "mittel": 5.22,
+    "oben": 5.87,
+    "seite": "15"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 1,
+    "ausstattung": "C_mit",
+    "unten": 5.12,
+    "mittel": 5.76,
+    "oben": 6.44,
+    "seite": "15"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 1,
+    "ausstattung": "C_ohne",
+    "unten": 5.78,
+    "mittel": 6.21,
+    "oben": 7,
+    "seite": "15"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 1,
+    "ausstattung": "C_mit",
+    "unten": 5.78,
+    "mittel": 6.21,
+    "oben": 7,
+    "seite": "15"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 1,
+    "ausstattung": "DH_ohne",
+    "unten": 5.34,
+    "mittel": 6.32,
+    "oben": 7.65,
+    "seite": "15"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 1,
+    "ausstattung": "DH_mit",
+    "unten": 6,
+    "mittel": 6.78,
+    "oben": 7.47,
+    "seite": "15"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 1,
+    "ausstattung": "DH_ohne",
+    "unten": 4.78,
+    "mittel": 5.2,
+    "oben": 5.56,
+    "seite": "15"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 1,
+    "ausstattung": "DH_mit",
+    "unten": 4.62,
+    "mittel": 5.32,
+    "oben": 6.01,
+    "seite": "15"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 1,
+    "ausstattung": "DH_ohne",
+    "unten": 4.25,
+    "mittel": 4.94,
+    "oben": 5.6,
+    "seite": "15"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 1,
+    "ausstattung": "DH_mit",
+    "unten": 5.06,
+    "mittel": 5.57,
+    "oben": 6.02,
+    "seite": "15"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 1,
+    "ausstattung": "DH_ohne",
+    "unten": 4.74,
+    "mittel": 5.92,
+    "oben": 6.98,
+    "seite": "15"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 1,
+    "ausstattung": "DH_mit",
+    "unten": 4.74,
+    "mittel": 5.92,
+    "oben": 6.98,
+    "seite": "15"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 2,
+    "ausstattung": "AB_mit",
+    "unten": 6.63,
+    "mittel": 7.21,
+    "oben": 7.77,
+    "seite": "15"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 2,
+    "ausstattung": "AB_ohne",
+    "unten": 4.97,
+    "mittel": 5.4,
+    "oben": 6.39,
+    "seite": "15"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 2,
+    "ausstattung": "AB_mit",
+    "unten": 5.31,
+    "mittel": 6.12,
+    "oben": 7.05,
+    "seite": "15"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 2,
+    "ausstattung": "AB_mit",
+    "unten": 4.86,
+    "mittel": 5.49,
+    "oben": 6.03,
+    "seite": "15"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 2,
+    "ausstattung": "AB_ohne",
+    "unten": 5.87,
+    "mittel": 6.76,
+    "oben": 7.84,
+    "seite": "15"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 2,
+    "ausstattung": "AB_mit",
+    "unten": 5.87,
+    "mittel": 6.76,
+    "oben": 7.84,
+    "seite": "15"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 2,
+    "ausstattung": "AB_ohne",
+    "unten": 8.7,
+    "mittel": 9.7,
+    "oben": 10.73,
+    "seite": "15"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 2,
+    "ausstattung": "AB_mit",
+    "unten": 8.7,
+    "mittel": 9.7,
+    "oben": 10.73,
+    "seite": "15"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 2,
+    "ausstattung": "C_ohne",
+    "unten": 5.59,
+    "mittel": 6.69,
+    "oben": 8.09,
+    "seite": "15"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 2,
+    "ausstattung": "C_mit",
+    "unten": 6,
+    "mittel": 6.81,
+    "oben": 7.53,
+    "seite": "15"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 2,
+    "ausstattung": "C_ohne",
+    "unten": 4.66,
+    "mittel": 5.48,
+    "oben": 6.06,
+    "seite": "15"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 2,
+    "ausstattung": "C_mit",
+    "unten": 4.88,
+    "mittel": 5.61,
+    "oben": 6.47,
+    "seite": "15"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 2,
+    "ausstattung": "C_ohne",
+    "unten": 4.22,
+    "mittel": 4.89,
+    "oben": 5.34,
+    "seite": "15"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 2,
+    "ausstattung": "C_mit",
+    "unten": 4.77,
+    "mittel": 5.39,
+    "oben": 6,
+    "seite": "15"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 2,
+    "ausstattung": "C_ohne",
+    "unten": 5.58,
+    "mittel": 6.6,
+    "oben": 7.54,
+    "seite": "15"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 2,
+    "ausstattung": "C_mit",
+    "unten": 5.58,
+    "mittel": 6.6,
+    "oben": 7.54,
+    "seite": "15"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 2,
+    "ausstattung": "DH_ohne",
+    "unten": 5,
+    "mittel": 6.26,
+    "oben": 7.16,
+    "seite": "15"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 2,
+    "ausstattung": "DH_mit",
+    "unten": 5.41,
+    "mittel": 6.42,
+    "oben": 7.21,
+    "seite": "15"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 2,
+    "ausstattung": "DH_ohne",
+    "unten": 4.76,
+    "mittel": 5.15,
+    "oben": 5.54,
+    "seite": "15"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 2,
+    "ausstattung": "DH_mit",
+    "unten": 4.71,
+    "mittel": 5.51,
+    "oben": 6.5,
+    "seite": "15"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 2,
+    "ausstattung": "DH_ohne",
+    "unten": 4.06,
+    "mittel": 4.82,
+    "oben": 5.44,
+    "seite": "15"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 2,
+    "ausstattung": "DH_mit",
+    "unten": 4.65,
+    "mittel": 5.36,
+    "oben": 6.01,
+    "seite": "15"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 3,
+    "ausstattung": "AB_mit",
+    "unten": 6.07,
+    "mittel": 6.85,
+    "oben": 7.5,
+    "seite": "15"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 3,
+    "ausstattung": "AB_ohne",
+    "unten": 4.91,
+    "mittel": 5.38,
+    "oben": 6.39,
+    "seite": "15"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 3,
+    "ausstattung": "AB_mit",
+    "unten": 5.33,
+    "mittel": 6.22,
+    "oben": 6.79,
+    "seite": "15"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 3,
+    "ausstattung": "AB_mit",
+    "unten": 4.99,
+    "mittel": 5.53,
+    "oben": 6.03,
+    "seite": "15"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 3,
+    "ausstattung": "AB_ohne",
+    "unten": 5.87,
+    "mittel": 6.56,
+    "oben": 7.62,
+    "seite": "15"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 3,
+    "ausstattung": "AB_mit",
+    "unten": 5.87,
+    "mittel": 6.56,
+    "oben": 7.62,
+    "seite": "15"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 3,
+    "ausstattung": "AB_ohne",
+    "unten": 7.95,
+    "mittel": 8.48,
+    "oben": 9.36,
+    "seite": "15"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 3,
+    "ausstattung": "AB_mit",
+    "unten": 7.95,
+    "mittel": 8.48,
+    "oben": 9.36,
+    "seite": "15"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 3,
+    "ausstattung": "AB_ohne",
+    "unten": 8.5,
+    "mittel": 9.5,
+    "oben": 10.87,
+    "seite": "15"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 3,
+    "ausstattung": "AB_mit",
+    "unten": 8.5,
+    "mittel": 9.5,
+    "oben": 10.87,
+    "seite": "15"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 3,
+    "ausstattung": "C_ohne",
+    "unten": 5.39,
+    "mittel": 6.22,
+    "oben": 6.96,
+    "seite": "15"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 3,
+    "ausstattung": "C_mit",
+    "unten": 5.58,
+    "mittel": 6.6,
+    "oben": 7.23,
+    "seite": "15"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 3,
+    "ausstattung": "C_mit",
+    "unten": 5.52,
+    "mittel": 6.04,
+    "oben": 6.51,
+    "seite": "15"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 3,
+    "ausstattung": "C_ohne",
+    "unten": 4.29,
+    "mittel": 4.83,
+    "oben": 5.2,
+    "seite": "15"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 3,
+    "ausstattung": "C_mit",
+    "unten": 4.6,
+    "mittel": 5.38,
+    "oben": 6.01,
+    "seite": "15"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 3,
+    "ausstattung": "C_ohne",
+    "unten": 5.45,
+    "mittel": 6.46,
+    "oben": 7.74,
+    "seite": "15"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 3,
+    "ausstattung": "C_mit",
+    "unten": 5.45,
+    "mittel": 6.46,
+    "oben": 7.74,
+    "seite": "15"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 3,
+    "ausstattung": "DH_ohne",
+    "unten": 4.96,
+    "mittel": 6.24,
+    "oben": 7.5,
+    "seite": "15"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 3,
+    "ausstattung": "DH_mit",
+    "unten": 5.46,
+    "mittel": 6.69,
+    "oben": 7.66,
+    "seite": "15"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 3,
+    "ausstattung": "DH_mit",
+    "unten": 5.12,
+    "mittel": 6.09,
+    "oben": 6.98,
+    "seite": "15"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 3,
+    "ausstattung": "DH_ohne",
+    "unten": 3.8,
+    "mittel": 4.64,
+    "oben": 5.23,
+    "seite": "15"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 3,
+    "ausstattung": "DH_mit",
+    "unten": 4.6,
+    "mittel": 5.25,
+    "oben": 5.84,
+    "seite": "15"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 4,
+    "ausstattung": "AB_mit",
+    "unten": 6.21,
+    "mittel": 7.02,
+    "oben": 8,
+    "seite": "15"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 4,
+    "ausstattung": "AB_ohne",
+    "unten": 8.08,
+    "mittel": 9.3,
+    "oben": 11.11,
+    "seite": "15"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 4,
+    "ausstattung": "AB_mit",
+    "unten": 8.08,
+    "mittel": 9.3,
+    "oben": 11.11,
+    "seite": "15"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 4,
+    "ausstattung": "C_ohne",
+    "unten": 5.09,
+    "mittel": 6.2,
+    "oben": 7.36,
+    "seite": "15"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 4,
+    "ausstattung": "C_mit",
+    "unten": 5.36,
+    "mittel": 6.57,
+    "oben": 7.5,
+    "seite": "15"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 4,
+    "ausstattung": "C_mit",
+    "unten": 4.58,
+    "mittel": 5.24,
+    "oben": 6,
+    "seite": "15"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 4,
+    "ausstattung": "C_ohne",
+    "unten": 4.85,
+    "mittel": 6.16,
+    "oben": 7.5,
+    "seite": "15"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 4,
+    "ausstattung": "C_mit",
+    "unten": 4.85,
+    "mittel": 6.16,
+    "oben": 7.5,
+    "seite": "15"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 4,
+    "ausstattung": "DH_ohne",
+    "unten": 4.64,
+    "mittel": 6.21,
+    "oben": 7.59,
+    "seite": "15"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 4,
+    "ausstattung": "DH_mit",
+    "unten": 5.5,
+    "mittel": 6.73,
+    "oben": 8.03,
+    "seite": "15"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 4,
+    "ausstattung": "DH_ohne",
+    "unten": 3.52,
+    "mittel": 4.57,
+    "oben": 5.6,
+    "seite": "15"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 4,
+    "ausstattung": "DH_ohne",
+    "unten": 4.38,
+    "mittel": 6.15,
+    "oben": 8.39,
+    "seite": "15"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 4,
+    "ausstattung": "DH_mit",
+    "unten": 4.38,
+    "mittel": 6.15,
+    "oben": 8.39,
+    "seite": "15"
+   }
+  ]
+ },
+ "pruefbeispiele": [
+  {
+   "eingabe": {
+    "baujahr": 1975,
+    "wfl": 60,
+    "ausstattung": "C_ohne"
+   },
+   "erwartet": {
+    "unten": 4.22,
+    "mittel": 4.89,
+    "oben": 5.34
+   },
+   "seite": "15",
+   "art": "tabellenzelle"
+  },
+  {
+   "eingabe": {
+    "baujahr": 2020,
+    "wfl": 100,
+    "ausstattung": "AB_mit"
+   },
+   "erwartet": {
+    "unten": 8.08,
+    "mittel": 9.3,
+    "oben": 11.11
+   },
+   "seite": "15",
+   "art": "tabellenzelle"
+  },
+  {
+   "eingabe": {
+    "baujahr": 1930,
+    "wfl": 40,
+    "ausstattung": "DH_ohne"
+   },
+   "erwartet": {
+    "unten": 5.87,
+    "mittel": 7.16,
+    "oben": 8.8
+   },
+   "seite": "15",
+   "art": "tabellenzelle"
+  },
+  {
+   "eingabe": {
+    "baujahr": 1960,
+    "wfl": 75,
+    "ausstattung": "C_ohne"
+   },
+   "erwartet": null,
+   "seite": "15",
+   "art": "tabellenzelle"
+  }
+ ]
+}
