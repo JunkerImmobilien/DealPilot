@@ -96,6 +96,9 @@
           return '<div><span>' + x.l.replace(/^davon /, '') + ' <small>' + x.herkunft + '</small></span><b>' + E.eur(x.eur) + '</b></div>'; }).join('') + '</details>' : '')
         + (r.quote != null ? '<div class="eg-klein">Anteil vom Netto ' + Math.round(r.quote) + ' %</div>' : '') + '</div>';
     }
+    /* Kurzurteil und Kaufnebenkosten bleiben auf der Karte (Marcel: nur Lage und Umfeld wandern in den Bericht) */
+    if (r.urteil && r.urteil.length) h += '<ul class="eg-urt">' + r.urteil.slice(1, 6).map(function (t) { return '<li>' + t + '</li>'; }).join('') + '</ul>';
+    if (r.nebenkosten) h += '<div class="eg-nk">Kaufnebenkosten ' + E.eur(r.nebenkosten.summe) + ' (' + String(r.nebenkosten.pct).replace('.', ',') + ' %): Grunderwerbsteuer ' + E.eur(r.nebenkosten.grest) + ', Notar ' + E.eur(r.nebenkosten.notar) + ', Grundbuch ' + E.eur(r.nebenkosten.grundbuch) + ', Makler ' + E.eur(r.nebenkosten.makler) + '.</div>';
     h += '<div class="eg-bericht">Lage, Umfeld und der Wert nach ImmoWertV stehen im Bericht.</div>';
     box.innerHTML = h; erg.appendChild(box);
   }
