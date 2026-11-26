@@ -46,7 +46,7 @@
   }
   function setzeFelder(e) {
     var map = { egKeller: e.keller, egGeschosse: e.geschosse, egDach: e.dach, egAusst: e.ausst, egKp: e.kp, egWfl: e.wfl, egGsfl: e.gsfl, egBj: e.bj, egEk: e.ek, egNetto: e.netto, egPlz: e.plz, egArt: e.objektart, egStr: e.str };
-    Object.keys(map).forEach(function (id) { var el = $(id); if (el && map[id] != null && map[id] !== '') el.value = typeof map[id] === 'number' ? map[id].toLocaleString('de-DE') : map[id]; });
+    Object.keys(map).forEach(function (id) { var el = $(id); if (el && map[id] != null && map[id] !== '') el.value = (typeof map[id] === 'number' && id !== 'egBj') ? map[id].toLocaleString('de-DE') : String(map[id]);   /* Baujahr nie mit Tausenderpunkt */ });
   }
 
   var preisText = '9,99 €';

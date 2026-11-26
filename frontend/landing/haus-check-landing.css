@@ -83,3 +83,8 @@
 .eg-umf-g small{font:400 11px/1.35 Inter,system-ui,sans-serif;color:#cfc8b8;overflow-wrap:anywhere}
 .eg-klein{font:400 11px/1.4 Inter,system-ui,sans-serif;color:#a9a294;margin:6px 0 0}
 #egArt{width:100%;background:transparent;color:inherit;border:0;font:inherit}
+/* v5130 KK6 · neue Auswahlfelder (Keller, Geschosse, Dach, Ausstattung): bei 390 px liefen sie über den Rand.
+   Grid-Kinder schrumpfen ohne min-width:0 nicht unter ihren Inhalt. */
+.eg-felder>*{min-width:0}
+.eg-f select{width:100%;max-width:100%;min-width:0;background:transparent;border:0;color:#fff;font:600 14px/1.3 var(--body,Inter,sans-serif);padding:6px 0 2px;outline:0}
+.eg-f select option{color:#050505}
