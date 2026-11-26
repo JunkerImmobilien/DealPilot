@@ -6,6 +6,7 @@ import { cfg, aiEnabled, geoEnabled, geomapEnabled, destatisEnabled } from '../l
 import { ReportOrchestrator } from '../services/ReportOrchestrator.js';
 import { MarketAnalysisService } from '../services/MarketAnalysisService.js';
 import { MicroLocationService } from '../services/MicroLocationService.js';
+import { UmfeldService } from '../services/UmfeldService.js';   /* v5130 · KK6 Umfeld fuer den Eigennutzer-Check */
 import { GeocodingService } from '../services/GeocodingService.js';
 import { DealPilotImportService } from '../services/DealPilotImportService.js';
 import { openaiSelfCheck, generateVerlaufText } from '../services/ReportGenerationService.js';
@@ -1633,6 +1634,14 @@ router.get('/micro/:propertyId', async (req, res) => {
   if (!p) return res.status(404).json({ error: 'unbekanntes Objekt' });
   const micro = await MicroLocationService.analyze(p.lat, p.lon, 2000);
   res.json(micro);
+});
+
+// GET /umfeld?lat=&lon= — v5130 · KK6 · Umfeld fuer den Eigennutzer-Check: naechster Supermarkt, Baecker, Apotheke,
+// Arzt, Kita, Grundschule, weiterfuehrende Schule, Bus und Bahn, Bahnhof, Park, Autobahnauffahrt (OSM/Overpass, 30 Tage Speicher).
+router.get('/umfeld', async (req, res) => {
+  const lat = parseFloat(req.query.lat), lon = parseFloat(req.query.lon);
+  if (!isFinite(lat) || !isFinite(lon) || Math.abs(lat) > 85 || Math.abs(lon) > 180) return res.status(400).json({ error: 'lat und lon erforderlich' });
+  res.json(await UmfeldService.analyze(lat, lon));
 });
 
 // GET /geocode?address=

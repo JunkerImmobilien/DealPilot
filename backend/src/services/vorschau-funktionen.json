@@ -88,6 +88,22 @@
       "backend_stellen": [],
       "backend_erkennung": "",
       "nur_frontend": "reine Darstellung öffentlicher Förderprogramme aus dem Register js/data/foerderregister.js, berechnet im Browser. Es gibt keine Route und keinen Datenweg, den eine Backend-Sperre schützen könnte."
+    },
+    {
+      "schluessel": "eigennutzer",
+      "bezeichnung": "Eigennutzer-Check: Haus für mich prüfen (Demo)",
+      "seit": "v5130",
+      "beschreibung": "Quick-Check-Umschalter „Vermieten / Selbst nutzen“ und Eigennutzer-Reiterleiste am Objekt (_nutzung = 'eigen'), Kern js/eigennutzer-kern.js (Haus-Score Preis 35 · Zustand 35 · Lage 30, Leistbarkeit eigene Ampel). Marcel 26.11.2026. Zusätzlich der Demo-Schalter ?eigennutzer=1, der nur auf Staging wirkt.",
+      "frei_fuer": [
+        "admin",
+        "vorschau"
+      ],
+      "frontend_erkennung": "eig-schalter|eig-tabs",
+      "frontend_ausgenommen": {},
+      "routen": [],
+      "backend_stellen": [],
+      "backend_erkennung": "",
+      "nur_frontend": "reine Darstellung im Browser aus dem Kern js/eigennutzer-kern.js. Das Umfeld (GET /market-stats/umfeld) ist allgemeine Lageinformation und keine Eigennutzer-Funktion. Ohne Vorschau sieht niemand die Ansicht, und es gibt keinen Datenweg, den eine Backend-Sperre schützen könnte."
     }
   ]
 }

@@ -3,7 +3,7 @@
 (function () {
   var sec = document.getElementById('dealcheck'); if (!sec) return;
   var szene = sec.querySelector('.dk-szene'); szene.classList.add('eg-szene');
-  var E = window.DemoEigennutzer;
+  var E = window.DpEigennutzerKern || window.DemoEigennutzer;   /* v5130 · KK6 · echter Kern */
 
   var um = document.createElement('div'); um.className = 'eg-umsch'; um.setAttribute('role', 'tablist');
   um.innerHTML = '<button type="button" class="an" data-m="verm" role="tab" aria-selected="true">Zum Vermieten</button>' +
@@ -17,7 +17,9 @@
       '<label class="eg-f"><span>Kaufpreis</span><input id="egKp" inputmode="numeric" value="310.000"></label>' +
       '<label class="eg-f"><span>Wohnfläche m²</span><input id="egWfl" inputmode="numeric" value="130"></label>' +
       '<label class="eg-f klein"><span>Baujahr</span><input id="egBj" inputmode="numeric" value="1998"></label>' +
+      '<label class="eg-f klein"><span>Objekt</span><select id="egArt"><option value="efh">Einfamilienhaus</option><option value="zfh">Zweifamilienhaus</option><option value="dhh">Doppelhaushälfte</option><option value="rh">Reihenhaus</option><option value="etw">Eigentumswohnung</option><option value="mfh">Mehrfamilienhaus</option></select></label>' +
       '<label class="eg-f klein"><span>PLZ</span><input id="egPlz" inputmode="numeric" value="33602"></label>' +
+      '<label class="eg-f"><span>Straße und Nr. (für das Umfeld)</span><input id="egStr" placeholder="Musterstraße 1"></label>' +
       '<label class="eg-f klein"><span>Eigenkapital</span><input id="egEk" inputmode="numeric" value="100.000"></label>' +
       '<label class="eg-f klein"><span>Netto im Monat</span><input id="egNetto" inputmode="numeric" value="5.200"></label>' +
       '<div class="eg-opt">Eigenkapital und Einkommen sind freiwillig. Ohne Einkommen fehlt nur die Leistbarkeit.</div>' +
@@ -50,9 +52,35 @@
     });
   }
 
+  /* v5130 · KK6 · Leistbarkeit als eigene Ampel, Kurzurteil und Umfeld (OSM) unter dem Ergebnis */
+  var AMPEL = { gruen: ['#5BD98E', 'gut tragbar'], gelb: ['var(--wl-c9a84c,#C9A84C)', 'knapp'], rot: ['#E08A7E', 'zu hoch'] };
+  function zusatz(r, d, e) {
+    var erg = document.getElementById('egErg'); if (!erg) return;
+    var box = document.createElement('div'); box.className = 'eg-zusatz';
+    var a = r.ampel ? AMPEL[r.ampel] : null;
+    var h = '<div class="eg-amp"><i style="background:' + (a ? a[0] : 'rgba(255,255,255,.2)') + '"></i><b>Passt es zu mir?</b> '
+      + (a ? 'Wohnkosten ' + Math.round(r.quote) + ' % vom Netto, ' + a[1] + '.' : 'Netto-Einkommen eintragen, dann zeigen wir die Belastung.') + '</div>';
+    if (r.urteil && r.urteil.length) h += '<ul class="eg-urt">' + r.urteil.slice(1, 6).map(function (t) { return '<li>' + t + '</li>'; }).join('') + '</ul>';
+    if (r.nebenkosten) h += '<div class="eg-nk">Kaufnebenkosten ' + E.eur(r.nebenkosten.summe) + ' (' + String(r.nebenkosten.pct).replace('.', ',') + ' %): Grunderwerbsteuer ' + E.eur(r.nebenkosten.grest) + ', Notar ' + E.eur(r.nebenkosten.notar) + ', Grundbuch ' + E.eur(r.nebenkosten.grundbuch) + ', Makler ' + E.eur(r.nebenkosten.makler) + '.</div>';
+    h += '<div class="eg-umf" id="egUmf"><b>Was ist in der Nähe?</b><p>Umfeld wird geladen …</p></div>';
+    box.innerHTML = h; erg.appendChild(box);
+    var str = document.getElementById('egStr').value.trim();
+    var adr = (str ? str + ', ' : '') + e.plz + ' ' + (d.gebiet || '').replace(/,.*$/, '');
+    E.umfeld(adr).then(function (u) {
+      var el = document.getElementById('egUmf'); if (!el) return;
+      if (!u || !u.ok) { el.innerHTML = '<b>Was ist in der Nähe?</b><p>Umfeld gerade nicht abrufbar.</p>'; return; }
+      el.innerHTML = '<b>Was ist in der Nähe?</b>' + (str ? '' : '<p class="eg-klein">Ohne Straße rund um die Mitte der PLZ.</p>') + '<div class="eg-umf-g">' + u.kategorien.map(function (k) {
+        var n = k.naechster;
+        return '<div><span>' + k.label + '</span><b>' + (n ? (n.luftlinie_m < 1000 ? n.luftlinie_m + ' m' : String(Math.round(n.luftlinie_m / 100) / 10).replace('.', ',') + ' km') : 'nicht im Umkreis') + '</b>'
+          + (n ? '<small>' + (n.name ? n.name + ' · ' : '') + 'ca. ' + n.fuss_min + ' Min. zu Fuß</small>' : '') + '</div>';
+      }).join('') + '</div><p class="eg-klein">' + u.hinweis + ' Kartendaten ' + u.vermerk + '.</p>';
+    });
+  }
   function start() {
-    var e = { kp: zahl('egKp'), wfl: zahl('egWfl'), bj: zahl('egBj'), ek: zahl('egEk'), netto: zahl('egNetto'), plz: document.getElementById('egPlz').value.trim() };
-    E.daten(e.plz, e.bj, e.wfl).then(function (d) { zeige(E.rechne(e, d)); });
+    var e = { kp: zahl('egKp'), wfl: zahl('egWfl'), bj: zahl('egBj'), ek: zahl('egEk'), netto: zahl('egNetto'), plz: document.getElementById('egPlz').value.trim(),
+      objektart: document.getElementById('egArt').value };
+    if (e.objektart === 'mfh') { var erg0 = document.getElementById('egErg'); erg0.innerHTML = '<div class="eg-satz">' + E.MFH_HINWEIS + '</div>'; erg0.classList.add('da'); return; }
+    E.daten(e.plz, e.bj, e.wfl).then(function (d) { var r = E.rechne(e, d); if (!r.ok) return; zeige(r); zusatz(r, d, e); });
   }
   document.getElementById('egStart').addEventListener('click', start);
 

@@ -20,7 +20,15 @@
     if (q === '1') lsSet('dp_demo_eigennutzer', '1');
     if (q === '0') lsSet('dp_demo_eigennutzer', null);
   } catch (e) {}
-  if (!HOST_OK || lsGet('dp_demo_eigennutzer') !== '1') return;
+  /* v5130 · KK6 · zwei Wege, die zusammenpassen: (1) Vorschau-Funktion „eigennutzer“ (Admin und Freigabeliste,
+     DpVorschau.frei('eigennutzer'), im Quick-Check-iframe über das Elternfenster), (2) der Demo-Schalter ?eigennutzer=1,
+     der weiter NUR auf Staging wirkt. Einer von beiden reicht. */
+  var _demo = HOST_OK && lsGet('dp_demo_eigennutzer') === '1';
+  var _V = window.DpVorschau || (function () { try { return window.parent !== window ? window.parent.DpVorschau : null; } catch (e) { return null; } })();
+  if (_demo) { start(); return; }
+  if (_V && typeof _V.frei === 'function') _V.frei('eigennutzer').then(function (an) { if (an) start(); });
+  return;
+  function start() {
 
   var MODUS_KEY = 'dp_qc_nutzung_demo';
   function $(id) { return document.getElementById(id); }
@@ -139,4 +147,5 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { setTimeout(aufbau, 300); });
   else setTimeout(aufbau, 300);
   window.DpEigQcDemo = { rechnen: rechnen, setzen: setzen };
+  }
 })();

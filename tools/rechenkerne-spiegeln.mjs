@@ -104,7 +104,11 @@ const KERNE = [
      mapDealPilotObject() sie fragt. Zusaetzlich ins mb-Backend (MB_SPIEGEL). */
   { datei: 'modernisierung-herkunft.js', global: 'DpModernisierung' },
   { datei: 'rnd-gnd-table.js', global: 'DealPilotRND_GND' },
-  { datei: 'rnd-calc.js', global: 'DealPilotRND' }
+  { datei: 'rnd-calc.js', global: 'DealPilotRND' },
+  /* v5130 · KK6 · Eigennutzer-Check (Marcel 26.11.2026): Notar/Grundbuch-Tabelle zuerst, dann der Kern,
+     der sie als DealPilotGnotkg liest. Der Kern liest keine Einstellungen. */
+  { datei: 'gnotkg.js', global: 'DealPilotGnotkg' },
+  { datei: 'eigennutzer-kern.js', global: 'DpEigennutzerKern' }
 ];
 
 const nurPruefen = process.argv.includes('--pruefen');

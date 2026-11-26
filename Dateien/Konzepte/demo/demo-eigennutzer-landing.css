@@ -68,3 +68,18 @@
   .eg-g{grid-template-columns:84px 1fr 28px}
   .eg-umsch button{padding:10px 12px;font-size:11px}
 }
+
+/* v5130 · KK6 · Ampel, Kurzurteil, Nebenkosten, Umfeld */
+.eg-zusatz{margin-top:14px;display:grid;gap:10px}
+.eg-amp{display:flex;align-items:center;gap:8px;font:500 13px/1.4 Inter,system-ui,sans-serif;color:#e9e4d8}
+.eg-amp i{width:12px;height:12px;border-radius:50%;flex:0 0 12px}
+.eg-urt{margin:0;padding-left:18px;font:400 12.5px/1.5 Inter,system-ui,sans-serif;color:#cfc8b8}
+.eg-nk{font:400 12px/1.5 Inter,system-ui,sans-serif;color:#a9a294}
+.eg-umf b{font:600 13px Inter,system-ui,sans-serif;color:#e9e4d8}
+.eg-umf-g{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-top:8px}
+.eg-umf-g div{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:8px 10px;display:grid;gap:2px}
+.eg-umf-g span{font:500 11px 'JetBrains Mono',monospace;letter-spacing:.04em;color:#a9a294;text-transform:uppercase}
+.eg-umf-g b{font:600 15px 'Space Grotesk',system-ui,sans-serif;color:var(--wl-e8cc7a,#E8CC7A)}
+.eg-umf-g small{font:400 11px/1.35 Inter,system-ui,sans-serif;color:#cfc8b8;overflow-wrap:anywhere}
+.eg-klein{font:400 11px/1.4 Inter,system-ui,sans-serif;color:#a9a294;margin:6px 0 0}
+#egArt{width:100%;background:transparent;color:inherit;border:0;font:inherit}

@@ -1,5 +1,5 @@
 {
- "erzeugt_am": "2026-11-24T09:10:43.703Z",
+ "erzeugt_am": "2026-11-26T15:35:04.158Z",
  "hinweis": "Woertliche Spiegelung von frontend/js/ — NICHT hier bearbeiten. Quelle aendern, dann: node tools/rechenkerne-spiegeln.mjs",
  "reihenfolge": [
   "dscr-engine.js",
@@ -10,7 +10,9 @@
   "qc-heuristik.js",
   "modernisierung-herkunft.js",
   "rnd-gnd-table.js",
-  "rnd-calc.js"
+  "rnd-calc.js",
+  "gnotkg.js",
+  "eigennutzer-kern.js"
  ],
  "quellen": {
   "dscr-engine.js": "7860b05e0580f415887b60e695fbbd083482423460e9948069f6c46706a165c2",
@@ -21,6 +23,8 @@
   "qc-heuristik.js": "60e207571011287e285282239e0a5a575d7fdbf616dbd3d65e26053dfc909204",
   "modernisierung-herkunft.js": "840050cf122a1e28ae7c5638ffa45609b9432f7548c89f66f5d6e7628827bf26",
   "rnd-gnd-table.js": "ed1df0eab13887a1c971f26e129924063b2665e0d33d249843c11f9cac206fb0",
-  "rnd-calc.js": "c193a0026ef24f4b8d7424a2d52a5d2af34286ff4acdeb48dbf9fb2352d19d40"
+  "rnd-calc.js": "c193a0026ef24f4b8d7424a2d52a5d2af34286ff4acdeb48dbf9fb2352d19d40",
+  "gnotkg.js": "d439b1cf178a7fa5c55a1428fb62ca90de5267d6aec0d9eb7ab9dc2ec152c83e",
+  "eigennutzer-kern.js": "74e8c60ee504462f99a1b6ef58aab183aeb063a3b86c3c2d7185ec332463031f"
  }
 }
