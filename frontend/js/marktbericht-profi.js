@@ -940,6 +940,8 @@
     if (d.brwZonen) q.push('Bodenrichtwertzonen in Karte und Tabelle: Gutachterausschüsse für Grundstückswerte, BORIS-D, dl-de/by-2-0 (bodenrichtwerte-boris.de)');
     if (d.karteNah || d.karteFern || (!d.fotos[0] && d.karteTitel)) q.push('Kartengrundlage: © OpenStreetMap-Mitwirkende (Open Database License, openstreetmap.org/copyright)');
     if (irw.quellennachweis) q.push('Immobilienrichtwert: ' + irw.quellennachweis);
+    /* v5090 · Pflichtvermerk des Angebotsdaten-Partners, nur wenn der Bericht seine Daten nutzt */
+    (p.quellen_nachweis_markt || []).forEach(function (x) { if (x && x.vermerk === '© by RealEstatePilot') q.push('Angebotspreise und Angebotsmieten am Markt: ' + x.vermerk); });
     var mq = p.makro_kennzahlen && p.makro_kennzahlen.quellennachweis;
     if (mq) q.push('Regionaldaten: ' + (typeof mq === 'object' ? [mq.vermerk, mq.lizenz].filter(Boolean).join(' · ') : mq));
     if (z.available) q.push('Zensus 2022: Statistische Ämter des Bundes und der Länder' + (z.license ? ', ' + z.license : ''));
