@@ -45302,3 +45302,9 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
   `/root/backups/haupt-vor-v5080m-20261126-1315.sql.gz` und `mb-vor-v5080m-…` (Köpfe gelesen).
 - **Rest:** Wächter-Punkt in Admin › Betrieb ist gelb bis zum ersten Lauf (20 Minuten nach Start). Tooltip im
   Investment- und Marktbericht-PDF offen. Anwaltliche Prüfung § 44b vor jeder TDM-Nutzung.
+
+### Rollout 1.0.241 · 26.11.2026 · landing-deal-sprung-2 Reihenfolge der Startseite (YY5, Marcel: „Slider-Videos und die Laufschrift wieder unter den Hero-Bereich packen und dann den Deal-Check“)
+- **Was:** Startseite in der Reihenfolge Hero, Slider-Videos (`.n6-band`), Laufband, Deal-Check, Preise. Der Hauptknopf springt weiter zu `#dealcheck`. Nur `frontend/landing/index.html`, kein Buster nötig.
+- **Commit:** main 3a5d9a2f-Kette (Cherry-Pick von staging 545b853c) und b24437cc (Version).
+- **Nachweis:** Prod 390 px: Hero 114, Slider 1393, Laufband 1665, Deal-Check 1705, Preise 3027. 1440 px: 114 / 865 / 1145 / 1185 / 2078. Knopf → Deal-Check-Oberkante 70 px, kein Vollbild-Fenster, keine waagerechte Scrollleiste bei 360/390/1440. `version.json` 241 auf beiden App-Adressen.
+- **Rest:** Cockpit-Deal-Check (Demo 3) wartet auf Marcels OK.
