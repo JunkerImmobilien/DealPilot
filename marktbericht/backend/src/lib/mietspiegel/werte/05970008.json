@@ -1,0 +1,791 @@
+{
+ "ags": "05970008",
+ "gemeinde": "Burbach",
+ "haus": {
+  "regel": "gilt",
+  "hinweis": "Gebäudeart fließt über Punkte in die Wohnqualität ein: freistehendes Einfamilienhaus +8, Zweifamilienhaus/Doppelhaus/Reihenhaus/Einliegerwohnung +5, Mehrfamilienhaus +3 Punkte; Wohnqualität dann selbst wählen",
+  "beleg": "PDF-S. 3 Nr. 1.2.1 Gebäude-/Wohnungsart"
+ },
+ "art": "einfach",
+ "stand": "2026-05-01",
+ "erhebungsstichtag": null,
+ "gueltig_ab": "2026-05-01",
+ "gueltig_bis": null,
+ "quelle": {
+  "url": "https://www.mieterbund-siegerland.de/images/download/mietspiegel/Mietspiegel_Altkreis_Siegen_2026.pdf",
+  "dokument": "Mietspiegel für den Altkreis Siegen (ohne Wittgenstein) für nicht preisgebundenen Wohnraum, Stand 01.05.2026 (Deutscher Mieterbund Siegerland und Umgebung e.V., Haus- und Grundbesitzerverein für Siegen und Umgebung e.V., Haus- und Grundeigentümerverein Hüttental und Umgebung e.V., Haus & Grund Niederschelden e.V.)",
+  "seite": "PDF-S. 8 (Mietpreistabelle), S. 2 (einfach, § 558c), S. 3–6 (Punktesystem Wohnqualität), S. 6–8 (Baujahrgruppe), S. 9 (Vergleichsmiete aus Punkten), S. 10 (Wohnfläche), S. 12 (Gebiets-Faktoren 57299 Burbach)",
+  "lizenz": "kein Rechtevorbehalt im Dokument (kein Nachdruck- oder Speicherverbot, kein Urheberrechtsvermerk), geprüft am 2026-11-26",
+  "abgerufen": "2026-11-26"
+ },
+ "einheit": "eur_qm_nettokalt",
+ "form": "tabelle",
+ "rundung": 2,
+ "hinweis": "Punkte-Mietspiegel Altkreis Siegen (ohne Wittgenstein), gleiches Dokument wie Siegen (05970040), als Tabelle abgebildet: Achse „ausstattung“ = Wohnqualitätsstufe aus dem Punktesystem (einfach 0–9, mittel 10–22, gut 23–35, gehoben 36–48 Punkte, S. 6). Das Dokument rechnet innerhalb der Spanne linear nach Punkten (S. 9); ohne Punkte setzt DealPilot die MITTE DER SPANNE als „mittel“ (keine Dokumentangabe). Ohne Angabe der Stufe gilt „mittel“ — DealPilot-Annahme. Gehoben für Baujahrgruppe 1 und 2 im Dokument „-“ (kein Wert). Baujahrgruppe nach fiktivem Baujahr aus Wertverbesserungen (S. 6–8). Burbach hat KEINEN Gebiets-Faktor 1,00: der Faktor für Burbach - Mitte (0,92, S. 12) ist als immer greifender Abschlag -8 % hinterlegt, die Ortsteile als lage:<ortsteil> mit dem UNTERSCHIED zu Burbach - Mitte in Prozentpunkten (Summe = Ortsteil-Faktor; am Druckbild S. 12 abgelesen, Textschicht dort durcheinander). Das Dokument MULTIPLIZIERT Wohnflächen-Faktor (S. 10) und Gebiets-Faktor; der Kern addiert Prozente — kleine Abweichung, wenn beide greifen (z. B. 1,10 × 0,95 = 1,045 statt 1,05). Appartement-Faktor 1,00 bis 1,25 (S. 10) nicht abgebildet. Unberücksichtigt: voll möblierte Wohnungen, sozialer Wohnungsbau (S. 2). Kein Anwendungsbeispiel für Burbach (Beispiel des Dokuments: Siegen-Eisern).",
+ "tabelle": {
+  "achsen": {
+   "baujahr": [
+    {
+     "von": null,
+     "bis": 1948,
+     "label": "Baujahrgruppe 1 (bis 1948)"
+    },
+    {
+     "von": 1949,
+     "bis": 1967,
+     "label": "Baujahrgruppe 2 (1949–1967)"
+    },
+    {
+     "von": 1968,
+     "bis": 1976,
+     "label": "Baujahrgruppe 3 (1968–1976)"
+    },
+    {
+     "von": 1977,
+     "bis": 1994,
+     "label": "Baujahrgruppe 4 (1977–1994)"
+    },
+    {
+     "von": 1995,
+     "bis": 2008,
+     "label": "Baujahrgruppe 5 (1995–2008)"
+    },
+    {
+     "von": 2009,
+     "bis": 2022,
+     "label": "Baujahrgruppe 6 (2009–2022)"
+    },
+    {
+     "von": 2023,
+     "bis": null,
+     "label": "Baujahrgruppe 7 (ab 2023)"
+    }
+   ],
+   "ausstattung": [
+    {
+     "schluessel": "einfach",
+     "label": "Wohnqualität einfach (0–9 Punkte)"
+    },
+    {
+     "schluessel": "mittel",
+     "label": "Wohnqualität mittel (10–22 Punkte)",
+     "standard": true,
+     "aliase": [
+      "standard",
+      "normal"
+     ]
+    },
+    {
+     "schluessel": "gut",
+     "label": "Wohnqualität gut (23–35 Punkte)"
+    },
+    {
+     "schluessel": "gehoben",
+     "label": "Wohnqualität gehoben (36–48 Punkte)",
+     "aliase": [
+      "sehr gut"
+     ]
+    }
+   ]
+  },
+  "zellen": [
+   {
+    "baujahr": 0,
+    "ausstattung": "einfach",
+    "unten": 4.25,
+    "mittel": 4.4,
+    "oben": 4.55,
+    "seite": "8"
+   },
+   {
+    "baujahr": 0,
+    "ausstattung": "mittel",
+    "unten": 4.55,
+    "mittel": 4.98,
+    "oben": 5.4,
+    "seite": "8"
+   },
+   {
+    "baujahr": 0,
+    "ausstattung": "gut",
+    "unten": 5.4,
+    "mittel": 5.75,
+    "oben": 6.1,
+    "seite": "8"
+   },
+   {
+    "baujahr": 1,
+    "ausstattung": "einfach",
+    "unten": 4.55,
+    "mittel": 4.98,
+    "oben": 5.4,
+    "seite": "8"
+   },
+   {
+    "baujahr": 1,
+    "ausstattung": "mittel",
+    "unten": 5.4,
+    "mittel": 5.75,
+    "oben": 6.1,
+    "seite": "8"
+   },
+   {
+    "baujahr": 1,
+    "ausstattung": "gut",
+    "unten": 6.1,
+    "mittel": 6.38,
+    "oben": 6.65,
+    "seite": "8"
+   },
+   {
+    "baujahr": 2,
+    "ausstattung": "einfach",
+    "unten": 5.4,
+    "mittel": 5.75,
+    "oben": 6.1,
+    "seite": "8"
+   },
+   {
+    "baujahr": 2,
+    "ausstattung": "mittel",
+    "unten": 6.1,
+    "mittel": 6.38,
+    "oben": 6.65,
+    "seite": "8"
+   },
+   {
+    "baujahr": 2,
+    "ausstattung": "gut",
+    "unten": 6.65,
+    "mittel": 7,
+    "oben": 7.35,
+    "seite": "8"
+   },
+   {
+    "baujahr": 2,
+    "ausstattung": "gehoben",
+    "unten": 7.35,
+    "mittel": 7.73,
+    "oben": 8.1,
+    "seite": "8"
+   },
+   {
+    "baujahr": 3,
+    "ausstattung": "einfach",
+    "unten": 6.1,
+    "mittel": 6.38,
+    "oben": 6.65,
+    "seite": "8"
+   },
+   {
+    "baujahr": 3,
+    "ausstattung": "mittel",
+    "unten": 6.65,
+    "mittel": 7,
+    "oben": 7.35,
+    "seite": "8"
+   },
+   {
+    "baujahr": 3,
+    "ausstattung": "gut",
+    "unten": 7.35,
+    "mittel": 7.73,
+    "oben": 8.1,
+    "seite": "8"
+   },
+   {
+    "baujahr": 3,
+    "ausstattung": "gehoben",
+    "unten": 8.1,
+    "mittel": 8.55,
+    "oben": 9,
+    "seite": "8"
+   },
+   {
+    "baujahr": 4,
+    "ausstattung": "einfach",
+    "unten": 6.65,
+    "mittel": 7,
+    "oben": 7.35,
+    "seite": "8"
+   },
+   {
+    "baujahr": 4,
+    "ausstattung": "mittel",
+    "unten": 7.35,
+    "mittel": 7.73,
+    "oben": 8.1,
+    "seite": "8"
+   },
+   {
+    "baujahr": 4,
+    "ausstattung": "gut",
+    "unten": 8.1,
+    "mittel": 8.55,
+    "oben": 9,
+    "seite": "8"
+   },
+   {
+    "baujahr": 4,
+    "ausstattung": "gehoben",
+    "unten": 9,
+    "mittel": 9.48,
+    "oben": 9.95,
+    "seite": "8"
+   },
+   {
+    "baujahr": 5,
+    "ausstattung": "einfach",
+    "unten": 7.35,
+    "mittel": 7.78,
+    "oben": 8.2,
+    "seite": "8"
+   },
+   {
+    "baujahr": 5,
+    "ausstattung": "mittel",
+    "unten": 8.2,
+    "mittel": 8.65,
+    "oben": 9.1,
+    "seite": "8"
+   },
+   {
+    "baujahr": 5,
+    "ausstattung": "gut",
+    "unten": 9.1,
+    "mittel": 9.55,
+    "oben": 10,
+    "seite": "8"
+   },
+   {
+    "baujahr": 5,
+    "ausstattung": "gehoben",
+    "unten": 10,
+    "mittel": 10.48,
+    "oben": 10.95,
+    "seite": "8"
+   },
+   {
+    "baujahr": 6,
+    "ausstattung": "einfach",
+    "unten": 8.25,
+    "mittel": 8.8,
+    "oben": 9.35,
+    "seite": "8"
+   },
+   {
+    "baujahr": 6,
+    "ausstattung": "mittel",
+    "unten": 9.35,
+    "mittel": 9.9,
+    "oben": 10.45,
+    "seite": "8"
+   },
+   {
+    "baujahr": 6,
+    "ausstattung": "gut",
+    "unten": 10.45,
+    "mittel": 10.98,
+    "oben": 11.5,
+    "seite": "8"
+   },
+   {
+    "baujahr": 6,
+    "ausstattung": "gehoben",
+    "unten": 11.5,
+    "mittel": 12,
+    "oben": 12.5,
+    "seite": "8"
+   }
+  ],
+  "zuschlaege": [
+   {
+    "merkmal": "wohnungsgroesse",
+    "label": "Anpassungsfaktor Wohnfläche",
+    "art": "pct",
+    "beleg": "PDF-S. 10 Nr. 5 (Faktoren 1,10 / 1,05 / 1,00 / 0,95 / 0,92)",
+    "wfl_klassen": [
+     {
+      "von": null,
+      "bis": 45,
+      "wert": 10
+     },
+     {
+      "von": 45,
+      "von_inkl": false,
+      "bis": 60,
+      "wert": 5
+     },
+     {
+      "von": 60,
+      "von_inkl": false,
+      "bis": 90,
+      "wert": 0
+     },
+     {
+      "von": 90,
+      "von_inkl": false,
+      "bis": 120,
+      "wert": -5
+     },
+     {
+      "von": 120,
+      "von_inkl": false,
+      "bis": null,
+      "wert": -8
+     }
+    ]
+   },
+   {
+    "merkmal": "gebietsfaktor_mitte",
+    "label": "Gebiets-Faktor Burbach - Mitte 0,92 (gilt ohne Ortsteilangabe)",
+    "art": "pct",
+    "wfl_klassen": [
+     {
+      "von": null,
+      "bis": null,
+      "wert": -8
+     }
+    ],
+    "beleg": "PDF-S. 12 Gebiets-Faktoren 57299 Burbach"
+   },
+   {
+    "merkmal": "lage:wahlbach",
+    "aliase": [],
+    "art": "pct",
+    "wert": -2,
+    "label": "Gebiets-Faktor Wahlbach 0,90 (hier als Unterschied zu Burbach - Mitte)",
+    "beleg": "PDF-S. 12 Gebiets-Faktoren"
+   },
+   {
+    "merkmal": "lage:gilsbach",
+    "aliase": [],
+    "art": "pct",
+    "wert": -4,
+    "label": "Gebiets-Faktor Gilsbach 0,88 (hier als Unterschied zu Burbach - Mitte)",
+    "beleg": "PDF-S. 12 Gebiets-Faktoren"
+   },
+   {
+    "merkmal": "lage:wuergendorf",
+    "aliase": [
+     "würgendorf"
+    ],
+    "art": "pct",
+    "wert": -4,
+    "label": "Gebiets-Faktor Würgendorf 0,88 (hier als Unterschied zu Burbach - Mitte)",
+    "beleg": "PDF-S. 12 Gebiets-Faktoren"
+   },
+   {
+    "merkmal": "lage:wasserscheide",
+    "aliase": [],
+    "art": "pct",
+    "wert": -4,
+    "label": "Gebiets-Faktor Wasserscheide 0,88 (hier als Unterschied zu Burbach - Mitte)",
+    "beleg": "PDF-S. 12 Gebiets-Faktoren"
+   },
+   {
+    "merkmal": "lage:holzhausen",
+    "aliase": [],
+    "art": "pct",
+    "wert": -4,
+    "label": "Gebiets-Faktor Holzhausen 0,88 (hier als Unterschied zu Burbach - Mitte)",
+    "beleg": "PDF-S. 12 Gebiets-Faktoren"
+   },
+   {
+    "merkmal": "lage:niederdresselndorf",
+    "aliase": [],
+    "art": "pct",
+    "wert": -6,
+    "label": "Gebiets-Faktor Niederdresselndorf 0,86 (hier als Unterschied zu Burbach - Mitte)",
+    "beleg": "PDF-S. 12 Gebiets-Faktoren"
+   },
+   {
+    "merkmal": "lage:oberdresselndorf",
+    "aliase": [],
+    "art": "pct",
+    "wert": -6,
+    "label": "Gebiets-Faktor Oberdresselndorf 0,86 (hier als Unterschied zu Burbach - Mitte)",
+    "beleg": "PDF-S. 12 Gebiets-Faktoren"
+   },
+   {
+    "merkmal": "lage:luetzeln",
+    "aliase": [
+     "lützeln"
+    ],
+    "art": "pct",
+    "wert": -8,
+    "label": "Gebiets-Faktor Lützeln 0,84 (hier als Unterschied zu Burbach - Mitte)",
+    "beleg": "PDF-S. 12 Gebiets-Faktoren"
+   },
+   {
+    "merkmal": "lage:lippe",
+    "aliase": [],
+    "art": "pct",
+    "wert": -8,
+    "label": "Gebiets-Faktor Lippe 0,84 (hier als Unterschied zu Burbach - Mitte)",
+    "beleg": "PDF-S. 12 Gebiets-Faktoren"
+   }
+  ]
+ },
+ "punkte": {
+  "beleg": "PDF-S. 3–9",
+  "stufen": [
+   {
+    "stufe": "einfach",
+    "von": 0,
+    "bis": 9,
+    "spanne": 9
+   },
+   {
+    "stufe": "mittel",
+    "von": 10,
+    "bis": 22,
+    "spanne": 12
+   },
+   {
+    "stufe": "gut",
+    "von": 23,
+    "bis": 35,
+    "spanne": 12
+   },
+   {
+    "stufe": "gehoben",
+    "von": 36,
+    "bis": 48,
+    "spanne": 12
+   }
+  ],
+  "rechenweg": "Mietwert = unterer Spannenwert + (Punkte − Untergrenze der Stufe) / Punktespanne × (oberer − unterer Spannenwert); × Wohnflächen-Faktor; × Gebiets-Faktor (S. 9–12)",
+  "merkmale": [
+   {
+    "gruppe": "1.1.1 Wohnlage",
+    "werte": {
+     "einfach": 0,
+     "mittel": 2,
+     "gut": 4
+    }
+   },
+   {
+    "gruppe": "1.1.2 Verkehrslage / Infrastruktur",
+    "werte": {
+     "schlecht": 0,
+     "mittel": 2,
+     "gut": 4
+    }
+   },
+   {
+    "gruppe": "1.2.1 Gebäude-/Wohnungsart",
+    "werte": {
+     "freistehendes_efh": 8,
+     "zfh_dh_rh_einliegerwohnung": 5,
+     "mfh": 3
+    }
+   },
+   {
+    "gruppe": "1.2.2 Lage der Wohnung",
+    "werte": {
+     "unter_kellergeschoss": -2,
+     "dg_gauben_jeder_raum": -1,
+     "dg_meist_schraegen": -2
+    }
+   },
+   {
+    "gruppe": "1.2.3 sonstige Wohnungsmerkmale",
+    "werte": {
+     "aufzug": 2,
+     "gaeste_wc": 2,
+     "keller_boden_abstellraum": 1,
+     "nicht_abgeschlossen": -4,
+     "unguenstige_raumaufteilung": -2,
+     "kein_bad_oder_ausserhalb": -4
+    }
+   },
+   {
+    "gruppe": "1.3.1 Böden",
+    "werte": {
+     "hochwertig_naturstein_parkett_keramik": 4,
+     "gut_laminat_vinyl_textil_keramik_besseres_parkett": 3,
+     "mittel": 2,
+     "einfach_bessere_holzdielen": 1,
+     "einfache_dielen_estrich": 0
+    }
+   },
+   {
+    "gruppe": "1.3.2 Fenster",
+    "werte": {
+     "isolierglas_nach_2000_u_unter_1_3": 4,
+     "isolierglas_doppelfenster": 2,
+     "einfachverglast": 0,
+     "rolllaeden": 1
+    }
+   },
+   {
+    "gruppe": "1.3.3 Beheizung",
+    "werte": {
+     "fussbodenheizung": 5,
+     "zentral_etage_brennwert_verbrauchserfassung": 4,
+     "zentral_etage_ohne_brennwert_mit_erfassung": 3,
+     "ohne_verbrauchserfassung": 2,
+     "nachtspeicher_gasoefen": 1,
+     "einzeloefen": -3
+    }
+   },
+   {
+    "gruppe": "1.3.4 sonstige Ausstattung",
+    "werte": {
+     "balkon_terrasse": 2,
+     "einbaukueche": 4,
+     "einbauschraenke_gehoben": 2,
+     "kaminofen": 2,
+     "waermedaemmung": 4,
+     "breitband_sat": 1
+    }
+   },
+   {
+    "gruppe": "1.3.5 besondere Merkmale",
+    "hinweis": "frei bewertet, z. B. Photovoltaik/Wärmepumpe +2, schlechte Belichtung −2"
+   }
+  ],
+  "wertverbesserung": "Maßnahmen ab 1990 (7 Arten, S. 6–7): 0 → tatsächliches Baujahr; 1–5 → fiktives Baujahr = Baujahr (vor 1948: 1948) + gerundet((Durchschnittsjahr − Baujahr) / 6 × Anzahl); 6–7 → Durchschnittsjahr (S. 7–8)"
+ },
+ "lage_faktoren": [
+  {
+   "schluessel": "siegen mitte",
+   "label": "siegen mitte",
+   "aliase": [
+    "siegen-mitte",
+    "mitte",
+    "siegen"
+   ],
+   "faktor": 1
+  },
+  {
+   "schluessel": "giersberg",
+   "label": "giersberg",
+   "aliase": [
+    "siegen - giersberg west / ost",
+    "giersberg west",
+    "giersberg ost"
+   ],
+   "faktor": 1.08
+  },
+  {
+   "schluessel": "oberstadt altstadt",
+   "label": "oberstadt altstadt",
+   "aliase": [
+    "siegen - oberstadt / altstadt",
+    "oberstadt",
+    "altstadt"
+   ],
+   "faktor": 1.05
+  },
+  {
+   "schluessel": "zentrumsnahe gute lagen",
+   "label": "zentrumsnahe gute lagen",
+   "aliase": [
+    "wellersberg",
+    "häusling",
+    "haeusling",
+    "unterer siegberg"
+   ],
+   "faktor": 1.03
+  },
+  {
+   "schluessel": "oberer fischbacherberg",
+   "label": "oberer fischbacherberg",
+   "aliase": [
+    "oberer fischbacherberg (ypernstraße)",
+    "fischbacherberg"
+   ],
+   "faktor": 0.96
+  },
+  {
+   "schluessel": "achenbach heidenberg",
+   "label": "achenbach heidenberg",
+   "aliase": [
+    "achenbach",
+    "heidenberg"
+   ],
+   "faktor": 0.98
+  },
+  {
+   "schluessel": "trupbach seelbach",
+   "label": "trupbach seelbach",
+   "aliase": [
+    "trupbach",
+    "seelbach"
+   ],
+   "faktor": 0.98
+  },
+  {
+   "schluessel": "kaan marienborn",
+   "label": "kaan marienborn",
+   "aliase": [
+    "kaan-marienborn"
+   ],
+   "faktor": 1
+  },
+  {
+   "schluessel": "buerbach",
+   "label": "buerbach",
+   "aliase": [
+    "bürbach"
+   ],
+   "faktor": 1
+  },
+  {
+   "schluessel": "volnsberg breitenbach feuersbach",
+   "label": "volnsberg breitenbach feuersbach",
+   "aliase": [
+    "volnsberg",
+    "breitenbach",
+    "feuersbach"
+   ],
+   "faktor": 0.94
+  },
+  {
+   "schluessel": "weidenau",
+   "label": "weidenau",
+   "aliase": [],
+   "faktor": 1
+  },
+  {
+   "schluessel": "geisweid",
+   "label": "geisweid",
+   "aliase": [],
+   "faktor": 1
+  },
+  {
+   "schluessel": "birlenbach",
+   "label": "birlenbach",
+   "aliase": [],
+   "faktor": 0.98
+  },
+  {
+   "schluessel": "langenholdinghausen",
+   "label": "langenholdinghausen",
+   "aliase": [],
+   "faktor": 0.94
+  },
+  {
+   "schluessel": "sohlbach buchen",
+   "label": "sohlbach buchen",
+   "aliase": [
+    "sohlbach",
+    "buchen"
+   ],
+   "faktor": 0.94
+  },
+  {
+   "schluessel": "meiswinkel",
+   "label": "meiswinkel",
+   "aliase": [],
+   "faktor": 0.92
+  },
+  {
+   "schluessel": "dillnhuetten",
+   "label": "dillnhuetten",
+   "aliase": [
+    "dillnhütten"
+   ],
+   "faktor": 0.98
+  },
+  {
+   "schluessel": "niedersetzen",
+   "label": "niedersetzen",
+   "aliase": [],
+   "faktor": 0.93
+  },
+  {
+   "schluessel": "obersetzen",
+   "label": "obersetzen",
+   "aliase": [],
+   "faktor": 0.93
+  },
+  {
+   "schluessel": "eiserfeld",
+   "label": "eiserfeld",
+   "aliase": [],
+   "faktor": 0.96
+  },
+  {
+   "schluessel": "hengsbach dreisbach",
+   "label": "hengsbach dreisbach",
+   "aliase": [
+    "hengsbach",
+    "dreisbach"
+   ],
+   "faktor": 0.96
+  },
+  {
+   "schluessel": "niederschelden",
+   "label": "niederschelden",
+   "aliase": [],
+   "faktor": 0.96
+  },
+  {
+   "schluessel": "oberschelden",
+   "label": "oberschelden",
+   "aliase": [],
+   "faktor": 0.92
+  },
+  {
+   "schluessel": "gosenbach",
+   "label": "gosenbach",
+   "aliase": [],
+   "faktor": 0.92
+  },
+  {
+   "schluessel": "eisern",
+   "label": "eisern",
+   "aliase": [
+    "siegen-eisern"
+   ],
+   "faktor": 0.96
+  }
+ ],
+ "pruefbeispiele": [
+  {
+   "eingabe": {
+    "baujahr": 1985,
+    "wfl": 75,
+    "ausstattung": "gut"
+   },
+   "erwartet": {
+    "unten": 6.76,
+    "mittel": 7.11,
+    "oben": 7.45
+   },
+   "seite": "8, 12",
+   "art": "tabellenzelle",
+   "anmerkung": "Baujahrgruppe 4, gut 7.35–8.1 (Mitte 7.73) × 0.92 (Burbach - Mitte)"
+  },
+  {
+   "eingabe": {
+    "baujahr": 1970,
+    "wfl": 75,
+    "ausstattung": "mittel",
+    "lage": "lippe"
+   },
+   "erwartet": {
+    "unten": 5.12,
+    "mittel": 5.36,
+    "oben": 5.59
+   },
+   "seite": "8, 12",
+   "art": "tabellenzelle",
+   "anmerkung": "Baujahrgruppe 3, mittel × 0.84 (Lippe)"
+  },
+  {
+   "eingabe": {
+    "baujahr": 1940,
+    "wfl": 75,
+    "ausstattung": "gehoben"
+   },
+   "erwartet": null,
+   "seite": "8",
+   "art": "tabellenzelle",
+   "anmerkung": "gehoben bis 1948 im Dokument „-“"
+  }
+ ]
+}
