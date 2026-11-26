@@ -72,6 +72,22 @@
       "backend_stellen": [],
       "nur_frontend": "reine Darstellung von Werten, die der Nutzer in der App ohnehin sieht (State.cfRows, Jahresbuch, DpMieteMax, Portfolio-Payload). Es gibt keine Route und keinen Datenweg, den eine Backend-Sperre schützen könnte.",
       "backend_erkennung": ""
+    },
+    {
+      "schluessel": "foerderung",
+      "bezeichnung": "Förderung: passende KfW- und BAFA-Programme (Demo)",
+      "seit": "v5120",
+      "beschreibung": "Pilot-Analyse › Potenzial: Karte „Förderung“ für Kapitalanleger aus dem Kern js/foerderung.js (nur bei geplanter Sanierung im Block Sanierungsbedarf). Demo, Marcel 26.11.2026.",
+      "frei_fuer": [
+        "admin",
+        "vorschau"
+      ],
+      "frontend_erkennung": "dp-foerder-karte",
+      "frontend_ausgenommen": {},
+      "routen": [],
+      "backend_stellen": [],
+      "backend_erkennung": "",
+      "nur_frontend": "reine Darstellung öffentlicher Förderprogramme aus dem Register js/data/foerderregister.js, berechnet im Browser. Es gibt keine Route und keinen Datenweg, den eine Backend-Sperre schützen könnte."
     }
   ]
 }
