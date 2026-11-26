@@ -179,6 +179,7 @@ var FIELDS = [
      beim Speichern lautlos. */
   'mv_art','mv_beginn','mv_letzte_erhoehung','mv_letzte_erhoehung_betrag',   /* v2545 */
   'mv_befristet_bis','mv_kuendigungsverzicht_bis','mv_abw_jahre',   /* v2660 · E2 · Restlaufzeit der Mietabweichung am Einzelobjekt */
+  '_besichtigung',   /* v5020 · Checkliste der Besichtigung (js/besichtigung.js): Haken und Notizen, JSON */
   'nk_vorauszahlung',   /* v3950 · Nebenkosten-Vorauszahlung des Mieters je Monat (§ 556 Abs. 2 BGB), Stammdatum fuer ViVi, kein Kern liest es. Beim MFH je Wohnung in _mfh */
   '_vivi',              /* v3950 · ViVi-Verknuepfung (js/vivi-felder.js): eigene Werte und Anzeige-Spiegel, JSON im versteckten Feld */
   // V36: DealScore 2.0 Zusatzangaben
@@ -720,6 +721,7 @@ function loadData(d) {
        Daten, Befristung und Kuendigungsverzicht von A und schrieb sie beim Speichern mit */
     'mv_art', 'mv_beginn', 'mv_letzte_erhoehung', 'mv_letzte_erhoehung_betrag',
     'mv_befristet_bis', 'mv_kuendigungsverzicht_bis', 'mv_abw_jahre',
+    '_besichtigung',   /* v5020: sonst erbt Objekt B die Haken und Notizen der Besichtigung von A */
     'nk_vorauszahlung', '_vivi',   /* v3950: sonst erbt Objekt B die Vorauszahlung und die ViVi-Verknuepfung von A */
     /* v3073: sonst erbt ein Bestandsobjekt ohne Detailgrad den des vorigen Objekts (leer = Experte) */
     'dp_stufe'
@@ -1022,6 +1024,14 @@ function loadData(d) {
           setTimeout(function () { try { _JA0.mountAll(); } catch (e) {} }, 0);
         }
       } catch (_eJa) {}
+      /* v5020 · die Besichtigungs-Checkliste braucht keine KI: im Ankauf steht sie auch ohne Analyse (js/besichtigung.js) */
+      try {
+        if (window.DpBesichtigung && !(d && (d._deal_won === true || d._deal_won === 'true'))) {
+          aiContentEmpty.innerHTML += '<div class="dp-pa-wrap dp-bs-ohne" data-dp-pa-modus="detail" style="display:block;margin-top:8px"></div>';
+          /* erst nach dem Befüllen der Felder zeichnen (Baujahr, Unterlagen) */
+          setTimeout(function () { try { var h = document.querySelector('#ai-content .dp-bs-ohne'); if (h) h.innerHTML = window.DpBesichtigung.html(); } catch (e) {} }, 400);
+        }
+      } catch (_eBs) {}
     }
     // Auch Mini-AI-Block leeren falls vorhanden
     var miniAi = document.getElementById('ai-mini-content');
@@ -1806,6 +1816,15 @@ function _dpBestandMelden(items) {
   window._dpHatBestand = hat;
   try { document.querySelectorAll(".sb-act-item[onclick=\"sbActionsAction('cockpit')\"]").forEach(function (b) { b.classList.toggle('dp-frei', hat); }); } catch (e) {}
   if (vorher !== hat) { try { window.dispatchEvent(new CustomEvent('dp:bestand', { detail: { anzahl: n, hat: hat } })); } catch (e) {} }
+  /* v5020 · Leerzustände (js/leerzustand.js): Menüeinträge ohne Objekt bzw. ohne Bestand aus */
+  try { if (window.DpLeerzustand) window.DpLeerzustand.melden((items || []).length, hat); } catch (e) {}
+}
+/* v5020 · Marcel 25.11.2026 („Sachen, die keinen Sinn machen, ausblenden oder vereinfachen“): statt des grauen Satzes
+   ein Weg zum ersten Objekt. Quick Boarding und Neues Objekt wie im Menü. */
+function _sbLeer() {
+  return '<div class="sb-empty sb-leer"><b>Noch kein Objekt</b><p>Leg dein erstes Objekt an. Danach stehen hier deine Objekte im Ankauf und im Bestand.</p>'
+    + '<button type="button" class="haupt" onclick="if(window.newObj)newObj()">Erstes Objekt anlegen</button>'
+    + '<button type="button" onclick="if(window.sbActionsAction)sbActionsAction(&quot;quickcheck&quot;)">Quick Boarding</button></div>';
 }
 /* v729-allobj-cache: Cache fuer getAllObjectsData (verhindert N+1-Flut -> 429). TTL 8s + inflight-dedup. */
 var _allObjCache = { data: null, ts: 0, ttl: 8000, inflight: null };
@@ -2252,7 +2271,7 @@ async function renderSaved(opts) {
 
       _dpBestandMelden(items);   /* v4010 */
       if (!items.length) {
-        list.innerHTML = '<div class="sb-empty">Noch keine Objekte<br>gespeichert.</div>';
+        list.innerHTML = _sbLeer();   /* v5020 */
         return;
       }
       // V63.27: Sortierung — aktives Objekt zuerst, dann nach Sort-Modus
@@ -2456,7 +2475,7 @@ async function renderSaved(opts) {
       keys = _lokal.map(function (o) { return o.id; });
 
     if (!keys.length) {
-      list.innerHTML = _addNewBtn() + '<div class="sb-empty">Noch keine Objekte<br>gespeichert.</div>';
+      list.innerHTML = _sbLeer();   /* v5020 */
       return;
     }
     list.innerHTML = _addNewBtn() + keys.map(function(k) {

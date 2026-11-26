@@ -1993,7 +1993,10 @@
       add('steuer', 'Steuer', o.steuer);
       add('haus', 'Haus &amp; Unterlagen', hausUl);
       add('potx', 'Potenzial &amp; Risiken', unterReiter([['pot', potH], ['risk', o.risiko]], false));
-      add('verh', 'Kaufpreis &amp; Offerte', o.verhandlung ? verhPanel(o.analyse || {}, kuerzen(o.verhandlung)) : o.verhandlung);   /* v4550 · Kachelleiste */
+      /* v5020 · Marcel 25.11.2026 („bei der Offerte für die Besichtigung Punkte angeben, eine Art Checkliste“): js/besichtigung.js
+         unter Kachelleiste und Verhandlungstext. Ohne Analysetext steht der Reiter mit der Checkliste allein. */
+      var bsH = ''; try { bsH = window.DpBesichtigung ? window.DpBesichtigung.html() : ''; } catch (eB) { bsH = ''; }
+      add('verh', 'Kaufpreis &amp; Offerte', (o.verhandlung ? verhPanel(o.analyse || {}, kuerzen(o.verhandlung)) : '') + bsH);   /* v4550 · Kachelleiste */
       add('bank', 'Finanzierung &amp; Bank', o.bank ? nachKopf(kuerzen(o.bank), bankKacheln()) : o.bank);
     }
     var phase = bestand ? 'Bestand' : 'Ankauf', info = '', seit = '';
