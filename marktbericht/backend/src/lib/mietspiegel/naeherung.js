@@ -39,6 +39,8 @@ function num(v) {
   return Number.isFinite(n) ? n : null;
 }
 function runden(x, n) { const f = Math.pow(10, n); return Math.round(x * f + 1e-9) / f; }
+/** v5110a · Kundentext ohne Gedankenstrich: Zensus-Klasse „1960 - 1969“ → „1960 bis 1969“ */
+function klTxt(k) { return String(k == null ? '' : k).replace(/\s*[-–]\s*/g, ' bis '); }
 function dez(x, n) { return x == null ? '–' : x.toFixed(n == null ? 2 : n).replace('.', ','); }
 
 /** Klasse aus der Zensus-Ausprägung: 'BAU1970B1979' → { von 1970, bis 1979 }, 'BAU2016BXXXX' → bis offen,
@@ -148,9 +150,9 @@ export function naeherungFuer(param, zeilen, objekt) {
   const teile = ['Zensus 2022 Bestandsmiete der Gemeinde ' + dez(b.gesamt) + ' €/m²'];
   if (p.modell === 'klassen_faktor') {
     const bj = b.baujahr ? b.baujahr.wert : b.gesamt, fl = b.flaeche ? b.flaeche.wert : b.gesamt;
-    if (b.baujahr) teile.push('Baujahr ' + b.baujahr.klasse + ': ' + dez(b.baujahr.wert));
+    if (b.baujahr) teile.push('Baujahr ' + klTxt(b.baujahr.klasse) + ': ' + dez(b.baujahr.wert));
     else hinweise.push(num(o.baujahr) > 1000 ? 'Zensus führt für die Baujahresklasse keinen Wert, Miete aller Baujahre' : 'Baujahr fehlt, Zensus-Miete aller Baujahre');
-    if (b.flaeche) teile.push(b.flaeche.klasse + ': ' + dez(b.flaeche.wert));
+    if (b.flaeche) teile.push(klTxt(b.flaeche.klasse) + ': ' + dez(b.flaeche.wert));
     else hinweise.push(num(o.wfl) > 0 ? 'Zensus führt für die Größenklasse keinen Wert, Miete aller Größen' : 'Wohnfläche fehlt, Zensus-Miete aller Größen');
     basis = bj * fl / b.gesamt;
   } else if (p.modell !== 'gesamt_faktor') return leer('Modell ' + p.modell + ' unbekannt');
