@@ -71,7 +71,7 @@
       if (!u || !u.ok) { el.innerHTML = '<b>Was ist in der Nähe?</b><p>Umfeld gerade nicht abrufbar.</p>'; return; }
       el.innerHTML = '<b>Was ist in der Nähe?</b>' + (str ? '' : '<p class="eg-klein">Ohne Straße rund um die Mitte der PLZ.</p>') + '<div class="eg-umf-g">' + u.kategorien.map(function (k) {
         var n = k.naechster;
-        return '<div><span>' + k.label + '</span><b>' + (n ? (n.luftlinie_m < 1000 ? n.luftlinie_m + ' m' : String(Math.round(n.luftlinie_m / 100) / 10).replace('.', ',') + ' km') : 'nicht im Umkreis') + '</b>'
+        return '<div><span>' + k.label + '</span><b>' + (k.nicht_ermittelt ? 'nicht ermittelt' : n ? (n.luftlinie_m < 1000 ? n.luftlinie_m + ' m' : String(Math.round(n.luftlinie_m / 100) / 10).replace('.', ',') + ' km') : 'nicht im Umkreis') + '</b>'
           + (n ? '<small>' + (n.name ? n.name + ' · ' : '') + 'ca. ' + n.fuss_min + ' Min. zu Fuß</small>' : '') + '</div>';
       }).join('') + '</div><p class="eg-klein">' + u.hinweis + ' Kartendaten ' + u.vermerk + '.</p>';
     });

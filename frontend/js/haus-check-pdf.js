@@ -80,7 +80,7 @@
       uHtml = '<table><thead><tr><th>In der Nähe</th><th class="r">Entfernung</th><th class="r">zu Fuß</th></tr></thead><tbody>' + U.kategorien.map(function (k) {
         var n = k.naechster;
         return '<tr><td>' + B.esc(k.label) + (n && n.name ? '<div class="det">' + B.esc(n.name) + '</div>' : '') + '</td><td class="r num">'
-          + (n ? (n.luftlinie_m < 1000 ? B.zahl(n.luftlinie_m) + ' m' : B.zahl(n.luftlinie_m / 1000, 1) + ' km') : 'nicht im Umkreis') + '</td><td class="r num">' + (n ? 'ca. ' + n.fuss_min + ' Min.' : '–') + '</td></tr>';
+          + (k.nicht_ermittelt ? 'nicht ermittelt' : n ? (n.luftlinie_m < 1000 ? B.zahl(n.luftlinie_m) + ' m' : B.zahl(n.luftlinie_m / 1000, 1) + ' km') : 'nicht im Umkreis') + '</td><td class="r num">' + (n ? 'ca. ' + n.fuss_min + ' Min.' : '–') + '</td></tr>';
       }).join('') + '</tbody></table><p class="det">' + B.esc(U.hinweis) + ' Kartendaten ' + B.esc(U.vermerk) + '.</p>';
     } else uHtml = '<p>Das Umfeld war beim Erstellen nicht abrufbar.</p>';
     add('Lage und Umfeld', 'Was ist in der Nähe?', (e.karte ? '<img class="karte" src="' + e.karte + '" alt="Karte">' : '') + uHtml);
