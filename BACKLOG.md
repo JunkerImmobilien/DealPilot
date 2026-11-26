@@ -20,6 +20,16 @@ direkt unter den Punkt — nicht kommentarlos liegenlassen.
 - Einfache Mietspiegel nach Ablauf: App kennzeichnet bisher nur qualifizierte als veraltet.
 - Marcel: Hauszuschlag „Einfamilienhaus“ auch für DHH/RH (Annahme) ok? Prod-Freigabe v5080.
 
+## → Wunsch Marcel 26.11.2026: Eigennutzer-Modus in der App (Selbst nutzen / Vermieten) demnächst umsetzen
+
+Marcel 26.11.2026: „Das Selbst nutzen und Vermieten nimm bitte aus Staging wieder raus, das hat mir im DealPilot noch nicht zugesagt. Das sollten wir als Wunsch ins Backlog schreiben, dass wir das demnächst noch umsetzen.“
+
+- **Was es gab (Staging, ausgebaut in v5150qq6):** Umschalter „Nutzung: Vermieten / Selbst nutzen“ am Objekt, eigene Reiterleiste (Überblick, Haus, Preis und Wert, Lage und Markt, Finanzierung, Kaufen oder mieten, Förderung, Unterlagen), Umschalter im Quick-Check, Knopf „Haus-Check als PDF“ in der App, Vorschau-Funktion `eigennutzer`, Route `POST /marktbericht/hauscheck-objekt` (Haupt-Backend), Demo-Schalter `?eigennutzer=1`.
+- **Wo der Stand liegt:** Commits v5120ii6 … v5120cii6 (II6) und v5130*kk6 (KK6) in der staging-Historie; Dateien `frontend/js/eigennutzer-app-demo.js`, `eigennutzer-qc-demo.js` (gelöscht, aus der Historie wiederherstellbar); Reiter-Tabelle `Dateien/Konzepte/Eigennutzer-App-Reiter.md`; Fotos `Dateien/Konzepte/demo/fotos/app-qc-*.png`.
+- **Bleibt (live, gewollt):** Haus-Check auf der Landing (`haus-check.html`, Reiter „Selbst nutzen“ im Deal-Check), Kern `eigennutzer-kern.js` + Backend-Spiegel, Kauf 9,99 €, PDF, Nebenkosten-Register, Verkauf-Schalter. Die mb-Route `/hauscheck-objekt` liegt noch im Marktbericht-Backend (intern, ohne Aufrufer).
+- **Daten:** Feld `_nutzung` bleibt in storage.js gelistet, damit gespeicherte Werte nicht still verloren gehen. Auf Staging tragen 2 Objekte `_nutzung: 'eigen'` (nicht angefasst).
+- **Vor dem nächsten Anlauf:** mit Marcel abstimmen, wie es in der App aussehen soll (Demo zeigen, nicht direkt bauen).
+
 ## → Offen aus dem 26.11.2026 (Weitermachen + Marcel entscheidet)
 
 **Eigennutzer-Check (KK6, v5130kk6, Staging, hinter Vorschau `eigennutzer`):**

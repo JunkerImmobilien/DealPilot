@@ -180,7 +180,7 @@ var FIELDS = [
   'mv_art','mv_beginn','mv_letzte_erhoehung','mv_letzte_erhoehung_betrag',   /* v2545 */
   'mv_befristet_bis','mv_kuendigungsverzicht_bis','mv_abw_jahre',   /* v2660 · E2 · Restlaufzeit der Mietabweichung am Einzelobjekt */
   '_besichtigung',   /* v5020 · Checkliste der Besichtigung (js/besichtigung.js): Haken und Notizen, JSON */
-  '_nutzung',        /* v5120ii6 · Demo Eigennutzer: '' vermieten, 'eigen' selbst nutzen */
+  '_nutzung',        /* v5120ii6 · Demo Eigennutzer ('eigen'). v5150qq6: Modus ausgebaut, Feld bleibt nur, damit gespeicherte Werte beim Speichern nicht still verloren gehen */
   'nk_vorauszahlung',   /* v3950 · Nebenkosten-Vorauszahlung des Mieters je Monat (§ 556 Abs. 2 BGB), Stammdatum fuer ViVi, kein Kern liest es. Beim MFH je Wohnung in _mfh */
   '_vivi',              /* v3950 · ViVi-Verknuepfung (js/vivi-felder.js): eigene Werte und Anzeige-Spiegel, JSON im versteckten Feld */
   // V36: DealScore 2.0 Zusatzangaben
