@@ -951,7 +951,7 @@
     /* v3940 · echter Ablauf statt Demo (einzelcheck.js/.css, Backend routes/publicEinzelcheck.js) */
     /* v3946 · Grundangaben, Bezahlen im selben Tab, Stufe 3, Finanzierung: beide Buster neu */
     var l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'einzelcheck.css?v=einzelcheck-4c'; document.head.appendChild(l);
-    var s = document.createElement('script'); s.src = 'einzelcheck.js?v=einzelcheck-10a-v5080m'; s.async = true;
+    var s = document.createElement('script'); s.src = 'einzelcheck.js?v=einzelcheck-10a-v5130kk6'; s.async = true;
     /* landing-faecher-2 · der Deal-Check zeigt den zweiten Weg „Bericht holen“ erst, wenn der Einzel-Check da ist */
     s.onload = function () { try { document.dispatchEvent(new CustomEvent('dp:einzelcheck-bereit')); } catch (e) {} };
     document.body.appendChild(s);

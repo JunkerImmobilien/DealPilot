@@ -621,6 +621,7 @@ async function handleEinzelcheckPaid(session) {
     return { ok: false, reason: 'kein_kauf' };
   }
   const k = claim.rows[0];
+  await require('./verkaufSchalter').gezaehlt('einzelcheck', k.amount_cents);   /* v5130 KK6 · Käufe heute und im Monat */
   /* Anrechnung: ein eigener Promotion-Code je Kauf auf den festen Coupon, einmal einloesbar, laeuft mit
      der Frist ab. Fehlt der Coupon im Konto, bleibt der Kauf gueltig - nur ohne Anrechnung (gemeldet). */
   let code = null;
@@ -1078,13 +1079,14 @@ function _fehlerMit(text, status, code) { const e = new Error(text); e.status = 
 /* einzelcheck-6 · Das PDF entsteht beim PDF-Dienst, nicht im Druckfenster des Browsers. Marcels Herford-Bericht trug
    oben Datum und Titel und unten die Adresse der Seite: das sind die Kopf- und Fusszeilen des Chrome-Druckfensters,
    die der Bericht nicht abschalten kann. Mail und Herunterladen nehmen jetzt denselben Weg. */
-async function _pdfDrucken(html, t, signal) {
+async function _pdfDrucken(html, t, signal, marke) {
+  const name = marke || 'Einzel-Check';   /* v5130 KK6 · Haus-Check nutzt denselben Druckweg */
   const geheim = process.env.PDF_DIENST_SECRET;
   const url = String(process.env.PDF_DIENST_URL || 'http://dealpilot-pdf:4100').replace(/\/+$/, '') + '/pdf';
   /* Art html druckt ohne Anmeldung (kein Skript, kein Netz). token/sitzung verlangt der Dienst nur formal. */
   const r = await deps().pdfFetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Pdf-Geheimnis': geheim },
-    body: JSON.stringify({ art: 'html', html: html, titel: 'DealPilot Einzel-Check ' + t,
-      fuss: ['DealPilot · Einzel-Check', 'Stand ' + new Date().toLocaleDateString('de-DE', { timeZone: 'Europe/Berlin' })],
+    body: JSON.stringify({ art: 'html', html: html, titel: 'DealPilot ' + name + ' ' + t,
+      fuss: ['DealPilot · ' + name, 'Stand ' + new Date().toLocaleDateString('de-DE', { timeZone: 'Europe/Berlin' })],
       token: 'einzelcheck', sitzung: { mode: 'einzelcheck' } }), signal: signal });
   if (!r.ok) throw new Error('PDF-Dienst ' + r.status);
   const pdf = Buffer.from(await r.arrayBuffer());
@@ -1100,7 +1102,7 @@ async function berichtPdf(zeile, html, titel) {
   if (!process.env.PDF_DIENST_SECRET) throw _fehlerMit('Der PDF-Dienst ist hier gerade nicht eingerichtet.', 503, 'kein_dienst');
   const t = String(titel || 'Einzel-Check').replace(/[\u0000-\u001f]/g, ' ').trim().slice(0, 120) || 'Einzel-Check';
   const ctrl = new AbortController(); const uhr = setTimeout(function () { ctrl.abort(); }, 120000);
-  try { return { pdf: await _pdfDrucken(html, t, ctrl.signal), titel: t }; }
+  try { return { pdf: await _pdfDrucken(html, t, ctrl.signal, zeile.produkt === 'hauscheck' ? 'Haus-Check' : null), titel: t }; }
   catch (e) { console.warn('[einzelcheck] PDF zum Herunterladen fehlgeschlagen:', e.message); throw _fehlerMit('Das PDF ließ sich gerade nicht erzeugen.', 502, 'pdf'); }
   finally { clearTimeout(uhr); }
 }

@@ -79,8 +79,9 @@ function fehler(res, e, fallback) {
 
 router.get('/preis', async function (req, res) {
   try {
+    const verkauf = await require('../services/verkaufSchalter').verkauft('einzelcheck');   /* v5130 KK6 · Schalter Admin › Betrieb */
     const p = await ec.preis(false);
-    res.json({ amount_cents: p.amount_cents, currency: p.currency, frist_tage: ec.FRIST_TAGE,
+    res.json({ amount_cents: p.amount_cents, currency: p.currency, frist_tage: ec.FRIST_TAGE, verkauf: verkauf,
       frei_max: ec.FREI_MAX_UNTERLAGEN, voll_max: ec.VOLL_MAX_UNTERLAGEN, max_mb: Math.round(ec.MAX_DATEI_BYTES / 1048576) });
   } catch (e) { fehler(res, e, 'preis'); }
 });
@@ -111,6 +112,7 @@ router.post('/kaufen', bremseKaufen, express.json({ limit: '32kb' }), async func
     const b = req.body || {};
     /* Widerrufsverzicht wie beim Abo (§ 356 Abs. 5 BGB): Pflicht, mit Fassung protokolliert */
     const cs = require('../services/consentService');
+    if (!(await require('../services/verkaufSchalter').verkauft('einzelcheck'))) return res.status(409).json({ error: 'Der Bericht ist bald wieder kaufbar. Der Deal-Check bleibt kostenlos.', code: 'verkauf_aus' });   /* v5130 KK6 */
     if (b.widerruf_verzicht !== true) return res.status(400).json({ error: 'Bitte bestätige vor dem Kauf, dass der Bericht sofort entstehen soll (Widerrufsrecht).', code: 'widerruf_verzicht_fehlt' });
     const k = await ec.kaufAnlegen({ zahlen: b.zahlen, siegelWert: b.siegel, grund: b.grund });
     try { await cs.widerrufVerzichtPruefen(req, { kauf: 'einzelcheck', kauf_id: String(k.kauf_id) }); } catch (e) { console.warn('[einzelcheck] Widerrufsverzicht nicht protokolliert:', e.message); }

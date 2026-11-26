@@ -166,6 +166,7 @@ export function eingabenAusBericht(cc, extra) {
     verkehrswert: (verf && wertVon[verf]) || wertVon.ertragswert || wertVon.sachwert || null,
     verkehrswert_verfahren: (verf && wertVon[verf]) ? verf : (wertVon.ertragswert ? 'ertragswert' : (wertVon.sachwert ? 'sachwert' : null)),
     darlehen: n(X.darlehen),
+    eigennutzung: X.eigennutzung === true,   /* v5130 KK6 · § 4 Abs. 2, siehe eigennutzungWeg() */
   };
 }
 
@@ -215,6 +216,69 @@ function ohneErtragswert(E, out, grund) {
   return out;
 }
 
+/** Beleihungsauslauf und Kleindarlehen (§ 14 PfandBG, § 24 BelWertV), fuer Ertrags- und Eigennutzungsweg gleich. */
+function auslaufUndKlein(darlehen, wertG, anteilGew) {
+  const darl = n(darlehen);
+  const auslauf = (darl != null && darl > 0 && wertG > 0) ? {
+    darlehen: r0(darl), auslauf_pct: r2(darl / wertG * 100),
+    grenze_60_eur: r0(wertG * BELWERTV.beleihungsgrenze),
+    ueber_60: darl > wertG * BELWERTV.beleihungsgrenze,
+    text: 'Beleihungsauslauf ' + pct(darl / wertG * 100) + ' (Darlehen ' + de(darl) + ' € / Beleihungswert ' + de(wertG) + ' €). '
+      + (darl > wertG * BELWERTV.beleihungsgrenze ? 'Über der 60-%-Grenze des § 14 PfandBG (' + de(r0(wertG * 0.6)) + ' €) - der Teil darüber gilt bei der Bank nicht als erstrangiger Realkredit.' : 'Innerhalb der 60-%-Grenze des § 14 PfandBG.'),
+  } : null;
+  const klein = darl != null && darl > 0 ? {
+    moeglich: darl <= BELWERTV.kleindarlehen_eur && anteilGew <= BELWERTV.kleindarlehen_gewerbe_max,
+    text: (darl <= BELWERTV.kleindarlehen_eur && anteilGew <= BELWERTV.kleindarlehen_gewerbe_max)
+      ? 'Darlehen bis 600.000 €: die Bank darf eine vereinfachte Wertermittlung statt eines Gutachtens verwenden (§ 24 BelWertV), sofern keine weiteren Vorlasten bestehen.'
+      : (darl > BELWERTV.kleindarlehen_eur ? 'Darlehen über 600.000 €: die Bank braucht ein Beleihungswertgutachten (§ 5 BelWertV).' : 'Gewerbeanteil über einem Drittel des Rohertrags: keine vereinfachte Wertermittlung nach § 24.'),
+  } : null;
+  return { auslauf, klein };
+}
+
+/* v5130 KK6 · § 4 Abs. 2 BelWertV bei EIGENNUTZUNG (Marcel 26.11.2026, Eigennutzer-Check „Haus-Check“).
+   Ein selbst genutztes Ein-/Zweifamilienhaus oder eine selbst genutzte Wohnung hat keinen Mietertrag. Der Ertragsweg
+   mit der fiktiven Miete und dem Mindestzins (5,5 %) unterschaetzt dann den Wert grob (gemessen an Bericht 553:
+   Ertragsweg 130.000 € gegen Sachwert 410.245 €). Deshalb fuehrt hier, sobald die Eigennutzung angegeben ist:
+     Haus (EFH, ZFH, DHH, RH, „haus“):  Sachwert nach § 16 (Sicherheitsabschlag auf die Herstellungskosten),
+                                       ohne Sachwert der amtliche Vergleichswert nach § 19.
+     Wohnung (ETW):                     amtlicher Vergleichswert nach § 19 (mit Abschlag), ohne ihn der Sachwert.
+   Der jeweils andere Wert laeuft als Kontrollwert mit. Gedeckelt auf den Verkehrswert (§ 16 Abs. 2 PfandBG).
+   Kein Sach- und kein Vergleichswert: dann der normale Ertragsweg (Rueckgabe null). MFH und Gewerbe nie. */
+const EIGEN_HAUS = /^(efh|zfh|dhh|rh|haus)$|einfamil|zweifamil|doppel|reihen/;
+const EIGEN_ETW = /^etw$|wohnung|eigentumsw/;
+export function eigennutzungsBasis(objektart) {
+  const a = String(objektart || '').toLowerCase().trim();
+  if (EIGEN_ETW.test(a)) return 'etw';
+  if (EIGEN_HAUS.test(a)) return 'haus';
+  return null;
+}
+function eigennutzungWeg(E, out) {
+  const typ = eigennutzungsBasis(E.objektart);
+  if (!typ) return null;
+  const sw = sachwertBel(E.sachwert, E.bodenwert);
+  const vg = E.vergleichswert && n(E.vergleichswert.wert) ? r0(n(E.vergleichswert.wert) * (1 - BELWERTV.sicherheitsabschlag_vergleich)) : null;
+  const kSw = sw ? { art: 'sachwert', wert: sw.wert } : null;
+  const kVg = vg != null ? { art: 'vergleichswert', wert: vg } : null;
+  const fuehrt = typ === 'haus' ? (kSw || kVg) : (kVg || kSw);
+  if (!fuehrt) return null;
+  const kontroll = fuehrt === kSw ? kVg : kSw;
+  let wert = fuehrt.wert;
+  const vw = n(E.verkehrswert);
+  const name = fuehrt.art === 'sachwert' ? 'Sachwert' : 'Vergleichswert';
+  out.hinweise.push('Selbst genutzt: bei ' + (typ === 'haus' ? 'Ein- und Zweifamilienhäusern' : 'Eigentumswohnungen') + ' darf sich die Bank am '
+    + name + ' orientieren, wenn das Objekt zweifelsfrei zur Eigennutzung taugt und dauerhaft nachgefragt wird (§ 4 Abs. 2 BelWertV). '
+    + (fuehrt.art === 'sachwert' ? 'Angesetzt mit 10 % Sicherheitsabschlag auf die Herstellungskosten (§ 16 Abs. 2).' : 'Angesetzt mit Sicherheitsabschlag auf den amtlichen Vergleichswert (§ 19).'));
+  if (vw != null && wert > vw) { wert = vw; out.hinweise.push('Gedeckelt auf den Verkehrswert des Berichts (' + de(vw) + ' €), der Beleihungswert darf den Marktwert nicht übersteigen (§ 16 Abs. 2 PfandBG).'); }
+  const bwG = Math.floor(wert / 1000) * 1000;
+  const { auslauf, klein } = auslaufUndKlein(E.darlehen, bwG, 0);
+  Object.assign(out, { verfuegbar: true, eigennutzung: true, beleihungswert: bwG, basis: fuehrt.art + '_4_2',
+    verkehrswert: vw, verkehrswert_verfahren: E.verkehrswert_verfahren || null, verhaeltnis_zum_verkehrswert_pct: vw ? r2(bwG / vw * 100) : null,
+    sachwert: sw, vergleichswert: vg != null ? { wert: vg, ausgang: n(E.vergleichswert.wert) } : null, ertragswert: null,
+    kontrolle: kontroll ? { art: kontroll.art, wert: kontroll.wert, abweichung_pct: r2((kontroll.wert - fuehrt.wert) / fuehrt.wert * 100), besondere_pruefung: false } : null,
+    auslauf, kleindarlehen: klein });
+  return out;
+}
+
 /** Der Check. eingaben aus eingabenAusBericht(), parameter aus der Konfiguration. */
 export function beleihungswert(eingaben, parameter) {
   const E = eingaben || {};
@@ -222,6 +286,7 @@ export function beleihungswert(eingaben, parameter) {
   const out = { version: VERSION, verfuegbar: false, indikativ: true,
     kennzeichnung: 'Indikativer Beleihungswert-Check nach BelWertV - kein Beleihungswertgutachten nach § 5 BelWertV und keine Festsetzung durch die Bank.',
     erklaerungen: ERKLAERUNGEN, hinweise };
+  if (E.eigennutzung === true) { const eig = eigennutzungWeg(E, out); if (eig) return eig; }   /* v5130 KK6 · § 4 Abs. 2 */
   const rnd = n(E.rnd_jahre), bw = n(E.bodenwert);
   const W = E.wohnen || { einheiten: [] };
 
@@ -328,20 +393,7 @@ export function beleihungswert(eingaben, parameter) {
   const wertGerundet = Math.floor(wert / 1000) * 1000;
 
   /* ── Beleihungsauslauf ── */
-  const darl = n(E.darlehen);
-  const auslauf = (darl != null && darl > 0 && wertGerundet > 0) ? {
-    darlehen: r0(darl), auslauf_pct: r2(darl / wertGerundet * 100),
-    grenze_60_eur: r0(wertGerundet * BELWERTV.beleihungsgrenze),
-    ueber_60: darl > wertGerundet * BELWERTV.beleihungsgrenze,
-    text: 'Beleihungsauslauf ' + pct(darl / wertGerundet * 100) + ' (Darlehen ' + de(darl) + ' € / Beleihungswert ' + de(wertGerundet) + ' €). '
-      + (darl > wertGerundet * BELWERTV.beleihungsgrenze ? 'Über der 60-%-Grenze des § 14 PfandBG (' + de(r0(wertGerundet * 0.6)) + ' €) - der Teil darüber gilt bei der Bank nicht als erstrangiger Realkredit.' : 'Innerhalb der 60-%-Grenze des § 14 PfandBG.'),
-  } : null;
-  const klein = darl != null && darl > 0 ? {
-    moeglich: darl <= BELWERTV.kleindarlehen_eur && anteilGew <= BELWERTV.kleindarlehen_gewerbe_max,
-    text: (darl <= BELWERTV.kleindarlehen_eur && anteilGew <= BELWERTV.kleindarlehen_gewerbe_max)
-      ? 'Darlehen bis 600.000 €: die Bank darf eine vereinfachte Wertermittlung statt eines Gutachtens verwenden (§ 24 BelWertV), sofern keine weiteren Vorlasten bestehen.'
-      : (darl > BELWERTV.kleindarlehen_eur ? 'Darlehen über 600.000 €: die Bank braucht ein Beleihungswertgutachten (§ 5 BelWertV).' : 'Gewerbeanteil über einem Drittel des Rohertrags: keine vereinfachte Wertermittlung nach § 24.'),
-  } : null;
+  const { auslauf, klein } = auslaufUndKlein(E.darlehen, wertGerundet, anteilGew);
 
   Object.assign(out, {
     verfuegbar: true,

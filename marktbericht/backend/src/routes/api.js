@@ -6,6 +6,7 @@ import { cfg, aiEnabled, geoEnabled, geomapEnabled, destatisEnabled } from '../l
 import { ReportOrchestrator } from '../services/ReportOrchestrator.js';
 import { MarketAnalysisService } from '../services/MarketAnalysisService.js';
 import { MicroLocationService } from '../services/MicroLocationService.js';
+import { UmfeldService } from '../services/UmfeldService.js';   /* v5130 · KK6 Umfeld fuer den Eigennutzer-Check */
 import { GeocodingService } from '../services/GeocodingService.js';
 import { DealPilotImportService } from '../services/DealPilotImportService.js';
 import { openaiSelfCheck, generateVerlaufText } from '../services/ReportGenerationService.js';
@@ -514,8 +515,21 @@ router.post('/reports/einzelcheck', async (req, res) => {
     delete b.user_id; delete b.external_ref; delete b.object_label;
     /* v3946 · Stufe 3 (Wertermittlung), Marcel 22.11.2026 „wir machen einfach eine Stufe drei“. Weiter ohne Ablage. */
     b.wert_stufe = Math.min(3, Math.max(1, Math.round(Number(b.wert_stufe) || 3)));
+    const hc = (b.hauscheck && typeof b.hauscheck === 'object') ? b.hauscheck : null; delete b.hauscheck;
     const out = await runLimited(() => ReportOrchestrator.generate(b, { ohneAblage: true, vergleichsmiete: true }));
-    console.log(`[req] /reports/einzelcheck OK in ${out.took_ms}ms (ohne Ablage)`);
+    /* v5130 KK6 · Haus-Check (Eigennutzer): indikativer Beleihungswert nach § 4 Abs. 2 (eigennutzung) aus dem
+       Quercheck dieses Laufs und das Umfeld an den Koordinaten des Laufs. Weiter ohne Ablage. */
+    if (hc) {
+      const cc = out && out.data && out.data.cross_check;
+      try {
+        const ein = cc ? belwEingaben(cc, { objektart: String(hc.objektart || '').toLowerCase(), darlehen: Number(hc.darlehen) > 0 ? Number(hc.darlehen) : null, eigennutzung: true }) : null;
+        out.beleihungswert = ein ? belwCheck(ein, (hc.parameter && typeof hc.parameter === 'object') ? hc.parameter : {}) : { verfuegbar: false, grund: 'ohne_wert' };
+      } catch (e) { out.beleihungswert = { verfuegbar: false, grund: 'fehler' }; }
+      const a = (out && out.data && out.data.address) || {};
+      try { out.umfeld = (Number.isFinite(Number(a.lat)) && Number.isFinite(Number(a.lon))) ? await UmfeldService.analyze(Number(a.lat), Number(a.lon)) : { ok: false, grund: 'ohne_koordinaten' }; }
+      catch (e) { out.umfeld = { ok: false, grund: 'fehler' }; }
+    }
+    console.log(`[req] /reports/einzelcheck OK in ${out.took_ms}ms (ohne Ablage)${hc ? ' · Haus-Check' : ''}`);
     res.json(out);
   } catch (e) {
     console.error('[req] /reports/einzelcheck FEHLER:', e.message);
@@ -720,6 +734,40 @@ router.post('/beleihungswert', async (req, res) => {
     }
     refs.forEach((r) => { if (!je[r]) je[r] = { verfuegbar: false, grund: 'kein Marktbericht mit Ertrags- oder Sachwert (Stufe 3) für dieses Objekt' }; });
     res.json({ objekte: je, stand: new Date().toISOString().slice(0, 10) });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+/* v5130 KK6 · Haus-Check aus dem GESPEICHERTEN Marktbericht eines App-Objekts (Eigennutzer, Vorschau eigennutzer):
+   neuester Stand des Objekts mit Stufe-3-Quercheck, daraus der Wertteil (der Haupt-Dienst nimmt ihn nur ueber seine
+   Weissliste, services/einzelcheck.js wertAus), der Beleihungswert nach § 4 Abs. 2 (eigennutzung) und das Umfeld an
+   den Koordinaten des Berichts. Kein neuer Abruf des Berichts, keine Kosten ausser dem Umfeld (30 Tage gespeichert).
+   POST { user_id, ref, darlehen, objektart, parameter } */
+router.post('/hauscheck-objekt', async (req, res) => {
+  const uid = _uidAus(req);
+  if (!uid) return res.status(400).json({ error: 'user_id erforderlich' });
+  const b = req.body || {};
+  const ref = String(b.ref || '');
+  if (!/^[A-Za-z0-9_.:-]{1,80}$/.test(ref)) return res.status(400).json({ error: 'ref erforderlich' });
+  try {
+    const rows = await q(
+      'SELECT report_id, created_at, property_type, data FROM mb.object_snapshots'
+      + ' WHERE user_id = $1 AND external_ref = $2'
+      + " AND (data->'cross_check') IS NOT NULL ORDER BY created_at DESC LIMIT 1", [uid, ref]);
+    if (!rows.length) return res.json({ verfuegbar: false, grund: 'kein_bericht' });
+    const r = rows[0], d = r.data || {};
+    const art = String(b.objektart || r.property_type || '').toLowerCase();
+    let belw = null;
+    try {
+      const ein = belwEingaben(d.cross_check, { objektart: art, darlehen: Number(b.darlehen) > 0 ? Number(b.darlehen) : null, eigennutzung: true });
+      belw = ein ? belwCheck(ein, (b.parameter && typeof b.parameter === 'object') ? b.parameter : {}) : null;
+    } catch (e) { belw = null; }
+    const a = d.address || {};
+    let umfeld = null;
+    try { if (Number.isFinite(Number(a.lat)) && Number.isFinite(Number(a.lon))) umfeld = await UmfeldService.analyze(Number(a.lat), Number(a.lon)); } catch (e) { umfeld = null; }
+    res.json({ verfuegbar: true, report_id: r.report_id, created_at: r.created_at,
+      data: { cross_check: d.cross_check, land_value: d.land_value, address: d.address, ref: d.ref, wertermittlung_herkunft: d.wertermittlung_herkunft,
+        quellen_nachweis_markt: d.quellen_nachweis_markt },
+      beleihungswert: belw, umfeld });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
@@ -1633,6 +1681,14 @@ router.get('/micro/:propertyId', async (req, res) => {
   if (!p) return res.status(404).json({ error: 'unbekanntes Objekt' });
   const micro = await MicroLocationService.analyze(p.lat, p.lon, 2000);
   res.json(micro);
+});
+
+// GET /umfeld?lat=&lon= — v5130 · KK6 · Umfeld fuer den Eigennutzer-Check: naechster Supermarkt, Baecker, Apotheke,
+// Arzt, Kita, Grundschule, weiterfuehrende Schule, Bus und Bahn, Bahnhof, Park, Autobahnauffahrt (OSM/Overpass, 30 Tage Speicher).
+router.get('/umfeld', async (req, res) => {
+  const lat = parseFloat(req.query.lat), lon = parseFloat(req.query.lon);
+  if (!isFinite(lat) || !isFinite(lon) || Math.abs(lat) > 85 || Math.abs(lon) > 180) return res.status(400).json({ error: 'lat und lon erforderlich' });
+  res.json(await UmfeldService.analyze(lat, lon));
 });
 
 // GET /geocode?address=

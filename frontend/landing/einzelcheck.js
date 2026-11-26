@@ -694,7 +694,7 @@
       + '<div class="ec-preis">' + esc(preisText()) + '<small>einmalig, kein Abo</small></div>'
       + '<p class="ec-fein">Buchst du innerhalb von ' + INFO.frist_tage + ' Tagen ein Paket, rechnet DealPilot den Betrag an.</p>'
       + '<label class="ec-haken"><input type="checkbox" class="ec-widerruf"> <span>Ich verlange ausdrücklich, dass DealPilot den Bericht sofort erstellt. Mir ist bekannt, dass mein Widerrufsrecht damit erlischt (§ 356 Abs. 5 BGB).</span></label>'
-      + '<button type="button" class="btn-p ec-kaufen" disabled>Bericht kaufen · ' + esc(preisText()) + '</button>'
+      + (INFO.verkauf === false ? '<button type="button" class="btn-p" disabled>Bald verfügbar</button>' : '<button type="button" class="btn-p ec-kaufen" disabled>Bericht kaufen · ' + esc(preisText()) + '</button>')
       + '<p class="ec-fein">Bezahlt wird bei Stripe. Danach kommst du hierher zurück und dein Bericht entsteht sofort, ohne dass du etwas noch einmal hochlädst.</p></div>';
   }
   /* einzelcheck-4 · vor dem Kauf zeigen, welche amtlichen Daten es für den Ort gibt (Marcel 25.11.2026: „damit er nicht
@@ -1703,6 +1703,7 @@
     holeJson(api('/preis')).then(function (p) {
       if (!p._ok || !(p.amount_cents > 0)) return;
       ['frei_max', 'voll_max', 'max_mb', 'frist_tage', 'amount_cents'].forEach(function (k) { if (p[k] > 0) INFO[k] = p[k]; });
+      INFO.verkauf = p.verkauf !== false;   /* v5130 KK6 · Admin › Betrieb: Verkauf aus = „Bald verfügbar“ */
       window.DpEinzelCheck.preis = INFO.amount_cents / 100;
       try { document.dispatchEvent(new CustomEvent('dp:einzelcheck-bereit')); } catch (e) {}
       knopf();
