@@ -68,7 +68,7 @@ export const UmfeldService = {
         kita: ['amenity', 'kindergarten'], schule: ['amenity', 'school'], haltestelle: ['highway', 'bus_stop'], bahnhof: ['railway', 'station'], park: ['leisure', 'park'] };
       await Promise.all(Object.keys(GEO_KAT).map(async (k) => {
         const r = (KAT.find((x) => x.k === k) || {}).r || RADIUS;
-        const arr = await GeoapifyConnector.places(GEO_KAT[k], lat, lon, r, 10);
+        const arr = await GeoapifyConnector.places(GEO_KAT[k], lat, lon, r, k === 'schule' ? 40 : 10);   /* Schulen: Grundschule und weiterfuehrende erst ueber den Namen getrennt */
         for (const p of arr) { const tags = { name: p.name }; tags[KEY[k][0]] = KEY[k][1]; els.push({ lat: p.lat, lon: p.lon, tags }); }
       }));
     }
