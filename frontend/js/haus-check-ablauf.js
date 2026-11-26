@@ -33,9 +33,10 @@
       belw: b.belw && b.belw.verfuegbar ? b.belw : null,
       umfeld: b.umfeld || null,
       karte: b.karte || null,
+      anrechnung: o.anrechnung || null,
       objekt: { adresse: o.adresse || ((e.plz || '') + ' ' + ((o.d && o.d.gebiet) || '')).trim(), objektart: String(e.objektart || 'efh').toLowerCase(),
         baujahr: e.bj, wfl: e.wfl, kaufpreis: e.kp, energieklasse: e.energieklasse || null, unterlagen: e.unterlagen || [], foerderung: foerderung(e) }
-    }).then(function (h) { return { html: h, haus: haus }; });
+    }).then(function (h) { return { html: h, haus: haus, r: r, anrechnung: o.anrechnung || null }; });
   }
   function laden(blob, name) {
     var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name || 'DealPilot Haus-Check.pdf';

@@ -49,6 +49,7 @@
       '<div class="eg-gr">' + g + '</div>' +
       '<div class="eg-zahlen"><div><b>' + E.eur(r.miete) + '</b><span>Ersparte Miete im Monat</span></div><div><b>' + E.eur(r.rate) + '</b><span>Rate im Monat</span></div><div><b>' + r.zins.toFixed(2).replace('.', ',') + ' %</b><span>Zins 10 Jahre</span></div></div>' +
       '<div class="eg-satz">' + satz + '</div>' +
+      (r.kern && r.kern.haus.gruppen.preis && r.kern.haus.gruppen.preis.wert_score != null ? '<div class="eg-fuss"><b>Mit dem Wert nach ImmoWertV gerechnet</b>, derselbe Haus-Score wie im PDF.</div>' : '<div class="eg-fuss">Kostenlose Schnellrechnung ohne den Wert nach ImmoWertV. Der Haus-Check rechnet den Preis zusätzlich gegen den ermittelten Wert, der Score kann sich dadurch ändern.</div>') +
       '<div class="eg-fuss">Beispielrechnung. Ersparte Miete aus ' + (r.quelle === 'Mietspiegel' ? 'dem Mietspiegel' : 'der DealPilot-Näherung') + ' mit Hauszuschlag, Wertentwicklung 1,5 % und Mietsteigerung 2 % im Jahr angenommen. Keine Finanzierungszusage.</div>';
     var erg = document.getElementById('egErg'); erg.classList.add('da');
     requestAnimationFrame(function () {
@@ -102,6 +103,8 @@
     var a = ev.target.closest('[data-eg-selbst]'); if (!a) return; setze('selbst');
   });
   window.DemoEgSetze = setze;
-  if (/[?&]selbst=1/.test(location.search)) { setze('selbst'); start(); }
+  if (/[?&]selbst=1/.test(location.search) || document.body.getAttribute('data-hc-seite') === '1') { setze('selbst'); if (!/(?:^#|&)hc=/.test(location.hash)) start(); }
+  /* v5130 KK6 · nach dem Kauf zeichnet haus-check-kauf.js das Ergebnis mit dem Wert nach ImmoWertV neu: derselbe Score wie im PDF */
+  window.DemoEgZeige = function (r, d, e) { zeige(r); zusatz(r, d, e); };
 
 })();

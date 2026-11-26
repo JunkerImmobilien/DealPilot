@@ -9,6 +9,9 @@ DealPilot läuft im Browser und auf dem Handy. Die Server stehen in Deutschland.
 - [Methodik und Datenbasis](https://dealpilot.immo/methodik.html): wie der Wert nach ImmoWertV begründet wird, Liegenschaftszinssatz, Sachwertfaktor, Vergleichsfaktor, Herkunft je Zahl, Grenzen
 - [Häufige Fragen](https://dealpilot.immo/fragen.html)
 
+## Haus-Check für Selbstnutzer
+- [Haus-Check](https://dealpilot.immo/haus-check.html): Für alle, die ein Haus oder eine Wohnung selbst bewohnen wollen. Kostenlose Schnellrechnung mit Haus-Score aus Preis, Zustand und Lage, Leistbarkeit vom Netto-Einkommen, Kaufen oder mieten und Umfeld. Das PDF für 9,99 Euro einmalig rechnet den Wert nach ImmoWertV mit Rechenweg, den indikativen Beleihungswert und eine Haushaltsrechnung für die Bank. Wird bei Buchung eines Pakets innerhalb von 14 Tagen angerechnet.
+
 ## Preise
 - [Preise](https://dealpilot.immo/preise.html): Free 0 Euro mit 1 Objekt. Starter 19,99 Euro im Monat mit 5 Objekten. Investor 34,99 Euro im Monat mit 25 Objekten. Pro 49,99 Euro im Monat. Jährlich 219, 384 und 549 Euro. Monatlich kündbar.
 - Partner-Plan für Makler, Sachverständige, Steuerberater und Finanzierer: 99 Euro im Monat, dazu Kundenplätze und Teamplätze mit Mengenstaffel, Einzelheiten auf der Preisseite.
