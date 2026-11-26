@@ -44,6 +44,23 @@ const armNetto = K.kern({ kaufpreis: 310000, wfl: 130, baujahr: 1998, objektart:
 ok(ohneNetto.haus.score === efh.haus.score && armNetto.haus.score === efh.haus.score, 'Haus-Score unabhängig vom Einkommen');
 ok(ohneNetto.leistbarkeit.ampel === null && armNetto.leistbarkeit.ampel === 'rot', 'Ampel null ohne Einkommen, rot bei 2.000 € netto');
 
+/* pp6 · Nebenkosten einzeln: Posten als „davon“-Zeilen mit Herkunft, Summe der Posten = übrige Nebenkosten,
+   Unterlagen ersetzen die Posten. Muster-Posten erfunden, nicht aus einer Gemeinde. */
+const POSTEN = [{ id: 'grundsteuer', name: 'Grundsteuer', qm: 0.17, herkunft: 'gemeinde' }, { id: 'wasser', name: 'Wasser und Abwasser', qm: 0.31, herkunft: 'gemeinde' },
+  { id: 'muell', name: 'Müllabfuhr', qm: 0.16, herkunft: 'bund' }, { id: 'versicherung', name: 'Gebäudeversicherung', qm: 0.31, herkunft: 'land' }];
+const mitP = K.kern({ kaufpreis: 310000, wfl: 140, baujahr: 1998, objektart: 'efh', ek: 100000, netto: 5200, zins_pct: 4.09, grest_pct: 6.5, vergleichsmiete_qm: 7.30,
+  nebenkosten_qm: { wert: 0.95, herkunft: 'teils ortsgenau', posten: POSTEN } });
+const AUp = mitP.leistbarkeit.aufstellung, teile = AUp.filter((x) => x.teil), ue = AUp.find((x) => x.k === 'uebrige');
+ok(teile.length === 4 && teile.every((x) => /^davon /.test(x.l) && x.herkunft), 'Posten einzeln als davon-Zeilen mit Herkunft (' + teile.length + ')');
+ok(teile.map((x) => x.herkunft).join() === 'je Gemeinde,je Gemeinde,Bundesschnitt,Landesmittel', 'Herkunft je Gemeinde / Bundesschnitt / Landesmittel');
+ok(ue.eur === teile.reduce((s, x) => s + x.eur, 0), 'Übrige Nebenkosten = Summe der Posten (' + ue.eur + ' €)');
+ok(AUp[AUp.length - 1].summe && AUp.filter((x) => !x.teil && !x.summe).reduce((s, x) => s + x.eur, 0) - AUp[AUp.length - 1].eur <= 2, 'Summe im Monat ohne doppelte Posten');
+const mitU = K.kern({ kaufpreis: 310000, wfl: 140, baujahr: 1998, objektart: 'efh', ek: 100000, netto: 5200, zins_pct: 4.09, grest_pct: 6.5, vergleichsmiete_qm: 7.30,
+  nebenkosten_qm: { wert: 0.95, posten: POSTEN }, betriebskosten_monat: 210 });
+ok(!mitU.leistbarkeit.aufstellung.some((x) => x.teil), 'Unterlagen ersetzen die Posten');
+const ohneP = K.kern({ kaufpreis: 310000, wfl: 140, baujahr: 1998, objektart: 'efh', ek: 100000, zins_pct: 4.09, grest_pct: 6.5, vergleichsmiete_qm: 7.30 });
+ok(!ohneP.leistbarkeit.aufstellung.some((x) => x.teil), 'Pauschale ohne Posten');
+
 /* 4 · MFH abgewiesen */
 const mfh = K.kern({ kaufpreis: 600000, wfl: 400, baujahr: 1970, objektart: 'mfh' });
 ok(mfh.ok === false && mfh.grund === 'mfh' && /Vermieten/.test(mfh.hinweis), 'MFH mit Hinweis Modus Vermieten');

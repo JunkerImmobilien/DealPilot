@@ -8,6 +8,17 @@ const KERN = './frontend/js/rnd-calc.js';
 const TAB = './frontend/js/rnd-gnd-table.js';
 const EXPORT = (process.argv[2] || './Dateien/API-Export/portfolio-20261010-1045.json');
 
+/* pp6 (26.11.2026) · Der Export liegt bewusst nicht im Repo (echte Objekte). In einem frischen Worktree
+   fehlt er. Dann NICHT grün und NICHT rot mit Stacktrace, sondern RC 2 „nicht geprüft“ mit Weg dorthin
+   (Memory pruefer-der-gruen-wird: ein Prüfer, der nichts prüfen konnte, darf nicht grün melden). */
+if (!fs.existsSync(EXPORT)) {
+  console.error('\n  NICHT GEPRÜFT: Export fehlt (' + EXPORT + ').');
+  console.error('  Pfad als Argument angeben: node tools/rnd-eingabe-pruefen.mjs <pfad/zum/portfolio-export.json>');
+  console.error('  Der Export liegt nur im Haupt-Arbeitsbaum unter Dateien/API-Export/ (nicht im Repo, echte Objekte).');
+  console.error('  RC 2 = nicht geprüft, weder sauber noch Fehler.\n');
+  process.exit(2);
+}
+
 const ctx = { window: {}, console };
 ctx.globalThis = ctx;
 vm.createContext(ctx);
