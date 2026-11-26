@@ -1,0 +1,426 @@
+{
+ "ags": "08226037",
+ "freigabe": "gesperrt",
+ "freigabe_grund": "Gemeinsamer Gutachterausschuss Südwestlicher Rhein-Neckar-Kreis: „Irrtum vorbehalten. Alle Rechte vorbehalten. Diese Mietübersicht ist urheberrechtlich geschützt. … Eine nicht kommerzielle, nur auszugsweise Vervielfältigung jeder Art ist nur mit Quellenangabe bei Übersendung eines Belegexemplars gestattet.“ (S. 2). Rechtevorbehalt ohne ausdrückliches Speicherverbot, auf Prod gesperrt bis zur Klärung",
+ "gemeinde": "Ketsch",
+ "haus": {"regel":"orientierung","gilt_fuer":["efh"],"gilt_fuer_herkunft":"wortlaut","hinweis":"Zu Einfamilienhäusern lagen nur 21 Fragebögen vor; der Mietrechner kann als Orientierungshilfe herangezogen werden.","beleg":"S. 10 Kapitel 4"},
+ "art": "einfach",
+ "stand": "2025-10-10",
+ "erhebungsstichtag": "2024-09-30",
+ "gueltig_ab": "2025-09-29",
+ "gueltig_bis": null,
+ "naechste_ausgabe": null,
+ "quelle": {
+  "url": "https://www.hockenheim.de/site/Hockenheim/get/params_E639528925_Dattachment/1628441/Mietu%CC%88bersicht%20als%20Mietspiegel%20anerkannt.pdf",
+  "dokument": "Mietübersicht und -rechner zur ortsüblichen Vergleichsmiete 2025, als einfacher Mietspiegel anerkannt, Stand 10.10.2025 (Version 2), Gemeinsamer Gutachterausschuss Südwestlicher Rhein-Neckar-Kreis",
+  "seite": "2–3, 10–22",
+  "lizenz": "„Alle Rechte vorbehalten. Diese Mietübersicht ist urheberrechtlich geschützt.“ (S. 2), kein Speicherverbot, geprüft am 26.11.2026",
+  "abgerufen": "2026-11-26"
+ },
+ "einheit": "eur_qm_nettokalt",
+ "form": "regression",
+ "rundung": 2,
+ "hinweis": "Mietrechner mit Punkten (S. 11–20): 82 Basispunkte, jeder Punkt = 0,10 €/m² (S. 11), Summe = durchschnittliche ortsübliche Vergleichsmiete; als Regression mit Basis 8,20 €/m² und Zuschlägen in €/m² (Punkte × 0,10) abgelegt. Spanne +19 %/−18 % (S. 21–22). Gilt für die zehn Gemeinden des Ausschusses, als einfacher Mietspiegel von Ketsch per Gemeinderatsbeschluss vom 29.09.2025 anerkannt (S. 3); Neulußheim und Reilingen haben nicht anerkannt. Baujahr hat laut S. 22 keinen nachweisbaren Einfluss. Merkmal 5.1 (unter 50 m²) setzt eine Küchenzeile voraus, die laut S. 17 Standard ist. Ausschlüsse: 2.2 bis 2.4 nur eines; 4.1 schließt 4.2.1 bis 4.2.5 aus; 4.2.1 nicht zusammen mit 4.2.2; 5.15 oder 5.16. 2.2 bis 2.4, 2.9 und 3.3 sind Höchstwerte (S. 12, 13, 15). Auswertungszeitraum 01.10.2018 bis 30.09.2024 (S. 2, 23). Das Dokument enthält kein Rechenbeispiel, die Prüfbeispiele folgen dem Rechenweg S. 11 und 20.",
+ "regression": {
+  "basis_eur_qm": 8.2,
+  "verknuepfung": "summe",
+  "faktoren": [
+   {
+    "merkmal": "wfl",
+    "label": "Wohnfläche (Merkmale 5.1 und 5.2)",
+    "typ": "wfl_kurve",
+    "art": "eur_qm",
+    "werte": [
+     {
+      "von": 0,
+      "bis": 50,
+      "bis_inkl": false,
+      "wert": 1.2,
+      "label": "unter 50 m² mit Küchenzeile (5.1: 12 Punkte)"
+     },
+     {
+      "von": 50,
+      "bis": 110,
+      "wert": 0,
+      "label": "50 bis 110 m²"
+     },
+     {
+      "von": 110,
+      "von_inkl": false,
+      "bis": null,
+      "wert": 0.2,
+      "label": "über 110 m² (5.2: 2 Punkte)"
+     }
+    ],
+    "beleg": "S. 16 Merkmale 5.1, 5.2"
+   },
+   {
+    "merkmal": "nachfragelage",
+    "label": "2.1 stark nachgefragte Wohnlage (Straßenliste Anlage 1) (+12 Punkte)",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 1.2,
+    "beleg": "S. 11, 19, 24 Merkmal 2.1; S. 19–20 Berechnungsbogen"
+   },
+   {
+    "merkmal": "laerm_bundesstrasse_bahn",
+    "label": "2.2 direkt an Bundesstraße, Autobahn oder Bahn-/Straßenbahnlinie, Räume zur Quelle (Höchstwert) (-4 Punkte)",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": -0.4,
+    "beleg": "S. 11 Merkmal 2.2; S. 19–20 Berechnungsbogen"
+   },
+   {
+    "merkmal": "hauptdurchgangsstrasse",
+    "label": "2.3 an innerörtlicher Hauptdurchgangsstraße, Räume dorthin (Höchstwert) (-3 Punkte)",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": -0.3,
+    "beleg": "S. 11 Merkmal 2.3; S. 19–20 Berechnungsbogen"
+   },
+   {
+    "merkmal": "andere_immissionsquelle",
+    "label": "2.4 an anderer Immissionsquelle, Räume dorthin (Höchstwert) (-3 Punkte)",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": -0.3,
+    "beleg": "S. 11 Merkmal 2.4; S. 19–20 Berechnungsbogen"
+   },
+   {
+    "merkmal": "geschaefte_400m",
+    "label": "2.5 Geschäfte des täglichen Bedarfs bis 400 m Fußweg (+1 Punkte)",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.1,
+    "beleg": "S. 11 Merkmal 2.5; S. 19–20 Berechnungsbogen"
+   },
+   {
+    "merkmal": "bahnhof_500m",
+    "label": "2.6 Bahnhof bis 500 m Fußweg (+2 Punkte)",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.2,
+    "beleg": "S. 11 Merkmal 2.6; S. 19–20 Berechnungsbogen"
+   },
+   {
+    "merkmal": "haltestelle_300m",
+    "label": "2.7 Bus-/Straßenbahnhaltestelle bis 300 m Fußweg (+1 Punkte)",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.1,
+    "beleg": "S. 12 Merkmal 2.7; S. 19–20 Berechnungsbogen"
+   },
+   {
+    "merkmal": "kita_schule_400m",
+    "label": "2.8 Kindergarten/Grundschule bis 400 m Fußweg (+1 Punkte)",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.1,
+    "beleg": "S. 12 Merkmal 2.8; S. 19–20 Berechnungsbogen"
+   },
+   {
+    "merkmal": "einfache_wohnlage",
+    "label": "2.9 Gebietscharakter einfache Wohnlage (Höchstwert) (-4 Punkte)",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": -0.4,
+    "beleg": "S. 12 Merkmal 2.9; S. 19–20 Berechnungsbogen"
+   },
+   {
+    "merkmal": "ueber_5_geschosse_ohne_aufzug",
+    "label": "3.1 mehr als 5 Geschosse, kein Fahrstuhl (-2 Punkte)",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": -0.2,
+    "beleg": "S. 14 Merkmal 3.1; S. 19–20 Berechnungsbogen"
+   },
+   {
+    "merkmal": "fahrradraum",
+    "label": "3.2 komfortabler, geschützter Fahrradraum (+3 Punkte)",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.3,
+    "beleg": "S. 14 Merkmal 3.2; S. 19–20 Berechnungsbogen"
+   },
+   {
+    "merkmal": "gebaeude_ungepflegt",
+    "label": "3.3 Gebäude ungepflegt und veraltet (Höchstwert) (-3 Punkte)",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": -0.3,
+    "beleg": "S. 14 Merkmal 3.3; S. 19–20 Berechnungsbogen"
+   },
+   {
+    "merkmal": "videogegensprechanlage",
+    "label": "3.4 Video-Gegensprechanlage (+1 Punkte)",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.1,
+    "beleg": "S. 14 Merkmal 3.4; S. 19–20 Berechnungsbogen"
+   },
+   {
+    "merkmal": "energie_bis_75_kwh",
+    "label": "4.1 Energieausweis bis 75 kWh/(m²a) (schließt 4.2.1 bis 4.2.5 aus) (+18 Punkte)",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 1.8,
+    "beleg": "S. 15 Merkmal 4.1; S. 19–20 Berechnungsbogen"
+   },
+   {
+    "merkmal": "fenster_nach_2002",
+    "label": "4.2.1 Fenster nach 2002 vollständig getauscht (+1 Punkte)",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.1,
+    "beleg": "S. 15 Merkmal 4.2.1; S. 19–20 Berechnungsbogen"
+   },
+   {
+    "merkmal": "fenster_nach_2016",
+    "label": "4.2.2 Fenster nach 2016 vollständig getauscht (nicht zusammen mit 4.2.1) (+3 Punkte)",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.3,
+    "beleg": "S. 15 Merkmal 4.2.2; S. 19–20 Berechnungsbogen"
+   },
+   {
+    "merkmal": "fassadendaemmung",
+    "label": "4.2.3 Fassade vollständig gedämmt oder Baujahr nach 2002 (+3 Punkte)",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.3,
+    "beleg": "S. 15 Merkmal 4.2.3; S. 19–20 Berechnungsbogen"
+   },
+   {
+    "merkmal": "dach_gedaemmt_dg",
+    "label": "4.2.4 nur DG-Wohnung: Dach nach 2002 gedämmt, Dachfenster erneuert (+2 Punkte)",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.2,
+    "beleg": "S. 15 Merkmal 4.2.4; S. 19–20 Berechnungsbogen"
+   },
+   {
+    "merkmal": "kellerdecke_gedaemmt_eg",
+    "label": "4.2.5 nur EG-Wohnung: Kellerdecke gedämmt (+2 Punkte)",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.2,
+    "beleg": "S. 15 Merkmal 4.2.5; S. 19–20 Berechnungsbogen"
+   },
+   {
+    "merkmal": "fussbodenheizung",
+    "label": "4.3 flüssigkeitsführende Fußbodenheizung in der ganzen Wohnung (+3 Punkte)",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.3,
+    "beleg": "S. 15 Merkmal 4.3; S. 19–20 Berechnungsbogen"
+   },
+   {
+    "merkmal": "smarte_thermostate",
+    "label": "4.4 elektrische (smarte) Heizkörperthermostate (+1 Punkte)",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.1,
+    "beleg": "S. 15 Merkmal 4.4; S. 19–20 Berechnungsbogen"
+   },
+   {
+    "merkmal": "nachtspeicher_elektro_fbh",
+    "label": "4.5 elektrische Fußbodenheizung oder Nachtspeicheröfen (-3 Punkte)",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": -0.3,
+    "beleg": "S. 16 Merkmal 4.5; S. 19–20 Berechnungsbogen"
+   },
+   {
+    "merkmal": "boiler_aelter_15",
+    "label": "4.6 Warmwasser über Boiler älter als 15 Jahre (-2 Punkte)",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": -0.2,
+    "beleg": "S. 16 Merkmal 4.6; S. 19–20 Berechnungsbogen"
+   },
+   {
+    "merkmal": "gasetagentherme",
+    "label": "4.7 Gasetagentherme (+2 Punkte)",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.2,
+    "beleg": "S. 16 Merkmal 4.7; S. 19–20 Berechnungsbogen"
+   },
+   {
+    "merkmal": "unbeheizte_raeume",
+    "label": "4.8 unbeheizte oder nur mit Heizlüftern beheizte Räume (-3 Punkte)",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": -0.3,
+    "beleg": "S. 16 Merkmal 4.8; S. 19–20 Berechnungsbogen"
+   },
+   {
+    "merkmal": "lueftungsanlage_wrg",
+    "label": "4.9 kontrollierte Wohnungslüftung mit Wärmetauscher (+2 Punkte)",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.2,
+    "beleg": "S. 16 Merkmal 4.9; S. 19–20 Berechnungsbogen"
+   },
+   {
+    "merkmal": "drei_zimmer_unter_100",
+    "label": "5.3 drei oder mehr Zimmer, weniger als 100 m² (+3 Punkte)",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.3,
+    "beleg": "S. 16 Merkmal 5.3; S. 19–20 Berechnungsbogen"
+   },
+   {
+    "merkmal": "gefangener_raum",
+    "label": "5.4 Grundriss entspricht nicht heutigen Anforderungen (Durchgangszimmer, Raum unter 7 m², innenliegende Räume) (-3 Punkte)",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": -0.3,
+    "beleg": "S. 16 Merkmal 5.4; S. 19–20 Berechnungsbogen"
+   },
+   {
+    "merkmal": "kein_balkon",
+    "label": "5.5 weder Balkon noch Terrasse (-2 Punkte)",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": -0.2,
+    "beleg": "S. 16 Merkmal 5.5; S. 19–20 Berechnungsbogen"
+   },
+   {
+    "merkmal": "wohnungstuer_nach_2004",
+    "label": "5.6 Wohnungseingangstür nach 2004 erneuert (+1 Punkte)",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.1,
+    "beleg": "S. 16 Merkmal 5.6; S. 19–20 Berechnungsbogen"
+   },
+   {
+    "merkmal": "innenausstattung_einfach",
+    "label": "5.7 Innenausstattung sehr einfach/veraltet oder Mieter muss renovieren (-4 Punkte)",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": -0.4,
+    "beleg": "S. 16 Merkmal 5.7; S. 19–20 Berechnungsbogen"
+   },
+   {
+    "merkmal": "innenausstattung_hochwertig",
+    "label": "5.8 Innenausstattung besonders hochwertig, Topzustand (+2 Punkte)",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.2,
+    "beleg": "S. 17 Merkmal 5.8; S. 19–20 Berechnungsbogen"
+   },
+   {
+    "merkmal": "bad_modernisiert",
+    "label": "5.9 Bad in den letzten 10 Jahren grundlegend modernisiert (+6 Punkte)",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.6,
+    "beleg": "S. 17 Merkmal 5.9; S. 19–20 Berechnungsbogen"
+   },
+   {
+    "merkmal": "wc_separat",
+    "label": "5.10 Toilette nicht im Bad, separat (-3 Punkte)",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": -0.3,
+    "beleg": "S. 17 Merkmal 5.10; S. 19–20 Berechnungsbogen"
+   },
+   {
+    "merkmal": "nur_badewanne",
+    "label": "5.11 nur Badewanne, keine Dusche (-2 Punkte)",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": -0.2,
+    "beleg": "S. 17 Merkmal 5.11; S. 19–20 Berechnungsbogen"
+   },
+   {
+    "merkmal": "badewanne_und_dusche",
+    "label": "5.12 Badewanne und Dusche (+2 Punkte)",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.2,
+    "beleg": "S. 17 Merkmal 5.12; S. 19–20 Berechnungsbogen"
+   },
+   {
+    "merkmal": "gaeste_wc",
+    "label": "5.13 zusätzliche Gästetoilette (+2 Punkte)",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.2,
+    "beleg": "S. 17 Merkmal 5.13; S. 19–20 Berechnungsbogen"
+   },
+   {
+    "merkmal": "handtuchheizkoerper",
+    "label": "5.14 Handtuchheizkörper (+1 Punkte)",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.1,
+    "beleg": "S. 17 Merkmal 5.14; S. 19–20 Berechnungsbogen"
+   },
+   {
+    "merkmal": "einbaukueche",
+    "label": "5.15/5.16 Küche mit Mindestausstattung bis 10 Jahre oder hochwertige Küche bis 15 Jahre (nur einmal) (+5 Punkte)",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.5,
+    "beleg": "S. 17 Merkmal 5.15/5.16; S. 19–20 Berechnungsbogen"
+   },
+   {
+    "merkmal": "elektrik_ab_2011",
+    "label": "5.17 Elektrik ab 2011 komplett erneuert (+3 Punkte)",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.3,
+    "beleg": "S. 17 Merkmal 5.17; S. 19–20 Berechnungsbogen"
+   },
+   {
+    "merkmal": "e_check",
+    "label": "5.18 Elektrik nicht modernisiert, E-Check mit ausgeführten Anpassungen (+1 Punkte)",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.1,
+    "beleg": "S. 17 Merkmal 5.18; S. 19–20 Berechnungsbogen"
+   }
+  ],
+  "spanne": {
+   "unten_pct": -18,
+   "oben_pct": 19
+  },
+  "beleg": "S. 11 (82 Basispunkte = 8,20 €/m²), S. 19–20 Berechnungsbogen, S. 21–22 Spanne"
+ },
+ "pruefbeispiele": [
+  {
+   "eingabe": {
+    "baujahr": 1970,
+    "wfl": 70
+   },
+   "erwartet": {
+    "unten": 6.72,
+    "mittel": 8.2,
+    "oben": 9.76
+   },
+   "seite": "11, 22",
+   "art": "rechenweg",
+   "anmerkung": "nur Basispunkte: 82 × 0,10 = 8,20 €; −18 %/+19 %"
+  },
+  {
+   "eingabe": {
+    "baujahr": 1970,
+    "wfl": 45,
+    "merkmale": {
+     "bad_modernisiert": true,
+     "kein_balkon": true
+    }
+   },
+   "erwartet": {
+    "unten": 8.04,
+    "mittel": 9.8,
+    "oben": 11.66
+   },
+   "seite": "16–20",
+   "art": "rechenweg",
+   "anmerkung": "82 + 12 (5.1) + 6 (5.9) − 2 (5.5) = 98 Punkte = 9,80 €"
+  }
+ ]
+}
