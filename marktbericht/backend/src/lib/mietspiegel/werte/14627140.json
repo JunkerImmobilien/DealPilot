@@ -1,0 +1,373 @@
+{
+ "ags": "14627140",
+ "gemeinde": "Meißen",
+ "haus": {
+  "regel": "ausgeschlossen",
+  "beleg": "PDF S. 2 Art der Wohnung: „Für Ein- und Zweifamilienhäuser liegen keine ausreichenden Datenmengen vor. Der Mietspiegel gilt daher nur für Wohnungen in Mehrfamilienhäusern.“"
+ },
+ "art": "einfach",
+ "stand": "2025-07-01",
+ "erhebungsstichtag": null,
+ "gueltig_ab": "2025-07-01",
+ "gueltig_bis": "2027-06-30",
+ "quelle": {
+  "url": "https://www.stadt-meissen.de/de/datei/anzeigen/id/41609,24/mietspiegel_fortgeschrieben_01_07_2025.pdf",
+  "dokument": "Mietspiegel der Großen Kreisstadt Meißen für nicht preisgebundene Wohnungen, gültig ab 01.07.2023, fortgeschrieben bis zum 30.06.2027",
+  "seite": "PDF S. 4 Mietspiegeltabelle, S. 1–3 Erstellung, § 558c, Größe, Baualter, Ausstattung, Wohnlage, Inkrafttreten, S. 5 Anlage 1 Punktetabelle, ab S. 6 Anlage 2 Wohnlageverzeichnis",
+  "lizenz": "kein Rechtevorbehalt und kein Speicherverbot im Dokument (alle 8 Seiten durchgesehen, 26.11.2026); amtliche Veröffentlichung der Großen Kreisstadt Meißen",
+  "abgerufen": "2026-11-26"
+ },
+ "einheit": "eur_qm_nettokalt",
+ "form": "tabelle",
+ "rundung": 2,
+ "hinweis": "Mietspiegel nach § 558c BGB (einfach), gemeinsam erstellt von Mieterverein Meißen und Umgebung (DMB), Interessengemeinschaft Haus- und Grundstückseigentümer des Kreises Meißen, Wohnungsunternehmen und Stadtverwaltung; Mietspiegel 2023 fortgeschrieben, in Kraft 01.07.2025, gültig bis 30.06.2027 (veröffentlicht im Amtsblatt 05.06.2025). Tabelle S. 4 am Druckbild gelesen (die Textschicht ordnet die Spalten falsch zu). Spalten A/B/C nach Punktsumme der Anlage 1 (Wohnlage und Wohnumfeld max. 12, Ausstattung max. 21, Energiekennwert max. 6 Punkte): A = 39 bis 22, B = 21 bis 15, C = 14 bis 0 Punkte – als Ausstattung angeben, kein Standard; die Punkte selbst rechnet DealPilot nicht. Felder mit * (keine ausreichende Datengrundlage) nicht eingetragen; drei Felder sind kursiv gesetzt (ab 03.10.1990, 45,01–60 m² A und B, 60,01–90 m² B), ohne Erklärung im Dokument. Baualter: bis 1948 / 1949–02.10.1990 / ab 03.10.1990; DealPilot kennt nur das Jahr und ordnet 1990 der mittleren Klasse zu. Nur Wohnungen mit Bad, WC und Zentral-/Etagenheizung (S. 2).",
+ "tabelle": {
+  "achsen": {
+   "baujahr": [
+    {
+     "von": null,
+     "bis": 1948,
+     "label": "bis 1948"
+    },
+    {
+     "von": 1949,
+     "bis": 1990,
+     "label": "ab 1949 bis 02.10.1990"
+    },
+    {
+     "von": 1991,
+     "bis": null,
+     "label": "ab 03.10.1990"
+    }
+   ],
+   "wfl": [
+    {
+     "von": null,
+     "bis": 45,
+     "label": "bis 45,00 m²"
+    },
+    {
+     "von": 45,
+     "von_inkl": false,
+     "bis": 60,
+     "label": "45,01 bis 60,00 m²"
+    },
+    {
+     "von": 60,
+     "von_inkl": false,
+     "bis": 90,
+     "label": "60,01 bis 90,00 m²"
+    },
+    {
+     "von": 90,
+     "von_inkl": false,
+     "bis": null,
+     "label": "ab 90,01 m²"
+    }
+   ],
+   "ausstattung": [
+    {
+     "schluessel": "A",
+     "label": "A: 39 bis 22 Punkte (Anlage 1)"
+    },
+    {
+     "schluessel": "B",
+     "label": "B: 21 bis 15 Punkte"
+    },
+    {
+     "schluessel": "C",
+     "label": "C: 14 bis 0 Punkte"
+    }
+   ]
+  },
+  "zellen": [
+   {
+    "baujahr": 0,
+    "wfl": 0,
+    "ausstattung": "A",
+    "unten": 4.99,
+    "mittel": 6.82,
+    "oben": 9.56,
+    "seite": "4"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 0,
+    "ausstattung": "B",
+    "unten": 4.92,
+    "mittel": 5.87,
+    "oben": 9.6,
+    "seite": "4"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 0,
+    "ausstattung": "C",
+    "unten": 4.2,
+    "mittel": 5.87,
+    "oben": 8.3,
+    "seite": "4"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 1,
+    "ausstattung": "A",
+    "unten": 5.0,
+    "mittel": 6.47,
+    "oben": 9.5,
+    "seite": "4"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 1,
+    "ausstattung": "B",
+    "unten": 4.21,
+    "mittel": 5.85,
+    "oben": 7.04,
+    "seite": "4"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 1,
+    "ausstattung": "C",
+    "unten": 4.25,
+    "mittel": 5.55,
+    "oben": 6.87,
+    "seite": "4"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 2,
+    "ausstattung": "A",
+    "unten": 4.9,
+    "mittel": 5.55,
+    "oben": 6.42,
+    "seite": "4"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 2,
+    "ausstattung": "B",
+    "unten": 4.8,
+    "mittel": 5.64,
+    "oben": 7.79,
+    "seite": "4"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 2,
+    "ausstattung": "C",
+    "unten": 4.65,
+    "mittel": 5.52,
+    "oben": 6.51,
+    "seite": "4"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 3,
+    "ausstattung": "A",
+    "unten": 5.0,
+    "mittel": 5.76,
+    "oben": 6.2,
+    "seite": "4"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 3,
+    "ausstattung": "B",
+    "unten": 4.8,
+    "mittel": 5.54,
+    "oben": 6.11,
+    "seite": "4"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 3,
+    "ausstattung": "C",
+    "unten": 4.8,
+    "mittel": 5.59,
+    "oben": 6.67,
+    "seite": "4"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 0,
+    "ausstattung": "A",
+    "unten": 5.0,
+    "mittel": 6.37,
+    "oben": 7.2,
+    "seite": "4"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 0,
+    "ausstattung": "B",
+    "unten": 4.43,
+    "mittel": 5.9,
+    "oben": 7.24,
+    "seite": "4"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 0,
+    "ausstattung": "C",
+    "unten": 5.5,
+    "mittel": 5.91,
+    "oben": 6.26,
+    "seite": "4"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 1,
+    "ausstattung": "A",
+    "unten": 4.75,
+    "mittel": 5.9,
+    "oben": 7.4,
+    "seite": "4"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 1,
+    "ausstattung": "B",
+    "unten": 4.55,
+    "mittel": 5.67,
+    "oben": 7.2,
+    "seite": "4"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 1,
+    "ausstattung": "C",
+    "unten": 4.59,
+    "mittel": 5.36,
+    "oben": 6.17,
+    "seite": "4"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 2,
+    "ausstattung": "A",
+    "unten": 4.89,
+    "mittel": 6.05,
+    "oben": 7.41,
+    "seite": "4"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 2,
+    "ausstattung": "B",
+    "unten": 4.7,
+    "mittel": 5.84,
+    "oben": 7.54,
+    "seite": "4"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 2,
+    "ausstattung": "C",
+    "unten": 5.07,
+    "mittel": 5.67,
+    "oben": 5.97,
+    "seite": "4"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 3,
+    "ausstattung": "A",
+    "unten": 5.53,
+    "mittel": 6.46,
+    "oben": 7.17,
+    "seite": "4"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 1,
+    "ausstattung": "A",
+    "unten": 4.8,
+    "mittel": 6.12,
+    "oben": 7.9,
+    "seite": "4",
+    "anmerkung": "im Dokument kursiv gesetzt (ohne Erläuterung)"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 1,
+    "ausstattung": "B",
+    "unten": 5.3,
+    "mittel": 6.06,
+    "oben": 6.9,
+    "seite": "4",
+    "anmerkung": "im Dokument kursiv gesetzt (ohne Erläuterung)"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 2,
+    "ausstattung": "A",
+    "unten": 5.0,
+    "mittel": 7.68,
+    "oben": 10.4,
+    "seite": "4"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 2,
+    "ausstattung": "B",
+    "unten": 5.4,
+    "mittel": 6.06,
+    "oben": 7.95,
+    "seite": "4",
+    "anmerkung": "im Dokument kursiv gesetzt (ohne Erläuterung)"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 3,
+    "ausstattung": "A",
+    "unten": 7.55,
+    "mittel": 9.41,
+    "oben": 10.98,
+    "seite": "4"
+   }
+  ]
+ },
+ "pruefbeispiele": [
+  {
+   "eingabe": {
+    "baujahr": 1975,
+    "wfl": 70,
+    "ausstattung": "B"
+   },
+   "erwartet": {
+    "unten": 4.7,
+    "mittel": 5.84,
+    "oben": 7.54
+   },
+   "seite": "4",
+   "art": "tabellenzelle"
+  },
+  {
+   "eingabe": {
+    "baujahr": 2000,
+    "wfl": 95,
+    "ausstattung": "A"
+   },
+   "erwartet": {
+    "unten": 7.55,
+    "mittel": 9.41,
+    "oben": 10.98
+   },
+   "seite": "4",
+   "art": "tabellenzelle"
+  },
+  {
+   "eingabe": {
+    "baujahr": 2000,
+    "wfl": 40,
+    "ausstattung": "A"
+   },
+   "erwartet": null,
+   "seite": "4",
+   "art": "tabellenzelle",
+   "anmerkung": "Feld * ohne Datengrundlage"
+  }
+ ]
+}
