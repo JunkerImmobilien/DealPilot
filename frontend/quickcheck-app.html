@@ -6197,13 +6197,20 @@ const QcApp = (function() {
          können, ist das ein Potenzial - da eine Karte wäre top.“ Drei Balken wie die Mietleiter
          (potenzial.js): Ist · in drei Jahren zulässig (Kappung, höchstens Marktmiete) · bei Neuvermietung
          (Marktmiete der Bewertung). Nur wenn die Ist-Miete darunter liegt; gerechnet hat _qcMietpotenzial. */
-      if (!leer && mp && Math.max(mp.markt_monat || 0, mp.grenze_monat || 0) >= wohn + 1) {   /* v3356 · C2: auch das Maximum zählt · v3670: Wohnung */
+      /* v5140 · OO6 · mit Vergleichsmiete aus der gemeinsamen Kette (Mietspiegel bzw. Naeherung) ist die Neuvermietung
+         mp.neu.monat (Vergleichsmiete x 1,10 bzw. x 1,20), der Angebots-Durchschnitt faellt weg */
+      const kette = !!(mp && mp.vgl_herkunft && mp.neu && mp.neu.monat > 0);
+      const neuMon = kette ? mp.neu.monat : (mp ? mp.markt_monat : 0);
+      if (!leer && mp && Math.max(neuMon || 0, kette ? 0 : (mp.grenze_monat || 0)) >= wohn + 1) {   /* v3356 · C2: auch das Maximum zählt · v3670: Wohnung */
         const z3 = (mp.zul && mp.zul.miete_monat > 0) ? mp.zul.miete_monat : null;   /* v3670: Wohnung, ohne Zusatzeinnahmen */
         const balken = [{ c: 'ist', t: 'Ist heute', v: wohn }];
         if (z3 != null && z3 > wohn + 0.5) balken.push({ c: 'soll', t: 'in 3 Jahren zulässig', v: z3 });
+        if (kette) { if (neuMon >= wohn + 1) balken.push({ c: 'markt', t: 'Neuvermietung', v: neuMon }); }
+        else {
         if (mp.markt_monat >= wohn + 1) balken.push({ c: 'markt', t: 'Neuvermietung Durchschnitt', v: mp.markt_monat });
         /* v3356 · C2: das Maximum bei Neuvermietung (Vergleichsmiete × 1,2 ohne Bremse, × 1,1 mit Bremse) */
         if (mp.grenze_monat > Math.max(wohn, mp.markt_monat) + 0.5) balken.push({ c: 'markt', t: 'Neuvermietung Maximum', v: mp.grenze_monat });
+        }
         const max = Math.max.apply(null, balken.map(b => b.v));
         const jahr = x => e0(x * 12);
         h += `<div class="qcb-box qcb-pot"><span class="qcb-l">Mietpotenzial</span><div class="qcb-bal">`
@@ -6211,11 +6218,13 @@ const QcApp = (function() {
             + `<span class="qcb-bar" style="height:${Math.max(10, Math.round(b.v / max * 90))}px"></span><i>${b.t}</i></div>`).join('')
           + `</div><p class="qcb-fuss" style="color:#2A2727;font-size:12.5px">`
           + (z3 != null && z3 > wohn + 0.5
-              ? 'Im laufenden Mietverhältnis: bis <b>' + e0(z3) + '</b> in drei Jahren (+' + jahr(z3 - wohn) + ' im Jahr), begrenzt durch ' + (mp.zul.grund === 'kappung' ? 'die Kappungsgrenze von ' + mp.kapp.pct + ' %' : 'die Marktmiete') + '. '
+              ? 'Im laufenden Mietverhältnis: bis <b>' + e0(z3) + '</b> in drei Jahren (+' + jahr(z3 - wohn) + ' im Jahr), begrenzt durch ' + (mp.zul.grund === 'kappung' ? 'die Kappungsgrenze von ' + mp.kapp.pct + ' %' : (kette ? 'die Vergleichsmiete' : 'die Marktmiete')) + '. '
               : '')
-          + 'Bei einem Mieterwechsel: <b>' + e0(mp.markt_monat) + '</b> (+' + jahr(mp.markt_monat - wohn) + ' im Jahr).'
+          + (neuMon >= wohn + 1 ? 'Bei einem Mieterwechsel: <b>' + e0(neuMon) + '</b> (+' + jahr(neuMon - wohn) + ' im Jahr).' : '')
           + (zus > 0 ? ' Alle Beträge für die Wohnung, ohne Stellplatz, Küche und Sonstiges (' + e0(zus) + ' im Monat).' : '')   /* v3670 */
-          + '</p><p class="qcb-fuss">Vergleichsgröße ist die Marktmiete der DealPilot-Bewertung als Annahme für die ortsübliche Miete. Wann die letzte Erhöhung war, sehen wir nicht, vor einer Erhöhung prüfen (§ 558 Abs. 1 BGB: frühestens 15 Monate nach der letzten).</p></div>';
+          + '</p><p class="qcb-fuss">' + (kette
+              ? 'Vergleichsmiete ' + String(mp.vgl_qm.toFixed(2)).replace('.', ',') + ' €/m²: ' + esc(mp.vgl_herkunft) + (mp.vgl_genauigkeit ? ' (' + esc(mp.vgl_genauigkeit) + ')' : '') + '. ' + esc(mp.neu.text) + '. '
+              : 'Vergleichsgröße ist die Marktmiete der DealPilot-Bewertung als Annahme für die ortsübliche Miete. ') + 'Wann die letzte Erhöhung war, sehen wir nicht, vor einer Erhöhung prüfen (§ 558 Abs. 1 BGB: frühestens 15 Monate nach der letzten).</p></div>';
       }
     }
 
