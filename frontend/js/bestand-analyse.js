@@ -420,7 +420,8 @@
   var _laedt = false;
   function mountAll() {
     if (!global.document) return;
-    var hs = global.document.querySelectorAll('[data-dp-bestand]');
+    /* v5050 · nur die beiden Platzhalter, nie ein Attribut am <html> (v5020 setzte dort data-dp-bestand, mountAll schrieb das ganze Dokument neu) */
+    var hs = global.document.querySelectorAll('div[data-dp-bestand="exit"], div[data-dp-bestand="anschluss"]');
     for (var i = 0; i < hs.length; i++) {
       var art = hs[i].getAttribute('data-dp-bestand');
       try { hs[i].innerHTML = art === 'exit' ? exitHtml() : anschlussHtml(); } catch (e) { hs[i].innerHTML = ''; }

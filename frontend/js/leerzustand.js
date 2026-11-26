@@ -20,7 +20,7 @@
  *
  * Gesteuert nur über Attribute am <html>, nie per Inline-Stil (v1935d):
  *   data-dp-objekte = "0" | "n"        aus storage.js _dpBestandMelden (dieselbe Listenabfrage wie die Karten)
- *   data-dp-bestand = "0" | "1"        dito
+ *   data-dp-lz-bestand = "0" | "1"        dito
  *   data-dp-obj-phase = "ankauf" | "bestand" | ""   das geladene Objekt (gewonnen = Bestand)
  * Einstellungen, Deal-Check, Marktbericht, Import und Neues Objekt bleiben immer erreichbar.
  */
@@ -54,7 +54,7 @@
   }
   function melden(n, bestand) {
     H.setAttribute('data-dp-objekte', n > 0 ? 'n' : '0');
-    H.setAttribute('data-dp-bestand', bestand ? '1' : '0');
+    H.setAttribute('data-dp-lz-bestand', bestand ? '1' : '0');
   }
 
   (function stil() {
@@ -64,7 +64,7 @@
        ab 1025 px steht das Register in der .dpl-schiene (#sb-actions-accordion) */
     var P = ['html[data-dp-objekte="0"] body #sidebar ', 'html[data-dp-objekte="0"] body #sb-actions-accordion ', 'html[data-dp-objekte="0"] body '];
     var aus = P.map(function (p) { return p + '.sb-act-item.sb-act-ausgeben,' + p + '.sb-act-section-title.sb-act-ausgeben'; }).join(',');
-    var Q = ['html[data-dp-bestand="0"] body #sidebar ', 'html[data-dp-bestand="0"] body #sb-actions-accordion ', 'html[data-dp-bestand="0"] body '];
+    var Q = ['html[data-dp-lz-bestand="0"] body #sidebar ', 'html[data-dp-lz-bestand="0"] body #sb-actions-accordion ', 'html[data-dp-lz-bestand="0"] body '];
     var tr = Q.map(function (p) { return p + ".sb-act-item[onclick=\"sbActionsAction('trackrec')\"]"; }).join(',');
     s.textContent = aus + ',' + tr + '{display:none !important}'
       /* Reiter Steuer im Ankauf */
