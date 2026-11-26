@@ -1,0 +1,198 @@
+{
+ "ags": "15084355",
+ "gemeinde": "Naumburg (Saale)",
+ "haus": {
+  "regel": "ausgeschlossen",
+  "beleg": "Fortschreibung 2026 S. 3 Tabellenkopf: „Der Mietspiegel der Stadt Naumburg (Saale) gilt nur für Wohnungen im Geschosswohnungsbau …“"
+ },
+ "art": "qualifiziert",
+ "stand": "2026-11-01",
+ "erhebungsstichtag": "2024-03-01",
+ "gueltig_ab": "2026-11-01",
+ "gueltig_bis": "2028-10-31",
+ "quelle": {
+  "url": "https://www.naumburg.de/de/datei/anzeigen/id/109674,1164/fortschreibung_qualifizierter_mietspiegel_naumburg_+_bad_koesen_2026-2028.pdf",
+  "dokument": "Anpassung des Qualifizierten Mietspiegels der Stadt Naumburg (Saale), Gültigkeit 01.11.2026–31.10.2028, mit Anlage „Qualifizierter Mietspiegel Stadt Naumburg (Saale) – Fortschreibung 2026“ (Methodenbericht, Koopmann Analytics)",
+  "seite": "PDF S. 4 (aufgedruckt S. 3) Tabelle Fortschreibung 2026; PDF S. 1 Anerkennung und Gültigkeit; PDF S. 3 Ausgangstabelle 2024 und Stichtag; PDF S. 4 VPI-Faktor",
+  "lizenz": "kein Rechtevorbehalt und kein Speicherverbot im Dokument (alle 4 Seiten am Druckbild durchgesehen, 26.11.2026); amtliche Veröffentlichung der Stadt Naumburg (Saale)",
+  "abgerufen": "2026-11-26"
+ },
+ "einheit": "eur_qm_nettokalt",
+ "form": "tabelle",
+ "rundung": 2,
+ "hinweis": "Qualifiziert; Indexfortschreibung (VPI März 2024 118,6 → März 2026 124,5, Faktor 1,0497) des Mietspiegels 2024 (Stichtag 1. März 2024), anerkannt am 24.06.2026 von Mieterverein im Burgenlandkreis e.V. und Haus & Grund Naumburg und Umgebung e.V. nach § 558d Abs. 1 BGB, „für den Zeitraum 01.11.2026 – 31.10.2028 verbindlich“ (PDF S. 1). Gilt für die Stadt Naumburg (Saale) und Bad Kösen. Tabelle teils Scan: am Druckbild gelesen und jeder Wert gegen die Ausgangstabelle 2024 × 1,0497 nachgerechnet (alle stimmen auf den Cent). Mittelwert und 3/4-Spanne. Feld 1949–1989 ab 90 m² mit * (keine ausreichende Fallzahl) nicht eingetragen. Nur Geschosswohnungsbau mit WC in der Wohnung, Bad oder Duschbad und Sammelheizung.",
+ "tabelle": {
+  "achsen": {
+   "baujahr": [
+    {
+     "von": null,
+     "bis": 1948,
+     "label": "bis 1948"
+    },
+    {
+     "von": 1949,
+     "bis": 1989,
+     "label": "1949–1989"
+    },
+    {
+     "von": 1990,
+     "bis": null,
+     "label": "1990 und jünger"
+    }
+   ],
+   "wfl": [
+    {
+     "von": null,
+     "bis": 50,
+     "bis_inkl": false,
+     "label": "unter 50 m²"
+    },
+    {
+     "von": 50,
+     "bis": 70,
+     "bis_inkl": false,
+     "label": "50 bis < 70 m²"
+    },
+    {
+     "von": 70,
+     "bis": 90,
+     "bis_inkl": false,
+     "label": "70 bis < 90 m²"
+    },
+    {
+     "von": 90,
+     "bis": null,
+     "label": "90 m² und größer"
+    }
+   ]
+  },
+  "zellen": [
+   {
+    "baujahr": 0,
+    "wfl": 0,
+    "unten": 5.55,
+    "mittel": 6.57,
+    "oben": 7.13,
+    "seite": "3"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 0,
+    "unten": 6.09,
+    "mittel": 6.71,
+    "oben": 7.04,
+    "seite": "3"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 0,
+    "unten": 5.95,
+    "mittel": 7.06,
+    "oben": 8.23,
+    "seite": "3"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 1,
+    "unten": 5.4,
+    "mittel": 6.37,
+    "oben": 7.34,
+    "seite": "3"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 1,
+    "unten": 5.76,
+    "mittel": 6.54,
+    "oben": 7.55,
+    "seite": "3"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 1,
+    "unten": 5.33,
+    "mittel": 6.39,
+    "oben": 7.35,
+    "seite": "3"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 2,
+    "unten": 4.92,
+    "mittel": 5.99,
+    "oben": 7.35,
+    "seite": "3"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 2,
+    "unten": 5.64,
+    "mittel": 6.5,
+    "oben": 7.03,
+    "seite": "3"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 2,
+    "unten": 5.11,
+    "mittel": 6.7,
+    "oben": 8.3,
+    "seite": "3"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 3,
+    "unten": 4.82,
+    "mittel": 6.04,
+    "oben": 7.36,
+    "seite": "3"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 3,
+    "unten": 5.25,
+    "mittel": 6.46,
+    "oben": 8.4,
+    "seite": "3"
+   }
+  ]
+ },
+ "pruefbeispiele": [
+  {
+   "eingabe": {
+    "baujahr": 1975,
+    "wfl": 60
+   },
+   "erwartet": {
+    "unten": 5.76,
+    "mittel": 6.54,
+    "oben": 7.55
+   },
+   "seite": "3",
+   "art": "tabellenzelle"
+  },
+  {
+   "eingabe": {
+    "baujahr": 2000,
+    "wfl": 95
+   },
+   "erwartet": {
+    "unten": 5.25,
+    "mittel": 6.46,
+    "oben": 8.4
+   },
+   "seite": "3",
+   "art": "tabellenzelle"
+  },
+  {
+   "eingabe": {
+    "baujahr": 1975,
+    "wfl": 95
+   },
+   "erwartet": null,
+   "seite": "3",
+   "art": "tabellenzelle",
+   "anmerkung": "Feld *"
+  }
+ ]
+}
