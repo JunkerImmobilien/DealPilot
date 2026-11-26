@@ -504,7 +504,7 @@ if (!window._wlc) {
       lbl.style.color = '';
       lbl.title = st.art ? ('Übernommen: ' + st.art + ' aus der Wertermittlung (Stufe 3)') : lbl.title;
     } else {
-      if (tn) tn.nodeValue = 'Marktwertindikation ';
+      if (tn) tn.nodeValue = 'Marktpreisindikation ';
       if (hint) {
         hint.textContent = '(' + (st.stufe ? 'Stufe ' + st.stufe + ' · ' : '') + 'aus Angebotspreisen mit Abschlag, kein Verkehrswert n. § 194 BauGB)';
         hint.style.color = 'var(--gold-3,#9a7f33)';

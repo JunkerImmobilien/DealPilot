@@ -1268,7 +1268,7 @@
         if (drei && _da(h.sachwert_eur)) weg.push('Sachwert ' + _eur(h.sachwert_eur));
         var adr = String(h.address || 'Adresse unbekannt').replace(/</g, '&lt;');
         var mv = _da(h.market_value)
-          ? '<div class="dab-mbl-wert">' + _eur(h.market_value) + '<small>Marktwert-Indikation</small></div>'
+          ? '<div class="dab-mbl-wert">' + _eur(h.market_value) + '<small>' + (drei ? 'Marktwert-Indikation' : 'Marktpreisindikation') + '</small></div>'
           : '<div class="dab-mbl-wert nod">keine Daten</div>';
         var rid = h.report_id | 0;
         var pdf = (drei && window.DpProfi)
