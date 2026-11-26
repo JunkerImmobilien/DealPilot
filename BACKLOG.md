@@ -8,6 +8,13 @@ Dort **ohne** Nummer: Nummern sind Reihenfolge, kein Name. Die verbleibenden
 Punkte werden fortlaufend neu durchnummeriert. Hängt etwas, kommt `**BLOCKIERT:**` mit einem Satz Begründung
 direkt unter den Punkt — nicht kommentarlos liegenlassen.
 
+## → Mietspiegel (VV5, 26.11.2026)
+- Saarbrücken: Tabellen am Druckbild ablesen (Textschicht verfälscht), dann Wertedatei (SL hat sonst keine).
+- Darmstadt, Frankfurt, Karlsruhe, Heidelberg, Ulm, Essen, Münster, Koblenz, Hamm: frei, noch nicht geerntet.
+- Punkte-Mietspiegel (Pforzheim, Magdeburg, Schweinfurt, Gera, Siegen) rechnet werte.js noch nicht.
+- Einfache Mietspiegel nach Ablauf: App kennzeichnet bisher nur qualifizierte als veraltet.
+- Marcel: Hauszuschlag „Einfamilienhaus“ auch für DHH/RH (Annahme) ok? Prod-Freigabe v5080.
+
 ## → Offen aus dem 26.11.2026 (Weitermachen + Marcel entscheidet)
 
 **Stand Prod 1.0.232.** Live seit 25.11.: Handy-Menüband wie Desktop, Leiste 280 px (1.0.232), Leerzustände + Besichtigungs-Checkliste (1.0.231), Investment-PDF Kombi/Kurz/Bank (1.0.230), Hinweis Marktpreisindikation Zielbild (1.0.229), Feld-Tipps + Portfolio-Cockpit Handy (1.0.228), npm-Sicherheit (bcrypt 6, zod 4, nodemailer 10, puppeteer 25).
