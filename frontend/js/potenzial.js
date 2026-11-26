@@ -1985,6 +1985,13 @@
     var r = ergebnis();
     var z = zusammenfassung(m, r);
     z.ertragswert_gerechnet = !!(r && r.verfuegbar);
+    /* v5080 · Vergleichsmiete, mit der gerechnet wird, und ihre Herkunft (eigene Angabe laut Mietspiegel der Stadt,
+       Mietspiegel-Werte, amtlich, DealPilot-Näherung, Schätzung) - damit die KI den Wert des Kunden kennt und nennt. */
+    try {
+      var _v = objektVgl();
+      if (_v && _v.qm > 0) z.vergleichsmiete = { qm: Math.round(_v.qm * 100) / 100, art: _v.quelle_art || _v.art || null, herkunft: _v.herkunft || _v.text || null,
+        eigene_angabe: /^(eigen|mietspiegel_)/.test(_v.quelle_art || '') && !(_v.werte) };
+    } catch (e) {}
     if (r && r.basis) z.zins = { pct: r.basis.lzs_pct, stufe: r.basis.lzs_stufe };
     if (!r) {
       /* v2431 · noch nichts gerechnet: ohne Freigabe keine Ertragswerte erwaehnen */
