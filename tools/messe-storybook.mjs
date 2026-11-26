@@ -42,10 +42,6 @@ const STORYS = [
     geschichte: 'Zwölf Wohnungen in Leipzig, Lageklasse A, sauber finanziert. Das Gegenstück zum Lindenhof: Score „Gut“, DSCR über 1,2 (nach Bewirtschaftungskosten), positiver Cashflow vor und nach Steuern.',
     zeigen: ['Objektkarte: Score und Pille', 'Reiter Kennzahlen: woraus sich der Score zusammensetzt', 'Portfolio-Cockpit: das Objekt im Vergleich zu den anderen'],
     satz: 'Ein Blick auf den Score sagt dir, wo du genauer hinschauen solltest – und wo nicht.' },
-  { seq: '2026-1051', titel: 'Wann DealPilot „Nein“ sagt', thema: 'Risiko · DSCR · Belastungsprobe',
-    geschichte: '24 Wohnungen in Castrop-Rauxel, fast 2,5 Mio. € Kaufpreis – auf dem Papier groß, in Wahrheit ein Verlustgeschäft. Die Mieten decken den Kapitaldienst nicht, der Cashflow ist tief negativ. Genau hier soll ein Werkzeug bremsen.',
-    zeigen: ['Score „Schwach“ und die rote DSCR-Ampel', 'Pilot-Analyse: Risiken und die Empfehlung', 'Belastungsprobe: was passiert, wenn der Zins steigt'],
-    satz: 'Das teuerste Objekt ist das, das du nicht hättest kaufen sollen. DealPilot sagt dir das vorher.' },
   { seq: '2026-1054', titel: 'Wertermittlung wie ein Gutachter', thema: 'Stufe 3 · Ertrags- und Sachwert · amtliche Daten',
     geschichte: 'Jugendstilhaus in Detmold, Baujahr 1908, sechs Wohnungen. Ein Fall für die Wertermittlung: Bodenrichtwert aus BORIS, Liegenschaftszins des Gutachterausschusses, Sachwert nach NHK 2010 – mit Rechenweg und Quellen. Und ein schöner Gesprächsanlass: Der Ertragswert liegt über dem Kaufpreis, die Marktpreisindikation aus Angeboten darunter. Warum? Weil Angebote den Markt von heute zeigen, der Ertragswert die Miete dieses Hauses – und genau dafür gibt es drei Verfahren nebeneinander.',
     zeigen: ['Reiter Bewertung: Stufe 3 erzeugen', 'Rechenweg Ertragswert: Rohertrag, Bewirtschaftung, Liegenschaftszins', 'Sachwert: NHK 2010, Baupreisindex, Alterswertminderung', 'Quellennachweis: welcher Gutachterausschuss, welches Jahr'],
@@ -78,10 +74,6 @@ const STORYS = [
     geschichte: 'Zweifamilienhaus in Hiddenhausen, Baujahr 1964. Für dieses Haus gibt es ein Verkehrswertgutachten über rund 350.000 € – genau der Kaufpreis. Ein schöner Prüfstein: Wie nah kommt die App an den Sachverständigen?',
     zeigen: ['Bewertung: Sachwertverfahren mit BGF und NHK 2010', 'Bodenwert aus dem Bodenrichtwert', 'Vergleich mit dem Gutachtenwert'],
     satz: 'Wir haben DealPilot an echten Gutachten geprüft – Zahl für Zahl.' },
-  { seq: '2026-1002', titel: 'Privat oder GmbH?', thema: 'Halter · Steuerwirkung', paar: '2026-1007',
-    geschichte: 'Dieselbe Wohnung in Kabelsketal, zweimal im Konto: vor der Überführung privat gehalten, seit 01.01.2026 in der vermögensverwaltenden GmbH. Im Portfolio zählt nur noch die GmbH-Fassung – die private ist als abgegeben markiert, damit nichts doppelt zählt. Gleiches Objekt, andere Steuer: privat greift die Einkommensteuer mit Progression, in der GmbH die Körperschaftsteuer, ohne Erstattung bei Verlust.',
-    zeigen: ['Reiter Objekt: Halter wählen', 'Cashflow nach Steuern privat und in der GmbH vergleichen', 'Portfolio-Cockpit: Objekte je Halter'],
-    satz: 'Ob privat oder in der GmbH: DealPilot rechnet beides – du siehst den Unterschied, bevor du dich festlegst.' },
   { seq: '2026-1008', titel: 'Die Wohnung in der GmbH', thema: 'Kapitalgesellschaft · Steuer',
     geschichte: 'Eigentumswohnung in Bad Oeynhausen, gehalten von der GmbH. Hier zeigt sich die Steuer der Gesellschaft: Körperschaft- und Gewerbesteuer statt Einkommensteuer.',
     zeigen: ['Halter: GmbH', 'Steuer: Körperschaftsteuer und Gewerbesteuer', 'Cashflow nach Steuern'],
@@ -192,12 +184,14 @@ const ubersicht = '<section class="seite"><div class="kick">Die Demo-Objekte auf
   + '</table><div class="fuss">DealPilot · Messe-Storybook</div></section>';
 
 /* ── v2954 · Der Rundgang am Stand: eine Geschichte in fünf Akten ───── */
-const NAME = (seq) => (O[seq] ? O[seq].name : seq);
+/* V1 26.11.2026 · fehlt ein Objekt, bricht das Skript ab, statt die Geschichte still wegzulassen */
+const NAME = (seq) => { if (!O[seq]) { console.error('FEHLT in der DB: ' + seq + ' (Storybook nicht erzeugt)'); process.exit(1); } return O[seq].name; };
+{ const fehltV = seqs.filter((x) => !O[x]); if (fehltV.length) { console.error('FEHLT in der DB: ' + fehltV.join(', ') + ' (Storybook nicht erzeugt)'); process.exit(1); } }
 const rundgang = '<section class="seite dicht"><div class="kick">Am Stand · fünf Minuten, eine Geschichte</div><h1>Der Rundgang: vom ersten Blick bis zum ganzen Bestand</h1>'
   + '<p class="gesch">Erzähl keine Funktionen, erzähl den Weg eines Investors. Jeder Akt hat ein Objekt und eine Frage, die der Besucher selbst kennt. Wer nur eine Minute hat, bekommt Akt 1 und Akt 5. Wer bleibt, bekommt alles.</p>'
   + '<table class="ueb akte"><tr><th>Akt</th><th>Die Frage des Besuchers</th><th>Objekt</th><th>Was du zeigst</th></tr>'
   + [['1 · Finden', '„Ist das Angebot überhaupt was?“', NAME('2026-999'), 'Quick-Check: Adresse und Preis rein, in Sekunden Score und Marktpreisindikation mit Spanne. Dann „übernehmen“ – das Objekt ist angelegt.'],
-     ['2 · Prüfen', '„Würde die Bank das finanzieren?“', NAME('2026-1041'), 'Pilot-Analyse mit Urteil, Stärken, Risiken – dann das Bank-PDF. Als Gegenstück ' + NAME('2026-1051') + ': hier sagt DealPilot „Nein“.'],
+     ['2 · Prüfen', '„Würde die Bank das finanzieren?“', NAME('2026-1041'), 'Pilot-Analyse mit Urteil, Stärken, Risiken – dann das Bank-PDF. Als Gegenstück ' + NAME('2026-004') + ': schwache Finanzierung, hier rät DealPilot zum Verhandeln.'],
      ['2b · Unterlagen', '„Was steht im Kleingedruckten?“', NAME('2026-1198'), 'Exposé, Mietaufstellung, Grundbuch, Teilungserklärung und WEG-Protokolle auf einmal einlesen: Felder gefüllt, Einheiten erfasst, die beschlossene Dachsanierung als Risiko mit Quelle – und eine Investitionsthese.'],
      ['3 · Bewerten', '„Was ist das Haus wirklich wert?“', NAME('2026-1054'), 'Stufe 3: Ertrags-, Sach- und Vergleichswert nebeneinander, jeder mit Gutachterausschuss, Jahr und Seite. Warum die Verfahren auseinanderliegen.'],
      ['4 · Halten', '„Hat sich die Sanierung gelohnt – und die nächste?“', NAME('2026-1056'), 'Modernisierung nach Anlage 2 verlängert die Restnutzungsdauer. Zielbild: Wertzuwachs nach Kosten – hier ehrlich negativ.'],
