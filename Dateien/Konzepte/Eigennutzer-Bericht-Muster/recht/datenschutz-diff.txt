@@ -1,0 +1,26 @@
+diff --git a/frontend/datenschutz.html b/frontend/datenschutz.html
+index 75836f19f..d1194b34b 100644
+--- a/frontend/datenschutz.html
++++ b/frontend/datenschutz.html
+@@ -94,3 +94,3 @@
+     <h1>Datenschutzerklärung</h1>
+-    <p class="meta">Stand: 17. November 2026 · Version 1.7</p>
++    <p class="meta">Stand: 26. November 2026 · Version 1.8</p>
+ 
+@@ -164,2 +164,7 @@
+ 
++    <h3 id="einzelberichte">(3a) Einzelberichte ohne Konto (Einzel-Check, Haus-Check)</h3>
++    <p>Kaufen Sie einen Einzelbericht ohne Konto, speichern wir zum Kauf die Angaben zum Objekt und zur Finanzierung, die für den Bericht nötig sind (zum Beispiel Kaufpreis, Wohn- und Grundstücksfläche, Baujahr, Objektart, Eigenkapital, Postleitzahl), den Zahlungsstatus, einen gegebenenfalls erzeugten Gutscheincode für die Anrechnung sowie Ihre Zustimmung zur sofortigen Ausführung (§ 356 Abs. 5 BGB) mit Zeitstempel. Ihr Zugang zum Bericht ist ein Zufallsschlüssel, der nur in der Internetadresse Ihres Browsers steht. Bei uns liegt nur sein Hashwert. Eine von Ihnen eingetragene Anschrift verwenden wir nur für die Berechnung dieses Berichts und speichern sie nicht. Nach Ablauf von 14 Tagen löschen wir den Kauf mit allen Angaben. Rechnungsdaten verarbeitet Stripe (siehe Ziffer 7).</p>
++    <p><strong>Netto-Einkommen im Haus-Check:</strong> Das Netto-Haushaltseinkommen, das Sie im Haus-Check freiwillig eintragen, wird ausschließlich in Ihrem Browser verarbeitet. Es wird weder an unsere Server noch an Dritte übertragen und nicht von uns gespeichert. Damit es nach dem Zahlungsvorgang wieder zur Verfügung steht, legt Ihr Browser es für die Dauer der Sitzung im Sitzungsspeicher dieses Tabs ab (sessionStorage). Mit dem Schließen des Tabs ist es gelöscht.</p>
++    <p><strong>Rechtsgrundlage:</strong> Art. 6 Abs. 1 lit. b DSGVO (Vertragserfüllung) und lit. c DSGVO (Nachweis der Zustimmung, steuerliche Aufbewahrung der Rechnung).</p>
++
+     <h3>(4) Technische Daten (Server-Logs)</h3>
+@@ -253,2 +258,3 @@
+       <li><strong>Geokodierung und Umgebungsanalyse</strong> (Geoapify): Objektanschrift bzw. Koordinaten, um die Lage und Einrichtungen in der Umgebung zu ermitteln.</li>
++      <li><strong>Umfeld im Haus-Check</strong> (OpenStreetMap-Daten über öffentliche Overpass-Dienste, ersatzweise Geoapify): Koordinaten des Objekts, abgerufen über unseren Server, um Einrichtungen in der Nähe zu ermitteln.</li>
+       <li><strong>Amtliche Geodienste der Länder</strong> (z.&nbsp;B. Bodenrichtwert-Informationssysteme): Koordinaten des Objekts.</li>
+@@ -514,3 +520,3 @@
+     <footer>
+-      Stand: 17. November 2026 · Datenschutz-Version 1.7 · <a href="/impressum.html">Impressum</a> · <a href="/agb.html">AGB</a>
++      Stand: 26. November 2026 · Datenschutz-Version 1.8 · <a href="/impressum.html">Impressum</a> · <a href="/agb.html">AGB</a>
+     </footer>
