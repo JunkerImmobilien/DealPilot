@@ -64,6 +64,7 @@ export function vergleichsmieteAuszug(crossCheck) {
     qm: r2(qm),
     art: code,
     ca: code === 'naeherung',
+    genauigkeit: code === 'naeherung' && b && b.anker_genauigkeit ? String(b.anker_genauigkeit) : null,   /* v5080 */
     unten: spanne ? spanne.unten : null,
     mittel: spanne ? spanne.mittel : null,
     oben: spanne ? spanne.oben : null,

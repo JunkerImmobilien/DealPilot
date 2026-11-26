@@ -100,10 +100,12 @@ export function genauigkeit(param, ags) {
   if (gr && num(gr.mape_pct) > 0 && (num(gr.staedte) || 0) >= 5) return { pct: num(gr.mape_pct), ebene: 'region', region: r };
   return { pct: num((p.guete || {}).mape_pct), ebene: 'gesamt' };
 }
-/** Kundentext: eine Zeile, Punkt und Komma (v5080). Die Herleitung steht in textDetail (Tooltip). */
-export function naeherungText(param, ags) {
+/** Kundentext (v5080, Marcel 26.11.2026): sichtbar nur „DealPilot-Näherung“. Die Genauigkeit steht im Tooltip (ⓘ) bzw. im PDF
+    klein auf der Rechenweg- oder Quellenseite: genauigkeitText(). Die Herleitung in textDetail. */
+export function naeherungText() { return 'DealPilot-Näherung'; }
+export function genauigkeitText(param, ags) {
   const g = genauigkeit(param, ags);
-  return 'DealPilot-Näherung, im Mittel ±' + dez(g.pct, 1) + ' % zum Mietspiegel' + (g.ebene === 'stadt' ? ' der Stadt' : '');
+  return num(g.pct) > 0 ? 'im Mittel ±' + dez(g.pct, 1) + ' % zum Mietspiegel' + (g.ebene === 'stadt' ? ' der Stadt' : '') : null;
 }
 export function naeherungTextDetail(param, ags) {
   const p = param || {}, g = genauigkeit(param, ags);
@@ -144,7 +146,7 @@ export function naeherungFuer(param, zeilen, objekt) {
   const rechnung = teile.join(' · ') + (p.modell === 'klassen_faktor' ? ' → ' + dez(basis) + ' €/m²' : '')
     + ' × Kalibrierfaktor ' + dez(ff.f, 3) + (ff.je ? ' (Marktlage ' + ff.je + ')' : '') + ' = ' + dez(qm) + ' €/m²';
   return {
-    qm, quelle_art: 'dealpilot_naeherung', text: naeherungText(p, o.ags), text_detail: naeherungTextDetail(p, o.ags), rechnung, hinweise,
+    qm, quelle_art: 'dealpilot_naeherung', text: naeherungText(), genauigkeit_text: genauigkeitText(p, o.ags), text_detail: naeherungTextDetail(p, o.ags), rechnung, hinweise,
     faktor: ff.f, basis: runden(basis, 2), marktlage: ff.je,
     zensus: { gemeinde: b.name, gesamt: b.gesamt, baujahr: b.baujahr, flaeche: b.flaeche, stichtag: '2022-05-15' },
     n_staedte: p.n_staedte || null, mape_pct: genauigkeit(p, o.ags).pct || null, genauigkeit_ebene: genauigkeit(p, o.ags).ebene, stand: p.stand || null,

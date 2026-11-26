@@ -938,7 +938,7 @@
     var rund = function (x) { return Math.round(x * 100) / 100; };
     if (nv.qm > 0) { nv.monat = rund(nv.qm * wfl); nv.plus_monat = rund(nv.monat - ist); nv.plus_jahr = rund(nv.plus_monat * 12); }
     var bestand = (zul && zul.miete_monat > 0) ? { monat: zul.miete_monat, plus_monat: rund(zul.miete_monat - ist), plus_jahr: rund((zul.miete_monat - ist) * 12) } : null;
-    return { ist_monat: ist, ist_qm: ist / wfl, wfl: wfl, vgl: vg, vgl_qm: vglQm, vgl_herkunft: vg ? (VGL_HERKUNFT[vg.art] || null) : null,
+    return { ist_monat: ist, ist_qm: ist / wfl, wfl: wfl, vgl: vg, vgl_qm: vglQm, vgl_herkunft: vg ? (VGL_HERKUNFT[vg.art] || null) : null, vgl_genauigkeit: vg && vg.art === 'naeherung' && vg.genauigkeit ? vg.genauigkeit : null,   /* v5080 */
       markt_qm: marktQm, zul: zul, bestand: bestand, kPct: kPct, kAus: !!(kapp && kapp.herkunft !== 'auffang' && kapp.pct === kPct), kVo: !!(kapp && kapp.herkunft === 'verordnung'),
       bremse: gilt, neu: neu, nv: nv, ziel: zi };
   }
@@ -963,7 +963,7 @@
   function mieteSaetzeInvestor(mi) {
     var s = [], z = mi.zul, zi = mi.ziel, ca = !!(mi.vgl && mi.vgl.ca), nv = mi.nv || {};
     var sp = spanneText(mi.vgl);
-    s.push('Ortsübliche Vergleichsmiete ' + qmText(mi.vgl_qm, ca) + ' (' + mi.vgl_herkunft + (sp ? ', ' + sp : '') + '). DealPilot rechnet aus Investorensicht mit dem Oberwert ' + qmText(zi.bestand_max_qm, ca) + '.');
+    s.push('Ortsübliche Vergleichsmiete ' + qmText(mi.vgl_qm, ca) + ' (' + mi.vgl_herkunft + (mi.vgl_genauigkeit ? ', ' + mi.vgl_genauigkeit : '') + (sp ? ', ' + sp : '') + '). DealPilot rechnet aus Investorensicht mit dem Oberwert ' + qmText(zi.bestand_max_qm, ca) + '.');
     if (zi.bedingung && zi.bestand_max_qm > (zi.mittel_qm || 0) + 0.004) s.push('Der Oberwert gilt, wenn Ausstattung, Lage und Zustand der Wohnung die Einordnung am oberen Rand tragen. Sonst gilt der Mittelwert ' + qmText(zi.mittel_qm, ca) + (zi.neu_sicher_qm ? ', bei Neuvermietung dann ' + qmText(zi.neu_sicher_qm, ca) : '') + '.');
     if (z && z.miete_monat > 0) {
       if (z.grund === 'vergleichsmiete_erreicht') s.push('Im Bestand: die Miete liegt schon am oder über dem Oberwert. Eine Erhöhung nach § 558 BGB ist nicht möglich.');
@@ -992,7 +992,7 @@
     if (mi.ziel && mi.vgl_qm) return mieteSaetzeInvestor(mi);
     var z = mi.zul, vq = mi.vgl_qm, ca = !!(mi.vgl && mi.vgl.ca), nv = mi.nv || {};
     /* Vergleichsmiete */
-    if (vq) s.push('Ortsübliche Vergleichsmiete ' + qmText(vq, ca) + ' (' + mi.vgl_herkunft + (spanneText(mi.vgl) ? ', ' + spanneText(mi.vgl) : '') + ').');
+    if (vq) s.push('Ortsübliche Vergleichsmiete ' + qmText(vq, ca) + ' (' + mi.vgl_herkunft + (mi.vgl_genauigkeit ? ', ' + mi.vgl_genauigkeit : '') + (spanneText(mi.vgl) ? ', ' + spanneText(mi.vgl) : '') + ').');
     else s.push('Für diesen Ort liegen keine amtlichen Mietdaten zur Vergleichsmiete vor. DealPilot nennt deshalb keine Zahl.');
     /* Bestand nach drei Jahren */
     if (z && z.miete_monat > 0) {
