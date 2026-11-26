@@ -1,0 +1,437 @@
+{
+ "ags": "16073077",
+ "gemeinde": "Saalfeld/Saale",
+ "art": "einfach",
+ "stand": "2026-03-01",
+ "erhebungsstichtag": null,
+ "gueltig_ab": "2026-03-01",
+ "gueltig_bis": null,
+ "quelle": {
+  "url": "https://www.saalfeld.de/files/19C94C37E9C/Ver%C3%B6ffentlichung%20Mietspiegel%202026.pdf",
+  "dokument": "Mietspiegel für die Stadt Saalfeld/Saale, gültig ab 01.03.2026",
+  "seite": "S. 1 (§ 558c, Arbeitskreis, Inkrafttreten, Geltungsbereich), S. 2 Grundmiete und Anwendung, S. 4 Anlage 1 Wohnlage, S. 5 Anlage 2 Zuschläge, S. 6 Anlage 3 Abschläge",
+  "lizenz": "kein Rechtevorbehalt und kein Speicherverbot im Dokument (alle 6 Seiten durchgesehen, 26.11.2026); amtliche Veröffentlichung der Stadt Saalfeld/Saale",
+  "abgerufen": "2026-11-26"
+ },
+ "einheit": "eur_qm_nettokalt",
+ "form": "regression",
+ "rundung": 2,
+ "hinweis": "Einfacher Mietspiegel nach § 558c BGB, erstellt von der Stadt Saalfeld/Saale mit Arbeitskreis (u. a. Mieterschutzgemeinschaft Ostthüringen, Wohnungs- und Grundeigentümer e.V. Saalfeld, Wohnungsunternehmen), 3.153 Datensätze Januar 2020 bis Juni 2025, in Kraft am 01.03.2026 (S. 1). Kein Enddatum genannt. Grundmiete nach drei Wohnflächenklassen (S. 2), dazu Zuschlag nach Wohnlage je Zone (Pflicht, S. 2 Schritt 2) und Zu-/Abschläge nach Wohnwert in €/m² (S. 2 Schritt 3). Keine Spanne im Dokument, nur ein Betrag. Textschicht der Anlagen 1–3 ist verschoben (Zonen und Beträge stehen nicht nebeneinander): Anlagen am Druckbild abgelesen. Geltung: Stadt ohne die 2018/2019 eingemeindeten Ortsteile und Arnsgereuth (S. 1). Zu Häusern sagt das Dokument nichts.",
+ "regression": {
+  "basis": {
+   "typ": "wfl_tabelle",
+   "werte": [
+    {
+     "von": null,
+     "bis": 45,
+     "bis_inkl": false,
+     "eur_qm": 4.94
+    },
+    {
+     "von": 45,
+     "bis": 90,
+     "bis_inkl": false,
+     "eur_qm": 4.51
+    },
+    {
+     "von": 90,
+     "bis": null,
+     "eur_qm": 5.12
+    }
+   ],
+   "beleg": "S. 2 Tabelle Grundmiete (bis 44,99 m² / 45,00–89,99 m² / ab 90,00 m²)"
+  },
+  "verknuepfung": "summe",
+  "faktoren": [
+   {
+    "merkmal": "lage",
+    "typ": "lage",
+    "art": "eur_qm",
+    "werte": {
+     "Altstadtkern": 1.0,
+     "Nördliche Vorstadt": 1.0,
+     "Obere Stadt-West": 1.0,
+     "Obere Stadt-Süd": 0.7,
+     "Krankenhaus": 0.3,
+     "Frankenweg": 0.6,
+     "Südstadt": 1.2,
+     "Gründerzeit": 0.6,
+     "Altsaalfeld": 0.7,
+     "Gorndorf-Nord": 0.4,
+     "Gorndorf-Süd": 0.3,
+     "Vor der Heide": 0.3,
+     "Alt-Graba": 1.1,
+     "Graba-Erweiterung": 0.9,
+     "Alte Kaserne / Gewerbegebiet": 0.0,
+     "Wittmannsgereuther Straße": 0.4,
+     "Aue am Berg": 0.4,
+     "Beulwitz": 0.4,
+     "Crösten": 0.4,
+     "Wöhlsdorf": 0.4,
+     "Remschütz": 0.4,
+     "Köditz": 0.4,
+     "Obernitz": 0.4
+    },
+    "aliase": {
+     "Altstadtkern": [
+      "1",
+      "Zone 1"
+     ],
+     "Nördliche Vorstadt": [
+      "2",
+      "Zone 2"
+     ],
+     "Obere Stadt-West": [
+      "3",
+      "Zone 3"
+     ],
+     "Obere Stadt-Süd": [
+      "4",
+      "Zone 4"
+     ],
+     "Krankenhaus": [
+      "5",
+      "Zone 5"
+     ],
+     "Frankenweg": [
+      "6",
+      "Zone 6"
+     ],
+     "Südstadt": [
+      "7",
+      "Zone 7"
+     ],
+     "Gründerzeit": [
+      "8",
+      "Zone 8"
+     ],
+     "Altsaalfeld": [
+      "9",
+      "Zone 9"
+     ],
+     "Gorndorf-Nord": [
+      "10",
+      "Zone 10"
+     ],
+     "Gorndorf-Süd": [
+      "11",
+      "Zone 11"
+     ],
+     "Vor der Heide": [
+      "12",
+      "Zone 12"
+     ],
+     "Alt-Graba": [
+      "13",
+      "Zone 13"
+     ],
+     "Graba-Erweiterung": [
+      "14",
+      "Zone 14"
+     ],
+     "Alte Kaserne / Gewerbegebiet": [
+      "15",
+      "Zone 15"
+     ],
+     "Wittmannsgereuther Straße": [
+      "16",
+      "Zone 16"
+     ],
+     "Aue am Berg": [
+      "17",
+      "Zone 17"
+     ],
+     "Beulwitz": [
+      "18",
+      "Zone 18"
+     ],
+     "Crösten": [
+      "19",
+      "Zone 19"
+     ],
+     "Wöhlsdorf": [
+      "20",
+      "Zone 20"
+     ],
+     "Remschütz": [
+      "21",
+      "Zone 21"
+     ],
+     "Köditz": [
+      "22",
+      "Zone 22"
+     ],
+     "Obernitz": [
+      "23",
+      "Zone 23"
+     ]
+    },
+    "label": "Zuschlag nach Wohnlage (Zone)",
+    "beleg": "S. 4 Anlage 1 (Zonen 1–23, Karte als Anwendungshilfe)"
+   },
+   {
+    "merkmal": "max_4_we",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.3,
+    "label": "Wohnung in Haus bis max. 4 WE",
+    "beleg": "S. 5 Anlage 2"
+   },
+   {
+    "merkmal": "aufzug",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.45,
+    "label": "Gebäude mit Aufzug",
+    "beleg": "S. 5 Anlage 2 (für EG nur, wenn Aufzug bis Keller und Boden)"
+   },
+   {
+    "merkmal": "bad_wc_getrennt",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.1,
+    "label": "Bad und WC getrennt",
+    "beleg": "S. 5 Anlage 2"
+   },
+   {
+    "merkmal": "wanne_und_dusche",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.2,
+    "label": "Bad mit Badewanne und separater Dusche",
+    "beleg": "S. 5 Anlage 2"
+   },
+   {
+    "merkmal": "gaeste_wc",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.1,
+    "label": "2. separates WC",
+    "beleg": "S. 5 Anlage 2"
+   },
+   {
+    "merkmal": "rolllaeden",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.4,
+    "label": "Außenrollläden an allen Fenstern/schließbare Fensterläden",
+    "beleg": "S. 5 Anlage 2"
+   },
+   {
+    "merkmal": "hochwertiger_boden",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.2,
+    "label": "überwiegend hochwertiger Bodenbelag",
+    "beleg": "S. 5 Anlage 2 (mehr als 50 % der Wohnfläche)"
+   },
+   {
+    "merkmal": "barrierearm",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.3,
+    "label": "barrierearm",
+    "beleg": "S. 5 Anlage 2"
+   },
+   {
+    "merkmal": "balkon",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.3,
+    "label": "Balkon/Loggia/Terrasse/Dachterrasse/Veranda",
+    "beleg": "S. 5 Anlage 2"
+   },
+   {
+    "merkmal": "garten",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.5,
+    "label": "Garten zur alleinigen, kostenfreien Nutzung",
+    "beleg": "S. 5 Anlage 2"
+   },
+   {
+    "merkmal": "gegensprechanlage",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.2,
+    "label": "Gegensprechanlage mit Türöffner",
+    "beleg": "S. 5 Anlage 2"
+   },
+   {
+    "merkmal": "stellplatz_kostenfrei",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.4,
+    "label": "kostenfreier PKW-Stellplatz",
+    "beleg": "S. 5 Anlage 2"
+   },
+   {
+    "merkmal": "fahrradraum",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.05,
+    "label": "Fahrradschuppen/Stellplatz Fahrrad, Kinderwagen, Rollator",
+    "beleg": "S. 5 Anlage 2"
+   },
+   {
+    "merkmal": "energie_bis_49",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.3,
+    "label": "Energieverbrauchswert bis 49,9 kWh",
+    "beleg": "S. 5 Anlage 2 (gemäß Energieverbrauchsausweis)"
+   },
+   {
+    "merkmal": "energie_50_99",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.2,
+    "label": "Energieverbrauchswert 50 bis 99,9 kWh",
+    "beleg": "S. 5 Anlage 2 (gemäß Energieverbrauchsausweis)"
+   },
+   {
+    "merkmal": "gehobene_wohnlage",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": 0.15,
+    "label": "gehobene Wohnlage",
+    "beleg": "S. 5 Anlage 2 (z. B. begrüntes Wohnumfeld)"
+   },
+   {
+    "merkmal": "ohne_aufzug_ab_5og",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": -0.2,
+    "label": "ohne Aufzug (ab 5. OG)",
+    "beleg": "S. 6 Anlage 3"
+   },
+   {
+    "merkmal": "bad_ohne_fenster",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": -0.3,
+    "label": "Bad ohne Fenster",
+    "beleg": "S. 6 Anlage 3"
+   },
+   {
+    "merkmal": "kueche_ohne_fenster",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": -0.3,
+    "label": "Küche ohne Fenster",
+    "beleg": "S. 6 Anlage 3"
+   },
+   {
+    "merkmal": "kein_bodenbelag",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": -0.5,
+    "label": "überwiegend kein Bodenbelag",
+    "beleg": "S. 6 Anlage 3 (mehr als 50 % der Wohnfläche)"
+   },
+   {
+    "merkmal": "keine_heizung",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": -1.0,
+    "label": "keine Heizung",
+    "beleg": "S. 6 Anlage 3"
+   },
+   {
+    "merkmal": "keine_warmwasserbereitung",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": -0.3,
+    "label": "keine WW-Bereitung",
+    "beleg": "S. 6 Anlage 3"
+   },
+   {
+    "merkmal": "unguenstiger_grundriss",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": -0.2,
+    "label": "ungünstiger Grundriss",
+    "beleg": "S. 6 Anlage 3 (z. B. Durchgangszimmer, gefangener Raum)"
+   },
+   {
+    "merkmal": "keine_abstellmoeglichkeit",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": -0.1,
+    "label": "keine Abstellmöglichkeit außerhalb der Wohnung",
+    "beleg": "S. 6 Anlage 3"
+   },
+   {
+    "merkmal": "energie_130_199",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": -0.2,
+    "label": "Energieverbrauchswert 130 bis 199,9 kWh",
+    "beleg": "S. 6 Anlage 3"
+   },
+   {
+    "merkmal": "energie_ab_200",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": -0.3,
+    "label": "Energieverbrauchswert ab 200 kWh",
+    "beleg": "S. 6 Anlage 3"
+   },
+   {
+    "merkmal": "einfache_wohnlage",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": -0.15,
+    "label": "einfache Wohnlage",
+    "beleg": "S. 6 Anlage 3"
+   },
+   {
+    "merkmal": "umweltbeeintraechtigung",
+    "typ": "flag",
+    "art": "eur_qm",
+    "werte": -0.2,
+    "label": "starke Umweltbeeinträchtigung",
+    "beleg": "S. 6 Anlage 3"
+   }
+  ],
+  "beleg": "S. 2 Erläuterungen zur Anwendung"
+ },
+ "pruefbeispiele": [
+  {
+   "eingabe": {
+    "wfl": 60,
+    "lage": "Südstadt",
+    "merkmale": {
+     "balkon": true
+    }
+   },
+   "erwartet": {
+    "mittel": 6.01
+   },
+   "seite": "2, 4, 5",
+   "art": "rechenweg",
+   "anmerkung": "4,51 + 1,20 (Zone 7 Südstadt) + 0,30 (Balkon) = 6,01"
+  },
+  {
+   "eingabe": {
+    "wfl": 40,
+    "lage": "15"
+   },
+   "erwartet": {
+    "mittel": 4.94
+   },
+   "seite": "2, 4",
+   "art": "tabellenzelle",
+   "anmerkung": "bis 44,99 m², Zone 15 ohne Zuschlag"
+  },
+  {
+   "eingabe": {
+    "wfl": 60
+   },
+   "erwartet": null,
+   "seite": "2",
+   "art": "tabellenzelle",
+   "anmerkung": "ohne Wohnlage-Zone kein Wert"
+  }
+ ]
+}
