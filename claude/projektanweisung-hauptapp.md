@@ -45324,3 +45324,8 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** staging `edd443f7`, main `89d3e951`.
 - **Nachweis:** Westerfeld-Kopie (btj leer) Staging 390/1440: Feld 20, Grafiken und 20 Karten enden 2044, kein Überlauf. steuerjahr-pruefen 36/0, buster-ebenen sauber, gold-audit Prod RC 0, beide App-Domains patch 246.
 - **Rest:** Variante 1 (Schalter „ganze Haltedauer“) nicht gebaut: es gibt keine Jahre jenseits von btj (cfRows = btj). 76 Staging-Objekte haben leeres btj = 20 Jahre, neue Objekte 15. Entscheidung Marcel: Fallback auf 15 setzen (ändert IRR/Exit dieser Objekte) oder 20 lassen.
+
+### Rollout 1.0.248 · v5120m Steuer: eine Grafik im Reiter Steuer (Fork GG6, 26.11.2026)
+- **Was:** Marcel „Steuergrafik: wenn es sinnvoll ist, gerne“. Im Reiter Steuer nur noch die Cockpit-Grafik „Verlauf mit Steuern“ mit `opt.voll`: Säulen Steuerwirkung je Jahr (grün/rot, Quelle `_computeYearTotal().refund` wie die Jahreskarten), Marken Wendepunkt, nach Steuer im Plus, Ende Zinsbindung, § 23, Kacheln Erstattungen bis Wendepunkt und Steuern ab Wendepunkt. Der alte Steuerverlauf (steuer-verlauf.js) bleibt im Reiter leer, solange die Grafik frei ist (Vorschau `grafiken_neu`), sonst wie bisher. Cockpit und Pilot-Analyse unverändert. Handy: Markentexte unter der Grafik, Kachelbeträge ohne Umbruch.
+- **Commit:** staging `b5da04dd`, `690adb3f`, main `b547a952`.
+- **Nachweis:** Westerfeld-Kopie Staging 390/1440: 20 Säulen, 4 Marken, Erstattungen 2025 bis 2040 +55.919 € = Summe der Jahreskarten, Steuern ab 2041 −26.323 €, kein Überlauf. buster-ebenen und vorschau-pruefen sauber, gold-audit Prod RC 0, beide App-Domains patch 248.
