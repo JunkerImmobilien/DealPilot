@@ -26,14 +26,14 @@
     /* 1 · Kurzurteil */
     var g = H.haus.gruppen;
     add('Kurzurteil', 'Ist das Haus gut? Und passt es zu dir?',
-      '<div class="zwei"><div>' + B.scoreRing(H.haus.score, H.haus.stufe.wort, 'Haus-Score von 100') + '</div><div>'
+      B.scoreRing(H.haus.score, H.haus.stufe.wort, 'Haus-Score von 100')
       + B.kacheln([
-        g.preis ? { l: 'Preis', v: B.zahl(g.preis.score) + ' / 100', s: 'Gewicht 35 %' } : null,
-        { l: 'Zustand', v: B.zahl(g.zustand.score) + ' / 100', s: 'Gewicht 35 %' },
-        g.lage ? { l: 'Lage', v: B.zahl(g.lage.score) + ' / 100', s: 'Gewicht 30 %' } : null,
+        g.preis ? { l: 'Preis', v: B.zahl(g.preis.score), s: 'von 100, Gewicht 35 %' } : null,
+        { l: 'Zustand', v: B.zahl(g.zustand.score), s: 'von 100, Gewicht 35 %' },
+        g.lage ? { l: 'Lage', v: B.zahl(g.lage.score), s: 'von 100, Gewicht 30 %' } : null,
         { l: 'Passt es zu mir?', v: H.leistbarkeit.quote == null ? 'ohne Einkommen' : B.pct(H.leistbarkeit.quote, 0), s: H.leistbarkeit.ampel === 'gruen' ? 'gut tragbar' : H.leistbarkeit.ampel === 'gelb' ? 'knapp' : H.leistbarkeit.ampel === 'rot' ? 'zu hoch' : 'Belastung vom Netto',
           art: H.leistbarkeit.ampel === 'gruen' ? 'gut' : H.leistbarkeit.ampel === 'rot' ? 'schlecht' : '' }
-      ]) + '</div></div>'
+      ])
       + '<div class="block"><h3>Was du wissen solltest</h3><ul>' + H.urteil.map(function (t) { return '<li>' + B.esc(t) + '</li>'; }).join('') + '</ul></div>');
 
     /* 2 · Preis und Wert */
@@ -45,7 +45,9 @@
         W.ertragswert ? { l: 'Ertragswert (stützend)', v: B.eur(W.ertragswert) } : null,
         W.marktpreis ? { l: 'Marktpreisindikation', v: B.eur(W.marktpreis), s: 'aus Angebotspreisen, kein Verkehrswert' } : null
       ]);
-      if (W.rechenweg && W.rechenweg.length) wHtml += '<div class="block"><h3>Rechenweg</h3>' + B.staffel(W.rechenweg, false) + '</div>';
+      /* Rechenweg aus dem Marktbericht: Gedankenstriche im Kundentext durch Kommas ersetzen (Kundentext-Regel) */
+      var glatt = function (t) { return t == null ? t : String(t).replace(/\s[–—]\s/g, ', ').replace(/[–—]/g, ' bis ').replace(/;/g, ','); };
+      if (W.rechenweg && W.rechenweg.length) wHtml += '<div class="block"><h3>Rechenweg</h3>' + B.staffel(W.rechenweg.map(function (z) { return Object.assign({}, z, { pos: glatt(z.pos), detail: glatt(z.detail) }); }), false) + '</div>';
       if (!W.vollstaendig) wHtml += '<p class="det">' + B.esc('Noch kein Verkehrswert: ' + (W.fehlt || 'eine amtliche Angabe fehlt') + '. ' + (W.weg || '')) + '</p>';
       wHtml += '<p class="det">Indikative Wertermittlung nach ImmoWertV, ohne Ortsbesichtigung, kein Gutachten.</p>';
     } else wHtml = '<p>Für dieses Objekt liegt noch keine Wertermittlung vor.</p>';
