@@ -50,7 +50,11 @@
       if (W.rechenweg && W.rechenweg.length) wHtml += '<div class="block"><h3>Rechenweg</h3>' + B.staffel(W.rechenweg.map(function (z) { return Object.assign({}, z, { pos: glatt(z.pos), detail: glatt(z.detail) }); }), false) + '</div>';
       if (!W.vollstaendig) wHtml += '<p class="det">' + B.esc('Noch kein Verkehrswert: ' + (W.fehlt || 'eine amtliche Angabe fehlt') + '. ' + (W.weg || '')) + '</p>';
       wHtml += '<p class="det">Indikative Wertermittlung nach ImmoWertV, ohne Ortsbesichtigung, kein Gutachten.</p>';
-    } else wHtml = '<p>Für dieses Objekt liegt noch keine Wertermittlung vor.</p>';
+      /* Namensnennung: nur die Quellen, die in DIESEM Wert stecken (Lizenzvermerke der Registersätze) */
+      if (W.quellen && W.quellen.length) wHtml += '<div class="block"><h3>Quellennachweis</h3><ul>' + W.quellen.map(function (q) {
+        return '<li class="det">' + B.esc(q.vermerk) + (q.kennzahlen && q.kennzahlen.length ? ' (' + B.esc(q.kennzahlen.join(', ')) + ')' : '') + '</li>'; }).join('') + '</ul></div>';
+    } else wHtml = '<p>Für dieses Objekt liegt noch keine Wertermittlung vor.' + (W && (W.weg || W.grund) && !/^[a-z_]+$/.test(String(W.weg || W.grund)) ? ' ' + B.esc(W.weg || W.grund) : '') + '</p>'
+      + '<p class="det">Mit der vollständigen Anschrift rechnet DealPilot den Wert nach ImmoWertV aus den Daten des Gutachterausschusses.</p>';
     wHtml += '<div class="block"><h3>Kaufnebenkosten</h3>' + B.liste([
       ['Grunderwerbsteuer', B.eur(H.nebenkosten.grest)], ['Notar', B.eur(H.nebenkosten.notar)], ['Grundbuch', B.eur(H.nebenkosten.grundbuch)],
       ['Makler (Käuferanteil)', B.eur(H.nebenkosten.makler)], ['Summe', B.eur(H.nebenkosten.summe) + ' (' + B.pct(H.nebenkosten.pct, 1) + ')', { art: 'summe' }]]) + '</div>';
@@ -99,7 +103,8 @@
       bank += '<div class="block"><h3>Indikativer Beleihungswert</h3>' + B.liste([
         ['Beleihungswert (indikativ)', B.eur(L.beleihungswert)],
         ['Beleihungsauslauf', L.auslauf_pct != null ? B.pct(L.auslauf_pct, 0) : (F.darlehen && L.beleihungswert ? B.pct(F.darlehen / L.beleihungswert * 100, 0) : '–')]
-      ]) + '<p class="det">Indikativer Check nach der Beleihungswertverordnung. Die Bank bewertet selbst und kann abweichen. Kein Gutachten.</p></div>';
+      ]) + (L.hinweise && L.hinweise.length ? '<p class="det">' + B.esc(L.hinweise[0]) + '</p>' : '')
+        + '<p class="det">Indikativer Check nach der Beleihungswertverordnung. Die Bank bewertet selbst und kann abweichen. Kein Gutachten.</p></div>';
     } else bank += '<p class="det">Den Beleihungswert bewertet die Bank selbst. Ein indikativer Check folgt, sobald die Wertermittlung vollständig ist.</p>';
     bank += '<div class="block"><h3>Für das Bankgespräch</h3><ul><li>Exposé, Grundriss, Wohnflächenberechnung</li><li>Energieausweis</li><li>Grundbuchauszug, Flurkarte</li>'
       + (O.objektart === 'etw' ? '<li>Teilungserklärung, letzte drei Protokolle, Wirtschaftsplan, Hausgeldabrechnung</li>' : '<li>Baubeschreibung, Liste der Modernisierungen</li>')

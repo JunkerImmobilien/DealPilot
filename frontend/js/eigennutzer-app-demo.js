@@ -86,7 +86,8 @@
     if (k === 'ueberblick') {
       return demo + '<div class="eig-gross"><div class="zahl" style="color:' + farbe(r.gesamt) + '">' + r.gesamt + '</div><div><h3 style="margin:0;font:700 20px \'Space Grotesk\',sans-serif">Ist das Haus gut? ' + esc(r.stufe.wort) + '</h3><p class="eig-hinweis" style="margin:4px 0 0">Eigennutzer-Score aus Preis, Zustand, Lage und Leistbarkeit</p></div></div>'
         + '<div class="eig-grid">' + r.gruppen.map(function (g) { return karte(g.k, '<div class="wert">' + (g.s == null ? '–' : g.s) + '</div><div class="eig-bar"><i style="width:' + (g.s || 0) + '%;background:' + farbe(g.s) + '"></i></div><p>' + esc(g.t) + '</p>'); }).join('') + '</div>'
-        + '<p class="eig-hinweis">' + (r.jahr ? 'Kaufen ist nach ' + r.jahr + ' Jahren günstiger als mieten.' : 'In 20 Jahren wird Kaufen hier nicht günstiger als mieten.') + '</p>';
+        + '<p class="eig-hinweis">' + (r.jahr ? 'Kaufen ist nach ' + r.jahr + ' Jahren günstiger als mieten.' : 'In 20 Jahren wird Kaufen hier nicht günstiger als mieten.') + '</p>'
+        + pdfKarte();
     }
     if (k === 'haus') {
       var z = r.gruppen[1];
@@ -99,7 +100,7 @@
       return demo + '<div class="eig-grid">' + karte('Kaufpreis', wertzeile('gesamt', eur(e.kp), Math.round(e.kp / e.wfl).toLocaleString('de-DE') + ' € je m²'))
         + karte('Preis gegen Miete', wertzeile('Jahresmieten', r.faktor.toFixed(1).replace('.', ','), 'Üblich sind rund 22 bis 26.'))
         + karte('Kaufnebenkosten', wertzeile('rund 10 %', eur(e.kp * 0.10), 'Grunderwerbsteuer, Notar, Grundbuch, ohne Makler.'))
-        + karte('Wert nach ImmoWertV', '<p>Aus dem Marktbericht des Objekts: Verkehrswert bei Stufe 3, sonst Wertindikation mit Rechenweg.</p>') + '</div>';
+        + karte('Wert nach ImmoWertV', '<p>Aus dem Marktbericht des Objekts: Verkehrswert bei Stufe 3, sonst Wertindikation mit Rechenweg.</p>') + '</div>' + pdfKarte();
     }
     if (k === 'lage') {
       var d = daten || {};
@@ -130,12 +131,49 @@
     return demo;
   }
 
+  /* v5130 KK6 · Haus-Check als PDF aus dem gespeicherten Marktbericht des Objekts: Wert (Stufe 3), Beleihungswert nach
+     § 4 Abs. 2 BelWertV (Eigennutzung) und Umfeld kommen von POST /marktbericht/hauscheck-objekt (hinter der Vorschau
+     eigennutzer), Haus-Score und Haushaltsrechnung aus dem Kern, das Dokument aus js/haus-check-pdf.js. */
+  function pdfKarte() {
+    return '<div class="eig-card" style="margin-top:12px"><h3>Haus-Check als PDF</h3><p>Kurzurteil, Wert nach ImmoWertV, Kaufen oder mieten, Umfeld und eine Seite für die Bank. '
+      + 'Wert und Beleihungswert kommen aus dem Marktbericht des Objekts (Stufe 3).</p>'
+      + '<button type="button" class="btn btn-gold" id="eig_pdf">Haus-Check als PDF</button><p class="eig-hinweis" id="eig_pdf_msg"></p></div>';
+  }
+  function objektart() {
+    var a = String(val('objart') || '').toLowerCase();
+    if (/etw|wohnung/.test(a)) return 'etw';
+    if (/zfh|zwei/.test(a)) return 'zfh';
+    if (/dhh|doppel/.test(a)) return 'dhh';
+    if (/^rh|reihen/.test(a)) return 'rh';
+    if (/mfh|mehr/.test(a)) return 'mfh';
+    return 'efh';
+  }
+  function hausCheckPdf() {
+    var btn = $('eig_pdf'), msg = $('eig_pdf_msg');
+    if (!ergebnis || !window.DpHausCheckAblauf) { if (msg) msg.textContent = 'Erst Kaufpreis, Wohnfläche und Baujahr eintragen.'; return; }
+    var e = eingaben(); e.objektart = objektart();
+    if (e.objektart === 'mfh') { if (msg) msg.textContent = DpEigennutzerKern.MFH_HINWEIS; return; }
+    var adresse = [((val('str') || '') + ' ' + (val('hnr') || '')).trim(), ((e.plz || '') + ' ' + (val('ort') || '')).trim()].filter(Boolean).join(', ');
+    btn.disabled = true; if (msg) msg.textContent = 'Wert, Beleihungswert und Umfeld werden geholt …';
+    var ref = window._currentObjKey || null;
+    var holen = (ref && window.Auth && typeof Auth.apiCall === 'function')
+      ? Auth.apiCall('/marktbericht/hauscheck-objekt', { method: 'POST', body: { ref: ref, darlehen: ergebnis.darlehen, objektart: e.objektart } }).catch(function () { return null; })
+      : Promise.resolve(null);
+    holen.then(function (b) {
+      if (msg) msg.textContent = (b && b.verfuegbar) ? '' : 'Ohne Marktbericht Stufe 3 für dieses Objekt fehlt im PDF der Wert. Den Marktbericht im Reiter Objekt erstellen.';
+      return DpHausCheckAblauf.html({ e: e, d: daten || {}, bericht: (b && b.verfuegbar) ? b : {}, adresse: adresse });
+    }).then(function (r) { window.DpDokument.vorschau(r.html, 'Haus-Check'); })
+      .catch(function (err) { if (msg) msg.textContent = (err && err.message) || 'Das PDF ging gerade nicht.'; })
+      .then(function () { btn.disabled = false; });
+  }
+
   function zeichnen() {
     var p = $('eig-panel'); if (!p) return;
     p.innerHTML = inhalt(aktiv);
     var bs = document.querySelectorAll('nav.eig-tabs .tab');
     for (var i = 0; i < bs.length; i++) bs[i].classList.toggle('active', bs[i].getAttribute('data-eig') === aktiv);
     var n = $('eig_netto_app'); if (n) n.addEventListener('change', function () { berechnen(zeichnen); });
+    var pb = $('eig_pdf'); if (pb) pb.addEventListener('click', hausCheckPdf);
     nutzKnoepfe();
   }
 
