@@ -1,0 +1,315 @@
+{
+ "ags": "12065136",
+ "gemeinde": "Hennigsdorf",
+ "haus": {
+  "regel": "ausgeschlossen",
+  "beleg": "S. 2 Nr. 2 Geltungsbereich: ausgenommen „Wohnungen in Ein- und Zweifamilienhäusern“; S. 4 Nr. 4.2.1: nur Mieten in Mehrfamilienhäusern mit drei und mehr Wohnungen"
+ },
+ "art": "qualifiziert",
+ "stand": "2026-04-01",
+ "erhebungsstichtag": "2026-01-01",
+ "gueltig_ab": "2026-04-01",
+ "gueltig_bis": null,
+ "quelle": {
+  "url": "https://www.hennigsdorf.de/media/custom/3590_5594_1.PDF",
+  "dokument": "Hennigsdorfer Mietspiegel 2026, Hinweise zum Mietspiegel der Stadt Hennigsdorf, Kap. 6 Mietspiegeltabelle",
+  "seite": "S. 8 (Tabelle, PDF-Seite 10), S. 1 (Erstellung, Stichtag, Anerkennung, Inkrafttreten), S. 2 (Geltungsbereich)",
+  "lizenz": "kein Rechtevorbehalt und kein Speicherverbot im Dokument (geprüft 26.11.2026); amtliche Veröffentlichung nach § 558c Abs. 4 BGB",
+  "abgerufen": "2026-11-26"
+ },
+ "einheit": "eur_qm_nettokalt",
+ "form": "tabelle",
+ "rundung": 2,
+ "hinweis": "Qualifiziert nach § 558d BGB, anerkannt von der Stadt Hennigsdorf und den Interessenvertretungen der Mieter und Vermieter im Arbeitskreis; Neuerstellung auf Stichprobe mit Stichtag 1. Januar 2026 (2.035 Mieten), in Kraft am 1. April 2026 (S. 1). Ein Ende der Geltung nennt das Dokument nicht. Tabelle S. 8 (Wohnfläche × Baualter, nur gute Ausstattung mit Innen-WC, Bad/Dusche und Sammelheizung, S. 5; Baualter vor 03.10.1990 gilt als saniert, S. 6), Mittelwert und 2/3-Spanne; Felder mit * (10 bis 20 Mietwerte, bedingte Aussagekraft): 1950–62 ab 80 m², 03.10.1990–2011 20 bis < 40 m², ab 2012 20 bis < 40 m² und ab 80 m². Leerfeld 1963–74 ab 80 m² nicht eingetragen. Baualtersgrenze 1990: die Tabelle trennt am 02./03.10.1990; DealPilot kennt nur das Baujahr und ordnet 1990 der Klasse 1975–02.10.1990 zu, ab 1991 der Klasse 03.10.1990–2011. Letzte Klasse endet am 31.01.2026. Keine Wohnlagen-Gliederung (normale Wohnlage, S. 6–7). Einbauküche mit Zusatzausstattung nur Höherstufung innerhalb der Spanne (S. 5). Tabelle am Druckbild geprüft. Seitenzahlen = aufgedruckte Seiten (PDF-Seite minus 2). Dazu der Endbericht „Grundlagen für den empirischen Mietspiegel“ (Dr. Michael Clar, April 2026): https://www.hennigsdorf.de/media/custom/3590_5635_1.PDF",
+ "tabelle": {
+  "geltung": {
+   "wfl_von": 20,
+   "baujahr_bis": 2026
+  },
+  "achsen": {
+   "baujahr": [
+    {
+     "von": null,
+     "bis": 1949,
+     "label": "1: bis 1949"
+    },
+    {
+     "von": 1950,
+     "bis": 1962,
+     "label": "2: 1950–1962"
+    },
+    {
+     "von": 1963,
+     "bis": 1974,
+     "label": "3: 1963–1974"
+    },
+    {
+     "von": 1975,
+     "bis": 1990,
+     "label": "4: 1975–02.10.1990"
+    },
+    {
+     "von": 1991,
+     "bis": 2011,
+     "label": "5: 03.10.1990–31.12.2011"
+    },
+    {
+     "von": 2012,
+     "bis": 2026,
+     "label": "6: 01.01.2012–31.01.2026"
+    }
+   ],
+   "wfl": [
+    {
+     "von": 20,
+     "bis": 40,
+     "bis_inkl": false,
+     "label": "A: 20 bis < 40 m²"
+    },
+    {
+     "von": 40,
+     "bis": 60,
+     "bis_inkl": false,
+     "label": "B: 40 bis < 60 m²"
+    },
+    {
+     "von": 60,
+     "bis": 80,
+     "bis_inkl": false,
+     "label": "C: 60 bis < 80 m²"
+    },
+    {
+     "von": 80,
+     "bis": null,
+     "label": "D: ab 80 m²"
+    }
+   ]
+  },
+  "zellen": [
+   {
+    "baujahr": 0,
+    "wfl": 0,
+    "unten": 7.18,
+    "mittel": 8.25,
+    "oben": 10,
+    "seite": "8"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 1,
+    "unten": 6.53,
+    "mittel": 7.43,
+    "oben": 7.88,
+    "seite": "8"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 2,
+    "unten": 6.35,
+    "mittel": 7.75,
+    "oben": 9.07,
+    "seite": "8"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 3,
+    "unten": 5.9,
+    "mittel": 7.84,
+    "oben": 10.31,
+    "seite": "8"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 0,
+    "unten": 5.74,
+    "mittel": 6.36,
+    "oben": 6.86,
+    "seite": "8"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 1,
+    "unten": 5.5,
+    "mittel": 6.26,
+    "oben": 6.5,
+    "seite": "8"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 2,
+    "unten": 6.1,
+    "mittel": 6.59,
+    "oben": 7.12,
+    "seite": "8"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 3,
+    "unten": 6.51,
+    "mittel": 6.95,
+    "oben": 7.3,
+    "seite": "8"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 0,
+    "unten": 5.74,
+    "mittel": 6.94,
+    "oben": 8,
+    "seite": "8"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 1,
+    "unten": 5.5,
+    "mittel": 6.06,
+    "oben": 6.5,
+    "seite": "8"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 2,
+    "unten": 5.5,
+    "mittel": 5.83,
+    "oben": 6,
+    "seite": "8"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 0,
+    "unten": 6.49,
+    "mittel": 7.09,
+    "oben": 8.5,
+    "seite": "8"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 1,
+    "unten": 5.3,
+    "mittel": 6.06,
+    "oben": 6.23,
+    "seite": "8"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 2,
+    "unten": 5.3,
+    "mittel": 5.91,
+    "oben": 6,
+    "seite": "8"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 3,
+    "unten": 5.52,
+    "mittel": 6.51,
+    "oben": 7.5,
+    "seite": "8"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 0,
+    "unten": 7.87,
+    "mittel": 10.84,
+    "oben": 12.78,
+    "seite": "8"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 1,
+    "unten": 7.75,
+    "mittel": 8.73,
+    "oben": 9.41,
+    "seite": "8"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 2,
+    "unten": 7.79,
+    "mittel": 8.94,
+    "oben": 10.22,
+    "seite": "8"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 3,
+    "unten": 7.55,
+    "mittel": 8.81,
+    "oben": 9.75,
+    "seite": "8"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 0,
+    "unten": 9.5,
+    "mittel": 14.76,
+    "oben": 18.01,
+    "seite": "8"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 1,
+    "unten": 9.54,
+    "mittel": 13.19,
+    "oben": 16.02,
+    "seite": "8"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 2,
+    "unten": 9.42,
+    "mittel": 12.07,
+    "oben": 15.08,
+    "seite": "8"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 3,
+    "unten": 9.5,
+    "mittel": 11.17,
+    "oben": 12.5,
+    "seite": "8"
+   }
+  ]
+ },
+ "pruefbeispiele": [
+  {
+   "eingabe": {
+    "baujahr": 1985,
+    "wfl": 65
+   },
+   "erwartet": {
+    "unten": 5.3,
+    "mittel": 5.91,
+    "oben": 6
+   },
+   "seite": "8",
+   "art": "tabellenzelle",
+   "anmerkung": "Feld C4"
+  },
+  {
+   "eingabe": {
+    "baujahr": 2020,
+    "wfl": 50
+   },
+   "erwartet": {
+    "unten": 9.54,
+    "mittel": 13.19,
+    "oben": 16.02
+   },
+   "seite": "8",
+   "art": "tabellenzelle",
+   "anmerkung": "Feld B6"
+  },
+  {
+   "eingabe": {
+    "baujahr": 1970,
+    "wfl": 90
+   },
+   "erwartet": null,
+   "seite": "8",
+   "art": "tabellenzelle",
+   "anmerkung": "Leerfeld D3"
+  }
+ ]
+}
