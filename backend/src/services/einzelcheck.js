@@ -621,6 +621,7 @@ async function handleEinzelcheckPaid(session) {
     return { ok: false, reason: 'kein_kauf' };
   }
   const k = claim.rows[0];
+  await require('./verkaufSchalter').gezaehlt('einzelcheck', k.amount_cents);   /* v5130 KK6 · Käufe heute und im Monat */
   /* Anrechnung: ein eigener Promotion-Code je Kauf auf den festen Coupon, einmal einloesbar, laeuft mit
      der Frist ab. Fehlt der Coupon im Konto, bleibt der Kauf gueltig - nur ohne Anrechnung (gemeldet). */
   let code = null;

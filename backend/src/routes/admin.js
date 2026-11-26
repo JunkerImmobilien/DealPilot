@@ -2296,6 +2296,27 @@ router.get('/landing-analytics', requireAdmin, async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
+/* v5130 KK6 · Verkauf an/aus (Marcel 26.11.2026): „Deal-Check verkaufen“, „Haus-Check verkaufen“ mit Käufen heute
+   und im Monat. Lesen für jeden Admin, Schalten nur Rolle owner, jede Änderung im admin_audit_log.
+   Die Umgebungsvariable bleibt Obergrenze (services/verkaufSchalter.js). */
+router.get('/verkauf', requireAdmin, async (req, res) => {
+  try { res.json({ produkte: await require('../services/verkaufSchalter').stand() }); }
+  catch (e) { res.status(500).json({ error: e.message }); }
+});
+router.post('/verkauf', requireAdmin, requireRole('owner'), async (req, res) => {
+  const vs = require('../services/verkaufSchalter');
+  const b = req.body || {};
+  const produkt = String(b.produkt || '');
+  if (!vs.PRODUKTE[produkt] || typeof b.aktiv !== 'boolean') return res.status(400).json({ error: 'produkt und aktiv (true/false) erforderlich' });
+  try {
+    const vorher = (await vs.stand()).find((x) => x.produkt === produkt);
+    const stand = await vs.setzen(produkt, b.aktiv, req.adminUser.email);
+    await audit(req.app.get('db'), req.adminUser.id, req.adminUser.email, 'verkauf.' + (b.aktiv ? 'an' : 'aus'), 'verkauf', produkt,
+      { produkt, vorher: vorher ? vorher.schalter : null, nachher: b.aktiv, umgebung: vorher ? vorher.umgebung : null }, req.ip, req.headers['user-agent']);
+    res.json({ produkte: stand });
+  } catch (e) { res.status(e.status || 500).json({ error: e.message }); }
+});
+
 /* v4880 · Betrieb: Zustand der Server (nur lesend). Daten vom Host-Takt, Bewertung in services/betrieb.js. */
 router.get('/betrieb', requireAdmin, async (req, res) => {
   try {
