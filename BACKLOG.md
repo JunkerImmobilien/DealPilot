@@ -18,7 +18,7 @@ Einzelheiten: wissen/2026-11-25.md, Abschnitt „Stand 25.11.2026 mittags“. In
 
 Stand und Einzelheiten: `wissen/2026-11-24.md`, Abschnitt „Abendstand 24.11.2026“. Prod 1.0.190.
 
-1. **Investment-PDF neu gegliedert + Kurzfassung** — Muster `Dateien/Investment-PDF/v4580/*-v4580b*.pdf`, nicht live. Bei Freigabe dp-dokumente.js v4580h und PDF-Dienst auf Prod. (Ersetzt den zurückgestellten Punkt „PDF-Fassungen neu denken“.)
+1. ~~**Investment-PDF neu gegliedert + Kurzfassung**~~ **Erledigt 26.11.2026 (v5060, main 70df7756, Prod 1.0.230):** drei Fassungen zur Auswahl, Kombi Standard, Kurzfassung, Bankfassung (Marcel 26.11.: „1. ja genau“). Rest: Marcel probiert je Fassung einmal auf Prod.
 2. **Portfolio-Cockpit neu** — zehn Demos `Dateien/Portfolio-Cockpit/Demos-2026-11-24/`, Empfehlung Demo 01 + Baukasten; Vermögenswert entscheiden.
 3. **EK-Rendite** — Marcel meldet sich.
 4. **Black Friday v2 / ViVi-Werbung** — Variante wählen, Hook, LinkedIn, ViVi-OK; nichts veröffentlichen ohne Freigabe.
