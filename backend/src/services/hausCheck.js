@@ -13,14 +13,19 @@
  *     verlässt den Browser NIE.
  *   - der Bericht holt Stufe 3 (Wert), den indikativen Beleihungswert nach § 4 Abs. 2 BelWertV (Eigennutzung) und
  *     das Umfeld in EINEM Lauf des mb-Dienstes (/reports/einzelcheck mit hauscheck: {...}), ohne Ablage.
- *   - keine Anrechnung aufs Abo (nicht entschieden).
+ *   - Anrechnung aufs Abo wie beim Einzel-Check (Marcel 26.11.2026): je Kauf ein eigener Promotion-Code auf den festen
+ *     Coupon dp_hauscheck_anrechnung (9,99 €, einmal), gültig bis Fristende.
+ *   - EIGENER Schalter HAUSCHECK_AKTIV (Marcel 26.11.2026), getrennt von EINZELCHECK_AKTIV.
  *   - nur EFH, ZFH, DHH, RH, ETW. Ein MFH bekommt den Hinweis auf den Modus Vermieten.
  * ═══════════════════════════════════════════════════════════════════════════ */
+const crypto = require('crypto');
 const ec = require('./einzelcheck');
 
 const VERSION = 'v5130kk6';
 const PRODUKT = 'hauscheck';
 const LOOKUP_KEY = 'dp_hauscheck_999';
+/* Coupon in BEIDEN Stripe-Konten mit genau dieser ID (tools/stripe-hauscheck-preis-anlegen.mjs legt ihn mit an) */
+const ANRECHNUNG_COUPON = 'dp_hauscheck_anrechnung';
 const ARTEN = ['EFH', 'ZFH', 'DHH', 'RH', 'ETW'];
 const PFLICHT = ['kp', 'wfl', 'art', 'bj', 'ek_eur'];
 const MFH_HINWEIS = 'Für Mehrfamilienhäuser den Modus Vermieten nutzen.';
@@ -36,6 +41,14 @@ let _deps = null;
 function deps() { return _deps || STANDARD; }
 /** nur für tools/hauscheck-pruefen.mjs */
 function _setzeDeps(d) { _preisCache = null; _deps = d ? Object.assign(Object.create(STANDARD), d) : null; }
+
+/* ── Schalter: HAUSCHECK_AKTIV=1 frei, =0 aus, sonst nur Staging ── */
+function aktiv() {
+  const s = String(process.env.HAUSCHECK_AKTIV || '');
+  if (s === '1') return true;
+  if (s === '0') return false;
+  return ec.istStaging();
+}
 
 /* ── Eingaben: nur die Felder des Einzel-Checks (Weißliste), Pflicht wie oben, Art nur Eigennutzer-Arten ── */
 function grundSauber(g) { return ec.grundSauber(g); }
@@ -115,8 +128,28 @@ async function kaufLesen(token) {
 }
 function statusAus(z, jetzt) {
   const s = ec.statusAus(z, jetzt);
-  delete s.anrechnung; delete s.mails_rest;
+  delete s.mails_rest;
   return s;
+}
+
+/* Anrechnung: ein eigener Promotion-Code je Kauf auf den festen Coupon, einmal einlösbar, läuft mit der Frist ab.
+   Fehlt der Coupon im Konto, bleibt der Kauf gültig, nur ohne Anrechnung (gemeldet). */
+async function anrechnungAnlegen(k) {
+  const d = deps();
+  let code = null;
+  try {
+    code = 'HC' + crypto.randomBytes(5).toString('hex').toUpperCase();
+    const pc = await d.stripe().promotionCodes.create({
+      coupon: ANRECHNUNG_COUPON, code: code, max_redemptions: 1,
+      expires_at: Math.floor(new Date(k.gueltig_bis).getTime() / 1000),
+      metadata: { dp_kind: 'hauscheck_anrechnung', kauf_id: String(k.id) }
+    });
+    await d.query('UPDATE einzelcheck_kaeufe SET anrechnung_code = $1, anrechnung_promo_id = $2 WHERE id = $3', [code, pc.id, k.id]);
+  } catch (e) {
+    code = null;
+    console.warn('[hauscheck-webhook] Anrechnung nicht angelegt (Coupon ' + ANRECHNUNG_COUPON + ' vorhanden?):', e.message);
+  }
+  return code;
 }
 
 /* ── Webhook: checkout.session.completed mit metadata.type = 'hauscheck' ── */
@@ -130,7 +163,7 @@ async function handlePaid(session) {
   if (!passt) { console.error('[hauscheck-webhook] Sitzung ohne Preis ' + LOOKUP_KEY + ':', session.id); return { ok: false, reason: 'fremder_preis' }; }
   const claim = await d.query(
     "UPDATE einzelcheck_kaeufe SET status = 'bezahlt', bezahlt_am = now(), stripe_payment_intent = COALESCE($1, stripe_payment_intent)" +
-    " WHERE stripe_session_id = $2 AND status = 'offen' AND produkt = 'hauscheck' AND gueltig_bis > now() RETURNING id",
+    " WHERE stripe_session_id = $2 AND status = 'offen' AND produkt = 'hauscheck' AND gueltig_bis > now() RETURNING id, gueltig_bis, amount_cents",
     [session.payment_intent || null, session.id]);
   if (!claim.rowCount) {
     const da = await d.query('SELECT status FROM einzelcheck_kaeufe WHERE stripe_session_id = $1', [session.id]);
@@ -138,8 +171,11 @@ async function handlePaid(session) {
     console.error('[hauscheck-webhook] kein offener Kauf zur Sitzung:', session.id);
     return { ok: false, reason: 'kein_kauf' };
   }
-  console.log('[hauscheck-webhook] bezahlt ' + claim.rows[0].id);
-  return { ok: true, kauf_id: claim.rows[0].id };
+  const k = claim.rows[0];
+  await require('./verkaufSchalter').gezaehlt('hauscheck', k.amount_cents);
+  const code = await anrechnungAnlegen(k);
+  console.log('[hauscheck-webhook] bezahlt ' + k.id + (code ? ' · Anrechnung ' + code : ' · ohne Anrechnung'));
+  return { ok: true, kauf_id: k.id, anrechnung: !!code };
 }
 
 /* ── Bericht: Wert (Stufe 3), Beleihungswert (§ 4 Abs. 2), Umfeld, Lage, Vergleichsmiete ──
@@ -217,5 +253,5 @@ async function bericht(zeile, adresse, darlehen, nhk) {
     lage: m.lage, vergleichsmiete: m.vergleichsmiete, markt: { qm: m.markt.qm, miete_qm: m.markt.miete_qm }, stichtag: m.stichtag, karte };
 }
 
-module.exports = { VERSION, PRODUKT, LOOKUP_KEY, ARTEN, PFLICHT, MFH_HINWEIS, grundSauber, grundFehlt, artErlaubt, preis, kaufAnlegen, kaufLesen,
+module.exports = { VERSION, PRODUKT, LOOKUP_KEY, ANRECHNUNG_COUPON, aktiv, anrechnungAnlegen, ARTEN, PFLICHT, MFH_HINWEIS, grundSauber, grundFehlt, artErlaubt, preis, kaufAnlegen, kaufLesen,
   statusAus, handlePaid, hausWert, belwAus, umfeldAus, nhkSauber, bericht, _setzeDeps };

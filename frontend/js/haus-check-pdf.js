@@ -119,6 +119,7 @@
     bank += '<div class="block"><h3>Kaufnebenkosten</h3>' + B.liste([
       ['Grunderwerbsteuer', B.eur(H.nebenkosten.grest)], ['Notar', B.eur(H.nebenkosten.notar)], ['Grundbuch', B.eur(H.nebenkosten.grundbuch)],
       ['Makler (Käuferanteil)', B.eur(H.nebenkosten.makler)], ['Summe', B.eur(H.nebenkosten.summe) + ' (' + B.pct(H.nebenkosten.pct, 1) + ')', { art: 'summe' }]]) + '</div>';
+    if (e.anrechnung && e.anrechnung.code) bank += '<div class="block"><h3>Weiter in DealPilot</h3><p>Buchst du bis ' + B.esc(new Date(e.anrechnung.bis).toLocaleDateString('de-DE')) + ' ein Paket, rechnet DealPilot ' + B.esc((e.anrechnung.cents / 100).toFixed(2).replace('.', ',')) + ' € an. Code ' + B.esc(e.anrechnung.code) + '. Ein anderer Gutscheincode lässt sich damit nicht kombinieren.</p></div>';
     add('Finanzierung und Bank', 'Rate, Belastung, Kaufnebenkosten, Beleihungswert, Unterlagen', bank);
 
     /* 7 · Förderung */

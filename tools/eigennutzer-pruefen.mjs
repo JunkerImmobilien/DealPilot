@@ -103,6 +103,11 @@ ok(texte.every((t) => !/[–—;]/.test(t)), 'Kundentext ohne – — ;');
   ok(ohneBK.haus.score === mitAusweis.haus.score, 'Haus-Score unabhängig von den Betriebskosten');
   ok(ohneBK.leistbarkeit.quote < mitAusweis.leistbarkeit.quote, 'Betriebskosten erhöhen die Belastung');
   ok(A.every((x) => !/[–—;]/.test(x.l + (x.herkunft || ''))), 'Aufstellung ohne – — ;');
+  const ort = K.kern(Object.assign({}, basisE, { nebenkosten_qm: { wert: 2.4, herkunft: 'Betriebskosten am Ort' } }));
+  const oU = ort.leistbarkeit.aufstellung.find((x) => x.k === 'uebrige');
+  ok(oU.eur === Math.round(2.4 * 130) && /Betriebskosten am Ort/.test(oU.herkunft), 'Schnittstelle: ortsgenauer Wert ersetzt die Pauschale, mit Herkunft');
+  const ortUnt = K.kern(Object.assign({}, basisE, { nebenkosten_qm: 2.4, betriebskosten_monat: 199 }));
+  ok(ortUnt.leistbarkeit.aufstellung.find((x) => x.k === 'uebrige').eur === 199, 'Unterlagen schlagen den ortsgenauen Wert');
 }
 
 /* 10 · Spiegel im Backend gleich der Quelle */

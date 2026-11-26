@@ -176,6 +176,11 @@
        Hausgeld, das die Heizung meist schon enthält, ausser weg.heizung_im_hausgeld === false, etwa bei Gasetagenheizung) */
     var heiz = heizung(e.zustand, wfl, bj, A), heizMonat = heiz.monat, heizHerkunft = heiz.herkunft;
     var uebrig = wfl * A.betriebskosten_qm, uebrigHerkunft = 'Pauschale ' + komma(A.betriebskosten_qm, 2) + ' €/m²';
+    /* Schnittstelle ortsgenaue Werte (Marcel 26.11.2026: eine Datenbank folgt, die Pauschale bleibt Rückfall):
+       e.nebenkosten_qm = Zahl oder { wert: €/m² mtl., herkunft: 'Text für die Aufstellung' }. Rangfolge:
+       Unterlagen (betriebskosten_monat, umlagefähiges Hausgeld) > ortsgenauer Wert > Pauschale. */
+    var nkq = e.nebenkosten_qm, nkqW = nkq != null && typeof nkq === 'object' ? num(nkq.wert) : num(nkq);
+    if (nkqW != null && nkqW > 0 && nkqW < 20) { uebrig = wfl * nkqW; uebrigHerkunft = (nkq && typeof nkq === 'object' && nkq.herkunft ? String(nkq.herkunft).slice(0, 80) : 'ortsüblicher Wert') + ', ' + komma(nkqW, 2) + ' €/m²'; }
     var hgU = art === 'etw' && e.weg ? num(e.weg.hausgeld_umlagefaehig) : null;
     if (num(e.betriebskosten_monat) != null) { uebrig = num(e.betriebskosten_monat); uebrigHerkunft = 'aus den Unterlagen'; }
     if (hgU != null) {

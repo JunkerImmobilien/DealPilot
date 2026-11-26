@@ -1,0 +1,40 @@
+diff --git a/frontend/agb.html b/frontend/agb.html
+index 1e9048da9..775c92438 100644
+--- a/frontend/agb.html
++++ b/frontend/agb.html
+@@ -88,3 +88,3 @@
+     <h1>Allgemeine Geschäftsbedingungen</h1>
+-    <p class="meta">Stand: 24. Mai 2026 · Version 1.0 · Anbieterbezeichnung berichtigt am 23. Oktober 2026</p>
++    <p class="meta">Stand: 26. November 2026 · Version 1.1 · Einzelberichte ergänzt</p>
+ 
+@@ -130,3 +130,4 @@
+       <li>der Erstellung von KI-gestützten Bewertungen und Hinweisen zu eingegebenen Investments,</li>
+-      <li>der Generierung von Exporten (PDF, Bankexport) zur weiteren Verwendung durch den Nutzer.</li>
++      <li>der Generierung von Exporten (PDF, Bankexport) zur weiteren Verwendung durch den Nutzer,</li>
++      <li>der Erstellung einzelner Berichte zu einem Objekt ohne Konto als Einmalkauf (Einzel-Check, Haus-Check, nachfolgend „Einzelberichte").</li>
+     </ul>
+@@ -161,2 +162,3 @@
+     <p>Für kostenpflichtige Plan-Varianten (Starter, Investor, Pro) sowie für KI-Credit-Pakete kommt der Vertrag durch Abschluss des Bestellvorgangs über den Zahlungsdienstleister Stripe Payments Europe Ltd. (siehe IV.) zustande. Der Nutzer erhält eine elektronische Bestätigung.</p>
++    <p>Einzelberichte lassen sich ohne Registrierung kaufen. Der Vertrag kommt ebenfalls mit Abschluss des Bestellvorgangs über Stripe zustande. Nach der Zahlung kann der Nutzer den Bericht innerhalb von 14 Tagen bis zu dreimal erzeugen. Danach erlischt der Zugang zum Bericht. Bereits gespeicherte PDF-Dateien bleiben beim Nutzer.</p>
+ 
+@@ -171,3 +173,3 @@
+     </div>
+-    <p>Die aktuellen Preise für die kostenpflichtigen Plan-Varianten und KI-Credit-Pakete sind auf der Plattform und im Bestellvorgang ersichtlich.</p>
++    <p>Die aktuellen Preise für die kostenpflichtigen Plan-Varianten, KI-Credit-Pakete und Einzelberichte sind auf der Plattform und im Bestellvorgang ersichtlich.</p>
+ 
+@@ -177,3 +179,4 @@
+     <h3>(3) Fälligkeit</h3>
+-    <p>Abonnement-Entgelte sind im Voraus zu Beginn der jeweiligen Abrechnungsperiode (monatlich oder jährlich) zahlbar. Einmal-Käufe (KI-Credit-Pakete) sind sofort fällig.</p>
++    <p>Abonnement-Entgelte sind im Voraus zu Beginn der jeweiligen Abrechnungsperiode (monatlich oder jährlich) zahlbar. Einmal-Käufe (KI-Credit-Pakete, Einzelberichte) sind sofort fällig.</p>
++    <p>Bucht der Nutzer innerhalb von 14 Tagen nach dem Kauf eines Einzelberichts eine kostenpflichtige Plan-Variante, wird der Preis des Einzelberichts einmalig über den mitgeteilten Gutscheincode angerechnet. Der Gutscheincode ist nicht mit anderen Gutscheincodes kombinierbar und wird nicht ausgezahlt.</p>
+ 
+@@ -227,3 +230,3 @@
+     </div>
+-    <p>Diese Zustimmung wird der Verbraucher im Bestellvorgang über eine gesonderte Checkbox abgeben. Der Anbieter weist darauf hin, dass die aktive Nutzung der Plattform (Anlegen von Objekten, Berechnungen durchführen) als Beginn der Vertragsausführung gilt.</p>
++    <p>Diese Zustimmung wird der Verbraucher im Bestellvorgang über eine gesonderte Checkbox abgeben. Der Anbieter weist darauf hin, dass die aktive Nutzung der Plattform (Anlegen von Objekten, Berechnungen durchführen) als Beginn der Vertragsausführung gilt. Bei Einzelberichten beginnt die Ausführung mit der Erstellung des Berichts unmittelbar nach der Zahlung.</p>
+ 
+@@ -366,3 +369,3 @@
+     <footer>
+-      Stand: 24. Mai 2026 · AGB-Version 1.0 · <a href="/impressum.html">Impressum</a> · <a href="/datenschutz.html">Datenschutzerklärung</a>
++      Stand: 26. November 2026 · AGB-Version 1.1 · <a href="/impressum.html">Impressum</a> · <a href="/datenschutz.html">Datenschutzerklärung</a>
+     </footer>

@@ -49,10 +49,12 @@
     Object.keys(map).forEach(function (id) { var el = $(id); if (el && map[id] != null && map[id] !== '') el.value = (typeof map[id] === 'number' && id !== 'egBj') ? map[id].toLocaleString('de-DE') : String(map[id]);   /* Baujahr nie mit Tausenderpunkt */ });
   }
 
-  var preisText = '9,99 €';
+  /* Ohne Antwort von /preis (Schalter HAUSCHECK_AKTIV aus: 404) gilt „Bald verfügbar“, nie ein Kaufknopf ins Leere */
+  var preisText = '9,99 €', verkauf = false;
   fetch(API + '/preis').then(function (r) { return r.ok ? r.json() : null; }).then(function (p) {
     if (p && p.amount_cents) preisText = (p.amount_cents / 100).toFixed(2).replace('.', ',') + ' €';
-    var b = $('hcKaufen'); if (b) b.textContent = 'Haus-Check kaufen · ' + preisText;
+    verkauf = !!(p && p.amount_cents > 0 && p.verkauf !== false);   /* Admin › Betrieb: Verkauf aus */
+    var b = $('hcKaufen'); if (b) { if (verkauf) b.textContent = 'Haus-Check kaufen · ' + preisText; else { b.textContent = 'Bald verfügbar'; b.disabled = true; } }
   }).catch(function () {});
 
   function kaufBox() {
@@ -66,7 +68,7 @@
       + '<li>Zustand, Umfeld und Unterlagenliste für die Bank</li></ul>'
       + (e.str && (e.objektart === 'etw' || e.gsfl > 0) ? '' : '<p>Für den Wert braucht es die Straße mit Hausnummer' + (e.objektart === 'etw' ? '' : ' und die Grundstücksfläche') + '.</p>')
       + '<label><input type="checkbox" id="hcWv"> Ich möchte, dass der Bericht sofort entsteht. Mir ist bekannt, dass mein Widerrufsrecht damit erlischt.</label>'
-      + '<button type="button" id="hcKaufen">Haus-Check kaufen · ' + preisText + '</button><div class="hc-msg" id="hcMsg"></div>';
+      + (verkauf ? '<button type="button" id="hcKaufen">Haus-Check kaufen · ' + preisText + '</button>' : '<button type="button" id="hcKaufen" disabled>Bald verfügbar</button>') + '<div class="hc-msg" id="hcMsg"></div>';
     erg.appendChild(box);
     $('hcKaufen').addEventListener('click', kaufen);
   }
@@ -83,6 +85,7 @@
       grund: { kp: e.kp, wfl: e.wfl, gsfl: e.gsfl || undefined, bj: e.bj, art: String(e.objektart).toUpperCase(), ek_eur: e.ek || 0, plz: e.plz } })
       .then(function (j) {
         if (j && j.url) { location.href = j.url; return; }
+        if (j && j.code === 'verkauf_aus') { verkauf = false; $('hcKaufen').textContent = 'Bald verfügbar'; meldung(j.error, true); return; }
         $('hcKaufen').disabled = false; meldung((j && j.error) || 'Der Kauf ging gerade nicht. Bitte noch einmal.', true);
       }).catch(function () { $('hcKaufen').disabled = false; meldung('Der Kauf ging gerade nicht. Bitte noch einmal.', true); });
   }
@@ -118,11 +121,16 @@
       var adresse = (e.str ? e.str + ', ' : '') + e.plz + ' ' + String(d.gebiet || '').replace(/,.*$/, '');
       return post('/bericht', { token: t, adresse: adresse, darlehen: vor && vor.darlehen, nhk: e.objektart === 'etw' ? null : nhkAus(e) }).then(function (b) {
         if (!b || b._status >= 400) throw new Error((b && b.error) || 'Der Bericht ging gerade nicht.');
-        return A.html({ e: { kp: e.kp, wfl: e.wfl, bj: e.bj, ek: e.ek, netto: e.netto, plz: e.plz, objektart: e.objektart }, d: d, bericht: b, adresse: adresse });
+        return post('/status', { token: t }).then(function (st) {
+          return A.html({ e: { kp: e.kp, wfl: e.wfl, bj: e.bj, ek: e.ek, netto: e.netto, plz: e.plz, objektart: e.objektart }, d: d, bericht: b, adresse: adresse, anrechnung: st && st.anrechnung });
+        });
       });
     }).then(function (erg) {
       html = erg.html;
+      /* Score angleichen: das Ergebnis oben rechnet jetzt mit demselben Wert wie das PDF */
+      try { if (window.DemoEgZeige && erg.r) { var kb = $('hcKauf'); window.DemoEgZeige(erg.r, d, e); if (kb && $('egErg')) $('egErg').appendChild(kb); } } catch (x) {}
       box.innerHTML = '<h4>Dein Haus-Check ist fertig</h4><p>Haus-Score ' + erg.haus.haus.score + ' von 100, ' + esc(erg.haus.haus.stufe.wort) + '. Der Kauf gilt 14 Tage, der Bericht lässt sich bis zu dreimal neu erzeugen.</p>'
+        + (erg.anrechnung ? '<p><b>Anrechnung:</b> Buchst du bis ' + esc(new Date(erg.anrechnung.bis).toLocaleDateString('de-DE')) + ' ein Paket, rechnet DealPilot ' + (erg.anrechnung.cents / 100).toFixed(2).replace('.', ',') + ' € an. Code <b>' + esc(erg.anrechnung.code) + '</b>. Ein anderer Gutscheincode lässt sich damit nicht kombinieren.</p>' : '')
         + '<button type="button" id="hcPdf">PDF herunterladen</button><button type="button" class="zweit" id="hcAnsehen">Im Browser ansehen</button><div id="hcMsg"></div>';
       $('hcAnsehen').addEventListener('click', function () { window.DpDokument.vorschau(html, 'Haus-Check'); });
       $('hcPdf').addEventListener('click', function () {

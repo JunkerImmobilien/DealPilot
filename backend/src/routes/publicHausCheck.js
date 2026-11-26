@@ -8,7 +8,7 @@
  *   POST /bericht   { token, adresse, darlehen } -> Wert (Stufe 3), Beleihungswert (§ 4 Abs. 2), Umfeld · 6 je Stunde
  *   POST /pdf       { token, html, titel } -> PDF vom PDF-Dienst · 12 je Stunde
  *
- * Schalter wie der Einzel-Check (ec.aktiv(): nur Staging, bis Marcel abnimmt). Logik in services/hausCheck.js.
+ * Eigener Schalter HAUSCHECK_AKTIV (hc.aktiv(): =1 frei, =0 aus, sonst nur Staging). Logik in services/hausCheck.js.
  * Das Netto-Einkommen kommt hier nie an, die Haushaltsrechnung macht der Browser.
  * ═══════════════════════════════════════════════════════════════════════════ */
 const express = require('express');
@@ -35,7 +35,7 @@ const bremseBericht = bremse(STUNDE, 6, 'Zu viele Berichte in kurzer Zeit. Bitte
 const bremsePdf = bremse(STUNDE, 12, 'Zu viele PDFs in kurzer Zeit. Bitte später noch einmal.');
 
 router.use(function (req, res, next) {
-  if (!ec.aktiv()) return res.status(404).json({ error: 'Der Haus-Check ist hier noch nicht verfügbar.', code: 'nicht_verfuegbar' });
+  if (!hc.aktiv()) return res.status(404).json({ error: 'Der Haus-Check ist hier noch nicht verfügbar.', code: 'nicht_verfuegbar' });
   res.set('Cache-Control', 'no-store');
   next();
 });
@@ -47,13 +47,18 @@ function fehler(res, e, fallback) {
 }
 
 router.get('/preis', async function (req, res) {
-  try { const p = await hc.preis(false); res.json({ amount_cents: p.amount_cents, currency: p.currency, frist_tage: ec.FRIST_TAGE }); }
+  try {
+    const verkauf = await require('../services/verkaufSchalter').verkauft('hauscheck');
+    const p = await hc.preis(false); res.json({ amount_cents: p.amount_cents, currency: p.currency, frist_tage: ec.FRIST_TAGE, verkauf: verkauf });
+  }
   catch (e) { fehler(res, e, 'preis'); }
 });
 
 router.post('/kaufen', bremseKaufen, express.json({ limit: '16kb' }), async function (req, res) {
   try {
     const b = req.body || {};
+    /* Verkauf aus (Admin › Betrieb): kein neuer Kauf, bezahlte Käufe laufen weiter */
+    if (!(await require('../services/verkaufSchalter').verkauft('hauscheck'))) return res.status(409).json({ error: 'Der Haus-Check ist bald wieder kaufbar. Die Schnellrechnung bleibt kostenlos.', code: 'verkauf_aus' });
     if (b.widerruf_verzicht !== true) return res.status(400).json({ error: 'Bitte bestätige vor dem Kauf, dass der Bericht sofort entstehen soll (Widerrufsrecht).', code: 'widerruf_verzicht_fehlt' });
     const k = await hc.kaufAnlegen({ grund: b.grund, rueckweg: b.rueckweg });
     try { await require('../services/consentService').widerrufVerzichtPruefen(req, { kauf: 'hauscheck', kauf_id: String(k.kauf_id) }); }
