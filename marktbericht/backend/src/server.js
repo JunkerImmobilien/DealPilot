@@ -11,6 +11,7 @@ import { starteHarvestScheduler } from './lib/harvestScheduler.js';
 import { starteMakroTakt } from './services/MakroImportService.js';   /* v2172 */
 import { starteBaustatistikTakt } from './services/BaustatistikService.js';   /* v3172 */
 import { starteJahreswerteTakt } from './services/JahreswerteService.js';   /* v3021 */
+import { starteMietspiegelWaechter } from './services/MietspiegelWaechterService.js';   /* v5080 */
 import { router } from './routes/api.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -46,6 +47,7 @@ const server = app.listen(cfg.port, () => {
   try { starteMakroTakt(); } catch (e) { console.log('[makro] Start fehlgeschlagen:', e.message); }
   try { starteBaustatistikTakt(); } catch (e) { console.log('[baustatistik] Start fehlgeschlagen:', e.message); }   /* v3172 */
   try { starteJahreswerteTakt(); } catch (e) { console.log('[jahreswerte] Start fehlgeschlagen:', e.message); }   /* v3021 */
+  try { starteMietspiegelWaechter(); } catch (e) { console.log('[mietspiegel] Start fehlgeschlagen:', e.message); }   /* v5080 */
   /* v1083a-WBOOT · Ausschuss-Register aus mb.param_modell nachladen.
    *
    * Das Register laedt seine Saatdatei beim ersten Zugriff selbst

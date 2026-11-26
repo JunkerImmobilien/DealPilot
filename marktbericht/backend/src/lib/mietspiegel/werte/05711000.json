@@ -1,6 +1,7 @@
 {
  "ags": "05711000",
  "gemeinde": "Bielefeld",
+ "haus": {"regel":"ausgeschlossen","beleg":"laut Dokument, siehe Zuschlag bzw. Geltungsbereich in dieser Datei"},
  "art": "qualifiziert",
  "stand": "2026-03",
  "erhebungsstichtag": null,

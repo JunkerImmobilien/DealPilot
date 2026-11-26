@@ -1,6 +1,7 @@
 {
  "ags": "05117000",
  "gemeinde": "Mülheim an der Ruhr",
+ "haus": {"regel":"zuschlag","merkmal":"efh_ohne_terrasse_garten","fuer":["efh","zfh","dhh","rh"],"hinweis":"Zuschlag mit Terrasse oder Garten wählbar","beleg":"laut Dokument, siehe Zuschlag bzw. Geltungsbereich in dieser Datei"},
  "art": "qualifiziert",
  "stand": "2026-01-01",
  "erhebungsstichtag": null,

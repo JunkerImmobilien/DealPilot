@@ -3,6 +3,7 @@
  "freigabe": "gesperrt",
  "freigabe_grund": "Stadt Leipzig, „Alle Rechte vorbehalten“ — auf Prod gesperrt bis zur Klärung (Marcel, 09.11.2026)",
  "gemeinde": "Leipzig",
+ "haus": {"regel":"zuschlag","merkmal":"efh_zfh","fuer":["efh","zfh","dhh","rh"],"beleg":"laut Dokument, siehe Zuschlag bzw. Geltungsbereich in dieser Datei"},
  "art": "qualifiziert",
  "stand": "2025-07-01",
  "erhebungsstichtag": "2024-10-01",

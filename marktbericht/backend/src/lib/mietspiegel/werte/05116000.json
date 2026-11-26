@@ -1,11 +1,13 @@
 {
  "ags": "05116000",
  "gemeinde": "Mönchengladbach",
+ "haus": {"regel":"zuschlag","merkmal":"einfamilienhaus","fuer":["efh","dhh","rh"],"beleg":"laut Dokument, siehe Zuschlag bzw. Geltungsbereich in dieser Datei"},
  "art": "einfach",
  "stand": "2026-05-01",
  "erhebungsstichtag": "2024-10-01",
  "gueltig_ab": "2026-05-01",
  "gueltig_bis": null,
+ "naechste_ausgabe": "2028",
  "quelle": {
   "url": "https://www.moenchengladbach.de/fileadmin/user_upload/FB62/Mietspiegel/Mietspiegel_2026_Download.pdf",
   "dokument": "Mietspiegel 2026 mit Dokumentation für nicht preisgebundene Wohnungen und Einfamilienhäuser in Mönchengladbach (Arbeitsgemeinschaft Mietspiegel Mönchengladbach)",

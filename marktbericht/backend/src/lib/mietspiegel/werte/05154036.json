@@ -1,6 +1,7 @@
 {
  "ags": "05154036",
  "gemeinde": "Kleve",
+ "haus": {"regel":"zuschlag","merkmal":{"efh":"haus_efh_freistehend","dhh":"haus_efh","rh":"haus_efh"},"fuer":["efh","dhh","rh"],"hinweis":"Mitte der Spanne des Mietspiegels","beleg":"S. 5 (Einfamilienhäuser 10 bis 15 %, freistehende 15 bis 25 %), geprüft 26.11.2026"},
  "art": "einfach",
  "stand": "2025-08-01",
  "erhebungsstichtag": null,
@@ -215,6 +216,8 @@
    }
   ],
   "zuschlaege": [
+   {"merkmal":"haus_efh_freistehend","art":"pct","wert":20,"label":"freistehendes Einfamilienhaus (Mitte der Spanne 15 bis 25 %)","beleg":"S. 5 (Einfamilienhäuser 10 bis 15 %, freistehende 15 bis 25 %), geprüft 26.11.2026"},
+   {"merkmal":"haus_efh","art":"pct","wert":12.5,"label":"Einfamilienhaus, nicht freistehend (Mitte der Spanne 10 bis 15 %)","beleg":"S. 5 (Einfamilienhäuser 10 bis 15 %, freistehende 15 bis 25 %), geprüft 26.11.2026"},
    {
     "merkmal": "lage:gut",
     "art": "pct",

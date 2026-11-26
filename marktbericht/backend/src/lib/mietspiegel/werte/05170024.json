@@ -1,6 +1,7 @@
 {
  "ags": "05170024",
  "gemeinde": "Moers",
+ "haus": {"regel":"zuschlag","merkmal":"haus_efh","fuer":["efh","dhh","rh"],"hinweis":"Mitte der Spanne des Mietspiegels","beleg":"S. 3 (Einfamilienhäuser Zuschlag 10 % bis 35 %), geprüft 26.11.2026"},
  "art": "einfach",
  "stand": "2025-01-01",
  "erhebungsstichtag": null,
@@ -529,6 +530,7 @@
    }
   ],
   "zuschlaege": [
+   {"merkmal":"haus_efh","art":"pct","wert":22.5,"label":"Einfamilienhaus (Mitte der Spanne 10 bis 35 %)","beleg":"S. 3 (Einfamilienhäuser Zuschlag 10 % bis 35 %), geprüft 26.11.2026"},
    {
     "merkmal": "lage:einfach",
     "art": "pct",

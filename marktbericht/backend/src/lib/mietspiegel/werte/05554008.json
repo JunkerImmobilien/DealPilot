@@ -1,6 +1,7 @@
 {
   "ags": "05554008",
   "gemeinde": "Bocholt",
+  "haus": {"regel":"gilt","hinweis":"Zuschlag für Terrasse oder Garten wählbar","beleg":"laut Dokument, siehe Zuschlag bzw. Geltungsbereich in dieser Datei"},
   "art": "qualifiziert",
   "stand": "2026-01-01",
   "erhebungsstichtag": "2025-05-01",

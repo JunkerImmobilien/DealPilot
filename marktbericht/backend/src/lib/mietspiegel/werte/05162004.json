@@ -3,6 +3,7 @@
  "freigabe": "gesperrt",
  "freigabe_grund": "„Eine Veröffentlichung des Mietspiegels ist ohne die Genehmigung der o.g. Vereine nicht gestattet“ (Titelseite) — kein ausdrückliches Speicherverbot; auf Prod gesperrt bis zur Klärung",
  "gemeinde": "Dormagen",
+ "haus": {"regel":"zuschlag","merkmal":"einfamilienhaus","fuer":["efh","zfh","dhh","rh"],"beleg":"laut Dokument, siehe Zuschlag bzw. Geltungsbereich in dieser Datei"},
  "art": "einfach",
  "stand": "2023-01-01",
  "erhebungsstichtag": null,

@@ -1184,7 +1184,8 @@
   function msMerkmalQuery() {
     var q = [['standardstufe', wert('standardstufe')], ['mikrolage', wert('mikrolage')], ['mod_punkte', wert('mod_punkte')],
       ['zustand', wert('ds2_zustand')], ['zieljahr', wert('zb_fertig_jahr')], ['mietstg', wert('mietstg')],
-      ['lage', wert('ms_lage')], ['ausstattung', wert('ms_ausst')], ['merkmale', wert('ms_merk')]]   /* v3880 · Merkmale laut Mietspiegel */
+      ['lage', wert('ms_lage')], ['ausstattung', wert('ms_ausst')], ['merkmale', wert('ms_merk')],   /* v3880 · Merkmale laut Mietspiegel */
+      ['objektart', (el('objart') && el('objart').value) || '']]   /* v5080 · Häuser: Zuschlag oder Ausschluss laut Mietspiegel */
       .filter(function (x) { return x[1] != null && String(x[1]).trim() !== ''; })
       .map(function (x) { return '&' + x[0] + '=' + encodeURIComponent(String(x[1]).trim().replace(',', '.')); });
     return q.join('') + (window.DpMieteRegel ? DpMieteRegel.query() : '');   /* v3845 */
@@ -1257,7 +1258,9 @@
   var _msNz = {};   /* 'ags|baujahr|wfl' -> naeherung | null */
   function msNaeherung() {
     var reg = msRegister();
-    if (!reg || reg.werte_verfuegbar || !reg.naeherung_verfuegbar) return null;
+    /* v5080 · Mietspiegel schließt Häuser aus (z. B. Dortmund, Dresden): für EFH/ZFH/DHH/RH gilt die Näherung */
+    var hausAus = !!(reg && reg.haus_regel === 'ausgeschlossen' && /^(EFH|ZFH|DHH|RH)$/.test((el('objart') && el('objart').value) || ''));
+    if (!reg || ((reg.werte_verfuegbar || !reg.naeherung_verfuegbar) && !hausAus)) return null;
     if (zahl(wert('zb_vgl_qm')) > 0 || zahl(wert('ms_unten')) > 0 || zahl(wert('ms_mittel')) > 0 || zahl(wert('ms_oben')) > 0) return null;
     var fl = Math.round(zahl(msObjektWfl()) * 100) / 100, bj = parseInt(wert('baujahr'), 10);
     if (!(bj > 1000) || !(fl > 0)) return null;

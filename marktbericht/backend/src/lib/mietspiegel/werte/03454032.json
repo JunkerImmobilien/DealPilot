@@ -1,6 +1,7 @@
 {
  "ags": "03454032",
  "gemeinde": "Lingen (Ems)",
+ "haus": {"regel":"ausgeschlossen","beleg":"laut Dokument, siehe Zuschlag bzw. Geltungsbereich in dieser Datei"},
  "art": "qualifiziert",
  "stand": "2026-04-01",
  "erhebungsstichtag": null,

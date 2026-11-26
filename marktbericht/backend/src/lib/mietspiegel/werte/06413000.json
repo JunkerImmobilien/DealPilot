@@ -1,6 +1,7 @@
 {
   "ags": "06413000",
   "gemeinde": "Offenbach am Main",
+  "haus": {"regel":"ausgeschlossen","beleg":"laut Dokument, siehe Zuschlag bzw. Geltungsbereich in dieser Datei"},
   "art": "einfach",
   "stand": "2026-01-01",
   "erhebungsstichtag": null,

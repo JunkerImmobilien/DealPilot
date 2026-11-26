@@ -1,6 +1,7 @@
 {
  "ags": "05758012",
  "gemeinde": "Herford",
+ "haus": {"regel":"ausgeschlossen","beleg":"laut Dokument, siehe Zuschlag bzw. Geltungsbereich in dieser Datei"},
  "art": "einfach",
  "stand": "2025-10",
  "erhebungsstichtag": null,

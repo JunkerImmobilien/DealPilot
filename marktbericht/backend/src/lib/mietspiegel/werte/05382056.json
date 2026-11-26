@@ -1,11 +1,13 @@
 {
  "ags": "05382056",
  "gemeinde": "Sankt Augustin",
+ "haus": {"regel":"zuschlag","merkmal":"efh_dhh_zfh_rh","fuer":["efh","zfh","dhh","rh"],"beleg":"laut Dokument, siehe Zuschlag bzw. Geltungsbereich in dieser Datei"},
  "art": "qualifiziert",
  "stand": "2026-01-01",
  "erhebungsstichtag": "2025-04-01",
  "gueltig_ab": "2026-01-01",
- "gueltig_bis": null,
+ "gueltig_bis": "2027-12-31",
+ "gueltig_bis_herkunft": "Mietspiegel-Verzeichnis, Beleg dort",
  "quelle": {
   "url": "https://serviceportal.sankt-augustin.de/detail/-/vr-bis-detail/dokument/83844/download",
   "dokument": "Qualifizierter Mietspiegel Sankt Augustin 2026 (Fortschreibung des Mietspiegels 2024, Broschüre)",

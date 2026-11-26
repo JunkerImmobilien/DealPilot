@@ -1,6 +1,7 @@
 {
  "ags": "05170008",
  "gemeinde": "Dinslaken",
+ "haus": {"regel":"gilt","hinweis":"Zuschlag für Einfamilienhaus mit Gartennutzung wählbar","beleg":"laut Dokument, siehe Zuschlag bzw. Geltungsbereich in dieser Datei"},
  "art": "einfach",
  "stand": "2026-01-01",
  "erhebungsstichtag": null,

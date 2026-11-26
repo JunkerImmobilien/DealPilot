@@ -1,11 +1,13 @@
 {
  "ags": "05358008",
  "gemeinde": "Düren",
+ "haus": {"regel":"gilt","beleg":"laut Dokument, siehe Zuschlag bzw. Geltungsbereich in dieser Datei"},
  "art": "qualifiziert",
  "stand": "2025-01-01",
  "erhebungsstichtag": "2024-08-01",
  "gueltig_ab": "2025-01-01",
  "gueltig_bis": "2026-12-31",
+ "naechste_ausgabe": "2027-01-01",
  "quelle": {
   "url": "https://www.dueren.de/assets/userfiles/pdf_bereich_lebenundwohnen/mietspiegel/qMSP_Dueren_Broschuere_2025.pdf",
   "dokument": "Mietspiegel für frei finanzierte Wohnungen in Düren 2025 (qualifiziert, Broschüre)",

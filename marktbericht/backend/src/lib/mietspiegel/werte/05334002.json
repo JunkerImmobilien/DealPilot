@@ -1,6 +1,7 @@
 {
  "ags": "05334002",
  "gemeinde": "Aachen",
+ "haus": {"regel":"ausgeschlossen","beleg":"laut Dokument, siehe Zuschlag bzw. Geltungsbereich in dieser Datei"},
  "art": "qualifiziert",
  "stand": "2026-01-01",
  "erhebungsstichtag": "2025-06-01",
