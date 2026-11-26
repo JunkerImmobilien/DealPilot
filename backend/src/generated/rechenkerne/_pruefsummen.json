@@ -1,5 +1,5 @@
 {
- "erzeugt_am": "2026-11-26T21:46:30.197Z",
+ "erzeugt_am": "2026-11-26T21:47:21.362Z",
  "hinweis": "Woertliche Spiegelung von frontend/js/ — NICHT hier bearbeiten. Quelle aendern, dann: node tools/rechenkerne-spiegeln.mjs",
  "reihenfolge": [
   "dscr-engine.js",
