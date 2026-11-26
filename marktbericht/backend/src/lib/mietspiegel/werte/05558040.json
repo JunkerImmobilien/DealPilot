@@ -1,0 +1,263 @@
+{
+ "ags": "05558040",
+ "gemeinde": "Rosendahl",
+ "art": "qualifiziert",
+ "stand": "2024-12-01",
+ "erhebungsstichtag": null,
+ "gueltig_ab": "2024-12-01",
+ "gueltig_bis": "2026-11-30",
+ "quelle": {
+  "url": "https://www.kreis-coesfeld.de/media/GAA/Downloads/Rosendahl2024.pdf",
+  "dokument": "Mietspiegel Gemeinde Rosendahl für nicht preisgebundene Wohnungen (Qualifizierter Mietspiegel i.S. § 558 d BGB), Stand 01. Dezember 2024, bearbeitet durch die Geschäftsstelle des Gutachterausschusses für Grundstückswerte im Kreis Coesfeld im Auftrag der Gemeinde Rosendahl (Herausgeber), mit Zustimmung der Vermieter- und Mieterverbände",
+  "seite": "S. 1 (Titel, § 558d, Laufzeit zwei Jahre, Kovarianzanalyse), S. 2 (Tabelle U/M/O, Art, Größe), S. 3–4 (Ausstattung, Beschaffenheit, Lage)",
+  "lizenz": "kein Rechtevorbehalt im Dokument (kein Nachdruck- oder Speicherverbot, kein Urheberrechtsvermerk), geprüft am 2026-11-26",
+  "abgerufen": "2026-11-26"
+ },
+ "einheit": "eur_qm_nettokalt",
+ "form": "tabelle",
+ "rundung": 2,
+ "hinweis": "Qualifizierter Mietspiegel (§ 558d BGB, Kovarianzanalyse, Vermieterbefragung 2024), einer von elf Mietspiegeln im Kreis Coesfeld (Arbeitskreis Mietspiegel, Dokumentation https://www.nottuln.de/fileadmin/media/PDF/Fachbereich_3/Mietspiegel/Mietspiegeldokumentation_2024.pdf). Stand 01.12.2024, „Laufzeit von zwei Jahren“ → gueltig_bis 30.11.2026 abgeleitet (Nachfolger zum 01.12.2026 zu erwarten, am 26.11.2026 noch nicht veröffentlicht). Tabelle S. 2: Unterer Wert / Mittelwert / Oberer Wert je Baujahrklasse × Wohnfläche; Werte aus der Textschicht (Koordinaten, Spaltenzuordnung U/M/O), Wohnflächenklassen am Druckbild geprüft. Ganzzahlige Wohnflächenklassen als stetige Grenzen; über 120 m² bis 180 m² gilt die letzte Zeile mit dem Übergrößenabschlag (S. 2 Größe: „Für freistehende Einfamilienhäuser, Doppelhaushälften und Reihenhäuser ist der Mietspiegel bis zu einer Wohnfläche von 120 m² anwendbar“, danach Abschläge) — die Abschläge gelten laut Dokument für übergroße Wohneinheiten allgemein. Zu-/Abschläge beziehen sich laut Dokument auf den Mittelwert, der Kern wendet % auf U, M und O an. Vor 1950 kein Tabellenwert (Tabelle beginnt mit 1950). NICHT abgebildet: Zu-/Abschläge für Ausstattung, Beschaffenheit/Modernisierung und Lage (S. 3–4), Einliegerwohnung/Wohn- und Geschäftshaus sind Tabellenbasis.",
+ "haus": {
+  "regel": "zuschlag",
+  "merkmal": {
+   "efh": "haus_efh",
+   "dhh": "haus_dhh",
+   "rh": "haus_rh"
+  },
+  "gilt_fuer": [
+   "efh",
+   "dhh",
+   "rh"
+  ],
+  "gilt_fuer_herkunft": "wortlaut",
+  "hinweis": "Einfamilienhaus +9 %, Doppelhaushälfte +4 %, Reihenhaus +4 % auf den Mittelwert",
+  "beleg": "S. 2 Art"
+ },
+ "tabelle": {
+  "achsen": {
+   "baujahr": [
+    {
+     "von": 1950,
+     "bis": 1979,
+     "label": "1950 – 1979"
+    },
+    {
+     "von": 1980,
+     "bis": 1999,
+     "label": "1980 – 1999"
+    },
+    {
+     "von": 2000,
+     "bis": 2023,
+     "label": "2000 – 2023"
+    }
+   ],
+   "wfl": [
+    {
+     "von": 30,
+     "von_inkl": true,
+     "bis": 70,
+     "label": "30 – 70 m²"
+    },
+    {
+     "von": 70,
+     "von_inkl": false,
+     "bis": 90,
+     "label": "71 – 90 m²"
+    },
+    {
+     "von": 90,
+     "von_inkl": false,
+     "bis": 180,
+     "label": "91 – 120 m² (darüber bis 180 m² mit Abschlag)"
+    }
+   ]
+  },
+  "geltung": {
+   "baujahr_von": null,
+   "baujahr_bis": null,
+   "wfl_von": 30,
+   "wfl_bis": 180
+  },
+  "zellen": [
+   {
+    "baujahr": 0,
+    "wfl": 0,
+    "unten": 5.8,
+    "mittel": 6.85,
+    "oben": 7.95,
+    "seite": "2"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 0,
+    "unten": 6.3,
+    "mittel": 7,
+    "oben": 7.75,
+    "seite": "2"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 0,
+    "unten": 6.4,
+    "mittel": 7.45,
+    "oben": 8.6,
+    "seite": "2"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 1,
+    "unten": 5.3,
+    "mittel": 6.45,
+    "oben": 7.7,
+    "seite": "2"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 1,
+    "unten": 5.8,
+    "mittel": 6.6,
+    "oben": 7.55,
+    "seite": "2"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 1,
+    "unten": 5.9,
+    "mittel": 7.05,
+    "oben": 8.35,
+    "seite": "2"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 2,
+    "unten": 4.85,
+    "mittel": 6.15,
+    "oben": 7.5,
+    "seite": "2"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 2,
+    "unten": 5.35,
+    "mittel": 6.3,
+    "oben": 7.35,
+    "seite": "2"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 2,
+    "unten": 5.45,
+    "mittel": 6.75,
+    "oben": 8.15,
+    "seite": "2"
+   }
+  ],
+  "zuschlaege": [
+   {
+    "merkmal": "uebergroesse",
+    "art": "pct",
+    "label": "Übergroße Wohneinheiten",
+    "beleg": "S. 2–3 Größe",
+    "wfl_klassen": [
+     {
+      "von": 120,
+      "von_inkl": false,
+      "bis": 140,
+      "wert": -5
+     },
+     {
+      "von": 140,
+      "von_inkl": false,
+      "bis": 160,
+      "wert": -9
+     },
+     {
+      "von": 160,
+      "von_inkl": false,
+      "bis": 180,
+      "wert": -13
+     }
+    ]
+   },
+   {
+    "merkmal": "haus_efh",
+    "art": "pct",
+    "wert": 9,
+    "label": "Einfamilienhaus",
+    "beleg": "S. 2 Art"
+   },
+   {
+    "merkmal": "haus_dhh",
+    "art": "pct",
+    "wert": 4,
+    "label": "Doppelhaushälfte",
+    "beleg": "S. 2 Art"
+   },
+   {
+    "merkmal": "haus_rh",
+    "art": "pct",
+    "wert": 4,
+    "label": "Reihenhaus",
+    "beleg": "S. 2 Art"
+   },
+   {
+    "merkmal": "eigentumswohnung",
+    "art": "pct",
+    "wert": 4,
+    "label": "Eigentumswohnung",
+    "beleg": "S. 2 Art"
+   }
+  ]
+ },
+ "pruefbeispiele": [
+  {
+   "eingabe": {
+    "baujahr": 2023,
+    "wfl": 70
+   },
+   "erwartet": {
+    "unten": 6.4,
+    "mittel": 7.45,
+    "oben": 8.6
+   },
+   "seite": "2",
+   "art": "tabellenzelle",
+   "anmerkung": "2000 – 2023 / 30–70 m²"
+  },
+  {
+   "eingabe": {
+    "baujahr": 1979,
+    "wfl": 180
+   },
+   "erwartet": {
+    "unten": 4.22,
+    "mittel": 5.35,
+    "oben": 6.53
+   },
+   "seite": "2",
+   "art": "rechenweg",
+   "anmerkung": "letzte Zeile, 161–180 m² -13 %"
+  },
+  {
+   "eingabe": {
+    "baujahr": 1990,
+    "wfl": 200
+   },
+   "erwartet": null,
+   "seite": "2",
+   "art": "tabellenzelle",
+   "anmerkung": "über 180 m²"
+  },
+  {
+   "eingabe": {
+    "baujahr": 1930,
+    "wfl": 60
+   },
+   "erwartet": null,
+   "seite": "2",
+   "art": "tabellenzelle",
+   "anmerkung": "vor 1950 keine Klasse"
+  }
+ ]
+}
