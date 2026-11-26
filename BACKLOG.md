@@ -8,6 +8,27 @@ Dort **ohne** Nummer: Nummern sind Reihenfolge, kein Name. Die verbleibenden
 Punkte werden fortlaufend neu durchnummeriert. Hängt etwas, kommt `**BLOCKIERT:**` mit einem Satz Begründung
 direkt unter den Punkt — nicht kommentarlos liegenlassen.
 
+## → Offen aus dem 26.11.2026 (Weitermachen + Marcel entscheidet)
+
+**Stand Prod 1.0.232.** Live seit 25.11.: Handy-Menüband wie Desktop, Leiste 280 px (1.0.232), Leerzustände + Besichtigungs-Checkliste (1.0.231), Investment-PDF Kombi/Kurz/Bank (1.0.230), Hinweis Marktpreisindikation Zielbild (1.0.229), Feld-Tipps + Portfolio-Cockpit Handy (1.0.228), npm-Sicherheit (bcrypt 6, zod 4, nodemailer 10, puppeteer 25).
+
+**Weitermachen (Claude):**
+1. Videos neu aufnehmen: Objekt-Cockpit (0:09–0:54), M11 Pilot-Analyse (0:12–0:48), M26 Mieterhöhung und Zielbild. Westerfeldstr. 140 ist auf Staging korrigiert (Ankaufsmiete 2.650 €/Monat, Pilot-Analyse neu). Deal-Check-Video mit `-Sek 260` neu (Auslesen dauert ~121 s).
+2. Drehbücher schreiben und aufnehmen: Ü2, Ü3 Kap. 8–12, Spot Quittengarten Bestandsteil (Daten stimmig), Anpassungen Ü1/M02/M03/M25/M27/M30.
+3. Storybook neu erzeugen. Videothek/Landing erst nach Marcels Abnahme.
+4. Aufnahme: Sperrdatei `scratchpad/m6/aufnahme-laeuft.lock`, Wrapper `scratchpad/m8/auf.ps1` (Vollbild vor/zurück), Demo-Objekte vorher/nachher ganze Zeile vergleichen.
+
+**Marcel entscheidet:**
+- Stimme in den neuen Videos ok? (Dateien/Messe/Videos/2026-11-25 und -26)
+- Storybook-Geschichten ohne Objekt: Castrop-Rauxel 2026-1051, Kabelsketal 2026-1002 — raus oder neu anlegen?
+- Besichtigungs-Checkliste ins Offerte-PDF? In M11 mit aufnehmen?
+- Finanzamt-PDF im Ankauf ganz aus (jetzt aus) oder Vorschau Anlage V behalten?
+- Track Record erst mit gewonnenem Objekt (jetzt so) ok?
+- postgis-Upgrade Marktbericht-DB (braucht ALTER EXTENSION, erst Staging)
+- Baukasten Runde 5 (v4995, nur Staging) nach Prod?
+- Je Investment-PDF-Fassung einmal auf Prod erzeugen und ansehen.
+- Ältere offene Punkte: siehe Blöcke 25.11. und 24.11. darunter.
+
 ## → Offen aus dem 25.11.2026 (Marcel entscheidet)
 
 Einzelheiten: wissen/2026-11-25.md, Abschnitt „Stand 25.11.2026 mittags“. Investment-PDF-Muster, Deal-Score-Grundlage, EK-Rendite-Delta, Tipps Reiter Bank, Portfolio Lagekarte/Vermögenswert, Dokumentenablage, Werbung (Black Week Handy, #dealpilotimmo, LinkedIn, ViVi-OK), Logodateien, Meta-Sprache.
