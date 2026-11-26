@@ -11252,8 +11252,11 @@
         await warteAuf(function () { return q('#ai-content .dp-pa-tab'); }, 10000);
         /* ViVi-Unterreiter gibt es nur mit Pilot-Analyse; vor der Aufnahme für Musterhof 8 abrufen */
         var hatVivi = q('#ai-content .dp-pa-tab') && await k5Tab(/^ViVi/);
-        await zeige(function () { return hatVivi ? k5Panel() : q('#s5'); }, 8);
-        await b2oZeile(s, 'ViVi im Objekt-Cockpit', 'Oben der Stand des Abgleichs, die Felder aus ViVi und die Restschuld. Abweichungen sind markiert.');
+        /* M8 26.11.: ohne Pilot-Analyse fehlt der Unterreiter, dann das Fenster „Abgleich mit ViVi“ (dieselbe Ansicht, nur lesen) */
+        if (!hatVivi) { try { if (window.DpViviReiter) DpViviReiter.oeffnen(); } catch (e) {} await warteAuf(function () { return q('#vr-fenster .oabi-modal'); }, 5000); await warte(900); }
+        await zeige(function () { return hatVivi ? k5Panel() : (q('#vr-fenster .oabi-modal') || q('#s5')); }, 8);
+        await b2oZeile(s, 'Der Abgleich mit ViVi', 'Oben der Stand des Abgleichs, die Felder aus ViVi und die Restschuld. Abweichungen sind markiert.');
+        var vz = q('#vr-fenster [data-vr="zu"]'); if (vz) { vz.click(); await warte(700); }
       },
       async function (s) {   /* 2 · Deal-Aktion */
         reiter('s8'); await warte(1400);
