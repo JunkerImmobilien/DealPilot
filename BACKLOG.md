@@ -38,6 +38,8 @@ Marcel 26.11.2026: „Das Selbst nutzen und Vermieten nimm bitte aus Staging wie
 - [x] 26.11.2026 Bezahlter Haus-Check 9,99 € über den Einzel-Check-Kaufweg, Bericht mit Wert, Beleihungswert und Umfeld, PDF-Knopf in App und Landing (`frontend/landing/haus-check.html`), Testpreis in der Sandbox, Testkauf auf Staging (v5130d bis v5130ikk6).
 - [x] 26.11.2026 Prod-Livegang Haus-Check und Deal-Check-Verkauf, Version 1.0.252 (main `2faa2805e`, `4f61259e`), Stripe live, Schalter an.
 - [x] 26.11.2026 Wohnnebenkosten je Gemeinde statt Pauschale (NN6, 1.0.254, main 5c7298de3): Grundsteuer ortsgenau, übrige Posten Bundesschnitt. Offen: Wasser je Land, Müll je Kreis, Grundsteuer nach Reform, Posten im Bericht einzeln zeigen.
+- [x] 26.11.2026 Haus-Check Nebenkosten einzeln mit Herkunft (PDF, Ergebniskarte), Wasser und Abwasser je Gemeinde aus dem Trinkwasserentgelt, Karte zum Umdrehen mit kompakten Eingaben, Lage und Umfeld nur im Bericht, Erklärung Netto, rnd-eingabe-pruefen ohne Export RC 2 (PP6, 1.0.255, main 85bf3ad0c, staging dcbe59c9d bis c3332048d).
+- [ ] Nebenkosten Haus-Check, offen aus PP6: Müll je Kreis (keine freie amtliche Quelle gefunden), Abwasserentgelt direkt (Regionaldatenbank führt es nicht regional, nur Landesämter als PDF), Grundsteuer nach der Reform (Hebesätze 2025), Rundungsversatz schnellcheck (€/m² gerundet, Kern 22/43 statt 23/44 €).
 - [ ] **Abnahmekauf mit Erstattung (Marcel)** nach `Dateien/Konzepte/Eigennutzer-Bericht-Muster/Abnahme-Haus-Check-Prod.md`.
 - [ ] App-Knopf „Haus-Check als PDF“ am echten Objekt mit Stufe-3-Bericht im Browser abnehmen (Staging-Abnahmepunkt, Route ohne Anmeldung 401 gemessen).
 - [x] 26.11.2026 Score angeglichen: nach dem Kauf rechnet das Ergebnis oben mit dem Wert (v5130kkk6).
