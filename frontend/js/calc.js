@@ -5035,16 +5035,13 @@ function updateFESH() {
 
   kfwBox.style.display = '';
   kfwText.innerHTML =
-    '<p style="margin-bottom:8px">Für Vermieter kommen nach deinen Sanierungsbereichen in Frage (Stand der Förderbedingungen ' + KFW_STAND + ' — vor dem Antrag beim Förderinstitut prüfen, der Antrag muss vor Auftragsvergabe gestellt sein):</p>' +
+    /* v5120a · Marcel 26.11.2026 „Förderkarte: ja": Einzelheiten (Warum, Antrag, Prüfen) stehen jetzt in der
+       Karte „Förderung" (Pilot-Analyse › Potenzial, js/foerderung-karte.js). Hier nur noch kurz Namen und Link. */
+    '<p style="margin-bottom:8px">Für Vermieter kommen nach deinen Sanierungsbereichen in Frage (Stand ' + KFW_STAND + '):</p>' +
     recommendations.map(function(r) {
-      return '<div class="kfw-rec">' +
-        '<div class="kfw-rec-head"><b>' + r.program + '</b></div>' +
-        '<div class="kfw-rec-row"><span class="kfw-label">Volumen:</span> ' + r.amount + '</div>' +
-        '<div class="kfw-rec-row"><span class="kfw-label">Vorteil:</span> ' + r.benefit + '</div>' +
-        '<div class="kfw-rec-row" style="font-style:italic;color:#888"><span class="kfw-label">→ Warum:</span> ' + r.reason + '</div>' +
-        '<a href="' + r.url + '" target="_blank" rel="noopener" class="kfw-rec-link">Zur KfW-Seite →</a>' +
-      '</div>';
-    }).join('');
+      return '<div class="kfw-rec"><a href="' + r.url + '" target="_blank" rel="noopener" class="kfw-rec-link"><b>' + r.program + '</b> →</a></div>';
+    }).join('') +
+    '<p style="margin-top:8px;font-size:12px;opacity:.75">Was jedes Programm bringt und wann der Antrag gestellt werden muss, steht in der Pilot-Analyse unter Potenzial. Voraussetzungen und Konditionen vor Antrag beim Förderprogramm prüfen.</p>';
 
   // State for KI prompt
   State.fesh = { selected: selected, total: total, recommendations: recommendations };

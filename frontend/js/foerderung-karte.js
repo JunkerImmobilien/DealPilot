@@ -1,17 +1,14 @@
-/* foerderung-karte.js · v5120 · DEMO-Karte „Förderung" für Kapitalanleger (JJ6)
-   Nur hinter der Vorschau-Funktion „foerderung" (DpVorschau.frei('foerderung')): normale
-   Kunden sehen nichts. Ort: Pilot-Analyse › Potenzial (unter #dp-pa-pot).
+/* foerderung-karte.js · v5120 · Karte „Förderung" für Kapitalanleger (JJ6)
+   v5120a · Marcel 26.11.2026 „Förderkarte: ja": für alle frei (Vorschau-Sperre entfernt).
+   Ort: Pilot-Analyse › Potenzial (unter #dp-pa-pot).
    Liest die geplanten Maßnahmen aus dem Block „Sanierungsbedarf" (fesh_*), die Energieklasse
    (ds2_energie) und das Baujahr, rechnet mit dem Kern js/foerderung.js (DpFoerderung.passend,
    Nutzung „vermietet") und zeigt nur dann Programme, wenn eine Sanierung geplant ist.
    Kein Beobachter auf dem DOM (v4850e-Lehre): ein leiser Takt alle 2 s, nur wenn frei. */
 (function () {
   'use strict';
-  /* js/vorschau.js lädt nach diesem Skript: erst nach load fragen */
   function start() {
-  if (!window.DpVorschau || typeof window.DpVorschau.frei !== 'function') return;
-  window.DpVorschau.frei('foerderung').then(function (frei) {
-    if (!frei) return;
+  (function () {
     var letzte = '';
     function an(id) { var e = document.getElementById(id); return !!(e && e.checked); }
     function wert(id) { var e = document.getElementById(id); return e ? e.value : ''; }
@@ -25,7 +22,7 @@
         baujahr: parseInt(wert('baujahr'), 10) || null, energieklasse: wert('ds2_energie') || null };
     }
     function html(r) {
-      var k = '<div class="dp-foerder-kopf"><b>Förderung</b><span class="dp-foerder-tag">Vorschau</span></div>';
+      var k = '<div class="dp-foerder-kopf"><b>Förderung</b><span class="dp-foerder-tag">KfW · BAFA</span></div>';
       if (!r.liste.length) return k + '<p class="dp-foerder-leer">' + esc(r.leer_grund || 'Keine passende Bundesförderung hinterlegt.') + '</p>';
       return k + '<div class="dp-foerder-liste">' + r.liste.map(function (p) {
         return '<div class="dp-foerder-p"><div class="dp-foerder-n">' + esc(p.name) + '</div>'
@@ -68,7 +65,7 @@
       setTimeout(takt, 2000);
     }
     takt();
-  });
+  })();
   }
   if (document.readyState === 'complete') start(); else window.addEventListener('load', start);
 })();
