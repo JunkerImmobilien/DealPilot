@@ -1,0 +1,344 @@
+{
+ "ags": "14627010",
+ "gemeinde": "Coswig",
+ "haus": {
+  "regel": "ausgeschlossen",
+  "beleg": "S. 2 Art der Wohnung: „Für Ein- und Zweifamilienhäuser liegen keine ausreichenden Datenmengen vor. Der Mietspiegel gilt daher nur für Wohnungen in Mehrfamilienhäusern.“"
+ },
+ "art": "einfach",
+ "stand": "2025-01-01",
+ "erhebungsstichtag": null,
+ "gueltig_ab": "2025-01-01",
+ "gueltig_bis": "2026-12-31",
+ "quelle": {
+  "url": "https://www.coswig.de/de/mietspiegel.html?file=files%2Fcoswig%2Fstadtleben%2Fbauen_wohnen%2Fmietspiegel%2FMietspiegel_2025-26.pdf&cid=12439",
+  "dokument": "Mietspiegel der Großen Kreisstadt Coswig für nicht preisgebundene Wohnungen, gültig ab 01.01.2025 (Anlage 2 Mietspiegeltabelle, gültig vom 01.01.2025 bis 31.12.2026)",
+  "seite": "S. 6 Anlage 2 Tabelle, S. 1–3 Erstellung, § 558c, Größe, Baualter, Ausstattung, Lage, S. 4–5 Anlage 1 Punktetabelle",
+  "lizenz": "kein Rechtevorbehalt und kein Speicherverbot im Dokument (alle 6 Seiten durchgesehen, 26.11.2026); amtliche Veröffentlichung der Großen Kreisstadt Coswig",
+  "abgerufen": "2026-11-26"
+ },
+ "einheit": "eur_qm_nettokalt",
+ "form": "tabelle",
+ "rundung": 2,
+ "hinweis": "Einvernehmlich vereinbarter (einfacher) Mietspiegel nach § 558c BGB, gemeinsam erstellt von Mieterverein Meißen und Umgebung (DMB), Haus & Grund Dresden, Wohnungsunternehmen und Stadtverwaltung Coswig; gültig 01.01.2025 bis 31.12.2026 (S. 1). Tabelle S. 6 am Druckbild geprüft (Textschicht stimmt in der Wertfolge). Je Feld Minimum, gewichtetes Mittel und Maximum der Nettokaltmiete – unten/oben sind hier Min./Max., keine Zwei-Drittel-Spanne. Felder mit * (keine ausreichende Datengrundlage) nicht eingetragen. Klasse B = 0 bis 19, Klasse A = 20 bis 37 Punkte nach Anlage 1 (Energieverbrauch, Ausstattung Wohnung und Haus, Lage/Wohnumfeld) – als Ausstattung angeben, kein Standard; die Punkte rechnet DealPilot nicht. Baualter: bis 1948 / ab 1949 (bis 02.10.1990) / 03.10.1990–31.12.2001 / ab 01.01.2002; 1990 wird der zweiten Klasse zugeordnet. Größe: bis 45 / bis 60 / bis 75 / ab 75,01 m².",
+ "tabelle": {
+  "achsen": {
+   "baujahr": [
+    {
+     "von": null,
+     "bis": 1948,
+     "label": "bis 1948"
+    },
+    {
+     "von": 1949,
+     "bis": 1990,
+     "label": "ab 1949 (bis 02.10.1990)"
+    },
+    {
+     "von": 1991,
+     "bis": 2001,
+     "label": "03.10.1990–31.12.2001"
+    },
+    {
+     "von": 2002,
+     "bis": null,
+     "label": "ab 01.01.2002"
+    }
+   ],
+   "wfl": [
+    {
+     "von": null,
+     "bis": 45,
+     "label": "bis 45 m²"
+    },
+    {
+     "von": 45,
+     "von_inkl": false,
+     "bis": 60,
+     "label": "bis 60 m²"
+    },
+    {
+     "von": 60,
+     "von_inkl": false,
+     "bis": 75,
+     "label": "bis 75 m²"
+    },
+    {
+     "von": 75,
+     "von_inkl": false,
+     "bis": null,
+     "label": "ab 75,01 m²"
+    }
+   ],
+   "ausstattung": [
+    {
+     "schluessel": "B",
+     "label": "Klasse B: 0 bis 19 Punkte (Anlage 1)"
+    },
+    {
+     "schluessel": "A",
+     "label": "Klasse A: 20 bis 37 Punkte"
+    }
+   ]
+  },
+  "zellen": [
+   {
+    "baujahr": 0,
+    "wfl": 0,
+    "ausstattung": "B",
+    "unten": 5.31,
+    "mittel": 6.67,
+    "oben": 8.84,
+    "seite": "6"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 1,
+    "ausstattung": "B",
+    "unten": 5.28,
+    "mittel": 5.84,
+    "oben": 8.0,
+    "seite": "6"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 1,
+    "ausstattung": "A",
+    "unten": 5.41,
+    "mittel": 6.1,
+    "oben": 6.47,
+    "seite": "6"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 2,
+    "ausstattung": "B",
+    "unten": 5.22,
+    "mittel": 6.01,
+    "oben": 8.18,
+    "seite": "6"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 2,
+    "ausstattung": "A",
+    "unten": 5.4,
+    "mittel": 6.54,
+    "oben": 8.5,
+    "seite": "6"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 3,
+    "ausstattung": "B",
+    "unten": 5.41,
+    "mittel": 6.09,
+    "oben": 8.0,
+    "seite": "6"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 3,
+    "ausstattung": "A",
+    "unten": 5.6,
+    "mittel": 6.79,
+    "oben": 8.47,
+    "seite": "6"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 0,
+    "ausstattung": "B",
+    "unten": 5.05,
+    "mittel": 5.98,
+    "oben": 7.56,
+    "seite": "6"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 0,
+    "ausstattung": "A",
+    "unten": 5.41,
+    "mittel": 6.38,
+    "oben": 7.49,
+    "seite": "6"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 1,
+    "ausstattung": "B",
+    "unten": 4.84,
+    "mittel": 5.66,
+    "oben": 7.83,
+    "seite": "6"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 1,
+    "ausstattung": "A",
+    "unten": 5.27,
+    "mittel": 6.44,
+    "oben": 8.0,
+    "seite": "6"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 2,
+    "ausstattung": "B",
+    "unten": 4.85,
+    "mittel": 5.81,
+    "oben": 7.65,
+    "seite": "6"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 2,
+    "ausstattung": "A",
+    "unten": 5.35,
+    "mittel": 6.17,
+    "oben": 7.3,
+    "seite": "6"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 3,
+    "ausstattung": "B",
+    "unten": 4.86,
+    "mittel": 5.75,
+    "oben": 7.3,
+    "seite": "6"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 3,
+    "ausstattung": "A",
+    "unten": 4.93,
+    "mittel": 5.9,
+    "oben": 7.3,
+    "seite": "6"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 0,
+    "ausstattung": "B",
+    "unten": 6.05,
+    "mittel": 7.19,
+    "oben": 9.31,
+    "seite": "6"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 1,
+    "ausstattung": "B",
+    "unten": 5.61,
+    "mittel": 7.03,
+    "oben": 9.02,
+    "seite": "6"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 2,
+    "ausstattung": "B",
+    "unten": 5.6,
+    "mittel": 6.9,
+    "oben": 8.9,
+    "seite": "6"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 3,
+    "ausstattung": "B",
+    "unten": 5.81,
+    "mittel": 6.83,
+    "oben": 7.67,
+    "seite": "6"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 3,
+    "ausstattung": "A",
+    "unten": 5.25,
+    "mittel": 6.14,
+    "oben": 7.12,
+    "seite": "6"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 1,
+    "ausstattung": "A",
+    "unten": 7.03,
+    "mittel": 9.73,
+    "oben": 11.5,
+    "seite": "6"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 2,
+    "ausstattung": "B",
+    "unten": 6.81,
+    "mittel": 7.11,
+    "oben": 7.88,
+    "seite": "6"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 2,
+    "ausstattung": "A",
+    "unten": 6.51,
+    "mittel": 10.01,
+    "oben": 11.5,
+    "seite": "6"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 3,
+    "ausstattung": "A",
+    "unten": 8.49,
+    "mittel": 10.09,
+    "oben": 12.0,
+    "seite": "6"
+   }
+  ]
+ },
+ "pruefbeispiele": [
+  {
+   "eingabe": {
+    "baujahr": 1970,
+    "wfl": 55,
+    "ausstattung": "A"
+   },
+   "erwartet": {
+    "unten": 5.27,
+    "mittel": 6.44,
+    "oben": 8.0
+   },
+   "seite": "6",
+   "art": "tabellenzelle"
+  },
+  {
+   "eingabe": {
+    "baujahr": 2010,
+    "wfl": 80,
+    "ausstattung": "A"
+   },
+   "erwartet": {
+    "unten": 8.49,
+    "mittel": 10.09,
+    "oben": 12.0
+   },
+   "seite": "6",
+   "art": "tabellenzelle"
+  },
+  {
+   "eingabe": {
+    "baujahr": 2010,
+    "wfl": 40,
+    "ausstattung": "B"
+   },
+   "erwartet": null,
+   "seite": "6",
+   "art": "tabellenzelle",
+   "anmerkung": "Feld *"
+  }
+ ]
+}
