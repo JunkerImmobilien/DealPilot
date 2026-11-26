@@ -1,0 +1,238 @@
+{
+ "ags": "03241012",
+ "gemeinde": "Neustadt am Rübenberge",
+ "haus": {
+  "regel": "ausgeschlossen",
+  "beleg": "S. 4 Nr. 2 Geltungsbereich: ausgenommen „Wohnungen in Ein- und Zweifamilienhäusern“"
+ },
+ "art": "qualifiziert",
+ "stand": "2025-04-01",
+ "erhebungsstichtag": "2025-04-01",
+ "gueltig_ab": "2025-12-02",
+ "gueltig_bis": null,
+ "quelle": {
+  "url": "https://www.hannover.de/content/download/644661/file/Mietspiegel_Neustadt_am_Ruebenberge_2025.pdf",
+  "dokument": "Mietspiegel der Stadt Neustadt am Rübenberge 2025 (qualifiziert nach § 558d BGB, Region Hannover), Tabelle 5.1, Berechnungsbeispiel Feld B2",
+  "seite": "S. 8 (Tabelle 5.1), S. 8 (Berechnungsbeispiel), S. 4 (Stichtag 1. April 2025, Anerkennung, Geltungsbereich)",
+  "lizenz": "kein Rechtevorbehalt und kein Speicherverbot im Dokument (geprüft 26.11.2026); amtliche Veröffentlichung nach § 558c Abs. 4 BGB",
+  "abgerufen": "2026-11-26"
+ },
+ "einheit": "eur_qm_nettokalt",
+ "form": "tabelle",
+ "rundung": 2,
+ "hinweis": "Qualifizierter Mietspiegel nach § 558d BGB unter Leitung der Region Hannover (Mietspiegelkommission mit Mieterbund, Haus und Grund, ArGeWo, IVD, Amtsgericht), Befragung mit Stichtag 1. April 2025, vom Rat der Stadt Neustadt am Rübenberge anerkannt, gilt ab dem Tag der Anerkennung (S. 4); „gueltig_ab“ = Datum laut Mietspiegelseite der Region Hannover (hannover.de, geprüft 26.11.2026). Mittelwert = arithmetisches Mittel, Spanne = 4/5-Spanne. Keine Wohnlagen-Gliederung. Grau hinterlegte Felder (10 bis 29 Datensätze, Qualität eines einfachen Mietspiegels) sind ohne Kennzeichnung je Feld übernommen. Leerfelder (unter 10 Mietwerte): D1 — nicht eingetragen. Spanneneinordnung über Ausstattungspunkte (0 bis 26 Punkte, Berechnungsbeispiel) nicht abgebildet. Gilt nicht für Wohnungen in Ein- und Zweifamilienhäusern, preisgebundenen Wohnraum, Staffel- und Indexmieten u. a. (S. 4). Tabelle am Druckbild (110 dpi) abgelesen und mit der Textschicht (pdftotext -table) verglichen; Seitenzahlen = PDF-Seiten.",
+ "tabelle": {
+  "achsen": {
+   "baujahr": [
+    {
+     "von": null,
+     "bis": 1960,
+     "label": "A: bis 1960"
+    },
+    {
+     "von": 1961,
+     "bis": 1994,
+     "label": "B: 1961 bis 1994"
+    },
+    {
+     "von": 1995,
+     "bis": 2020,
+     "label": "C: 1995 bis 2020"
+    },
+    {
+     "von": 2021,
+     "bis": 2025,
+     "label": "D: 2021 bis 03/2025"
+    }
+   ],
+   "wfl": [
+    {
+     "von": null,
+     "bis": 45,
+     "bis_inkl": false,
+     "label": "1: unter 45 m²"
+    },
+    {
+     "von": 45,
+     "bis": 65,
+     "bis_inkl": false,
+     "label": "2: 45 m² bis unter 65 m²"
+    },
+    {
+     "von": 65,
+     "bis": 85,
+     "bis_inkl": false,
+     "label": "3: 65 m² bis unter 85 m²"
+    },
+    {
+     "von": 85,
+     "bis": null,
+     "label": "4: 85 m² und mehr"
+    }
+   ]
+  },
+  "zellen": [
+   {
+    "baujahr": 0,
+    "wfl": 0,
+    "unten": 5.72,
+    "mittel": 6.22,
+    "oben": 6.86,
+    "seite": "8",
+    "feld": "A1"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 0,
+    "unten": 5.93,
+    "mittel": 6.92,
+    "oben": 8.11,
+    "seite": "8",
+    "feld": "B1"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 0,
+    "unten": 7.75,
+    "mittel": 8.99,
+    "oben": 11.87,
+    "seite": "8",
+    "feld": "C1"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 1,
+    "unten": 6.15,
+    "mittel": 6.99,
+    "oben": 8.49,
+    "seite": "8",
+    "feld": "A2"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 1,
+    "unten": 5.98,
+    "mittel": 6.98,
+    "oben": 8.24,
+    "seite": "8",
+    "feld": "B2"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 1,
+    "unten": 6.37,
+    "mittel": 7.94,
+    "oben": 10.14,
+    "seite": "8",
+    "feld": "C2"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 1,
+    "unten": 9.67,
+    "mittel": 11.05,
+    "oben": 13.74,
+    "seite": "8",
+    "feld": "D2"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 2,
+    "unten": 5.88,
+    "mittel": 6.84,
+    "oben": 8.17,
+    "seite": "8",
+    "feld": "A3"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 2,
+    "unten": 5.86,
+    "mittel": 6.99,
+    "oben": 8.3,
+    "seite": "8",
+    "feld": "B3"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 2,
+    "unten": 6.79,
+    "mittel": 7.99,
+    "oben": 9.85,
+    "seite": "8",
+    "feld": "C3"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 2,
+    "unten": 9.06,
+    "mittel": 10.94,
+    "oben": 13.99,
+    "seite": "8",
+    "feld": "D3"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 3,
+    "unten": 5.46,
+    "mittel": 6.39,
+    "oben": 7.88,
+    "seite": "8",
+    "feld": "A4"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 3,
+    "unten": 5.53,
+    "mittel": 6.9,
+    "oben": 8.67,
+    "seite": "8",
+    "feld": "B4"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 3,
+    "unten": 6.62,
+    "mittel": 8.65,
+    "oben": 10.81,
+    "seite": "8",
+    "feld": "C4"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 3,
+    "unten": 9.12,
+    "mittel": 10.94,
+    "oben": 13.09,
+    "seite": "8",
+    "feld": "D4"
+   }
+  ]
+ },
+ "pruefbeispiele": [
+  {
+   "eingabe": {
+    "baujahr": 1977,
+    "wfl": 55
+   },
+   "erwartet": {
+    "unten": 5.98,
+    "mittel": 6.98,
+    "oben": 8.24
+   },
+   "seite": "8",
+   "art": "anwendungsbeispiel",
+   "anmerkung": "Berechnungsbeispiel Feld B2"
+  },
+  {
+   "eingabe": {
+    "baujahr": 2023,
+    "wfl": 40
+   },
+   "erwartet": null,
+   "seite": "8",
+   "art": "tabellenzelle",
+   "anmerkung": "Leerfeld D1"
+  }
+ ]
+}
