@@ -132,8 +132,8 @@ ${p.land_value && p.land_value.available
 ${(sale.comparables || []).slice(0, 8).map((c) =>
   `- ${c.living_area} m², Bj. ${c.build_year}, ${c.condition}: ${fmt(c.price, ' €')} (${fmt(c.price_per_sqm, ' €/m²')}), ${c.distance_m} m`).join('\n') || 'Keine Vergleichsobjekte gefunden.'}
 
-## K) Marktwertindikation
-Geschätzter Marktwert: **${fmt(mv.estimated, ' €')}** (Spanne ${fmt(mv.low)} – ${fmt(mv.high)} €).
+## K) Marktpreisindikation (aus Angebotspreisen, kein Verkehrswert)
+Geschätzte Marktpreisindikation: **${fmt(mv.estimated, ' €')}** (Spanne ${fmt(mv.low)} – ${fmt(mv.high)} €).
 Basis: Median ${fmt(mv.basis_median_sqm, ' €/m²')} × Fläche × Faktoren
 (${v.factors ? Object.entries(v.factors).map(([k, val]) => `${k}=${val}`).join(', ') : 'n/a'}).
 ${mv.discount_to_market_pct != null ? `Abweichung Kaufpreis ggü. Marktwert: ${mv.discount_to_market_pct} % ${mv.discount_to_market_pct > 0 ? '(unter Marktwert)' : '(über Marktwert)'}.` : ''}
@@ -295,7 +295,7 @@ async function callOpenAI(payload, opts = {}) {
       const mvc = (payload.valuation && payload.valuation.market_value) || {};
       const ns = (payload.sale && payload.sale.sample_size) || null;
       extra = `\n\nWICHTIG fuer "A) Executive Summary": Beginne mit einem Satz zur AUSSAGEKRAFT der `
-        + `Marktwertindikation (Konfidenz ${mvc.confidence_pct ?? '?'} % – ${mvc.confidence_label ?? 'n/a'}`
+        + `Marktpreisindikation (Konfidenz ${mvc.confidence_pct ?? '?'} % – ${mvc.confidence_label ?? 'n/a'}`
         + `${ns ? ', gestuetzt auf ' + ns + ' Vergleichsangebote' : ''}`
         + `${mvc.input_filled != null ? ' und ' + mvc.input_filled + '/' + mvc.input_total + ' wertrelevante Objektangaben' : ''}). `
         + ((mvc.input_missing && mvc.input_missing.length)
