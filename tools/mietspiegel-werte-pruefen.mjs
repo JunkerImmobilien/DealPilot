@@ -30,7 +30,10 @@ const jeAgs = new Map((verz.saetze || []).map(s => [s.ags, s]));
 const fehler = []; const warn = []; let dateien = 0, beispiele = 0, zellenZahl = 0;
 const F = (d, t) => fehler.push(d + ': ' + t);
 const isNum = (v) => typeof v === 'number' && Number.isFinite(v);
-const plausibel = (v) => isNum(v) && v >= 3 && v <= 30;
+/* v5080 · Grenze 1,5–40 €/m² (vorher 3–30): Darmstadt führt belegte Werte über 30 €, Velbert unter 3 €. Zwischen 1,5–3 und
+   30–40 gelb (am Dokument prüfen), außerhalb rot. */
+const plausibel = (v) => isNum(v) && v >= 1.5 && v <= 40;
+const grenzwertig = (v) => isNum(v) && (v < 3 || v > 30);
 const DATUM = /^\d{4}(-\d{2}(-\d{2})?)?$/;
 
 let liste = [];
@@ -84,7 +87,7 @@ for (const f of liste) {
       const vals = ['unten', 'mittel', 'oben'].filter(k => z[k] != null);
       if (z.mittel == null) F(d, wo + ': mittel fehlt');
       if (!T.spanne && (z.unten == null || z.oben == null)) warn.push(d + ': ' + wo + ' ohne Spanne (unten/oben) und ohne tabelle.spanne');
-      for (const k of vals) if (!plausibel(z[k])) F(d, wo + ': ' + k + ' ' + z[k] + ' außerhalb 3–30 €/m²');
+      for (const k of vals) { if (!plausibel(z[k])) F(d, wo + ': ' + k + ' ' + z[k] + ' außerhalb 1,5–40 €/m²'); else if (grenzwertig(z[k])) warn.push(d + ': ' + wo + ': ' + k + ' ' + z[k] + ' €/m² außerhalb 3–30, am Dokument prüfen'); }
       if (isNum(z.unten) && isNum(z.mittel) && z.unten > z.mittel) F(d, wo + ': unten > mittel');
       if (isNum(z.mittel) && isNum(z.oben) && z.mittel > z.oben) F(d, wo + ': mittel > oben');
       const key = [z.baujahr, z.wfl, z.lage, z.ausstattung].join('|');
@@ -104,8 +107,8 @@ for (const f of liste) {
     const R = w.regression || {};
     const B = R.basis || {};
     if (!isNum(R.basis_eur_qm) && !Array.isArray(B.werte)) F(d, 'regression braucht basis_eur_qm oder basis.werte');
-    (B.werte || []).forEach((b, i) => { zellenZahl++; if (!plausibel(b.eur_qm)) F(d, 'basis.werte[' + i + '].eur_qm ' + b.eur_qm + ' außerhalb 3–30'); });
-    if (isNum(R.basis_eur_qm) && !plausibel(R.basis_eur_qm)) F(d, 'basis_eur_qm außerhalb 3–30');
+    (B.werte || []).forEach((b, i) => { zellenZahl++; if (!plausibel(b.eur_qm)) F(d, 'basis.werte[' + i + '].eur_qm ' + b.eur_qm + ' außerhalb 1,5–40'); });
+    if (isNum(R.basis_eur_qm) && !plausibel(R.basis_eur_qm)) F(d, 'basis_eur_qm außerhalb 1,5–40');
     (R.faktoren || []).forEach((f, i) => {
       if (!['wfl_kurve', 'baujahr_klasse', 'flag', 'lage', 'auswahl', 'eingabe'].includes(f.typ)) F(d, 'faktoren[' + i + '].typ unbekannt: ' + f.typ);
       /* v3261 · eingabe: Betrag vom Nutzer (Rostock Wohnlage je Adresse) - Spannweite des Verzeichnisses ist Pflicht */
