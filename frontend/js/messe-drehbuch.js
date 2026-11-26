@@ -1954,7 +1954,7 @@
         await warteAuf(function () { var e = rhIm('#oabi-ov', /\d+\s*von\s*\d+\s*Angaben/i), x = e && /(\d+)\s*von/.exec(e.textContent); return x && +x[1] > 0; }, 12000);
         var z = rhIm('#oabi-ov', /\d+\s*von\s*\d+\s*Angaben/i), m = z && /(\d+)\s*von\s*(\d+)\s*Angaben/i.exec(z.textContent);
         await zeige(function () { return q('#oabi-ov details.vi-transcript') || q('#oabi-ov .oabi-modal'); }, 6);
-        await b2oZeile(s, 'Weg 2 · ' + rhNameKachel('voice'), 'Zwei Sätze gesprochen' + (m ? ', <b>' + m[1] + ' von ' + m[2] + '</b> Angaben schon erkannt' : '') + '. Das ganze Beispiel zeigt Modul 05.');
+        await b2oZeile(s, 'Weg 2 · ' + rhNameKachel('voice'), 'Zwei Sätze gesprochen' + (m && m[1] !== '0' ? ', <b>' + m[1] + ' von ' + m[2] + '</b> Angaben schon erkannt' : ', die Mitschrift steht') + '. Das ganze Beispiel zeigt Modul 05.');
         var c = q('#oabi-ov #oabi-cancel'); if (c) c.click();
         kegelHoch(false);
         await warte(700);
