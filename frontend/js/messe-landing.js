@@ -41,6 +41,11 @@
     }, 120);
   }
   var N = 0, I = -1, KICK = 'Der Deal-Check';
+  function fuellen() {   /* Pflichtfelder, die leer sind, mit Musterwerten (nichts Echtes) */
+    var setz = function (sel, v) { var e = q(sel, fenster()); if (e && String(e.value).trim() === '') { e.value = v; e.dispatchEvent(new Event('input', { bubbles: true })); e.dispatchEvent(new Event('change', { bubbles: true })); } };
+    setz('#ecgEk', '300000'); setz('#ecgZins', '3,9');
+    qa('.ec-wahl', fenster()).forEach(function (w) { if (!q('button.an', w)) { var b0 = q('button', w); if (b0) b0.click(); } });
+  }
   async function zeile(titel, text, extra) { I++; an({ type: 'kapitel', kick: KICK, titel: titel, text: text, i: I, n: N }); await warte(lies(titel, text) + (extra || 0)); }
   function fenster() { return q('.ec-fenster:not([hidden]) .ec-box'); }
   function inhalt() { var f = fenster(); return f && (q('.ec-inhalt', f) || f); }
@@ -76,15 +81,14 @@
       var t0 = Date.now();
       I++; an({ type: 'kapitel', kick: KICK, titel: 'Erst auslesen', text: 'Die Unterlagen werden geschwärzt und ausgelesen. Erst danach fragt DealPilot, was noch fehlt.', i: I, n: N });
       await warteAuf(function () { return q('.ec-grund', fenster()); }, 120000);
+      fuellen();   /* M9 26.11.: sofort, sonst steht 'Es fehlt noch' rot im Bild */
       var rest = lies('Erst auslesen', 'Die Unterlagen werden geschwärzt und ausgelesen. Erst danach fragt DealPilot, was noch fehlt.') - (Date.now() - t0);
       if (rest > 0) await warte(rest);
     },
     async function () {   /* 4 · Grundangaben mit Herkunft */
       var g = q('.ec-grund', fenster());
       /* M9 26.11.: VOR der Zeile füllen, sonst stehen Eigenkapital und Zins leer und rot im Bild. Pflichtfelder, die noch leer sind, mit Musterwerten füllen (nichts Echtes) */
-      var setz = function (sel, v) { var e = q(sel, fenster()); if (e && String(e.value).trim() === '') { e.value = v; e.dispatchEvent(new Event('input', { bubbles: true })); e.dispatchEvent(new Event('change', { bubbles: true })); } };
-      setz('#ecgEk', '300000'); setz('#ecgZins', '3,9');
-      qa('.ec-wahl', fenster()).forEach(function (w) { if (!q('button.an', w)) { var b0 = q('button', w); if (b0) b0.click(); } });
+      fuellen();
       await warte(400);
       zeige(g || inhalt(), 8);
       await warte(800);
