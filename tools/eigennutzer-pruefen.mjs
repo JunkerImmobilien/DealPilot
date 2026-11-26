@@ -73,6 +73,38 @@ ok(demo.ok && demo.gruppen.length === 4 && demo.reihe.length === 21 && demo.reih
 const texte = [].concat(efh.urteil, etwMit.urteil, ohneNetto.urteil, demo.gruppen.map((x) => x.t), [mfh.hinweis]);
 ok(texte.every((t) => !/[–—;]/.test(t)), 'Kundentext ohne – — ;');
 
+/* 11 · v5130j · Betriebskosten in der Leistbarkeit (Marcel 26.11.2026) */
+{
+  const basisE = { kaufpreis: 310000, wfl: 130, baujahr: 1998, objektart: 'efh', ek: 100000, netto: 5200, zins_pct: 4.09, grest_pct: 6.5, vergleichsmiete_qm: 7.30, hauszuschlag_pct: 15, lage_score: 57 };
+  const mitAusweis = K.kern(Object.assign({}, basisE, { zustand: { endenergie_kwh: 120, energietraeger: 'Erdgas' } }));
+  const L = mitAusweis.leistbarkeit, A = L.aufstellung;
+  const z = (k) => A.find((x) => x.k === k).eur;
+  ok(z('heizung') === Math.round(120 * 130 * 12.2 / 100 / 12), 'Heizung aus Ausweis: 120 kWh × 130 m² × 12,2 ct / 12 = ' + z('heizung') + ' €');
+  ok(z('uebrige') === 260, 'übrige Nebenkosten Pauschale 2,00 €/m² × 130 = 260 €');
+  ok(Math.abs(z('summe') - (z('rate') + z('eigentuemer') + z('heizung') + z('uebrige'))) <= 2, 'Summe = Rate + Eigentümer + Heizung + übrige');
+  ok(Math.abs(L.quote - L.wohnkosten / 5200 * 100) < 0.05, 'Quote = Summe / Netto');
+  ok(L.grenzen.gruen === 40 && L.grenzen.gelb === 50, 'Ampelgrenzen 40 / 50 %');
+  const oel = K.kern(Object.assign({}, basisE, { zustand: { endenergie_kwh: 120, energietraeger: 'Heizöl' } }));
+  ok(oel.leistbarkeit.aufstellung.find((x) => x.k === 'heizung').eur > z('heizung'), 'Heizöl teurer als Gas bei gleicher Endenergie');
+  const klasse = K.kern(Object.assign({}, basisE, { zustand: { energieklasse: 'C' } }));
+  ok(klasse.leistbarkeit.heizung.kwh_qm === 87 && /Energieklasse C/.test(klasse.leistbarkeit.heizung.herkunft), 'ohne Ausweiswert: Mitte der Klasse C (87 kWh)');
+  const bj = K.kern(Object.assign({}, basisE));
+  ok(bj.leistbarkeit.heizung.kwh_qm === 110 && /Baujahr/.test(bj.leistbarkeit.heizung.herkunft), 'ohne Klasse: Annahme nach Baujahr 1998 (110 kWh)');
+  const expose = K.kern(Object.assign({}, basisE, { betriebskosten_monat: 210, heizkosten_monat: 150 }));
+  ok(expose.leistbarkeit.aufstellung.find((x) => x.k === 'uebrige').eur === 210 && expose.leistbarkeit.aufstellung.find((x) => x.k === 'heizung').eur === 150, 'Werte aus den Unterlagen haben Vorrang');
+  const etwHg = K.kern({ kaufpreis: 220000, wfl: 75, baujahr: 1975, objektart: 'etw', ek: 50000, netto: 3800, zins_pct: 4.0, grest_pct: 6.5, vergleichsmiete_qm: 8.5, lage_score: 60, weg: { hausgeld_umlagefaehig: 230, hausgeld_nicht_umlagefaehig: 90 } });
+  const ea = etwHg.leistbarkeit.aufstellung;
+  ok(ea.find((x) => x.k === 'uebrige').eur === 230 && ea.find((x) => x.k === 'heizung').eur === 0 && ea.find((x) => x.k === 'eigentuemer').eur === 90, 'ETW: umlagefähiges Hausgeld statt Pauschale, Heizung darin enthalten');
+  const etwGasEtage = K.kern({ kaufpreis: 220000, wfl: 75, baujahr: 1975, objektart: 'etw', ek: 50000, netto: 3800, zins_pct: 4.0, vergleichsmiete_qm: 8.5, weg: { hausgeld_umlagefaehig: 160, heizung_im_hausgeld: false } });
+  ok(etwGasEtage.leistbarkeit.aufstellung.find((x) => x.k === 'heizung').eur > 0, 'ETW mit Etagenheizung: Heizung extra');
+  /* Kaufen oder mieten bleibt unverändert: Betriebskosten heben sich auf */
+  const ohneBK = K.kern(Object.assign({}, basisE, { betriebskosten_monat: 0, heizkosten_monat: 0 }));
+  ok(JSON.stringify(ohneBK.kaufen_mieten.reihe) === JSON.stringify(mitAusweis.kaufen_mieten.reihe), 'Kaufen oder mieten unabhängig von den Betriebskosten');
+  ok(ohneBK.haus.score === mitAusweis.haus.score, 'Haus-Score unabhängig von den Betriebskosten');
+  ok(ohneBK.leistbarkeit.quote < mitAusweis.leistbarkeit.quote, 'Betriebskosten erhöhen die Belastung');
+  ok(A.every((x) => !/[–—;]/.test(x.l + (x.herkunft || ''))), 'Aufstellung ohne – — ;');
+}
+
 /* 10 · Spiegel im Backend gleich der Quelle */
 const quelle = path.join(W, 'frontend', 'js', 'eigennutzer-kern.js');
 const spiegel = path.join(W, 'backend', 'src', 'generated', 'rechenkerne', 'eigennutzer-kern.js');

@@ -34,8 +34,51 @@
     wertsteigerung_pct: 1.5,   /* Wertentwicklung p. a. (vorsichtig) */
     mietsteigerung_pct: 2.0,   /* Mietsteigerung p. a. */
     anlagezins_pct: 3.0,       /* Anlagezins des Mieters für Eigenkapital und Differenz */
-    jahre: 20
+    jahre: 20,
+    /* v5130j KK6 · BETRIEBSKOSTEN des Eigentümers für die Leistbarkeit (Marcel 26.11.2026, Zusatz)
+       Grundsteuer, Wasser und Abwasser, Müll, Gebäudeversicherung, Strom Allgemein: pauschal 2,00 €/m² mtl.
+       (Marcels Spanne 2,00 bis 2,50, untere Kante). Gegenprobe intern: DMB-Betriebskostenspiegel Abrechnungsjahr
+       2024 (erschienen 18.12.2025), Bundesmittel Wasser/Abwasser 0,29, Grundsteuer 0,18, Müll 0,16, Versicherungen
+       0,31 €/m² mtl., zusammen rund 1,0 €/m² ohne Heizung. Die Pauschale liegt bewusst darüber (Haus: Niederschlagswasser,
+       Schornsteinfeger, Allgemeinstrom, Garten, regionale Spreizung bei Grundsteuer und Wasser). Vorrang: Angabe aus den
+       Unterlagen (betriebskosten_monat, bei der ETW das umlagefähige Hausgeld). */
+    betriebskosten_qm: 2.0,
+    /* Heizung: Endenergie aus dem Energieausweis × Wohnfläche × Preis je Energieträger (ct/kWh brutto, Stand Oktober
+       2026, intern: Erdgas 12,2 BDEW 10/2026, Heizöl 14,1 und Fernwärme 15,6 gewichtetes Mittel Sommer 2026,
+       Wärmepumpe 27,4 Wärmestromtarif, Pellets 9,3, Strom direkt 37,0 Haushaltsstrom). Beim Wärmepumpen-Ausweis ist
+       die Endenergie schon der Strom. Ohne Ausweis: Mitte der Energieklasse, ohne Klasse nach Baujahr. */
+    energiepreis_ct: { gas: 12.2, oel: 14.1, fernwaerme: 15.6, waermepumpe: 27.4, pellets: 9.3, strom: 37.0 },
+    energiepreis_stand: '2026-10',
+    /* Ampel der Belastung (Rate + Eigentümerkosten + Betriebskosten) / Netto. Die übliche Bank-Faustregel „höchstens
+       40 % vom Netto“ gilt für die RATE allein (Verbraucherzentrale, Interhyp, Dr. Klein 35 bis 40 %). Eigentümer- und
+       Betriebskosten kommen hinzu (130 m²: rund 650 € mtl., bei 5.000 € netto gut 10 Punkte). Deshalb grün bis 40 %,
+       gelb bis 50 %, darüber rot. */
+    ampel_gruen_pct: 40,
+    ampel_gelb_pct: 50
   };
+  /* Endenergie kWh/(m²·a) ohne Ausweis: Mitte der Klasse (GEG Anlage 10), sonst grobe Bestandsmittel nach Baujahr */
+  var KLASSE_KWH = { 'A+': 25, A: 40, B: 62, C: 87, D: 115, E: 145, F: 180, G: 225, H: 275 };
+  function kwhNachBaujahr(bj) { return bj >= 2016 ? 45 : bj >= 2002 ? 80 : bj >= 1995 ? 110 : bj >= 1978 ? 145 : bj >= 1949 ? 180 : 200; }
+  function traeger(t) {
+    var s = String(t || '').toLowerCase();
+    if (/w(ä|ae)rmepumpe|^wp$/.test(s)) return 'waermepumpe';
+    if (/fern/.test(s)) return 'fernwaerme';
+    if (/(ö|oe)l/.test(s)) return 'oel';
+    if (/pellet|holz/.test(s)) return 'pellets';
+    if (/strom|nachtspeicher/.test(s)) return 'strom';
+    return 'gas';
+  }
+  /** Heizkosten im Monat: Ausweis, sonst Klasse, sonst Baujahr. Mit Herkunft für die Aufstellung. */
+  function heizung(z, wfl, bj, A) {
+    z = z || {};
+    var tr = traeger(z.energietraeger || z.heizung_art);
+    var preise = A.energiepreis_ct || STANDARD.energiepreis_ct;
+    var ct = num(preise[tr]) || STANDARD.energiepreis_ct.gas;
+    var kwh = num(z.endenergie_kwh), herkunft = 'Energieausweis';
+    if (kwh == null) { var kl = String(z.energieklasse || '').toUpperCase().replace(/\s/g, ''); if (KLASSE_KWH[kl] != null) { kwh = KLASSE_KWH[kl]; herkunft = 'Mitte der Energieklasse ' + kl; } }
+    if (kwh == null) { kwh = kwhNachBaujahr(bj); herkunft = 'Annahme nach Baujahr ' + bj; }
+    return { monat: kwh * wfl * ct / 100 / 12, kwh_qm: kwh, traeger: tr, ct: ct, herkunft: herkunft };
+  }
 
   var ARTEN = ['efh', 'zfh', 'dhh', 'rh', 'etw'];
   var MFH_HINWEIS = 'Für Mehrfamilienhäuser den Modus Vermieten nutzen.';
@@ -129,6 +172,17 @@
     var rate = darlehen * (zins + A.tilgung_pct) / 100 / 12;
     var bewirt = wfl * A.bewirt_qm;
     if (art === 'etw' && e.weg && num(e.weg.hausgeld_nicht_umlagefaehig) != null) bewirt = num(e.weg.hausgeld_nicht_umlagefaehig);
+    /* Betriebskosten: Heizung + übrige. Vorrang Unterlagen (Exposé: heizkosten_monat, betriebskosten_monat. ETW: umlagefähiges
+       Hausgeld, das die Heizung meist schon enthält, ausser weg.heizung_im_hausgeld === false, etwa bei Gasetagenheizung) */
+    var heiz = heizung(e.zustand, wfl, bj, A), heizMonat = heiz.monat, heizHerkunft = heiz.herkunft;
+    var uebrig = wfl * A.betriebskosten_qm, uebrigHerkunft = 'Pauschale ' + komma(A.betriebskosten_qm, 2) + ' €/m²';
+    var hgU = art === 'etw' && e.weg ? num(e.weg.hausgeld_umlagefaehig) : null;
+    if (num(e.betriebskosten_monat) != null) { uebrig = num(e.betriebskosten_monat); uebrigHerkunft = 'aus den Unterlagen'; }
+    if (hgU != null) {
+      uebrig = hgU; uebrigHerkunft = 'umlagefähiges Hausgeld';
+      if (e.weg.heizung_im_hausgeld !== false) { heizMonat = 0; heizHerkunft = 'im Hausgeld enthalten'; }
+    }
+    if (num(e.heizkosten_monat) != null) { heizMonat = num(e.heizkosten_monat); heizHerkunft = 'aus den Unterlagen'; }
 
     /* Ersparte Miete = MITTELWERT der Vergleichsmiete (+ Hauszuschlag laut Mietspiegel bei Häusern) */
     var vm = num(e.vergleichsmiete_qm);
@@ -150,9 +204,17 @@
     var haus = r0(summe / summeW);
 
     /* Leistbarkeit (eigene Ampel) */
-    var wohnkosten = rate + bewirt;
+    /* v5130j · Belastung = (Rate + Eigentümerkosten + Betriebskosten) / Netto */
+    var wohnkosten = rate + bewirt + heizMonat + uebrig;
     var quote = netto > 0 ? wohnkosten / netto * 100 : null;
-    var ampel = quote == null ? null : quote <= 35 ? 'gruen' : quote <= 45 ? 'gelb' : 'rot';
+    var ampel = quote == null ? null : quote <= A.ampel_gruen_pct ? 'gruen' : quote <= A.ampel_gelb_pct ? 'gelb' : 'rot';
+    var aufstellung = [
+      { k: 'rate', l: 'Rate (Zins und Tilgung)', eur: r0(rate) },
+      { k: 'eigentuemer', l: art === 'etw' && e.weg && num(e.weg.hausgeld_nicht_umlagefaehig) != null ? 'Eigentümerkosten (nicht umlagefähiges Hausgeld)' : 'Eigentümerkosten (Instandhaltung, Rücklage)', eur: r0(bewirt) },
+      { k: 'heizung', l: 'Heizung', eur: r0(heizMonat), herkunft: heizHerkunft },
+      { k: 'uebrige', l: 'Übrige Nebenkosten (Grundsteuer, Wasser, Müll, Versicherung, Strom Allgemein)', eur: r0(uebrig), herkunft: uebrigHerkunft },
+      { k: 'summe', l: 'Summe im Monat', eur: r0(wohnkosten), summe: true }
+    ];
 
     /* Kaufen gegen Mieten über A.jahre */
     var reihe = [], wert = kp, schuld = darlehen, depot = ek, mieteJ = miete ? miete * 12 : null, jahr = null;
@@ -163,6 +225,7 @@
       var zinsJ = schuld * zins / 100, tilgJ = Math.min(schuld, rate * 12 - zinsJ);
       schuld = Math.max(0, schuld - tilgJ);
       wert *= 1 + A.wertsteigerung_pct / 100;
+      /* Betriebskosten (Heizung, übrige) zahlt ein Mieter genauso, sie heben sich auf: nur Rate + Eigentümerkosten */
       depot = depot * (1 + A.anlagezins_pct / 100) + Math.max(0, (rate + bewirt) * 12 - mieteJ);
       mieteJ *= 1 + A.mietsteigerung_pct / 100;
     }
@@ -176,14 +239,16 @@
       : 'Der Kaufpreis liegt ' + komma(-pr.abweichung_pct) + ' % unter dem ermittelten Wert.');
     if (faktor) urteil.push('Du zahlst ' + komma(faktor) + ' Jahresmieten für das, was du an Miete sparst.');
     zu.hinweise.slice(0, art === 'etw' ? 4 : 2).forEach(function (h) { urteil.push(h); });
-    if (ampel) urteil.push('Deine Wohnkosten liegen bei ' + r0(quote) + ' % vom Netto-Einkommen' + (ampel === 'gruen' ? ', das ist gut tragbar.' : ampel === 'gelb' ? ', das ist knapp.' : ', das ist zu hoch.'));
+    if (ampel) urteil.push('Rate und alle Wohnkosten zusammen liegen bei ' + r0(quote) + ' % vom Netto-Einkommen' + (ampel === 'gruen' ? ', das ist gut tragbar.' : ampel === 'gelb' ? ', das ist knapp.' : ', das ist zu hoch.'));
     if (reihe.length) urteil.push(jahr ? 'Kaufen ist nach ' + jahr + ' Jahren günstiger als mieten.' : 'In ' + A.jahre + ' Jahren wird Kaufen hier nicht günstiger als mieten.');
 
     return {
-      ok: true, version: 'v5130',
+      ok: true, version: 'v5130j',
       haus: { score: haus, stufe: st, gewichte: GEWICHT,
         gruppen: { preis: pr, zustand: zu, lage: lage != null ? { score: r0(klemm(lage)) } : null } },
-      leistbarkeit: { quote: quote != null ? r2(quote) : null, ampel: ampel, wohnkosten: r0(wohnkosten), netto: netto },
+      leistbarkeit: { quote: quote != null ? r2(quote) : null, ampel: ampel, wohnkosten: r0(wohnkosten), netto: netto, aufstellung: aufstellung,
+        grenzen: { gruen: A.ampel_gruen_pct, gelb: A.ampel_gelb_pct }, betriebskosten: r0(heizMonat + uebrig),
+        heizung: { kwh_qm: heiz.kwh_qm, traeger: heiz.traeger, ct: heiz.ct, herkunft: heizHerkunft } },
       finanzierung: { zins_pct: zins, tilgung_pct: A.tilgung_pct, darlehen: r0(darlehen), rate: r0(rate), ltv_pct: r2(darlehen / kp * 100), bewirt: r0(bewirt) },
       nebenkosten: nk,
       miete: { vergleich_qm: vm, hauszuschlag_pct: zuschlag, qm: mieteQm != null ? r2(mieteQm) : null, monat: miete != null ? r0(miete) : null,
@@ -214,7 +279,7 @@
       lage_score: lageAusMarkt(d), zustand: e.zustand, weg: e.weg, wert: e.wert });
     if (!r.ok) return r;
     var G = r.haus.gruppen, L = r.leistbarkeit;
-    var leistS = L.quote == null ? null : r0(lin(L.quote, [[25, 100], [30, 90], [35, 72], [40, 50], [45, 30], [55, 5]]));
+    var leistS = L.quote == null ? null : r0(lin(L.quote, [[30, 100], [35, 90], [40, 72], [45, 50], [50, 30], [60, 5]]));
     return {
       ok: true, kern: r, gesamt: r.haus.score, stufe: r.haus.stufe, zins: r.finanzierung.zins_pct, rate: r.finanzierung.rate,
       bew: r.finanzierung.bewirt, miete: r.miete.monat, faktor: r.miete.faktor, quote: L.quote, ampel: L.ampel,
@@ -264,7 +329,7 @@
 
   var api = { rechne: function (e, d) { return arguments.length >= 2 || (e && e.kp != null) ? rechneDemo(e, d) : rechne(e); },
     kern: rechne, rechneDemo: rechneDemo, daten: daten, umfeld: umfeld, nebenkosten: nebenkosten, eur: eur, stufe: stufe,
-    GEWICHT: GEWICHT, STANDARD: STANDARD, ARTEN: ARTEN, MFH_HINWEIS: MFH_HINWEIS, version: 'v5130' };
+    GEWICHT: GEWICHT, STANDARD: STANDARD, ARTEN: ARTEN, MFH_HINWEIS: MFH_HINWEIS, version: 'v5130j' };
   root.DpEigennutzerKern = api;
   root.DpEigennutzer = api;
 
