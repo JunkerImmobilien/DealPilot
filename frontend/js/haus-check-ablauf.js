@@ -15,7 +15,7 @@
   function foerderung(e) {
     var F = root.DpFoerderung; if (!F || typeof F.passend !== 'function') return [];
     try {
-      var f = F.passend({ nutzung: 'eigen', kauf: true, baujahr: e.bj, energieklasse: e.energieklasse || (e.zustand && e.zustand.energieklasse) || null, massnahmen: [] });
+      var f = F.passend({ nutzung: 'eigen', kauf: true, baujahr: e.bj, energieklasse: e.energieklasse || (e.zustand && e.zustand.energieklasse) || null, massnahmen: ['heizung', 'huelle'] });   /* pp6 · Kauf und die typischen Sanierungen danach (Heizung, Hülle), wie das Muster */
       return (f.liste || []).map(function (x) { return { name: x.name, warum: x.warum || '', betrag: x.betrag || '', satz: [x.warum, x.betrag].filter(Boolean).join(' ') }; });
     } catch (err) { return []; }
   }
