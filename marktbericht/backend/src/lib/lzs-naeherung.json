@@ -1,5 +1,5 @@
 {
-  "stand": "2026-10-21",
+  "stand": "2026-11-26",
   "form": "LZS [%] = c + a_ETW + a_MFH + a_WGH + r * min(80, max(5, RND))/10 + s * Stadt",
   "herkunft": "DealPilot-Naeherung aus allen amtlichen Liegenschaftszinssaetzen des Registers (Wohnnutzung, juengster Jahrgang je Zweig), kleinste Quadrate",
   "kennzeichnung": "abgeleitet aus der DealPilot-Formel (nie amtlich)",
@@ -18,25 +18,26 @@
     "nicht": "Gewerbe, Buero, Handel, Sonderimmobilien; nie wo der Ausschuss einen Wert fuehrt (auch keinen gesperrten: dann Weg zum Ausschuss)"
   },
   "koeffizienten": {
-    "c": 1.173,
-    "ETW": 0.167,
-    "MFH": 1.572,
-    "WGH": 2.556,
-    "je_10_jahre_rnd": 0.205,
-    "stadt": -0.669
+    "c": 1.035,
+    "ETW": 0.148,
+    "MFH": 1.594,
+    "WGH": 2.677,
+    "je_10_jahre_rnd": 0.248,
+    "stadt": -0.679
   },
   "rnd_ersatz": {
-    "EZFH": 37,
-    "ETW": 43,
+    "EZFH": 38,
+    "ETW": 44,
     "MFH": 32,
     "WGH": 31
   },
   "daten": {
-    "saetze": 1011,
-    "ausschuesse": 132,
+    "saetze": 1060,
+    "ausschuesse": 135,
     "laender": [
       "BB",
       "BW",
+      "BY",
       "HE",
       "MV",
       "NI",
@@ -51,151 +52,155 @@
   "pruefung": {
     "methode": "Leave-one-Land-out (massgeblich) und Leave-one-Ausschuss-out; |Naeherung - amtlich| in Prozentpunkten",
     "lolo": {
-      "median_pp": 0.712,
-      "p80_pp": 1.369,
-      "p90_pp": 1.73,
-      "p95_pp": 1.998
+      "median_pp": 0.693,
+      "p80_pp": 1.359,
+      "p90_pp": 1.718,
+      "p95_pp": 2.068
     },
     "loao": {
-      "median_pp": 0.575,
-      "p80_pp": 1.131,
-      "p90_pp": 1.517,
-      "p95_pp": 1.86
+      "median_pp": 0.54,
+      "p80_pp": 1.119,
+      "p90_pp": 1.527,
+      "p95_pp": 1.856
     },
     "in_stichprobe": {
-      "median_pp": 0.566,
-      "p80_pp": 1.09,
-      "p90_pp": 1.5,
-      "p95_pp": 1.796
+      "median_pp": 0.529,
+      "p80_pp": 1.085,
+      "p90_pp": 1.477,
+      "p95_pp": 1.812
     },
     "bewg256_lolo": {
-      "median_pp": 0.84,
-      "p80_pp": 1.47,
-      "p90_pp": 1.75,
-      "p95_pp": 2.1
+      "median_pp": 0.8,
+      "p80_pp": 1.404,
+      "p90_pp": 1.8,
+      "p95_pp": 2.122
     },
-    "besser_als_256_in_laendern": "7 von 11",
+    "besser_als_256_in_laendern": "7 von 12",
     "je_land": {
       "NW": {
         "saetze": 480,
-        "formel_median_pp": 0.808,
-        "bewg256_median_pp": 1
+        "formel_median_pp": 0.841,
+        "bewg256_median_pp": 0.95
       },
       "HE": {
-        "saetze": 66,
-        "formel_median_pp": 0.531,
-        "bewg256_median_pp": 0.7
+        "saetze": 79,
+        "formel_median_pp": 0.54,
+        "bewg256_median_pp": 0.8
       },
       "NI": {
         "saetze": 125,
-        "formel_median_pp": 0.496,
-        "bewg256_median_pp": 0.5
+        "formel_median_pp": 0.407,
+        "bewg256_median_pp": 0.4
       },
       "TH": {
-        "saetze": 47,
-        "formel_median_pp": 1.285,
-        "bewg256_median_pp": 0.7
+        "saetze": 51,
+        "formel_median_pp": 1.74,
+        "bewg256_median_pp": 1.2
       },
       "ST": {
         "saetze": 48,
-        "formel_median_pp": 1.777,
+        "formel_median_pp": 1.733,
         "bewg256_median_pp": 0.9
       },
       "SH": {
         "saetze": 16,
-        "formel_median_pp": 1.095,
+        "formel_median_pp": 1.05,
         "bewg256_median_pp": 0.62
       },
       "BB": {
         "saetze": 83,
-        "formel_median_pp": 0.602,
+        "formel_median_pp": 0.556,
         "bewg256_median_pp": 0.7
       },
       "SN": {
         "saetze": 42,
-        "formel_median_pp": 0.883,
+        "formel_median_pp": 0.897,
         "bewg256_median_pp": 1.76
       },
       "BW": {
-        "saetze": 85,
-        "formel_median_pp": 0.303,
-        "bewg256_median_pp": 0.77
+        "saetze": 116,
+        "formel_median_pp": 0.333,
+        "bewg256_median_pp": 0.69
       },
       "RP": {
         "saetze": 11,
-        "formel_median_pp": 0.361,
+        "formel_median_pp": 0.321,
         "bewg256_median_pp": 1.22
       },
       "MV": {
         "saetze": 8,
-        "formel_median_pp": 2.155,
-        "bewg256_median_pp": 1.55
+        "formel_median_pp": 2.192,
+        "bewg256_median_pp": 1.65
+      },
+      "BY": {
+        "saetze": 1,
+        "formel_median_pp": 0.625,
+        "bewg256_median_pp": 1.2
       }
     },
     "laender_einsatz": [
       "BB",
       "BW",
       "HE",
-      "NI",
       "NW",
       "RP",
       "SN"
     ],
     "loao_einsatz": {
-      "median_pp": 0.506,
-      "p80_pp": 0.972,
-      "p90_pp": 1.258,
-      "p95_pp": 1.522
+      "median_pp": 0.512,
+      "p80_pp": 0.977,
+      "p90_pp": 1.264,
+      "p95_pp": 1.523
     },
     "spanne_p80_pp": {
-      "EZFH": 0.925,
-      "ETW": 0.805,
-      "MFH": 1.165,
-      "WGH": 1.376
+      "EZFH": 0.923,
+      "ETW": 0.84,
+      "MFH": 1.156,
+      "WGH": 1.349
     },
     "spanne_methode": "P80 der |Fehler| je Objektart, Leave-one-Ausschuss-out, nur Laender aus laender_einsatz; Deckung mit Halbbreite ohne den eigenen Ausschuss",
     "spanne_deckung": {
-      "gesamt_pct": 79.6,
+      "gesamt_pct": 79.8,
       "je_objektart": {
         "EZFH": {
-          "saetze": 339,
-          "deckung_pct": 79.6
+          "saetze": 290,
+          "deckung_pct": 79.3
         },
         "ETW": {
-          "saetze": 237,
-          "deckung_pct": 79.7
+          "saetze": 215,
+          "deckung_pct": 80.5
         },
         "MFH": {
-          "saetze": 210,
-          "deckung_pct": 79.5
+          "saetze": 219,
+          "deckung_pct": 79.9
         },
         "WGH": {
-          "saetze": 106,
-          "deckung_pct": 79.2
+          "saetze": 87,
+          "deckung_pct": 79.3
         }
       }
     },
-    "rnd_steigung_aus": "574 Saetzen mit eigener RND (zweistufig, v2593)",
+    "rnd_steigung_aus": "635 Saetzen mit eigener RND (zweistufig, v2593)",
     "stadt_merkmal": "lzsStadt(ags) wie zur Laufzeit (v2593)"
   },
   "bewg256_gegen_amtlich": {
     "EZFH": {
-      "saetze": 363,
+      "saetze": 374,
       "amtlich_median_pct": 1.8,
       "bewg256_minus_amtlich_pp": 0.7
     },
     "ETW": {
-      "saetze": 249,
+      "saetze": 266,
       "amtlich_median_pct": 2.2,
       "bewg256_minus_amtlich_pp": 0.8
     },
     "MFH": {
-      "saetze": 280,
-      "amtlich_median_pct": 3.1,
-      "bewg256_minus_amtlich_pp": 0.9
+      "saetze": 296,
+      "amtlich_median_pct": 3.2,
+      "bewg256_minus_amtlich_pp": 0.8
     },
     "WGH": {
-      "saetze": 119,
+      "saetze": 124,
       "amtlich_median_pct": 4.2,
       "bewg256_minus_amtlich_pp": -0.2
     }
@@ -218,8 +223,8 @@
         "fehler_loao": {
           "landesmittel_median_pp": 0.41,
           "landesmittel_p80_pp": 0.98,
-          "formel_median_pp": 0.539,
-          "formel_p80_pp": 1.38,
+          "formel_median_pp": 0.5,
+          "formel_p80_pp": 1.332,
           "bewg256_median_pp": 0.51
         },
         "spanne_p80_pp": 0.98,
@@ -237,8 +242,8 @@
         "fehler_loao": {
           "landesmittel_median_pp": 0.508,
           "landesmittel_p80_pp": 1.092,
-          "formel_median_pp": 0.61,
-          "formel_p80_pp": 0.956,
+          "formel_median_pp": 0.573,
+          "formel_p80_pp": 0.945,
           "bewg256_median_pp": 0.52
         },
         "spanne_p80_pp": 1.092,
@@ -256,8 +261,8 @@
         "fehler_loao": {
           "landesmittel_median_pp": 0.32,
           "landesmittel_p80_pp": 0.77,
-          "formel_median_pp": 0.285,
-          "formel_p80_pp": 0.601,
+          "formel_median_pp": 0.286,
+          "formel_p80_pp": 0.577,
           "bewg256_median_pp": 0.72
         },
         "spanne_p80_pp": 0.77,
@@ -275,46 +280,82 @@
         "fehler_loao": {
           "landesmittel_median_pp": 1.3,
           "landesmittel_p80_pp": 1.78,
-          "formel_median_pp": 0.972,
-          "formel_p80_pp": 1.63,
+          "formel_median_pp": 1.052,
+          "formel_p80_pp": 1.544,
           "bewg256_median_pp": 1.265
         },
         "spanne_p80_pp": 1.78,
         "spanne_deckung_pct": 78.6
       },
       "BW|EZFH": {
-        "saetze": 51,
+        "saetze": 62,
         "ausschuesse": 5,
         "median_pct": 1.73,
-        "jahrgang_von": 2023,
+        "jahrgang_von": 2025,
         "jahrgang_bis": 2026,
         "verdrahtet": false,
         "grund": "zu_wenig_saetze"
       },
       "BW|ETW": {
-        "saetze": 15,
+        "saetze": 26,
         "ausschuesse": 3,
-        "median_pct": 2.79,
-        "jahrgang_von": 2023,
+        "median_pct": 2.22,
+        "jahrgang_von": 2025,
         "jahrgang_bis": 2026,
         "verdrahtet": false,
         "grund": "zu_wenig_saetze"
       },
       "BW|MFH": {
-        "saetze": 17,
+        "saetze": 28,
         "ausschuesse": 4,
-        "median_pct": 2.25,
-        "jahrgang_von": 2023,
+        "median_pct": 3.72,
+        "jahrgang_von": 2025,
         "jahrgang_bis": 2026,
         "verdrahtet": false,
         "grund": "zu_wenig_saetze"
       },
       "BW|WGH": {
-        "saetze": 2,
+        "saetze": 0,
+        "ausschuesse": 0,
+        "median_pct": null,
+        "jahrgang_von": null,
+        "jahrgang_bis": null,
+        "verdrahtet": false,
+        "grund": "zu_wenig_saetze"
+      },
+      "BY|EZFH": {
+        "saetze": 0,
+        "ausschuesse": 0,
+        "median_pct": null,
+        "jahrgang_von": null,
+        "jahrgang_bis": null,
+        "verdrahtet": false,
+        "grund": "zu_wenig_saetze"
+      },
+      "BY|ETW": {
+        "saetze": 0,
+        "ausschuesse": 0,
+        "median_pct": null,
+        "jahrgang_von": null,
+        "jahrgang_bis": null,
+        "verdrahtet": false,
+        "grund": "zu_wenig_saetze"
+      },
+      "BY|MFH": {
+        "saetze": 1,
         "ausschuesse": 1,
-        "median_pct": 2.5,
-        "jahrgang_von": 2023,
-        "jahrgang_bis": 2023,
+        "median_pct": 2.8,
+        "jahrgang_von": 2026,
+        "jahrgang_bis": 2026,
+        "verdrahtet": false,
+        "grund": "zu_wenig_saetze"
+      },
+      "BY|WGH": {
+        "saetze": 0,
+        "ausschuesse": 0,
+        "median_pct": null,
+        "jahrgang_von": null,
+        "jahrgang_bis": null,
         "verdrahtet": false,
         "grund": "zu_wenig_saetze"
       },
@@ -330,74 +371,94 @@
         "fehler_loao": {
           "landesmittel_median_pp": 0.55,
           "landesmittel_p80_pp": 0.7,
-          "formel_median_pp": 0.529,
-          "formel_p80_pp": 0.837,
+          "formel_median_pp": 0.52,
+          "formel_p80_pp": 0.86,
           "bewg256_median_pp": 0.7
         },
         "spanne_p80_pp": 0.7,
         "spanne_deckung_pct": 73.9
       },
       "HE|ETW": {
-        "saetze": 16,
-        "ausschuesse": 7,
-        "median_pct": 2.6,
-        "jahrgang_von": 2026,
+        "saetze": 21,
+        "ausschuesse": 9,
+        "median_pct": 2.4,
+        "jahrgang_von": 2025,
         "jahrgang_bis": 2026,
-        "verdrahtet": false,
-        "grund": "zu_wenig_saetze"
+        "verdrahtet": true,
+        "grund": "besser_als_formel_und_256",
+        "formel_rechnet_im_land": true,
+        "fehler_loao": {
+          "landesmittel_median_pp": 0.4,
+          "landesmittel_p80_pp": 0.8,
+          "formel_median_pp": 0.508,
+          "formel_p80_pp": 0.856,
+          "bewg256_median_pp": 0.6
+        },
+        "spanne_p80_pp": 0.8,
+        "spanne_deckung_pct": 81
       },
       "HE|MFH": {
-        "saetze": 17,
-        "ausschuesse": 8,
-        "median_pct": 3.1,
+        "saetze": 21,
+        "ausschuesse": 9,
+        "median_pct": 2.9,
         "jahrgang_von": 2026,
         "jahrgang_bis": 2026,
         "verdrahtet": true,
         "grund": "besser_als_formel_und_256",
         "formel_rechnet_im_land": true,
         "fehler_loao": {
-          "landesmittel_median_pp": 0.3,
-          "landesmittel_p80_pp": 1.04,
-          "formel_median_pp": 0.409,
-          "formel_p80_pp": 0.593,
-          "bewg256_median_pp": 0.9
+          "landesmittel_median_pp": 0.2,
+          "landesmittel_p80_pp": 1.2,
+          "formel_median_pp": 0.454,
+          "formel_p80_pp": 0.804,
+          "bewg256_median_pp": 1.1
         },
-        "spanne_p80_pp": 1.04,
-        "spanne_deckung_pct": 76.5
+        "spanne_p80_pp": 1.2,
+        "spanne_deckung_pct": 71.4
       },
       "HE|WGH": {
-        "saetze": 10,
-        "ausschuesse": 6,
-        "median_pct": 3.4,
+        "saetze": 14,
+        "ausschuesse": 9,
+        "median_pct": 3.55,
         "jahrgang_von": 2024,
         "jahrgang_bis": 2026,
-        "verdrahtet": false,
-        "grund": "zu_wenig_saetze"
+        "verdrahtet": true,
+        "grund": "besser_als_formel_und_256",
+        "formel_rechnet_im_land": true,
+        "fehler_loao": {
+          "landesmittel_median_pp": 0.6,
+          "landesmittel_p80_pp": 1.92,
+          "formel_median_pp": 0.811,
+          "formel_p80_pp": 1.479,
+          "bewg256_median_pp": 0.85
+        },
+        "spanne_p80_pp": 1.92,
+        "spanne_deckung_pct": 78.6
       },
       "MV|EZFH": {
         "saetze": 4,
         "ausschuesse": 2,
-        "median_pct": 3.95,
-        "jahrgang_von": 2025,
-        "jahrgang_bis": 2025,
+        "median_pct": 4.05,
+        "jahrgang_von": 2026,
+        "jahrgang_bis": 2026,
         "verdrahtet": false,
         "grund": "zu_wenig_saetze"
       },
       "MV|ETW": {
         "saetze": 1,
         "ausschuesse": 1,
-        "median_pct": 3.9,
-        "jahrgang_von": 2025,
-        "jahrgang_bis": 2025,
+        "median_pct": 4,
+        "jahrgang_von": 2026,
+        "jahrgang_bis": 2026,
         "verdrahtet": false,
         "grund": "zu_wenig_saetze"
       },
       "MV|MFH": {
         "saetze": 2,
         "ausschuesse": 1,
-        "median_pct": 5.8,
+        "median_pct": 6.25,
         "jahrgang_von": 2025,
-        "jahrgang_bis": 2025,
+        "jahrgang_bis": 2026,
         "verdrahtet": false,
         "grund": "zu_wenig_saetze"
       },
@@ -418,16 +479,16 @@
         "jahrgang_bis": 2025,
         "verdrahtet": false,
         "grund": "nicht_besser_als_256",
-        "formel_rechnet_im_land": true,
+        "formel_rechnet_im_land": false,
         "fehler_loao": {
-          "landesmittel_median_pp": 0.6,
-          "landesmittel_p80_pp": 0.9,
-          "formel_median_pp": 0.682,
-          "formel_p80_pp": 0.993,
-          "bewg256_median_pp": 0.4
+          "landesmittel_median_pp": 0.45,
+          "landesmittel_p80_pp": 0.8,
+          "formel_median_pp": 0.483,
+          "formel_p80_pp": 0.943,
+          "bewg256_median_pp": 0.35
         },
-        "spanne_p80_pp": 0.9,
-        "spanne_deckung_pct": 75
+        "spanne_p80_pp": 0.8,
+        "spanne_deckung_pct": 78.3
       },
       "NI|ETW": {
         "saetze": 38,
@@ -435,18 +496,18 @@
         "median_pct": 2.3,
         "jahrgang_von": 2024,
         "jahrgang_bis": 2025,
-        "verdrahtet": false,
-        "grund": "formel_besser",
-        "formel_rechnet_im_land": true,
+        "verdrahtet": true,
+        "grund": "besser_als_256",
+        "formel_rechnet_im_land": false,
         "fehler_loao": {
-          "landesmittel_median_pp": 0.4,
-          "landesmittel_p80_pp": 0.5,
-          "formel_median_pp": 0.326,
-          "formel_p80_pp": 0.497,
+          "landesmittel_median_pp": 0.32,
+          "landesmittel_p80_pp": 0.4,
+          "formel_median_pp": 0.279,
+          "formel_p80_pp": 0.44,
           "bewg256_median_pp": 0.7
         },
-        "spanne_p80_pp": 0.5,
-        "spanne_deckung_pct": 63.2
+        "spanne_p80_pp": 0.4,
+        "spanne_deckung_pct": 94.7
       },
       "NI|MFH": {
         "saetze": 6,
@@ -478,8 +539,8 @@
         "fehler_loao": {
           "landesmittel_median_pp": 0.4,
           "landesmittel_p80_pp": 0.7,
-          "formel_median_pp": 0.495,
-          "formel_p80_pp": 0.973,
+          "formel_median_pp": 0.521,
+          "formel_p80_pp": 0.987,
           "bewg256_median_pp": 0.9
         },
         "spanne_p80_pp": 0.7,
@@ -497,8 +558,8 @@
         "fehler_loao": {
           "landesmittel_median_pp": 0.4,
           "landesmittel_p80_pp": 0.76,
-          "formel_median_pp": 0.469,
-          "formel_p80_pp": 0.816,
+          "formel_median_pp": 0.48,
+          "formel_p80_pp": 0.896,
           "bewg256_median_pp": 1
         },
         "spanne_p80_pp": 0.76,
@@ -509,7 +570,7 @@
         "ausschuesse": 71,
         "median_pct": 2.9,
         "jahrgang_von": 2024,
-        "jahrgang_bis": 2025,
+        "jahrgang_bis": 2026,
         "verdrahtet": true,
         "grund": "besser_als_formel_und_256",
         "formel_rechnet_im_land": true,
@@ -517,7 +578,7 @@
           "landesmittel_median_pp": 0.4,
           "landesmittel_p80_pp": 0.9,
           "formel_median_pp": 0.604,
-          "formel_p80_pp": 1.079,
+          "formel_p80_pp": 1.123,
           "bewg256_median_pp": 1.1
         },
         "spanne_p80_pp": 0.9,
@@ -535,8 +596,8 @@
         "fehler_loao": {
           "landesmittel_median_pp": 0.5,
           "landesmittel_p80_pp": 1.08,
-          "formel_median_pp": 0.422,
-          "formel_p80_pp": 0.967,
+          "formel_median_pp": 0.437,
+          "formel_p80_pp": 1.014,
           "bewg256_median_pp": 0.5
         },
         "spanne_p80_pp": 1.08,
@@ -696,29 +757,29 @@
         "grund": "zu_wenig_saetze"
       },
       "TH|ETW": {
-        "saetze": 7,
+        "saetze": 8,
         "ausschuesse": 3,
         "median_pct": 3.56,
-        "jahrgang_von": 2024,
-        "jahrgang_bis": 2025,
+        "jahrgang_von": 2025,
+        "jahrgang_bis": 2026,
         "verdrahtet": false,
         "grund": "zu_wenig_saetze"
       },
       "TH|MFH": {
         "saetze": 18,
         "ausschuesse": 7,
-        "median_pct": 4.4,
+        "median_pct": 4.53,
         "jahrgang_von": 2023,
-        "jahrgang_bis": 2025,
+        "jahrgang_bis": 2026,
         "verdrahtet": false,
         "grund": "zu_wenig_saetze"
       },
       "TH|WGH": {
-        "saetze": 9,
+        "saetze": 12,
         "ausschuesse": 5,
-        "median_pct": 6.3,
+        "median_pct": 6.8,
         "jahrgang_von": 2024,
-        "jahrgang_bis": 2025,
+        "jahrgang_bis": 2026,
         "verdrahtet": false,
         "grund": "zu_wenig_saetze"
       }
