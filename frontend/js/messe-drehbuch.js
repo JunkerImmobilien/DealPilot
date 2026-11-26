@@ -11162,11 +11162,6 @@
         await zeige(function () { var r = q('#dab-cockpit .dab-rowflex'); return r && r.parentElement; }, 8);
         await b2oZeile(s, 'Bereit für die Bank', 'Der Vorflug-Check zeigt, welche Grundfelder eine Bank noch braucht. Ein Klick springt ins Feld.');
       },
-      async function (s) {   /* 3 · ViVi */
-        var v = function () { return k5Eng(rhIm(q('#s8'), /ViVi/), 260); };
-        if (v()) { await zeige(v, 8); }
-        await b2oZeile(s, 'ViVi', 'Mit ViVi verbunden? Dann stehen hier Abgleich, Jetzt abgleichen und Verknüpfung lösen.');
-      },
       async function (s) {   /* 4 · Dokumente */
         await r13Zeige(/^Dokumente/);
         await b2oZeile(s, 'Dokumente und Exporte', 'Investment-PDF und Kurzfassung, Track Record, Finanzamt-PDF, Kaufpreisaufteilung und deine Marktberichte.');
