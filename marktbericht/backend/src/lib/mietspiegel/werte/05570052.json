@@ -1,0 +1,744 @@
+{
+ "ags": "05570052",
+ "freigabe": "gesperrt",
+ "freigabe_grund": "„Die Mietspiegel sind urheberrechtlich geschützt. Die Marktdaten dürfen zu eigenen Zwecken verwendet werden. Eine Vervielfältigung und Verbreitung der Mietspiegel (auch auszugsweise) ist nur mit Genehmigung des Herausgebers gestattet.“ (S. 3, Impressum) — Rechtevorbehalt ohne ausdrückliches Speicherverbot (eigene Zwecke ausdrücklich erlaubt); auf Prod gesperrt bis zur Klärung",
+ "gemeinde": "Warendorf",
+ "art": "qualifiziert",
+ "stand": "2026-03-31",
+ "erhebungsstichtag": "2024-03-31",
+ "gueltig_ab": "2026-04-01",
+ "gueltig_bis": "2028-03-31",
+ "quelle": {
+  "url": "https://www.warendorf.de/de/stadt/stadtverwaltung/satzungen-verordnungen/alphabetische-uebersicht/5-03-qualifizierter-mietspiegel-2026-31.03.2026.pdf?cid=i0g",
+  "dokument": "Qualifizierter Mietspiegel 2026 gemäß § 558d BGB für nicht preisgebundenen Wohnraum auf dem Gebiet der Stadt Warendorf, gültig 01.04.2026 bis 31.03.2028 (Herausgeber Stadt Warendorf; erstellt vom Gutachterausschuss, Fortschreibung per VPI, beschlossen 31.03.2026 vom Arbeitskreis Mietspiegel)",
+  "seite": "S. 1 (Titel, Gültigkeit), S. 3 (Impressum, Rechte), S. 4 (Laufzeit, Fortschreibung), S. 7 (Tabelle 1 Basistabelle), S. 8–10 (Tabellen 3–7), S. 12 (Tabelle 9 Modernisierung), S. 13 (Tabelle 11 Lagezonen), S. 23 (Mietspannen ±14 %), S. 24 (Berechnungsbeispiel Wohnung, Tabelle 17)",
+  "lizenz": "Rechtevorbehalt: „Die Mietspiegel sind urheberrechtlich geschützt. Die Marktdaten dürfen zu eigenen Zwecken verwendet werden. Eine Vervielfältigung und Verbreitung der Mietspiegel (auch auszugsweise) ist nur mit Genehmigung des Herausgebers gestattet.“ (S. 3, Impressum)",
+  "abgerufen": "2026-11-26"
+ },
+ "einheit": "eur_qm_nettokalt",
+ "form": "tabelle",
+ "rundung": 2,
+ "hinweis": "Qualifizierter Mietspiegel für WOHNUNGEN (Kapitel 2, Regression, als Basistabelle Baualter × Wohnfläche veröffentlicht) — der EINFACHE Mietspiegel für Einfamilienhäuser im selben Dokument (Kapitel 3, Tabelle 12 ff.) ist hier NICHT abgebildet. Basistabelle S. 7 (Textschicht, am Druckbild geprüft); Wohnflächenklassen ganzzahlig 21–30 … 121–150 m² als stetige Grenzen (über 20 bis 30 usw.), außerhalb 21–150 m² kein Wert. Zu-/Abschläge in €/m² werden addiert (S. 7): Ausstattungsstandard aus Punktesystem (Tabelle 2/3: bis −3 Punkte −0,98, ab 8 Punkte +0,49 — Punkte selbst nicht gerechnet, als Merkmal), Aufzug +0,29, Küchenmobiliar +0,40, 3.–6. OG −0,43, Terrasse +0,24 / Dachterrasse +0,44 (nur eines), Modernisierungsstufe 2/3/4 aus Punkten (Tabelle 8/9) +0,47/+0,82/+0,96 (Punkte nicht gerechnet, als Merkmal; nur Maßnahmen, die nicht schon bei Errichtung vollzogen waren), Lagezonen Tabelle 11 (Zuordnung laut Karten 1–5; ohne Angabe ±0 = Ortsrand). Spanne ±14 % auf die durchschnittliche Vergleichsmiete nach allen Zu-/Abschlägen (S. 23). Berechnungsbeispiel S. 24: das Dokument schreibt bei den Spannengrenzen „8,00 EUR/m² × 1,14 / × 0,86“, die Ergebnisse 9,14 / 6,90 passen aber zum Mittel 8,02 — Druckfehler im Rechenweg, das Prüfbeispiel nimmt 8,02 / 6,90 / 9,14.",
+ "haus": {
+  "regel": "ausgeschlossen",
+  "gilt_fuer": [
+   "efh",
+   "dhh",
+   "rh"
+  ],
+  "gilt_fuer_herkunft": "rechtslage",
+  "gilt_fuer_begruendung": "Rechtslage: „Einfamilienhaus“ ohne „freistehend“ umfasst Doppelhaushälfte und Reihenhaus (§ 181 Abs. 2 BewG).",
+  "hinweis": "Für Einfamilienhäuser gibt es im selben Dokument einen eigenen einfachen Mietspiegel (Kapitel 3), der hier nicht abgebildet ist",
+  "beleg": "S. 19 Kapitel 3 „Einfacher Mietspiegel für Einfamilienhäuser“"
+ },
+ "tabelle": {
+  "achsen": {
+   "baujahr": [
+    {
+     "von": null,
+     "bis": 1948,
+     "label": "bis 1948"
+    },
+    {
+     "von": 1949,
+     "bis": 1957,
+     "label": "1949 - 1957"
+    },
+    {
+     "von": 1958,
+     "bis": 1968,
+     "label": "1958 - 1968"
+    },
+    {
+     "von": 1969,
+     "bis": 1978,
+     "label": "1969 - 1978"
+    },
+    {
+     "von": 1979,
+     "bis": 1983,
+     "label": "1979 - 1983"
+    },
+    {
+     "von": 1984,
+     "bis": 1994,
+     "label": "1984 - 1994"
+    },
+    {
+     "von": 1995,
+     "bis": 2001,
+     "label": "1995 - 2001"
+    },
+    {
+     "von": 2002,
+     "bis": 2009,
+     "label": "2002 - 2009"
+    },
+    {
+     "von": 2010,
+     "bis": 2015,
+     "label": "2010 - 2015"
+    },
+    {
+     "von": 2016,
+     "bis": null,
+     "label": "seit 2016"
+    }
+   ],
+   "wfl": [
+    {
+     "von": 20,
+     "von_inkl": false,
+     "bis": 30,
+     "label": "21 - 30 m²"
+    },
+    {
+     "von": 30,
+     "von_inkl": false,
+     "bis": 40,
+     "label": "31 - 40 m²"
+    },
+    {
+     "von": 40,
+     "von_inkl": false,
+     "bis": 50,
+     "label": "41 - 50 m²"
+    },
+    {
+     "von": 50,
+     "von_inkl": false,
+     "bis": 70,
+     "label": "51 - 70 m²"
+    },
+    {
+     "von": 70,
+     "von_inkl": false,
+     "bis": 90,
+     "label": "71 - 90 m²"
+    },
+    {
+     "von": 90,
+     "von_inkl": false,
+     "bis": 120,
+     "label": "91 - 120 m²"
+    },
+    {
+     "von": 120,
+     "von_inkl": false,
+     "bis": 150,
+     "label": "121 - 150 m²"
+    }
+   ]
+  },
+  "geltung": {
+   "baujahr_von": null,
+   "baujahr_bis": null,
+   "wfl_von": 20,
+   "wfl_bis": 150
+  },
+  "spanne": {
+   "unten_pct": -14,
+   "oben_pct": 14
+  },
+  "zellen": [
+   {
+    "baujahr": 0,
+    "wfl": 0,
+    "mittel": 9.72,
+    "seite": "7 (Tabelle 1)"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 1,
+    "mittel": 7.8,
+    "seite": "7 (Tabelle 1)"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 2,
+    "mittel": 7.23,
+    "seite": "7 (Tabelle 1)"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 3,
+    "mittel": 6.76,
+    "seite": "7 (Tabelle 1)"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 4,
+    "mittel": 6.46,
+    "seite": "7 (Tabelle 1)"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 5,
+    "mittel": 6.14,
+    "seite": "7 (Tabelle 1)"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 6,
+    "mittel": 5.81,
+    "seite": "7 (Tabelle 1)"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 0,
+    "mittel": 9.72,
+    "seite": "7 (Tabelle 1)"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 1,
+    "mittel": 7.8,
+    "seite": "7 (Tabelle 1)"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 2,
+    "mittel": 7.23,
+    "seite": "7 (Tabelle 1)"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 3,
+    "mittel": 6.76,
+    "seite": "7 (Tabelle 1)"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 4,
+    "mittel": 6.46,
+    "seite": "7 (Tabelle 1)"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 5,
+    "mittel": 6.14,
+    "seite": "7 (Tabelle 1)"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 6,
+    "mittel": 5.81,
+    "seite": "7 (Tabelle 1)"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 0,
+    "mittel": 9.72,
+    "seite": "7 (Tabelle 1)"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 1,
+    "mittel": 7.8,
+    "seite": "7 (Tabelle 1)"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 2,
+    "mittel": 7.23,
+    "seite": "7 (Tabelle 1)"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 3,
+    "mittel": 6.76,
+    "seite": "7 (Tabelle 1)"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 4,
+    "mittel": 6.46,
+    "seite": "7 (Tabelle 1)"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 5,
+    "mittel": 6.14,
+    "seite": "7 (Tabelle 1)"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 6,
+    "mittel": 5.81,
+    "seite": "7 (Tabelle 1)"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 0,
+    "mittel": 9.84,
+    "seite": "7 (Tabelle 1)"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 1,
+    "mittel": 7.91,
+    "seite": "7 (Tabelle 1)"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 2,
+    "mittel": 7.35,
+    "seite": "7 (Tabelle 1)"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 3,
+    "mittel": 6.87,
+    "seite": "7 (Tabelle 1)"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 4,
+    "mittel": 6.58,
+    "seite": "7 (Tabelle 1)"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 5,
+    "mittel": 6.25,
+    "seite": "7 (Tabelle 1)"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 6,
+    "mittel": 5.93,
+    "seite": "7 (Tabelle 1)"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 0,
+    "mittel": 9.84,
+    "seite": "7 (Tabelle 1)"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 1,
+    "mittel": 7.91,
+    "seite": "7 (Tabelle 1)"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 2,
+    "mittel": 7.35,
+    "seite": "7 (Tabelle 1)"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 3,
+    "mittel": 6.87,
+    "seite": "7 (Tabelle 1)"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 4,
+    "mittel": 6.58,
+    "seite": "7 (Tabelle 1)"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 5,
+    "mittel": 6.25,
+    "seite": "7 (Tabelle 1)"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 6,
+    "mittel": 5.93,
+    "seite": "7 (Tabelle 1)"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 0,
+    "mittel": 10.2,
+    "seite": "7 (Tabelle 1)"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 1,
+    "mittel": 8.27,
+    "seite": "7 (Tabelle 1)"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 2,
+    "mittel": 7.71,
+    "seite": "7 (Tabelle 1)"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 3,
+    "mittel": 7.23,
+    "seite": "7 (Tabelle 1)"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 4,
+    "mittel": 6.94,
+    "seite": "7 (Tabelle 1)"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 5,
+    "mittel": 6.61,
+    "seite": "7 (Tabelle 1)"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 6,
+    "mittel": 6.29,
+    "seite": "7 (Tabelle 1)"
+   },
+   {
+    "baujahr": 6,
+    "wfl": 0,
+    "mittel": 10.37,
+    "seite": "7 (Tabelle 1)"
+   },
+   {
+    "baujahr": 6,
+    "wfl": 1,
+    "mittel": 8.45,
+    "seite": "7 (Tabelle 1)"
+   },
+   {
+    "baujahr": 6,
+    "wfl": 2,
+    "mittel": 7.88,
+    "seite": "7 (Tabelle 1)"
+   },
+   {
+    "baujahr": 6,
+    "wfl": 3,
+    "mittel": 7.4,
+    "seite": "7 (Tabelle 1)"
+   },
+   {
+    "baujahr": 6,
+    "wfl": 4,
+    "mittel": 7.11,
+    "seite": "7 (Tabelle 1)"
+   },
+   {
+    "baujahr": 6,
+    "wfl": 5,
+    "mittel": 6.78,
+    "seite": "7 (Tabelle 1)"
+   },
+   {
+    "baujahr": 6,
+    "wfl": 6,
+    "mittel": 6.46,
+    "seite": "7 (Tabelle 1)"
+   },
+   {
+    "baujahr": 7,
+    "wfl": 0,
+    "mittel": 10.93,
+    "seite": "7 (Tabelle 1)"
+   },
+   {
+    "baujahr": 7,
+    "wfl": 1,
+    "mittel": 9.01,
+    "seite": "7 (Tabelle 1)"
+   },
+   {
+    "baujahr": 7,
+    "wfl": 2,
+    "mittel": 8.45,
+    "seite": "7 (Tabelle 1)"
+   },
+   {
+    "baujahr": 7,
+    "wfl": 3,
+    "mittel": 7.97,
+    "seite": "7 (Tabelle 1)"
+   },
+   {
+    "baujahr": 7,
+    "wfl": 4,
+    "mittel": 7.67,
+    "seite": "7 (Tabelle 1)"
+   },
+   {
+    "baujahr": 7,
+    "wfl": 5,
+    "mittel": 7.35,
+    "seite": "7 (Tabelle 1)"
+   },
+   {
+    "baujahr": 7,
+    "wfl": 6,
+    "mittel": 7.02,
+    "seite": "7 (Tabelle 1)"
+   },
+   {
+    "baujahr": 8,
+    "wfl": 0,
+    "mittel": 10.93,
+    "seite": "7 (Tabelle 1)"
+   },
+   {
+    "baujahr": 8,
+    "wfl": 1,
+    "mittel": 9.01,
+    "seite": "7 (Tabelle 1)"
+   },
+   {
+    "baujahr": 8,
+    "wfl": 2,
+    "mittel": 8.45,
+    "seite": "7 (Tabelle 1)"
+   },
+   {
+    "baujahr": 8,
+    "wfl": 3,
+    "mittel": 7.97,
+    "seite": "7 (Tabelle 1)"
+   },
+   {
+    "baujahr": 8,
+    "wfl": 4,
+    "mittel": 7.67,
+    "seite": "7 (Tabelle 1)"
+   },
+   {
+    "baujahr": 8,
+    "wfl": 5,
+    "mittel": 7.35,
+    "seite": "7 (Tabelle 1)"
+   },
+   {
+    "baujahr": 8,
+    "wfl": 6,
+    "mittel": 7.02,
+    "seite": "7 (Tabelle 1)"
+   },
+   {
+    "baujahr": 9,
+    "wfl": 0,
+    "mittel": 12.87,
+    "seite": "7 (Tabelle 1)"
+   },
+   {
+    "baujahr": 9,
+    "wfl": 1,
+    "mittel": 10.95,
+    "seite": "7 (Tabelle 1)"
+   },
+   {
+    "baujahr": 9,
+    "wfl": 2,
+    "mittel": 10.39,
+    "seite": "7 (Tabelle 1)"
+   },
+   {
+    "baujahr": 9,
+    "wfl": 3,
+    "mittel": 9.91,
+    "seite": "7 (Tabelle 1)"
+   },
+   {
+    "baujahr": 9,
+    "wfl": 4,
+    "mittel": 9.62,
+    "seite": "7 (Tabelle 1)"
+   },
+   {
+    "baujahr": 9,
+    "wfl": 5,
+    "mittel": 9.29,
+    "seite": "7 (Tabelle 1)"
+   },
+   {
+    "baujahr": 9,
+    "wfl": 6,
+    "mittel": 8.96,
+    "seite": "7 (Tabelle 1)"
+   }
+  ],
+  "zuschlaege": [
+   {
+    "merkmal": "ausstattung_gering",
+    "label": "geringer Ausstattungsstandard (bis −3 Punkte)",
+    "art": "eur_qm",
+    "wert": -0.98,
+    "beleg": "S. 8 Tabelle 3"
+   },
+   {
+    "merkmal": "ausstattung_hochwertig",
+    "label": "hochwertiger Ausstattungsstandard (ab 8 Punkte)",
+    "art": "eur_qm",
+    "wert": 0.49,
+    "beleg": "S. 8 Tabelle 3"
+   },
+   {
+    "merkmal": "aufzug",
+    "label": "Aufzug",
+    "art": "eur_qm",
+    "wert": 0.29,
+    "beleg": "S. 9 Tabelle 4"
+   },
+   {
+    "merkmal": "kuechenmobiliar",
+    "label": "Küchenmobiliar (Einbauküche inkl. Elektrogeräte) vom Vermieter",
+    "art": "eur_qm",
+    "wert": 0.4,
+    "beleg": "S. 9 Tabelle 5"
+   },
+   {
+    "merkmal": "geschoss_3_bis_6",
+    "label": "Wohnung im 3.–6. Obergeschoss",
+    "art": "eur_qm",
+    "wert": -0.43,
+    "beleg": "S. 10 Tabelle 6"
+   },
+   {
+    "merkmal": "terrasse",
+    "label": "Terrasse",
+    "art": "eur_qm",
+    "wert": 0.24,
+    "beleg": "S. 10 Tabelle 7"
+   },
+   {
+    "merkmal": "dachterrasse",
+    "label": "Dachterrasse",
+    "art": "eur_qm",
+    "wert": 0.44,
+    "beleg": "S. 10 Tabelle 7"
+   },
+   {
+    "merkmal": "modernisierung_stufe2",
+    "label": "Modernisierungsstufe 2 (6–12 Punkte)",
+    "art": "eur_qm",
+    "wert": 0.47,
+    "beleg": "S. 12 Tabelle 9"
+   },
+   {
+    "merkmal": "modernisierung_stufe3",
+    "label": "Modernisierungsstufe 3 (13–15 Punkte)",
+    "art": "eur_qm",
+    "wert": 0.82,
+    "beleg": "S. 12 Tabelle 9"
+   },
+   {
+    "merkmal": "modernisierung_stufe4",
+    "label": "Modernisierungsstufe 4 (mehr als 15 Punkte)",
+    "art": "eur_qm",
+    "wert": 0.96,
+    "beleg": "S. 12 Tabelle 9"
+   },
+   {
+    "merkmal": "lage:stadtkern",
+    "label": "Lagezone Warendorf Stadtkern",
+    "art": "eur_qm",
+    "wert": 0.52,
+    "beleg": "S. 13 Tabelle 11",
+    "aliase": [
+     "warendorf stadtkern",
+     "zentrum"
+    ]
+   },
+   {
+    "merkmal": "lage:suedwesten",
+    "label": "Lagezone Warendorf Südwesten mit Zentrumsnähe",
+    "art": "eur_qm",
+    "wert": 0.28,
+    "beleg": "S. 13 Tabelle 11",
+    "aliase": [
+     "warendorf südwesten",
+     "südwesten",
+     "warendorf suedwesten mit zentrumsnaehe"
+    ]
+   },
+   {
+    "merkmal": "lage:ortsrand",
+    "label": "Lagezone Warendorf Ortsrand",
+    "art": "eur_qm",
+    "wert": 0,
+    "beleg": "S. 13 Tabelle 11",
+    "aliase": [
+     "warendorf ortsrand"
+    ]
+   },
+   {
+    "merkmal": "lage:freckenhorst",
+    "label": "Lagezone Ortsteil Freckenhorst",
+    "art": "eur_qm",
+    "wert": -0.58,
+    "beleg": "S. 13 Tabelle 11",
+    "aliase": [
+     "ortsteil freckenhorst"
+    ]
+   },
+   {
+    "merkmal": "lage:ortsteile",
+    "label": "Lagezone Ortsteile Einen-Müssingen, Hoetmar, Milte sowie Außenbereich",
+    "art": "eur_qm",
+    "wert": -1.15,
+    "beleg": "S. 13 Tabelle 11",
+    "aliase": [
+     "einen",
+     "müssingen",
+     "einen-müssingen",
+     "hoetmar",
+     "milte",
+     "außenbereich",
+     "aussenbereich"
+    ]
+   }
+  ]
+ },
+ "pruefbeispiele": [
+  {
+   "eingabe": {
+    "baujahr": 1965,
+    "wfl": 105,
+    "lage": "suedwesten",
+    "merkmale": {
+     "ausstattung_hochwertig": true,
+     "kuechenmobiliar": true,
+     "terrasse": true,
+     "modernisierung_stufe2": true
+    }
+   },
+   "erwartet": {
+    "unten": 6.9,
+    "mittel": 8.02,
+    "oben": 9.14
+   },
+   "seite": "24 (Tabelle 17)",
+   "art": "anwendungsbeispiel",
+   "anmerkung": "6,14 + 0,49 + 0,40 + 0,24 + 0,47 + 0,28 = 8,02; ±14 %"
+  },
+  {
+   "eingabe": {
+    "baujahr": 1975,
+    "wfl": 80
+   },
+   "erwartet": {
+    "unten": 5.66,
+    "mittel": 6.58,
+    "oben": 7.5
+   },
+   "seite": "7, 23",
+   "art": "tabellenzelle",
+   "anmerkung": "1969–1978 / 71–90 m² = 6,58 (im Dokument rot markiertes Beispielfeld), ±14 %"
+  },
+  {
+   "eingabe": {
+    "baujahr": 1975,
+    "wfl": 160
+   },
+   "erwartet": null,
+   "seite": "7",
+   "art": "tabellenzelle",
+   "anmerkung": "über 150 m² nicht in der Tabelle"
+  }
+ ]
+}
