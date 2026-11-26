@@ -22,7 +22,7 @@
     '.seite{width:210mm;height:297mm;margin:0 auto;background:#fff;position:relative;padding:16mm 17mm 20mm;overflow:hidden;page-break-after:always;break-after:page}',
     '.seite:last-child{page-break-after:auto;break-after:auto}',
     '.kopf{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1.2px solid var(--ink);padding-bottom:5mm;margin-bottom:7mm}',
-    '.kopf img{height:11mm}.wort{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:15pt;letter-spacing:-.01em}',
+    '.kopf img{height:9mm;width:auto;display:block}.wort{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:15pt;letter-spacing:-.01em}',
     '.kopf .r{font-family:"JetBrains Mono",monospace;font-size:7.5pt;letter-spacing:.14em;text-transform:uppercase;text-align:right;line-height:1.6}',
     '.fuss{position:absolute;left:17mm;right:17mm;bottom:9mm;display:flex;justify-content:space-between;font-size:7.5pt;color:var(--mut);border-top:.6px solid var(--linie);padding-top:2.5mm}',
     '.ober{font-family:"JetBrains Mono",monospace;font-size:7.5pt;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-d);margin:0 0 2mm}',
@@ -42,7 +42,7 @@
     '.kachel b{font-family:"Space Grotesk",sans-serif;font-size:15pt;display:block;margin:1.5mm 0 .5mm}.kachel small{font-size:7.5pt;color:var(--mut)}',
     '.karte{position:relative;height:92mm;margin:-16mm -17mm 8mm;overflow:hidden;background:#e9e6df}',
     '.karte img.bild{width:100%;height:100%;object-fit:cover;display:block}',
-    '.karte .logo{position:absolute;left:17mm;top:12mm;background:#050505;padding:2.5mm 3.5mm;border-radius:2mm;color:#fff}.karte .logo img{height:9mm;display:block}',
+    '.karte .logo{position:absolute;left:17mm;top:12mm}.karte .logo img{height:11mm;width:auto;display:block}.karte .logo .wort{background:#050505;color:#fff;padding:2.5mm 3.5mm;border-radius:2mm;display:block}',
     '.karte .attr{position:absolute;right:2mm;bottom:1.5mm;font-size:6.5pt;background:rgba(255,255,255,.85);padding:.5mm 1.5mm}',
     '.lagekarte{height:70mm;border:.8px solid var(--linie);overflow:hidden;margin:4mm 0}.lagekarte img{width:100%;height:100%;object-fit:cover}',
     '.score{display:flex;gap:7mm;align-items:center;margin:5mm 0 2mm}.ring{width:34mm;height:34mm;position:relative;flex:0 0 34mm}',
@@ -179,7 +179,7 @@
       var mk = '<p class="ober">' + kapNr() + ' · Markt am Ort</p><h2>Was Häuser am Ort kosten und einbringen</h2>'
         + '<p class="unter">Aktueller Marktdurchschnitt aus Angeboten im Umkreis. Angebotspreise sind Wunschpreise der Verkäufer und liegen meist über den gezahlten Preisen.</p>'
         + '<div class="kacheln">' + kachel('Angebotspreis', M.kauf && M.kauf.median ? eur(M.kauf.median) : '–', 'je m², Median' + (M.kauf && M.kauf.n ? ' aus ' + zahl(M.kauf.n) + ' Angeboten' : ''))
-        + kachel('Spanne', M.kauf && M.kauf.q25 ? zahl(M.kauf.q25) + ' bis ' + zahl(M.kauf.q75) : '–', '€ je m², mittlere Hälfte')
+        + kachel('Spanne', M.kauf && M.kauf.q25 ? '<span style="font-size:11.5pt">' + zahl(M.kauf.q25) + ' bis ' + zahl(M.kauf.q75) + '</span>' : '–', '€ je m², mittlere Hälfte')
         + kachel('Angebotsmiete', M.miete && M.miete.median ? eur(M.miete.median, 2) : '–', 'je m², Median')
         + kachel('Marktpreisindikation', M.wert ? eur(M.wert) : '–', M.abschlag_pct ? 'nach ' + zahl(M.abschlag_pct) + ' % Abschlag' : 'kein Verkehrswert') + '</div>'
         + '<div class="zwei"><div>' + linie(M.reihe && M.reihe.preis, function (v) { return zahl(v); }, 'ANGEBOTSPREIS € JE M²') + '</div><div>' + linie(M.reihe && M.reihe.miete, function (v) { return zahl(v, 2); }, 'ANGEBOTSMIETE € JE M²') + '</div></div>'
@@ -226,13 +226,13 @@
       + '<table class="eng"><tr><th>Finanzierung</th><th class="z">Betrag</th></tr>' + zeile('Kaufpreis', '', eur(O.kaufpreis)) + zeile('Kaufnebenkosten', 'Kapitel Kaufnebenkosten', eur(NK.summe))
       + zeile('Eigenkapital', 'deine Angabe', '− ' + eur(O.ek || 0)) + zeile('Darlehen', '', eur(F.darlehen), 'summe') + zeile('Beleihung', 'Darlehen geteilt durch Kaufpreis', pct(F.ltv_pct, 0))
       + zeile('Zins ' + (F.bindung_jahre || 10) + ' Jahre', esc(F.zins_herkunft || 'Bauzins heute für diese Beleihung'), pct(F.zins_pct, 2)) + zeile('Tilgung', 'im ersten Jahr', pct(F.tilgung_pct, 1)) + '</table>'
-      + '<h3>Monatliche Belastung</h3><table class="eng">' + haupt.map(function (x) {
-        return zeile(esc(x.k === 'uebrige' ? 'Nebenkosten ohne Heizung' : x.l), x.k === 'uebrige' ? 'Grundsteuer, Wasser, Müll, Versicherung, Schornsteinfeger, Straße, Strom' : esc(x.herkunft || ''), eur(x.eur)); }).join('')
+      + '<div class="zwei"><div><h3>Monatliche Belastung</h3><table class="eng">' + haupt.map(function (x) {
+        return zeile(esc(x.k === 'uebrige' ? 'Nebenkosten ohne Heizung' : x.l), x.k === 'uebrige' ? 'Posten rechts' : esc(x.herkunft || ''), eur(x.eur)); }).join('')
       + (sum ? zeile('Wohnkosten im Monat', '', eur(sum.eur), 'summe') : '')
       + (LB.quote != null ? zeile('Anteil am Netto-Haushaltseinkommen', '', '<span class="ampel" style="background:' + (LB.ampel === 'gruen' ? 'var(--gruen)' : LB.ampel === 'rot' ? 'var(--rot)' : 'var(--gold)') + '"></span>' + pct(LB.quote, 1))
-        : abGruen ? zeile('Gut tragbar ab einem Netto-Einkommen von', 'knapp ab ' + eur(abGelb), eur(abGruen)) : '') + '</table>';
-    if (teile.length) lb += '<h3>Nebenkosten einzeln</h3><table class="eng"><tr><th>Posten</th><th>Herkunft</th><th class="z">Im Monat</th></tr>'
-      + teile.map(function (x) { return '<tr><td>' + esc(x.l.replace(/^davon /, '')) + '</td><td>' + esc(x.herkunft) + '</td><td class="z">' + eur(x.eur) + '</td></tr>'; }).join('') + '</table>';
+        : abGruen ? zeile('Gut tragbar ab einem Netto-Einkommen von', 'knapp ab ' + eur(abGelb), eur(abGruen)) : '') + '</table></div><div>';
+    lb += teile.length ? '<h3>Nebenkosten einzeln</h3><table class="eng">' + teile.map(function (x) { return zeile(esc(x.l.replace(/^davon /, '').replace(/^Strom für Außenbereich und Allgemeinflächen$/, 'Strom Allgemein')), esc(x.herkunft), eur(x.eur)); }).join('') + '</table>' : '';
+    lb += '</div></div>';
     lb += '<div class="box">Grün bis ' + LB.grenzen.gruen + ' %, gelb bis ' + LB.grenzen.gelb + ' % vom Netto. Banken rechnen meist nur die Rate gegen höchstens 40 % vom Netto. Je Gemeinde heißt: aus den Zahlen deiner Gemeinde abgeleitet, kein Bescheid.</div>'
       + '<p class="quelle">Keine Finanzierungszusage. Die Bank prüft Einkommen, Ausgaben und Objekt selbst.</p>';
     seite('Leistbarkeit', lb, 'Leistbarkeit: Was dich das Haus im Monat kostet');
@@ -337,7 +337,7 @@
     var html = S.map(function (s, i) {
       var kopf = i === 0 ? '' : '<div class="kopf">' + (logo ? '<img src="' + logo + '" alt="DealPilot">' : '<span class="wort">DealPilot</span>') + '<div class="r">Haus-Check · ' + esc(s[0]) + '<br>' + esc(ORT) + '</div></div>';
       var fuss = '<div class="fuss"><span>' + (i === 0 || i === N - 1 ? 'DealPilot · Junker Solution · info@dealpilot.immo' : 'DealPilot · Haus-Check') + '</span><span>' + (i === 0 ? 'Entscheidungshilfe, kein Gutachten · ' : 'Stand ' + D.datum(new Date()) + ' · ') + 'Seite ' + (i + 1) + ' von ' + N + '</span></div>';
-      return '<section class="seite">' + kopf + s[1] + fuss + '</section>';
+      return '<section class="seite">' + kopf + s[1] + (e.mitFuss ? fuss : '') + '</section>';
     }).join('\n');
     return '<!doctype html><html lang="de"><head><meta charset="utf-8"><title>DealPilot Haus-Check · ' + esc(O.adresse || '') + '</title>'
       + '<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">'
@@ -356,10 +356,19 @@
   }
 
   /** e wie oben. Rückgabe Promise<html>. */
+  /* Logo IMMER die Originaldatei, dieselbe wie im Deal-Check-PDF (landing/assets/dealpilot-logo-2026.png, 512 x 161, eigener
+     schwarzer Rahmen mit Goldkante). Als data:-URL, damit der Druckdienst sie ohne Netz hat. Kein Nachbau, keine Ersatzschrift. */
+  var LOGO = null;
+  function logoLaden() {
+    if (LOGO) return Promise.resolve(LOGO);
+    var basis = /^app./.test(location.hostname) ? location.origin + '/landing' : location.origin;
+    return fetch(basis + '/assets/dealpilot-logo-2026.png').then(function (r) { return r.ok ? r.blob() : null; }).then(function (bl) {
+      if (!bl) return null;
+      return new Promise(function (ok) { var fr = new FileReader(); fr.onload = function () { LOGO = String(fr.result || '') || null; ok(LOGO); }; fr.onerror = function () { ok(null); }; fr.readAsDataURL(bl); });
+    }).catch(function () { return null; });
+  }
   function dokument(e) {
-    var D = hilfen(), B = window.DpDokument;
-    var logoP = B && B.logo ? B.logo().catch(function () { return null; }) : Promise.resolve(null);
-    return logoP.then(function (logo) { return bauen(e, D, typeof logo === 'string' ? logo : (logo && logo.dataUrl) || null); });
+    return logoLaden().then(function (logo) { return bauen(e, hilfen(), logo); });
   }
   window.DpHausCheck = { dokument: dokument, bauen: function (e) { return bauen(e, hilfen(), null); },
     vorschau: function (e) { return dokument(e).then(function (h) { window.DpDokument.vorschau(h, 'Haus-Check'); return h; }); }, version: 'v5150pp6' };
