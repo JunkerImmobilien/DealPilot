@@ -55,7 +55,8 @@
     + '.eig-gross{display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-bottom:12px}'
     + '.eig-gross .zahl{font:700 44px "Space Grotesk",sans-serif;line-height:1}'
     + '.eig-demo{font:600 10px "JetBrains Mono",monospace;letter-spacing:.08em;color:var(--muted,#8a826f);margin:0 0 10px}'
-    + '.eig-hinweis{font:400 11.5px Inter,sans-serif;color:var(--muted,#8a826f);margin-top:10px}';
+    + '.eig-hinweis{font:400 11.5px Inter,sans-serif;color:var(--muted,#8a826f);margin-top:10px}'
+    + '@media(max-width:700px){body.eig-obj nav.tabs.eig-tabs{flex-wrap:nowrap!important;justify-content:flex-start!important;overflow-x:auto;padding-left:10px!important}nav.eig-tabs .tab{flex:0 0 auto!important}nav.eig-tabs .eig-nutz{order:-1;margin-left:0;flex:0 0 auto;padding-right:8px}}';
 
   function eingaben() {
     return { kp: num('kp'), wfl: num('wfl'), bj: num('baujahr'), ek: num('ek') || 0, netto: num('eig_netto_app') || 0, plz: String(val('plz') || '').trim() };
