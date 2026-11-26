@@ -69,7 +69,10 @@ router.get('/schnellcheck', schnellLimit, async (req, res) => {
      Baujahr 1975 / 70 m^2 (an ihr ist die DealPilot-Naeherung gemessen, 85 % innerhalb +-10 %) - die Antwort sagt, welche. */
   const bjIn = parseInt(String(req.query.baujahr || ''), 10), wflIn = parseFloat(String(req.query.wfl || '').replace(',', '.'));
   const bj = bjIn >= 1800 && bjIn <= 2030 ? bjIn : null, wfl = wflIn >= 15 && wflIn <= 400 ? Math.round(wflIn) : null;
-  const msQ = '&baujahr=' + (bj || 1975) + '&wfl=' + (wfl || 70);
+  /* v5080 · wie der Proxy (routes/marktbericht.js v3260): ausserhalb von Staging nur freie Mietspiegel-Werte, gesperrte
+     (Rechtevorbehalt) rechnen dort nie, dann rechnet die DealPilot-Naeherung. */
+  const _staging = /staging|localhost|127\.0\.0\.1/i.test(String(process.env.APP_URL || '') + ' ' + String(process.env.APP_DOMAIN || ''));
+  const msQ = '&baujahr=' + (bj || 1975) + '&wfl=' + (wfl || 70) + (_staging ? '' : '&nur_frei=1');
   const key = plz + '|' + ort.toLowerCase() + '|' + (bj || '') + '|' + (wfl || '');
   const alt = schnellSpeicher.get(key);
   if (alt && Date.now() - alt.t < SCHNELL_TTL) return res.set('Cache-Control', 'public, max-age=3600').json(alt.d);
