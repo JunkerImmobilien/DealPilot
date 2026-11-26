@@ -17,6 +17,8 @@ Disallow: /admin/
 Disallow: /entwurf-
 Disallow: /demo-
 Disallow: /quickcheck-app.html
+# landing-deal-sprung-1 · alte Startseite, nirgends verlinkt
+Disallow: /alt-original.html
 
 # landing-kern-2 · die Methodik-PDF ist geloescht (Marcel 11.11.2026), kein Eintrag mehr noetig.
 
