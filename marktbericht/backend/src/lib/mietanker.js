@@ -100,8 +100,8 @@ export function einordnung(signale, ohne) {
   const mp = num(s.mod_punkte), bj = num(s.baujahr), jahr = num(s.jahr);
   const z = String(s.zustand || '').toLowerCase();
   if (/sanierungsbed|renovierungsbed|schlecht|mangelhaft/.test(z)) neg.push('Zustand ' + s.zustand);
-  else if ((mp != null && mp >= 11) || (bj > 1000 && jahr > 1000 && jahr - bj <= 10))
-    pos.push(mp != null && mp >= 11 ? 'überwiegend modernisiert (' + String(mp).replace('.', ',') + ' Punkte)' : 'neuwertiges Gebäude (Baujahr ' + bj + ')');
+  else if ((!o.modernisierung && mp != null && mp >= 11) || (bj > 1000 && jahr > 1000 && jahr - bj <= 10))
+    pos.push(!o.modernisierung && mp != null && mp >= 11 ? 'überwiegend modernisiert (' + String(mp).replace('.', ',') + ' Punkte)' : 'neuwertiges Gebäude (Baujahr ' + bj + ')');
   const wahl = (pos.length >= 2 && !neg.length) ? 'oben' : (neg.length >= 2 && !pos.length) ? 'unten' : 'mittel';
   return { wahl, positiv: pos, negativ: neg, belegt_oben: wahl === 'oben',
     text: wahl === 'oben' ? 'Einordnung am Oberwert: ' + pos.join(', ')
@@ -142,10 +142,11 @@ export function vergleichsmieteWohnung(k, wfl) {
       rechnung: r.rechnung || null, hinweise: r.hinweise || [], url: r.url || null };
   }
   if (k.naeherung_param && Array.isArray(k.zensus_zeilen) && k.zensus_zeilen.length) {
-    const n = naeherungFuer(k.naeherung_param, k.zensus_zeilen, { baujahr: k.baujahr, wfl: fl, marktlage: k.marktlage || null, ags: k.ags || null,
+    const n = naeherungFuer(k.naeherung_param, k.zensus_zeilen, { baujahr: k.baujahr, wfl: fl, marktlage: k.marktlage || null, ags: k.ags || null, mod_punkte: k.signale ? k.signale.mod_punkte : null,   /* MM6 */
       marktmiete: k.ags ? marktmieteFuer(marktmieteParameter(), k.ags) : null });   /* v5110 · amtliche Marktmiete wie in der Route */
     if (!(n && n.qm > 0)) return null;
-    const e = einordnung(k.signale, {});
+    /* MM6 · ist die Modernisierung schon als Zuschlag in der Näherung, zählt sie in der Einordnung nicht noch einmal */
+    const e = einordnung(k.signale, n.modernisierung ? { modernisierung: true } : {});
     /* v5110 · Spanne aus naeherung.json (dieselbe wie die Route /mietspiegel), sonst die Konstanten */
     const unten = n.unten > 0 ? n.unten : r2(n.qm * NAEHERUNG_UNTEN), oben = n.oben > 0 ? n.oben : r2(n.qm * NAEHERUNG_OBEN);
     const qm = e.wahl === 'oben' ? oben : e.wahl === 'unten' ? unten : n.qm;

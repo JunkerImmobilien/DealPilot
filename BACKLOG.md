@@ -28,6 +28,7 @@ direkt unter den Punkt — nicht kommentarlos liegenlassen.
 - [ ] Gemischter Fall MFH „eine Einheit selbst, Rest vermietet“: heute abgewiesen mit „Für Mehrfamilienhäuser den Modus Vermieten nutzen“. Offen, ob ein eigener Mischmodus kommt.
 - [ ] Bezahlter Bericht: Stufe 3 (Wert) + `beleihungswert` + Umfeld automatisch in `DpHausCheck.dokument()` verdrahten, PDF-Knopf in der App-Demo (II6) und auf der Landing nach dem Kauf.
 - [ ] Beleihungswert für Eigennutzer: Lib rechnet beim Haus mit Ertragswert (Mindestzins 5,5 %) und landet weit unter dem Sachwert; für selbst genutzte EZFH nach § 4 Abs. 2 BelWertV den Sach-/Vergleichswert-Weg wählen (im Muster so gerechnet).
+- **MM6 v5130 Modernisierung in der Mietnäherung:** Prod nach Marcels OK. Faktor Neuvermietung je Kreis: `node tools/neuvermietung-faktor-ableiten.mjs --prod` monatlich, ab 20 Messungen je Kreis Schreibweg bauen (Untergrenze 1,20). Modernisierungs-Zuschlag mit mehr Mietspiegeln nachmessen (bisher nur Kreise Unna und Herford).
 
 **GeoMap (v5090, XX5):** Mit GeoMap im Dezember 2026 schriftlich bestätigen lassen: KI-Nutzung, eigene Statistik aus API-Abrufen, kein Konkurrenzprodukt (AGB Stand 28.11.2025, Ziff. 7.2a/7.3a KI nur mit Zustimmung, Ziff. 7 d kein Konkurrenzprodukt). Pflichtvermerk „© by RealEstatePilot“ steht seit v5090a im Quellennachweis. Zusammengefasste Angebotsmieten je Marktbericht (mb.angebot_miete_messung, Admin › Register & Ernte › Jahreswerte) gehen erst in die Mietspiegel-Näherung, wenn je Kreis und Klasse mindestens 20 Messungen vorliegen und die Bestätigung da ist.
 
