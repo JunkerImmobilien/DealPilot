@@ -1777,7 +1777,10 @@
         { u: Z && Z.lzs && Z.lzs.pct != null ? 'Liegenschaftszins ' + de(Z.lzs.pct, 2) + ' %' + (Z.lzs.stufe ? ' · Stufe ' + esc(Z.lzs.stufe) : '') : '' }),
       ewGesperrt ? null : zeile('Marktpreisindikation', function (k) {
         if (k === 'ankauf') return aB && zahl(aB.mpi) ? sub(eur(aB.mpi), aB.ohne != null ? 'ohne Abschlag ' + eur(aB.ohne) : aBst) : null;
-        var st = S[k]; return st && st.marktpreisindikation != null ? sub(eur(st.marktpreisindikation), st.mpi_ohne_abschlag != null ? 'ohne Abschlag ' + eur(st.mpi_ohne_abschlag) : '') : null; },
+        var st = S[k]; if (!(st && st.marktpreisindikation != null)) return null;
+        /* v5050ss5 · Marcel 26.11.2026: der Sprung im Zielbild kommt aus Angeboten modernisierter Häuser (PotenzialService ZIELBILD_REF) - das steht jetzt dabei */
+        var mz = k === 'zielbild' ? 'Angebote im modernisierten Zustand' : '';
+        return sub(eur(st.marktpreisindikation), [st.mpi_ohne_abschlag != null ? 'ohne Abschlag ' + eur(st.mpi_ohne_abschlag) : '', mz].filter(Boolean).join('<br>')); },
         { d: true, u: S.bestand && S.bestand.mpi_abschlag_pct > 0 ? 'Angebote am Ort, nach ' + de(S.bestand.mpi_abschlag_pct, 1) + ' % Abschlag' : 'Angebote am Ort' }),
       TA ? zeile('Wert nach Aufteilung', function (k) { var t = k === 'ankauf' ? null : TA[k]; return t && zahl(t.summe) ? '<b>' + eur(t.summe) + (t.vollstaendig ? '' : '*') + '</b>' : null; },
         { u: 'aus ' + esc(String(T.bezeichnung || 'Vergleichswert').replace(/\s*\(indikativ, aus Angebotspreisen abgeleitet\)/, ', indikativ aus Angebotspreisen')) + (nW ? ', ' + nW + ' Wohnungen einzeln' : '') + ', vor Aufteilungskosten' + (T.vollstaendig ? '' : '. * nicht jede Wohnung hat einen Wert') }) : null,
