@@ -1,0 +1,843 @@
+{
+ "ags": "05916000",
+ "gemeinde": "Herne",
+ "art": "qualifiziert",
+ "stand": "2025-01-01",
+ "erhebungsstichtag": "2024-01-01",
+ "gueltig_ab": "2025-01-01",
+ "gueltig_bis": "2026-12-31",
+ "quelle": {
+  "url": "https://herne.de/PDF/mietspiegel/mietspiegel.pdf",
+  "dokument": "Qualifizierter Mietspiegel 2025 für nicht preisgebundene Wohnungen in der Stadt Herne, gültig ab 1. Januar 2025, Erhebungsstand 1. Januar 2024 (Arbeitskreis Mietspiegel Herne, Neitzel Consultants GmbH)",
+  "seite": "S. 1 (Titel), S. 3 (qualifiziert), S. 4 (Geltung, Laufzeit), S. 5–6 Tabelle 1, S. 7–10 Tabellen 2–8, S. 11 Tabelle 9 und Spanne, S. 16–17 Beispiel",
+  "lizenz": "kein Rechtevorbehalt und kein Speicherverbot im Dokument gefunden (geprüft am 26.11.2026); nur das Titel-Luftbild trägt „© RVR, 2022, Datenlizenz Deutschland – Namensnennung – Version 2.0“",
+  "abgerufen": "2026-11-26"
+ },
+ "einheit": "eur_qm_nettokalt",
+ "form": "tabelle",
+ "rundung": 2,
+ "hinweis": "Erster qualifizierter Mietspiegel Herne (§ 558d, Regressionsmietspiegel nach MsV, S. 3), Laufzeit bis 31.12.2026 (S. 4); ein Nachfolger war am 26.11.2026 weder auf herne.de noch im Serviceportal veröffentlicht. Basistabelle Baualter × Wohnungsgröße für Wohnlage 1 (Referenz: Etagenheizung, ohne Oberboden, ohne Balkon, Zwei-Scheiben-Isolierverglasung), Zu-/Abschläge in €/m² auf den Basiswert (S. 6–11), Spanne −13,4/+13,8 % um die errechnete Miete (Zwei-Drittel-Spanne, S. 11; Vordruck: M × 0,866 bzw. × 1,138, S. 15). Gilt für Wohnungen in Gebäuden ab drei Wohnungen und für Wohnungen in Ein-/Zweifamilienhäusern als Doppelhaushälfte, Reihenmittel- und Reihenendhaus, 19–152 m² (S. 4). Keine Angaben zu freistehenden Ein- und Zweifamilienhäusern, Penthouse, Staffelgeschoss, Wohnungen ohne Bad/WC — „als Orientierung“ verwendbar (S. 4). Ab Baujahr 2022 nicht Teil des Mietspiegels (Baualter 2015–2021 nur als Orientierung, S. 6) — hier kein Wert. Kernsanierung → Baualter des Jahres der Maßnahme (S. 5), nicht abgebildet. Wohnlage je Adresse aus dem Wohnlagenverzeichnis S. 17 ff. (Grundsatz Wohnlage 1); als Lage „2“ bzw. „3“ übergeben. Haustyp-Zuschläge: DHH/Reihenendhaus ab Baujahr 1970 +0,61 (DealPilot-Merkmal dhh_reh), Reihenmittelhaus ab 1950 +0,51 bzw. bis 1949 −0,57 (Merkmal reihenmittelhaus); DHH/Reihenendhaus bis 1969 nur Tendenz zum Abschlag in der Spanne (S. 12). Modernisierungszuschläge nur für Baujahr vor 1985 (Tabelle 8). Merkmale, die nur in der Spanne zu berücksichtigen sind (S. 12–13), nicht abgebildet.",
+ "haus": {
+  "regel": "zuschlag",
+  "merkmal": {
+   "dhh": "dhh_reh",
+   "rh": "reihenmittelhaus"
+  },
+  "fuer": [
+   "dhh",
+   "rh"
+  ],
+  "beleg": "S. 4 Geltung (Ein-/Zweifamilienhäuser als DHH, Reihenmittel- und Reihenendhaus erfasst, freistehende nur zur Orientierung); S. 7 Tabelle 2: DHH/Reihenendhaus (ab 1970) +0,61 €/m², Reihenmittelhaus ab 1950 +0,51, bis 1949 −0,57 €/m²"
+ },
+ "tabelle": {
+  "achsen": {
+   "baujahr": [
+    {
+     "von": null,
+     "bis": 1907,
+     "label": "bis 1907"
+    },
+    {
+     "von": 1908,
+     "bis": 1939,
+     "label": "1908 bis 1939"
+    },
+    {
+     "von": 1940,
+     "bis": 1959,
+     "label": "1940 bis 1959"
+    },
+    {
+     "von": 1960,
+     "bis": 1969,
+     "label": "1960 bis 1969"
+    },
+    {
+     "von": 1970,
+     "bis": 1979,
+     "label": "1970 bis 1979"
+    },
+    {
+     "von": 1980,
+     "bis": 1984,
+     "label": "1980 bis 1984"
+    },
+    {
+     "von": 1985,
+     "bis": 1999,
+     "label": "1985 bis 1999"
+    },
+    {
+     "von": 2000,
+     "bis": 2014,
+     "label": "2000 bis 2014"
+    },
+    {
+     "von": 2015,
+     "bis": 2021,
+     "label": "2015 bis 2021"
+    }
+   ],
+   "wfl": [
+    {
+     "von": null,
+     "bis": 30,
+     "bis_inkl": false,
+     "label": "kleiner als 30 m²"
+    },
+    {
+     "von": 30,
+     "bis": 35,
+     "bis_inkl": false,
+     "label": "30 bis unter 35 m²"
+    },
+    {
+     "von": 35,
+     "bis": 40,
+     "bis_inkl": false,
+     "label": "35 bis unter 40 m²"
+    },
+    {
+     "von": 40,
+     "bis": 55,
+     "bis_inkl": false,
+     "label": "40 bis unter 55 m²"
+    },
+    {
+     "von": 55,
+     "bis": 60,
+     "bis_inkl": false,
+     "label": "55 bis unter 60 m²"
+    },
+    {
+     "von": 60,
+     "bis": 115,
+     "bis_inkl": false,
+     "label": "60 bis unter 115 m²"
+    },
+    {
+     "von": 115,
+     "bis": 130,
+     "bis_inkl": false,
+     "label": "115 bis unter 130 m²"
+    },
+    {
+     "von": 130,
+     "bis": null,
+     "label": "130 m² und größer"
+    }
+   ]
+  },
+  "geltung": {
+   "baujahr_von": null,
+   "baujahr_bis": 2021,
+   "wfl_von": 19,
+   "wfl_bis": 152
+  },
+  "spanne": {
+   "unten_pct": -13.4,
+   "oben_pct": 13.8
+  },
+  "zellen": [
+   {
+    "baujahr": 0,
+    "wfl": 0,
+    "mittel": 6.09,
+    "seite": "6"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 0,
+    "mittel": 6.07,
+    "seite": "6"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 0,
+    "mittel": 6.28,
+    "seite": "6"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 0,
+    "mittel": 6.42,
+    "seite": "6"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 0,
+    "mittel": 6.28,
+    "seite": "6"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 0,
+    "mittel": 6.64,
+    "seite": "6"
+   },
+   {
+    "baujahr": 6,
+    "wfl": 0,
+    "mittel": 7.05,
+    "seite": "6"
+   },
+   {
+    "baujahr": 7,
+    "wfl": 0,
+    "mittel": 7.78,
+    "seite": "6"
+   },
+   {
+    "baujahr": 8,
+    "wfl": 0,
+    "mittel": 8.74,
+    "seite": "6"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 1,
+    "mittel": 5.96,
+    "seite": "6"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 1,
+    "mittel": 5.94,
+    "seite": "6"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 1,
+    "mittel": 6.15,
+    "seite": "6"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 1,
+    "mittel": 6.29,
+    "seite": "6"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 1,
+    "mittel": 6.15,
+    "seite": "6"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 1,
+    "mittel": 6.51,
+    "seite": "6"
+   },
+   {
+    "baujahr": 6,
+    "wfl": 1,
+    "mittel": 6.92,
+    "seite": "6"
+   },
+   {
+    "baujahr": 7,
+    "wfl": 1,
+    "mittel": 7.65,
+    "seite": "6"
+   },
+   {
+    "baujahr": 8,
+    "wfl": 1,
+    "mittel": 8.61,
+    "seite": "6"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 2,
+    "mittel": 5.88,
+    "seite": "6"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 2,
+    "mittel": 5.86,
+    "seite": "6"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 2,
+    "mittel": 6.07,
+    "seite": "6"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 2,
+    "mittel": 6.21,
+    "seite": "6"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 2,
+    "mittel": 6.07,
+    "seite": "6"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 2,
+    "mittel": 6.43,
+    "seite": "6"
+   },
+   {
+    "baujahr": 6,
+    "wfl": 2,
+    "mittel": 6.84,
+    "seite": "6"
+   },
+   {
+    "baujahr": 7,
+    "wfl": 2,
+    "mittel": 7.57,
+    "seite": "6"
+   },
+   {
+    "baujahr": 8,
+    "wfl": 2,
+    "mittel": 8.53,
+    "seite": "6"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 3,
+    "mittel": 5.47,
+    "seite": "6"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 3,
+    "mittel": 5.45,
+    "seite": "6"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 3,
+    "mittel": 5.66,
+    "seite": "6"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 3,
+    "mittel": 5.8,
+    "seite": "6"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 3,
+    "mittel": 5.66,
+    "seite": "6"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 3,
+    "mittel": 6.02,
+    "seite": "6"
+   },
+   {
+    "baujahr": 6,
+    "wfl": 3,
+    "mittel": 6.43,
+    "seite": "6"
+   },
+   {
+    "baujahr": 7,
+    "wfl": 3,
+    "mittel": 7.16,
+    "seite": "6"
+   },
+   {
+    "baujahr": 8,
+    "wfl": 3,
+    "mittel": 8.12,
+    "seite": "6"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 4,
+    "mittel": 5.36,
+    "seite": "6"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 4,
+    "mittel": 5.34,
+    "seite": "6"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 4,
+    "mittel": 5.55,
+    "seite": "6"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 4,
+    "mittel": 5.69,
+    "seite": "6"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 4,
+    "mittel": 5.55,
+    "seite": "6"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 4,
+    "mittel": 5.91,
+    "seite": "6"
+   },
+   {
+    "baujahr": 6,
+    "wfl": 4,
+    "mittel": 6.32,
+    "seite": "6"
+   },
+   {
+    "baujahr": 7,
+    "wfl": 4,
+    "mittel": 7.05,
+    "seite": "6"
+   },
+   {
+    "baujahr": 8,
+    "wfl": 4,
+    "mittel": 8.01,
+    "seite": "6"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 5,
+    "mittel": 5.21,
+    "seite": "6"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 5,
+    "mittel": 5.19,
+    "seite": "6"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 5,
+    "mittel": 5.4,
+    "seite": "6"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 5,
+    "mittel": 5.54,
+    "seite": "6"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 5,
+    "mittel": 5.4,
+    "seite": "6"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 5,
+    "mittel": 5.76,
+    "seite": "6"
+   },
+   {
+    "baujahr": 6,
+    "wfl": 5,
+    "mittel": 6.17,
+    "seite": "6"
+   },
+   {
+    "baujahr": 7,
+    "wfl": 5,
+    "mittel": 6.9,
+    "seite": "6"
+   },
+   {
+    "baujahr": 8,
+    "wfl": 5,
+    "mittel": 7.86,
+    "seite": "6"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 6,
+    "mittel": 4.83,
+    "seite": "6"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 6,
+    "mittel": 4.81,
+    "seite": "6"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 6,
+    "mittel": 5.02,
+    "seite": "6"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 6,
+    "mittel": 5.16,
+    "seite": "6"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 6,
+    "mittel": 5.02,
+    "seite": "6"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 6,
+    "mittel": 5.38,
+    "seite": "6"
+   },
+   {
+    "baujahr": 6,
+    "wfl": 6,
+    "mittel": 5.79,
+    "seite": "6"
+   },
+   {
+    "baujahr": 7,
+    "wfl": 6,
+    "mittel": 6.52,
+    "seite": "6"
+   },
+   {
+    "baujahr": 8,
+    "wfl": 6,
+    "mittel": 7.48,
+    "seite": "6"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 7,
+    "mittel": 4.45,
+    "seite": "6"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 7,
+    "mittel": 4.43,
+    "seite": "6"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 7,
+    "mittel": 4.64,
+    "seite": "6"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 7,
+    "mittel": 4.78,
+    "seite": "6"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 7,
+    "mittel": 4.64,
+    "seite": "6"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 7,
+    "mittel": 5,
+    "seite": "6"
+   },
+   {
+    "baujahr": 6,
+    "wfl": 7,
+    "mittel": 5.41,
+    "seite": "6"
+   },
+   {
+    "baujahr": 7,
+    "wfl": 7,
+    "mittel": 6.14,
+    "seite": "6"
+   },
+   {
+    "baujahr": 8,
+    "wfl": 7,
+    "mittel": 7.1,
+    "seite": "6"
+   }
+  ],
+  "zuschlaege": [
+   {
+    "merkmal": "dhh_reh",
+    "art": "eur_qm",
+    "wert": 0.61,
+    "label": "Ein-/Zweifamilienhaus als Doppelhaushälfte oder Reihenendhaus (ab 1970 errichtet)",
+    "beleg": "S. 7 Tabelle 2",
+    "bedingung": {
+     "baujahr_von": 1970
+    }
+   },
+   {
+    "merkmal": "reihenmittelhaus",
+    "art": "eur_qm",
+    "wert": 0.51,
+    "label": "Reihenmittelhaus (1950 und später errichtet)",
+    "beleg": "S. 7 Tabelle 2",
+    "bedingung": {
+     "baujahr_von": 1950
+    }
+   },
+   {
+    "merkmal": "reihenmittelhaus",
+    "art": "eur_qm",
+    "wert": -0.57,
+    "label": "Reihenmittelhaus (1949 und früher errichtet)",
+    "beleg": "S. 7 Tabelle 2",
+    "bedingung": {
+     "baujahr_bis": 1949
+    }
+   },
+   {
+    "merkmal": "maisonette",
+    "art": "eur_qm",
+    "wert": 0.32,
+    "label": "Maisonette- oder Galerie-Wohnung",
+    "beleg": "S. 7 Tabelle 2"
+   },
+   {
+    "merkmal": "dachgeschoss",
+    "art": "eur_qm",
+    "wert": -0.17,
+    "label": "Dachgeschosswohnung",
+    "beleg": "S. 7 Tabelle 2"
+   },
+   {
+    "merkmal": "zweites_bad",
+    "art": "eur_qm",
+    "wert": 0.35,
+    "label": "zweites Badezimmer mit WC sowie Badewanne oder Dusche",
+    "beleg": "S. 7 Tabelle 3"
+   },
+   {
+    "merkmal": "offene_kueche",
+    "art": "eur_qm",
+    "wert": 0.1,
+    "label": "Wohnküche oder offene Küche",
+    "beleg": "S. 7 Tabelle 3"
+   },
+   {
+    "merkmal": "standardbodenbelag",
+    "art": "eur_qm",
+    "wert": 0.29,
+    "label": "Standardbodenbelag (Laminat, Teppich, Fliesen, Dielen, Klick-Vinyl)",
+    "beleg": "S. 8 Tabelle 4"
+   },
+   {
+    "merkmal": "hochwertige_bodenbelaege",
+    "art": "eur_qm",
+    "wert": 0.94,
+    "label": "hochwertiger Bodenbelag (Echtholzparkett, Naturstein, verklebtes Design-Vinyl)",
+    "beleg": "S. 8 Tabelle 4"
+   },
+   {
+    "merkmal": "waermeschutzverglasung",
+    "art": "eur_qm",
+    "wert": 0.15,
+    "label": "Wärmeschutzverglasung (U-Wert bis 1,9)",
+    "beleg": "S. 8 Tabelle 5"
+   },
+   {
+    "merkmal": "zentralheizung",
+    "art": "eur_qm",
+    "wert": 0.11,
+    "label": "Zentralheizung",
+    "beleg": "S. 8 Tabelle 5"
+   },
+   {
+    "merkmal": "waermecontracting",
+    "art": "eur_qm",
+    "wert": -0.17,
+    "label": "gewerblicher Wärmeliefervertrag/Contracting",
+    "beleg": "S. 8 Tabelle 5"
+   },
+   {
+    "merkmal": "balkon",
+    "art": "eur_qm",
+    "wert": 0.19,
+    "label": "Balkon/Loggia (nicht nur Austritt)",
+    "beleg": "S. 9 Tabelle 6"
+   },
+   {
+    "merkmal": "terrasse",
+    "art": "eur_qm",
+    "wert": 0.51,
+    "label": "ebenerdige Terrasse oder Dachterrasse",
+    "beleg": "S. 9 Tabelle 6"
+   },
+   {
+    "merkmal": "barrierearm",
+    "art": "eur_qm",
+    "wert": 0.2,
+    "label": "barrierearm erstellte bzw. modernisierte Wohnung",
+    "beleg": "S. 9 Tabelle 7"
+   },
+   {
+    "merkmal": "heizung_erneuert_ab_2019",
+    "art": "eur_qm",
+    "wert": 0.28,
+    "label": "Erneuerung der gesamten Heizungsanlage ab 2019",
+    "beleg": "S. 10 Tabelle 8",
+    "bedingung": {
+     "baujahr_bis": 1984
+    }
+   },
+   {
+    "merkmal": "fenster_erneuert_ab_2017",
+    "art": "eur_qm",
+    "wert": 0.24,
+    "label": "Erneuerung aller Fenster ab 2017",
+    "beleg": "S. 10 Tabelle 8",
+    "bedingung": {
+     "baujahr_bis": 1984
+    }
+   },
+   {
+    "merkmal": "dach_gedaemmt_2008_2018",
+    "art": "eur_qm",
+    "wert": 0.22,
+    "label": "Erneuerung/Dämmung Dach oder oberste Geschossdecke 2008–2018",
+    "beleg": "S. 10 Tabelle 8",
+    "bedingung": {
+     "baujahr_bis": 1984
+    }
+   },
+   {
+    "merkmal": "dach_gedaemmt_ab_2019",
+    "art": "eur_qm",
+    "wert": 0.27,
+    "label": "Erneuerung/Dämmung Dach oder oberste Geschossdecke ab 2019",
+    "beleg": "S. 10 Tabelle 8",
+    "bedingung": {
+     "baujahr_bis": 1984
+    }
+   },
+   {
+    "merkmal": "fassade_gedaemmt_ab_2016",
+    "art": "eur_qm",
+    "wert": 0.15,
+    "label": "Erneuerung/Dämmung der Außenwände ab 2016",
+    "beleg": "S. 10 Tabelle 8",
+    "bedingung": {
+     "baujahr_bis": 1984
+    }
+   },
+   {
+    "merkmal": "elektro_erneuert_2003_2018",
+    "art": "eur_qm",
+    "wert": 0.1,
+    "label": "vollständige Erneuerung der Elektroinstallation 2003–2018",
+    "beleg": "S. 10 Tabelle 8",
+    "bedingung": {
+     "baujahr_bis": 1984
+    }
+   },
+   {
+    "merkmal": "elektro_erneuert_ab_2019",
+    "art": "eur_qm",
+    "wert": 0.28,
+    "label": "vollständige Erneuerung der Elektroinstallation ab 2019",
+    "beleg": "S. 10 Tabelle 8",
+    "bedingung": {
+     "baujahr_bis": 1984
+    }
+   },
+   {
+    "merkmal": "grundriss_2008_2017",
+    "art": "eur_qm",
+    "wert": 0.29,
+    "label": "Neugestaltung der Grundrisse 2008–2017",
+    "beleg": "S. 10 Tabelle 8",
+    "bedingung": {
+     "baujahr_bis": 1984
+    }
+   },
+   {
+    "merkmal": "grundriss_ab_2018",
+    "art": "eur_qm",
+    "wert": 0.44,
+    "label": "Neugestaltung der Grundrisse ab 2018",
+    "beleg": "S. 10 Tabelle 8",
+    "bedingung": {
+     "baujahr_bis": 1984
+    }
+   },
+   {
+    "merkmal": "lage:2",
+    "art": "eur_qm",
+    "wert": 0.07,
+    "label": "Wohnlage 2",
+    "beleg": "S. 11 Tabelle 9",
+    "aliase": [
+     "wohnlage 2"
+    ]
+   },
+   {
+    "merkmal": "lage:3",
+    "art": "eur_qm",
+    "wert": 0.28,
+    "label": "Wohnlage 3",
+    "beleg": "S. 11 Tabelle 9",
+    "aliase": [
+     "wohnlage 3"
+    ]
+   }
+  ]
+ },
+ "pruefbeispiele": [
+  {
+   "eingabe": {
+    "baujahr": 1955,
+    "wfl": 57,
+    "lage": "2",
+    "merkmale": {
+     "offene_kueche": true,
+     "zentralheizung": true,
+     "balkon": true
+    }
+   },
+   "erwartet": {
+    "unten": 5.21,
+    "mittel": 6.02,
+    "oben": 6.85
+   },
+   "seite": "16–17",
+   "art": "anwendungsbeispiel"
+  },
+  {
+   "eingabe": {
+    "baujahr": 2018,
+    "wfl": 140
+   },
+   "erwartet": {
+    "mittel": 7.1
+   },
+   "seite": "6",
+   "art": "tabellenzelle"
+  },
+  {
+   "eingabe": {
+    "baujahr": 2023,
+    "wfl": 70
+   },
+   "erwartet": null,
+   "seite": "6",
+   "art": "tabellenzelle"
+  }
+ ]
+}
