@@ -234,6 +234,23 @@ router.post('/beleihungswert', authenticate, async function (req, res) {
   } catch (e) { res.status(502).json({ error: 'mb_unreachable', message: e.message }); }
 });
 
+/* v5130 KK6 · Haus-Check aus dem gespeicherten Marktbericht des Objekts (Eigennutzer-Modus, hinter der Vorschau
+   eigennutzer). Wert ueber die Weissliste des Einzel-Checks, Beleihungswert nach § 4 Abs. 2, Umfeld. */
+router.post('/hauscheck-objekt', authenticate, async function (req, res) {
+  try {
+    const vorschau = require('../services/vorschau');
+    if (!(await vorschau.darf(req.user, 'eigennutzer'))) return res.status(403).json({ error: 'nicht_freigeschaltet' });
+    const body = Object.assign({}, req.body || {}, { user_id: req.user && req.user.id });
+    const out = await forward('POST', '/hauscheck-objekt', { body: body });
+    const j = out.data || {};
+    if (out.status !== 200 || !j.verfuegbar) return res.status(out.status === 200 ? 200 : out.status).json({ verfuegbar: false, grund: j.grund || j.error || 'dienst' });
+    const ec = require('../services/einzelcheck'), hc = require('../services/hausCheck');
+    const ref = Object.assign({}, j.data.ref || {}, { wert_stufe: (j.data.ref && j.data.ref.wert_stufe) || 3 });
+    const m = ec.marktAus({ data: Object.assign({}, j.data, { ref: ref }) });
+    res.json({ verfuegbar: true, report_id: j.report_id, stand: j.created_at, wert: hc.hausWert(m.wert), belw: hc.belwAus(j.beleihungswert), umfeld: hc.umfeldAus(j.umfeld) });
+  } catch (e) { res.status(502).json({ error: 'mb_unreachable', message: e.message }); }
+});
+
 /* v972b: KI-Trend-Text. v1183: im Plan enthalten — er ist ein Begleittext
    zu einem Verlauf, keine Bewertung, und passt in keines der drei
    Kontingente. Der Aufruf wird weiter protokolliert, damit die Nutzung

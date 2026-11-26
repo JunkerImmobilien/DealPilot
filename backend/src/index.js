@@ -389,6 +389,7 @@ app.use('/api/v1/public/datenumfang', rateLimit({ windowMs: 60000, max: 60 }), r
 app.use('/api/v1/public/partner-logo', rateLimit({ windowMs: 60000, max: 240 }), require('./routes/partnerLogo'));  // v3299 · Partner-Logos fuer Mails (gehostet statt data:)
 /* v3940 · Einzel-Check der Landing ohne Konto (Unterlagen nur im Arbeitsspeicher, Bremsen je Route, bis zur Abnahme nur Staging) */
 app.use('/api/v1/public/einzelcheck', require('./routes/publicEinzelcheck'));
+app.use('/api/v1/public/hauscheck', require('./routes/publicHausCheck'));   /* v5130 KK6 · Haus-Check 9,99 € (Eigennutzer) */
 app.use('/api/v1/deal-action', dealActionRoutes);
 app.use('/api/v1/feedback', feedbackRoutes);
 app.use('/api/v1/dateien', require('./routes/dateien'));  // v3162 · Unterlagen-Ablage (Ordner, Grenzen je Plan, verschluesselt)

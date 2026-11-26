@@ -125,6 +125,12 @@ async function handleEvent(event) {
       }
       /* v3940 · Einzel-Check der Landing (ohne Konto). Muster wie die Bewertung darueber: der Fehler wird
          NICHT verschluckt, sonst waere bezahlt und kein Bericht freigeschaltet. */
+      /* v5130 KK6 · Haus-Check (Eigennutzer, 9,99 €), derselbe Kaufweg */
+      if (session.mode === 'payment' && session.metadata?.type === 'hauscheck') {
+        const r = await require('../services/hausCheck').handlePaid(session);
+        console.log('[stripe-webhook] hauscheck:', JSON.stringify(r));
+        return;
+      }
       if (session.mode === 'payment' && session.metadata?.type === 'einzelcheck') {
         const r = await require('../services/einzelcheck').handleEinzelcheckPaid(session);
         console.log('[stripe-webhook] einzelcheck:', JSON.stringify(r));

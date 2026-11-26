@@ -85,9 +85,13 @@
       "frontend_erkennung": "eig-schalter|eig-tabs",
       "frontend_ausgenommen": {},
       "routen": [],
-      "backend_stellen": [],
-      "backend_erkennung": "",
-      "nur_frontend": "reine Darstellung im Browser aus dem Kern js/eigennutzer-kern.js. Das Umfeld (GET /market-stats/umfeld) ist allgemeine Lageinformation und keine Eigennutzer-Funktion. Ohne Vorschau sieht niemand die Ansicht, und es gibt keinen Datenweg, den eine Backend-Sperre schützen könnte."
+      "backend_stellen": [
+        {
+          "datei": "backend/src/routes/marktbericht.js",
+          "grund": "Haus-Check-PDF aus dem Marktbericht des Objekts (POST /marktbericht/hauscheck-objekt)"
+        }
+      ],
+      "backend_erkennung": ""
     }
   ]
 }
