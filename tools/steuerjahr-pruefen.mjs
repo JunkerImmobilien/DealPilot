@@ -6,6 +6,7 @@
  *  B  Ladezustand der Steuergrundlagen (tax-periods.js + wk-aggregator.js DpSteuerGrundlagen):
  *     offen/laedt -> 'laedt', beides geladen -> 'bereit', HTTP 429 -> 'fehler' (sichtbar geloggt),
  *     warten() loest ueber Ereignisse auf, nicht angemeldet -> 'bereit'.
+ *  E  (v5130) Nachrechnen, wenn Daten nach dem ersten calc() eintreffen: Tabelle und Steuerkarten gleich.
  *  C  Verdrahtung: calc.js nimmt das Steuerjahr aus steuerjahrHeute, storage.js wartet in
  *     saveObj und laesst _kpis_cf_ns bei vorlaeufiger Steuer stehen.
  *
@@ -154,6 +155,52 @@ ok(/_dpKpisHeute\(K\)/.test(js('pdf-investment-bank.js')) && /_dpKpisHeute\(K\)/
     ok(h.bmy === 7.3 && K.nkm_j === 39000, 'D Kennzahlen und Original unveraendert');
     ok(f({ nkm_j: 1 }).nkm_j === 1, 'D ohne heute (Ankauf) unveraendert');
   }
+}
+
+
+/* ── E (v5130 · LL6) · Tabelle und Steuerkarten bleiben gleich, wenn Daten NACH dem ersten calc() eintreffen ─────
+   Echter Block aus mietentwicklung.js (DpNachrechnen) mit nachgebautem State, _computeYearTotal und calc():
+   Potenzial bzw. Übergang ändern das steuerliche Ergebnis eines Jahres -> genau ein calc(), danach
+   Σ Karten-Erstattung == Σ (cfop_y − cfns_y) je Jahr. Gegenprobe ohne Auslöser muss abweichen. */
+{
+  const me = js('mietentwicklung.js');
+  const m = me.match(/\/\* v5130 · LL6[\s\S]*$/);
+  ok(!!m, 'E Nachrechnen-Block in mietentwicklung.js gefunden');
+  ok(/js\/mietentwicklung\.js\?v=v5130/.test(fs.readFileSync(path.join(ROOT, 'frontend/index.html'), 'utf8')) || /mietentwicklung\.js\?v=v5[1-9]\d\d/.test(fs.readFileSync(path.join(ROOT, 'frontend/index.html'), 'utf8')), 'E index.html laedt mietentwicklung.js mit neuem Buster');
+  const lauf = async (ohneAusloeser) => {
+    const L = {}; const timers = [];
+    const win = { addEventListener: (e, f) => { (L[e] = L[e] || []).push(f); } };
+    const ctx = { window: win, setTimeout: (f, ms) => { timers.push(f); return timers.length; }, clearTimeout: () => {}, Math, isFinite, Array };
+    // Modell: 5 Jahre, Erstattung = -0,42 * Ergebnis; Jahr 3 ändert sich nach dem ersten calc (Potenzial)
+    let erg = [-12000, -9000, -8000, -7000, 3000];
+    win._computeYearTotal = (cal, i) => ({ ergebnis: erg[i], refund: -0.42 * erg[i] });
+    let calls = 0;
+    win.State = {};
+    win.calc = () => { calls++; win.State.cfRows = erg.map((e, i) => { const t = win._computeYearTotal(2025 + i, i); const cfop = 5000; const tax = -t.refund; return { cal: 2025 + i, cfop_y: cfop, tax_y: tax, cfns_y: cfop - tax, zve_steuer: t.ergebnis }; }); };
+    vm.createContext(ctx); vm.runInContext(m[0], ctx);
+    win.calc(); calls = 0;
+    const feuer = (e) => { (L[e] || []).forEach((f) => f()); while (timers.length) timers.shift()(); };
+    if (ohneAusloeser) win.DpNachrechnen.aus(true);
+    feuer('dp:potenzial');
+    const callsOhneAenderung = calls;
+    erg = erg.slice(); erg[3] = -7700;           // Potenzial kommt an: Mieterhöhung ändert Jahr 4
+    feuer('dp:potenzial');
+    const R = win.State.cfRows;
+    const gleich = R.every((r, i) => Math.abs(win._computeYearTotal(r.cal, i).refund + (r.cfop_y - r.cfns_y)) < 0.5);   /* Erstattung = −Steuer = −(cfop − cfns) */
+    const callsNach = calls;
+    feuer('dp:mietspiegel-werte'); feuer('dp:object-ready');
+    // Deckel: Ergebnis aendert sich bei jedem Lesen -> hoechstens 3 calc je Objekt
+    let z = 0; win._computeYearTotal = (cal, i) => ({ ergebnis: erg[i] + (z++), refund: 0 });
+    feuer('dp:object-ready');
+    return { callsOhneAenderung, callsNach, gleich, deckel: win.DpNachrechnen.anzahl(), rest: calls };
+  };
+  const a = await lauf(false);
+  ok(a.callsOhneAenderung === 0, 'E kein calc(), solange Tabelle und Rechnung passen, ist ' + a.callsOhneAenderung);
+  ok(a.callsNach === 1, 'E genau ein calc() nach dp:potenzial mit geändertem Jahr, ist ' + a.callsNach);
+  ok(a.gleich, 'E danach Karten-Erstattung == −(cfop_y − cfns_y) in jedem Jahr');
+  ok(a.deckel <= 3, 'E höchstens 3 Nachrechnungen je Objekt (keine Schleife), ist ' + a.deckel);
+  const g = await lauf(true);
+  ok(g.callsNach === 0 && !g.gleich, 'E Gegenprobe ohne Auslöser: Karten und Tabelle weichen ab (muss rot sein, ist es)');
 }
 
 console.log(`steuerjahr-pruefen: ${gruen} gruen, ${rot} rot`);
