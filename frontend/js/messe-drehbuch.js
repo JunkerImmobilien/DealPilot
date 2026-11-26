@@ -10907,7 +10907,8 @@
         await warteAuf(function () { return q('#ai-content .dp-pa-tab'); }, 10000);
         await warte(800);
         await k5Tab(/^Haus/);
-        await zeige(function () { var e = rhIm(k5Panel(), /Eingelesen und übernommen/); return (e && k5Eng(e, 520)) || k5Karte(/Meine Dokumente|Risiken aus den Unterlagen/)(); }, 8);
+        /* M9 26.11.: Rahmen auf die ganze Karte, nicht nur die Überschrift */
+        await zeige(function () { var e = rhIm(k5Panel(), /Eingelesen und übernommen/); var c = e; while (c && c.parentElement && c.parentElement !== k5Panel() && (c.offsetHeight < 160 || !/card|karte|kachel/i.test(c.className || ''))) c = c.parentElement; return (c && c.offsetHeight >= 160 ? k5Eng(c, 560) : null) || (e && k5Eng(e, 520)) || k5Karte(/Meine Dokumente|Risiken aus den Unterlagen/)(); }, 8);
         await b2oZeile(s, 'Eingelesen und aufbewahrt', 'Jede eingelesene Unterlage mit Zuordnung, die Originale nach Jahr, dazu die Belegung deiner Ablage.');
       },
       async function (s) {   /* 2 · Belege einlesen */
