@@ -1,0 +1,325 @@
+{
+ "ags": "03241015",
+ "gemeinde": "Seelze",
+ "haus": {
+  "regel": "ausgeschlossen",
+  "beleg": "S. 5 Nr. 2 Geltungsbereich: ausgenommen „Wohnungen in Ein- und Zweifamilienhäusern“"
+ },
+ "art": "qualifiziert",
+ "stand": "2025-04-01",
+ "erhebungsstichtag": "2025-04-01",
+ "gueltig_ab": "2025-11-27",
+ "gueltig_bis": null,
+ "quelle": {
+  "url": "https://www.hannover.de/content/download/528888/file/Mietspiegel_Seelze_2025.pdf",
+  "dokument": "Mietspiegel der Stadt Seelze 2025 (qualifiziert nach § 558d BGB, Region Hannover), Tabelle 5.1, Berechnungsbeispiel Feld C2",
+  "seite": "S. 9 (Tabelle 5.1), S. 9 (Berechnungsbeispiel), S. 5 (Stichtag 1. April 2025, Anerkennung, Geltungsbereich)",
+  "lizenz": "kein Rechtevorbehalt und kein Speicherverbot im Dokument (geprüft 26.11.2026); amtliche Veröffentlichung nach § 558c Abs. 4 BGB",
+  "abgerufen": "2026-11-26"
+ },
+ "einheit": "eur_qm_nettokalt",
+ "form": "tabelle",
+ "rundung": 2,
+ "hinweis": "Qualifizierter Mietspiegel nach § 558d BGB unter Leitung der Region Hannover (Mietspiegelkommission mit Mieterbund, Haus und Grund, ArGeWo, IVD, Amtsgericht), Befragung mit Stichtag 1. April 2025, vom Rat der Stadt Seelze anerkannt, gilt ab dem Tag der Anerkennung (S. 5); „gueltig_ab“ = Datum laut Mietspiegelseite der Region Hannover (hannover.de, geprüft 26.11.2026). Mittelwert = arithmetisches Mittel, Spanne = 4/5-Spanne. Keine Wohnlagen-Gliederung. Grau hinterlegte Felder (10 bis 29 Datensätze, Qualität eines einfachen Mietspiegels) sind ohne Kennzeichnung je Feld übernommen. Leerfelder (unter 10 Mietwerte): A1, E1, F1, G1, F2 — nicht eingetragen. Spanneneinordnung über Ausstattungspunkte (0 bis 26 Punkte, Berechnungsbeispiel) nicht abgebildet. Gilt nicht für Wohnungen in Ein- und Zweifamilienhäusern, preisgebundenen Wohnraum, Staffel- und Indexmieten u. a. (S. 5). Tabelle am Druckbild (110 dpi) abgelesen und mit der Textschicht (pdftotext -table) verglichen; Seitenzahlen = PDF-Seiten.",
+ "tabelle": {
+  "achsen": {
+   "baujahr": [
+    {
+     "von": null,
+     "bis": 1918,
+     "label": "A: bis 1918"
+    },
+    {
+     "von": 1919,
+     "bis": 1948,
+     "label": "B: 1919 bis 1948"
+    },
+    {
+     "von": 1949,
+     "bis": 1977,
+     "label": "C: 1949 bis 1977"
+    },
+    {
+     "von": 1978,
+     "bis": 1994,
+     "label": "D: 1978 bis 1994"
+    },
+    {
+     "von": 1995,
+     "bis": 2014,
+     "label": "E: 1995 bis 2014"
+    },
+    {
+     "von": 2015,
+     "bis": 2020,
+     "label": "F: 2015 bis 2020"
+    },
+    {
+     "von": 2021,
+     "bis": 2025,
+     "label": "G: 2021 bis 03/2025"
+    }
+   ],
+   "wfl": [
+    {
+     "von": null,
+     "bis": 45,
+     "bis_inkl": false,
+     "label": "1: unter 45 m²"
+    },
+    {
+     "von": 45,
+     "bis": 65,
+     "bis_inkl": false,
+     "label": "2: 45 m² bis unter 65 m²"
+    },
+    {
+     "von": 65,
+     "bis": 85,
+     "bis_inkl": false,
+     "label": "3: 65 m² bis unter 85 m²"
+    },
+    {
+     "von": 85,
+     "bis": null,
+     "label": "4: 85 m² und mehr"
+    }
+   ]
+  },
+  "zellen": [
+   {
+    "baujahr": 1,
+    "wfl": 0,
+    "unten": 6.46,
+    "mittel": 6.62,
+    "oben": 7.25,
+    "seite": "9",
+    "feld": "B1"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 0,
+    "unten": 6.12,
+    "mittel": 6.85,
+    "oben": 8.19,
+    "seite": "9",
+    "feld": "C1"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 0,
+    "unten": 7.87,
+    "mittel": 9.3,
+    "oben": 11.75,
+    "seite": "9",
+    "feld": "D1"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 1,
+    "unten": 6.47,
+    "mittel": 7.33,
+    "oben": 9.36,
+    "seite": "9",
+    "feld": "A2"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 1,
+    "unten": 5.93,
+    "mittel": 6.79,
+    "oben": 7.58,
+    "seite": "9",
+    "feld": "B2"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 1,
+    "unten": 6.19,
+    "mittel": 7.34,
+    "oben": 8.75,
+    "seite": "9",
+    "feld": "C2"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 1,
+    "unten": 6.62,
+    "mittel": 8.06,
+    "oben": 10.05,
+    "seite": "9",
+    "feld": "D2"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 1,
+    "unten": 7.21,
+    "mittel": 8.7,
+    "oben": 10.34,
+    "seite": "9",
+    "feld": "E2"
+   },
+   {
+    "baujahr": 6,
+    "wfl": 1,
+    "unten": 9.04,
+    "mittel": 10.81,
+    "oben": 12.17,
+    "seite": "9",
+    "feld": "G2"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 2,
+    "unten": 6.16,
+    "mittel": 7.17,
+    "oben": 8.58,
+    "seite": "9",
+    "feld": "A3"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 2,
+    "unten": 6.03,
+    "mittel": 6.76,
+    "oben": 7.63,
+    "seite": "9",
+    "feld": "B3"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 2,
+    "unten": 6.14,
+    "mittel": 7.13,
+    "oben": 8.38,
+    "seite": "9",
+    "feld": "C3"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 2,
+    "unten": 6.36,
+    "mittel": 7.52,
+    "oben": 9.09,
+    "seite": "9",
+    "feld": "D3"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 2,
+    "unten": 6.51,
+    "mittel": 7.94,
+    "oben": 9.1,
+    "seite": "9",
+    "feld": "E3"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 2,
+    "unten": 9.12,
+    "mittel": 9.96,
+    "oben": 11.2,
+    "seite": "9",
+    "feld": "F3"
+   },
+   {
+    "baujahr": 6,
+    "wfl": 2,
+    "unten": 9.88,
+    "mittel": 10.64,
+    "oben": 12.22,
+    "seite": "9",
+    "feld": "G3"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 3,
+    "unten": 6.12,
+    "mittel": 7.12,
+    "oben": 8.5,
+    "seite": "9",
+    "feld": "A4"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 3,
+    "unten": 5.81,
+    "mittel": 6.87,
+    "oben": 7.9,
+    "seite": "9",
+    "feld": "B4"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 3,
+    "unten": 6.2,
+    "mittel": 7.36,
+    "oben": 8.87,
+    "seite": "9",
+    "feld": "C4"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 3,
+    "unten": 6.6,
+    "mittel": 7.59,
+    "oben": 8.89,
+    "seite": "9",
+    "feld": "D4"
+   },
+   {
+    "baujahr": 4,
+    "wfl": 3,
+    "unten": 7.32,
+    "mittel": 8.37,
+    "oben": 9.65,
+    "seite": "9",
+    "feld": "E4"
+   },
+   {
+    "baujahr": 5,
+    "wfl": 3,
+    "unten": 9.26,
+    "mittel": 9.95,
+    "oben": 10.91,
+    "seite": "9",
+    "feld": "F4"
+   },
+   {
+    "baujahr": 6,
+    "wfl": 3,
+    "unten": 9.34,
+    "mittel": 10.53,
+    "oben": 12.64,
+    "seite": "9",
+    "feld": "G4"
+   }
+  ]
+ },
+ "pruefbeispiele": [
+  {
+   "eingabe": {
+    "baujahr": 1963,
+    "wfl": 55
+   },
+   "erwartet": {
+    "unten": 6.19,
+    "mittel": 7.34,
+    "oben": 8.75
+   },
+   "seite": "9",
+   "art": "anwendungsbeispiel",
+   "anmerkung": "Berechnungsbeispiel Feld C2"
+  },
+  {
+   "eingabe": {
+    "baujahr": 1913,
+    "wfl": 40
+   },
+   "erwartet": null,
+   "seite": "9",
+   "art": "tabellenzelle",
+   "anmerkung": "Leerfeld A1"
+  }
+ ]
+}
