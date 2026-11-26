@@ -72,26 +72,6 @@
       "backend_stellen": [],
       "nur_frontend": "reine Darstellung von Werten, die der Nutzer in der App ohnehin sieht (State.cfRows, Jahresbuch, DpMieteMax, Portfolio-Payload). Es gibt keine Route und keinen Datenweg, den eine Backend-Sperre schützen könnte.",
       "backend_erkennung": ""
-    },
-    {
-      "schluessel": "eigennutzer",
-      "bezeichnung": "Eigennutzer-Check: Haus für mich prüfen (Demo)",
-      "seit": "v5130",
-      "beschreibung": "Quick-Check-Umschalter „Vermieten / Selbst nutzen“ und Eigennutzer-Reiterleiste am Objekt (_nutzung = 'eigen'), Kern js/eigennutzer-kern.js (Haus-Score Preis 35 · Zustand 35 · Lage 30, Leistbarkeit eigene Ampel). Marcel 26.11.2026. Zusätzlich der Demo-Schalter ?eigennutzer=1, der nur auf Staging wirkt.",
-      "frei_fuer": [
-        "admin",
-        "vorschau"
-      ],
-      "frontend_erkennung": "eig-schalter|eig-tabs",
-      "frontend_ausgenommen": {},
-      "routen": [],
-      "backend_stellen": [
-        {
-          "datei": "backend/src/routes/marktbericht.js",
-          "grund": "Haus-Check-PDF aus dem Marktbericht des Objekts (POST /marktbericht/hauscheck-objekt)"
-        }
-      ],
-      "backend_erkennung": ""
     }
   ]
 }
