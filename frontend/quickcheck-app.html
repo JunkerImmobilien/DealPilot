@@ -6266,15 +6266,32 @@ const QcApp = (function() {
     if (mp.kapp && mp.kapp.text) zeilen.push(esc(mp.kapp.text));
     if (z.termin_text) zeilen.push(esc(z.termin_text) + '.');
     (z.hinweise || []).forEach(h => zeilen.push(esc(h.charAt(0).toUpperCase() + h.slice(1)) + '.'));
-    if (mp.zusatz > 0) zeilen.push('Stellplatz, Küche und Sonstiges (' + e0(mp.zusatz) + '/Monat) bleiben unverändert — Kappung und Vergleichsmiete gelten für die Wohnungsmiete.');
+    if (mp.zusatz > 0) zeilen.push('Stellplatz, Küche und Sonstiges (' + e0(mp.zusatz) + '/Monat) bleiben unverändert. Kappung und Vergleichsmiete gelten für die Wohnungsmiete.');
     if (mp.neu) {
       zeilen.push('<strong>Bei Neuvermietung</strong> (Marktmiete, nicht die Bestandsmiete): '
         + (Math.round(mp.neu.qm * 100) / 100).toFixed(2).replace('.', ',') + ' €/m² → ' + e0(mp.neu.jahr + mp.zusatz * 12) + '/Jahr. ' + esc(mp.neu.text) + '.');
     }
-    if (zk && zk.nach3 != null) zeilen.push('Der Zielkaufpreis mit zulässiger Miete rechnet mit der Miete in drei Jahren und höchstens dem Marktwert — er ist ein Verhandlungsrahmen, kein Wert.');
-    host.innerHTML = `
+    if (zk && zk.nach3 != null) zeilen.push('Der Zielkaufpreis mit zulässiger Miete rechnet mit der Miete in drei Jahren und höchstens dem Marktwert. Er ist ein Verhandlungsrahmen, kein Wert.');
+    /* v5140 · OO6 · Karte „Miete“: dieselbe Kette wie App und Deal-Check (Ist, zulässig, Vergleichsmiete, Neuvermietung) */
+    const wflM = QcEngine.num(inputs.wfl) || 0, qm2 = x => (x == null || !isFinite(x)) ? '—' : (Math.round(x * 100) / 100).toFixed(2).replace('.', ',') + ' €/m²';
+    const grundM = mp.grund != null ? mp.grund : mp.nkm_heute;
+    const vglHer = mp.vgl_herkunft ? mp.vgl_herkunft : (mp.vgl_quelle === 'marktbewertung' ? 'aus dem Marktdurchschnitt abgeleitet' : 'noch nicht ermittelt');
+    const tip = mp.vgl_genauigkeit ? ` <span class="qc-mk-tip" tabindex="0" role="note" title="${esc(mp.vgl_genauigkeit)}" aria-label="${esc(mp.vgl_genauigkeit)}">ⓘ</span>` : '';
+    const mk = (l, v, u) => `<div class="qc-mk-z"><div class="qc-mk-l">${l}</div><div class="qc-mk-v">${v}</div><div class="qc-mk-u">${u}</div></div>`;
+    let mkHtml = '<div class="qc-mk"><div class="qc-mk-h">Miete</div><div class="qc-mk-g">'
+      + mk('Ist heute', wflM > 0 ? qm2(grundM / wflM) : e0(grundM), e0(grundM) + ' im Monat')
+      + mk('Zulässig nach 3 Jahren', wflM > 0 && mp.zul && mp.zul.miete_monat > 0 ? qm2(mp.zul.miete_monat / wflM) : '—', mp.zul && mp.zul.miete_monat > 0 ? e0(mp.zul.miete_monat) + ' im Monat' : 'Kappung und Vergleichsmiete')
+      + mk('Vergleichsmiete', mp.vgl_qm ? qm2(mp.vgl_qm) + tip : '—', esc(vglHer))
+      + mk('Neuvermietung', mp.neu && mp.neu.qm ? qm2(mp.neu.qm) : '—', mp.neu && mp.neu.monat ? e0(mp.neu.monat) + ' im Monat' : '')
+      + '</div></div>';
+    const mkCss = '<style>.qc-mk{border:1px solid var(--line,#E8E2D6);border-radius:12px;background:var(--surface,#fff);padding:12px 14px;margin:0 0 12px}'
+      + '.qc-mk-h{font:600 11px/1.2 "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:#7A7370;margin:0 0 8px}'
+      + '.qc-mk-g{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}@media(max-width:560px){.qc-mk-g{grid-template-columns:repeat(2,minmax(0,1fr))}}'
+      + '.qc-mk-l{font:500 11px/1.3 Inter,sans-serif;color:#7A7370}.qc-mk-v{font:600 17px/1.25 "Space Grotesk",sans-serif;color:var(--ch,#2A2727);white-space:nowrap}'
+      + '.qc-mk-u{font:400 11px/1.35 Inter,sans-serif;color:#7A7370;overflow-wrap:anywhere}.qc-mk-tip{cursor:help;font-size:12px;color:#7A7370}</style>';
+    host.innerHTML = mkCss + mkHtml + `
 <div class="ai-marktcheck">
-  <div class="ai-marktcheck-head">Mietpotenzial — rechtlich zulässig <span style="font-weight:400;font-size:12px;color:var(--ch2)">(Bestandsmiete, § 558 BGB)</span></div>
+  <div class="ai-marktcheck-head">Mietpotenzial, rechtlich zulässig <span style="font-weight:400;font-size:12px;color:var(--ch2)">(Bestandsmiete, § 558 BGB)</span></div>
   <div class="ai-marktcheck-grid">${cells}</div>
   <div class="ai-marktcheck-verdict">${zeilen.join('<br>')}</div>
 </div>`;
@@ -8547,6 +8564,43 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
       .then(function(){ delete _qcAgsLauf[k]; if (_qcAgs[k]) { try { QcApp.scheduleUpdate(); } catch (e) {} } });
     return null;
   }
+  /* v5140 · OO6 · DIESELBE MIETKETTE WIE APP, MARKTBERICHT UND DEAL-CHECK (Marcel 26.11.2026).
+     Vergleichsmiete aus der Route /marktbericht/mietspiegel (Mietspiegel, sonst DealPilot-Naeherung mit
+     oberem Wert, Modernisierungs- und Hauszuschlag, amtliche Marktmiete; Vorbehalts-Mietspiegel auf Prod
+     nicht, nur_frei setzt das Backend). Gerechnet wird NUR dort, hier wird nur ausgewaehlt: oberer Wert
+     wie in der App (msWahl 'oben'). Ein lesender Abruf je Gemeinde x Baujahr x Flaeche x Objektart. */
+  var _qcMs = {}, _qcMsLauf = {};
+  function _qcMsFuer(ags, bj, wflE, objart){
+    if (!ags || !(bj > 1000) || !(wflE > 0)) return null;
+    var fl = Math.round(wflE * 100) / 100, k = ags + '|' + bj + '|' + fl + '|' + (objart || '');
+    if (_qcMs[k] !== undefined) return _qcMs[k];
+    if (_qcMsLauf[k]) return null;
+    var P = _par(), A = P && P.Auth;
+    if (!A || typeof A.apiCall !== 'function') return null;
+    var R = (P && P.DpMieteRegel) || window.DpMieteRegel;
+    _qcMsLauf[k] = A.apiCall('/marktbericht/mietspiegel?ags=' + encodeURIComponent(ags) + '&baujahr=' + bj + '&wfl=' + fl
+        + (objart ? '&objektart=' + encodeURIComponent(objart) : '') + (R && R.query ? R.query() : ''), { method:'GET' })
+      .then(function(a){ _qcMs[k] = a || null; })
+      .catch(function(){ _qcMs[k] = null; })
+      .then(function(){ delete _qcMsLauf[k]; if (_qcMs[k]) { try { QcApp.scheduleUpdate(); } catch (e) {} } });
+    return null;
+  }
+  /** v5140 · { qm, mittel, quelle_art, herkunft, genauigkeit } oder null */
+  function _qcVglAusMs(ms){
+    if (!ms) return null;
+    var w = ms.werte, nz = ms.naeherung;
+    if (w && (Number(w.oben) > 0 || Number(w.mittel) > 0)) {
+      var o = Number(w.oben) > 0 ? Number(w.oben) : Number(w.mittel);
+      return { qm: Math.round(o * 100) / 100, mittel: Number(w.mittel) || null, quelle_art: 'mietspiegel',
+        herkunft: 'Mietspiegel der Gemeinde, oberer Spannenwert', genauigkeit: null };
+    }
+    if (nz && (Number(nz.oben) > 0 || Number(nz.qm) > 0)) {
+      var q = Number(nz.oben) > 0 ? Number(nz.oben) : Number(nz.qm);
+      return { qm: Math.round(q * 100) / 100, mittel: Number(nz.qm) || null, quelle_art: 'dealpilot_naeherung',
+        herkunft: (nz.text || 'DealPilot-Näherung') + ', oberer Wert', genauigkeit: nz.genauigkeit_text || null };
+    }
+    return null;
+  }
   window._qcMietpotenzial = function(inputs, avm){
     var Km = window.DpMietpotenzial; if (!Km) return null;
     var i = inputs||{}, nkm=n(i.nkm), wfl=n(i.wfl);
@@ -8583,16 +8637,29 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
     var abS = null;
     try { var Cf = (window.parent && window.parent.DealPilotConfig) || window.DealPilotConfig, ab = Cf && Cf.mieteAngebotAbschlag;
       if (ab && ab.stufen) { var st = (bremse && bremse.gilt === true && !bremse.neubau) ? 'angespannt' : 'mittel'; abS = { pct: ab.stufen[st], stufe: st }; } } catch (e) {}
-    var vglA = (mm>0 && wfl>0 && Km.vglAusAngebot) ? Km.vglAusAngebot(mm/wfl, abS) : null;
-    var vglQm = vglA ? vglA.qm : ((mm>0 && wfl>0) ? Math.round(mm/wfl*100)/100 : null);
+    /* v5140 · zuerst die gemeinsame Kette (Mietspiegel bzw. Naeherung), nur ohne sie wie bisher aus der Angebotsmiete */
+    var _einh = 0; try { var _ee = document.getElementById('qc_einheiten'); _einh = n(i.einheiten || (_ee && _ee.value)); } catch (e) {}
+    var _art = String(i.objektart || '');
+    var _wflE = (_art === 'MFH' && _einh > 1) ? wfl / _einh : wfl;
+    var msV = (_ags && _art !== 'Gewerbe') ? _qcVglAusMs(_qcMsFuer(_ags, bjQ, _wflE, _art)) : null;
+    var vglA = (!msV && mm>0 && wfl>0 && Km.vglAusAngebot) ? Km.vglAusAngebot(mm/wfl, abS) : null;
+    var vglQm = msV ? msV.qm : (vglA ? vglA.qm : ((mm>0 && wfl>0) ? Math.round(mm/wfl*100)/100 : null));
     var zul = leer ? null : Km.zulaessig({ ist:grund, wfl:wfl, vgl_qm:vglQm, kappung_pct:kapp.pct, letzte:null });
     var neu = (mm>0 && wfl>0) ? Km.neuvermietung({ markt_qm:mm/wfl, wfl:wfl, vgl_qm:null, bremse:bremse }) : null;
+    /* v5140 · Investorenlogik wie in der App: Neuvermietung = Vergleichsmiete x 1,10 mit Mietpreisbremse, sonst x Faktor
+       der Einstellung (Vorgabe 1,20, DpMieteRegel). */
+    if (msV && wfl > 0) {
+      var _R = (_par() && _par().DpMieteRegel) || window.DpMieteRegel, _fo = (_R && _R.faktorOhne) ? _R.faktorOhne() : 1.2;
+      var _mit = !!(bremse && bremse.gilt === true), _f = _mit ? 1.1 : _fo, _nq = Math.round(msV.qm * _f * 100) / 100;
+      neu = { qm:_nq, markt_qm:_nq, faktor:_f, bremse_gilt: bremse ? bremse.gilt : null, monat: Math.round(_nq * wfl * 100) / 100, jahr: Math.round(_nq * wfl * 12 * 100) / 100,
+        text: _mit ? 'Mietpreisbremse: höchstens Vergleichsmiete plus 10 % (§ 556d BGB)' : 'Keine Mietpreisbremse, DealPilot rechnet mit Vergleichsmiete × ' + String(_f).replace('.', ',') + ' (§ 5 WiStG)' };
+    }
     return { kapp:kapp, bremse:bremse, zul:zul, neu:neu, zusatz:zusatz, grund:grund /* v3670 */, leer:leer, markt_monat:mm, vgl_qm:vglQm,
       /* v3356 · B6: eine „obere Spanne“ nur, wenn sie gemessen ist - dealpilot-mb.js setzt ohne q75 high = Mitte × 1,1 */
       markt_oben:(mmSpanne && Number(mmSpanne.high) > 0 && Number(mmSpanne.med) > 0 && Math.abs(Number(mmSpanne.high) / Number(mmSpanne.med) - 1.1) > 0.005 ? Number(mmSpanne.high) : null),
       vgl_abschlag: abS, vgl_text: vglA ? vglA.text : null,
       grenze_monat: (vglQm > 0 && wfl > 0) ? Math.round(vglQm * wfl * ((bremse && bremse.gilt === false) ? 1.2 : 1.1)) : null,
-      vgl_quelle:(vglQm ? 'marktbewertung' : null),
+      vgl_quelle:(msV ? msV.quelle_art : (vglQm ? 'marktbewertung' : null)), vgl_herkunft:(msV ? msV.herkunft : null), vgl_genauigkeit:(msV ? msV.genauigkeit : null), vgl_mittel:(msV ? msV.mittel : null),
       nkm_heute:nkm, nkm_3j:(zul && zul.miete_monat>0 ? zul.miete_monat : grund) + zusatz };
   };
 
