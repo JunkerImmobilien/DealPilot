@@ -1,0 +1,361 @@
+{
+ "ags": "01004000",
+ "gemeinde": "Neumünster",
+ "haus": {
+  "regel": "zuschlag",
+  "merkmal": "einfamilien_reihenhaus",
+  "fuer": [
+   "efh",
+   "dhh",
+   "rh"
+  ],
+  "hinweis": "Mietspiegel nennt „einem Zuschlag bis zu 10 % - 20 %“ für allein bewohnte Einfamilien- und Reihenhäuser; DealPilot setzt die Mitte 15 %",
+  "beleg": "S. 6 Nr. 5: „Allein bewohnte Einfamilien- und Reihenhäuser haben ebenfalls einen höheren Wohnwert als Wohnungen in Häusern mit mehreren Mietparteien. Für die Festsetzung der Miete gilt der Mietspiegel mit einem Zuschlag bis zu 10 % - 20 % oder die Wirtschaftlichkeitsberechnung zur Ermittlung der Kostenmiete. In besonderen Einzelfällen kann ein höherer Zuschlag erhoben werden.“"
+ },
+ "art": "einfach",
+ "stand": "2026-06-01",
+ "erhebungsstichtag": "2026-05-31",
+ "gueltig_ab": "2026-06-01",
+ "gueltig_bis": "2028-06-01",
+ "quelle": {
+  "url": "https://www.neumuenster.de/fileadmin/neumuenster.de/media/wirtschaft_und_bauen/wohnen/mietspiegel/Mietspiegel_Neumuenster_2026_PDF_Internetseite.pdf",
+  "dokument": "Mietspiegel der Stadt Neumünster, Ausgabe 01.06.2026 (Stadt Neumünster, Fachdienst Stadtplanung und -entwicklung), Tabelle S. 8",
+  "seite": "8",
+  "lizenz": "kein Rechtevorbehalt und kein Speicherverbot im Dokument (Impressum S. 2: nur Bezugspreis 3,50 € für das gedruckte Heft, „einsehbar auf www.neumuenster.de“), geprüft 26.11.2026",
+  "abgerufen": "2026-11-26"
+ },
+ "einheit": "eur_qm_nettokalt",
+ "form": "tabelle",
+ "rundung": 2,
+ "hinweis": "Mietspiegel „nach § 558 c BGB“ (S. 3 der PDF, ohne Seitenzahl), in Zusammenarbeit und Anerkenntnis mit Haus- und Grundeigentümerverein, Mieterverein u. a.; Stichtag der Erhebung 31.05.2026, Mieten der letzten sechs Jahre. Gültigkeit 01.06.2026 bis 01.06.2028 laut Stadtseite (Verzeichnis). Bild-PDF: Seiten am Druckbild gelesen, die Tabelle S. 8 (PDF-Seite 9) stimmt mit der schwachen Textschicht überein. Seitenzahlen = aufgedruckte Seitenzahl (PDF-Seite minus 1). Tabelle nur Spannen (Unter- und Obergrenze, S. 3 Nr. II), kein Mittelwert: „mittel“ = Mitte der Spanne (DealPilot-Rechnung). Tabelle gilt für Wohnungen „mit Heizung mit VoDB“ (Voll- oder Duschbad); ohne Heizung oder Bad führt sie keinen Wert. Spalten 2 und 4 („durch Modernisierung u. a. mit Hzg. und VoDB“ bis 1959, „Modernisiert“ 1960–1980) für modernisierte Wohnungen (S. 7 Nr. V) = Ausstattung „modernisiert“; ab 1981 keine Unterteilung. Vollständig sanierte Gebäude können in die Baualtersklasse des Abschlusses der Maßnahmen eingeordnet werden (S. 6). Wohnlage einfach/gut/beste je Straße aus dem Straßenverzeichnis (S. 9 ff.); „gute Wohnlage“ = normaler bis guter Wohnwert (S. 3), deshalb Standard ohne Angabe. Keine Größenklassen. Abschlag bis 10 % bei Naraheizung (S. 6 Nr. 3) und weitere Merkmale (Schnitt, Sanitär, Fenster, Verkehr) ohne Betrag — nicht übernommen. Gilt nur für frei finanzierten Wohnraum (S. 3).",
+ "tabelle": {
+  "achsen": {
+   "baujahr": [
+    {
+     "von": null,
+     "bis": 1959,
+     "label": "bis 31.12.1959"
+    },
+    {
+     "von": 1960,
+     "bis": 1980,
+     "label": "1960–1980"
+    },
+    {
+     "von": 1981,
+     "bis": 2000,
+     "label": "1981–2000"
+    },
+    {
+     "von": 2001,
+     "bis": 2020,
+     "label": "2001–2020"
+    },
+    {
+     "von": 2021,
+     "bis": null,
+     "label": "ab 2021"
+    }
+   ],
+   "lage": [
+    {
+     "schluessel": "einfach",
+     "label": "einfache Wohnlage",
+     "aliase": [
+      "einfache"
+     ]
+    },
+    {
+     "schluessel": "gut",
+     "label": "gute Wohnlage",
+     "standard": true,
+     "aliase": [
+      "gute",
+      "mittel",
+      "normal"
+     ]
+    },
+    {
+     "schluessel": "beste",
+     "label": "beste Wohnlage",
+     "aliase": [
+      "sehr gut",
+      "sehr_gut"
+     ]
+    }
+   ],
+   "ausstattung": [
+    {
+     "schluessel": "standard",
+     "label": "mit Heizung und Voll- oder Duschbad",
+     "standard": true
+    },
+    {
+     "schluessel": "modernisiert",
+     "label": "modernisiert (u. a. mit Heizung und Voll- oder Duschbad)",
+     "aliase": [
+      "modernisierung",
+      "mit_modernisierung"
+     ]
+    }
+   ]
+  },
+  "zellen": [
+   {
+    "baujahr": 0,
+    "lage": "einfach",
+    "ausstattung": "standard",
+    "unten": 5.8,
+    "mittel": 6.95,
+    "oben": 8.1,
+    "seite": "8",
+    "spalte": 1
+   },
+   {
+    "baujahr": 0,
+    "lage": "einfach",
+    "ausstattung": "modernisiert",
+    "unten": 6,
+    "mittel": 7.25,
+    "oben": 8.5,
+    "seite": "8",
+    "spalte": 2
+   },
+   {
+    "baujahr": 1,
+    "lage": "einfach",
+    "ausstattung": "standard",
+    "unten": 6.35,
+    "mittel": 7.43,
+    "oben": 8.5,
+    "seite": "8",
+    "spalte": 3
+   },
+   {
+    "baujahr": 1,
+    "lage": "einfach",
+    "ausstattung": "modernisiert",
+    "unten": 6.6,
+    "mittel": 7.73,
+    "oben": 8.85,
+    "seite": "8",
+    "spalte": 4
+   },
+   {
+    "baujahr": 2,
+    "lage": "einfach",
+    "unten": 7,
+    "mittel": 7.93,
+    "oben": 8.85,
+    "seite": "8",
+    "spalte": 5
+   },
+   {
+    "baujahr": 3,
+    "lage": "einfach",
+    "unten": 7.55,
+    "mittel": 8.28,
+    "oben": 9,
+    "seite": "8",
+    "spalte": 6
+   },
+   {
+    "baujahr": 4,
+    "lage": "einfach",
+    "unten": 9.85,
+    "mittel": 10.55,
+    "oben": 11.25,
+    "seite": "8",
+    "spalte": 7
+   },
+   {
+    "baujahr": 0,
+    "lage": "gut",
+    "ausstattung": "standard",
+    "unten": 5.85,
+    "mittel": 7.23,
+    "oben": 8.6,
+    "seite": "8",
+    "spalte": 1
+   },
+   {
+    "baujahr": 0,
+    "lage": "gut",
+    "ausstattung": "modernisiert",
+    "unten": 6.7,
+    "mittel": 7.75,
+    "oben": 8.8,
+    "seite": "8",
+    "spalte": 2
+   },
+   {
+    "baujahr": 1,
+    "lage": "gut",
+    "ausstattung": "standard",
+    "unten": 7,
+    "mittel": 7.9,
+    "oben": 8.8,
+    "seite": "8",
+    "spalte": 3
+   },
+   {
+    "baujahr": 1,
+    "lage": "gut",
+    "ausstattung": "modernisiert",
+    "unten": 7.3,
+    "mittel": 8.15,
+    "oben": 9,
+    "seite": "8",
+    "spalte": 4
+   },
+   {
+    "baujahr": 2,
+    "lage": "gut",
+    "unten": 7,
+    "mittel": 8.13,
+    "oben": 9.25,
+    "seite": "8",
+    "spalte": 5
+   },
+   {
+    "baujahr": 3,
+    "lage": "gut",
+    "unten": 7.7,
+    "mittel": 8.65,
+    "oben": 9.6,
+    "seite": "8",
+    "spalte": 6
+   },
+   {
+    "baujahr": 4,
+    "lage": "gut",
+    "unten": 10,
+    "mittel": 11,
+    "oben": 12,
+    "seite": "8",
+    "spalte": 7
+   },
+   {
+    "baujahr": 0,
+    "lage": "beste",
+    "ausstattung": "standard",
+    "unten": 6,
+    "mittel": 7.3,
+    "oben": 8.6,
+    "seite": "8",
+    "spalte": 1
+   },
+   {
+    "baujahr": 0,
+    "lage": "beste",
+    "ausstattung": "modernisiert",
+    "unten": 6.75,
+    "mittel": 7.78,
+    "oben": 8.8,
+    "seite": "8",
+    "spalte": 2
+   },
+   {
+    "baujahr": 1,
+    "lage": "beste",
+    "ausstattung": "standard",
+    "unten": 7.1,
+    "mittel": 8.05,
+    "oben": 9,
+    "seite": "8",
+    "spalte": 3
+   },
+   {
+    "baujahr": 1,
+    "lage": "beste",
+    "ausstattung": "modernisiert",
+    "unten": 7.4,
+    "mittel": 8.35,
+    "oben": 9.3,
+    "seite": "8",
+    "spalte": 4
+   },
+   {
+    "baujahr": 2,
+    "lage": "beste",
+    "unten": 7.6,
+    "mittel": 8.5,
+    "oben": 9.4,
+    "seite": "8",
+    "spalte": 5
+   },
+   {
+    "baujahr": 3,
+    "lage": "beste",
+    "unten": 7.8,
+    "mittel": 8.9,
+    "oben": 10,
+    "seite": "8",
+    "spalte": 6
+   },
+   {
+    "baujahr": 4,
+    "lage": "beste",
+    "unten": 10,
+    "mittel": 11.5,
+    "oben": 13,
+    "seite": "8",
+    "spalte": 7
+   }
+  ],
+  "zuschlaege": [
+   {
+    "merkmal": "einfamilien_reihenhaus",
+    "label": "allein bewohntes Einfamilien- oder Reihenhaus",
+    "art": "pct",
+    "wert": 15,
+    "beleg": "S. 6 Nr. 5 „Zuschlag bis zu 10 % - 20 %“, Mitte der Spanne (DealPilot)"
+   }
+  ]
+ },
+ "pruefbeispiele": [
+  {
+   "eingabe": {
+    "baujahr": 1970,
+    "wfl": 65,
+    "lage": "gut"
+   },
+   "erwartet": {
+    "unten": 7,
+    "mittel": 7.9,
+    "oben": 8.8
+   },
+   "seite": "8",
+   "art": "tabellenzelle"
+  },
+  {
+   "eingabe": {
+    "baujahr": 1955,
+    "wfl": 50,
+    "lage": "einfach",
+    "ausstattung": "modernisiert"
+   },
+   "erwartet": {
+    "unten": 6,
+    "mittel": 7.25,
+    "oben": 8.5
+   },
+   "seite": "8",
+   "art": "tabellenzelle"
+  },
+  {
+   "eingabe": {
+    "baujahr": 2022,
+    "wfl": 90,
+    "lage": "beste"
+   },
+   "erwartet": {
+    "unten": 10,
+    "mittel": 11.5,
+    "oben": 13
+   },
+   "seite": "8",
+   "art": "tabellenzelle"
+  }
+ ]
+}
