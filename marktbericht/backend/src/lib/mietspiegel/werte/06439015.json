@@ -1,0 +1,312 @@
+{
+ "ags": "06439015",
+ "gemeinde": "Taunusstein",
+ "haus": {"regel":"zuschlag","merkmal":{"efh":"freistehendes_haus","dhh":"reihenend_doppelhaus","rh":"reihenmittelhaus"},"gilt_fuer":["efh","dhh","rh"],"gilt_fuer_herkunft":"wortlaut","hinweis":"Zuschläge für Einfamilienhäuser je nach Bauweise: Reihenmittelhaus 10 %, Reihenend-/Doppelhaus 15 %, freistehendes Haus 20 % (nicht für Einliegerwohnungen).","beleg":"S. 3 Zuschläge Ziffer 1"},
+ "art": "einfach",
+ "stand": "2022-07-01",
+ "erhebungsstichtag": null,
+ "gueltig_ab": "2022-07-01",
+ "gueltig_bis": null,
+ "naechste_ausgabe": "2027",
+ "quelle": {
+  "url": "https://www.idstein.de/umwelt-bauen/grundstuecke-hochbau/allgemeine-informationen/mietspiegel/mietspiegel-taunusstein-idstein-stand-2018-2022.pdf?cid=sdr",
+  "dokument": "Mietspiegel für nicht preisgebundene Wohnungen im Gebiet der Stadt Idstein, der Stadt Taunusstein, der Stadt Bad Schwalbach und der Gemeinde Niedernhausen, Stand 1. Juli 2022 (gemeinsamer einfacher Mietspiegel)",
+  "seite": "1–4",
+  "lizenz": "kein Rechtevorbehalt und kein Speicherverbot im Dokument (geprüft am 26.11.2026)",
+  "abgerufen": "2026-11-26"
+ },
+ "einheit": "eur_qm_nettokalt",
+ "form": "tabelle",
+ "rundung": 2,
+ "hinweis": "Gemeinsamer einfacher Mietspiegel (S. 3) mit je eigener Tabelle für Idstein, Taunusstein, Bad Schwalbach und Niedernhausen (S. 2, am Druckbild gegengelesen); hier die Tabelle Taunusstein. Mittelwert und Spanne je Feld aus dem Dokument; Tabellenwerte gelten für Wohnungen mit Heizung und Bad. Zu- und Abschläge in Prozent (S. 3); „bis x %“-Angaben als Mitte der Spanne abgelegt. Bei Einfamilienhäusern keine Ausstattungszuschläge nach Ziffer 2. Erhebung über die Mitglieder von Mieterbund und Haus und Grund (S. 3). Mietspiegel 2026 laut Stadt Taunusstein noch nicht verfügbar, voraussichtlich Anfang 2027.",
+ "tabelle": {
+  "achsen": {
+   "baujahr": [
+    {
+     "von": null,
+     "bis": 1960,
+     "label": "Gruppe I: bezugsfertig bis 31.12.1960"
+    },
+    {
+     "von": 1961,
+     "bis": 1980,
+     "label": "Gruppe II: 01.01.1961 bis 31.12.1980"
+    },
+    {
+     "von": 1981,
+     "bis": 1999,
+     "label": "Gruppe III: 01.01.1981 bis 31.12.1999"
+    },
+    {
+     "von": 2000,
+     "bis": null,
+     "label": "Gruppe IV: ab 01.01.2000"
+    }
+   ],
+   "wfl": [
+    {
+     "von": null,
+     "bis": 60,
+     "bis_inkl": false,
+     "label": "A) bis unter 60 qm"
+    },
+    {
+     "von": 60,
+     "bis": 100,
+     "bis_inkl": false,
+     "label": "B) 60 qm bis unter 100 qm"
+    },
+    {
+     "von": 100,
+     "bis": null,
+     "label": "C) ab 100 qm"
+    }
+   ]
+  },
+  "zellen": [
+   {
+    "baujahr": 0,
+    "wfl": 0,
+    "unten": 7.52,
+    "mittel": 8.32,
+    "oben": 9.12,
+    "seite": "2"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 0,
+    "unten": 7.53,
+    "mittel": 8.33,
+    "oben": 9.13,
+    "seite": "2"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 0,
+    "unten": 8.05,
+    "mittel": 8.85,
+    "oben": 9.65,
+    "seite": "2"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 0,
+    "unten": 9.1,
+    "mittel": 9.9,
+    "oben": 10.7,
+    "seite": "2"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 1,
+    "unten": 6.48,
+    "mittel": 7.48,
+    "oben": 8.48,
+    "seite": "2"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 1,
+    "unten": 6.6,
+    "mittel": 7.6,
+    "oben": 8.6,
+    "seite": "2"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 1,
+    "unten": 7.24,
+    "mittel": 8.24,
+    "oben": 9.24,
+    "seite": "2"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 1,
+    "unten": 8.84,
+    "mittel": 9.84,
+    "oben": 10.84,
+    "seite": "2"
+   },
+   {
+    "baujahr": 0,
+    "wfl": 2,
+    "unten": 6.43,
+    "mittel": 7.23,
+    "oben": 8.03,
+    "seite": "2"
+   },
+   {
+    "baujahr": 1,
+    "wfl": 2,
+    "unten": 7.27,
+    "mittel": 8.07,
+    "oben": 8.87,
+    "seite": "2"
+   },
+   {
+    "baujahr": 2,
+    "wfl": 2,
+    "unten": 8.14,
+    "mittel": 8.94,
+    "oben": 9.74,
+    "seite": "2"
+   },
+   {
+    "baujahr": 3,
+    "wfl": 2,
+    "unten": 8.84,
+    "mittel": 9.64,
+    "oben": 10.44,
+    "seite": "2"
+   }
+  ],
+  "zuschlaege": [
+   {
+    "merkmal": "reihenmittelhaus",
+    "art": "pct",
+    "wert": 10,
+    "label": "Einfamilienhaus: Reihenmittelhaus",
+    "beleg": "S. 3 Zu- und Abschläge"
+   },
+   {
+    "merkmal": "reihenend_doppelhaus",
+    "art": "pct",
+    "wert": 15,
+    "label": "Einfamilienhaus: Reihenend-/Doppelhaus",
+    "beleg": "S. 3 Zu- und Abschläge"
+   },
+   {
+    "merkmal": "freistehendes_haus",
+    "art": "pct",
+    "wert": 20,
+    "label": "Einfamilienhaus: freistehendes Haus",
+    "beleg": "S. 3 Zu- und Abschläge"
+   },
+   {
+    "merkmal": "zweites_bad",
+    "art": "pct",
+    "wert": 4,
+    "label": "zusätzliches Zweitbad bzw. -dusche (bis 8 %, Mitte; nicht bei Einfamilienhäusern)",
+    "beleg": "S. 3 Zu- und Abschläge"
+   },
+   {
+    "merkmal": "einbaukueche",
+    "art": "pct",
+    "wert": 4,
+    "label": "Einbauküche (bis 8 %, Mitte; nicht bei Einfamilienhäusern)",
+    "beleg": "S. 3 Zu- und Abschläge"
+   },
+   {
+    "merkmal": "kamin",
+    "art": "pct",
+    "wert": 2,
+    "label": "offener Kamin/Kachelofen/Kaminofen (bis 4 %, Mitte; nicht bei Einfamilienhäusern)",
+    "beleg": "S. 3 Zu- und Abschläge"
+   },
+   {
+    "merkmal": "ohne_heizung",
+    "art": "pct",
+    "wert": -10,
+    "label": "ohne Heizung",
+    "beleg": "S. 3 Zu- und Abschläge"
+   },
+   {
+    "merkmal": "kein_bad",
+    "art": "pct",
+    "wert": -10,
+    "label": "ohne Bad",
+    "beleg": "S. 3 Zu- und Abschläge"
+   },
+   {
+    "merkmal": "wc_ausserhalb",
+    "art": "pct",
+    "wert": -10,
+    "label": "ohne WC in der Wohnung",
+    "beleg": "S. 3 Zu- und Abschläge"
+   },
+   {
+    "merkmal": "ohne_waschraum",
+    "art": "pct",
+    "wert": -3,
+    "label": "ohne Wasch- und Trockenraum",
+    "beleg": "S. 3 Zu- und Abschläge"
+   },
+   {
+    "merkmal": "fehlender_kellerraum_oder_abstellraum",
+    "art": "pct",
+    "wert": -3,
+    "label": "ohne Keller",
+    "beleg": "S. 3 Zu- und Abschläge"
+   },
+   {
+    "merkmal": "kein_balkon",
+    "art": "pct",
+    "wert": -3,
+    "label": "ohne Balkon",
+    "beleg": "S. 3 Zu- und Abschläge"
+   },
+   {
+    "merkmal": "ohne_isolierverglasung",
+    "art": "pct",
+    "wert": -5,
+    "label": "ohne Isolierverglasung",
+    "beleg": "S. 3 Zu- und Abschläge"
+   },
+   {
+    "merkmal": "gefangener_raum",
+    "art": "pct",
+    "wert": -5,
+    "label": "ungünstiger Grundriss, Belichtung/Belüftung, Souterrain oder schlechte DG-Wohnung (bis max. 10 %, Mitte)",
+    "beleg": "S. 3 Zu- und Abschläge"
+   },
+   {
+    "merkmal": "schlechte_infrastruktur",
+    "art": "pct",
+    "wert": -5,
+    "label": "Stadtteil mit unzureichender Infrastruktur und schlechter Verkehrsanbindung (bis max. 10 %, Mitte)",
+    "beleg": "S. 3 Zu- und Abschläge"
+   },
+   {
+    "merkmal": "strassenlaerm",
+    "art": "pct",
+    "wert": -7.5,
+    "label": "erhöhte Lärmbelästigung (bis max. 15 %, Mitte)",
+    "beleg": "S. 3 Zu- und Abschläge"
+   }
+  ]
+ },
+ "pruefbeispiele": [
+  {
+   "eingabe": {
+    "baujahr": 1970,
+    "wfl": 75
+   },
+   "erwartet": {
+    "unten": 6.6,
+    "mittel": 7.6,
+    "oben": 8.6
+   },
+   "seite": "2",
+   "art": "tabellenzelle",
+   "anmerkung": "Gruppe II, 60 bis unter 100 qm"
+  },
+  {
+   "eingabe": {
+    "baujahr": 1970,
+    "wfl": 75,
+    "merkmale": {
+     "kein_balkon": true
+    }
+   },
+   "erwartet": {
+    "mittel": 7.37,
+    "unten": 6.4,
+    "oben": 8.34
+   },
+   "seite": "2–3",
+   "art": "tabellenzelle",
+   "anmerkung": "Abschlag ohne Balkon −3 %"
+  }
+ ]
+}
