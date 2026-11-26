@@ -91,8 +91,8 @@ function faktorFuer(param, marktlage) {
 export function naeherungText(param) {
   const p = param || {}, g = p.guete || {};
   return 'DealPilot-Näherung der ortsüblichen Vergleichsmiete (aus der Zensus-Bestandsmiete, kalibriert an '
-    + (p.n_staedte || '–') + ' freien Mietspiegeln; mittlere Abweichung ' + dez(num(g.mape_pct), 1) + ' %) — nicht der Mietspiegel; '
-    + 'für das Erhöhungsverlangen mit dem Mietspiegel, drei Vergleichswohnungen oder Gutachten belegen';
+    + (p.n_staedte || '–') + ' freien Mietspiegeln, mittlere Abweichung ' + dez(num(g.mape_pct), 1) + ' %), nicht der Mietspiegel. '
+    + 'Für das Erhöhungsverlangen mit dem Mietspiegel, drei Vergleichswohnungen oder Gutachten belegen';
 }
 
 /**
@@ -109,7 +109,7 @@ export function naeherungFuer(param, zeilen, objekt) {
   const leer = (h) => ({ qm: null, quelle_art: 'dealpilot_naeherung', hinweise: hinweise.concat(h), stand: p.stand || null });
   if (!p.modell || !(num(p.faktor) > 0)) return leer('DealPilot-Näherung nicht kalibriert');
   const b = zensusBlock(zeilen, o.baujahr, o.wfl);
-  if (!(b.gesamt > 0)) return leer('keine Zensus-Bestandsmiete für die Gemeinde — keine Näherung');
+  if (!(b.gesamt > 0)) return leer('keine Zensus-Bestandsmiete für die Gemeinde, keine Näherung');
   const ff = faktorFuer(p, o.marktlage);
   if (!(ff.f > 0)) return leer('DealPilot-Näherung ohne Faktor');
   let basis = b.gesamt;
@@ -117,9 +117,9 @@ export function naeherungFuer(param, zeilen, objekt) {
   if (p.modell === 'klassen_faktor') {
     const bj = b.baujahr ? b.baujahr.wert : b.gesamt, fl = b.flaeche ? b.flaeche.wert : b.gesamt;
     if (b.baujahr) teile.push('Baujahr ' + b.baujahr.klasse + ': ' + dez(b.baujahr.wert));
-    else hinweise.push(num(o.baujahr) > 1000 ? 'Zensus führt für die Baujahresklasse keinen Wert — Miete aller Baujahre' : 'Baujahr fehlt — Zensus-Miete aller Baujahre');
+    else hinweise.push(num(o.baujahr) > 1000 ? 'Zensus führt für die Baujahresklasse keinen Wert, Miete aller Baujahre' : 'Baujahr fehlt, Zensus-Miete aller Baujahre');
     if (b.flaeche) teile.push(b.flaeche.klasse + ': ' + dez(b.flaeche.wert));
-    else hinweise.push(num(o.wfl) > 0 ? 'Zensus führt für die Größenklasse keinen Wert — Miete aller Größen' : 'Wohnfläche fehlt — Zensus-Miete aller Größen');
+    else hinweise.push(num(o.wfl) > 0 ? 'Zensus führt für die Größenklasse keinen Wert, Miete aller Größen' : 'Wohnfläche fehlt, Zensus-Miete aller Größen');
     basis = bj * fl / b.gesamt;
   } else if (p.modell !== 'gesamt_faktor') return leer('Modell ' + p.modell + ' unbekannt');
   const qm = runden(basis * ff.f, 2);
