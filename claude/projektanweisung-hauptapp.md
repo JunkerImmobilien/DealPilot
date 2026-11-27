@@ -45958,3 +45958,10 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commits:** staging 28d2eb25a, 5ccb6317a, 12e0a4fd0, 694ecda6b; main 28d2eb25a, c9bf235a7, 113fff072, ddd033d70, 20bb8942 (1.0.259). Sicherung `/root/backups/*-vor-pp6d-20261126-2236*` und `*-vor-pp6e-20261126-2244*`.
 - **Nachweis:** Prüfer eigennutzer 54 (+6), hauscheck 42, wertermittlung RC 0 mit neuem Fall B10k, buster, vorschau, nebenkosten grün, gold RC 0. Muster aus der Pipeline 16 Seiten, jede Seite gemessen (`Dateien/Konzepte/Eigennutzer-Bericht-Muster/vergleich-pp6/seiten-messung.txt`, 58 bis 98 %, kein Überlauf), Netto im PDF 0.
 - **Rest:** Altersstruktur und Wohnungsbestand liefert die Antwort des Marktberichts nicht. Bei drei und mehr Geschossen führt nicht automatisch Vergleichs- oder Ertragswert (Verfahrenswahl im mb-Kern unverändert). Rückmerge main → staging nicht gemacht: Konflikte in fremden Dateien (frontend-konstanten.json, index.html), main enthält von PP6 nur die Versionsnummer zusätzlich.
+
+## Rollout-Journal · 26./27.11.2026 — Haus-Check 1.0.255 bis 1.0.259, Übergabe
+
+**Was:** Haus-Check Karte zum Umdrehen und Nebenkosten einzeln je Gemeinde (1.0.255), Netto bleibt im Browser (1.0.256), Bericht nach HH6-Muster mit Markt am Ort und Original-Logo (1.0.257), Zins/Tilgung/Zustand/Geschosse und Region (1.0.259). Eigennutzer-Modus in der App aus Staging entfernt (v5150qq6), Wunsch im Backlog. Ü3 Kap. 8–10 Ton je Szene (ed5b32d7a).
+**Commit:** Rückmerge 7dfd89d27, QQ6 21e88bb08.
+**Nachweis:** Prüfer eigennutzer, hauscheck, wertermittlung (B10k), nebenkosten, buster, vorschau, jahreswerte, gold-audit grün.
+**Rest:** siehe wissen/2026-11-27.md (Videos Schritt 2 offen, drei App-Fehler, M10a-Rohdateien löschen, Abnahmen Marcel).
